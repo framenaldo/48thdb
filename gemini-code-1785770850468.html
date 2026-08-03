@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>48TH Group Member Database</title>
+    <style>
+        :root {
+            --bnk-color: #dfa6cd; /* สีวง BNK48 */
+            --cgm-color: #8cc4aa; /* สีวง CGM48 */
+            --bg-color: #f4f4f9;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #333;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .btn-all { background-color: #ddd; }
+        .btn-bnk { background-color: var(--bnk-color); color: white; }
+        .btn-cgm { background-color: var(--cgm-color); color: white; }
+
+        button:hover { opacity: 0.8; transform: scale(1.05); }
+
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .member-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .member-image {
+            width: 100%;
+            height: 250px;
+            background-color: #eee;
+            object-fit: cover;
+        }
+
+        .member-info {
+            padding: 15px;
+        }
+
+        .group-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .badge-bnk48 { background-color: var(--bnk-color); }
+        .badge-cgm48 { background-color: var(--cgm-color); }
+
+        .loading-state {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+
+    </style>
+    <!-- โหลดฟอนต์ภาษาไทย Kanit จาก Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- โหลดไลบรารี PapaParse สำหรับแปลง CSV จาก Google Sheets -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>ระบบจัดเก็บข้อมูลสมาชิก BNK48 & CGM48</h1>
+        <p>เชื่อมต่อฐานข้อมูลโดยตรงจาก Google Sheets</p>
+    </header>
+
+    <div class="filter-container">
+        <button class="btn-all" onclick="filterMembers('ALL')">ทั้งหมด</button>
+        <button class="btn-bnk" onclick="filterMembers('BNK48')">BNK48</button>
+        <button class="btn-cgm" onclick="filterMembers('CGM48')">CGM48</button>
+    </div>
+
+    <main class="members-grid" id="members-container">
+        <!-- สถานะกำลังโหลดจะแสดงตรงนี้ก่อนดึงข้อมูลเสร็จ -->
+        <div id="loading" class="loading-state">กำลังซิงค์ข้อมูลจาก Google Sheets...</div>
+    </main>
+
+    <script>
+        // รหัส ID ของ Google Sheets ที่คุณให้มา
+        const sheetId = '1-59NtPAohnPnb-MiH8943pcZvLpKw-UywwPZUs0DoGg';
+        
+        // สร้าง URL สำหรับดึงข้อมูลแต่ละแท็บ (BNK48 และ CGM48) ออกมาเป็นรูปแบบ CSV
+        const bnkUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=BNK48`;
+        const cgmUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=CGM48`;
+
+        let allMembersData = [];
+        const container = document.getElementById('members-container');
+        const loadingDiv = document.getElementById('loading');
+
+        // ฟังก์ชันหลักสำหรับโหลดข้อมูล
+        async function loadDatabase() {
+            try {
+                // รอให้ดึงข้อมูลทั้งวง BNK48 และ CGM48 เสร็จพร้อมกัน
+                const [bnkData, cgmData] = await Promise.all([
+                    fetchSheetData(bnkUrl, 'BNK48'),
+                    fetchSheetData(cgmUrl, 'CGM48')
+                ]);
+                
+                // นำข้อมูลทั้ง 2 วงมารวมกัน
+                allMembersData = [...bnkData, ...cgmData];
+                
+                // ลบข้อความกำลังโหลด แล้วเริ่มเรนเดอร์การ์ด
+                container.innerHTML = ''; 
+                renderMembers(allMembersData);
+            } catch (error) {
+                console.error("Error loading data:", error);
+                loadingDiv.innerHTML = "เกิดข้อผิดพลาดในการโหลดข้อมูล โปรดตรวจสอบว่าเปิดการแชร์ลิงก์ Sheet เป็น Public หรือยัง";
+            }
+        }
+
+        // ฟังก์ชันอ่านข้อมูลผ่าน PapaParse
+        function fetchSheetData(url, groupName) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(url, {
+                    download: true,
+                    header: false, // อ่านเป็น Array Index เพื่อหลีกเลี่ยงบัคจากแถวหัวข้อรุ่น
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        const validData = [];
+                        
+                        // วนลูปอ่านข้อมูลทุกแถวที่ดึงมาได้
+                        results.data.forEach(row => {
+                            const nickname = row[0] ? row[0].trim() : '';
+                            const fullName = row[1] ? row[1].trim() : '';
+                            
+                            // เช็คเพื่อป้องกันการดึงแถวที่เป็นหัวข้อ (เช่น 1st Generation) หรือหมายเหตุด้านล่างชีต
+                            const isRealMember = /[ก-๙a-zA-Z]/.test(fullName) && 
+                                                 !fullName.toLowerCase().includes('name') &&
+                                                 !nickname.includes('*');
+
+                            // ถ้าแถวนั้นมีข้อมูลเกิน 7 คอลัมน์ และเป็นรายชื่อคนจริงๆ
+                            if (row.length > 7 && isRealMember) {
+                                const team = row[3] ? row[3].trim() : 'Trainee';
+                                const age = row[7] ? row[7].trim() : '-';
+
+                                validData.push({
+                                    name: nickname,
+                                    fullName: fullName,
+                                    group: groupName,
+                                    team: team === '-' ? 'Trainee' : team,
+                                    age: age,
+                                    imageUrl: `https://via.placeholder.com/250x300/${groupName === 'BNK48' ? 'dfa6cd' : '8cc4aa'}/ffffff?text=${nickname}`
+                                });
+                            }
+                        });
+                        resolve(validData);
+                    },
+                    error: function(error) {
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        // ฟังก์ชันสร้างการ์ด HTML
+        function renderMembers(data) {
+            container.innerHTML = ''; 
+            
+            data.forEach(member => {
+                const badgeClass = member.group === 'BNK48' ? 'badge-bnk48' : 'badge-cgm48';
+                
+                const cardHTML = `
+                    <div class="member-card">
+                        <img src="${member.imageUrl}" alt="${member.name}" class="member-image">
+                        <div class="member-info">
+                            <span class="group-badge ${badgeClass}">${member.group}</span>
+                            <h3>${member.name}</h3>
+                            <p style="font-size: 0.85em; color: #777; margin-bottom: 8px;">${member.fullName}</p>
+                            <p style="font-size: 0.95em;"><strong>Team:</strong> ${member.team}</p>
+                            <p style="font-size: 0.95em;"><strong>Age:</strong> ${member.age} ปี</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // ฟังก์ชันคัดกรองวง
+        function filterMembers(group) {
+            if (group === 'ALL') {
+                renderMembers(allMembersData);
+            } else {
+                const filtered = allMembersData.filter(member => member.group === group);
+                renderMembers(filtered);
+            }
+        }
+
+        // เรียกคำสั่งเริ่มต้นโหลดข้อมูลทันทีเมื่อเปิดหน้าเว็บ
+        loadDatabase();
+    </script>
+</body>
+</html>
