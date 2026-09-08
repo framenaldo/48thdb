@@ -1539,9 +1539,11 @@ const firebaseConfig = {
 </script>
   <!-- แทรกโค้ด Firebase SDK ก่อนปิดแท็ก body -->
 <script type="module">
-  // 1. นำเข้าฟังก์ชันที่จำเป็นจาก Firebase SDK
+  // 1. นำเข้าฟังก์ชันที่จำเป็น
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
   import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+  // นำเข้าฟังก์ชันสำหรับ Auth
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
   // 2. ใส่ Config ของคุณ
   const firebaseConfig = {
@@ -1554,16 +1556,59 @@ const firebaseConfig = {
     measurementId: "G-RB8KWSK0PN"
   };
 
-  // 3. เริ่มต้นระบบ Firebase
+  // 3. เริ่มต้น Firebase
   const app = initializeApp(firebaseConfig);
-  
-  // 4. เริ่มต้นระบบฐานข้อมูล Firestore
   const db = getFirestore(app);
-  
-  // ทดสอบการเชื่อมต่อ
-  console.log("เชื่อมต่อ Firebase สำเร็จ! โพรเจกต์:", firebaseConfig.projectId);
 
-  // ตัวอย่าง: คุณสามารถดึงข้อมูลไอดอลมาแสดงที่นี่ในอนาคตได้โดยใช้ตัวแปร 'db'
+  // 4. เริ่มต้นระบบ Auth
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // 5. ฟังก์ชันเข้าสู่ระบบด้วย Google
+  async function loginWithGoogle() {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("เข้าสู่ระบบสำเร็จ! สวัสดีคุณ:", user.displayName);
+      alert(`ยินดีต้อนรับคุณ ${user.displayName}`);
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการเข้าสู่ระบบ:", error);
+    }
+  }
+
+  // 6. ฟังก์ชันออกจากระบบ
+  async function logout() {
+    try {
+      await signOut(auth);
+      console.log("ออกจากระบบแล้ว");
+      alert("ออกจากระบบเรียบร้อยแล้ว");
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการออกจากระบบ:", error);
+    }
+  }
+
+  // 7. ติดตามสถานะ (ทำงานอัตโนมัติเมื่อเปิดเว็บ หรือเมื่อมีการ Login/Logout)
+  onAuthStateChanged(auth, (user) => {
+    const signInBtn = document.querySelector('.signin-btn');
+    
+    if (user) {
+      // กรณี: ล็อกอินอยู่
+      console.log("ผู้ใช้ล็อกอินด้วยอีเมล:", user.email);
+      // เปลี่ยนปุ่ม Sign in เป็นปุ่ม Logout
+      if (signInBtn) {
+        signInBtn.textContent = "ออกจากระบบ";
+        signInBtn.onclick = logout; // ผูกฟังก์ชันออกจากระบบ
+      }
+    } else {
+      // กรณี: ยังไม่ได้ล็อกอิน (หรือกด Logout ไปแล้ว)
+      console.log("สถานะ: ผู้ใช้ทั่วไป");
+      // ตั้งค่าปุ่มกลับเป็น Sign in
+      if (signInBtn) {
+        signInBtn.textContent = "ลงชื่อเข้าใช้";
+        signInBtn.onclick = loginWithGoogle; // ผูกฟังก์ชันเข้าสู่ระบบ
+      }
+    }
+  });
 </script>
 </body>
 </html>
