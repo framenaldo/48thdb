@@ -1,6 +1,32 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+
+    <!-- แทรกโค้ด Firebase SDK ตรงนี้ -->
+<script type="module">
+  // นำเข้าฟังก์ชันที่จำเป็นจาก SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+  // การตั้งค่า Firebase ของแอปคุณ (คัดลอกจาก Firebase Console)
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDnh4nwoEyJor6GHFyZL8CqWhq5xVcejOg",
+  authDomain: "thdatabase.firebaseapp.com",
+  projectId: "thdatabase",
+  storageBucket: "thdatabase.firebasestorage.app",
+  messagingSenderId: "786675755170",
+  appId: "1:786675755170:web:0c96de3abb4dcf24e50ffb",
+  measurementId: "G-RB8KWSK0PN"
+};
+
+  // เริ่มต้น Firebase
+  const app = initializeApp(firebaseConfig);
+  // เริ่มต้น Firestore
+  const db = getFirestore(app);
+
+  // คุณสามารถเริ่มต้นเขียนโค้ดเพื่อดึงหรือเพิ่มข้อมูลที่นี่
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>48TH Group Member Database</title>
