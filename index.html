@@ -1537,5 +1537,33 @@ const firebaseConfig = {
 
   // คุณสามารถเริ่มต้นเขียนโค้ดเพื่อดึงหรือเพิ่มข้อมูลที่นี่
 </script>
+  <!-- แทรกโค้ด Firebase SDK ก่อนปิดแท็ก body -->
+<script type="module">
+  // 1. นำเข้าฟังก์ชันที่จำเป็นจาก Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+  // 2. ใส่ Config ของคุณ
+  const firebaseConfig = {
+    apiKey: "AIzaSyDnh4nwoEyJor6GHFyZL8CqWhq5xVcejOg",
+    authDomain: "thdatabase.firebaseapp.com",
+    projectId: "thdatabase",
+    storageBucket: "thdatabase.firebasestorage.app",
+    messagingSenderId: "786675755170",
+    appId: "1:786675755170:web:0c96de3abb4dcf24e50ffb",
+    measurementId: "G-RB8KWSK0PN"
+  };
+
+  // 3. เริ่มต้นระบบ Firebase
+  const app = initializeApp(firebaseConfig);
+  
+  // 4. เริ่มต้นระบบฐานข้อมูล Firestore
+  const db = getFirestore(app);
+  
+  // ทดสอบการเชื่อมต่อ
+  console.log("เชื่อมต่อ Firebase สำเร็จ! โพรเจกต์:", firebaseConfig.projectId);
+
+  // ตัวอย่าง: คุณสามารถดึงข้อมูลไอดอลมาแสดงที่นี่ในอนาคตได้โดยใช้ตัวแปร 'db'
+</script>
 </body>
 </html>
