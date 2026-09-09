@@ -911,7 +911,7 @@ function renderRow(m){
     <div class="cell col-age mono">${age!==null?age:'-'}</div>
     <div class="cell col-birthday mono">${formatDateShort(m.birthday)}</div>
     <div class="cell col-height mono">${m.height?m.height+' ซม.':'-'}</div>
-    <div class="cell col-fav"><button class="fav-btn-sm ${isOshi?'is-oshi':''} ${state._justToggledOshi===m.id?'star-pop':''}" data-action="toggle-oshi" data-id="${m.id}">${favInner}</button></div>
+    <div class="cell col-fav"><button class="fav-btn-sm ${isOshi?'is-oshi':''}" data-action="toggle-oshi" data-id="${m.id}">${favInner}</button></div>
   </div>`;
 }
 
@@ -984,10 +984,10 @@ function renderDetailModal(){
           </div>
         </div>
         <div class="oshi-actions">
-          <button class="oshi-btn ${isOshi?'active':''} ${state._justToggledOshi===m.id?'star-pop':''}" data-action="toggle-oshi" data-id="${m.id}">
+          <button class="oshi-btn ${isOshi?'active':''}" data-action="toggle-oshi" data-id="${m.id}">
             <span>${isOshi?'\u2605':'\u2606'}</span> ${isOshi?'เป็น Oshi ของคุณ':'เพิ่มเป็น Oshi'}
           </button>
-          <button class="kami-btn ${isKami?'active':''} ${state._justToggledOshi===m.id?'star-pop':''}" data-action="toggle-kami-oshi" data-id="${m.id}">
+          <button class="kami-btn ${isKami?'active':''}" data-action="toggle-kami-oshi" data-id="${m.id}">
             <span class="crown-ico">${ICONS.crown}</span> ${isKami?'เป็น Kami Oshi':'ตั้งเป็น Kami Oshi'}
           </button>
         </div>
@@ -1248,6 +1248,30 @@ function renderMain(){
   attachMainEvents();
 }
 
+function updateOshiButtonsFor(id){
+  const m = getMember(id);
+  if(!m) return;
+  const isOshi = state.oshi.includes(id);
+  const isKami = state.kamiOshi === id;
+  const favInner = isKami ? `<span class="crown-ico" title="Kami Oshi">${ICONS.crown}</span>` : (isOshi?'\u2605':'\u2606');
+
+  document.querySelectorAll(`.fav-btn-sm[data-id="${id}"]`).forEach(btn=>{
+    btn.innerHTML = favInner;
+    btn.classList.toggle('is-oshi', isOshi);
+    btn.classList.remove('star-pop'); void btn.offsetWidth; btn.classList.add('star-pop');
+  });
+  document.querySelectorAll(`.oshi-btn[data-id="${id}"]`).forEach(btn=>{
+    btn.innerHTML = `<span>${isOshi?'\u2605':'\u2606'}</span> ${isOshi?'เป็น Oshi ของคุณ':'เพิ่มเป็น Oshi'}`;
+    btn.classList.toggle('active', isOshi);
+    btn.classList.remove('star-pop'); void btn.offsetWidth; btn.classList.add('star-pop');
+  });
+  document.querySelectorAll(`.kami-btn[data-id="${id}"]`).forEach(btn=>{
+    btn.innerHTML = `<span class="crown-ico">${ICONS.crown}</span> ${isKami?'เป็น Kami Oshi':'ตั้งเป็น Kami Oshi'}`;
+    btn.classList.toggle('active', isKami);
+    btn.classList.remove('star-pop'); void btn.offsetWidth; btn.classList.add('star-pop');
+  });
+}
+
 function attachMainEvents(){
   const bodyWrap = document.getElementById('table-body-wrap');
   const theadTrack = document.getElementById('thead-track');
@@ -1458,10 +1482,8 @@ function bindDelegatedEvents(){
       } else {
         state.oshi.push(id);
       }
-      state._justToggledOshi = id;
       await saveOshiData();
-      renderMain();
-      state._justToggledOshi = null;
+      updateOshiButtonsFor(id);
     }
     else if(action==='toggle-kami-oshi'){
       if(state.kamiOshi===id){
@@ -1470,10 +1492,8 @@ function bindDelegatedEvents(){
         state.kamiOshi=id;
         if(!state.oshi.includes(id)) state.oshi.push(id);
       }
-      state._justToggledOshi = id;
       await saveOshiData();
-      renderMain();
-      state._justToggledOshi = null;
+      updateOshiButtonsFor(id);
     }
     else if(action==='toggle-profile-menu'){
       state.profileMenuOpen = !state.profileMenuOpen;
