@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "thdatabase"
+  },
+  "targets": {
+    "thdatabase": {
+      "hosting": {
+        "main": [
+          "48thdb"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
