@@ -8,11 +8,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- ===== FIREBASE SETUP =====
-Go to console.firebase.google.com -> create a project.
-Project settings -> your apps -> add a Web app -> copy the config object below.
-Firestore Database -> create database -> start in production mode.
-Authentication -> Sign-in method -> enable "Email/Password", "Google", and "Anonymous".
-Firestore Database -> Rules -> paste the rules from FIRESTORE_RULES.txt (shown at the end of this file as a comment) -> Publish.
+  1) Go to console.firebase.google.com -> create a project.
+  2) Project settings -> your apps -> add a Web app -> copy the config object below.
+  3) Firestore Database -> create database -> start in production mode.
+  4) Authentication -> Sign-in method -> enable "Email/Password", "Google", and "Anonymous".
+  5) Firestore Database -> Rules -> paste the rules from FIRESTORE_RULES.txt (shown at the end of this file as a comment) -> Publish.
 -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1224,6 +1224,7 @@ function syncBodyScrollLock(){
   }
 }
 
+let _lastRenderedView = null;
 function renderMain(){
   const navContainer = document.getElementById('nav-container');
   if(navContainer) navContainer.innerHTML = NAV_HIDDEN_VIEWS.includes(state.view) ? '' : renderNav();
@@ -1237,9 +1238,12 @@ function renderMain(){
     state.view==='editprofile' ? renderEditProfile() :
     renderForm())
     + (state.selectedId ? renderDetailModal() : '');
-  main.classList.remove('view-fade-in');
-  void main.offsetWidth;
-  main.classList.add('view-fade-in');
+  if(state.view !== _lastRenderedView){
+    main.classList.remove('view-fade-in');
+    void main.offsetWidth;
+    main.classList.add('view-fade-in');
+    _lastRenderedView = state.view;
+  }
   syncBodyScrollLock();
   attachMainEvents();
 }
