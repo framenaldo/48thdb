@@ -1149,7 +1149,7 @@ function filterAndSort(){
   // tab shows them on their own, and a search reaches them from anywhere so
   // they stay findable without leaving the main list.
   if(state.showGraduated) list = list.filter(m=>!!m.graduated);
-  else if(!q) list = list.filter(m=>!m.graduated);
+  else if(!q && !state.favoritesOnly) list = list.filter(m=>!m.graduated);
   if(state.favoritesOnly) list = list.filter(m=>state.oshi.includes(m.id));
   if(state.groupFilter!=='all') list = list.filter(m=>m.groupId===state.groupFilter);
   if(state.teamFilter!=='all') list = list.filter(m=>m.teamId===state.teamFilter);
@@ -1777,7 +1777,7 @@ function attachMainEvents(){
     state.selectedId = data.id;
     state.editingId = null;
     state.favoritesOnly = false;
-    renderMain();
+    renderMain(); replaceHistory();
   });
 }
 
@@ -1976,7 +1976,7 @@ function bindDelegatedEvents(){
     else if(action==='clear-gen-filter'){
       state.genFilter = 'all';
       state.captainFilter = 'all';
-      renderMain();
+      renderMain(); replaceHistory();
     }
     else if(action==='toggle-oshi'){
       if(state.oshi.includes(id)){
@@ -2023,7 +2023,7 @@ function bindDelegatedEvents(){
         state.members = state.members.filter(x=>x.id!==id);
         await deleteMemberDoc(id);
         state.view='browse'; state.selectedId=null;
-        render();
+        render(); replaceHistory();
       }
     }
     else if(action==='cancel-form'){
@@ -2069,7 +2069,7 @@ function bindDelegatedEvents(){
       const prevScroll = document.querySelector('.table-wrap')?.scrollLeft || 0;
       if(state.sortBy===col){ state.sortDir = state.sortDir==='asc' ? 'desc' : 'asc'; }
       else { state.sortBy = col; state.sortDir = 'asc'; }
-      renderMain();
+      renderMain(); replaceHistory();
       const newWrap = document.querySelector('.table-wrap');
       if(newWrap) newWrap.scrollLeft = prevScroll;
     }
