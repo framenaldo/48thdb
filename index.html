@@ -160,6 +160,31 @@
     padding:6px 15px; border-radius:14px; border:1.5px solid var(--ink-soft);
     background:var(--paper-dim); cursor:pointer; color:var(--ink);
   }
+  /* graduated roster: tucked behind its own pill, muted until switched on */
+  .pill-grad{
+    display:inline-flex; align-items:center; gap:6px;
+    border-style:dashed; border-color:var(--gold);
+    color:var(--gold); background:transparent;
+  }
+  .pill-grad.active{
+    background:var(--gold); color:#fff; border-style:solid; border-color:transparent;
+  }
+  .pill-grad .grad-cap{ display:inline-flex; width:14px; height:14px; }
+  .pill-grad .grad-cap svg{ width:100%; height:100%; display:block; }
+  .grad-tag{
+    display:inline-flex; width:13px; height:13px; margin-left:5px;
+    color:var(--gold); vertical-align:-1px;
+  }
+  .grad-tag svg{ width:100%; height:100%; display:block; }
+  .grad-note{
+    display:flex; align-items:center; gap:7px;
+    font-size:12.5px; color:var(--ink-soft);
+    background:#FBF4E6; border:1px solid #EBD9B4; border-radius:10px;
+    padding:8px 12px; margin:0 0 12px;
+  }
+  .grad-note .grad-cap{ display:inline-flex; width:15px; height:15px; color:var(--gold); flex-shrink:0; }
+  .grad-note .grad-cap svg{ width:100%; height:100%; display:block; }
+
   select.filter-select{
     font-size:13px; padding:7px 10px;
     border-radius:14px; border:1px solid var(--line); background:var(--card); color:var(--ink);
@@ -741,6 +766,121 @@ const SEED_MEMBERS = [
   { id:'cgm-namphet', name:'Namphet', nameTh:'น้ำเพชร', realName:'Phetphailin Makmee', realNameTh:'เพชรไพลิน มากมี', groupId:'cgm48', teamId:'trainee-cgm', gen:5, birthday:'2008-02-24', height:168, blood:'B', photo:'data:image/jpeg;base64,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', facts:['บ้านเกิดเชียงใหม่','รุ่น 5 เข้าร่วม CGM48 7 ก.พ. 2026','เล่นเบสได้','งานอดิเรกทำขนม เดินป่า เต้น ดูคอนเสิร์ต'] }
 ];
 
+// Members who have graduated (จบการศึกษา). They are ordinary member
+// records that additionally carry a `graduated` date, and are kept out of
+// the default roster by filterAndSort() unless the graduated view is on or
+// the user is searching.
+// Source: English Wikipedia 'List of BNK48 members' / 'CGM48' former-member tables.
+const SEED_GRADUATED = [
+  // ---- BNK48 ----
+  { id:'bnk-kitkat', name:'Kitkat', nameTh:'คิตแคต', realName:'Watsamon Phongwanit', realNameTh:'วรรษมณฑ์ พงษ์วานิช', groupId:'bnk48', teamId:'trainee-bnk', gen:1, birthday:'2001-11-01', height:null, blood:'', graduated:'2017-09-23', facts:[] },
+  { id:'bnk-cincin', name:'Cincin', nameTh:'ซินซิน', realName:'Irada Tavachphongsri', realNameTh:'ไอรดา ธวัชผ่องศรี', groupId:'bnk48', teamId:'trainee-bnk', gen:1, birthday:'2000-11-07', height:null, blood:'', graduated:'2017-11-18', facts:[] },
+  { id:'bnk-namhom', name:'Namhom', nameTh:'น้ำหอม', realName:'Christin Larsen', realNameTh:'คริสติน ลาร์เซ่น', groupId:'bnk48', teamId:'trainee-bnk', gen:1, birthday:'2002-06-17', height:null, blood:'', graduated:'2018-02-12', facts:[] },
+  { id:'bnk-jan', name:'Jan', nameTh:'แจน', realName:'Jetsupa Kruetang', realNameTh:'เจตสุภา เครือแตง', groupId:'bnk48', teamId:'biii', gen:1, birthday:'1994-04-08', height:null, blood:'', graduated:'2018-02-28', facts:[] },
+  { id:'bnk-can', name:'Can', nameTh:'แคน', realName:'Nayika Srinian', realNameTh:'นายิกา ศรีเนียน', groupId:'bnk48', teamId:'biii', gen:1, birthday:'1997-11-10', height:null, blood:'', graduated:'2018-08-26', facts:[] },
+  { id:'bnk-maysa', name:'Maysa', nameTh:'เมษา', realName:'Mesa Chinavicharana', realNameTh:'เมษา จีนะวิจารณะ', groupId:'bnk48', teamId:'trainee-bnk', gen:1, birthday:'1999-04-08', height:null, blood:'', graduated:'2018-10-21', facts:[] },
+  { id:'bnk-deenee', name:'Deenee', nameTh:'ดีนี่', realName:'Pimnipa Tungsakul', realNameTh:'พิมพ์นิภา ตั้งสกุล', groupId:'bnk48', teamId:'trainee-bnk', gen:2, birthday:'2001-11-28', height:null, blood:'', graduated:'2019-08-11', facts:[] },
+  { id:'bnk-aom', name:'Aom', nameTh:'ออม', realName:'Punyawee Jungcharoen', realNameTh:'ปุณยวีร์ จึงเจริญ', groupId:'bnk48', teamId:'trainee-bnk', gen:2, birthday:'1995-09-20', height:null, blood:'', graduated:'2019-08-27', facts:[] },
+  { id:'bnk-izurina', name:'Izurina', nameTh:'', realName:'Rina Izuta', realNameTh:'', groupId:'bnk48', teamId:'biii', gen:10, birthday:'1995-11-26', height:null, blood:'', graduated:'2019-08-27', facts:[] },
+  { id:'bnk-cake', name:'Cake', nameTh:'เค้ก', realName:'Nawaporn Chansuk', realNameTh:'นวพร จันทร์สุข', groupId:'bnk48', teamId:'trainee-bnk', gen:2, birthday:'1996-11-18', height:null, blood:'', graduated:'2019-09-27', facts:[] },
+  { id:'bnk-maira', name:'Maira', nameTh:'มัยร่า', realName:'Maira Kuyama', realNameTh:'มะอิระ คูยามา', groupId:'bnk48', teamId:'trainee-bnk', gen:2, birthday:'1997-02-24', height:null, blood:'', graduated:'2019-12-07', facts:[] },
+  { id:'bnk-natherine', name:'Natherine', nameTh:'แนทเธอรีน', realName:'Dusita Kitisarakulchai', realNameTh:'ดุสิตา กิติสาระกุลชัย', groupId:'bnk48', teamId:'nv', gen:2, birthday:'1999-11-11', height:null, blood:'', graduated:'2020-02-16', facts:[] },
+  { id:'bnk-oom', name:'Oom', nameTh:'อุ้ม', realName:'Natcha Krisdhasima', realNameTh:'ณัชชา กฤษฎาสิมะ', groupId:'bnk48', teamId:'trainee-bnk', gen:2, birthday:'2002-09-29', height:null, blood:'', graduated:'2020-02-16', facts:[] },
+  { id:'bnk-nink', name:'Nink', nameTh:'นิ้ง', realName:'Mananya Kaoju', realNameTh:'มนัญญา เกาะจู', groupId:'bnk48', teamId:'nv', gen:1, birthday:'2000-02-03', height:null, blood:'', graduated:'2020-03-25', facts:[] },
+  { id:'bnk-june', name:'Juné', nameTh:'จูเน่', realName:'Plearnpichaya Komalarajun', realNameTh:'เพลินพิชญา โกมลารชุน', groupId:'bnk48', teamId:'biii', gen:2, birthday:'2000-07-04', height:null, blood:'', graduated:'2020-06-11', facts:[] },
+  { id:'bnk-kheng', name:'Kheng', nameTh:'เข่ง', realName:'Juthamas Khonta', realNameTh:'จุฑามาศ คลทา', groupId:'bnk48', teamId:'biii', gen:2, birthday:'2000-03-26', height:null, blood:'', graduated:'2020-12-04', facts:[] },
+  { id:'bnk-fifa', name:'Fifa', nameTh:'ฟีฟ่า', realName:'Paweethida Sakunpiphat', realNameTh:'ปวีณ์ธิดา สกุลพิพัฒน์', groupId:'bnk48', teamId:'trainee-bnk', gen:2, birthday:'2001-11-06', height:null, blood:'', graduated:'2020-12-23', facts:[] },
+  { id:'bnk-faii', name:'Faii', nameTh:'ฝ้าย', realName:'Sumitta Duangkaew', realNameTh:'สุมิตตา ดวงแก้ว', groupId:'bnk48', teamId:'biii', gen:2, birthday:'1996-06-28', height:null, blood:'', graduated:'2021-03-19', facts:[] },
+  { id:'bnk-jeje', name:'Jeje', nameTh:'จีจี้', realName:'Natkritta Sangdamhru', realNameTh:'ณัฐกฤตา สังดำหรุ', groupId:'bnk48', teamId:'trainee-bnk', gen:3, birthday:'2005-09-11', height:null, blood:'', graduated:'2021-03-19', facts:[] },
+  { id:'bnk-mewnich', name:'Mewnich', nameTh:'มิวนิค', realName:'Nannaphas Loetnamchoetsakun', realNameTh:'นันท์นภัส เลิศนามเชิดสกุล', groupId:'bnk48', teamId:'nv', gen:2, birthday:'2002-03-11', height:null, blood:'', graduated:'2021-12-05', facts:[] },
+  { id:'bnk-bamboo', name:'Bamboo', nameTh:'แบมบู', realName:'Janista Tansiri', realNameTh:'จณิสตา ตันศิริ', groupId:'bnk48', teamId:'nv', gen:2, birthday:'2002-09-03', height:null, blood:'', graduated:'2022-05-29', facts:[] },
+  { id:'bnk-view', name:'View', nameTh:'วิว', realName:'Kamonthida Rotthawinithi', realNameTh:'กมนธิดา โรจน์ทวีนิธิ', groupId:'bnk48', teamId:'trainee-bnk', gen:2, birthday:'2004-05-28', height:null, blood:'', graduated:'2022-05-31', facts:[] },
+  { id:'bnk-jaa', name:'Jaa', nameTh:'จ๋า', realName:'Napaphat Worraphuttanon', realNameTh:'ณปภัช วรพฤทธานนท์', groupId:'bnk48', teamId:'nv', gen:1, birthday:'2003-01-20', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-jane', name:'Jane', nameTh:'เจน', realName:'Kunjiranut Intarasin', realNameTh:'กุลจิราณัฐ อินทรศิลป์', groupId:'bnk48', teamId:'biii', gen:1, birthday:'2000-03-23', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-jennis', name:'Jennis', nameTh:'เจนนิษฐ์', realName:'Jennis Oprasert', realNameTh:'เจนนิษฐ์ โอ่ประเสริฐ', groupId:'bnk48', teamId:'biii', gen:1, birthday:'2000-07-04', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-jib', name:'Jib', nameTh:'จิ๊บ', realName:'Suchaya Saenkhot', realNameTh:'สุชญา แสนโคต', groupId:'bnk48', teamId:'biii', gen:1, birthday:'2002-07-04', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-kaew', name:'Kaew', nameTh:'แก้ว', realName:'Natruja Chutiwansopon', realNameTh:'ณัฐรุจา ชุติวรรณโสภณ', groupId:'bnk48', teamId:'biii', gen:1, birthday:'1994-03-31', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-kaimook', name:'Kaimook', nameTh:'ไข่มุก', realName:'Warattaya Deesomlert', realNameTh:'วรัทยา ดีสมเลิศ', groupId:'bnk48', teamId:'nv', gen:1, birthday:'1997-08-27', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-kate', name:'Kate', nameTh:'เคท', realName:'Korapat Nilprapa', realNameTh:'กรภัทร์ นิลประภา', groupId:'bnk48', teamId:'biii', gen:1, birthday:'2001-06-09', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-korn', name:'Korn', nameTh:'ก่อน', realName:'Vathusiri Phuwapunyasiri', realNameTh:'วฑูศิริ ภูวปัญญาสิริ', groupId:'bnk48', teamId:'biii', gen:1, birthday:'1999-01-21', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-mind', name:'Mind', nameTh:'มายด์', realName:'Panisa Srilaloeng', realNameTh:'ปณิศา ศรีละเลิง', groupId:'bnk48', teamId:'trainee-bnk', gen:1, birthday:'2001-09-06', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-mobile', name:'Mobile', nameTh:'โมบายล์', realName:'Pimrapat Phadungwatanachok', realNameTh:'พิมรภัส ผดุงวัฒนะโชค', groupId:'bnk48', teamId:'nv', gen:1, birthday:'2002-07-09', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-music', name:'Music', nameTh:'มิวสิค', realName:'Praewa Suthamphong', realNameTh:'แพรวา สุธรรมพงษ์', groupId:'bnk48', teamId:'nv', gen:1, birthday:'2001-02-24', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-namneung', name:'Namneung', nameTh:'น้ำหนึ่ง', realName:'Milin Dokthian', realNameTh:'มิลิน ดอกเทียน', groupId:'bnk48', teamId:'nv', gen:1, birthday:'1996-11-11', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-namsai', name:'Namsai', nameTh:'น้ำใส', realName:'Pichayapa Natha', realNameTh:'พิชญาภา นาถา', groupId:'bnk48', teamId:'nv', gen:1, birthday:'1999-10-26', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-noey', name:'Noey', nameTh:'เนย', realName:'Kanteera Wadcharathadsanakul', realNameTh:'กานต์ธีรา วัชรทัศนกุล', groupId:'bnk48', teamId:'biii', gen:1, birthday:'1997-04-09', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-orn', name:'Orn', nameTh:'อร', realName:'Patchanan Jiajirachote', realNameTh:'พัศชนันท์ เจียจิรโชติ', groupId:'bnk48', teamId:'nv', gen:1, birthday:'1997-02-03', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-piam', name:'Piam', nameTh:'เปี่ยม', realName:'Rinrada Inthaisong', realNameTh:'รินรดา อินทร์ไธสง', groupId:'bnk48', teamId:'biii', gen:1, birthday:'2003-06-04', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-pun', name:'Pun', nameTh:'ปัญ', realName:'Punsikorn Tiyakorn', realNameTh:'ปัญสิกรณ์ ติยะกร', groupId:'bnk48', teamId:'biii', gen:1, birthday:'2000-11-09', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-pupe', name:'Pupe', nameTh:'ปูเป้', realName:'Jiradapa Intajak', realNameTh:'จิรดาภา อินทจักร', groupId:'bnk48', teamId:'nv', gen:1, birthday:'1998-01-18', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-tarwaan', name:'Tarwaan', nameTh:'ตาหวาน', realName:'Isarapa Thawatpakdee', realNameTh:'อิสราภา ธวัชภักดี', groupId:'bnk48', teamId:'nv', gen:1, birthday:'1996-12-18', height:null, blood:'', graduated:'2022-12-21', facts:[] },
+  { id:'bnk-pim', name:'Pim', nameTh:'พิม', realName:'Nicharee Wachiralapphaithoon', realNameTh:'ณิชารีย์ วชิรลาภไพฑูรย์', groupId:'bnk48', teamId:'trainee-bnk', gen:3, birthday:'2006-02-26', height:null, blood:'', graduated:'2023-01-15', facts:[] },
+  { id:'bnk-pampam', name:'Pampam', nameTh:'แพมแพม', realName:'Sarisa Worasunthorn', realNameTh:'สาริศา วรสุนทร', groupId:'bnk48', teamId:'nv', gen:3, birthday:'2003-07-03', height:null, blood:'', graduated:'2023-03-29', facts:[] },
+  { id:'bnk-cherprang', name:'Cherprang', nameTh:'เฌอปราง', realName:'Cherprang Areekul', realNameTh:'เฌอปราง อารีย์กุล', groupId:'bnk48', teamId:'biii', gen:1, birthday:'1996-05-02', height:null, blood:'', graduated:'2023-10-30', facts:[] },
+  { id:'bnk-miori', name:'Miori', nameTh:'', realName:'Miori Ohkubo', realNameTh:'', groupId:'bnk48', teamId:'biii', gen:1, birthday:'1998-09-30', height:null, blood:'', graduated:'2023-12-31', facts:[] },
+  { id:'bnk-fond', name:'Fond', nameTh:'ฟ้อนด์', realName:'Natticha Chantaravareelekha', realNameTh:'ณัฐทิชา จันทรวารีเลขา', groupId:'bnk48', teamId:'nv', gen:2, birthday:'2002-12-03', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-gygee', name:'Gygee', nameTh:'จีจี้', realName:'Nuttakul Pimtongchaikul', realNameTh:'ณัฐกุล พิมพ์ธงชัยกุล', groupId:'bnk48', teamId:'nv', gen:2, birthday:'2001-10-04', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-khamin', name:'Khamin', nameTh:'ขมิ้น', realName:'Manipa Roopanya', realNameTh:'มณิภา รู้ปัญญา', groupId:'bnk48', teamId:'nv', gen:2, birthday:'1999-04-23', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-minmin', name:'Minmin', nameTh:'มินมิน', realName:'Rachaya Tupkunanon', realNameTh:'รชยา ทัพพ์คุณานนต์', groupId:'bnk48', teamId:'biii', gen:2, birthday:'1997-03-20', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-myyu', name:'Myyu', nameTh:'มายยู', realName:'Khawisara Singplod', realNameTh:'กวิสรา สิงห์ปลอด', groupId:'bnk48', teamId:'biii', gen:2, birthday:'1999-10-28', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-new', name:'New', nameTh:'นิว', realName:'Chanyapuk Numprasop', realNameTh:'ชัญญาภัค นุ่มประสพ', groupId:'bnk48', teamId:'nv', gen:2, birthday:'2003-01-02', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-niky', name:'Niky', nameTh:'นิกี้', realName:'Warinrat Yolprasong', realNameTh:'วรินท์รัตน์ ยลประสงค์', groupId:'bnk48', teamId:'biii', gen:2, birthday:'2005-01-26', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-nine', name:'Nine', nameTh:'นาย', realName:'Phattharanarin Mueanrit', realNameTh:'ภัทรนรินทร์ เหมือนฤทธิ์', groupId:'bnk48', teamId:'nv', gen:2, birthday:'2000-11-11', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-pakwan', name:'Pakwan', nameTh:'พาขวัญ', realName:'Pakwan Noijaiboon', realNameTh:'พาขวัญ น้อยใจบุญ', groupId:'bnk48', teamId:'nv', gen:2, birthday:'2000-02-18', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-panda', name:'Panda', nameTh:'แพนด้า', realName:'Jidarpha Chamchooy', realNameTh:'จิดาภา แช่มช้อย', groupId:'bnk48', teamId:'biii', gen:2, birthday:'1997-10-10', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-phukkhom', name:'Phukkhom', nameTh:'ผักขม', realName:'Sirikarn Shinnawatsuwan', realNameTh:'สิริการย์ ชินวัชร์สุวรรณ', groupId:'bnk48', teamId:'nv', gen:2, birthday:'1998-02-28', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-ratah', name:'Ratah', nameTh:'รตา', realName:'Ratah Chinkrajangkit', realNameTh:'รตา ชินกระจ่างกิจ', groupId:'bnk48', teamId:'nv', gen:2, birthday:'2002-03-27', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-stang', name:'Stang', nameTh:'สตางค์', realName:'Tarisa Preechatangkit', realNameTh:'ตริษา ปรีชาตั้งกิจ', groupId:'bnk48', teamId:'nv', gen:2, birthday:'2003-10-22', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-wee', name:'Wee', nameTh:'วี', realName:'Weeraya Zhang', realNameTh:'วีรยา จาง', groupId:'bnk48', teamId:'biii', gen:2, birthday:'2001-10-23', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'bnk-paeyah', name:'Paeyah', nameTh:'ปาเอญ่า', realName:'Nippitcha Pipitdaecha', realNameTh:'นิพพิชฌาน์ พิพิธเดชา', groupId:'bnk48', teamId:'nv', gen:3, birthday:'2005-05-14', height:null, blood:'', graduated:'2024-06-30', facts:[] },
+  { id:'bnk-nana', name:'Nana', nameTh:'นานา', realName:'Nana Goto', realNameTh:'นานา โกโตะ', groupId:'bnk48', teamId:'trainee-bnk', gen:5, birthday:'2007-03-25', height:null, blood:'', graduated:'2024-08-31', facts:[] },
+  { id:'bnk-jaokhem', name:'Jaokhem', nameTh:'เจ้าเข็ม', realName:'Chanikhan Busadee', realNameTh:'ชนิกานต์ บุษดี', groupId:'bnk48', teamId:'nv', gen:3, birthday:'2003-10-12', height:null, blood:'', graduated:'2024-11-01', facts:[] },
+  { id:'bnk-nene', name:'Nene', nameTh:'เนเน่', realName:'Thanida Akarawuthi', realNameTh:'ธนิดา อัครวุฒิ', groupId:'bnk48', teamId:'trainee-bnk', gen:4, birthday:'2001-03-14', height:null, blood:'', graduated:'2024-12-08', facts:[] },
+  { id:'bnk-satchan', name:'Satchan', nameTh:'ซัทจัง', realName:'Sachiya Hanami Sawitchaya Kajonrungsilp', realNameTh:'สวิชญา ขจรรุ่งศิลป์', groupId:'bnk48', teamId:'nv', gen:1, birthday:'2003-12-13', height:null, blood:'', graduated:'2024-12-31', facts:[] },
+  { id:'bnk-popper', name:'Popper', nameTh:'ป๊อปเป้อ', realName:'Pinyada Jungkanjana', realNameTh:'พิณญาดา จึงกาญจนา', groupId:'bnk48', teamId:'nv', gen:3, birthday:'1998-09-13', height:null, blood:'', graduated:'2025-09-07', facts:[] },
+  { id:'bnk-earn', name:'Earn', nameTh:'เอิร์น', realName:'Wachiraphon Phatthanaphanit', realNameTh:'วชิราพร พัฒนพานิช', groupId:'bnk48', teamId:'biii', gen:3, birthday:'1998-12-03', height:null, blood:'', graduated:'2026-03-06', facts:[] },
+  { id:'bnk-earth', name:'Earth', nameTh:'เอิร์ธ', realName:'Napason Siripanee', realNameTh:'นภสรณ์ ศิริปาณี', groupId:'bnk48', teamId:'nv', gen:3, birthday:'2002-04-22', height:null, blood:'', graduated:'2026-03-06', facts:[] },
+  { id:'bnk-eve', name:'Eve', nameTh:'อีฟ', realName:'Issaree Taweegulpanit', realNameTh:'อิสรีย์ ทวีกุลพาณิชย์', groupId:'bnk48', teamId:'biii', gen:3, birthday:'2003-01-22', height:null, blood:'', graduated:'2026-03-06', facts:[] },
+  { id:'bnk-grace', name:'Grace', nameTh:'เกรซ', realName:'Virunpat Thamrongpantavanich', realNameTh:'วิรัลพัชร ธำรงค์พันธวนิช', groupId:'bnk48', teamId:'nv', gen:3, birthday:'2003-08-02', height:null, blood:'', graduated:'2026-03-06', facts:[] },
+  { id:'bnk-kaofrang', name:'Kaofrang', nameTh:'ข้าวฟ่าง', realName:'Yanisa Muangkam', realNameTh:'ญาณิศา เมืองคำ', groupId:'bnk48', teamId:'nv', gen:3, birthday:'2002-11-15', height:null, blood:'', graduated:'2026-03-06', facts:[] },
+  { id:'bnk-mean', name:'Mean', nameTh:'มีน', realName:'Nathanya Dulyapol', realNameTh:'ณัฐธันยา ดุลยพล', groupId:'bnk48', teamId:'biii', gen:3, birthday:'2007-07-08', height:null, blood:'', graduated:'2026-03-06', facts:[] },
+  { id:'bnk-peak', name:'Peak', nameTh:'พีค', realName:'Phusita Watthanakronkeaw', realNameTh:'ภูษิตา วัฒนากรแก้ว', groupId:'bnk48', teamId:'biii', gen:3, birthday:'2004-04-02', height:null, blood:'', graduated:'2026-03-06', facts:[] },
+  { id:'bnk-yayee', name:'Yayee', nameTh:'ยาหยี', realName:'Natthathida Asanani', realNameTh:'ณัฏฐธิดา อาสนานิ', groupId:'bnk48', teamId:'biii', gen:3, birthday:'2001-10-09', height:null, blood:'', graduated:'2026-03-06', facts:[] },
+  // ---- CGM48 ----
+  { id:'cgm-nicha', name:'Nicha', nameTh:'ณิชา', realName:'Nicharee Sungkhathat Na Ayudhya', realNameTh:'ณิชารีย์ สังขทัต ณ อยุธยา', groupId:'cgm48', teamId:null, gen:1, birthday:'2004-08-26', height:null, blood:'', graduated:'2021-12-12', facts:[] },
+  { id:'cgm-pepo', name:'Pepo', nameTh:'ปีโป้', realName:'Jirattikan Tasee', realNameTh:'จิรัฐิกาล ทะสี', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-09-21', height:null, blood:'', graduated:'2022-03-31', facts:[] },
+  { id:'cgm-parima', name:'Parima', nameTh:'ปะริมะ', realName:'Chutipapha Rattanakornyannawut', realNameTh:'ชุติปภา รัตนกรญาณวุฒิ', groupId:'cgm48', teamId:null, gen:1, birthday:'2005-07-29', height:null, blood:'', graduated:'2023-09-16', facts:[] },
+  { id:'cgm-jayda', name:'Jayda', nameTh:'เจย์ดา', realName:'Ravinda Alan', realNameTh:'รวินดา อลัน', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-12-16', height:null, blood:'', graduated:'2023-10-07', facts:[] },
+  { id:'cgm-twobam', name:'Twobam', nameTh:'ทูแบม', realName:'Pitchaporn Whathanathongtin', realNameTh:'พิชชาพร วัฒนาทองทิน', groupId:'cgm48', teamId:null, gen:2, birthday:'2006-02-10', height:null, blood:'', graduated:'2023-10-08', facts:[] },
+  { id:'cgm-milk', name:'Milk', nameTh:'มิลค์', realName:'Chayanan Jedpeenongruamjai', realNameTh:'ชยานันท์ เจ็ดพี่น้องร่วมใจ', groupId:'cgm48', teamId:null, gen:1, birthday:'2005-12-06', height:null, blood:'', graduated:'2024-01-11', facts:[] },
+  { id:'cgm-aom', name:'Aom', nameTh:'ออม', realName:'Punyawee Jungcharoen', realNameTh:'ปุณยวีร์ จึงเจริญ', groupId:'cgm48', teamId:null, gen:2, birthday:'1995-09-20', height:null, blood:'', graduated:'2024-04-30', facts:[] },
+  { id:'cgm-izurina', name:'Izurina', nameTh:'', realName:'Rina Izuta', realNameTh:'', groupId:'cgm48', teamId:null, gen:10, birthday:'1995-11-26', height:null, blood:'', graduated:'2024-07-07', facts:[] },
+  { id:'cgm-papang', name:'Papang', nameTh:'พะแพง', realName:'Suphatchaya Khamngern', realNameTh:'ศุภัชญา คำเงิน', groupId:'cgm48', teamId:null, gen:2, birthday:'2007-08-17', height:null, blood:'', graduated:'2024-08-31', facts:[] },
+  { id:'cgm-fortune', name:'Fortune', nameTh:'ฟอร์จูน', realName:'Pundita Koontawee', realNameTh:'ปัณฑิตา คูณทวี', groupId:'cgm48', teamId:null, gen:1, birthday:'1999-08-18', height:null, blood:'', graduated:'2024-10-31', facts:[] },
+  { id:'cgm-meilli', name:'Meilli', nameTh:'เหมยลี่', realName:'Phichayapha Showtale', realNameTh:'พิชญาภา โชว์ทะเล', groupId:'cgm48', teamId:null, gen:4, birthday:'2008-08-21', height:null, blood:'', graduated:'2025-05-15', facts:[] },
+  { id:'cgm-angel', name:'Angel', nameTh:'แองเจิ้ล', realName:'Napassanan Thambuacha', realNameTh:'นภัสนันท์ ธรรมบัวชา', groupId:'cgm48', teamId:null, gen:1, birthday:'2002-04-06', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-champoo', name:'Champoo', nameTh:'แชมพู', realName:'Kodchaporn Leelatheep', realNameTh:'กชพร ลีละทีป', groupId:'cgm48', teamId:null, gen:1, birthday:'2005-10-10', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-fahsai', name:'Fahsai', nameTh:'ฟ้าใส', realName:'Phattaratida Chongprasankiat', realNameTh:'ภัทรธิดา จงประสานเกียรติ', groupId:'cgm48', teamId:null, gen:1, birthday:'2007-05-23', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-jjae', name:'Jjae', nameTh:'เจเจ', realName:'Supapit Sripairoj', realNameTh:'ศุภาพิชญ์ ศรีไพโรจน์', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-07-27', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-kaiwan', name:'Kaiwan', nameTh:'ไข่หวาน', realName:'Manita Chanchai', realNameTh:'มานิตา จันทร์ฉาย', groupId:'cgm48', teamId:null, gen:1, birthday:'2004-01-06', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-kaning', name:'Kaning', nameTh:'คนิ้ง', realName:'Vithita Srasreesom', realNameTh:'วิทิตา สระศรีสม', groupId:'cgm48', teamId:null, gen:1, birthday:'2004-12-15', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-kyla', name:'Kyla', nameTh:'เคียล่า', realName:'Kyla Ziyun Khoo', realNameTh:'เคียล่า ซือหยุน คู', groupId:'cgm48', teamId:null, gen:1, birthday:'2007-01-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-latin', name:'Latin', nameTh:'ลาติน', realName:'Pimnara Rumruaymunkong', realNameTh:'พิมพ์นารา ร่ำรวยมั่นคง', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-01-28', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-marmink', name:'Marmink', nameTh:'มามิ้งค์', realName:'Manichar Aimdilokwong', realNameTh:'มาณิฌา เอี่ยมดิลกวงศ์', groupId:'cgm48', teamId:null, gen:1, birthday:'1999-11-07', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-meen', name:'Meen', nameTh:'มีน', realName:'Pitchayathida Sonthisakwanna', realNameTh:'พิชญธิดา สนธิศักดิ์วรรณะ', groupId:'cgm48', teamId:null, gen:1, birthday:'2003-03-05', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-mei', name:'Mei', nameTh:'เหมย', realName:'Rapeephan Chaemcharoen', realNameTh:'รพีพรรณ แช่มเจริญ', groupId:'cgm48', teamId:null, gen:1, birthday:'2004-09-16', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-nena', name:'Nena', nameTh:'นีน่า', realName:'Nattarika Boontua', realNameTh:'ณัฐริกา บุญตั๋ว', groupId:'cgm48', teamId:null, gen:1, birthday:'2000-09-12', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-nenie', name:'Nenie', nameTh:'นีนี่', realName:'Phitchayapha Supanya', realNameTh:'พิชญาภา สุปัญญา', groupId:'cgm48', teamId:null, gen:1, birthday:'2002-11-01', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-pim', name:'Pim', nameTh:'พิม', realName:'Pronwarin Wongtrakulkit', realNameTh:'พรวารินทร์ วงศ์ตระกูลกิจ', groupId:'cgm48', teamId:null, gen:1, birthday:'2005-12-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-ping', name:'Ping', nameTh:'ปิ๊ง', realName:'Pinpana Saengboon', realNameTh:'พิณพณา แสงบุญ', groupId:'cgm48', teamId:null, gen:1, birthday:'2003-07-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-punch', name:'Punch', nameTh:'พั้นซ์', realName:'Wacharee Danphasukkul', realNameTh:'วัชรี ด่านผาสุกกุล', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-02-16', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-sita', name:'Sita', nameTh:'สิตา', realName:'Sita Teeradechsakul', realNameTh:'สิตา ธีรเดชสกุล', groupId:'cgm48', teamId:null, gen:1, birthday:'2003-06-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-runma', name:'Runma', nameTh:'รันม่า', realName:'Tantaya Shishida', realNameTh:'แทนทยา ชิชิดะ', groupId:'cgm48', teamId:null, gen:3, birthday:'2003-01-19', height:null, blood:'', graduated:'2026-03-07', facts:[] },
+];
+
+// One pool for storage: seeding and reconciliation treat both the same.
+const SEED_ALL_MEMBERS = SEED_MEMBERS.concat(SEED_GRADUATED);
+
 const SEED_SINGLES = [
   { id:'bnk-s1', groupId:'bnk48', num:1, title:'Aitakatta', titleTh:'อยากจะได้พบเธอ', year:2017 },
   { id:'bnk-s2', groupId:'bnk48', num:2, title:'Koisuru Fortune Cookie', titleTh:'คุกกี้เสี่ยงทาย', year:2017 },
@@ -779,7 +919,8 @@ const ICONS = {
   worksFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6.5" cy="18" r="2.8"/><circle cx="17" cy="16" r="2.8"/><path d="M8.7 18V6.7L19.3 3.9v11.3h-2V7.4l-8.6 2.3V18z"/></svg>`,
   profile: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-4.1 3.4-6.8 7.5-6.8s7.5 2.7 7.5 6.8"/></svg>`,
   profileFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="3.9"/><path d="M4 20.3c0-4.3 3.6-7.1 8-7.1s8 2.8 8 7.1v.2H4v-.2z"/></svg>`,
-  crown: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 8.2l3.9 2.7L12 4.5l4.6 6.4 3.9-2.7-1.7 9.3H5.2L3.5 8.2z"/></svg>`
+  crown: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 8.2l3.9 2.7L12 4.5l4.6 6.4 3.9-2.7-1.7 9.3H5.2L3.5 8.2z"/></svg>`,
+  cap: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4L2.5 8.6 12 13.2l9.5-4.6L12 4z"/><path d="M6.4 10.8v4.4c0 1.5 2.5 2.8 5.6 2.8s5.6-1.3 5.6-2.8v-4.4"/><path d="M21.5 8.6v4.9"/></svg>`
 };
 
 // ============================= STATE =============================
@@ -787,7 +928,8 @@ let state = {
   view:'browse', members:[], oshi:[], kamiOshi:null,
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, selectedId:null, editingId:null,
-  account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all'
+  account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
+  showGraduated:false
 };
 
 // ============================= HELPERS =============================
@@ -830,9 +972,9 @@ async function loadMembers(){
 
   if(stored.length === 0){
     const batch = fbDb.batch();
-    SEED_MEMBERS.forEach(m => batch.set(fbDb.collection('members').doc(m.id), m));
+    SEED_ALL_MEMBERS.forEach(m => batch.set(fbDb.collection('members').doc(m.id), m));
     await batch.commit();
-    return SEED_MEMBERS.slice();
+    return SEED_ALL_MEMBERS.slice();
   }
 
   // Reconcile with the current seed: add any brand-new members that weren't
@@ -842,7 +984,7 @@ async function loadMembers(){
   const byId = new Map(stored.map(m => [m.id, m]));
   const batch = fbDb.batch();
   let changed = false;
-  for(const seedM of SEED_MEMBERS){
+  for(const seedM of SEED_ALL_MEMBERS){
     const existing = byId.get(seedM.id);
     if(!existing){
       stored.push({ ...seedM });
@@ -973,6 +1115,14 @@ function renderGroupPills(){
   }).join('');
 }
 
+// The graduated roster lives behind its own pill rather than in the main list.
+function renderGraduatedPill(){
+  const on = state.showGraduated;
+  return `<button class="pill pill-grad ${on?'active':''}" data-action="toggle-graduated">
+    <span class="grad-cap">${ICONS.cap}</span>จบการศึกษา
+  </button>`;
+}
+
 // ============================= RENDER: VIEWS =============================
 const CAPTAIN_LABELS = { 'group-captain':'กัปตันวง', 'group-vc':'รองกัปตันวง', 'team-captain':'กัปตันทีม', 'team-vc':'รองกัปตันทีม' };
 function isCaptainType(m, type){
@@ -987,12 +1137,17 @@ function isCaptainType(m, type){
 
 function filterAndSort(){
   let list = state.members.slice();
+  const q = state.query.trim();
+  // Graduated members are hidden from the default roster. The "จบการศึกษา"
+  // tab shows them on their own, and a search reaches them from anywhere so
+  // they stay findable without leaving the main list.
+  if(state.showGraduated) list = list.filter(m=>!!m.graduated);
+  else if(!q) list = list.filter(m=>!m.graduated);
   if(state.favoritesOnly) list = list.filter(m=>state.oshi.includes(m.id));
   if(state.groupFilter!=='all') list = list.filter(m=>m.groupId===state.groupFilter);
   if(state.teamFilter!=='all') list = list.filter(m=>m.teamId===state.teamFilter);
   if(state.genFilter!=='all') list = list.filter(m=>m.gen===state.genFilter);
   if(state.captainFilter!=='all') list = list.filter(m=>isCaptainType(m, state.captainFilter));
-  const q = state.query.trim();
   if(q){
     const ql = q.toLowerCase();
     list = list.filter(m=>
@@ -1005,7 +1160,9 @@ function filterAndSort(){
   const cmp = {
     name: (a,b)=>a.name.localeCompare(b.name),
     group: (a,b)=>getGroup(a.groupId).name.localeCompare(getGroup(b.groupId).name),
-    team: (a,b)=>shortTeamLabel(getTeam(a.teamId)).localeCompare(shortTeamLabel(getTeam(b.teamId))),
+    team: (a,b)=> state.showGraduated
+      ? (a.graduated||'').localeCompare(b.graduated||'')
+      : shortTeamLabel(getTeam(a.teamId)).localeCompare(shortTeamLabel(getTeam(b.teamId))),
     gen: (a,b)=>(a.gen||99)-(b.gen||99),
     age: (a,b)=>(a.birthday||'9999-99-99').localeCompare(b.birthday||'9999-99-99'),
     birthday: (a,b)=>{
@@ -1069,7 +1226,10 @@ function renderTableHeader(){
   const cells = SORTABLE_COLS.map(c=>{
     const active = state.sortBy===c.key;
     const arrow = active ? (state.sortDir==='desc' ? ' \u25BC' : ' \u25B2') : '';
-    return `<div class="cell ${c.cellClass} sortable-th ${active?'active-sort':''}" data-action="sort-column" data-column="${c.key}">${c.label}${arrow}</div>`;
+    // In the graduated view the team column carries the graduation date
+    // instead — former members mostly have no team left to show.
+    const label = (c.key==='team' && state.showGraduated) ? 'จบการศึกษา' : c.label;
+    return `<div class="cell ${c.cellClass} sortable-th ${active?'active-sort':''}" data-action="sort-column" data-column="${c.key}">${label}${arrow}</div>`;
   }).join('');
   return `
   <div class="row head">
@@ -1093,12 +1253,12 @@ function renderRow(m){
     <div class="cell sticky-name">
       ${renderAvatar(m, 'avatar-sm', g.color)}
       <div class="name-block">
-        <div class="name-en">${m.name}</div>
+        <div class="name-en">${m.name}${m.graduated?`<span class="grad-tag" title="จบการศึกษา ${formatDateShort(m.graduated)}">${ICONS.cap}</span>`:''}</div>
         <div class="name-th">${m.nameTh}</div>
       </div>
     </div>
     <div class="cell col-group"><span class="group-chip" style="background:${g.color}">${g.name}</span>${badgeHtml(groupBadge, groupBadge==='C'?'#C08A2E':'#9AA0A8')}</div>
-    <div class="cell col-team">${shortTeamLabel(t)}${badgeHtml(teamBadge, g.color)}</div>
+    <div class="cell col-team">${state.showGraduated ? `<span class="mono">${formatDateShort(m.graduated)}</span>` : `${shortTeamLabel(t)}${badgeHtml(teamBadge, g.color)}`}</div>
     <div class="cell col-gen mono">${m.gen||'-'}</div>
     <div class="cell col-age mono">${age!==null?age:'-'}</div>
     <div class="cell col-birthday mono">${formatDateShort(m.birthday)}</div>
@@ -1113,6 +1273,7 @@ function renderBrowse(){
   return `
   <div class="filter-bar">
     ${renderGroupPills()}
+    ${renderGraduatedPill()}
     <select class="filter-select" id="team-filter">
       <option value="all">ทุกทีม</option>
       ${teamsAvailable.map(t=>`<option value="${t.id}" ${state.teamFilter===t.id?'selected':''}>${t.name}</option>`).join('')}
@@ -1126,6 +1287,7 @@ function renderBrowse(){
     ${state.genFilter!=='all' ? `<button class="gen-filter-chip" data-action="clear-gen-filter">รุ่น ${state.genFilter} \u2715</button>` : ''}
     ${state.captainFilter!=='all' ? `<button class="gen-filter-chip" data-action="clear-gen-filter">${CAPTAIN_LABELS[state.captainFilter]} \u2715</button>` : ''}
   </div>
+  ${state.showGraduated ? `<div class="grad-note"><span class="grad-cap">${ICONS.cap}</span>สมาชิกที่จบการศึกษาไปแล้ว — ไม่แสดงในรายชื่อหลัก แต่ค้นหาเจอได้ตลอด</div>` : ''}
   ${list.length ? `
   <div class="thead-sticky-outer">
     <div class="thead-sticky-track" id="thead-track">
@@ -1175,6 +1337,7 @@ function renderDetailModal(){
             <div>${badges.join('')}</div>
           </div>
         </div>
+        ${m.graduated ? `<div class="grad-note"><span class="grad-cap">${ICONS.cap}</span>จบการศึกษาเมื่อ ${formatDateShort(m.graduated)}</div>` : ''}
         <div class="oshi-actions">
           <button class="oshi-btn ${isOshi?'active':''}" data-action="toggle-oshi" data-id="${m.id}">
             <span>${isOshi?'\u2605':'\u2606'}</span> ${isOshi?'เป็น Oshi ของคุณ':'เพิ่มเป็น Oshi'}
@@ -1749,6 +1912,15 @@ function bindDelegatedEvents(){
       state.captainFilter = 'all';
       renderMain();
     }
+    else if(action==='toggle-graduated'){
+      state.showGraduated = !state.showGraduated;
+      // Team/gen filters rarely carry over meaningfully between the two
+      // rosters, so start the switched-to view clean.
+      state.teamFilter = 'all';
+      state.genFilter = 'all';
+      state.captainFilter = 'all';
+      renderMain();
+    }
     else if(action==='filter-team-direct'){
       state.groupFilter = el.dataset.group;
       state.teamFilter = el.dataset.team;
@@ -1808,7 +1980,7 @@ async function init(){
     }
     if(!state.members || !state.members.length){
       try{ state.members = await loadMembers(); }
-      catch(e){ state.members = SEED_MEMBERS.slice(); }
+      catch(e){ state.members = SEED_ALL_MEMBERS.slice(); }
     }
     const oshiData = await loadOshiData();
     state.oshi = oshiData.oshi;
