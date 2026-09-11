@@ -531,9 +531,11 @@
 
   /* --- ripple: expands from the exact point you touched --- */
   .btn-add, .btn-secondary, .btn-danger, .signin-btn, .pill, .gen-filter-chip,
-  .oshi-btn, .kami-btn, .team-row, .modal-close-btn, .profile-dropdown button{
+  .oshi-btn, .kami-btn, .team-row, .profile-dropdown button{
     position:relative; overflow:hidden;
   }
+  /* Already absolutely positioned — must keep it, so only clip the ripple. */
+  .modal-close-btn{ overflow:hidden; }
   .btn-add::after, .btn-secondary::after, .btn-danger::after, .signin-btn::after,
   .pill::after, .gen-filter-chip::after, .oshi-btn::after, .kami-btn::after,
   .team-row::after, .modal-close-btn::after, .profile-dropdown button::after{
@@ -624,7 +626,7 @@
   .auth-switch button:active{ transform:scale(.94); transition-duration:.09s; }
 
   /* --- oshi / kami toggle: star wobble + ring burst, pill gets a gold pulse --- */
-  .fav-btn, .fav-btn-sm{ position:relative; }
+  .fav-btn-sm{ position:relative; }
   .fav-btn.star-pop::before, .fav-btn-sm.star-pop::before{
     content:''; position:absolute; left:50%; top:50%;
     width:24px; height:24px; margin:-12px 0 0 -12px;
