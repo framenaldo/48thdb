@@ -259,6 +259,8 @@
   .col-age{ width:64px; text-align:center; }
   .col-birthday{ width:92px; }
   .col-height{ width:82px; text-align:center; }
+  /* the graduation date needs more room than a height does */
+  .dtable.grad-mode .col-height{ width:108px; }
   .col-fav{ width:36px; text-align:center; padding-left:6px; padding-right:6px; }
 
   .captain-badge{
@@ -849,35 +851,35 @@ const SEED_GRADUATED = [
   { id:'bnk-peak', name:'Peak', nameTh:'พีค', realName:'Phusita Watthanakronkeaw', realNameTh:'ภูษิตา วัฒนากรแก้ว', groupId:'bnk48', teamId:'biii', gen:3, birthday:'2004-04-02', height:null, blood:'', graduated:'2026-03-06', facts:[] },
   { id:'bnk-yayee', name:'Yayee', nameTh:'ยาหยี', realName:'Natthathida Asanani', realNameTh:'ณัฏฐธิดา อาสนานิ', groupId:'bnk48', teamId:'biii', gen:3, birthday:'2001-10-09', height:null, blood:'', graduated:'2026-03-06', facts:[] },
   // ---- CGM48 ----
-  { id:'cgm-nicha', name:'Nicha', nameTh:'ณิชา', realName:'Nicharee Sungkhathat Na Ayudhya', realNameTh:'ณิชารีย์ สังขทัต ณ อยุธยา', groupId:'cgm48', teamId:null, gen:1, birthday:'2004-08-26', height:null, blood:'', graduated:'2021-12-12', facts:[] },
-  { id:'cgm-pepo', name:'Pepo', nameTh:'ปีโป้', realName:'Jirattikan Tasee', realNameTh:'จิรัฐิกาล ทะสี', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-09-21', height:null, blood:'', graduated:'2022-03-31', facts:[] },
-  { id:'cgm-parima', name:'Parima', nameTh:'ปะริมะ', realName:'Chutipapha Rattanakornyannawut', realNameTh:'ชุติปภา รัตนกรญาณวุฒิ', groupId:'cgm48', teamId:null, gen:1, birthday:'2005-07-29', height:null, blood:'', graduated:'2023-09-16', facts:[] },
-  { id:'cgm-jayda', name:'Jayda', nameTh:'เจย์ดา', realName:'Ravinda Alan', realNameTh:'รวินดา อลัน', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-12-16', height:null, blood:'', graduated:'2023-10-07', facts:[] },
-  { id:'cgm-twobam', name:'Twobam', nameTh:'ทูแบม', realName:'Pitchaporn Whathanathongtin', realNameTh:'พิชชาพร วัฒนาทองทิน', groupId:'cgm48', teamId:null, gen:2, birthday:'2006-02-10', height:null, blood:'', graduated:'2023-10-08', facts:[] },
+  { id:'cgm-nicha', name:'Nicha', nameTh:'ณิชา', realName:'Nicharee Sungkhathat Na Ayudhya', realNameTh:'ณิชารีย์ สังขทัต ณ อยุธยา', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2004-08-26', height:null, blood:'', graduated:'2021-12-12', facts:[] },
+  { id:'cgm-pepo', name:'Pepo', nameTh:'ปีโป้', realName:'Jirattikan Tasee', realNameTh:'จิรัฐิกาล ทะสี', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2006-09-21', height:null, blood:'', graduated:'2022-03-31', facts:[] },
+  { id:'cgm-parima', name:'Parima', nameTh:'ปะริมะ', realName:'Chutipapha Rattanakornyannawut', realNameTh:'ชุติปภา รัตนกรญาณวุฒิ', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2005-07-29', height:null, blood:'', graduated:'2023-09-16', facts:[] },
+  { id:'cgm-jayda', name:'Jayda', nameTh:'เจย์ดา', realName:'Ravinda Alan', realNameTh:'รวินดา อลัน', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2006-12-16', height:null, blood:'', graduated:'2023-10-07', facts:[] },
+  { id:'cgm-twobam', name:'Twobam', nameTh:'ทูแบม', realName:'Pitchaporn Whathanathongtin', realNameTh:'พิชชาพร วัฒนาทองทิน', groupId:'cgm48', teamId:'trainee-cgm', gen:2, birthday:'2006-02-10', height:null, blood:'', graduated:'2023-10-08', facts:[] },
   { id:'cgm-milk', name:'Milk', nameTh:'มิลค์', realName:'Chayanan Jedpeenongruamjai', realNameTh:'ชยานันท์ เจ็ดพี่น้องร่วมใจ', groupId:'cgm48', teamId:null, gen:1, birthday:'2005-12-06', height:null, blood:'', graduated:'2024-01-11', facts:[] },
-  { id:'cgm-aom', name:'Aom', nameTh:'ออม', realName:'Punyawee Jungcharoen', realNameTh:'ปุณยวีร์ จึงเจริญ', groupId:'cgm48', teamId:null, gen:1, birthday:'1995-09-20', height:null, blood:'', graduated:'2024-04-30', transfer:{ fromGroupId:'bnk48', fromGen:2, date:'2019-08-27' }, facts:[] },
-  { id:'cgm-izurina', name:'Izurina', nameTh:'อิซึรินะ', realName:'Rina Izuta', realNameTh:'รินะ อิซึตะ', groupId:'cgm48', teamId:null, gen:1, birthday:'1995-11-26', height:null, blood:'', graduated:'2024-07-07', transfer:{ fromGroupId:'bnk48', fromGen:1, date:'2019-08-27' }, facts:[] },
-  { id:'cgm-papang', name:'Papang', nameTh:'พะแพง', realName:'Suphatchaya Khamngern', realNameTh:'ศุภัชญา คำเงิน', groupId:'cgm48', teamId:null, gen:2, birthday:'2007-08-17', height:null, blood:'', graduated:'2024-08-31', facts:[] },
-  { id:'cgm-fortune', name:'Fortune', nameTh:'ฟอร์จูน', realName:'Pundita Koontawee', realNameTh:'ปัณฑิตา คูณทวี', groupId:'cgm48', teamId:null, gen:1, birthday:'1999-08-18', height:null, blood:'', graduated:'2024-10-31', facts:[] },
+  { id:'cgm-aom', name:'Aom', nameTh:'ออม', realName:'Punyawee Jungcharoen', realNameTh:'ปุณยวีร์ จึงเจริญ', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'1995-09-20', height:null, blood:'', graduated:'2024-04-30', transfer:{ fromGroupId:'bnk48', fromGen:2, date:'2019-08-27' }, facts:[] },
+  { id:'cgm-izurina', name:'Izurina', nameTh:'อิซึรินะ', realName:'Rina Izuta', realNameTh:'รินะ อิซึตะ', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'1995-11-26', height:null, blood:'', graduated:'2024-07-07', transfer:{ fromGroupId:'bnk48', fromGen:1, date:'2019-08-27' }, facts:[] },
+  { id:'cgm-papang', name:'Papang', nameTh:'พะแพง', realName:'Suphatchaya Khamngern', realNameTh:'ศุภัชญา คำเงิน', groupId:'cgm48', teamId:'trainee-cgm', gen:2, birthday:'2007-08-17', height:null, blood:'', graduated:'2024-08-31', facts:[] },
+  { id:'cgm-fortune', name:'Fortune', nameTh:'ฟอร์จูน', realName:'Pundita Koontawee', realNameTh:'ปัณฑิตา คูณทวี', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'1999-08-18', height:null, blood:'', graduated:'2024-10-31', facts:[] },
   { id:'cgm-meilli', name:'Meilli', nameTh:'เหมยลี่', realName:'Phichayapha Showtale', realNameTh:'พิชญาภา โชว์ทะเล', groupId:'cgm48', teamId:null, gen:4, birthday:'2008-08-21', height:null, blood:'', graduated:'2025-05-15', facts:[] },
-  { id:'cgm-angel', name:'Angel', nameTh:'แองเจิ้ล', realName:'Napassanan Thambuacha', realNameTh:'นภัสนันท์ ธรรมบัวชา', groupId:'cgm48', teamId:null, gen:1, birthday:'2002-04-06', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-champoo', name:'Champoo', nameTh:'แชมพู', realName:'Kodchaporn Leelatheep', realNameTh:'กชพร ลีละทีป', groupId:'cgm48', teamId:null, gen:1, birthday:'2005-10-10', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-fahsai', name:'Fahsai', nameTh:'ฟ้าใส', realName:'Phattaratida Chongprasankiat', realNameTh:'ภัทรธิดา จงประสานเกียรติ', groupId:'cgm48', teamId:null, gen:1, birthday:'2007-05-23', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-jjae', name:'Jjae', nameTh:'เจเจ', realName:'Supapit Sripairoj', realNameTh:'ศุภาพิชญ์ ศรีไพโรจน์', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-07-27', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-kaiwan', name:'Kaiwan', nameTh:'ไข่หวาน', realName:'Manita Chanchai', realNameTh:'มานิตา จันทร์ฉาย', groupId:'cgm48', teamId:null, gen:1, birthday:'2004-01-06', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-kaning', name:'Kaning', nameTh:'คนิ้ง', realName:'Vithita Srasreesom', realNameTh:'วิทิตา สระศรีสม', groupId:'cgm48', teamId:null, gen:1, birthday:'2004-12-15', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-kyla', name:'Kyla', nameTh:'เคียล่า', realName:'Kyla Ziyun Khoo', realNameTh:'เคียล่า ซือหยุน คู', groupId:'cgm48', teamId:null, gen:1, birthday:'2007-01-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-latin', name:'Latin', nameTh:'ลาติน', realName:'Pimnara Rumruaymunkong', realNameTh:'พิมพ์นารา ร่ำรวยมั่นคง', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-01-28', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-marmink', name:'Marmink', nameTh:'มามิ้งค์', realName:'Manichar Aimdilokwong', realNameTh:'มาณิฌา เอี่ยมดิลกวงศ์', groupId:'cgm48', teamId:null, gen:1, birthday:'1999-11-07', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-meen', name:'Meen', nameTh:'มีน', realName:'Pitchayathida Sonthisakwanna', realNameTh:'พิชญธิดา สนธิศักดิ์วรรณะ', groupId:'cgm48', teamId:null, gen:1, birthday:'2003-03-05', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-mei', name:'Mei', nameTh:'เหมย', realName:'Rapeephan Chaemcharoen', realNameTh:'รพีพรรณ แช่มเจริญ', groupId:'cgm48', teamId:null, gen:1, birthday:'2004-09-16', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-nena', name:'Nena', nameTh:'นีน่า', realName:'Nattarika Boontua', realNameTh:'ณัฐริกา บุญตั๋ว', groupId:'cgm48', teamId:null, gen:1, birthday:'2000-09-12', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-nenie', name:'Nenie', nameTh:'นีนี่', realName:'Phitchayapha Supanya', realNameTh:'พิชญาภา สุปัญญา', groupId:'cgm48', teamId:null, gen:1, birthday:'2002-11-01', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-pim', name:'Pim', nameTh:'พิม', realName:'Pronwarin Wongtrakulkit', realNameTh:'พรวารินทร์ วงศ์ตระกูลกิจ', groupId:'cgm48', teamId:null, gen:1, birthday:'2005-12-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-ping', name:'Ping', nameTh:'ปิ๊ง', realName:'Pinpana Saengboon', realNameTh:'พิณพณา แสงบุญ', groupId:'cgm48', teamId:null, gen:1, birthday:'2003-07-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-punch', name:'Punch', nameTh:'พั้นซ์', realName:'Wacharee Danphasukkul', realNameTh:'วัชรี ด่านผาสุกกุล', groupId:'cgm48', teamId:null, gen:1, birthday:'2006-02-16', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-sita', name:'Sita', nameTh:'สิตา', realName:'Sita Teeradechsakul', realNameTh:'สิตา ธีรเดชสกุล', groupId:'cgm48', teamId:null, gen:1, birthday:'2003-06-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
-  { id:'cgm-runma', name:'Runma', nameTh:'รันม่า', realName:'Tantaya Shishida', realNameTh:'แทนทยา ชิชิดะ', groupId:'cgm48', teamId:null, gen:3, birthday:'2003-01-19', height:null, blood:'', graduated:'2026-03-07', facts:[] },
+  { id:'cgm-angel', name:'Angel', nameTh:'แองเจิ้ล', realName:'Napassanan Thambuacha', realNameTh:'นภัสนันท์ ธรรมบัวชา', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2002-04-06', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-champoo', name:'Champoo', nameTh:'แชมพู', realName:'Kodchaporn Leelatheep', realNameTh:'กชพร ลีละทีป', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2005-10-10', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-fahsai', name:'Fahsai', nameTh:'ฟ้าใส', realName:'Phattaratida Chongprasankiat', realNameTh:'ภัทรธิดา จงประสานเกียรติ', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2007-05-23', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-jjae', name:'Jjae', nameTh:'เจเจ', realName:'Supapit Sripairoj', realNameTh:'ศุภาพิชญ์ ศรีไพโรจน์', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2006-07-27', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-kaiwan', name:'Kaiwan', nameTh:'ไข่หวาน', realName:'Manita Chanchai', realNameTh:'มานิตา จันทร์ฉาย', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2004-01-06', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-kaning', name:'Kaning', nameTh:'คนิ้ง', realName:'Vithita Srasreesom', realNameTh:'วิทิตา สระศรีสม', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2004-12-15', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-kyla', name:'Kyla', nameTh:'เคียล่า', realName:'Kyla Ziyun Khoo', realNameTh:'เคียล่า ซือหยุน คู', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2007-01-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-latin', name:'Latin', nameTh:'ลาติน', realName:'Pimnara Rumruaymunkong', realNameTh:'พิมพ์นารา ร่ำรวยมั่นคง', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2006-01-28', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-marmink', name:'Marmink', nameTh:'มามิ้งค์', realName:'Manichar Aimdilokwong', realNameTh:'มาณิฌา เอี่ยมดิลกวงศ์', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'1999-11-07', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-meen', name:'Meen', nameTh:'มีน', realName:'Pitchayathida Sonthisakwanna', realNameTh:'พิชญธิดา สนธิศักดิ์วรรณะ', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2003-03-05', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-mei', name:'Mei', nameTh:'เหมย', realName:'Rapeephan Chaemcharoen', realNameTh:'รพีพรรณ แช่มเจริญ', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2004-09-16', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-nena', name:'Nena', nameTh:'นีน่า', realName:'Nattarika Boontua', realNameTh:'ณัฐริกา บุญตั๋ว', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2000-09-12', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-nenie', name:'Nenie', nameTh:'นีนี่', realName:'Phitchayapha Supanya', realNameTh:'พิชญาภา สุปัญญา', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2002-11-01', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-pim', name:'Pim', nameTh:'พิม', realName:'Pronwarin Wongtrakulkit', realNameTh:'พรวารินทร์ วงศ์ตระกูลกิจ', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2005-12-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-ping', name:'Ping', nameTh:'ปิ๊ง', realName:'Pinpana Saengboon', realNameTh:'พิณพณา แสงบุญ', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2003-07-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-punch', name:'Punch', nameTh:'พั้นซ์', realName:'Wacharee Danphasukkul', realNameTh:'วัชรี ด่านผาสุกกุล', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2006-02-16', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-sita', name:'Sita', nameTh:'สิตา', realName:'Sita Teeradechsakul', realNameTh:'สิตา ธีรเดชสกุล', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2003-06-25', height:null, blood:'', graduated:'2025-09-03', facts:[] },
+  { id:'cgm-runma', name:'Runma', nameTh:'รันม่า', realName:'Tantaya Shishida', realNameTh:'แทนทยา ชิชิดะ', groupId:'cgm48', teamId:'teamc', gen:3, birthday:'2003-01-19', height:null, blood:'', graduated:'2026-03-07', facts:[] },
 ];
 
 // One pool for storage: seeding and reconciliation treat both the same.
@@ -1163,16 +1165,16 @@ function filterAndSort(){
   const cmp = {
     name: (a,b)=>a.name.localeCompare(b.name),
     group: (a,b)=>getGroup(a.groupId).name.localeCompare(getGroup(b.groupId).name),
-    team: (a,b)=> state.showGraduated
-      ? (a.graduated||'').localeCompare(b.graduated||'')
-      : shortTeamLabel(getTeam(a.teamId)).localeCompare(shortTeamLabel(getTeam(b.teamId))),
+    team: (a,b)=>shortTeamLabel(getTeam(a.teamId)).localeCompare(shortTeamLabel(getTeam(b.teamId))),
     gen: (a,b)=>(a.gen||99)-(b.gen||99),
     age: (a,b)=>(a.birthday||'9999-99-99').localeCompare(b.birthday||'9999-99-99'),
     birthday: (a,b)=>{
       const norm = d => d ? d.slice(5) : '99-99'; // compare month-day only, ignore birth year
       return norm(a.birthday).localeCompare(norm(b.birthday));
     },
-    height: (a,b)=>(a.height||0)-(b.height||0),
+    height: (a,b)=> state.showGraduated
+      ? (a.graduated||'').localeCompare(b.graduated||'')
+      : (a.height||0)-(b.height||0),
   }[state.sortBy] || ((a,b)=>a.name.localeCompare(b.name));
   list.sort(cmp);
   if(state.sortDir==='desc') list.reverse();
@@ -1229,9 +1231,9 @@ function renderTableHeader(){
   const cells = SORTABLE_COLS.map(c=>{
     const active = state.sortBy===c.key;
     const arrow = active ? (state.sortDir==='desc' ? ' \u25BC' : ' \u25B2') : '';
-    // In the graduated view the team column carries the graduation date
-    // instead — former members mostly have no team left to show.
-    const label = (c.key==='team' && state.showGraduated) ? 'จบการศึกษา' : c.label;
+    // Graduated members have no recorded height, so that column carries the
+    // graduation date instead and the team column keeps showing their team.
+    const label = (c.key==='height' && state.showGraduated) ? 'จบการศึกษา' : c.label;
     return `<div class="cell ${c.cellClass} sortable-th ${active?'active-sort':''}" data-action="sort-column" data-column="${c.key}">${label}${arrow}</div>`;
   }).join('');
   return `
@@ -1261,11 +1263,11 @@ function renderRow(m){
       </div>
     </div>
     <div class="cell col-group"><span class="group-chip" style="background:${g.color}">${g.name}</span>${badgeHtml(groupBadge, groupBadge==='C'?'#C08A2E':'#9AA0A8')}</div>
-    <div class="cell col-team">${state.showGraduated ? `<span class="mono">${formatDateShort(m.graduated)}</span>` : `${shortTeamLabel(t)}${badgeHtml(teamBadge, g.color)}`}</div>
+    <div class="cell col-team">${shortTeamLabel(t)}${badgeHtml(teamBadge, g.color)}</div>
     <div class="cell col-gen mono">${m.gen||'-'}</div>
     <div class="cell col-age mono">${age!==null?age:'-'}</div>
     <div class="cell col-birthday mono">${formatDateShort(m.birthday)}</div>
-    <div class="cell col-height mono">${m.height?m.height+' ซม.':'-'}</div>
+    <div class="cell col-height mono">${state.showGraduated ? formatDateShort(m.graduated) : (m.height?m.height+' ซม.':'-')}</div>
     <div class="cell col-fav"><button class="fav-btn-sm ${isOshi?'is-oshi':''}" data-action="toggle-oshi" data-id="${m.id}">${favInner}</button></div>
   </div>`;
 }
@@ -1294,11 +1296,11 @@ function renderBrowse(){
   ${list.length ? `
   <div class="thead-sticky-outer">
     <div class="thead-sticky-track" id="thead-track">
-      <div class="dtable">${renderTableHeader()}</div>
+      <div class="dtable${state.showGraduated?' grad-mode':''}">${renderTableHeader()}</div>
     </div>
   </div>
   <div class="table-wrap" id="table-body-wrap">
-    <div class="dtable">
+    <div class="dtable${state.showGraduated?' grad-mode':''}">
       ${list.map(renderRow).join('')}
     </div>
   </div>` : `<div class="empty-state"><p>${state.favoritesOnly?'ยังไม่มี Oshi กดดาว ☆ เพื่อเพิ่ม':'ไม่พบสมาชิกที่ตรงกับเงื่อนไข'}</p></div>`}`;
@@ -1460,7 +1462,7 @@ function renderProfile(){
 function renderAuth(){
   const mode = state.authMode || 'signin';
   return `
-  <button class="back-btn" data-action="nav" data-view="browse">\u2190 กลับ</button>
+  <button class="back-btn" data-action="go-back">\u2190 กลับ</button>
   <div class="auth-card">
     <h2 class="display" style="margin:0 0 4px;font-size:22px;">${mode==='signup'?'สร้างบัญชีใหม่':'เข้าสู่ระบบ'}</h2>
     <p class="muted-note" style="margin:0 0 20px;">เข้าสู่ระบบเพื่อบันทึก Oshi ของคุณไว้ถาวร และเข้าจากอุปกรณ์ไหนก็ได้</p>
@@ -1488,7 +1490,7 @@ function renderAuth(){
 function renderEditProfile(){
   const acc = state.account || {name:'', email:''};
   return `
-  <button class="back-btn" data-action="nav" data-view="profile">\u2190 กลับ</button>
+  <button class="back-btn" data-action="go-back">\u2190 กลับ</button>
   <h2 class="display" style="margin:0 0 18px;font-size:22px;">แก้ไขข้อมูลส่วนตัว</h2>
   <form id="editprofile-form" novalidate style="max-width:420px;">
     <div class="form-field" style="margin-bottom:14px;"><label>ชื่อที่แสดง</label><input id="edit-name-input" name="name" value="${escapeAttr(acc.name)}"></div>
@@ -1777,6 +1779,123 @@ function attachMainEvents(){
   });
 }
 
+// ============================= NAVIGATION HISTORY =============================
+// Each screen the user lands on becomes one history entry, so "back" always
+// returns to wherever they came from rather than a hard-coded destination.
+// This drives the back buttons, the modal close, the edge-swipe gesture and
+// the browser/phone back button alike.
+const NAV_KEYS = ['view','selectedId','editingId','favoritesOnly','query','groupFilter',
+  'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir'];
+
+function navSnapshot(){
+  const snap = {};
+  NAV_KEYS.forEach(k => snap[k] = state[k]);
+  return snap;
+}
+
+// Filters and search refine a screen, they don't create a new one — only these
+// fields decide whether the user has actually moved somewhere else.
+function isSameScreen(a, b){
+  return !!a && !!b && a.view===b.view && a.selectedId===b.selectedId
+    && a.editingId===b.editingId && a.favoritesOnly===b.favoritesOnly
+    && a.showGraduated===b.showGraduated;
+}
+
+let _navReady = false;
+let _navDepth = 0;
+
+function initHistory(){
+  history.replaceState({ snap:navSnapshot(), depth:0 }, '');
+  _navReady = true;
+  window.addEventListener('popstate', (e)=>{
+    const snap = e.state && e.state.snap;
+    if(!snap) return;
+    _navDepth = (e.state && e.state.depth) || 0;
+    NAV_KEYS.forEach(k => state[k] = snap[k]);
+    state.profileMenuOpen = false;
+    render();
+  });
+}
+
+// Call after a state change that lands the user on a different screen.
+function pushHistory(){
+  if(!_navReady) return;
+  const snap = navSnapshot();
+  if(isSameScreen(history.state && history.state.snap, snap)){
+    history.replaceState({ snap, depth:_navDepth }, '');
+    return;
+  }
+  history.pushState({ snap, depth:++_navDepth }, '');
+}
+
+// Same screen, changed filters — keep the entry current so going back later
+// restores what was on screen instead of replaying every keystroke.
+function replaceHistory(){
+  if(!_navReady) return;
+  history.replaceState({ snap:navSnapshot(), depth:_navDepth }, '');
+}
+
+function canGoBack(){ return _navDepth > 0; }
+
+// `fallback` covers the case where this screen is the first thing the user
+// saw (a shared link, say) and there is nothing of ours to go back to.
+function goBack(fallback){
+  if(canGoBack()){ history.back(); return; }
+  if(fallback){ fallback(); render(); }
+}
+
+// Drag in from the left edge to go back, the way native apps behave.
+function bindEdgeSwipeBack(){
+  const EDGE = 28, THRESHOLD = 90;
+  let startX = 0, startY = 0, dx = 0, tracking = false, committed = false;
+
+  function shift(px, animate){
+    const app = document.getElementById('app');
+    if(!app) return;
+    app.style.transition = animate ? 'transform .24s var(--ease-out)' : '';
+    app.style.transform = px ? `translateX(${px}px)` : '';
+    app.style.boxShadow = px ? '-14px 0 34px rgba(28,19,41,.16)' : '';
+  }
+
+  document.addEventListener('touchstart', (e)=>{
+    if(e.touches.length !== 1){ tracking = false; return; }
+    const t = e.touches[0];
+    tracking = t.clientX <= EDGE && canGoBack();
+    committed = false; dx = 0;
+    if(tracking){ startX = t.clientX; startY = t.clientY; }
+  }, {passive:true});
+
+  document.addEventListener('touchmove', (e)=>{
+    if(!tracking) return;
+    const t = e.touches[0];
+    dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    if(!committed){
+      // Let a vertical scroll win; only claim the gesture once it is clearly
+      // a rightward drag, so the table can still be scrolled sideways.
+      if(Math.abs(dy) > Math.abs(dx)){ tracking = false; return; }
+      if(dx < 10) return;
+      committed = true;
+    }
+    e.preventDefault();
+    shift(Math.max(0, dx * 0.92), false);
+  }, {passive:false});
+
+  function finish(){
+    if(!tracking) return;
+    const shouldGo = committed && dx > THRESHOLD;
+    tracking = false; committed = false;
+    shift(0, true);
+    setTimeout(()=>{
+      const app = document.getElementById('app');
+      if(app){ app.style.transition = ''; app.style.boxShadow = ''; }
+    }, 260);
+    if(shouldGo) goBack();
+  }
+  document.addEventListener('touchend', finish, {passive:true});
+  document.addEventListener('touchcancel', finish, {passive:true});
+}
+
 // ============================= EVENTS (delegated) =============================
 const RIPPLE_SEL = '.btn-add,.btn-secondary,.btn-danger,.signin-btn,.pill,.gen-filter-chip,'
   + '.oshi-btn,.kami-btn,.team-row,.modal-close-btn,.profile-dropdown button';
@@ -1817,17 +1936,19 @@ function bindDelegatedEvents(){
       state.view = el.dataset.view;
       if(el.dataset.fav !== undefined) state.favoritesOnly = el.dataset.fav==='1';
       state.selectedId = null; state.editingId = null;
-      render();
+      render(); pushHistory();
+    }
+    else if(action==='go-back'){
+      goBack(()=>{ state.view='browse'; state.selectedId=null; state.editingId=null; });
     }
     else if(action==='open-member'){
-      state.selectedId=id; state.editingId=null; renderMain();
+      state.selectedId=id; state.editingId=null; renderMain(); pushHistory();
     }
     else if(action==='close-modal'){
       const insideCard = e.target.closest('.modal-glass-card');
       const onCloseBtn = e.target.closest('.modal-close-btn');
       if(insideCard && !onCloseBtn) return;
-      state.selectedId = null;
-      renderMain();
+      goBack(()=>{ state.selectedId = null; });
     }
     else if(action==='filter-to'){
       const m = getMember(id);
@@ -1847,7 +1968,7 @@ function bindDelegatedEvents(){
         state.view = 'browse';
         state.selectedId = null;
         state.query = '';
-        render();
+        render(); pushHistory();
       }
     }
     else if(action==='clear-gen-filter'){
@@ -1889,10 +2010,10 @@ function bindDelegatedEvents(){
       renderMain();
     }
     else if(action==='add-new'){
-      state.view='form'; state.editingId=null; render();
+      state.view='form'; state.editingId=null; render(); pushHistory();
     }
     else if(action==='edit-member'){
-      state.view='form'; state.editingId=id; state.selectedId=null; render();
+      state.view='form'; state.editingId=id; state.selectedId=null; render(); pushHistory();
     }
     else if(action==='delete-member'){
       const m = getMember(id);
@@ -1904,17 +2025,18 @@ function bindDelegatedEvents(){
       }
     }
     else if(action==='cancel-form'){
-      state.view = 'browse';
-      state.selectedId = state.editingId || null;
-      state.editingId = null;
-      render();
+      goBack(()=>{
+        state.view = 'browse';
+        state.selectedId = state.editingId || null;
+        state.editingId = null;
+      });
     }
     else if(action==='filter-group'){
       state.groupFilter = el.dataset.value;
       state.teamFilter = 'all';
       state.genFilter = 'all';
       state.captainFilter = 'all';
-      renderMain();
+      renderMain(); replaceHistory();
     }
     else if(action==='toggle-graduated'){
       state.showGraduated = !state.showGraduated;
@@ -1923,13 +2045,13 @@ function bindDelegatedEvents(){
       state.teamFilter = 'all';
       state.genFilter = 'all';
       state.captainFilter = 'all';
-      renderMain();
+      renderMain(); pushHistory();
     }
     else if(action==='filter-team-direct'){
       state.groupFilter = el.dataset.group;
       state.teamFilter = el.dataset.team;
       state.view = 'browse'; state.favoritesOnly = false;
-      render();
+      render(); pushHistory();
     }
     else if(action==='nav-select'){
       const opt = NAV_OPTIONS.find(o=>o.value===el.dataset.value);
@@ -1937,7 +2059,7 @@ function bindDelegatedEvents(){
         state.view = opt.view;
         state.favoritesOnly = opt.fav;
         state.selectedId = null; state.editingId = null;
-        render();
+        render(); pushHistory();
       }
     }
     else if(action==='sort-column'){
@@ -1952,18 +2074,20 @@ function bindDelegatedEvents(){
   });
 
   document.body.addEventListener('change', (e)=>{
-    if(e.target.id==='team-filter'){ state.teamFilter = e.target.value; state.genFilter = 'all'; state.captainFilter = 'all'; renderMain(); }
-    else if(e.target.id==='sort-filter'){ state.sortBy = e.target.value; state.sortDir = 'asc'; renderMain(); }
+    if(e.target.id==='team-filter'){ state.teamFilter = e.target.value; state.genFilter = 'all'; state.captainFilter = 'all'; renderMain(); replaceHistory(); }
+    else if(e.target.id==='sort-filter'){ state.sortBy = e.target.value; state.sortDir = 'asc'; renderMain(); replaceHistory(); }
   });
 
   document.body.addEventListener('input', (e)=>{
-    if(e.target.id==='search-input'){ state.query = e.target.value; renderMain(); }
+    if(e.target.id==='search-input'){ state.query = e.target.value; renderMain(); replaceHistory(); }
   });
 }
 
 // ============================= INIT =============================
 async function init(){
   bindDelegatedEvents();
+  initHistory();
+  bindEdgeSwipeBack();
   let checkedInitialAuth = false;
 
   fbAuth.onAuthStateChanged(async (user) => {
