@@ -2630,7 +2630,10 @@ function renderStage(work, trackIndex, track){
     const w = lerp(STAGE.front.w, STAGE.back.w, t) + pad;
     return [50 - w/2, 50 + w/2];
   };
-  const [fl, fr] = edge(0, 6), [bl, br] = edge(1, 6);
+  // The padding has to leave the floor inside the 0-100 viewBox: the SVG
+  // clips anything past it, and since the outline is a stroke, a clipped
+  // edge shows as a white sliver cutting the corner off.
+  const [fl, fr] = edge(0, 3), [bl, br] = edge(1, 3);
   const yTop = STAGE.back.y - 14, yBot = STAGE.front.y + 17;
   const floorY = t => lerp(yBot, yTop, t);
   const floorX = (t, side) => lerp(side ? fr : fl, side ? br : bl, t);
