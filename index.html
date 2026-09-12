@@ -476,6 +476,33 @@
   .bar-val{ font-size:12.5px; font-weight:600; }
   .stats-note{ color:var(--ink-soft); font-size:12.5px; margin:10px 0 0; }
 
+  /* anything that jumps through to a filtered roster */
+  button.bar-row{
+    width:100%; background:none; border:none; padding:2px 4px; margin:0 -4px 5px;
+    border-radius:7px; cursor:pointer; font:inherit; color:inherit; text-align:left;
+    transition:background .16s var(--ease-out);
+  }
+  button.stat-cell{
+    border:none; cursor:pointer; font:inherit; color:inherit; text-align:left; width:100%;
+    transition:background .16s var(--ease-out);
+  }
+  .link-inline{
+    background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;
+    text-decoration:underline; text-decoration-color:color-mix(in srgb, currentColor 35%, transparent);
+    text-underline-offset:3px;
+  }
+  .link-inline.strong{ font-family:'Noto Sans Thai',sans-serif; font-weight:700; font-size:15px; }
+  .link-h2{
+    background:none; border:none; padding:0; cursor:pointer; text-align:left;
+    font-family:'Noto Sans Thai',sans-serif; font-weight:800; font-size:27px; color:inherit;
+  }
+  .link-inline:active, .link-h2:active{ opacity:.6; }
+  @media (hover:hover){
+    button.bar-row:hover{ background:var(--paper-dim); }
+    button.stat-cell:hover{ background:var(--paper-dim); }
+    .link-inline:hover, .link-h2:hover{ text-decoration-color:currentColor; }
+  }
+
   /* birthdays */
   .bday-next{ display:flex; gap:10px; overflow-x:auto; padding:2px 0 8px; -webkit-overflow-scrolling:touch; }
   .bday-next::-webkit-scrollbar{ display:none; }
@@ -1730,13 +1757,18 @@ const STATS_TABS = [
   { id:'timeline',  label:'ไทม์ไลน์' }
 ];
 
-function renderBar(label, value, max, color){
+function renderBar(label, value, max, color, drill){
   const pct = max>0 ? Math.round(value/max*100) : 0;
-  return `<div class="bar-row" style="--c:${color||'var(--ink)'}">
-    <span class="bar-label">${escapeHtml(label)}</span>
+  const inner = `<span class="bar-label">${escapeHtml(label)}</span>
     <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
-    <span class="bar-val">${value}</span>
-  </div>`;
+    <span class="bar-val">${value}</span>`;
+  const style = `--c:${color||'var(--ink)'}`;
+  if(!drill || !value) return `<div class="bar-row" style="${style}">${inner}</div>`;
+  // HTML attribute names are case-insensitive, so a camelCase key would arrive
+  // as dataset.agemin. Emit kebab-case and the dataset camelCases it back.
+  const attrs = Object.entries(drill)
+    .map(([k,v])=>`data-${k.replace(/[A-Z]/g, c=>'-'+c.toLowerCase())}="${escapeAttr(v)}"`).join(' ');
+  return `<button class="bar-row drillable" style="${style}" data-action="drill" ${attrs}>${inner}</button>`;
 }
 
 function renderStatsOverview(){
@@ -1751,8 +1783,8 @@ function renderStatsOverview(){
 
   return `
   <div class="stat-grid">
-    <div class="stat-cell"><div class="label">สมาชิกปัจจุบัน</div><div class="value">${active.length} คน</div></div>
-    <div class="stat-cell"><div class="label">จบการศึกษาแล้ว</div><div class="value">${grads.length} คน</div></div>
+    <button class="stat-cell drillable" data-action="drill"><div class="label">สมาชิกปัจจุบัน</div><div class="value">${active.length} คน</div></button>
+    <button class="stat-cell drillable" data-action="drill" data-grad="1"><div class="label">จบการศึกษาแล้ว</div><div class="value">${grads.length} คน</div></button>
     <div class="stat-cell"><div class="label">อายุเฉลี่ย</div><div class="value">${avg(ages)??'-'} ปี</div></div>
     <div class="stat-cell"><div class="label">ส่วนสูงเฉลี่ย</div><div class="value">${avg(heights)??'-'} ซม.</div></div>
   </div>
@@ -1767,20 +1799,26 @@ function renderStatsOverview(){
     return `
     <div class="group-card" style="--c:${g.color}">
       <div class="group-head">
-        <h2 style="color:${g.color}">${g.name}</h2>
-        <span class="mono" style="font-size:12px;color:var(--ink-soft);">${mine.length} คน · จบแล้ว ${gradMine.length} คน</span>
+        <button class="link-h2" data-action="drill" data-group="${g.id}" style="color:${g.color}">${g.name}</button>
+        <span class="mono" style="font-size:12px;color:var(--ink-soft);">
+          <button class="link-inline" data-action="drill" data-group="${g.id}">${mine.length} คน</button> ·
+          <button class="link-inline" data-action="drill" data-group="${g.id}" data-grad="1">จบแล้ว ${gradMine.length} คน</button>
+        </span>
       </div>
       <h3 class="section-label" style="margin-top:6px;">แยกตามทีม</h3>
-      ${teams.map(t=>renderBar(t.name, mine.filter(m=>m.teamId===t.id).length, maxTeam, g.color)).join('')}
+      ${teams.map(t=>renderBar(t.name, mine.filter(m=>m.teamId===t.id).length, maxTeam, g.color,
+          {group:g.id, team:t.id})).join('')}
       <h3 class="section-label">แยกตามรุ่น</h3>
-      ${gens.map(n=>renderBar('รุ่น '+n, mine.filter(m=>m.gen===n).length, maxGen, g.color)).join('')
+      ${gens.map(n=>renderBar('รุ่น '+n, mine.filter(m=>m.gen===n).length, maxGen, g.color,
+          {group:g.id, gen:n})).join('')
         || '<p class="muted-note">ไม่มีข้อมูลรุ่น</p>'}
     </div>`;
   }).join('')}
 
   <div class="group-card" style="--c:var(--gold)">
     <div class="group-head"><h2 style="font-size:21px;">ช่วงอายุ (ทุกวง)</h2></div>
-    ${buckets.map(([lo,hi,label])=>renderBar(label, ages.filter(a=>a>=lo&&a<=hi).length, maxBucket, 'var(--gold)')).join('')}
+    ${buckets.map(([lo,hi,label])=>renderBar(label, ages.filter(a=>a>=lo&&a<=hi).length, maxBucket, 'var(--gold)',
+        {ageMin:lo||'', ageMax:hi>=99?'':hi})).join('')}
     <p class="stats-note">นับจาก ${ages.length} คนที่มีข้อมูลวันเกิด</p>
   </div>`;
 }
@@ -1798,15 +1836,19 @@ function renderStatsBirthdays(){
   };
   const upcoming = withBday.map(m=>({m, d:daysUntil(m)})).sort((a,b)=>a.d-b.d).slice(0,8);
   const whenLabel = d => d===0 ? 'วันนี้!' : d===1 ? 'พรุ่งนี้' : `อีก ${d} วัน`;
+  // calcAge counts birthdays already had, so the next one is always one more —
+  // except on the day itself, where it has just been counted.
+  const turning = (m, d) => { const a = calcAge(m.birthday); return a==null ? null : (d===0 ? a : a+1); };
 
   return `
   <h3 class="section-label" style="margin-top:4px;">วันเกิดที่ใกล้ถึง</h3>
   <div class="bday-next">
     ${upcoming.map(({m,d})=>{
       const g = getGroup(m.groupId);
+      const t = turning(m, d);
       return `<button class="bday-chip ${d===0?'today':''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
         ${renderAvatar(m,'avatar-sm',g.color)}
-        <span><span class="when">${whenLabel(d)}</span><span class="who" style="display:block;">${escapeHtml(m.nameTh||m.name)}</span></span>
+        <span><span class="when">${whenLabel(d)}${t!=null?` · ${d===0?'ครบ':'จะครบ'} ${t} ปี`:''}</span><span class="who" style="display:block;">${escapeHtml(m.nameTh||m.name)}</span></span>
       </button>`;
     }).join('')}
   </div>
@@ -1817,15 +1859,19 @@ function renderStatsBirthdays(){
       .sort((a,b)=>a.birthday.slice(8).localeCompare(b.birthday.slice(8)));
     if(!inMonth.length) return '';
     return `<div class="month-block">
-      <div class="month-head">${name} <span class="n">${inMonth.length} คน</span></div>
+      <div class="month-head">
+        <button class="link-inline strong" data-action="drill" data-month="${mm}">${name}</button>
+        <span class="n">${inMonth.length} คน</span>
+      </div>
       ${inMonth.map(m=>{
         const g = getGroup(m.groupId);
-        const age = calcAge(m.birthday);
+        const d = daysUntil(m);
+        const t = turning(m, d);
         return `<button class="bday-row" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
           <span class="day">${+m.birthday.slice(8)}</span>
           ${renderAvatar(m,'avatar-sm',g.color)}
           <span>${escapeHtml(m.nameTh||m.name)}</span>
-          <span class="age">${age!=null?age+' ปี':''}</span>
+          <span class="age">${t!=null?`${d===0?'ครบ':'จะครบ'} ${t} ปี`:''}</span>
         </button>`;
       }).join('')}
     </div>`;
@@ -1862,7 +1908,7 @@ function renderStatsTimeline(){
           if(!gs.length) return '';
           return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
             <span>${gs.length} คนจบการศึกษาจาก ${g.name}
-            <span class="ev-names">${gs.map(m=>escapeHtml(m.nameTh||m.name)).join(' · ')}</span></span></div>`;
+            <span class="ev-names">${gs.map(m=>`<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(m.nameTh||m.name)}</button>`).join(' · ')}</span></span></div>`;
         }).join('')}
       </div>`;
     }).join('')}
@@ -2488,6 +2534,24 @@ function bindDelegatedEvents(){
       state.genFilter = 'all';
       state.captainFilter = 'all';
       renderMain(); pushHistory();
+    }
+    else if(action==='drill'){
+      const d = el.dataset;
+      state.groupFilter = d.group || 'all';
+      state.teamFilter  = d.team  || 'all';
+      state.genFilter   = d.gen ? +d.gen : 'all';
+      state.captainFilter = 'all';
+      state.ageMin = d.ageMin || '';
+      state.ageMax = d.ageMax || '';
+      state.heightMin = ''; state.heightMax = '';
+      state.birthMonth = d.month || 'all';
+      state.showGraduated = d.grad === '1';
+      // Open the panel when the jump set something only it can show, so the
+      // narrowing is visible rather than mysterious.
+      state.advOpen = !!(d.ageMin || d.ageMax || d.month);
+      state.view = 'browse'; state.favoritesOnly = false;
+      state.selectedId = null; state.query = '';
+      render(); pushHistory();
     }
     else if(action==='filter-team-direct'){
       state.groupFilter = el.dataset.group;
