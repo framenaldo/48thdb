@@ -423,6 +423,17 @@
   .facts-list li:before{ content:'\2013'; position:absolute; left:0; color:var(--ink-soft); }
   .muted-note{ color:var(--ink-soft); font-size:14px; }
 
+  .team-history{ list-style:none; padding:0; margin:8px 0 0; }
+  .team-history li{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 0; border-bottom:1px solid var(--line); font-size:14.5px;
+  }
+  .team-history li:last-child{ border-bottom:none; }
+  .th-dot{ width:9px; height:9px; border-radius:50%; flex:none; }
+  .th-team{ font-weight:600; }
+  .th-range{ margin-left:auto; color:var(--ink-soft); font-size:12.5px; white-space:nowrap; }
+  .th-now{ color:var(--ink); font-weight:600; }
+
   .action-row{ display:flex; gap:10px; margin-top:26px; flex-wrap:wrap; }
   .btn-secondary{
     background:var(--paper-dim); color:var(--ink); border:1px solid var(--line);
@@ -1007,7 +1018,7 @@ const SEED_GRADUATED = [
   { id:'bnk-natherine', name:'Natherine', nameTh:'แนทเธอรีน', realName:'Dusita Kitisarakulchai', realNameTh:'ดุสิตา กิติสาระกุลชัย', groupId:'bnk48', teamId:'nv', gen:2, birthday:'1999-11-11', height:163, blood:'', graduated:'2020-02-16', facts:[] },
   { id:'bnk-oom', name:'Oom', nameTh:'อุ้ม', realName:'Natcha Krisdhasima', realNameTh:'ณัชชา กฤษฎาสิมะ', groupId:'bnk48', teamId:'trainee-bnk', gen:2, birthday:'2002-09-29', height:165, blood:'', graduated:'2020-02-16', facts:[] },
   { id:'bnk-nink', name:'Nink', nameTh:'นิ้ง', realName:'Mananya Kaoju', realNameTh:'มนัญญา เกาะจู', groupId:'bnk48', teamId:'nv', gen:1, birthday:'2000-02-03', height:160, blood:'', graduated:'2020-03-25', facts:[] },
-  { id:'bnk-june', name:'Juné', nameTh:'จูเน่', realName:'Plearnpichaya Komalarajun', realNameTh:'เพลินพิชญา โกมลารชุน', groupId:'bnk48', teamId:'biii', gen:2, birthday:'2000-07-04', height:171, blood:'', graduated:'2020-06-11', facts:[] },
+  { id:'bnk-june', name:'Juné', nameTh:'จูเน่', realName:'Plearnpichaya Komalarajun', realNameTh:'เพลินพิชญา โกมลารชุน', groupId:'bnk48', teamId:'biii', gen:2, birthday:'2000-07-04', height:171, blood:'', graduated:'2021-06-02', facts:[] },
   { id:'bnk-kheng', name:'Kheng', nameTh:'เข่ง', realName:'Juthamas Khonta', realNameTh:'จุฑามาศ คลทา', groupId:'bnk48', teamId:'biii', gen:2, birthday:'2000-03-26', height:161, blood:'', graduated:'2020-12-04', facts:[] },
   { id:'bnk-fifa', name:'Fifa', nameTh:'ฟีฟ่า', realName:'Paweethida Sakunpiphat', realNameTh:'ปวีณ์ธิดา สกุลพิพัฒน์', groupId:'bnk48', teamId:'trainee-bnk', gen:2, birthday:'2001-11-06', height:163, blood:'', graduated:'2020-12-23', facts:[] },
   { id:'bnk-faii', name:'Faii', nameTh:'ฝ้าย', realName:'Sumitta Duangkaew', realNameTh:'สุมิตตา ดวงแก้ว', groupId:'bnk48', teamId:'biii', gen:2, birthday:'1996-06-28', height:165, blood:'', graduated:'2021-03-19', facts:[] },
@@ -1072,12 +1083,12 @@ const SEED_GRADUATED = [
   { id:'cgm-parima', name:'Parima', nameTh:'ปะริมะ', realName:'Chutipapha Rattanakornyannawut', realNameTh:'ชุติปภา รัตนกรญาณวุฒิ', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2005-07-29', height:157, blood:'', graduated:'2023-09-16', facts:[] },
   { id:'cgm-jayda', name:'Jayda', nameTh:'เจย์ดา', realName:'Ravinda Alan', realNameTh:'รวินดา อลัน', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2006-12-16', height:160, blood:'', graduated:'2023-10-07', facts:[] },
   { id:'cgm-twobam', name:'Twobam', nameTh:'ทูแบม', realName:'Pitchaporn Whathanathongtin', realNameTh:'พิชชาพร วัฒนาทองทิน', groupId:'cgm48', teamId:'trainee-cgm', gen:2, birthday:'2006-02-10', height:163, blood:'', graduated:'2023-10-08', facts:[] },
-  { id:'cgm-milk', name:'Milk', nameTh:'มิลค์', realName:'Chayanan Jedpeenongruamjai', realNameTh:'ชยานันท์ เจ็ดพี่น้องร่วมใจ', groupId:'cgm48', teamId:null, gen:1, birthday:'2005-12-06', height:149, blood:'', graduated:'2024-01-11', facts:[] },
+  { id:'cgm-milk', name:'Milk', nameTh:'มิลค์', realName:'Chayanan Jedpeenongruamjai', realNameTh:'ชยานันท์ เจ็ดพี่น้องร่วมใจ', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2005-12-06', height:149, blood:'', graduated:'2024-01-11', facts:[] },
   { id:'cgm-aom', name:'Aom', nameTh:'ออม', realName:'Punyawee Jungcharoen', realNameTh:'ปุณยวีร์ จึงเจริญ', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'1995-09-20', height:157, blood:'', graduated:'2024-04-30', transfer:{ fromGroupId:'bnk48', fromGen:2, date:'2019-08-27' }, facts:[] },
-  { id:'cgm-izurina', name:'Izurina', nameTh:'อิซึรินะ', realName:'Rina Izuta', realNameTh:'รินะ อิซึตะ', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'1995-11-26', height:158, blood:'', graduated:'2024-07-07', transfer:{ fromGroupId:'bnk48', fromGen:1, date:'2019-08-27' }, facts:[] },
+  { id:'cgm-izurina', name:'Izurina', nameTh:'อิซึรินะ', realName:'Rina Izuta', realNameTh:'รินะ อิซึตะ', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'1995-11-26', height:158, blood:'', graduated:'2024-11-30', transfer:{ fromGroupId:'bnk48', fromGen:1, date:'2019-08-27' }, facts:[] },
   { id:'cgm-papang', name:'Papang', nameTh:'พะแพง', realName:'Suphatchaya Khamngern', realNameTh:'ศุภัชญา คำเงิน', groupId:'cgm48', teamId:'trainee-cgm', gen:2, birthday:'2007-08-17', height:167, blood:'', graduated:'2024-08-31', facts:[] },
   { id:'cgm-fortune', name:'Fortune', nameTh:'ฟอร์จูน', realName:'Pundita Koontawee', realNameTh:'ปัณฑิตา คูณทวี', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'1999-08-18', height:162, blood:'', graduated:'2024-10-31', facts:[] },
-  { id:'cgm-meilli', name:'Meilli', nameTh:'เหมยลี่', realName:'Phichayapha Showtale', realNameTh:'พิชญาภา โชว์ทะเล', groupId:'cgm48', teamId:null, gen:4, birthday:'2008-08-21', height:null, blood:'', graduated:'2025-05-15', facts:[] },
+  { id:'cgm-meilli', name:'Meilli', nameTh:'เหมยลี่', realName:'Phichayapha Showtale', realNameTh:'พิชญาภา โชว์ทะเล', groupId:'cgm48', teamId:'trainee-cgm', gen:4, birthday:'2008-08-21', height:null, blood:'', graduated:'2025-05-15', facts:[] },
   { id:'cgm-angel', name:'Angel', nameTh:'แองเจิ้ล', realName:'Napassanan Thambuacha', realNameTh:'นภัสนันท์ ธรรมบัวชา', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2002-04-06', height:155, blood:'', graduated:'2025-09-03', facts:[] },
   { id:'cgm-champoo', name:'Champoo', nameTh:'แชมพู', realName:'Kodchaporn Leelatheep', realNameTh:'กชพร ลีละทีป', groupId:'cgm48', teamId:'teamc', gen:1, birthday:'2005-10-10', height:158, blood:'', graduated:'2025-09-03', facts:[] },
   { id:'cgm-fahsai', name:'Fahsai', nameTh:'ฟ้าใส', realName:'Phattaratida Chongprasankiat', realNameTh:'ภัทรธิดา จงประสานเกียรติ', groupId:'cgm48', teamId:'trainee-cgm', gen:1, birthday:'2007-05-23', height:168, blood:'', graduated:'2025-09-03', facts:[] },
@@ -1100,6 +1111,174 @@ const SEED_GRADUATED = [
 
 // One pool for storage: seeding and reconciliation treat both the same.
 const SEED_ALL_MEMBERS = SEED_MEMBERS.concat(SEED_GRADUATED);
+
+// Which team each member belonged to and when, from the "Team History"
+// section of their page on the AKB48 fandom wiki. A null `to` means the
+// member is still on that team. Captain and vice-captain appointments name a
+// team without changing which one a member belongs to, so they are not spans.
+// A member who moved between BNK48 and CGM48 shows a gap: the wiki names no
+// team for the stretch between the transfer and the next promotion. Time in
+// AKB48 is outside what this database covers and is not listed.
+const SEED_TEAM_HISTORY = {
+  'bnk-fame': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-10-30' }, { team:'biii', from:'2022-10-30', to:null }],
+  'bnk-hoop': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'biii', from:'2022-06-02', to:null }],
+  'bnk-janry': [{ team:'trainee-bnk', from:'2022-10-30', to:'2024-09-15' }, { team:'biii', from:'2024-09-15', to:null }],
+  'bnk-luksorn': [{ team:'trainee-bnk', from:'2025-05-31', to:'2026-05-30' }, { team:'biii', from:'2026-05-30', to:null }],
+  'bnk-mail': [{ team:'trainee-bnk', from:'2025-05-31', to:'2026-05-30' }, { team:'biii', from:'2026-05-30', to:null }],
+  'bnk-marine': [{ team:'trainee-bnk', from:'2022-10-30', to:'2024-09-15' }, { team:'biii', from:'2024-09-15', to:null }],
+  'bnk-micha': [{ team:'trainee-bnk', from:'2022-10-30', to:'2025-07-13' }, { team:'biii', from:'2025-07-13', to:null }],
+  'bnk-monet': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-10-30' }, { team:'biii', from:'2022-10-30', to:null }],
+  'bnk-patt': [{ team:'trainee-bnk', from:'2022-10-30', to:'2024-09-15' }, { team:'biii', from:'2024-09-15', to:null }],
+  'bnk-praew': [{ team:'trainee-bnk', from:'2025-05-31', to:'2026-05-30' }, { team:'biii', from:'2026-05-30', to:null }],
+  'bnk-wawa': [{ team:'trainee-bnk', from:'2022-10-30', to:'2024-09-15' }, { team:'biii', from:'2024-09-15', to:null }],
+  'bnk-arlee': [{ team:'trainee-bnk', from:'2024-02-22', to:'2025-07-13' }, { team:'nv', from:'2025-07-13', to:null }],
+  'bnk-berry': [{ team:'trainee-bnk', from:'2022-10-30', to:'2025-07-13' }, { team:'nv', from:'2025-07-13', to:null }],
+  'bnk-emmy': [{ team:'trainee-bnk', from:'2022-10-30', to:'2024-09-15' }, { team:'nv', from:'2024-09-15', to:null }],
+  'bnk-jew': [{ team:'trainee-bnk', from:'2024-02-22', to:'2026-05-30' }, { team:'nv', from:'2026-05-30', to:null }],
+  'bnk-l': [{ team:'trainee-bnk', from:'2022-10-30', to:'2024-09-15' }, { team:'nv', from:'2024-09-15', to:null }],
+  'bnk-palmmy': [{ team:'trainee-bnk', from:'2022-10-30', to:'2024-09-15' }, { team:'nv', from:'2024-09-15', to:null }],
+  'bnk-pancake': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'nv', from:'2022-06-02', to:null }],
+  'bnk-proud': [{ team:'trainee-bnk', from:'2024-02-22', to:'2025-07-13' }, { team:'nv', from:'2025-07-13', to:null }],
+  'bnk-saonoi': [{ team:'trainee-bnk', from:'2024-02-22', to:'2026-05-30' }, { team:'nv', from:'2026-05-30', to:null }],
+  'bnk-sindy': [{ team:'trainee-bnk', from:'2022-10-30', to:'2025-07-13' }, { team:'nv', from:'2025-07-13', to:null }],
+  'bnk-yoghurt': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'nv', from:'2022-06-02', to:null }],
+  'bnk-blythe': [{ team:'trainee-bnk', from:'2025-05-31', to:null }],
+  'bnk-cartoon': [{ team:'trainee-bnk', from:'2025-05-31', to:null }],
+  'bnk-galeya': [{ team:'trainee-bnk', from:'2024-02-22', to:null }],
+  'bnk-grape': [{ team:'trainee-bnk', from:'2025-05-31', to:null }],
+  'bnk-inkcha': [{ team:'trainee-bnk', from:'2025-05-31', to:null }],
+  'bnk-khaimook': [{ team:'trainee-bnk', from:'2024-02-22', to:null }],
+  'bnk-khowjow': [{ team:'trainee-bnk', from:'2025-05-31', to:null }],
+  'bnk-mayji': [{ team:'trainee-bnk', from:'2024-02-22', to:null }],
+  'bnk-mint': [{ team:'trainee-bnk', from:'2025-05-31', to:null }],
+  'bnk-mirin': [{ team:'trainee-bnk', from:'2025-05-31', to:null }],
+  'bnk-nall': [{ team:'trainee-bnk', from:'2024-02-22', to:null }],
+  'bnk-nammonn': [{ team:'trainee-bnk', from:'2024-02-22', to:null }],
+  'bnk-neen': [{ team:'trainee-bnk', from:'2024-02-22', to:null }],
+  'bnk-niya': [{ team:'trainee-bnk', from:'2024-02-22', to:null }],
+  'bnk-rose': [{ team:'trainee-bnk', from:'2025-05-31', to:null }],
+  'cgm-lookked': [{ team:'trainee-cgm', from:'2022-10-30', to:'2023-08-05' }, { team:'teamc', from:'2023-08-05', to:null }],
+  'cgm-nana': [{ team:'trainee-cgm', from:'2022-10-30', to:'2024-05-18' }, { team:'teamc', from:'2024-05-18', to:null }],
+  'cgm-jingjing': [{ team:'trainee-cgm', from:'2022-10-30', to:'2023-08-05' }, { team:'teamc', from:'2023-08-05', to:null }],
+  'cgm-prae': [{ team:'trainee-cgm', from:'2024-07-06', to:'2025-06-01' }, { team:'teamc', from:'2025-06-01', to:null }],
+  'cgm-lingling': [{ team:'trainee-cgm', from:'2024-07-06', to:'2026-05-30' }, { team:'teamc', from:'2026-05-30', to:null }],
+  'cgm-else': [{ team:'trainee-cgm', from:'2025-03-22', to:'2026-05-30' }, { team:'teamc', from:'2026-05-30', to:null }],
+  'cgm-ginna': [{ team:'trainee-cgm', from:'2022-10-30', to:'2026-05-30' }, { team:'teamc', from:'2026-05-30', to:null }],
+  'cgm-ploen': [{ team:'trainee-cgm', from:'2024-07-06', to:'2026-05-30' }, { team:'teamc', from:'2026-05-30', to:null }],
+  'cgm-kwan': [{ team:'trainee-cgm', from:'2024-07-06', to:'2025-06-01' }, { team:'teamc', from:'2025-06-01', to:null }],
+  'cgm-nisha': [{ team:'trainee-cgm', from:'2025-03-22', to:'2026-05-30' }, { team:'teamc', from:'2026-05-30', to:null }],
+  'cgm-valentine': [{ team:'trainee-cgm', from:'2025-03-22', to:null }],
+  'cgm-satangpound': [{ team:'trainee-cgm', from:'2025-03-22', to:null }],
+  'cgm-praifa': [{ team:'trainee-cgm', from:'2025-03-22', to:null }],
+  'cgm-shenae': [{ team:'trainee-cgm', from:'2025-03-22', to:null }],
+  'cgm-emma': [{ team:'trainee-cgm', from:'2022-10-30', to:null }],
+  'cgm-hongyok': [{ team:'trainee-cgm', from:'2025-03-22', to:null }],
+  'cgm-chifa': [{ team:'trainee-cgm', from:'2026-02-07', to:null }],
+  'cgm-tara': [{ team:'trainee-cgm', from:'2026-02-07', to:null }],
+  'cgm-punpon': [{ team:'trainee-cgm', from:'2026-02-07', to:null }],
+  'cgm-lewlew': [{ team:'trainee-cgm', from:'2026-02-07', to:null }],
+  'cgm-namphet': [{ team:'trainee-cgm', from:'2026-02-07', to:null }],
+  'bnk-kitkat': [{ team:'trainee-bnk', from:'2016-12-19', to:'2017-09-23' }],
+  'bnk-cincin': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-11-18' }],
+  'bnk-namhom': [{ team:'trainee-bnk', from:'2017-02-12', to:'2018-02-12' }],
+  'bnk-jan': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2018-02-28' }],
+  'bnk-can': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2018-08-26' }],
+  'bnk-maysa': [{ team:'trainee-bnk', from:'2017-02-12', to:'2018-10-21' }],
+  'bnk-deenee': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-08-11' }],
+  'bnk-cake': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-09-27' }],
+  'bnk-maira': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-12-07' }],
+  'bnk-natherine': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2020-02-16' }],
+  'bnk-oom': [{ team:'trainee-bnk', from:'2018-04-29', to:'2020-02-16' }],
+  'bnk-nink': [{ team:'trainee-bnk', from:'2017-02-12', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2020-03-25' }],
+  'bnk-june': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'biii', from:'2019-11-16', to:'2021-06-02' }],
+  'bnk-kheng': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'biii', from:'2019-11-16', to:'2020-12-04' }],
+  'bnk-fifa': [{ team:'trainee-bnk', from:'2018-04-29', to:'2020-12-23' }],
+  'bnk-faii': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'biii', from:'2019-11-16', to:'2021-03-18' }],
+  'bnk-jeje': [{ team:'trainee-bnk', from:'2020-08-09', to:'2021-03-18' }],
+  'bnk-mewnich': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2021-12-05' }],
+  'bnk-bamboo': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-05-29' }],
+  'bnk-view': [{ team:'trainee-bnk', from:'2018-04-29', to:'2022-05-31' }],
+  'bnk-jaa': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-jane': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2022-12-21' }],
+  'bnk-jennis': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2022-12-21' }],
+  'bnk-jib': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2022-12-21' }],
+  'bnk-kaew': [{ team:'trainee-bnk', from:'2016-12-19', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2022-12-21' }],
+  'bnk-kaimook': [{ team:'trainee-bnk', from:'2017-02-12', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-kate': [{ team:'trainee-bnk', from:'2017-02-12', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2022-12-21' }],
+  'bnk-korn': [{ team:'trainee-bnk', from:'2017-02-12', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2022-12-21' }],
+  'bnk-mind': [{ team:'trainee-bnk', from:'2016-12-19', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2020-03-26' }, { team:'trainee-bnk', from:'2020-03-26', to:'2022-12-21' }],
+  'bnk-mobile': [{ team:'trainee-bnk', from:'2016-12-19', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-music': [{ team:'trainee-bnk', from:'2016-12-19', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-namneung': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-namsai': [{ team:'trainee-bnk', from:'2017-02-12', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-noey': [{ team:'trainee-bnk', from:'2017-02-12', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2022-12-21' }],
+  'bnk-orn': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-piam': [{ team:'trainee-bnk', from:'2016-12-19', to:'2019-11-16' }, { team:'biii', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-pun': [{ team:'trainee-bnk', from:'2016-12-19', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2022-12-21' }],
+  'bnk-pupe': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-tarwaan': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2022-12-21' }],
+  'bnk-pim': [{ team:'trainee-bnk', from:'2020-08-09', to:'2023-01-15' }],
+  'bnk-pampam': [{ team:'trainee-bnk', from:'2020-08-09', to:'2022-06-02' }, { team:'nv', from:'2022-06-02', to:'2023-03-29' }],
+  'bnk-cherprang': [{ team:'trainee-bnk', from:'2016-12-19', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2023-10-30' }],
+  'bnk-miori': [{ team:'trainee-bnk', from:'2016-12-21', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2023-12-31' }],
+  'bnk-fond': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-gygee': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-khamin': [{ team:'trainee-bnk', from:'2018-04-29', to:'2023-08-06' }, { team:'nv', from:'2023-08-06', to:'2024-04-30' }],
+  'bnk-minmin': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'biii', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-myyu': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'biii', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-new': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-niky': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'biii', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-nine': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-pakwan': [{ team:'trainee-bnk', from:'2018-04-29', to:'2023-08-06' }, { team:'nv', from:'2023-08-06', to:'2024-04-30' }],
+  'bnk-panda': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'biii', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-phukkhom': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-ratah': [{ team:'trainee-bnk', from:'2018-04-29', to:'2022-06-02' }, { team:'nv', from:'2022-06-02', to:'2024-04-30' }],
+  'bnk-stang': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-wee': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-11-16' }, { team:'biii', from:'2019-11-16', to:'2024-04-30' }],
+  'bnk-paeyah': [{ team:'trainee-bnk', from:'2020-08-09', to:'2022-06-02' }, { team:'nv', from:'2022-06-02', to:'2024-06-30' }],
+  'bnk-nana': [{ team:'trainee-bnk', from:'2024-02-22', to:'2024-08-31' }],
+  'bnk-jaokhem': [{ team:'trainee-bnk', from:'2020-03-06', to:'2023-08-06' }, { team:'nv', from:'2023-08-06', to:'2024-11-01' }],
+  'bnk-nene': [{ team:'trainee-bnk', from:'2022-10-30', to:'2024-12-08' }],
+  'bnk-satchan': [{ team:'trainee-bnk', from:'2016-12-19', to:'2017-12-24' }, { team:'biii', from:'2017-12-24', to:'2019-11-16' }, { team:'nv', from:'2019-11-16', to:'2024-12-31' }],
+  'bnk-popper': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'nv', from:'2022-06-02', to:'2025-09-07' }],
+  'bnk-earn': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'biii', from:'2022-06-02', to:'2026-03-06' }],
+  'bnk-earth': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-10-30' }, { team:'nv', from:'2022-10-30', to:'2026-03-06' }],
+  'bnk-eve': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-10-30' }, { team:'nv', from:'2022-10-30', to:'2024-09-15' }, { team:'biii', from:'2024-09-15', to:'2026-03-06' }],
+  'bnk-grace': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'biii', from:'2022-06-02', to:'2024-09-15' }, { team:'nv', from:'2024-09-15', to:'2026-03-06' }],
+  'bnk-kaofrang': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'nv', from:'2022-06-02', to:'2026-03-06' }],
+  'bnk-mean': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'biii', from:'2022-06-02', to:'2026-03-06' }],
+  'bnk-peak': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-10-30' }, { team:'biii', from:'2022-10-30', to:'2026-03-06' }],
+  'bnk-yayee': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'biii', from:'2022-06-02', to:'2026-03-06' }],
+  'cgm-nicha': [{ team:'trainee-cgm', from:'2019-09-03', to:'2021-12-12' }],
+  'cgm-pepo': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-03-13' }],
+  'cgm-parima': [{ team:'trainee-cgm', from:'2019-09-03', to:'2023-09-17' }],
+  'cgm-jayda': [{ team:'trainee-cgm', from:'2019-09-03', to:'2023-10-07' }],
+  'cgm-twobam': [{ team:'trainee-cgm', from:'2022-10-30', to:'2023-10-07' }],
+  'cgm-milk': [{ team:'trainee-cgm', from:'2019-09-03', to:'2024-01-11' }],
+  'cgm-aom': [{ team:'trainee-bnk', from:'2018-04-29', to:'2019-06-10' }, { team:'teamc', from:'2020-02-09', to:'2024-04-30' }],
+  'cgm-izurina': [{ team:'biii', from:'2017-12-24', to:'2019-07-10' }, { team:'teamc', from:'2020-02-09', to:'2024-11-30' }],
+  'cgm-papang': [{ team:'trainee-cgm', from:'2022-10-30', to:'2024-08-27' }],
+  'cgm-fortune': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2024-10-31' }],
+  'cgm-meilli': [{ team:'trainee-cgm', from:'2025-03-22', to:'2025-05-15' }],
+  'cgm-angel': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2025-09-03' }],
+  'cgm-champoo': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2025-09-03' }],
+  'cgm-fahsai': [{ team:'trainee-cgm', from:'2019-09-03', to:'2025-09-03' }],
+  'cgm-jjae': [{ team:'trainee-cgm', from:'2019-09-03', to:'2025-09-03' }],
+  'cgm-kaiwan': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2025-09-03' }],
+  'cgm-kaning': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2025-09-03' }],
+  'cgm-kyla': [{ team:'trainee-cgm', from:'2019-09-03', to:'2023-08-05' }, { team:'teamc', from:'2023-08-05', to:'2025-09-03' }],
+  'cgm-latin': [{ team:'trainee-cgm', from:'2019-09-03', to:'2025-06-01' }, { team:'teamc', from:'2025-06-01', to:'2025-09-03' }],
+  'cgm-marmink': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2025-09-03' }],
+  'cgm-meen': [{ team:'trainee-cgm', from:'2019-09-03', to:'2025-09-03' }],
+  'cgm-mei': [{ team:'trainee-cgm', from:'2019-09-03', to:'2025-09-03' }],
+  'cgm-nena': [{ team:'trainee-cgm', from:'2019-09-03', to:'2025-09-03' }],
+  'cgm-nenie': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2025-09-03' }],
+  'cgm-pim': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2025-09-03' }],
+  'cgm-ping': [{ team:'trainee-cgm', from:'2019-09-03', to:'2023-08-05' }, { team:'teamc', from:'2023-08-05', to:'2025-09-03' }],
+  'cgm-punch': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2025-09-03' }],
+  'cgm-sita': [{ team:'trainee-cgm', from:'2019-09-03', to:'2022-05-28' }, { team:'teamc', from:'2022-05-28', to:'2025-09-03' }],
+  'cgm-runma': [{ team:'trainee-cgm', from:'2024-07-06', to:'2025-06-01' }, { team:'teamc', from:'2025-06-01', to:'2026-03-07' }],
+};
 
 const SEED_SINGLES = [
   { id:'bnk-s1', groupId:'bnk48', num:1, title:'อยากจะได้พบเธอ', alt:'Aitakatta', year:2017 },
@@ -1813,6 +1992,22 @@ function getGroupCaptainBadge(m){
   return null;
 }
 
+function renderTeamHistory(m){
+  const spans = SEED_TEAM_HISTORY[m.id];
+  if(!spans || !spans.length) return '';
+  const rows = spans.map(s=>{
+    const t = getTeam(s.team);
+    const colour = t ? getGroup(t.groupId).color : 'var(--ink-soft)';
+    const end = s.to ? formatDateShort(s.to) : `<span class="th-now">ปัจจุบัน</span>`;
+    return `<li>
+      <span class="th-dot" style="background:${colour}"></span>
+      <span class="th-team">${t ? t.name : s.team}</span>
+      <span class="th-range mono">${formatDateShort(s.from)} – ${end}</span>
+    </li>`;
+  }).join('');
+  return `<h3 class="section-label">ประวัติทีม</h3><ol class="team-history">${rows}</ol>`;
+}
+
 function getTeamCaptainBadge(m){
   const t = getTeam(m.teamId);
   if(t && t.captain===m.name) return 'C';
@@ -2011,6 +2206,7 @@ function renderDetailModal(){
           <div class="stat-cell"><div class="label">ส่วนสูง</div><div class="value">${m.height?m.height+' ซม.':'-'}</div></div>
           <div class="stat-cell"><div class="label">กรุ๊ปเลือด</div><div class="value">${m.blood||'-'}</div></div>
         </div>
+        ${renderTeamHistory(m)}
         <h3 class="section-label">ข้อเท็จจริง</h3>
         ${m.facts && m.facts.length ? `<ul class="facts-list">${m.facts.map(f=>`<li>${f}</li>`).join('')}</ul>` : `<p class="muted-note">ยังไม่มีข้อมูลเพิ่มเติม — กด "แก้ไขข้อมูล" เพื่อเพิ่ม</p>`}
         <div class="action-row">
