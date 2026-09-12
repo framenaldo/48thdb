@@ -49,6 +49,54 @@
     --mint:#2FD8A9;
     --mint-soft:#C9FBEA;
     --radius:8px;
+    --danger:#B84545;
+    --danger-soft:#FBEAEA;
+    --cgm-soft-edge:#BFDFDA;
+    --scrim:rgba(28,19,41,.42);
+    /* One knob scales every frosted-white overlay, so the whole glass
+       treatment can be dialled down at once for the dark palette. */
+    --glass-k:1;
+    --shadow-rgb:28,19,41;
+    --bg-body:
+      radial-gradient(circle at 8% 8%, rgba(255,111,165,.35), transparent 40%),
+      radial-gradient(circle at 92% 18%, rgba(47,216,169,.30), transparent 45%),
+      radial-gradient(circle at 15% 85%, rgba(47,216,169,.28), transparent 42%),
+      radial-gradient(circle at 90% 92%, rgba(255,111,165,.30), transparent 45%),
+      linear-gradient(160deg, #FFF3F7 0%, #FFF7EF 45%, #EFFDF7 100%);
+    --bg-header:linear-gradient(135deg, rgba(255,111,165,.32), rgba(47,216,169,.28));
+    --bg-nav:linear-gradient(135deg, rgba(255,111,165,.4), rgba(47,216,169,.36));
+    color-scheme:light;
+  }
+
+  /* Dark palette. Only the tokens change — every rule above is written in
+     terms of them, so nothing here needs to restate layout or structure. */
+  :root[data-theme="dark"]{
+    --ink:#F0E9F5;
+    --ink-soft:#A99DB6;
+    --paper:#16111E;
+    --paper-dim:#251E32;
+    --card:#1E1729;
+    --line:#362C45;
+    --bnk:#FF6C9F;
+    --bnk-soft:#3E2130;
+    --cgm:#48C4B6;
+    --cgm-soft:#16332E;
+    --cgm-soft-edge:#2A5B54;
+    --gold:#D3A14A;
+    --danger:#F08585;
+    --danger-soft:#3B2020;
+    --scrim:rgba(0,0,0,.62);
+    --glass-k:.14;
+    --shadow-rgb:0,0,0;
+    --bg-body:
+      radial-gradient(circle at 8% 8%, rgba(255,111,165,.16), transparent 40%),
+      radial-gradient(circle at 92% 18%, rgba(47,216,169,.13), transparent 45%),
+      radial-gradient(circle at 15% 85%, rgba(47,216,169,.12), transparent 42%),
+      radial-gradient(circle at 90% 92%, rgba(255,111,165,.13), transparent 45%),
+      linear-gradient(160deg, #17111F 0%, #191320 45%, #111C1B 100%);
+    --bg-header:linear-gradient(135deg, rgba(255,111,165,.15), rgba(47,216,169,.13));
+    --bg-nav:linear-gradient(135deg, rgba(255,111,165,.2), rgba(47,216,169,.17));
+    color-scheme:dark;
     /* motion */
     --ease-spring:cubic-bezier(.34,1.56,.64,1);
     --ease-out:cubic-bezier(.22,1,.36,1);
@@ -68,12 +116,7 @@
   html,body{margin:0;padding:0;}
   body{
     font-family:'Noto Sans Thai',sans-serif;
-    background:
-      radial-gradient(circle at 8% 8%, rgba(255,111,165,.35), transparent 40%),
-      radial-gradient(circle at 92% 18%, rgba(47,216,169,.30), transparent 45%),
-      radial-gradient(circle at 15% 85%, rgba(47,216,169,.28), transparent 42%),
-      radial-gradient(circle at 90% 92%, rgba(255,111,165,.30), transparent 45%),
-      linear-gradient(160deg, #FFF3F7 0%, #FFF7EF 45%, #EFFDF7 100%);
+    background:var(--bg-body);
     background-attachment:fixed;
     color:var(--ink);
     line-height:1.4;
@@ -87,13 +130,13 @@
 
   header.top{
     position:sticky; top:0; z-index:20;
-    background:linear-gradient(135deg, rgba(255,111,165,.32), rgba(47,216,169,.28));
+    background:var(--bg-header);
     backdrop-filter:blur(22px) saturate(180%);
     -webkit-backdrop-filter:blur(22px) saturate(180%);
     color:var(--ink);
     padding:14px 20px;
     display:flex; align-items:center; gap:16px; flex-wrap:wrap;
-    border-bottom:1px solid rgba(255,255,255,.5);
+    border-bottom:1px solid rgba(255,255,255,calc(.5*var(--glass-k)));
   }
   .wordmark{
     font-family:'Noto Sans Thai',sans-serif; font-weight:800; font-size:21px; letter-spacing:.3px;
@@ -105,8 +148,8 @@
   }
   .search-box{
     flex:1; min-width:150px; max-width:420px;
-    background:rgba(255,255,255,.5);
-    border:1px solid rgba(255,255,255,.7);
+    background:rgba(255,255,255,calc(.5*var(--glass-k)));
+    border:1px solid rgba(255,255,255,calc(.7*var(--glass-k)));
     border-radius:20px;
     padding:9px 16px;
     color:var(--ink);
@@ -114,7 +157,7 @@
     outline:none;
   }
   .search-box::placeholder{color:var(--ink-soft);}
-  .search-box:focus{ border-color:rgba(255,255,255,.95); background:rgba(255,255,255,.65); }
+  .search-box:focus{ border-color:rgba(255,255,255,calc(.95*var(--glass-k))); background:rgba(255,255,255,calc(.65*var(--glass-k))); }
 
   .btn-add{
     background:var(--gold); color:#241a06; border:none;
@@ -131,17 +174,17 @@
     display:flex; align-items:center; gap:6px;
     padding:13px 22px;
     border-radius:999px;
-    background:linear-gradient(135deg, rgba(255,111,165,.4), rgba(47,216,169,.36));
+    background:var(--bg-nav);
     backdrop-filter:blur(20px) saturate(180%);
     -webkit-backdrop-filter:blur(20px) saturate(180%);
-    border:1px solid rgba(255,255,255,.55);
-    box-shadow:0 10px 30px rgba(28,19,41,.18);
+    border:1px solid rgba(255,255,255,calc(.55*var(--glass-k)));
+    box-shadow:0 10px 30px rgba(var(--shadow-rgb),.18);
     max-width:calc(100vw - 24px);
   }
   .glass-nav button{
     background:none; border:none; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
-    color:rgba(28,19,41,.5);
+    color:var(--ink-soft);
     padding:5px 12px;
     transition:color .15s ease, transform .1s ease;
   }
@@ -184,7 +227,7 @@
   }
   /* transferred between groups rather than graduated from the first one */
   .transfer-tag{ color:var(--cgm); }
-  .transfer-note{ background:var(--cgm-soft); border-color:#BFDFDA; }
+  .transfer-note{ background:var(--cgm-soft); border-color:var(--cgm-soft-edge); }
   .transfer-note .grad-cap{ color:var(--cgm)!important; }
   .grad-note .grad-cap{ display:inline-flex; width:15px; height:15px; color:var(--gold); flex-shrink:0; }
   .grad-note .grad-cap svg{ width:100%; height:100%; display:block; }
@@ -233,14 +276,14 @@
   }
   .dtable .row.head .cell{
     font-family:'Noto Sans Thai',sans-serif; font-size:15px; letter-spacing:.5px;
-    color:rgba(28,19,41,.62); text-transform:uppercase; font-weight:600;
+    color:var(--ink-soft); text-transform:uppercase; font-weight:600;
     scroll-snap-align:start; background:transparent;
   }
   .sortable-th{ cursor:pointer; user-select:none; }
-  .sortable-th:active{ background:rgba(255,255,255,.25) !important; }
+  .sortable-th:active{ background:rgba(255,255,255,calc(.25*var(--glass-k))) !important; }
   .sortable-th.active-sort{ color:var(--ink); }
   .dtable .cell:not(.sticky-name){ border-right:1px solid var(--line); }
-  .dtable .row.head .cell:not(.sticky-name){ border-right:1px solid rgba(255,255,255,.4); }
+  .dtable .row.head .cell:not(.sticky-name){ border-right:1px solid rgba(255,255,255,calc(.4*var(--glass-k))); }
   .dtable .cell{
     flex:0 0 auto; padding:10px 7px; font-size:14px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
@@ -251,7 +294,7 @@
     display:flex; align-items:center; gap:7px;
     width:158px; background:var(--card); border-right:1px solid var(--line);
   }
-  .dtable .row.head .cell.sticky-name{ background:transparent; border-right:1px solid rgba(255,255,255,.45); }
+  .dtable .row.head .cell.sticky-name{ background:transparent; border-right:1px solid rgba(255,255,255,calc(.45*var(--glass-k))); }
   .dtable .row:not(.head):active .cell.sticky-name{ background:var(--paper-dim); }
   .col-group{ width:94px; }
   .col-team{ width:140px; }
@@ -312,7 +355,7 @@
   .back-btn:hover{ color:var(--ink); }
   .modal-backdrop{
     position:fixed; inset:0; z-index:60;
-    background:rgba(28,19,41,.42);
+    background:var(--scrim);
     backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
     display:flex; align-items:center; justify-content:center;
     padding:24px 18px;
@@ -322,11 +365,11 @@
   @keyframes modalPopIn{ from{transform:scale(.94) translateY(10px);opacity:0;} to{transform:scale(1) translateY(0);opacity:1;} }
   .modal-glass-card{
     position:relative; width:100%; max-width:460px; max-height:calc(100% - 8px);
-    background:rgba(255,255,255,.7);
+    background:rgba(255,255,255,calc(.7*var(--glass-k)));
     backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%);
-    border:1px solid rgba(255,255,255,.55);
+    border:1px solid rgba(255,255,255,calc(.55*var(--glass-k)));
     border-radius:24px;
-    box-shadow:0 20px 60px rgba(28,19,41,.35);
+    box-shadow:0 20px 60px rgba(var(--shadow-rgb),.35);
     animation:modalPopIn .22s cubic-bezier(.22,1,.36,1);
     display:flex; flex-direction:column;
   }
@@ -334,12 +377,12 @@
   .modal-close-btn{
     position:absolute; top:14px; right:14px; z-index:2;
     width:32px; height:32px; border-radius:50%;
-    background:rgba(255,255,255,.7); border:1px solid rgba(255,255,255,.6);
+    background:rgba(255,255,255,calc(.7*var(--glass-k))); border:1px solid rgba(255,255,255,calc(.6*var(--glass-k)));
     display:flex; align-items:center; justify-content:center;
     color:var(--ink); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.1);
   }
   .modal-close-btn svg{ width:16px; height:16px; }
-  .modal-close-btn:active{ background:rgba(255,255,255,.95); }
+  .modal-close-btn:active{ background:rgba(255,255,255,calc(.95*var(--glass-k))); }
 
   .back-btn-sticky{
     position:sticky; top:132px; z-index:20;
@@ -386,14 +429,14 @@
     font-family:'Noto Sans Thai',sans-serif; font-weight:600; font-size:14px; padding:9px 18px; border-radius:20px; cursor:pointer;
   }
   .btn-danger{
-    background:none; color:#B84545; border:1px solid #B84545;
+    background:none; color:var(--danger); border:1px solid var(--danger);
     font-family:'Noto Sans Thai',sans-serif; font-weight:600; font-size:13px; padding:9px 17px; border-radius:20px; cursor:pointer;
   }
 
   /* groups view */
   .group-card{
     background:var(--card); border-radius:10px; border-top:4px solid var(--c);
-    box-shadow:0 1px 3px rgba(28,19,41,.08); padding:22px; margin-bottom:20px;
+    box-shadow:0 1px 3px rgba(var(--shadow-rgb),.08); padding:22px; margin-bottom:20px;
   }
   .group-head{ display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
   .group-head h2{ margin:0; font-size:27px; font-family:'Noto Sans Thai',sans-serif; font-weight:800; }
@@ -414,6 +457,86 @@
   .timeline-year{ font-family:'Noto Sans Thai',sans-serif; font-size:11.5px; color:var(--ink-soft); }
   .timeline-title{ font-family:'Noto Sans Thai',sans-serif; font-weight:600; font-size:16.5px; margin-top:2px; }
 
+  /* sub-tabs shared by the stats screens */
+  .subtab-bar{ display:flex; gap:6px; margin:0 0 4px; flex-wrap:wrap; }
+  .subtab{
+    background:rgba(255,255,255,calc(.5*var(--glass-k)));
+    border:1px solid rgba(255,255,255,calc(.6*var(--glass-k)));
+    color:var(--ink-soft); border-radius:20px; padding:7px 15px; cursor:pointer;
+    font-family:'Noto Sans Thai',sans-serif; font-size:13px; font-weight:600;
+    transition:background .18s var(--ease-out), color .18s var(--ease-out);
+  }
+  .subtab.active{ background:var(--ink); color:var(--paper); border-color:transparent; }
+
+  /* proportional bars used by the distribution blocks */
+  .bar-row{ display:grid; grid-template-columns:96px 1fr 44px; align-items:center; gap:10px; margin-bottom:7px; }
+  .bar-label{ font-size:12.5px; color:var(--ink-soft); text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bar-track{ display:block; background:var(--paper-dim); border-radius:999px; height:16px; overflow:hidden; }
+  .bar-fill{ display:block; height:100%; border-radius:999px; background:var(--c,var(--ink)); min-width:2px; transition:width .5s var(--ease-out); }
+  .bar-val{ font-size:12.5px; font-weight:600; }
+  .stats-note{ color:var(--ink-soft); font-size:12.5px; margin:10px 0 0; }
+
+  /* birthdays */
+  .bday-next{ display:flex; gap:10px; overflow-x:auto; padding:2px 0 8px; -webkit-overflow-scrolling:touch; }
+  .bday-next::-webkit-scrollbar{ display:none; }
+  .bday-chip{
+    flex:0 0 auto; display:flex; align-items:center; gap:9px; cursor:pointer; text-align:left;
+    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--c,var(--ink));
+    border-radius:10px; padding:9px 13px 9px 11px; font-family:'Noto Sans Thai',sans-serif;
+    color:var(--ink); box-shadow:0 1px 3px rgba(var(--shadow-rgb),.08);
+  }
+  .bday-chip .when{ font-size:11px; color:var(--ink-soft); }
+  .bday-chip .who{ font-size:14px; font-weight:600; margin-top:1px; }
+  .bday-chip.today{ border-color:var(--gold); background:var(--bnk-soft); }
+  .month-block{ margin-bottom:16px; }
+  .month-head{
+    display:flex; align-items:baseline; gap:8px; margin:0 0 7px;
+    font-family:'Noto Sans Thai',sans-serif; font-weight:700; font-size:15px;
+  }
+  .month-head .n{ font-size:12px; font-weight:500; color:var(--ink-soft); }
+  .bday-row{
+    display:flex; align-items:center; gap:10px; width:100%; cursor:pointer; text-align:left;
+    background:var(--card); border:none; border-bottom:1px solid var(--line);
+    padding:9px 12px; font-family:'Noto Sans Thai',sans-serif; font-size:14px; color:var(--ink);
+  }
+  .bday-row:first-child{ border-top-left-radius:9px; border-top-right-radius:9px; }
+  .bday-row:last-child{ border-bottom:none; border-bottom-left-radius:9px; border-bottom-right-radius:9px; }
+  .bday-row:active{ background:var(--paper-dim); }
+  .bday-row .day{ font-weight:700; width:26px; flex-shrink:0; color:var(--c,var(--ink)); }
+  .bday-row .age{ margin-left:auto; font-size:12px; color:var(--ink-soft); flex-shrink:0; }
+
+  /* history timeline */
+  .year-block{ margin-bottom:4px; }
+  .year-head{ font-family:'Noto Sans Thai',sans-serif; font-weight:800; font-size:20px; margin:0 0 4px; }
+  .ev-row{ display:flex; gap:9px; align-items:flex-start; font-size:13.5px; line-height:1.5; padding:3px 0; }
+  .ev-dot{ width:8px; height:8px; border-radius:50%; background:var(--c,var(--ink)); margin-top:6px; flex-shrink:0; }
+  .ev-names{ color:var(--ink-soft); }
+
+  /* advanced filter panel */
+  .adv-panel{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:13px;
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:15px; margin:0 20px 14px;
+  }
+  .adv-field{ display:flex; flex-direction:column; gap:6px; }
+  .adv-field > label{ font-family:'Noto Sans Thai',sans-serif; font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+  .adv-field > label .cover{ font-weight:500; opacity:.8; }
+  .adv-range{ display:flex; align-items:center; gap:7px; }
+  .adv-range input{
+    width:100%; min-width:0; background:var(--paper-dim); color:var(--ink);
+    border:1px solid var(--line); border-radius:7px; padding:8px 10px; font-size:13.5px; outline:none;
+  }
+  .adv-range input:focus{ border-color:var(--ink-soft); }
+  .adv-range span{ color:var(--ink-soft); font-size:13px; }
+  .adv-field select{
+    background:var(--paper-dim); color:var(--ink); border:1px solid var(--line);
+    border-radius:7px; padding:8px 10px; font-size:13.5px; outline:none;
+  }
+  .adv-actions{ display:flex; align-items:flex-end; }
+  .adv-actions .btn-secondary:disabled{ opacity:.45; cursor:default; }
+  .pill.adv-on{ background:var(--ink); color:var(--paper); border-color:transparent; }
+  @media (max-width:640px){ .adv-panel{ margin-left:14px; margin-right:14px; } }
+
   /* form */
   .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   .form-field{ display:flex; flex-direction:column; gap:5px; }
@@ -430,22 +553,31 @@
   /* profile slot in header */
   #profile-slot{ margin-left:auto; }
   .signin-btn{
-    background:rgba(255,255,255,.5); color:var(--ink); border:1px solid rgba(255,255,255,.7);
+    background:rgba(255,255,255,calc(.5*var(--glass-k))); color:var(--ink); border:1px solid rgba(255,255,255,calc(.7*var(--glass-k)));
     font-family:'Noto Sans Thai',sans-serif; font-weight:600; font-size:13.5px;
     padding:8px 18px; border-radius:20px; cursor:pointer;
   }
-  .signin-btn:hover{ background:rgba(255,255,255,.7); }
+  .signin-btn:hover{ background:rgba(255,255,255,calc(.7*var(--glass-k))); }
   .profile-slot-wrap{ position:relative; }
+  .theme-btn{
+    flex-shrink:0; width:34px; height:34px; border-radius:50%; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; padding:0; color:var(--ink);
+    background:rgba(255,255,255,calc(.5*var(--glass-k)));
+    border:1px solid rgba(255,255,255,calc(.7*var(--glass-k)));
+    transition:background .18s var(--ease-out), transform .35s var(--ease-spring);
+  }
+  .theme-btn svg{ width:17px; height:17px; display:block; }
+  .theme-btn:active{ transform:scale(.9); }
   .mini-avatar-btn{ background:none; border:none; cursor:pointer; padding:0; display:block; }
   .mini-avatar{
     width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     background:var(--gold); color:#241a06; font-family:'Noto Sans Thai',sans-serif; font-weight:700; font-size:14px;
-    border:2px solid rgba(255,255,255,.4);
+    border:2px solid rgba(255,255,255,calc(.4*var(--glass-k)));
   }
   .profile-dropdown{
     position:absolute; top:44px; right:0; z-index:40; width:220px;
     background:var(--card); border-radius:12px; border:1px solid var(--line);
-    box-shadow:0 14px 34px rgba(28,19,41,.22); padding:8px; text-align:left;
+    box-shadow:0 14px 34px rgba(var(--shadow-rgb),.22); padding:8px; text-align:left;
   }
   .profile-dropdown .dropdown-name{ font-family:'Noto Sans Thai',sans-serif; font-weight:700; font-size:14px; padding:8px 10px 0; color:var(--ink); }
   .profile-dropdown .dropdown-email{ font-size:12px; color:var(--ink-soft); padding:1px 10px 8px; border-bottom:1px solid var(--line); margin-bottom:6px; }
@@ -455,7 +587,7 @@
     padding:9px 10px; border-radius:8px; cursor:pointer;
   }
   .profile-dropdown button:hover{ background:var(--paper-dim); }
-  .profile-dropdown button.danger{ color:#B84545; }
+  .profile-dropdown button.danger{ color:var(--danger); }
 
   /* oshi / kami oshi */
   .crown-ico{ display:inline-flex; width:15px; height:15px; vertical-align:-2px; color:var(--gold); }
@@ -509,7 +641,7 @@
     display:flex; align-items:center; gap:12px;
     background:var(--paper-dim); border-radius:12px; padding:14px 16px;
   }
-  .auth-error{ font-size:13px; color:#B84545; background:#FBEAEA; border-radius:8px; padding:10px 12px; margin:0 0 12px; line-height:1.5; }
+  .auth-error{ font-size:13px; color:var(--danger); background:var(--danger-soft); border-radius:8px; padding:10px 12px; margin:0 0 12px; line-height:1.5; }
   .auth-switch{ font-size:13px; color:var(--ink-soft); margin-top:16px; }
   .auth-switch button{ background:none; border:none; color:var(--bnk); font-weight:600; font-size:13px; cursor:pointer; padding:0; }
 
@@ -562,21 +694,21 @@
   /* --- hover (pointer devices only) --- */
   @media (hover:hover){
     .btn-add:hover{ filter:brightness(1.06); transform:translateY(-2px); box-shadow:0 8px 20px rgba(192,138,46,.4); }
-    .btn-secondary:hover{ background:#fff; border-color:var(--ink-soft); transform:translateY(-2px); box-shadow:0 7px 18px rgba(28,19,41,.11); }
-    .btn-danger:hover{ background:#B84545; color:#fff; transform:translateY(-2px); box-shadow:0 7px 18px rgba(184,69,69,.3); }
-    .signin-btn:hover{ background:rgba(255,255,255,.75); transform:translateY(-2px); box-shadow:0 7px 18px rgba(28,19,41,.13); }
+    .btn-secondary:hover{ background:var(--card); border-color:var(--ink-soft); transform:translateY(-2px); box-shadow:0 7px 18px rgba(var(--shadow-rgb),.11); }
+    .btn-danger:hover{ background:var(--danger); color:#fff; transform:translateY(-2px); box-shadow:0 7px 18px rgba(184,69,69,.3); }
+    .signin-btn:hover{ background:rgba(255,255,255,calc(.75*var(--glass-k))); transform:translateY(-2px); box-shadow:0 7px 18px rgba(var(--shadow-rgb),.13); }
     .pill:hover{ border-color:var(--bnk); color:var(--bnk); transform:translateY(-1px); }
     .gen-filter-chip:hover{ filter:brightness(1.35); }
-    .oshi-btn:hover, .kami-btn:hover{ border-color:var(--gold); transform:translateY(-2px); box-shadow:0 7px 18px rgba(28,19,41,.1); }
+    .oshi-btn:hover, .kami-btn:hover{ border-color:var(--gold); transform:translateY(-2px); box-shadow:0 7px 18px rgba(var(--shadow-rgb),.1); }
     .team-row:hover{ background:var(--pink-soft); transform:translateX(4px); }
     .mini-card:hover{
       transform:translateY(-4px);
-      box-shadow:0 12px 26px rgba(28,19,41,.15);
+      box-shadow:0 12px 26px rgba(var(--shadow-rgb),.15);
       box-shadow:0 12px 26px -6px color-mix(in srgb, var(--c) 55%, transparent);
       border-color:color-mix(in srgb, var(--c) 40%, var(--line));
     }
     .kami-feature:hover{ transform:translateY(-3px); box-shadow:0 14px 30px rgba(192,138,46,.26); }
-    .modal-close-btn:hover{ background:#fff; transform:rotate(90deg); }
+    .modal-close-btn:hover{ background:var(--card); transform:rotate(90deg); }
     .fav-btn:hover, .fav-btn-sm:hover{ transform:scale(1.3) rotate(10deg); }
     .back-btn:hover{ transform:translateX(-4px); }
     .mini-avatar-btn:hover{ transform:scale(1.08); }
@@ -586,7 +718,7 @@
       z-index:3;
       background:var(--paper-dim);
       background:color-mix(in srgb, var(--c) 15%, var(--card));
-      box-shadow:0 6px 22px -4px rgba(28,19,41,.28);
+      box-shadow:0 6px 22px -4px rgba(var(--shadow-rgb),.28);
       box-shadow:
         0 6px 22px -4px color-mix(in srgb, var(--c) 70%, transparent),
         inset 10px 0 22px -14px var(--c);
@@ -651,8 +783,8 @@
   }
   .glass-nav button::before{
     content:''; position:absolute; inset:1px 5px; z-index:0;
-    border-radius:999px; background:rgba(255,255,255,.8);
-    box-shadow:0 2px 8px rgba(28,19,41,.14);
+    border-radius:999px; background:rgba(255,255,255,calc(.8*var(--glass-k)));
+    box-shadow:0 2px 8px rgba(var(--shadow-rgb),.14);
     opacity:0; transform:scale(.55);
     transition:opacity .28s var(--ease-out), transform .4s var(--ease-spring);
   }
@@ -684,6 +816,14 @@
     .filter-bar{ padding-left:14px; padding-right:14px; }
   }
 </style>
+<script>
+  /* Runs before first paint: a stored choice wins, otherwise follow the OS. */
+  (function(){
+    var t; try{ t = localStorage.getItem('48thdb-theme'); }catch(e){}
+    if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
 </head>
 <body>
 <div id="app"><div class="loading">กำลังโหลด...</div></div>
@@ -927,6 +1067,10 @@ const ICONS = {
   profileFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="3.9"/><path d="M4 20.3c0-4.3 3.6-7.1 8-7.1s8 2.8 8 7.1v.2H4v-.2z"/></svg>`,
   crown: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 8.2l3.9 2.7L12 4.5l4.6 6.4 3.9-2.7-1.7 9.3H5.2L3.5 8.2z"/></svg>`,
   cap: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4L2.5 8.6 12 13.2l9.5-4.6L12 4z"/><path d="M6.4 10.8v4.4c0 1.5 2.5 2.8 5.6 2.8s5.6-1.3 5.6-2.8v-4.4"/><path d="M21.5 8.6v4.9"/></svg>`,
+  stats: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="12.5" width="4.4" height="8" rx="1.3"/><rect x="9.8" y="7" width="4.4" height="13.5" rx="1.3"/><rect x="16.4" y="3.5" width="4.4" height="17" rx="1.3"/></svg>`,
+  statsFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3.2" y="12.5" width="4.4" height="8" rx="1.3"/><rect x="9.8" y="7" width="4.4" height="13.5" rx="1.3"/><rect x="16.4" y="3.5" width="4.4" height="17" rx="1.3"/></svg>`,
+  sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6L17 17M7 7L5.4 5.4"/></svg>`,
+  moon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 14.2A8.4 8.4 0 0 1 9.8 3.7a8.7 8.7 0 1 0 10.5 10.5z"/></svg>`,
   transfer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h13"/><path d="M13.5 5l3.5 3.5-3.5 3.5"/><path d="M20 15.5H7"/><path d="M10.5 12L7 15.5l3.5 3.5"/></svg>`
 };
 
@@ -936,8 +1080,19 @@ let state = {
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
-  showGraduated:false
+  showGraduated:false,
+  statsTab:'overview', advOpen:false,
+  ageMin:'', ageMax:'', heightMin:'', heightMax:'', birthMonth:'all',
+  theme: document.documentElement.dataset.theme || 'light'
 };
+
+function applyTheme(theme){
+  state.theme = theme;
+  document.documentElement.dataset.theme = theme;
+  try{ localStorage.setItem('48thdb-theme', theme); }catch(e){}
+  const btn = document.querySelector('.theme-btn');
+  if(btn) btn.innerHTML = theme==='dark' ? ICONS.sun : ICONS.moon;
+}
 
 // ============================= HELPERS =============================
 function getGroup(id){ return GROUPS.find(g=>g.id===id); }
@@ -969,6 +1124,13 @@ function calcAge(d){
   if(m<0 || (m===0 && t.getDate()<b.getDate())) age--;
   return age;
 }
+const MONTH_NAMES = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+  'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+// Members currently in a group — the graduated roster is counted separately
+// everywhere it appears, so totals never silently include former members.
+function activeMembers(){ return state.members.filter(m=>!m.graduated); }
+
 function escapeAttr(s){ return (s==null?'':s.toString()).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function escapeHtml(s){ return escapeAttr(s); }
 
@@ -1037,6 +1199,7 @@ function renderHeader(){
   <header class="top">
     <div class="wordmark" data-action="nav-select" data-value="browse" style="cursor:pointer;">48thDB<small>48 THAILAND DATABASE</small></div>
     <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก..." value="${escapeAttr(state.query)}">
+    <button class="theme-btn" data-action="toggle-theme" aria-label="สลับธีมสว่าง/มืด">${state.theme==='dark'?ICONS.sun:ICONS.moon}</button>
     <button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>
     <div id="profile-slot"></div>
   </header>`;
@@ -1069,12 +1232,14 @@ const NAV_OPTIONS = [
   { value:'browse',      view:'browse', fav:false, icon:ICONS.members, iconActive:ICONS.membersFilled },
   { value:'groups',      view:'groups', fav:false, icon:ICONS.groups, iconActive:ICONS.groupsFilled },
   { value:'discography', view:'discography', fav:false, icon:ICONS.works, iconActive:ICONS.worksFilled },
+  { value:'stats',       view:'stats', fav:false, icon:ICONS.stats, iconActive:ICONS.statsFilled },
   { value:'profile',     view:'profile', fav:false, icon:ICONS.profile, iconActive:ICONS.profileFilled }
 ];
 function currentNavValue(){
   if(state.view==='browse') return state.favoritesOnly ? 'oshi' : 'browse';
   if(state.view==='groups') return 'groups';
   if(state.view==='discography') return 'discography';
+  if(state.view==='stats') return 'stats';
   if(state.view==='profile') return 'profile';
   return 'browse';
 }
@@ -1118,7 +1283,10 @@ function renderGroupPills(){
     const label = isAll ? 'ทั้งหมด' : g.name;
     const active = state.groupFilter===gid;
     const bg = isAll ? 'var(--ink)' : g.color;
-    return `<button class="pill" data-action="filter-group" data-value="${gid}" style="${active?`background:${bg};color:#fff;border-color:transparent;`:''}">${label}</button>`;
+    // The "all" pill inverts against the page, so its label has to follow the
+    // palette rather than being hard-coded white.
+    const fg = isAll ? 'var(--paper)' : '#fff';
+    return `<button class="pill" data-action="filter-group" data-value="${gid}" style="${active?`background:${bg};color:${fg};border-color:transparent;`:''}">${label}</button>`;
   }).join('');
 }
 
@@ -1142,6 +1310,35 @@ function isCaptainType(m, type){
   return false;
 }
 
+// A blank bound means "no limit"; a member missing the value drops out only
+// once a bound is actually set.
+function applyRange(list, min, max, valueOf){
+  const lo = min==='' ? null : Number(min);
+  const hi = max==='' ? null : Number(max);
+  if(lo===null && hi===null) return list;
+  return list.filter(m=>{
+    const v = valueOf(m);
+    if(v==null || isNaN(v)) return false;
+    return (lo===null || v>=lo) && (hi===null || v<=hi);
+  });
+}
+
+// The roster as it stands before the advanced panel narrows it — kept so the
+// panel can report data coverage instead of silently returning nothing.
+let _advBase = [];
+function applyAdvFilters(list){
+  if(state.birthMonth!=='all') list = list.filter(m=>m.birthday && m.birthday.slice(5,7)===state.birthMonth);
+  list = applyRange(list, state.ageMin, state.ageMax, m=>calcAge(m.birthday));
+  list = applyRange(list, state.heightMin, state.heightMax, m=>m.height);
+  return list;
+}
+
+function activeAdvCount(){
+  return (state.ageMin!==''||state.ageMax!=='' ? 1 : 0)
+       + (state.heightMin!==''||state.heightMax!=='' ? 1 : 0)
+       + (state.birthMonth!=='all' ? 1 : 0);
+}
+
 function filterAndSort(){
   let list = state.members.slice();
   const q = state.query.trim();
@@ -1155,6 +1352,8 @@ function filterAndSort(){
   if(state.teamFilter!=='all') list = list.filter(m=>m.teamId===state.teamFilter);
   if(state.genFilter!=='all') list = list.filter(m=>m.gen===state.genFilter);
   if(state.captainFilter!=='all') list = list.filter(m=>isCaptainType(m, state.captainFilter));
+  _advBase = list.slice();
+  list = applyAdvFilters(list);
   if(q){
     const ql = q.toLowerCase();
     list = list.filter(m=>
@@ -1274,6 +1473,43 @@ function renderRow(m){
   </div>`;
 }
 
+function renderAdvFilters(){
+  const n = activeAdvCount();
+  if(!state.advOpen) return '';
+  const total = _advBase.length;
+  const withHeight = _advBase.filter(m=>m.height).length;
+  const months = MONTH_NAMES.map((name,i)=>{
+    const v = String(i+1).padStart(2,'0');
+    return `<option value="${v}" ${state.birthMonth===v?'selected':''}>${name}</option>`;
+  }).join('');
+  return `
+  <div class="adv-panel">
+    <div class="adv-field">
+      <label>อายุ (ปี)</label>
+      <div class="adv-range">
+        <input type="number" inputmode="numeric" id="age-min" placeholder="ต่ำสุด" value="${escapeAttr(state.ageMin)}">
+        <span>–</span>
+        <input type="number" inputmode="numeric" id="age-max" placeholder="สูงสุด" value="${escapeAttr(state.ageMax)}">
+      </div>
+    </div>
+    <div class="adv-field">
+      <label>ส่วนสูง (ซม.) ${withHeight<total ? `<span class="cover">มีข้อมูล ${withHeight}/${total} คน</span>` : ''}</label>
+      <div class="adv-range">
+        <input type="number" inputmode="numeric" id="height-min" placeholder="ต่ำสุด" value="${escapeAttr(state.heightMin)}">
+        <span>–</span>
+        <input type="number" inputmode="numeric" id="height-max" placeholder="สูงสุด" value="${escapeAttr(state.heightMax)}">
+      </div>
+    </div>
+    <div class="adv-field">
+      <label>เดือนเกิด</label>
+      <select id="birth-month"><option value="all">ทุกเดือน</option>${months}</select>
+    </div>
+    <div class="adv-field adv-actions">
+      <button class="btn-secondary" data-action="reset-adv" ${n?'':'disabled'} style="width:100%;">ล้างตัวกรอง</button>
+    </div>
+  </div>`;
+}
+
 function renderBrowse(){
   const list = filterAndSort();
   const teamsAvailable = state.groupFilter==='all' ? TEAMS : getTeamsForGroup(state.groupFilter);
@@ -1281,6 +1517,8 @@ function renderBrowse(){
   <div class="filter-bar">
     ${renderGroupPills()}
     ${renderGraduatedPill()}
+    ${(()=>{ const n=activeAdvCount();
+      return `<button class="pill ${n?'adv-on':''}" data-action="toggle-adv">ตัวกรอง${n?' · '+n:''}</button>`; })()}
     <select class="filter-select" id="team-filter">
       <option value="all">ทุกทีม</option>
       ${teamsAvailable.map(t=>`<option value="${t.id}" ${state.teamFilter===t.id?'selected':''}>${t.name}</option>`).join('')}
@@ -1294,6 +1532,7 @@ function renderBrowse(){
     ${state.genFilter!=='all' ? `<button class="gen-filter-chip" data-action="clear-gen-filter">รุ่น ${state.genFilter} \u2715</button>` : ''}
     ${state.captainFilter!=='all' ? `<button class="gen-filter-chip" data-action="clear-gen-filter">${CAPTAIN_LABELS[state.captainFilter]} \u2715</button>` : ''}
   </div>
+  ${renderAdvFilters()}
   ${state.showGraduated ? `<div class="grad-note"><span class="grad-cap">${ICONS.cap}</span>สมาชิกที่จบการศึกษาไปแล้ว — ไม่แสดงในรายชื่อหลัก แต่ค้นหาเจอได้ตลอด</div>` : ''}
   ${list.length ? `
   <div class="thead-sticky-outer">
@@ -1305,7 +1544,13 @@ function renderBrowse(){
     <div class="dtable${state.showGraduated?' grad-mode':''}">
       ${list.map(renderRow).join('')}
     </div>
-  </div>` : `<div class="empty-state"><p>${state.favoritesOnly?'ยังไม่มี Oshi กดดาว ☆ เพื่อเพิ่ม':'ไม่พบสมาชิกที่ตรงกับเงื่อนไข'}</p></div>`}`;
+  </div>` : `<div class="empty-state">
+    <p>${state.favoritesOnly?'ยังไม่มี Oshi กดดาว ☆ เพื่อเพิ่ม':'ไม่พบสมาชิกที่ตรงกับเงื่อนไข'}</p>
+    ${activeAdvCount() ? `<p class="muted-note" style="margin:8px 0 12px;">ตัวกรองที่ตั้งไว้กรองออกหมด${
+        (state.heightMin!==''||state.heightMax!=='') && _advBase.some(m=>!m.height)
+          ? ` — สมาชิก ${_advBase.filter(m=>!m.height).length} คนในรายชื่อนี้ไม่มีข้อมูลส่วนสูง จึงไม่เข้าเงื่อนไข` : ''}</p>
+      <button class="btn-secondary" data-action="reset-adv">ล้างตัวกรอง</button>` : ''}
+  </div>`}`;
 }
 
 
@@ -1374,7 +1619,8 @@ function renderDetailModal(){
 function renderGroups(){
   return GROUPS.map(g=>{
     const teams = getTeamsForGroup(g.id);
-    const count = state.members.filter(m=>m.groupId===g.id).length;
+    const count = activeMembers().filter(m=>m.groupId===g.id).length;
+    const gradCount = state.members.filter(m=>m.groupId===g.id && m.graduated).length;
     return `
     <div class="group-card" style="--c:${g.color}">
       <div class="group-head">
@@ -1386,9 +1632,10 @@ function renderGroups(){
         <span class="chip">กัปตัน: ${g.captain||'-'}</span>
         ${g.viceCaptain?`<span class="chip">รองกัปตัน: ${g.viceCaptain}</span>`:''}
         <span class="chip">${count} คน</span>
+        ${gradCount?`<span class="chip">จบแล้ว ${gradCount} คน</span>`:''}
       </div>
       ${teams.map(t=>{
-        const tc = state.members.filter(m=>m.teamId===t.id).length;
+        const tc = activeMembers().filter(m=>m.teamId===t.id).length;
         return `<button class="team-row" data-action="filter-team-direct" data-group="${g.id}" data-team="${t.id}">
           <span>${t.name}</span>
           <span class="mono">${tc} คน${t.captain?' · กัปตัน '+t.captain:''}</span>
@@ -1459,6 +1706,165 @@ function renderProfile(){
   <h3 class="section-label">Oshi ทั้งหมด (${oshiMembers.length})</h3>
   ${oshiMembers.length ? `<div class="grid-mini">${oshiMembers.map(renderMiniCard).join('')}</div>` : `<p class="muted-note">ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม</p>`}
   `;
+}
+
+const STATS_TABS = [
+  { id:'overview',  label:'ภาพรวม' },
+  { id:'birthdays', label:'วันเกิด' },
+  { id:'timeline',  label:'ไทม์ไลน์' }
+];
+
+function renderBar(label, value, max, color){
+  const pct = max>0 ? Math.round(value/max*100) : 0;
+  return `<div class="bar-row" style="--c:${color||'var(--ink)'}">
+    <span class="bar-label">${escapeHtml(label)}</span>
+    <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
+    <span class="bar-val">${value}</span>
+  </div>`;
+}
+
+function renderStatsOverview(){
+  const active = activeMembers();
+  const grads = state.members.filter(m=>m.graduated);
+  const ages = active.map(m=>calcAge(m.birthday)).filter(a=>a!=null);
+  const heights = active.map(m=>m.height).filter(Boolean);
+  const avg = arr => arr.length ? Math.round(arr.reduce((s,n)=>s+n,0)/arr.length) : null;
+
+  const buckets = [[0,15,'ต่ำกว่า 16'],[16,18,'16–18'],[19,21,'19–21'],[22,24,'22–24'],[25,99,'25 ขึ้นไป']];
+  const maxBucket = Math.max(...buckets.map(([lo,hi])=>ages.filter(a=>a>=lo&&a<=hi).length), 1);
+
+  return `
+  <div class="stat-grid">
+    <div class="stat-cell"><div class="label">สมาชิกปัจจุบัน</div><div class="value">${active.length} คน</div></div>
+    <div class="stat-cell"><div class="label">จบการศึกษาแล้ว</div><div class="value">${grads.length} คน</div></div>
+    <div class="stat-cell"><div class="label">อายุเฉลี่ย</div><div class="value">${avg(ages)??'-'} ปี</div></div>
+    <div class="stat-cell"><div class="label">ส่วนสูงเฉลี่ย</div><div class="value">${avg(heights)??'-'} ซม.</div></div>
+  </div>
+
+  ${GROUPS.map(g=>{
+    const mine = active.filter(m=>m.groupId===g.id);
+    const gradMine = grads.filter(m=>m.groupId===g.id);
+    const gens = [...new Set(mine.map(m=>m.gen).filter(n=>n!=null))].sort((a,b)=>a-b);
+    const teams = getTeamsForGroup(g.id);
+    const maxGen = Math.max(...gens.map(n=>mine.filter(m=>m.gen===n).length), 1);
+    const maxTeam = Math.max(...teams.map(t=>mine.filter(m=>m.teamId===t.id).length), 1);
+    return `
+    <div class="group-card" style="--c:${g.color}">
+      <div class="group-head">
+        <h2 style="color:${g.color}">${g.name}</h2>
+        <span class="mono" style="font-size:12px;color:var(--ink-soft);">${mine.length} คน · จบแล้ว ${gradMine.length} คน</span>
+      </div>
+      <h3 class="section-label" style="margin-top:6px;">แยกตามทีม</h3>
+      ${teams.map(t=>renderBar(t.name, mine.filter(m=>m.teamId===t.id).length, maxTeam, g.color)).join('')}
+      <h3 class="section-label">แยกตามรุ่น</h3>
+      ${gens.map(n=>renderBar('รุ่น '+n, mine.filter(m=>m.gen===n).length, maxGen, g.color)).join('')
+        || '<p class="muted-note">ไม่มีข้อมูลรุ่น</p>'}
+    </div>`;
+  }).join('')}
+
+  <div class="group-card" style="--c:var(--gold)">
+    <div class="group-head"><h2 style="font-size:21px;">ช่วงอายุ (ทุกวง)</h2></div>
+    ${buckets.map(([lo,hi,label])=>renderBar(label, ages.filter(a=>a>=lo&&a<=hi).length, maxBucket, 'var(--gold)')).join('')}
+    <p class="stats-note">นับจาก ${ages.length} คนที่มีข้อมูลวันเกิด</p>
+  </div>`;
+}
+
+function renderStatsBirthdays(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const withBday = activeMembers().filter(m=>m.birthday);
+
+  // Days until the next occurrence, so December birthdays surface in January.
+  const daysUntil = m => {
+    const [, mo, d] = m.birthday.split('-').map(Number);
+    let next = new Date(today.getFullYear(), mo-1, d);
+    if(next < today) next = new Date(today.getFullYear()+1, mo-1, d);
+    return Math.round((next - today)/86400000);
+  };
+  const upcoming = withBday.map(m=>({m, d:daysUntil(m)})).sort((a,b)=>a.d-b.d).slice(0,8);
+  const whenLabel = d => d===0 ? 'วันนี้!' : d===1 ? 'พรุ่งนี้' : `อีก ${d} วัน`;
+
+  return `
+  <h3 class="section-label" style="margin-top:4px;">วันเกิดที่ใกล้ถึง</h3>
+  <div class="bday-next">
+    ${upcoming.map(({m,d})=>{
+      const g = getGroup(m.groupId);
+      return `<button class="bday-chip ${d===0?'today':''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+        ${renderAvatar(m,'avatar-sm',g.color)}
+        <span><span class="when">${whenLabel(d)}</span><span class="who" style="display:block;">${escapeHtml(m.nameTh||m.name)}</span></span>
+      </button>`;
+    }).join('')}
+  </div>
+
+  ${MONTH_NAMES.map((name,i)=>{
+    const mm = String(i+1).padStart(2,'0');
+    const inMonth = withBday.filter(m=>m.birthday.slice(5,7)===mm)
+      .sort((a,b)=>a.birthday.slice(8).localeCompare(b.birthday.slice(8)));
+    if(!inMonth.length) return '';
+    return `<div class="month-block">
+      <div class="month-head">${name} <span class="n">${inMonth.length} คน</span></div>
+      ${inMonth.map(m=>{
+        const g = getGroup(m.groupId);
+        const age = calcAge(m.birthday);
+        return `<button class="bday-row" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+          <span class="day">${+m.birthday.slice(8)}</span>
+          ${renderAvatar(m,'avatar-sm',g.color)}
+          <span>${escapeHtml(m.nameTh||m.name)}</span>
+          <span class="age">${age!=null?age+' ปี':''}</span>
+        </button>`;
+      }).join('')}
+    </div>`;
+  }).join('')}`;
+}
+
+function renderStatsTimeline(){
+  // One entry per year, merging what the database actually knows: group
+  // debuts, single releases and graduations.
+  const years = {};
+  const slot = y => (years[y] = years[y] || { debuts:[], singles:[], grads:[] });
+  GROUPS.forEach(g=> slot(+g.debut.slice(0,4)).debuts.push(g));
+  SEED_SINGLES.forEach(s=> slot(s.year).singles.push(s));
+  state.members.filter(m=>m.graduated).forEach(m=> slot(+m.graduated.slice(0,4)).grads.push(m));
+
+  const sorted = Object.keys(years).map(Number).sort((a,b)=>b-a);
+  return `
+  <div class="timeline" style="margin-top:6px;">
+    ${sorted.map(y=>{
+      const e = years[y];
+      const byGroup = gid => e.grads.filter(m=>m.groupId===gid);
+      return `<div class="timeline-item" style="--c:var(--ink-soft)">
+        <div class="year-head">${y}</div>
+        ${e.debuts.map(g=>`<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
+          <span><b>${g.name}</b> เดบิวต์ · ${formatDate(g.debut)}</span></div>`).join('')}
+        ${e.singles.length ? GROUPS.map(g=>{
+          const ss = e.singles.filter(s=>s.groupId===g.id).sort((a,b)=>a.num-b.num);
+          if(!ss.length) return '';
+          return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
+            <span>${g.name} ปล่อย ${ss.length} ซิงเกิล <span class="ev-names">${ss.map(s=>escapeHtml(s.title)).join(' · ')}</span></span></div>`;
+        }).join('') : ''}
+        ${GROUPS.map(g=>{
+          const gs = byGroup(g.id);
+          if(!gs.length) return '';
+          return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
+            <span>${gs.length} คนจบการศึกษาจาก ${g.name}
+            <span class="ev-names">${gs.map(m=>escapeHtml(m.nameTh||m.name)).join(' · ')}</span></span></div>`;
+        }).join('')}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderStats(){
+  const body = state.statsTab==='birthdays' ? renderStatsBirthdays()
+             : state.statsTab==='timeline'  ? renderStatsTimeline()
+             : renderStatsOverview();
+  return `
+  <div class="filter-bar">
+    <div class="subtab-bar">
+      ${STATS_TABS.map(t=>`<button class="subtab ${state.statsTab===t.id?'active':''}"
+        data-action="stats-tab" data-value="${t.id}">${t.label}</button>`).join('')}
+    </div>
+  </div>
+  ${body}`;
 }
 
 function renderAuth(){
@@ -1566,6 +1972,7 @@ function renderForm(){
 }
 
 // ============================= RENDER: ROOT =============================
+const ADV_INPUTS = { 'age-min':'ageMin', 'age-max':'ageMax', 'height-min':'heightMin', 'height-max':'heightMax' };
 const NAV_HIDDEN_VIEWS = ['auth','editprofile','form'];
 function render(){
   const app = document.getElementById('app');
@@ -1596,6 +2003,7 @@ function renderMain(){
     (state.view==='browse' ? renderBrowse() :
     state.view==='groups' ? renderGroups() :
     state.view==='discography' ? renderDiscography() :
+    state.view==='stats' ? renderStats() :
     state.view==='profile' ? renderProfile() :
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
@@ -1787,7 +2195,8 @@ function attachMainEvents(){
 // This drives the back buttons, the modal close, the edge-swipe gesture and
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','editingId','favoritesOnly','query','groupFilter',
-  'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir'];
+  'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth'];
 
 function navSnapshot(){
   const snap = {};
@@ -1998,6 +2407,21 @@ function bindDelegatedEvents(){
       await saveOshiData();
       updateOshiButtonsFor(id);
     }
+    else if(action==='stats-tab'){
+      state.statsTab = el.dataset.value;
+      renderMain(); replaceHistory();
+    }
+    else if(action==='toggle-adv'){
+      state.advOpen = !state.advOpen;
+      renderMain(); replaceHistory();
+    }
+    else if(action==='reset-adv'){
+      state.ageMin=''; state.ageMax=''; state.heightMin=''; state.heightMax=''; state.birthMonth='all';
+      renderMain(); replaceHistory();
+    }
+    else if(action==='toggle-theme'){
+      applyTheme(state.theme==='dark' ? 'light' : 'dark');
+    }
     else if(action==='toggle-profile-menu'){
       state.profileMenuOpen = !state.profileMenuOpen;
       renderProfileSlot();
@@ -2076,12 +2500,21 @@ function bindDelegatedEvents(){
   });
 
   document.body.addEventListener('change', (e)=>{
-    if(e.target.id==='team-filter'){ state.teamFilter = e.target.value; state.genFilter = 'all'; state.captainFilter = 'all'; renderMain(); replaceHistory(); }
+    if(e.target.id==='birth-month'){ state.birthMonth = e.target.value; renderMain(); replaceHistory(); }
+    else if(e.target.id==='team-filter'){ state.teamFilter = e.target.value; state.genFilter = 'all'; state.captainFilter = 'all'; renderMain(); replaceHistory(); }
     else if(e.target.id==='sort-filter'){ state.sortBy = e.target.value; state.sortDir = 'asc'; renderMain(); replaceHistory(); }
   });
 
   document.body.addEventListener('input', (e)=>{
     if(e.target.id==='search-input'){ state.query = e.target.value; renderMain(); replaceHistory(); }
+    else if(ADV_INPUTS[e.target.id]){
+      state[ADV_INPUTS[e.target.id]] = e.target.value;
+      const id = e.target.id, caret = e.target.selectionStart;
+      renderMain(); replaceHistory();
+      // renderMain rebuilds the panel, so put the user back where they were typing.
+      const again = document.getElementById(id);
+      if(again){ again.focus(); try{ again.setSelectionRange(caret, caret); }catch(err){} }
+    }
   });
 }
 
