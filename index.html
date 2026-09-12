@@ -434,7 +434,7 @@
   .th-range{ margin-left:auto; color:var(--ink-soft); font-size:12.5px; white-space:nowrap; }
   .th-now{ color:var(--ink); font-weight:600; }
 
-  .stage-wrap{ position:relative; margin:10px 0 16px; }
+  .stage-wrap{ position:relative; margin:12px 0 2px; }
   .stage{ position:relative; aspect-ratio:16/9; min-height:210px; }
   .stage-floor{ position:absolute; inset:0; width:100%; height:100%; }
   .stage-row{
@@ -497,7 +497,7 @@
   }
 
   .stage-toggle{
-    display:flex; align-items:center; gap:10px; width:100%; margin:12px 0 12px;
+    display:flex; align-items:center; gap:10px; width:100%; margin:12px 0 0;
     padding:10px 14px; border-radius:12px; cursor:pointer;
     background:var(--card); border:1px solid var(--line);
     font-family:inherit; color:var(--ink); text-align:left;
@@ -3371,11 +3371,11 @@ function renderSingleDetail(){
       <div class="track-sub">${t.members.length} คน${t.centers.length
         ? ' · เซ็นเตอร์ ' + t.centers.map(id=>escapeHtml(getMember(id)?.nameTh||getMember(id)?.name||'')).join(', ')
         : ''}</div>
-      ${renderStage(s, i, t)}
       <div class="grid-mini">
         ${t.centers.map(id=>card(id, true)).join('')}
         ${rest.map(id=>card(id, false)).join('')}
       </div>
+      ${renderStage(s, i, t)}
     </div>`;
   };
 
