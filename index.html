@@ -435,6 +435,12 @@
   .th-now{ color:var(--ink); font-weight:600; }
 
   .works-count{ color:var(--ink-soft); font-size:12.5px; margin:6px 0 0; }
+  .stat-cell .sub{ font-size:11px; color:var(--ink-soft); margin-top:2px; }
+  .shared-day{ padding:9px 0; border-bottom:1px solid var(--line); }
+  .shared-day:last-of-type{ border-bottom:none; }
+  .shared-date{ display:flex; align-items:baseline; gap:8px; font-weight:600; font-size:14px; }
+  .shared-date span{ font-size:11.5px; color:var(--ink-soft); font-weight:400; }
+  .shared-who{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
   .work-list{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
   .work-row{
     display:flex; align-items:center; gap:10px; width:100%; text-align:left;
@@ -2601,6 +2607,32 @@ function renderStatsOverview(){
     </div>`;
   }).join('')}
 
+  ${(() => {
+    const tracks = allTracks();
+    const appearances = new Map();
+    tracks.forEach(t=>t.members.forEach(id=>appearances.set(id,(appearances.get(id)||0)+1)));
+    const top = [...appearances.entries()].filter(([id])=>getMember(id))
+      .sort((a,b)=> b[1]-a[1] || getMember(a[0]).name.localeCompare(getMember(b[0]).name))
+      .slice(0,5);
+    if(!top.length) return '';
+    const sizes = tracks.map(t=>t.members.length);
+    const mean = Math.round(sizes.reduce((s,n)=>s+n,0)/sizes.length);
+    return `
+    <div class="group-card" style="--c:var(--gold)">
+      <div class="group-head"><h2 style="font-size:21px;">เพลง</h2>
+        <button class="link-inline" data-action="stats-tab" data-value="songs">ดูทั้งหมด →</button></div>
+      <div class="stat-grid" style="margin-bottom:4px;">
+        <div class="stat-cell"><div class="label">เพลงทั้งหมด</div><div class="value">${tracks.length} เพลง</div></div>
+        <div class="stat-cell"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length+SEED_ALBUMS.length} ชิ้น</div></div>
+        <div class="stat-cell"><div class="label">เซ็มบัตสึเฉลี่ย</div><div class="value">${mean} คน</div></div>
+        <div class="stat-cell"><div class="label">มีเพลงอย่างน้อย 1</div><div class="value">${appearances.size} คน</div></div>
+      </div>
+      <h3 class="section-label" style="margin-top:6px;">ติดเพลงมากที่สุด</h3>
+      ${top.map(([id,n])=>renderBarLink(getMember(id).name+' · '+getMember(id).nameTh, n, top[0][1],
+          getGroup(getMember(id).groupId).color, 'open-member', {id})).join('')}
+    </div>`;
+  })()}
+
   <div class="group-card" style="--c:var(--gold)">
     <div class="group-head"><h2 style="font-size:21px;">ช่วงอายุ (ทุกวง)</h2></div>
     ${buckets.map(([lo,hi,label])=>renderBar(label, ages.filter(a=>a>=lo&&a<=hi).length, maxBucket, 'var(--gold)',
@@ -2684,7 +2716,70 @@ function renderStatsBirthdays(){
     return `<span class="age-step"><span class="from">${from}</span><span class="arrow">→</span><span class="to">${to}</span></span>`;
   };
 
+  // The headline figures count everyone, graduates included: the clustering
+  // only shows up across all 158, while the lists below stay on the current
+  // line-up because an upcoming birthday only means something for a member
+  // who is still in the group.
+  const everyone = state.members.filter(m=>m.birthday);
+  const byMonth = MONTH_NAMES.map((name,i)=>({
+    name, mm:String(i+1).padStart(2,'0'),
+    n:everyone.filter(m=>+m.birthday.slice(5,7)===i+1).length }));
+  const ranked = [...byMonth].filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  const busiest = ranked[0], quietest = ranked[ranked.length-1];
+  const maxMonth = busiest ? busiest.n : 1;
+
+  const byDate = new Map();
+  everyone.forEach(m=>{
+    const d = m.birthday.slice(5);
+    if(!byDate.has(d)) byDate.set(d, []);
+    byDate.get(d).push(m);
+  });
+  const shared = [...byDate.entries()].filter(([,list])=>list.length>1)
+    .sort((a,b)=> b[1].length-a[1].length || a[0].localeCompare(b[0]));
+  const sharedPeople = shared.reduce((n,[,list])=>n+list.length, 0);
+  const topShared = shared.filter(([,list])=>list.length>=3);
+  const dateLabel = d => `${+d.slice(3)} ${THAI_MONTHS[+d.slice(0,2)-1]}`;
+
   return `
+  <div class="stat-grid">
+    <button class="stat-cell" data-action="drill" data-month="${busiest?busiest.mm:''}">
+      <div class="label">เดือนที่เกิดมากที่สุด</div>
+      <div class="value">${busiest?busiest.name:'-'}</div>
+      <div class="sub">${busiest?busiest.n+' คน':''}</div></button>
+    <button class="stat-cell" data-action="drill" data-month="${quietest?quietest.mm:''}">
+      <div class="label">เดือนที่เกิดน้อยที่สุด</div>
+      <div class="value">${quietest?quietest.name:'-'}</div>
+      <div class="sub">${quietest?quietest.n+' คน':''}</div></button>
+    <div class="stat-cell"><div class="label">วันเกิดตรงกับคนอื่น</div>
+      <div class="value">${sharedPeople} คน</div>
+      <div class="sub">${shared.length} วันที่ซ้ำกัน</div></div>
+    <div class="stat-cell"><div class="label">ซ้ำกันมากที่สุด</div>
+      <div class="value">${topShared.length?topShared[0][1].length+' คน':'-'}</div>
+      <div class="sub">${topShared.length?topShared.length+' วัน':''}</div></div>
+  </div>
+
+  <div class="group-card" style="--c:var(--gold)">
+    <div class="group-head"><h2 style="font-size:21px;">แยกตามเดือนเกิด</h2>
+      <span class="mono" style="font-size:12px;color:var(--ink-soft);">${everyone.length} คน ทุกวง รวมที่จบแล้ว</span></div>
+    ${byMonth.map(x=>renderBar(x.name, x.n, maxMonth, 'var(--gold)', {month:x.mm})).join('')}
+  </div>
+
+  ${topShared.length ? `
+  <div class="group-card" style="--c:var(--gold)">
+    <div class="group-head"><h2 style="font-size:21px;">วันเกิดซ้ำกันมากที่สุด</h2></div>
+    ${topShared.map(([d,list])=>`
+      <div class="shared-day">
+        <div class="shared-date">${dateLabel(d)}<span>${list.length} คน</span></div>
+        <div class="shared-who">
+          ${list.map(m=>{ const g=getGroup(m.groupId);
+            return `<button class="chip-link" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+              ${escapeHtml(m.nameTh||m.name)}</button>`; }).join('')}
+        </div>
+      </div>`).join('')}
+    <p class="stats-note">24 กุมภาพันธ์ ตรงกับวันศิลปินแห่งชาติ ซึ่งกำหนดตามวันพระราชสมภพของรัชกาลที่ 2
+      — และวาเลนไทน์เกิดวันที่ 14 กุมภาพันธ์ ตรงกับชื่อตัวเองพอดี</p>
+  </div>` : ''}
+
   <h3 class="section-label" style="margin-top:4px;">วันเกิดที่ใกล้ถึง</h3>
   <div class="bday-next">
     ${upcoming.map(({m,d})=>{
