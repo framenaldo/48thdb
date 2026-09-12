@@ -434,7 +434,7 @@
   .th-range{ margin-left:auto; color:var(--ink-soft); font-size:12.5px; white-space:nowrap; }
   .th-now{ color:var(--ink); font-weight:600; }
 
-  .stage-wrap{ position:relative; margin:14px 0 18px; padding-left:74px; }
+  .stage-wrap{ position:relative; margin:10px 0 18px; padding-left:74px; }
   .stage{ position:relative; aspect-ratio:16/9; min-height:210px; }
   .stage-floor{ position:absolute; inset:0; width:100%; height:100%; }
   .stage-row{
@@ -445,17 +445,18 @@
      the stage, so a row always fits the floor at that depth — on any screen
      width, without a pixel minimum that would break the perspective. */
   .seat{
-    background:none; border:none; padding:0 1px; cursor:pointer; font-family:inherit;
-    display:flex; flex-direction:column; align-items:center; gap:3px;
-    width:var(--seat); max-width:72px; flex:none; min-width:0;
+    background:none; border:none; padding:0 2px 12px; cursor:pointer; font-family:inherit;
+    display:flex; flex-direction:column; align-items:center;
+    width:var(--seat); max-width:78px; flex:none; min-width:0;
   }
+  .seat-badge{ position:relative; display:block; width:min(54px, 84%); }
   .seat.is-gap{ pointer-events:none; }
   .seat-face{
-    width:min(52px, 82%); aspect-ratio:1; border-radius:50%;
-    overflow:hidden; border:2px solid #fff; background:var(--paper);
-    box-shadow:0 2px 7px rgba(0,0,0,.3); display:grid; place-items:center;
+    width:100%; aspect-ratio:1; border-radius:50%;
+    overflow:hidden; border:2.5px solid var(--gold); background:var(--paper);
+    box-shadow:0 2px 8px rgba(0,0,0,.32); display:grid; place-items:center;
   }
-  .seat.is-centre .seat-face{ border-color:var(--gold); box-shadow:0 0 0 2px var(--gold), 0 2px 8px rgba(0,0,0,.34); }
+  .seat.is-centre .seat-face{ box-shadow:0 0 0 3px #fff, 0 0 0 5px var(--gold), 0 2px 9px rgba(0,0,0,.36); }
   /* .avatar-img inside is absolutely positioned, so this has to be the
      positioned, clipping ancestor or the photo escapes to the whole stage. */
   .seat-avatar{
@@ -464,12 +465,30 @@
     font-family:'Noto Sans Thai',sans-serif; font-weight:700; color:#fff;
     font-size:clamp(11px, 2.2vw, 17px);
   }
+  /* The name rides on the portrait rather than sitting under it, so a seat
+     takes the height of its circle and rows can pack closer together. */
   .seat-name{
-    font-size:clamp(8.5px, calc(10.5px * var(--s)), 12px); font-weight:700; color:#fff; line-height:1.15;
-    text-shadow:0 1px 3px rgba(0,0,0,.55); max-width:100%;
+    position:absolute; left:50%; bottom:-9px; transform:translateX(-50%);
+    max-width:132%; padding:2px 8px; border-radius:999px;
+    background:var(--c); border:2px solid var(--gold); color:#fff;
+    font-size:clamp(8.5px, calc(10.5px * var(--s)), 12px); font-weight:700; line-height:1.25;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    box-shadow:0 2px 6px rgba(0,0,0,.3);
   }
-  .seat.is-centre .seat-name{ color:var(--gold); }
+  .seat.is-centre .seat-name{ background:var(--gold); border-color:#fff; }
+
+  .stage-toggle{
+    display:flex; align-items:center; gap:10px; width:100%; margin:12px 0 0;
+    padding:10px 14px; border-radius:12px; cursor:pointer;
+    background:var(--paper-dim); border:1px solid var(--line);
+    font-family:inherit; color:var(--ink); text-align:left;
+  }
+  .stage-toggle:hover{ border-color:var(--ink-soft); }
+  .stage-toggle-label{ font-weight:700; font-size:14px; }
+  .stage-toggle-sub{ font-size:11.5px; color:var(--ink-soft); }
+  .stage-caret{ margin-left:auto; width:17px; height:17px; color:var(--ink-soft); transition:transform .22s ease; }
+  .stage-caret svg{ width:100%; height:100%; display:block; }
+  .stage-toggle.is-open .stage-caret{ transform:rotate(180deg); }
   .stage-side{ position:absolute; inset:0; width:74px; pointer-events:none; }
   .stage-side span{
     position:absolute; right:8px; transform:translateY(-50%);
@@ -2103,7 +2122,7 @@ let state = {
   favoritesOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
   showGraduated:false,
-  statsTab:'overview', advOpen:false, selectedSingle:null, discTab:'singles',
+  statsTab:'overview', advOpen:false, selectedSingle:null, discTab:'singles', stagesOpen:{},
   ageMin:'', ageMax:'', heightMin:'', heightMax:'', birthMonth:'all',
   theme: document.documentElement.dataset.theme || 'light'
 };
@@ -2571,8 +2590,10 @@ function renderStage(work, trackIndex, track){
       const isCentre = track.centers.includes(id);
       return `<button class="seat${isCentre?' is-centre':''}" style="--c:${g.color}"
         data-action="open-member" data-id="${id}" title="${escapeAttr(m.name+' · '+m.nameTh)}">
-        <span class="seat-face">${renderAvatar(m, 'seat-avatar', g.color)}</span>
-        <span class="seat-name">${escapeHtml(m.nameTh || m.name)}</span>
+        <span class="seat-badge">
+          <span class="seat-face">${renderAvatar(m, 'seat-avatar', g.color)}</span>
+          <span class="seat-name">${escapeHtml(m.nameTh || m.name)}</span>
+        </span>
       </button>`;
     }).join('');
     return { i, html: `<div class="stage-row" style="top:${at(i,'y')}%;width:${at(i,'w')}%;
@@ -2580,7 +2601,18 @@ function renderStage(work, trackIndex, track){
       z-index:${n - i};">${seats}</div>` };
   });
 
+  const key = `${work.id}:${trackIndex}`;
+  const open = !!state.stagesOpen[key];
   return `
+  <button class="stage-toggle${open?' is-open':''}" data-action="toggle-stage" data-key="${key}"
+    aria-expanded="${open}">
+    <span class="stage-toggle-label">ผังเวที</span>
+    <span class="stage-toggle-sub">${grid.length} แถว · ${grid.flat().filter(Boolean).length} คน</span>
+    <span class="stage-caret" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </span>
+  </button>
+  ${!open ? '' : `
   <div class="stage-wrap">
     <div class="stage-side">
       <span style="top:${STAGE.back.y}%">UPSTAGE</span>
@@ -2599,7 +2631,7 @@ function renderStage(work, trackIndex, track){
       ${rows.sort((a,b)=>a.i<b.i?1:-1).map(r=>r.html).join('')}
     </div>
     <div class="stage-audience">AUDIENCE</div>
-  </div>`;
+  </div>`}`;
 }
 
 function renderTeamHistory(m){
@@ -3938,6 +3970,11 @@ function bindDelegatedEvents(){
     else if(action==='disc-tab'){
       state.discTab = el.dataset.value;
       renderMain(); replaceHistory();
+    }
+    else if(action==='toggle-stage'){
+      const k = el.dataset.key;
+      state.stagesOpen = { ...state.stagesOpen, [k]: !state.stagesOpen[k] };
+      renderMain();
     }
     else if(action==='open-single'){
       state.selectedSingle = el.dataset.id;
