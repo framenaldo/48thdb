@@ -487,6 +487,10 @@
   .single-head{ border-left:4px solid var(--c); padding:2px 0 2px 14px; margin:4px 0 6px; }
   .single-head h2{ font-family:'Noto Sans Thai',sans-serif; font-weight:800; font-size:26px; margin:4px 0 0; }
   .single-th{ color:var(--ink-soft); font-size:14.5px; margin:3px 0 0; }
+  .title-alt{ font-weight:500; font-size:13px; color:var(--ink-soft); }
+  .album-singles{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:4px; }
+  .chip-link{ cursor:pointer; border:1px solid var(--line); font-family:'Noto Sans Thai',sans-serif; }
+  @media (hover:hover){ .chip-link:hover{ background:var(--paper-dim); } }
   .track-block{ margin:0 0 26px; }
   .track-head{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin:18px 0 2px; }
   .track-tag{
@@ -1098,35 +1102,47 @@ const SEED_GRADUATED = [
 const SEED_ALL_MEMBERS = SEED_MEMBERS.concat(SEED_GRADUATED);
 
 const SEED_SINGLES = [
-  { id:'bnk-s1', groupId:'bnk48', num:1, title:'Aitakatta', titleTh:'อยากจะได้พบเธอ', year:2017 },
-  { id:'bnk-s2', groupId:'bnk48', num:2, title:'Koisuru Fortune Cookie', titleTh:'คุกกี้เสี่ยงทาย', year:2017 },
-  { id:'bnk-s3', groupId:'bnk48', num:3, title:'Shonichi', titleTh:'', year:2018 },
-  { id:'bnk-s4', groupId:'bnk48', num:4, title:'Kimi wa Melody', titleTh:'', year:2018 },
-  { id:'bnk-s5', groupId:'bnk48', num:5, title:'BNK Festival', titleTh:'', year:2018 },
-  { id:'bnk-s6', groupId:'bnk48', num:6, title:'Beginner', titleTh:'', year:2019 },
-  { id:'bnk-s7', groupId:'bnk48', num:7, title:'77-oku no Suteki na Machi e', titleTh:'', year:2019 },
-  { id:'bnk-s8', groupId:'bnk48', num:8, title:'High Tension', titleTh:'', year:2020 },
-  { id:'bnk-s9', groupId:'bnk48', num:9, title:'Heavy Rotation', titleTh:'', year:2020 },
-  { id:'bnk-s10', groupId:'bnk48', num:10, title:'D.AAA', titleTh:'ดีอะ', year:2021 },
-  { id:'bnk-s11', groupId:'bnk48', num:11, title:'Sayonara Crawl', titleTh:'', year:2022 },
-  { id:'bnk-s12', groupId:'bnk48', num:12, title:'Believers', titleTh:'', year:2022 },
-  { id:'bnk-s13', groupId:'bnk48', num:13, title:'Iiwake Maybe', titleTh:'', year:2023 },
-  { id:'bnk-s14', groupId:'bnk48', num:14, title:'Promise', titleTh:'', year:2023 },
-  { id:'bnk-s15', groupId:'bnk48', num:15, title:'Kibouteki Refrain', titleTh:'', year:2023 },
-  { id:'bnk-s16', groupId:'bnk48', num:16, title:'Kiss Me!', titleTh:'', year:2024 },
-  { id:'bnk-s17', groupId:'bnk48', num:17, title:'BORDERLESS', titleTh:'', year:2024 },
-  { id:'bnk-s18', groupId:'bnk48', num:18, title:'Green Flash', titleTh:'', year:2025 },
-  { id:'bnk-s19', groupId:'bnk48', num:19, title:'Colorcon Wink', titleTh:'', year:2025 },
-  { id:'bnk-s20', groupId:'bnk48', num:20, title:'Masaka no Confession', titleTh:'คำสารภาพที่ไม่คาดฝัน', year:2025 },
-  { id:'cgm-s1', groupId:'cgm48', num:1, title:'Chiang Mai 106', titleTh:'', year:2020 },
-  { id:'cgm-s2', groupId:'cgm48', num:2, title:'Melon Juice', titleTh:'', year:2020 },
-  { id:'cgm-s3', groupId:'cgm48', num:3, title:'Mali', titleTh:'มะลิ', year:2021 },
-  { id:'cgm-s4', groupId:'cgm48', num:4, title:'Mae Shika Mukanee', titleTh:'', year:2022 }
+  { id:'bnk-s1', groupId:'bnk48', num:1, title:'อยากจะได้พบเธอ', alt:'Aitakatta', year:2017 },
+  { id:'bnk-s2', groupId:'bnk48', num:2, title:'คุกกี้เสี่ยงทาย', alt:'Koisuru Fortune Cookie', year:2017 },
+  { id:'bnk-s3', groupId:'bnk48', num:3, title:'วันแรก', alt:'Shonichi', year:2018 },
+  { id:'bnk-s4', groupId:'bnk48', num:4, title:'เธอคือ...เมโลดี้', alt:'Kimi wa Melody', year:2018 },
+  { id:'bnk-s5', groupId:'bnk48', num:5, title:'BNK Festival', alt:'', year:2018 },
+  { id:'bnk-s6', groupId:'bnk48', num:6, title:'Beginner', alt:'', year:2019 },
+  { id:'bnk-s7', groupId:'bnk48', num:7, title:'77 ดินแดนแสนวิเศษ', alt:'77 no Suteki na Machi e', year:2019 },
+  { id:'bnk-s8', groupId:'bnk48', num:8, title:'High Tension', alt:'', year:2020 },
+  { id:'bnk-s9', groupId:'bnk48', num:9, title:'Heavy Rotation', alt:'', year:2020 },
+  { id:'bnk-s10', groupId:'bnk48', num:10, title:'ดีอะ', alt:'D.AAA', year:2021 },
+  { id:'bnk-s11', groupId:'bnk48', num:11, title:'Sayonara Crawl', alt:'', year:2022 },
+  { id:'bnk-s12', groupId:'bnk48', num:12, title:'Believers', alt:'', year:2022 },
+  { id:'bnk-s13', groupId:'bnk48', num:13, title:'Iiwake Maybe', alt:'', year:2023 },
+  { id:'bnk-s14', groupId:'bnk48', num:14, title:'สัญญานะ', alt:'', year:2023 },
+  { id:'bnk-s15', groupId:'bnk48', num:15, title:'แค่นี้ก็พอใจแล้ว', alt:'Kibouteki Refrain', year:2023 },
+  { id:'bnk-s16', groupId:'bnk48', num:16, title:'Kiss Me! (ให้ฉันได้รู้)', alt:'', year:2024 },
+  { id:'bnk-s17', groupId:'bnk48', num:17, title:'BORDERLESS', alt:'', year:2024 },
+  { id:'bnk-s18', groupId:'bnk48', num:18, title:'Green Flash', alt:'', year:2025 },
+  { id:'bnk-s19', groupId:'bnk48', num:19, title:'Colorcon Wink', alt:'', year:2025 },
+  { id:'bnk-s20', groupId:'bnk48', num:20, title:'คำสารภาพที่ไม่คาดฝัน', alt:'Masaka no Confession', year:2025 },
+  { id:'cgm-s1', groupId:'cgm48', num:1, title:'เชียงใหม่ 106', alt:'', year:2020 },
+  { id:'cgm-s2', groupId:'cgm48', num:2, title:'Melon Juice', alt:'', year:2020 },
+  { id:'cgm-s3', groupId:'cgm48', num:3, title:'มะลิ', alt:'Mali', year:2021 },
+  { id:'cgm-s4', groupId:'cgm48', num:4, title:'สุดเส้นทาง', alt:'Mae Shika Mukanee', year:2022 }
 ];
 
 // Senbatsu line-ups, from the Thai Wikipedia article for each single (the
 // member list of the title track; bolded names there mark the centre).
 // Singles with no entry here have no article section to take one from.
+const SEED_ALBUMS = [
+  { id:'bnk-a1', groupId:'bnk48', num:1, title:'RIVER', alt:'', year:2018, singles:['bnk-s1', 'bnk-s2', 'bnk-s3'] },
+  { id:'bnk-a2', groupId:'bnk48', num:2, title:'Jabaja', alt:'', year:2019, singles:['bnk-s4', 'bnk-s5', 'bnk-s6'] },
+  { id:'bnk-a3', groupId:'bnk48', num:3, title:'หัวเราะเซ่', alt:'Warota People', year:2021, singles:['bnk-s7', 'bnk-s8', 'bnk-s9'] },
+  { id:'bnk-a4', groupId:'bnk48', num:4, title:'Gingham Check', alt:'', year:2023, singles:['bnk-s10', 'bnk-s11', 'bnk-s12', 'bnk-s13', 'bnk-s14'] },
+  { id:'bnk-a5', groupId:'bnk48', num:5, title:'#SukiNanda', alt:'', year:2024, singles:['bnk-s15', 'bnk-s16', 'bnk-s17'] },
+  { id:'bnk-a6', groupId:'bnk48', num:6, title:'Ponytail to Shushu', alt:'', year:2026, singles:['bnk-s18', 'bnk-s19', 'bnk-s20'] },
+  { id:'cgm-a1', groupId:'cgm48', num:1, title:'ผูกพันนิรันดร์', alt:'Eien Pressure', year:2021, singles:['cgm-s1', 'cgm-s2', 'cgm-s3'] },
+  { id:'cgm-a2', groupId:'cgm48', num:2, title:'Lip Gloss ที่คิดถึง', alt:'', year:2023, singles:['cgm-s4'] },
+  { id:'cgm-a3', groupId:'cgm48', num:3, title:'เนินเขาแห่งความฝัน', alt:'', year:2025, singles:[] },
+];
+
 const SEED_SENBATSU = {
   'bnk-s1': [
     { track:'Aitakatta (อยากจะได้พบเธอ)', centers:['bnk-music'],
@@ -1363,6 +1379,58 @@ const SEED_SENBATSU = {
     { track:'เพื่อน', centers:[],
       members:['cgm-angel', 'cgm-fortune'] },
   ],
+  'bnk-a1': [
+    { track:'RIVER', centers:['bnk-orn'],
+      members:['bnk-cherprang', 'bnk-can', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-korn', 
+        'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-noey', 'bnk-orn', 
+        'bnk-pun', 'bnk-pupe', 'bnk-tarwaan', 'bnk-piam'] },
+  ],
+  'bnk-a2': [
+    { track:'Jabaja', centers:['bnk-pupe', 'bnk-fond'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 
+        'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 
+        'bnk-pupe', 'bnk-tarwaan', 'bnk-bamboo', 'bnk-fond', 'bnk-gygee'] },
+    { track:'Reborn', centers:['cgm-izurina'],
+      members:['cgm-izurina', 'bnk-jaa', 'bnk-jib', 'bnk-korn', 'bnk-miori', 'bnk-namsai', 
+        'bnk-satchan', 'bnk-faii', 'bnk-june', 'bnk-mewnich', 'bnk-minmin', 'bnk-myyu', 
+        'bnk-natherine', 'bnk-new', 'bnk-nine', 'bnk-pakwan', 'bnk-phukkhom', 'bnk-piam', 
+        'bnk-wee'] },
+    { track:'บ๊ายบาย...นายพลาสติก (Kami7 Go Green)', centers:['bnk-cherprang'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 
+        'bnk-mind', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 
+        'bnk-pun', 'bnk-pupe', 'bnk-tarwaan', 'bnk-natherine', 'bnk-wee'] },
+  ],
+  'bnk-a3': [
+    { track:'หัวเราะเซ่ (Warota People)', centers:['bnk-gygee'],
+      members:['bnk-cherprang', 'bnk-jennis', 'bnk-korn', 'bnk-minmin', 'bnk-myyu', 
+        'bnk-pun', 'bnk-wee', 'bnk-gygee', 'bnk-new', 'bnk-orn', 'bnk-pakwan', 'cgm-kyla', 
+        'cgm-milk', 'cgm-nena', 'cgm-nicha', 'cgm-parima'] },
+    { track:'เธอนั่นแหละ (Can you...?)', centers:['bnk-cherprang'],
+      members:['bnk-cherprang', 'bnk-jennis', 'bnk-jane', 'bnk-kaew', 'bnk-noey', 'bnk-pun', 
+        'bnk-wee', 'bnk-fond', 'bnk-mewnich', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 
+        'bnk-orn', 'bnk-phukkhom', 'bnk-pupe', 'bnk-tarwaan'] },
+    { track:'Ma Ma Milk', centers:['bnk-jane'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-minmin', 'bnk-wee', 'bnk-bamboo', 
+        'bnk-gygee', 'bnk-mewnich', 'bnk-mobile', 'bnk-music', 'bnk-phukkhom', 'bnk-pupe', 
+        'bnk-tarwaan'] },
+  ],
+  'bnk-a5': [
+    { track:'#SukiNanda', centers:['bnk-marine'],
+      members:['bnk-earn', 'bnk-fame', 'bnk-marine', 'bnk-monet', 'bnk-kaofrang', 'bnk-l', 
+        'bnk-palmmy', 'bnk-pancake', 'bnk-yoghurt', 'bnk-arlee', 'bnk-jew', 'bnk-sindy'] },
+  ],
+  'cgm-a1': [
+    { track:'Eien Pressure - ผูกพันนิรันดร์', centers:['cgm-champoo'],
+      members:['cgm-aom', 'cgm-angel', 'cgm-champoo', 'cgm-fortune', 'cgm-jjae', 
+        'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-marmink', 'cgm-mei', 'cgm-nenie', 
+        'cgm-parima', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+    { track:'มะลิ (Special Ver.)', centers:['cgm-kaning'],
+      members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 
+        'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 
+        'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 
+        'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 
+        'cgm-punch', 'cgm-sita'] },
+  ],
 };
 const ICONS = {
   members: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>`,
@@ -1391,7 +1459,7 @@ let state = {
   favoritesOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
   showGraduated:false,
-  statsTab:'overview', advOpen:false, selectedSingle:null,
+  statsTab:'overview', advOpen:false, selectedSingle:null, discTab:'singles',
   ageMin:'', ageMax:'', heightMin:'', heightMax:'', birthMonth:'all',
   theme: document.documentElement.dataset.theme || 'light'
 };
@@ -2260,7 +2328,8 @@ function renderEditProfile(){
 }
 
 function renderSingleDetail(){
-  const s = SEED_SINGLES.find(x=>x.id===state.selectedSingle);
+  const isAlbum = /-a\d+$/.test(state.selectedSingle||'');
+  const s = (isAlbum?SEED_ALBUMS:SEED_SINGLES).find(x=>x.id===state.selectedSingle);
   if(!s) return '';
   const g = getGroup(s.groupId);
   const tracks = SEED_SENBATSU[s.id];
@@ -2269,10 +2338,11 @@ function renderSingleDetail(){
   // The first track is the single's title song; the rest are its coupling songs.
   const renderTrack = (t, i) => {
     const rest = t.members.filter(id=>!t.centers.includes(id));
+    const tag = isAlbum ? (i===0?'เพลงไตเติล':'เพลงในอัลบั้ม') : (i===0?'เพลงหลัก':'เพลงรอง');
     return `
     <div class="track-block">
       <div class="track-head">
-        <span class="track-tag ${i===0?'lead':''}">${i===0?'เพลงหลัก':'เพลงรอง'}</span>
+        <span class="track-tag ${i===0?'lead':''}">${tag}</span>
         <span class="track-name">${escapeHtml(t.track)}</span>
       </div>
       <div class="track-sub">${t.members.length} คน${t.centers.length
@@ -2288,10 +2358,16 @@ function renderSingleDetail(){
   return `
   <button class="back-btn" data-action="go-back">← กลับ</button>
   <div class="single-head" style="--c:${g.color}">
-    <div class="timeline-year">${g.name} · ซิงเกิลที่ ${s.num} · ${s.year}</div>
-    <h2>${s.title}</h2>
-    ${s.titleTh?`<p class="single-th">${s.titleTh}</p>`:''}
+    <div class="timeline-year">${g.name} · ${isAlbum?'อัลบั้มที่':'ซิงเกิลที่'} ${s.num} · ${s.year}</div>
+    <h2>${escapeHtml(s.title)}</h2>
+    ${s.alt?`<p class="single-th">${escapeHtml(s.alt)}</p>`:''}
   </div>
+  ${isAlbum && s.singles.length ? `
+    <h3 class="section-label">ซิงเกิลที่รวมอยู่ในอัลบั้ม</h3>
+    <div class="album-singles">
+      ${s.singles.map(sid=>{ const x=SEED_SINGLES.find(y=>y.id===sid); return x
+        ? `<button class="chip chip-link" data-action="open-single" data-id="${x.id}">${escapeHtml(x.title)}</button>` : ''; }).join('')}
+    </div>` : ''}
   ${!tracks ? `
     <div class="empty-state">
       <p>ยังไม่มีข้อมูลเซ็มบัตสึของซิงเกิลนี้</p>
@@ -2300,29 +2376,49 @@ function renderSingleDetail(){
   : tracks.map(renderTrack).join('')}`;
 }
 
+const DISC_TABS = [{ id:'singles', label:'ซิงเกิล' }, { id:'albums', label:'อัลบั้ม' }];
+
+function renderWorkRow(w, kind){
+  const g = getGroup(w.groupId);
+  const tracks = SEED_SENBATSU[w.id];
+  const lead = tracks && tracks[0];
+  const nick = id => { const m = getMember(id); return escapeHtml(m ? (m.nameTh||m.name) : ''); };
+  const label = kind==='album' ? 'อัลบั้มที่' : 'ซิงเกิลที่';
+  return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${w.id}">
+    <div class="timeline-year">${w.year} · ${g.name} · ${label} ${w.num}</div>
+    <div class="timeline-title">${escapeHtml(w.title)}${w.alt?` <span class="title-alt">${escapeHtml(w.alt)}</span>`:''}</div>
+    <div class="single-meta">${lead
+      ? `${kind==='album'?'เพลงประจำอัลบั้ม':'เซ็มบัตสึ'} ${lead.members.length} คน`
+        + (lead.centers.length?' · เซ็นเตอร์ '+lead.centers.map(nick).join(', '):'')
+        + (tracks.length>1 ? ` · อีก ${tracks.length-1} เพลง` : '')
+      : 'ยังไม่มีข้อมูลเซ็มบัตสึ'}</div>
+  </button>`;
+}
+
 function renderDiscography(){
-  let singles = SEED_SINGLES.slice();
-  if(state.groupFilter!=='all') singles = singles.filter(s=>s.groupId===state.groupFilter);
+  const inGroup = x => state.groupFilter==='all' || x.groupId===state.groupFilter;
+  const tabBar = `
+  <div class="filter-bar">
+    ${renderGroupPills()}
+    <div class="subtab-bar" style="margin-left:auto;">
+      ${DISC_TABS.map(t=>`<button class="subtab ${state.discTab===t.id?'active':''}"
+        data-action="disc-tab" data-value="${t.id}">${t.label}</button>`).join('')}
+    </div>
+  </div>`;
+
+  if(state.discTab==='albums'){
+    const albums = SEED_ALBUMS.filter(inGroup).sort((a,b)=> a.year-b.year || a.num-b.num);
+    return tabBar + `<div class="timeline">
+      ${albums.map(a=>renderWorkRow(a,'album')).join('')}
+    </div>
+    <p class="muted-note" style="margin-top:10px;">อัลบั้มรวมเพลงจากซิงเกิลที่ออกก่อนหน้า และมีเพลงเฉพาะอัลบั้มเพิ่มมา — แสดงเฉพาะเพลงเฉพาะอัลบั้ม</p>`;
+  }
+  let singles = SEED_SINGLES.filter(inGroup);
   singles.sort((a,b)=> a.year-b.year || a.num-b.num);
-  return `
-  <div class="filter-bar">${renderGroupPills()}</div>
+  return tabBar + `
   <div class="timeline">
-    ${singles.map(s=>{
-      const g = getGroup(s.groupId);
-      const tracks = SEED_SENBATSU[s.id];
-      const lead = tracks && tracks[0];
-      const nick = id => { const m = getMember(id); return escapeHtml(m ? (m.nameTh||m.name) : ''); };
-      return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${s.id}">
-        <div class="timeline-year">${s.year} · ${g.name} · ซิงเกิลที่ ${s.num}</div>
-        <div class="timeline-title">${s.title}${s.titleTh?' — '+s.titleTh:''}</div>
-        <div class="single-meta">${lead
-          ? `เซ็มบัตสึ ${lead.members.length} คน${lead.centers.length?' · เซ็นเตอร์ '+lead.centers.map(nick).join(', '):''}`
-            + (tracks.length>1 ? ` · อีก ${tracks.length-1} เพลงรอง` : '')
-          : 'ยังไม่มีข้อมูลเซ็มบัตสึ'}</div>
-      </button>`;
-    }).join('')}
-  </div>
-  <p class="muted-note" style="margin-top:10px;">รายชื่อผลงานยังไม่ครบทุกซิงเกิล เพิ่มเติมได้ในโค้ดหากต้องการ</p>`;
+    ${singles.map(s=>renderWorkRow(s,'single')).join('')}
+  </div>`;
 }
 
 function renderForm(){
@@ -2593,7 +2689,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','editingId','favoritesOnly','query','groupFilter',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab'];
 
 function navSnapshot(){
   const snap = {};
@@ -2869,6 +2965,10 @@ function bindDelegatedEvents(){
       state.genFilter = 'all';
       state.captainFilter = 'all';
       renderMain(); pushHistory();
+    }
+    else if(action==='disc-tab'){
+      state.discTab = el.dataset.value;
+      renderMain(); replaceHistory();
     }
     else if(action==='open-single'){
       state.selectedSingle = el.dataset.id;
