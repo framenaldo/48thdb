@@ -434,6 +434,18 @@
   .th-range{ margin-left:auto; color:var(--ink-soft); font-size:12.5px; white-space:nowrap; }
   .th-now{ color:var(--ink); font-weight:600; }
 
+  .social-row{ display:flex; flex-wrap:wrap; gap:7px; margin:14px 0 2px; }
+  .social-chip{
+    display:inline-flex; align-items:center; gap:6px; max-width:100%;
+    padding:6px 11px 6px 8px; border-radius:999px; text-decoration:none;
+    border:1px solid var(--line); background:var(--paper-dim); color:var(--ink);
+    font-size:12.5px; font-weight:600;
+  }
+  .social-chip:hover{ border-color:var(--c); color:var(--c); }
+  .social-ico{ width:15px; height:15px; flex:none; color:var(--c); }
+  .social-ico svg{ width:100%; height:100%; display:block; }
+  .social-handle{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:15ch; }
+
   .works-count{ color:var(--ink-soft); font-size:12.5px; margin:6px 0 0; }
   .stat-cell .sub{ font-size:11px; color:var(--ink-soft); margin-top:2px; }
   .shared-day{ padding:9px 0; border-bottom:1px solid var(--line); }
@@ -1145,6 +1157,171 @@ const SEED_ALL_MEMBERS = SEED_MEMBERS.concat(SEED_GRADUATED);
 // A member who moved between BNK48 and CGM48 shows a gap: the wiki names no
 // team for the stretch between the transfer and the next promotion. Time in
 // AKB48 is outside what this database covers and is not listed.
+// Social accounts, from the `blog` field of each member's infobox on the
+// AKB48 fandom wiki — [platform, handle], newest-looking platforms first.
+// Only X and YouTube can be checked from here: a wrong Instagram, TikTok or
+// Facebook handle returns the same page as a right one, so those are as
+// reliable as the wiki and no more. Four dead X and YouTube links were
+// dropped after checking; the same rate may hold among the unverifiable.
+const SEED_SOCIAL = {
+  'bnk-fame': [['instagram','fame.bnk48official'], ['x','Famequadlips'], ['tiktok','fame.bnk48official'], ['facebook','bnk48official.fame']],
+  'bnk-hoop': [['instagram','hoop.bnk48official'], ['facebook','bnk48official.hoop']],
+  'bnk-janry': [['instagram','janry.bnk48official'], ['facebook','bnk48official.janry']],
+  'bnk-luksorn': [['instagram','luksorn.bnk48office'], ['facebook','luksorn.bnk48official']],
+  'bnk-mail': [['instagram','mail.bnk48official'], ['facebook','mail.bnk48official']],
+  'bnk-marine': [['instagram','marine.bnk48official'], ['facebook','bnk48official.marine']],
+  'bnk-micha': [['instagram','micha.bnk48official'], ['facebook','bnk48official.micha']],
+  'bnk-monet': [['instagram','monet.bnk48official'], ['tiktok','monet.bnk48official'], ['facebook','bnk48official.monet']],
+  'bnk-patt': [['instagram','patt.bnk48official'], ['tiktok','patt.bnk48official'], ['facebook','bnk48official.patt']],
+  'bnk-praew': [['instagram','praew.bnk48.official'], ['tiktok','praew.bnk48office'], ['facebook','praew.bnk48official']],
+  'bnk-wawa': [['instagram','wawa.bnk48office'], ['facebook','bnk48official.wawa']],
+  'bnk-arlee': [['instagram','arlee.bnk48official'], ['facebook','arlee.bnk48official']],
+  'bnk-berry': [['instagram','berry.bnk48official'], ['facebook','bnk48official.berry']],
+  'bnk-emmy': [['instagram','emmy.bnk48official'], ['facebook','bnk48official.emmy']],
+  'bnk-jew': [['instagram','jew.bnk48official'], ['facebook','jew.bnk48official']],
+  'bnk-l': [['instagram','l.bnk48official'], ['facebook','bnk48official.l']],
+  'bnk-palmmy': [['instagram','palmmy.bnk48official'], ['facebook','bnk48official.palmmy']],
+  'bnk-pancake': [['instagram','pancake.bnk48office'], ['tiktok','pancake.bnk48official'], ['facebook','bnk48official.pancake']],
+  'bnk-proud': [['instagram','proud.bnk48official'], ['facebook','proud.bnk48official']],
+  'bnk-saonoi': [['instagram','saonoi.bnk48official'], ['facebook','saonoi.bnk48official']],
+  'bnk-sindy': [['instagram','sindy.bnk48official'], ['facebook','bnk48official.sindy']],
+  'bnk-yoghurt': [['instagram','yoghurt.bnk48official'], ['facebook','bnk48official.yoghurt']],
+  'bnk-blythe': [['instagram','blythe.bnk48official'], ['facebook','blythe.bnk48official']],
+  'bnk-cartoon': [['instagram','cartoon.bnk48office'], ['facebook','cartoon.bnk48official']],
+  'bnk-galeya': [['instagram','galeya.bnk48office'], ['facebook','galeya.bnk48official']],
+  'bnk-grape': [['instagram','grape.bnk48official'], ['facebook','grape.bnk48official']],
+  'bnk-inkcha': [['instagram','inkcha.bnk48.official'], ['facebook','inkcha.bnk48official']],
+  'bnk-khaimook': [['instagram','Khaimook.bnk48official'], ['facebook','Khaimook.bnk48official']],
+  'bnk-khowjow': [['instagram','khowjow.bnk48office'], ['facebook','khowjow.bnk48official']],
+  'bnk-mayji': [['instagram','mayji.bnk48official'], ['facebook','mayji.bnk48official']],
+  'bnk-mint': [['instagram','mint.bnk48office'], ['facebook','mint.bnk48official']],
+  'bnk-mirin': [['instagram','mirin.bnk48.official'], ['facebook','mirin.bnk48official']],
+  'bnk-nammonn': [['instagram','nammonn.bnk48official'], ['facebook','nammonn.bnk48official']],
+  'bnk-neen': [['instagram','neen.bnk48official'], ['facebook','neen.bnk48official']],
+  'bnk-niya': [['instagram','niya.bnk48official'], ['facebook','niya.bnk48official']],
+  'bnk-rose': [['instagram','rose.bnk48office'], ['facebook','rose.bnk48official']],
+  'cgm-lookked': [['instagram','lookked.cgm48official'], ['tiktok','lookked.cgm48official'], ['facebook','cgm48official.lookked']],
+  'cgm-nana': [['instagram','nana.cgm48official'], ['tiktok','nana.cgm48official'], ['facebook','cgm48official.nana']],
+  'cgm-jingjing': [['instagram','jingjing.cgm48official'], ['tiktok','jingjing.cgm48official'], ['facebook','cgm48official.jingjing']],
+  'cgm-prae': [['instagram','prae.cgm48official'], ['tiktok','prae.cgm48official'], ['facebook','prae.cgm48official']],
+  'cgm-lingling': [['instagram','lingling.cgm48official'], ['tiktok','lingling.cgm48official'], ['facebook','lingling.cgm48official']],
+  'cgm-else': [['instagram','else.cgm48official'], ['tiktok','else.cgm48'], ['facebook','else.cgm48official']],
+  'cgm-ginna': [['instagram','ginna.cgm48official'], ['tiktok','ginna.cgm48official'], ['facebook','cgm48official.ginna']],
+  'cgm-ploen': [['instagram','ploen.cgm48official'], ['tiktok','ploen.cgm48official'], ['facebook','ploen.cgm48official']],
+  'cgm-kwan': [['instagram','kwan.cgm48office'], ['tiktok','kwan.cgm48official'], ['facebook','kwan.cgm48official']],
+  'cgm-nisha': [['instagram','nisha.cgm48office'], ['tiktok','nisha.cgm48offici'], ['facebook','nisha.cgm48official']],
+  'cgm-valentine': [['instagram','valentine.cgm48office'], ['tiktok','valentine.cgm48of'], ['facebook','valentine.cgm48official']],
+  'cgm-satangpound': [['instagram','satangpound.cgm48official'], ['tiktok','satangpound.cgm48'], ['facebook','satangpound.cgm48official']],
+  'cgm-praifa': [['instagram','praifa.cgm48official'], ['tiktok','praifa.cgm48offic'], ['facebook','praifa.cgm48official']],
+  'cgm-shenae': [['instagram','shenae.cgm48official'], ['tiktok','shenae.cgm48official'], ['facebook','shenae.cgm48official']],
+  'cgm-emma': [['instagram','emma.cgm48official'], ['facebook','cgm48official.emma']],
+  'cgm-hongyok': [['instagram','hongyok.cgm48official'], ['tiktok','hongyok.cgm48'], ['facebook','hongyok.cgm48official']],
+  'cgm-chifa': [['instagram','chifa.cgm48official'], ['tiktok','chifa.cgm485thgen'], ['facebook','chifa.cgm48official']],
+  'cgm-tara': [['instagram','tara.cgm48office'], ['facebook','tara.cgm48official']],
+  'cgm-punpon': [['instagram','punpon.cgm48office'], ['tiktok','punpon.cgm485thgen'], ['facebook','punpon.cgm48official']],
+  'cgm-lewlew': [['instagram','lewlew.cgm48official'], ['tiktok','lewlew.cgm485thgen'], ['facebook','lewlew.cgm48official']],
+  'cgm-namphet': [['instagram','namphet.cgm48office'], ['tiktok','namphet.cgm485thgen'], ['facebook','namphet.cgm48official']],
+  'bnk-kitkat': [['instagram','kidcatmew'], ['x','Kidcatmew'], ['facebook','Kidcatpurrson'], ['youtube','channel/UCDEVoCC-oWZsEy18nLtBuEw']],
+  'bnk-cincin': [['instagram','cincinnirada'], ['youtube','channel/UCKTSPt8BnGniWWZyOa84tnQ']],
+  'bnk-namhom': [['instagram','christinnlarsen']],
+  'bnk-jan': [['instagram','janchan.xoxo'], ['facebook','janchan.official'], ['youtube','channel/UCA3G7ASN92BX7yhBsdA_oOA']],
+  'bnk-can': [['instagram','cannayika'], ['x','cannayika97'], ['facebook','cannayika97'], ['youtube','channel/UCsp4Wo-w9v3i0R06urhlRRA']],
+  'bnk-maysa': [['instagram','maysa_officially'], ['facebook','maysaofficiallymissingyou'], ['youtube','channel/UCsGzf2IHZLY9JvWxBsWOCdg']],
+  'bnk-deenee': [['instagram','70.3.45']],
+  'bnk-cake': [['instagram','cakenawanine'], ['facebook','cekkicake']],
+  'bnk-maira': [['instagram','maira_k97'], ['facebook','100047830572791']],
+  'bnk-natherine': [['instagram','natherine.dusita'], ['facebook','natherinedusitaa'], ['youtube','channel/UCwN63MiEkwwuD3WFvnJJNKw']],
+  'bnk-oom': [['instagram','natcha_oom'], ['x','natchakofficial'], ['facebook','natcha.k.oom']],
+  'bnk-nink': [['instagram','nnink_m.k'], ['tiktok','nink.mananya43'], ['facebook','Sailor-Nink'], ['facebook','Ninkmananya68.official'], ['youtube','channel/UC56-TIer2o-tphKigSuZ0vg']],
+  'bnk-june': [['instagram','juneiperb0i'], ['instagram','plearnpichaya']],
+  'bnk-kheng': [['instagram','juthaoum']],
+  'bnk-fifa': [['instagram','fifafifas'], ['facebook','fifafifias']],
+  'bnk-faii': [['instagram','fyeqoodgurl'], ['x','fyeqoodgurl'], ['tiktok','fyeqoodgurl'], ['facebook','fyeqoodgurl'], ['youtube','channel/UCqQ_OOh6zWczZWwkM48z5XA']],
+  'bnk-jeje': [['instagram','iamjejey'], ['tiktok','iamjejey11'], ['facebook','iamjeje-101475155371250']],
+  'bnk-mewnich': [['instagram','me.w_mn'], ['instagram','mewnich.nannaphas'], ['x','mewnich__'], ['tiktok','me.w_mn'], ['facebook','mewnich.mn'], ['youtube','channel/UCLCO7qVFlSty2HVZ7JhHbbw']],
+  'bnk-bamboo': [['instagram','bamjnis'], ['tiktok','bamjnis'], ['facebook','Bamboo-Janista-Tansiri-111231641568920'], ['youtube','@bybamboo']],
+  'bnk-view': [['instagram','view.kmntd_'], ['x','Viewkmntd'], ['tiktok','view.kmntd_'], ['facebook','111221961592029']],
+  'bnk-jaa': [['instagram','jaja.napaphat'], ['facebook','bnk48official.jaa']],
+  'bnk-jane': [['instagram','janemiiiiiiii'], ['facebook','bnk48official.jane']],
+  'bnk-jennis': [['instagram','o_o.jennis.x_x'], ['x','JennisYouAgain'], ['facebook','bnk48official.jennis'], ['youtube','@jennisyouagain']],
+  'bnk-jib': [['instagram','jibbe.rin'], ['facebook','JibRenarin']],
+  'bnk-kaew': [['instagram','kkaew.chuu'], ['x','KisalwaysKaew'], ['facebook','bnk48official.kaew']],
+  'bnk-kaimook': [['instagram','kai.moooook'], ['x','Kaimoooood'], ['tiktok','kai.moooook'], ['facebook','100057474248310'], ['youtube','@Kai.moooook']],
+  'bnk-kate': [['instagram','kate.bnk48official'], ['facebook','bnk48official.kate']],
+  'bnk-korn': [['instagram','kornvathu'], ['facebook','vathusiri.p']],
+  'bnk-mind': [['instagram','hiya.muiimuii'], ['facebook','bnk48official.mind']],
+  'bnk-mobile': [['instagram','moby.e'], ['tiktok','moby.e_'], ['facebook','MOBYePimlapat'], ['youtube','@mobye']],
+  'bnk-music': [['instagram','miu.miusic'], ['tiktok','miusictuajing'], ['facebook','miu.miusic']],
+  'bnk-namneung': [['instagram','milinnn.d'], ['x','Milinyahhhh'], ['facebook','bnk48official.namneung'], ['youtube','@milind.channel'], ['youtube','@sertistchannel']],
+  'bnk-namsai': [['instagram','whereisnamsai'], ['facebook','bnk48official.namsai']],
+  'bnk-noey': [['instagram','noeyyyy.kw'], ['facebook','100044497656787'], ['youtube','@Noeykanteera']],
+  'bnk-orn': [['instagram','ornoung'], ['x','Ornoung_']],
+  'bnk-piam': [['instagram','rinminepr'], ['x','rinminepr'], ['facebook','rinminepr']],
+  'bnk-pun': [['instagram','pun.bnk48official'], ['instagram','punn_______'], ['facebook','bnk48official.pun']],
+  'bnk-pupe': [['instagram','sleepypupe.zzz'], ['x','sleepypupezzz'], ['tiktok','sleepypupe.zzz'], ['facebook','sleepypupe.zzz'], ['youtube','@sleepypupezzz']],
+  'bnk-tarwaan': [['instagram','istarwaan'], ['x','istarwaan'], ['facebook','bnk48official.tarwaan']],
+  'bnk-pim': [['instagram','pimnichaar'], ['instagram','pimkyomi']],
+  'bnk-pampam': [['instagram','palapamm'], ['tiktok','palapamm']],
+  'bnk-cherprang': [['instagram','ccherprang.ark'], ['facebook','ccherprang.ark'], ['youtube','channel/UCeZwo79IRDETy9ar1XacJKQ']],
+  'bnk-miori': [['instagram','09bo30ri'], ['facebook','bnk48official.miori']],
+  'bnk-fond': [['instagram','fondnatticha'], ['x','fond3cember'], ['facebook','fond.natticha']],
+  'bnk-gygee': [['instagram','gygeenutkul'], ['x','gygeenutkul'], ['facebook','gygeenutkul']],
+  'bnk-khamin': [['instagram','khamiin__'], ['facebook','Khamin.ManipaR']],
+  'bnk-minmin': [['instagram','minmin.rachaya'], ['x','Minmin_Rachaya'], ['facebook','minminrachaya']],
+  'bnk-myyu': [['instagram','calledmemyyu.k'], ['x','calledmemyyuk'], ['facebook','calledmemyyu.k']],
+  'bnk-new': [['instagram','chanyaaaa_n'], ['x','chanya_cyp'], ['facebook','bnk48official.new']],
+  'bnk-niky': [['instagram','youknowinever_'], ['x','youknowinever_'], ['facebook','bnk48official.niky']],
+  'bnk-nine': [['instagram','nine.narinn'], ['x','NineNarinn_'], ['facebook','ninenarinn.p']],
+  'bnk-pakwan': [['instagram','pa.kwannn'], ['x','pakwannoii'], ['facebook','pakwan.bnk48official']],
+  'bnk-panda': [['instagram','panda.jdp'], ['x','PandaJDP'], ['facebook','bnk48official.panda']],
+  'bnk-phukkhom': [['instagram','bitterbitty'], ['x','bitterbitty28'], ['facebook','bnk48official.phukkhom']],
+  'bnk-ratah': [['instagram','ratahtouille'], ['x','ratahtouille'], ['facebook','bnk48official.ratah']],
+  'bnk-stang': [['instagram','stang.tari'], ['facebook','Stang.Tari']],
+  'bnk-wee': [['instagram','weewrya'], ['instagram','actiweety'], ['facebook','bnk48official.wee']],
+  'bnk-paeyah': [['instagram','pitchapaeyah'], ['facebook','bnk48official.paeyah']],
+  'bnk-nana': [['instagram','qpnanx_07']],
+  'bnk-jaokhem': [['instagram','jkchanikhan']],
+  'bnk-nene': [['instagram','nenethanida'], ['x','nenethanida'], ['facebook','nenethanida']],
+  'bnk-satchan': [['instagram','satchan.sawitchaya'], ['facebook','satchan.sawitchaya']],
+  'bnk-popper': [['instagram','pinaday.y'], ['x','pinadayy'], ['tiktok','pinadayy'], ['facebook','bnk48official.popper']],
+  'bnk-earn': [['instagram','earnnchiii'], ['facebook','bnk48official.earn']],
+  'bnk-earth': [['instagram','earthnapason'], ['facebook','bnk48official.earth']],
+  'bnk-eve': [['instagram','eveissaree'], ['facebook','bnk48official.eve']],
+  'bnk-grace': [['instagram','gracevirunpat'], ['x','gracevirunpat'], ['tiktok','gracevirunpat'], ['facebook','gracevirunpat']],
+  'bnk-kaofrang': [['instagram','kaofrang'], ['tiktok','kaofrangfie'], ['facebook','bnk48official.kaofrang']],
+  'bnk-mean': [['instagram','meinbownn'], ['tiktok','mean.bnk48official'], ['facebook','bnk48official.mean']],
+  'bnk-peak': [['instagram','peakphusiita'], ['tiktok','peak.bnk48official'], ['facebook','bnk48official.peak']],
+  'bnk-yayee': [['instagram','yayiiyee.01'], ['tiktok','yayee.bnk48official'], ['facebook','Yayiiyee01']],
+  'cgm-nicha': [['instagram','norchor_is_nichaa']],
+  'cgm-pepo': [['instagram','pepo_mellfias'], ['x','mellfias'], ['youtube','channel/UC0HwcHqTnhO1kVGEWRWplLQ']],
+  'cgm-parima': [['instagram','parima.cgm48official'], ['instagram','aliceyinjuly'], ['tiktok','aliceyinjuly'], ['facebook','cgm48official.parima']],
+  'cgm-jayda': [['instagram','jadaejayda']],
+  'cgm-twobam': [['instagram','lariebam']],
+  'cgm-milk': [['instagram','miruku_luminus']],
+  'cgm-aom': [['instagram','aompunyawee'], ['x','Aommpunyawee'], ['tiktok','aom.punyawee'], ['facebook','aommii.pj']],
+  'cgm-izurina': [['instagram','rinaizuta.official'], ['x','izuketsu_deen'], ['tiktok','rinaizuta.official'], ['facebook','rinaizuta.official']],
+  'cgm-papang': [['instagram','19pscyhrr']],
+  'cgm-fortune': [['instagram','fortunekeiths'], ['tiktok','fortunekeiths']],
+  'cgm-meilli': [['instagram','jjelili__']],
+  'cgm-angel': [['instagram','angelnpssn'], ['tiktok','angelnpssn']],
+  'cgm-champoo': [['instagram','champoo.kodcha'], ['x','chamcham101048'], ['tiktok','champoo.kodcha']],
+  'cgm-fahsai': [['instagram','fallinfromfah'], ['tiktok','__fallinfromfah'], ['facebook','PhattaratidaFahsai']],
+  'cgm-jjae': [['instagram','chaechaespr'], ['x','Chaechaespr'], ['tiktok','jjae.cgm48official']],
+  'cgm-kaiwan': [['instagram','kaiwanmanita'], ['tiktok','kaiwanmanitaa']],
+  'cgm-kaning': [['instagram','kanigii_._'], ['tiktok','kaning.cgm48official'], ['facebook','cgm48official.kaning'], ['youtube','channel/UCgshnxc-JJdd4uJBlOdk7Fw']],
+  'cgm-kyla': [['instagram','kylakh00'], ['x','kylakh00'], ['tiktok','kylakh00'], ['facebook','Kylakh00'], ['youtube','channel/UCg3y7ATRYRGr96sSMTqGZDg']],
+  'cgm-latin': [['instagram','tinmatomato'], ['tiktok','tinmatomato']],
+  'cgm-marmink': [['instagram','marminkmani'], ['instagram','eatfoodwithmercy'], ['x','marminkmani'], ['tiktok','marminkmani']],
+  'cgm-meen': [['instagram','pitchameen'], ['x','pitchameen'], ['tiktok','pitchameen']],
+  'cgm-mei': [['instagram','kimmeii._'], ['tiktok','kimmeii._'], ['facebook','cgm48official.mei']],
+  'cgm-nena': [['instagram','nenatwenty7'], ['x','NenaTwenty7'], ['tiktok','nenatwenty7']],
+  'cgm-nenie': [['instagram','neni3pcyy'], ['instagram','naniesnap'], ['x','neniepcyyy'], ['tiktok','neniepcyy']],
+  'cgm-pim': [['instagram','pimwarinnnnn.w'], ['tiktok','pimwarinnnnn_w'], ['facebook','cgm48official.pim']],
+  'cgm-ping': [['instagram','pingphorest'], ['tiktok','pingphorest']],
+  'cgm-punch': [['instagram','ppunchii.wcrr'], ['x','punching_U_'], ['tiktok','punch.cgm48official'], ['facebook','cgm48official.punch']],
+  'cgm-sita': [['instagram','sitaaaaaaaaa.a'], ['x','25andjune'], ['tiktok','sitaaaaaaaaa.a']],
+};
+
 const SEED_TEAM_HISTORY = {
   'bnk-fame': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-10-30' }, { team:'biii', from:'2022-10-30', to:null }],
   'bnk-hoop': [{ team:'trainee-bnk', from:'2020-03-06', to:'2022-06-02' }, { team:'biii', from:'2022-06-02', to:null }],
@@ -2223,6 +2400,37 @@ function renderMemberWorks(m){
     <div class="work-list">${rows}</div>`;
 }
 
+const SOCIAL = {
+  instagram: { label:'Instagram', colour:'#E1306C', url:h=>'https://www.instagram.com/'+h,
+    icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.2" fill="currentColor" stroke="none"/></svg>` },
+  x: { label:'X', colour:'#111', url:h=>'https://x.com/'+h,
+    icon:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.7 3h3.3l-7.2 8.3L22 21h-6.3l-4.4-5.7L6 21H2.7l7.5-8.6L2.3 3h6.4l4.1 5.4zm-1.1 16h1.8L7.5 4.9H5.6z"/></svg>` },
+  tiktok: { label:'TikTok', colour:'#000', url:h=>'https://www.tiktok.com/@'+h,
+    icon:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 2h-3v13.2a2.7 2.7 0 1 1-2.7-2.7c.3 0 .6 0 .8.1V9.5a5.7 5.7 0 1 0 4.9 5.7V8.6a6.3 6.3 0 0 0 3.9 1.3V6.8a3.4 3.4 0 0 1-3.9-3z"/></svg>` },
+  facebook: { label:'Facebook', colour:'#1877F2', url:h=>'https://www.facebook.com/'+h,
+    icon:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.2-1.5 1.5-1.5h1.6V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4.1v2.1H7.5v3h2.2V21z"/></svg>` },
+  youtube: { label:'YouTube', colour:'#FF0000', url:h=>'https://www.youtube.com/'+h.replace(/^\//,''),
+    icon:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8C22 15.2 22 12 22 12s0-3.2-.4-4.8zM10 15.5v-7l6 3.5z"/></svg>` },
+};
+
+function renderSocial(m){
+  const links = SEED_SOCIAL[m.id];
+  if(!links || !links.length) return '';
+  return `<div class="social-row">
+    ${links.map(([p, handle])=>{
+      const s = SOCIAL[p];
+      if(!s) return '';
+      // A channel id is not a name, so show the platform instead of 24 characters
+      // of base64. An @handle reads fine as it is.
+      const shown = handle.startsWith('channel/') ? s.label : handle.replace(/^@/,'');
+      return `<a class="social-chip" style="--c:${s.colour}" href="${escapeAttr(s.url(handle))}"
+        target="_blank" rel="noopener noreferrer" title="${s.label}: ${escapeAttr(handle)}">
+        <span class="social-ico">${s.icon}</span><span class="social-handle">${escapeHtml(shown)}</span>
+      </a>`;
+    }).join('')}
+  </div>`;
+}
+
 function renderTeamHistory(m){
   const spans = SEED_TEAM_HISTORY[m.id];
   if(!spans || !spans.length) return '';
@@ -2431,6 +2639,7 @@ function renderDetailModal(){
             <span class="crown-ico">${ICONS.crown}</span> ${isKami?'เป็น Kami Oshi':'ตั้งเป็น Kami Oshi'}
           </button>
         </div>
+        ${renderSocial(m)}
         <div class="stat-grid">
           <div class="stat-cell"><div class="label">วันเกิด</div><div class="value">${formatDate(m.birthday)}</div></div>
           <div class="stat-cell"><div class="label">อายุ</div><div class="value">${age!==null?age+' ปี':'-'}</div></div>
