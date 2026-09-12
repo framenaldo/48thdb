@@ -647,13 +647,19 @@
   @media (hover:hover){ .chip-link:hover{ background:var(--paper-dim); } }
   /* Each track gets its own panel. Three tracks of near-identical chips ran
      together as one field otherwise, with nothing saying where one ended. */
+  /* The accent is painted as background rather than as a thick left border:
+     a 3px border meeting 1px ones under a 13px radius tapers at the corners
+     and leaves a wedge. As background the radius clips it cleanly, and the
+     left border goes transparent so the stripe reaches the very edge. */
   .track-block{
     margin:0 0 14px; padding:14px 15px 16px;
-    background:var(--paper-dim); border:1px solid var(--line);
-    border-left:3px solid var(--c, var(--ink-soft)); border-radius:13px;
+    border:1px solid var(--line); border-left-color:transparent;
+    border-radius:13px;
+    background:linear-gradient(to right, var(--silver) 0 4px, var(--paper-dim) 4px);
   }
-  .track-block{ border-left-color:var(--silver); }
-  .track-block.is-lead{ border-left-color:var(--gold); }
+  .track-block.is-lead{
+    background:linear-gradient(to right, var(--gold) 0 4px, var(--paper-dim) 4px);
+  }
   .track-head{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin:0 0 2px; }
   .track-tag{
     flex-shrink:0; font-family:'Noto Sans Thai',sans-serif; font-size:10px; font-weight:700;
