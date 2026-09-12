@@ -434,6 +434,61 @@
   .th-range{ margin-left:auto; color:var(--ink-soft); font-size:12.5px; white-space:nowrap; }
   .th-now{ color:var(--ink); font-weight:600; }
 
+  .stage-wrap{ position:relative; margin:14px 0 18px; padding-left:74px; }
+  .stage{ position:relative; aspect-ratio:16/9; min-height:210px; }
+  .stage-floor{ position:absolute; inset:0; width:100%; height:100%; }
+  .stage-row{
+    position:absolute; left:50%; transform:translate(-50%,-50%);
+    display:flex; justify-content:center; align-items:flex-end;
+  }
+  /* Each seat takes an equal share of its own row, and the row is a share of
+     the stage, so a row always fits the floor at that depth — on any screen
+     width, without a pixel minimum that would break the perspective. */
+  .seat{
+    background:none; border:none; padding:0 1px; cursor:pointer; font-family:inherit;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    width:var(--seat); max-width:72px; flex:none; min-width:0;
+  }
+  .seat.is-gap{ pointer-events:none; }
+  .seat-face{
+    width:min(52px, 82%); aspect-ratio:1; border-radius:50%;
+    overflow:hidden; border:2px solid #fff; background:var(--paper);
+    box-shadow:0 2px 7px rgba(0,0,0,.3); display:grid; place-items:center;
+  }
+  .seat.is-centre .seat-face{ border-color:var(--gold); box-shadow:0 0 0 2px var(--gold), 0 2px 8px rgba(0,0,0,.34); }
+  /* .avatar-img inside is absolutely positioned, so this has to be the
+     positioned, clipping ancestor or the photo escapes to the whole stage. */
+  .seat-avatar{
+    position:relative; overflow:hidden; width:100%; height:100%; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Noto Sans Thai',sans-serif; font-weight:700; color:#fff;
+    font-size:clamp(11px, 2.2vw, 17px);
+  }
+  .seat-name{
+    font-size:clamp(8.5px, calc(10.5px * var(--s)), 12px); font-weight:700; color:#fff; line-height:1.15;
+    text-shadow:0 1px 3px rgba(0,0,0,.55); max-width:100%;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .seat.is-centre .seat-name{ color:var(--gold); }
+  .stage-side{ position:absolute; inset:0; width:74px; pointer-events:none; }
+  .stage-side span{
+    position:absolute; right:8px; transform:translateY(-50%);
+    font-size:9.5px; font-weight:700; letter-spacing:.07em; color:var(--ink-soft);
+  }
+  .stage-side span:after{
+    content:''; position:absolute; right:-7px; top:50%; width:5px;
+    border-top:1px solid var(--line);
+  }
+  .stage-audience{
+    text-align:center; font-size:11px; font-weight:700; letter-spacing:.16em;
+    color:var(--ink-soft); margin-top:2px;
+  }
+  @media (max-width:560px){
+    .stage-wrap{ padding-left:0; }
+    .stage-side{ display:none; }
+    .stage{ aspect-ratio:1/1; min-height:260px; }
+  }
+
   .social-row{ display:flex; flex-wrap:wrap; gap:7px; margin:14px 0 2px; }
   .social-chip{
     display:inline-flex; align-items:center; gap:6px; max-width:100%;
@@ -1320,6 +1375,49 @@ const SEED_SOCIAL = {
   'cgm-ping': [['instagram','pingphorest'], ['tiktok','pingphorest']],
   'cgm-punch': [['instagram','ppunchii.wcrr'], ['x','punching_U_'], ['tiktok','punch.cgm48official'], ['facebook','cgm48official.punch']],
   'cgm-sita': [['instagram','sitaaaaaaaaa.a'], ['x','25andjune'], ['tiktok','sitaaaaaaaaa.a']],
+};
+
+// Stage formations, from the Line-up tables on akb48.fandom.com. Rows run
+// front to back — the first row is downstage, nearest the audience — and a
+// null is a deliberate gap the wiki marks with non-breaking spaces, which
+// staggers a row so the one behind it stays visible. Keyed by release, then
+// by which track of that release.
+const SEED_FORMATION = {
+  'bnk-s19': {
+    0: [['bnk-hoop', 'cgm-kaning', 'bnk-pancake', 'cgm-nenie', 'cgm-champoo'], ['bnk-popper', 'cgm-sita', 'bnk-yoghurt', 'bnk-l'], ['bnk-jew', 'bnk-grace', 'bnk-neen']],
+    1: [['bnk-janry', 'cgm-nana', 'bnk-earn', 'bnk-kaofrang', 'cgm-mei'], ['bnk-emmy', 'bnk-mean', 'bnk-arlee', 'bnk-wawa'], ['bnk-niya', 'bnk-saonoi', 'bnk-micha']],
+    2: [['bnk-nall', 'cgm-jingjing', 'bnk-nammonn', 'bnk-marine', 'cgm-lookked'], ['bnk-patt', 'bnk-palmmy', 'bnk-proud', 'bnk-galeya'], ['cgm-ploen', 'bnk-sindy', 'bnk-khaimook']],
+  },
+  'bnk-s20': {
+    0: [['bnk-arlee', 'bnk-pancake', 'bnk-janry', 'bnk-hoop', 'bnk-praew'], ['bnk-monet', 'bnk-yoghurt', 'bnk-emmy', 'bnk-l'], ['bnk-marine', 'bnk-niya', 'bnk-micha']],
+  },
+  'bnk-a6': {
+    0: [['bnk-pancake', 'bnk-yoghurt'], ['bnk-hoop', 'bnk-arlee', 'bnk-janry', 'bnk-praew'], ['bnk-niya', 'bnk-monet', 'bnk-emmy', 'bnk-luksorn', 'bnk-blythe', 'bnk-khowjow'], ['bnk-jew', 'bnk-marine', 'bnk-micha', 'bnk-nammonn', 'bnk-l', 'bnk-galeya']],
+  },
+  'cgm-s5': {
+    0: [['cgm-jingjing', 'cgm-kaning', 'cgm-marmink', 'cgm-pim', 'cgm-aom'], ['cgm-mei', 'cgm-fortune', 'cgm-sita', 'cgm-champoo', 'cgm-nenie'], ['cgm-punch', 'cgm-meen', 'cgm-angel', 'cgm-izurina', 'cgm-parima', 'cgm-lookked']],
+  },
+  'cgm-s6': {
+    0: [['cgm-sita', 'cgm-fortune', 'cgm-nenie', 'cgm-pim', 'cgm-kaning', 'cgm-marmink'], ['cgm-champoo', 'cgm-mei', 'cgm-aom', 'cgm-jingjing', 'cgm-angel', 'cgm-kaiwan'], ['cgm-lookked', 'cgm-punch', 'cgm-twobam', 'cgm-nana']],
+  },
+  'cgm-s7': {
+    0: [['cgm-sita', 'cgm-kaning', 'cgm-nana', 'cgm-pim', 'cgm-marmink'], ['cgm-kaiwan', 'cgm-nenie', 'cgm-punch', 'cgm-champoo', 'cgm-fortune'], ['cgm-lookked', 'cgm-jingjing']],
+  },
+  'cgm-s8': {
+    0: [['cgm-punch', 'cgm-champoo'], ['cgm-nana', 'cgm-izurina', 'cgm-sita'], ['cgm-nenie', 'cgm-pim', 'cgm-kaning', 'cgm-marmink'], ['cgm-jingjing', 'cgm-kaiwan', 'cgm-lookked']],
+  },
+  'cgm-s9': {
+    0: [['cgm-nana', 'cgm-lookked', 'cgm-nenie'], ['cgm-kaning', 'cgm-pim', 'cgm-sita', 'cgm-jingjing'], ['cgm-punch', 'cgm-kaiwan', 'cgm-champoo', 'cgm-marmink', 'cgm-lingling']],
+  },
+  'cgm-s10': {
+    0: [['cgm-lookked', 'cgm-ploen', 'cgm-nisha', 'cgm-jingjing'], ['cgm-nana', 'cgm-lingling', 'cgm-kwan', 'cgm-else', 'cgm-prae'], ['cgm-ginna', 'cgm-emma', 'cgm-shenae']],
+  },
+  'cgm-a2': {
+    0: [['cgm-sita', 'cgm-champoo', 'cgm-aom', 'cgm-kaning', 'cgm-fortune'], ['cgm-kaiwan', 'cgm-lookked', 'cgm-nana', 'cgm-marmink', 'cgm-pim', 'cgm-mei'], ['cgm-jingjing', 'cgm-ping', 'cgm-nena', 'cgm-izurina', 'cgm-punch']],
+  },
+  'cgm-a3': {
+    0: [['cgm-champoo', 'cgm-nana', 'cgm-lingling', 'cgm-sita'], ['cgm-pim', 'cgm-kaning', null, 'cgm-nenie', 'cgm-mei'], ['cgm-lookked', 'cgm-ploen', 'cgm-emma', 'cgm-jingjing']],
+  },
 };
 
 const SEED_TEAM_HISTORY = {
@@ -2431,6 +2529,79 @@ function renderSocial(m){
   </div>`;
 }
 
+// A stage seen from the audience: the floor recedes upstage, but the members
+// standing on it are drawn upright rather than skewed with it, so faces and
+// names stay readable. Depth is carried by how far in a row sits, how wide it
+// spreads and how large its avatars are.
+const STAGE = { front:{ y:71, w:95, s:1 }, back:{ y:24, w:64, s:0.66 } };
+const lerp = (a, b, t) => a + (b - a) * t;
+
+function renderStage(work, trackIndex, track){
+  const grid = (SEED_FORMATION[work.id] || {})[trackIndex];
+  if(!grid || !grid.length) return '';
+  const n = grid.length;
+  const depth = i => n > 1 ? i / (n - 1) : 0;          // 0 downstage, 1 upstage
+  const at = (i, k) => lerp(STAGE.front[k], STAGE.back[k], depth(i));
+
+  // floor edges, a touch outside the front and back rows
+  const edge = (t, pad) => {
+    const w = lerp(STAGE.front.w, STAGE.back.w, t) + pad;
+    return [50 - w/2, 50 + w/2];
+  };
+  const [fl, fr] = edge(0, 6), [bl, br] = edge(1, 6);
+  const yTop = STAGE.back.y - 14, yBot = STAGE.front.y + 17;
+  const floorY = t => lerp(yBot, yTop, t);
+  const floorX = (t, side) => lerp(side ? fr : fl, side ? br : bl, t);
+
+  const divider = t => `<line x1="${floorX(t,0)}" y1="${floorY(t)}" x2="${floorX(t,1)}" y2="${floorY(t)}"
+    stroke="rgba(255,255,255,.7)" stroke-width="1.3" stroke-dasharray="7 5" vector-effect="non-scaling-stroke"/>`;
+  const rowBands = grid.map((_, i) => i === 0 ? '' : divider((depth(i) + depth(i-1)) / 2)).join('');
+  const columns = [0.2, 0.4, 0.6, 0.8].map(f => {
+    const x0 = lerp(fl, fr, f), x1 = lerp(bl, br, f);
+    return `<line x1="${x0}" y1="${floorY(0)}" x2="${x1}" y2="${floorY(1)}"
+      stroke="rgba(255,255,255,.42)" stroke-width="1.1" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>`;
+  }).join('');
+
+  const rows = grid.map((row, i) => {
+    const seats = row.map(id => {
+      if(!id) return `<span class="seat is-gap" aria-hidden="true"></span>`;
+      const m = getMember(id);
+      if(!m) return '';
+      const g = getGroup(m.groupId);
+      const isCentre = track.centers.includes(id);
+      return `<button class="seat${isCentre?' is-centre':''}" style="--c:${g.color}"
+        data-action="open-member" data-id="${id}" title="${escapeAttr(m.name+' · '+m.nameTh)}">
+        <span class="seat-face">${renderAvatar(m, 'seat-avatar', g.color)}</span>
+        <span class="seat-name">${escapeHtml(m.nameTh || m.name)}</span>
+      </button>`;
+    }).join('');
+    return { i, html: `<div class="stage-row" style="top:${at(i,'y')}%;width:${at(i,'w')}%;
+      --s:${at(i,'s').toFixed(3)};--seat:${(100 / row.length).toFixed(3)}%;
+      z-index:${n - i};">${seats}</div>` };
+  });
+
+  return `
+  <div class="stage-wrap">
+    <div class="stage-side">
+      <span style="top:${STAGE.back.y}%">UPSTAGE</span>
+      <span style="top:${STAGE.front.y}%">DOWNSTAGE</span>
+    </div>
+    <div class="stage" style="--c:${getGroup(work.groupId).color}">
+      <svg class="stage-floor" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <polygon points="${fl},${floorY(0)} ${bl},${floorY(1)} ${br},${floorY(1)} ${fr},${floorY(0)}"
+          fill="url(#stageGrad)" stroke="rgba(255,255,255,.85)" stroke-width="1.8" vector-effect="non-scaling-stroke"/>
+        ${columns}${rowBands}
+        <defs><linearGradient id="stageGrad" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="var(--c)" stop-opacity=".62"/>
+          <stop offset="1" stop-color="var(--c)" stop-opacity=".18"/>
+        </linearGradient></defs>
+      </svg>
+      ${rows.sort((a,b)=>a.i<b.i?1:-1).map(r=>r.html).join('')}
+    </div>
+    <div class="stage-audience">AUDIENCE</div>
+  </div>`;
+}
+
 function renderTeamHistory(m){
   const spans = SEED_TEAM_HISTORY[m.id];
   if(!spans || !spans.length) return '';
@@ -3141,6 +3312,7 @@ function renderSingleDetail(){
       <div class="track-sub">${t.members.length} คน${t.centers.length
         ? ' · เซ็นเตอร์ ' + t.centers.map(id=>escapeHtml(getMember(id)?.nameTh||getMember(id)?.name||'')).join(', ')
         : ''}</div>
+      ${renderStage(s, i, t)}
       <div class="grid-mini">
         ${t.centers.map(id=>`<div class="is-center">${card(id)}</div>`).join('')}
         ${rest.map(card).join('')}
