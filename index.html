@@ -453,10 +453,10 @@
   .seat.is-gap{ pointer-events:none; }
   .seat-face{
     width:100%; aspect-ratio:1; border-radius:50%;
-    overflow:hidden; border:2.5px solid var(--gold); background:var(--paper);
+    overflow:hidden; border:2.5px solid #fff; background:var(--paper);
     box-shadow:0 2px 8px rgba(0,0,0,.32); display:grid; place-items:center;
   }
-  .seat.is-centre .seat-face{ box-shadow:0 0 0 3px #fff, 0 0 0 5px var(--gold), 0 2px 9px rgba(0,0,0,.36); }
+  .seat.is-centre .seat-face{ border-color:var(--gold); box-shadow:0 0 0 3px var(--gold), 0 2px 9px rgba(0,0,0,.36); }
   /* .avatar-img inside is absolutely positioned, so this has to be the
      positioned, clipping ancestor or the photo escapes to the whole stage. */
   .seat-avatar{
@@ -470,7 +470,7 @@
   .seat-name{
     position:absolute; left:50%; bottom:-9px; transform:translateX(-50%);
     max-width:132%; padding:2px 8px; border-radius:999px;
-    background:var(--c); border:2px solid var(--gold); color:#fff;
+    background:var(--c); border:2px solid #fff; color:#fff;
     font-size:clamp(8.5px, calc(10.5px * var(--s)), 12px); font-weight:700; line-height:1.25;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     box-shadow:0 2px 6px rgba(0,0,0,.3);
