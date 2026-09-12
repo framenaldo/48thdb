@@ -464,11 +464,17 @@
   .seat:hover .seat-face, .seat:focus-visible .seat-face{
     box-shadow:0 0 0 2px rgba(255,255,255,.85), 0 7px 20px rgba(0,0,0,.34);
   }
+  /* The centre wears the same faint rim as everyone else, with a soft gold
+     halo outside it — the mark reads without the hard ring breaking the glass. */
   .seat.is-centre .seat-face{
-    box-shadow:0 0 0 2.5px #fff, 0 0 0 5px var(--gold), 0 3px 11px rgba(0,0,0,.36);
+    box-shadow:0 0 0 1.5px rgba(255,255,255,.55),
+               0 0 0 4.5px color-mix(in srgb, var(--gold) 62%, transparent),
+               0 3px 12px rgba(0,0,0,.3);
   }
   .seat.is-centre:hover .seat-face{
-    box-shadow:0 0 0 2.5px #fff, 0 0 0 6px var(--gold), 0 8px 22px rgba(0,0,0,.4);
+    box-shadow:0 0 0 2px rgba(255,255,255,.9),
+               0 0 0 6px color-mix(in srgb, var(--gold) 78%, transparent),
+               0 8px 22px rgba(0,0,0,.36);
   }
   /* .avatar-img inside is absolutely positioned, so this has to be the
      positioned, clipping ancestor or the photo escapes to the whole stage. */
@@ -493,7 +499,8 @@
     box-shadow:0 2px 7px rgba(0,0,0,.22);
   }
   .seat.is-centre .seat-name{
-    background:var(--gold); border:2px solid #fff; text-shadow:none;
+    background:color-mix(in srgb, var(--gold) 68%, rgba(255,255,255,.28));
+    border:1px solid rgba(255,255,255,.62);
   }
 
   /* Sits on the panel rather than in a card of its own: the arrow is what
