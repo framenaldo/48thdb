@@ -487,7 +487,21 @@
   .single-head{ border-left:4px solid var(--c); padding:2px 0 2px 14px; margin:4px 0 6px; }
   .single-head h2{ font-family:'Noto Sans Thai',sans-serif; font-weight:800; font-size:26px; margin:4px 0 0; }
   .single-th{ color:var(--ink-soft); font-size:14.5px; margin:3px 0 0; }
-  .center-grid .mini-card{ border-width:1px 1px 1px 1px; border-top-width:3px; box-shadow:0 0 0 2px var(--gold) inset; }
+  .track-block{ margin:0 0 26px; }
+  .track-head{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin:18px 0 2px; }
+  .track-tag{
+    flex-shrink:0; font-family:'Noto Sans Thai',sans-serif; font-size:10px; font-weight:700;
+    padding:3px 8px; border-radius:5px; background:var(--paper-dim); color:var(--ink-soft);
+  }
+  .track-tag.lead{ background:var(--gold); color:#241a06; }
+  .track-name{ font-family:'Noto Sans Thai',sans-serif; font-weight:700; font-size:15.5px; }
+  .track-sub{ font-size:12px; color:var(--ink-soft); margin:0 0 9px; }
+  .is-center .mini-card{ box-shadow:0 0 0 2px var(--gold) inset; }
+  .is-center .mini-card:after{
+    content:'CENTER'; position:absolute; left:50%; transform:translateX(-50%); bottom:-7px;
+    font-family:'Noto Sans Thai',sans-serif; font-size:7.5px; font-weight:800; letter-spacing:.5px;
+    background:var(--gold); color:#241a06; padding:1px 5px; border-radius:4px;
+  }
 
   /* anything that jumps through to a filtered roster */
   button.bar-row{
@@ -1114,78 +1128,221 @@ const SEED_SINGLES = [
 // member list of the title track; bolded names there mark the centre).
 // Singles with no entry here have no article section to take one from.
 const SEED_SENBATSU = {
-  'bnk-s1': { centers:['bnk-jennis'],
-    members:['bnk-cherprang', 'bnk-can', 'bnk-jaa', 'bnk-jan', 'bnk-jennis', 'bnk-kaew', 
-      'bnk-kaimook', 'bnk-miori', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-noey', 
-      'bnk-orn', 'bnk-pun', 'bnk-satchan', 'bnk-tarwaan'] },
-  'bnk-s2': { centers:['bnk-mobile'],
-    members:['bnk-cherprang', 'cgm-izurina', 'bnk-jan', 'bnk-jennis', 'bnk-kaew', 
-      'bnk-kaimook', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 
-      'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
-  'bnk-s3': { centers:['bnk-music', 'bnk-noey'],
-    members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 
-      'bnk-korn', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 
-      'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
-  'bnk-s4': { centers:['bnk-noey'],
-    members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 
-      'bnk-mind', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 
-      'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'cgm-aom', 'bnk-cake', 'bnk-faii', 
-      'bnk-minmin', 'bnk-phukkhom'] },
-  'bnk-s5': { centers:['bnk-pun'],
-    members:['bnk-cherprang', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 'bnk-mobile', 
-      'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-tarwaan', 
-      'bnk-june', 'bnk-fond', 'bnk-mewnich', 'bnk-wee'] },
-  'bnk-s6': { centers:['bnk-cherprang'],
-    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 'bnk-mind', 
-      'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 'bnk-pupe', 
-      'bnk-tarwaan', 'bnk-natherine', 'bnk-wee'] },
-  'bnk-s7': { centers:['bnk-cherprang'],
-    members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kate', 
-      'bnk-mind', 'bnk-mobile', 'bnk-music', 'bnk-noey', 'bnk-orn', 'bnk-satchan', 
-      'bnk-bamboo', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-new', 'bnk-niky', 'bnk-oom', 
-      'bnk-piam', 'bnk-ratah', 'bnk-stang', 'bnk-view', 'bnk-wee'] },
-  'bnk-s8': { centers:['bnk-namneung'],
-    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-myyu', 'bnk-noey', 
-      'bnk-fond', 'bnk-gygee', 'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 
-      'bnk-namsai', 'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
-  'bnk-s9': { centers:['bnk-jane'],
-    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-june', 'bnk-kaew', 'bnk-minmin', 
-      'bnk-noey', 'bnk-pun', 'bnk-wee', 'bnk-fond', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 
-      'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
-  'bnk-s10': { centers:['bnk-mobile'],
-    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-minmin', 'bnk-noey', 
-      'bnk-pun', 'bnk-wee', 'bnk-gygee', 'bnk-kaimook', 'bnk-mobile', 'bnk-music', 
-      'bnk-namneung', 'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
-  'bnk-s11': { centers:['bnk-fond', 'bnk-music', 'bnk-paeyah', 'cgm-champoo'],
-    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-minmin', 'bnk-miori', 
-      'bnk-noey', 'bnk-pun', 'bnk-wee', 'bnk-fond', 'bnk-gygee', 'bnk-mobile', 'bnk-music', 
-      'bnk-namneung', 'bnk-new', 'bnk-orn', 'bnk-phukkhom', 'bnk-pupe', 'bnk-stang', 
-      'bnk-tarwaan', 'bnk-fame', 'bnk-hoop', 'bnk-mean', 'bnk-paeyah', 'bnk-pampam', 
-      'bnk-peak', 'cgm-aom', 'cgm-champoo', 'cgm-fortune', 'cgm-kaning', 'cgm-marmink', 
-      'cgm-sita'] },
-  'bnk-s12': { centers:['bnk-mobile'],
-    members:['bnk-minmin', 'bnk-miori', 'bnk-noey', 'bnk-wee', 'bnk-fond', 'bnk-gygee', 
-      'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-pupe', 'bnk-tarwaan', 
-      'cgm-aom', 'cgm-kaning', 'cgm-marmink', 'cgm-pim'] },
-  'bnk-s13': { centers:['bnk-pancake'],
-    members:['bnk-cherprang', 'bnk-fame', 'bnk-minmin', 'bnk-miori', 'bnk-monet', 'bnk-wee', 
-      'bnk-hoop', 'bnk-fond', 'bnk-gygee', 'bnk-new', 'bnk-pampam', 'bnk-pancake', 
-      'bnk-paeyah', 'bnk-janry', 'bnk-l', 'bnk-patt'] },
-  'bnk-s18': { centers:['bnk-earn', 'bnk-popper'],
-    members:['bnk-earn', 'bnk-eve', 'bnk-hoop', 'bnk-janry', 'bnk-marine', 'bnk-emmy', 
-      'bnk-pancake', 'bnk-popper', 'bnk-yoghurt', 'bnk-arlee', 'bnk-galeya', 'bnk-saonoi'] },
-  'cgm-s2': { centers:['cgm-kaning', 'cgm-sita'],
-    members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-fortune', 'cgm-kaiwan', 'cgm-kaning', 
-      'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nenie', 'cgm-parima', 'cgm-pepo', 
-      'cgm-pim', 'cgm-punch', 'cgm-sita'] },
-  'cgm-s3': { centers:['cgm-kaning'],
-    members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fortune', 'cgm-jayda', 
-      'cgm-kaning', 'cgm-marmink', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-pepo', 'cgm-pim', 
-      'cgm-ping', 'cgm-punch', 'cgm-sita'] },
-  'cgm-s4': { centers:['cgm-fortune'],
-    members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fortune', 'cgm-kaiwan', 'cgm-kaning', 
-      'cgm-marmink', 'cgm-nenie', 'cgm-punch', 'cgm-pim', 'cgm-sita', 'cgm-fahsai', 
-      'cgm-jayda', 'cgm-latin', 'cgm-mei', 'cgm-ping'] },
+  'bnk-s1': [
+    { track:'Aitakatta (อยากจะได้พบเธอ) และ Oogoe Diamond (ก็ชอบให้รู้ว่าชอบ)', centers:['bnk-music'],
+      members:['bnk-cherprang', 'bnk-can', 'bnk-jaa', 'bnk-jan', 'bnk-jennis', 'bnk-kaew', 
+        'bnk-kaimook', 'bnk-miori', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-noey', 
+        'bnk-orn', 'bnk-pun', 'bnk-satchan', 'bnk-tarwaan'] },
+    { track:'365 Nichi no Kamihikouki (365 วันกับเครื่องบินกระดาษ)', centers:['bnk-jennis'],
+      members:['bnk-cherprang', 'bnk-can', 'bnk-jaa', 'bnk-jan', 'bnk-jennis', 'bnk-kaew', 
+        'bnk-kaimook', 'bnk-miori', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-noey', 
+        'bnk-orn', 'bnk-pun', 'bnk-satchan', 'bnk-tarwaan'] },
+  ],
+  'bnk-s2': [
+    { track:'Koisuru Fortune Cookie (คุกกี้เสี่ยงทาย)', centers:['bnk-mobile'],
+      members:['bnk-cherprang', 'cgm-izurina', 'bnk-jan', 'bnk-jennis', 'bnk-kaew', 
+        'bnk-kaimook', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 
+        'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+    { track:'Skirt, Hirari (พลิ้ว)', centers:['bnk-jaa', 'bnk-mind'],
+      members:['bnk-jaa', 'bnk-jane', 'bnk-jib', 'bnk-kate', 'bnk-mind', 'bnk-namsai', 
+        'bnk-nink'] },
+  ],
+  'bnk-s3': [
+    { track:'Shonichi (วันแรก)', centers:['bnk-music', 'bnk-noey'],
+      members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 
+        'bnk-kaimook', 'bnk-korn', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 
+        'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+    { track:'Sakura no Hanabiratachi (ความทรงจำและคำอำลา)', centers:[],
+      members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 
+        'bnk-kaimook', 'bnk-korn', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 
+        'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+    { track:'Namida Surprise! (ประกายน้ำตาและรอยยิ้ม) (Type A)', centers:['bnk-tarwaan'],
+      members:['bnk-cherprang', 'bnk-can', 'cgm-izurina', 'bnk-jennis', 'bnk-kate', 
+        'bnk-korn', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namsai', 'bnk-noey', 
+        'bnk-orn', 'bnk-pun', 'bnk-tarwaan', 'bnk-nink', 'bnk-piam'] },
+    { track:'Anata to Christmas Eve (คำสัญญาแห่งคริสต์มาสอีฟ) (Type B)', centers:[],
+      members:['bnk-kaew', 'bnk-jan'] },
+  ],
+  'bnk-s4': [
+    { track:'Kimi wa Melody (เธอคือ...เมโลดี้)', centers:['bnk-noey'],
+      members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 
+        'bnk-kaimook', 'bnk-mind', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 
+        'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'cgm-aom', 
+        'bnk-cake', 'bnk-faii', 'bnk-minmin', 'bnk-phukkhom'] },
+    { track:'Tsugi no Season (ฤดูใหม่)', centers:['bnk-mewnich'],
+      members:['bnk-bamboo', 'bnk-deenee', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-june', 
+        'bnk-kheng', 'bnk-mewnich', 'bnk-myyu', 'bnk-new', 'bnk-niky', 'bnk-panda', 
+        'bnk-ratah', 'bnk-stang', 'bnk-view', 'bnk-wee'] },
+    { track:'Yume e no Route (หมื่นเส้นทาง)', centers:['bnk-pupe'],
+      members:['cgm-izurina', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaimook', 
+        'bnk-kate', 'bnk-korn', 'bnk-mind', 'bnk-miori', 'bnk-namneung', 'bnk-namsai', 
+        'bnk-pupe', 'bnk-satchan', 'bnk-nink', 'bnk-piam'] },
+  ],
+  'bnk-s5': [
+    { track:'BNK Festival (บีเอ็นเคเฟสติวัล)', centers:['bnk-pun'],
+      members:['bnk-cherprang', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 'bnk-mobile', 
+        'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 'bnk-pupe', 
+        'bnk-tarwaan', 'bnk-june', 'bnk-fond', 'bnk-mewnich', 'bnk-wee'] },
+    { track:'Mata Anata no Koto wo Kangaeteta (คิดถึง...)', centers:['bnk-myyu'],
+      members:['bnk-kaimook', 'bnk-jib', 'bnk-mobile', 'bnk-tarwaan', 'bnk-cake', 'bnk-fifa', 
+        'bnk-kheng', 'bnk-myyu', 'bnk-nine', 'bnk-niky', 'bnk-panda'] },
+    { track:'Temodemo no Namida (ถึงแม้จะมีน้ำตา)', centers:[],
+      members:['bnk-cherprang', 'bnk-music'] },
+  ],
+  'bnk-s6': [
+    { track:'Beginner (บีกินเนอร์)', centers:['bnk-cherprang'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 
+        'bnk-mind', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 
+        'bnk-pun', 'bnk-pupe', 'bnk-tarwaan', 'bnk-natherine', 'bnk-wee'] },
+    { track:'Kimi no Koto ga Suki Dakara (ก็เพราะว่าชอบเธอ)', centers:['bnk-satchan'],
+      members:['cgm-izurina', 'bnk-jaa', 'bnk-jib', 'bnk-korn', 'bnk-miori', 'bnk-namsai', 
+        'bnk-satchan', 'bnk-bamboo', 'bnk-fond', 'bnk-june', 'bnk-khamin', 'bnk-minmin', 
+        'bnk-mewnich', 'bnk-nink', 'bnk-oom', 'bnk-phukkhom'] },
+    { track:'Let U Go (Ost. Where We Belong ที่ตรงนั้น มีฉันหรือเปล่า)', centers:[],
+      members:['bnk-jennis', 'bnk-music'] },
+  ],
+  'bnk-s7': [
+    { track:'77 no Suteki na Machi e (77 ดินแดนแสนวิเศษ)', centers:['bnk-cherprang'],
+      members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kate', 
+        'bnk-mind', 'bnk-mobile', 'bnk-music', 'bnk-noey', 'bnk-orn', 'bnk-satchan', 
+        'bnk-bamboo', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-new', 'bnk-niky', 'bnk-oom', 
+        'bnk-piam', 'bnk-ratah', 'bnk-stang', 'bnk-view', 'bnk-wee'] },
+    { track:'It\'s Life (Ost. BNK48: One Take) (ไทป์ A)', centers:[],
+      members:['bnk-cherprang'] },
+    { track:'It\'s Me (Ost. BNK48: One Take) (ไทป์ A)', centers:[],
+      members:['bnk-jib'] },
+    { track:'สายซับ (Ost. ONE YEAR 365 วัน บ้านฉัน บ้านเธอ) (ไทป์ B)', centers:['bnk-cherprang', 'bnk-june'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-namsai', 'bnk-pun', 'bnk-fond', 'bnk-june', 
+        'bnk-mewnich', 'bnk-wee'] },
+    { track:'มปร. (Ost. ONE YEAR 365 วัน บ้านฉัน บ้านเธอ) (ไทป์ B)', centers:[],
+      members:['bnk-pun', 'bnk-wee'] },
+  ],
+  'bnk-s8': [
+    { track:'High Tension (ไฮเทนชัน)', centers:['bnk-namneung'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-myyu', 'bnk-noey', 
+        'bnk-fond', 'bnk-gygee', 'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 
+        'bnk-namsai', 'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
+    { track:'โดดดิด่ง (Ost.ไทบ้าน x BNK48 จากใจผู้สาวคนนี้)', centers:['bnk-namneung'],
+      members:['bnk-kaew', 'bnk-noey', 'bnk-kaimook', 'bnk-mobile', 'bnk-namneung', 
+        'bnk-namsai', 'bnk-pupe', 'bnk-tarwaan'] },
+    { track:'จากใจผู้สาวคนนี้ (Ost.ไทบ้าน x BNK48 จากใจผู้สาวคนนี้)', centers:[],
+      members:['bnk-mobile'] },
+  ],
+  'bnk-s9': [
+    { track:'Heavy Rotation', centers:['bnk-jane'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-june', 'bnk-kaew', 
+        'bnk-minmin', 'bnk-noey', 'bnk-pun', 'bnk-wee', 'bnk-fond', 'bnk-mobile', 
+        'bnk-music', 'bnk-namneung', 'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
+    { track:'Hashire! Penguin', centers:['bnk-kaimook'],
+      members:['bnk-jib', 'bnk-korn', 'bnk-miori', 'bnk-bamboo', 'bnk-gygee', 'bnk-kaimook', 
+        'bnk-mewnich', 'bnk-new', 'bnk-phukkhom', 'bnk-satchan', 'bnk-stang', 'bnk-mind', 
+        'bnk-ratah', 'cgm-aom', 'cgm-izurina', 'cgm-pim'] },
+    { track:'Wink wa Sankai', centers:['bnk-jaa'],
+      members:['bnk-faii', 'bnk-kheng', 'bnk-myyu', 'bnk-niky', 'bnk-panda', 'bnk-jaa', 
+        'bnk-namsai', 'bnk-nine', 'bnk-khamin', 'bnk-pakwan', 'bnk-view', 'cgm-fortune', 
+        'cgm-kaiwan', 'cgm-kaning', 'cgm-marmink', 'cgm-sita'] },
+  ],
+  'bnk-s10': [
+    { track:'ดีอะ', centers:['bnk-mobile'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-minmin', 
+        'bnk-noey', 'bnk-pun', 'bnk-wee', 'bnk-gygee', 'bnk-kaimook', 'bnk-mobile', 
+        'bnk-music', 'bnk-namneung', 'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
+    { track:'Sukida Sukida Sukida – ชอบเธอนะ', centers:['bnk-music'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-minmin', 
+        'bnk-noey', 'bnk-pun', 'bnk-wee', 'bnk-gygee', 'bnk-kaimook', 'bnk-mobile', 
+        'bnk-music', 'bnk-namneung', 'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
+    { track:'Only Today – Band Version (Type A)', centers:[],
+      members:['bnk-korn', 'bnk-panda', 'bnk-bamboo', 'bnk-namsai', 'bnk-nine', 
+        'bnk-phukkhom', 'bnk-satchan'] },
+    { track:'Only Today – Acapella Version (Type B)', centers:[],
+      members:['bnk-miori', 'bnk-myyu', 'bnk-niky', 'bnk-fond', 'bnk-jaa', 'bnk-new', 
+        'bnk-stang'] },
+  ],
+  'bnk-s11': [
+    { track:'ซาโยนาระครอวล์', centers:['bnk-fond', 'bnk-music', 'bnk-paeyah', 'cgm-champoo'],
+      members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-minmin', 
+        'bnk-miori', 'bnk-noey', 'bnk-pun', 'bnk-wee', 'bnk-fond', 'bnk-gygee', 'bnk-mobile', 
+        'bnk-music', 'bnk-namneung', 'bnk-new', 'bnk-orn', 'bnk-phukkhom', 'bnk-pupe', 
+        'bnk-stang', 'bnk-tarwaan', 'bnk-fame', 'bnk-hoop', 'bnk-mean', 'bnk-paeyah', 
+        'bnk-pampam', 'bnk-peak', 'cgm-aom', 'cgm-champoo', 'cgm-fortune', 'cgm-kaning', 
+        'cgm-marmink', 'cgm-sita'] },
+    { track:'ทุ่งแสงดาว', centers:['bnk-jaa', 'bnk-kaimook'],
+      members:['bnk-niky', 'bnk-jaa', 'bnk-kaimook', 'bnk-monet', 'bnk-ratah', 'bnk-yoghurt'] },
+  ],
+  'bnk-s12': [
+    { track:'บีลีฟเวอส์', centers:['bnk-mobile'],
+      members:['bnk-minmin', 'bnk-miori', 'bnk-noey', 'bnk-wee', 'bnk-fond', 'bnk-gygee', 
+        'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-pupe', 'bnk-tarwaan', 
+        'cgm-aom', 'cgm-kaning', 'cgm-marmink', 'cgm-pim'] },
+    { track:'เมกนอยซ์', centers:['bnk-hoop'],
+      members:['bnk-earn', 'bnk-hoop', 'bnk-jaa', 'bnk-new', 'bnk-pampam', 'bnk-phukkhom', 
+        'bnk-popper', 'bnk-stang', 'bnk-paeyah', 'bnk-fame', 'bnk-mind', 'cgm-champoo', 
+        'cgm-fortune', 'cgm-izurina', 'cgm-kaiwan', 'cgm-sita'] },
+    { track:'ชอบเธอมากกว่าเมื่อวาน', centers:['cgm-mei'],
+      members:['bnk-grace', 'bnk-jib', 'bnk-mean', 'bnk-myyu', 'bnk-niky', 'bnk-nine', 
+        'bnk-pancake', 'bnk-ratah', 'bnk-yoghurt', 'bnk-earth', 'cgm-angel', 'cgm-nenie', 
+        'cgm-punch', 'cgm-jayda', 'cgm-mei', 'cgm-ping'] },
+  ],
+  'bnk-s13': [
+    { track:'อีวาเกะเมย์บี', centers:['bnk-pancake'],
+      members:['bnk-cherprang', 'bnk-fame', 'bnk-minmin', 'bnk-miori', 'bnk-monet', 
+        'bnk-wee', 'bnk-hoop', 'bnk-fond', 'bnk-gygee', 'bnk-new', 'bnk-pampam', 
+        'bnk-pancake', 'bnk-paeyah', 'bnk-janry', 'bnk-l', 'bnk-patt'] },
+  ],
+  'bnk-s18': [
+    { track:'กรีนแฟลช', centers:['bnk-earn', 'bnk-popper'],
+      members:['bnk-earn', 'bnk-eve', 'bnk-hoop', 'bnk-janry', 'bnk-marine', 'bnk-emmy', 
+        'bnk-pancake', 'bnk-popper', 'bnk-yoghurt', 'bnk-arlee', 'bnk-galeya', 'bnk-saonoi'] },
+    { track:'ทวินเทล สุดยอดเลย!', centers:['bnk-mean'],
+      members:['bnk-fame', 'bnk-mean', 'bnk-monet', 'bnk-patt', 'bnk-wawa', 'bnk-berry', 
+        'bnk-khaimook', 'bnk-mayji', 'bnk-micha', 'bnk-nammonn', 'bnk-niya', 'bnk-sindy'] },
+    { track:'GAGAGA', centers:['bnk-grace'],
+      members:['bnk-peak', 'bnk-yayee', 'bnk-earth', 'bnk-grace', 'bnk-kaofrang', 'bnk-l', 
+        'bnk-palmmy', 'bnk-jew', 'bnk-nall', 'bnk-neen', 'bnk-proud'] },
+  ],
+  'cgm-s2': [
+    { track:'เมลอนจูซ', centers:['cgm-kaning', 'cgm-sita'],
+      members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-fortune', 'cgm-kaiwan', 
+        'cgm-kaning', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nenie', 
+        'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-punch', 'cgm-sita'] },
+    { track:'เส้นทางของผู้ใหญ่', centers:['cgm-nena', 'cgm-ping'],
+      members:['cgm-champoo', 'cgm-fahsai', 'cgm-jayda', 'cgm-jjae', 'cgm-kyla', 'cgm-latin', 
+        'cgm-nena', 'cgm-nicha', 'cgm-ping'] },
+    { track:'เพื่อใครสักคน', centers:['cgm-aom'],
+      members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 
+        'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 
+        'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 
+        'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 
+        'cgm-punch', 'cgm-sita'] },
+  ],
+  'cgm-s3': [
+    { track:'มะลิ', centers:['cgm-kaning'],
+      members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fortune', 
+        'cgm-jayda', 'cgm-kaning', 'cgm-marmink', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 
+        'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+    { track:'Chain of love', centers:['cgm-fortune', 'cgm-jayda'],
+      members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fortune', 
+        'cgm-jayda', 'cgm-kaning', 'cgm-marmink', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 
+        'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+    { track:'บ้านแห่งหัวใจ', centers:['cgm-marmink'],
+      members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 
+        'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 
+        'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 
+        'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 
+        'cgm-punch', 'cgm-sita'] },
+  ],
+  'cgm-s4': [
+    { track:'สุดเส้นทาง', centers:['cgm-fortune'],
+      members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fortune', 'cgm-kaiwan', 
+        'cgm-kaning', 'cgm-marmink', 'cgm-nenie', 'cgm-punch', 'cgm-pim', 'cgm-sita', 
+        'cgm-fahsai', 'cgm-jayda', 'cgm-latin', 'cgm-mei', 'cgm-ping'] },
+    { track:'รถไฟสายรุ้ง', centers:['cgm-champoo', 'cgm-kaning'],
+      members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fortune', 'cgm-kaiwan', 
+        'cgm-kaning', 'cgm-marmink', 'cgm-nenie', 'cgm-punch', 'cgm-pim', 'cgm-sita', 
+        'cgm-fahsai', 'cgm-jayda', 'cgm-latin', 'cgm-mei', 'cgm-ping'] },
+    { track:'เพื่อน', centers:[],
+      members:['cgm-angel', 'cgm-fortune'] },
+  ],
 };
 const ICONS = {
   members: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>`,
@@ -2086,10 +2243,27 @@ function renderSingleDetail(){
   const s = SEED_SINGLES.find(x=>x.id===state.selectedSingle);
   if(!s) return '';
   const g = getGroup(s.groupId);
-  const sb = SEED_SENBATSU[s.id];
-  const centers = sb ? sb.centers : [];
-  const rest = sb ? sb.members.filter(id=>!centers.includes(id)) : [];
+  const tracks = SEED_SENBATSU[s.id];
   const card = id => { const m = getMember(id); return m ? renderMiniCard(m) : ''; };
+
+  // The first track is the single's title song; the rest are its coupling songs.
+  const renderTrack = (t, i) => {
+    const rest = t.members.filter(id=>!t.centers.includes(id));
+    return `
+    <div class="track-block">
+      <div class="track-head">
+        <span class="track-tag ${i===0?'lead':''}">${i===0?'เพลงหลัก':'เพลงรอง'}</span>
+        <span class="track-name">${escapeHtml(t.track)}</span>
+      </div>
+      <div class="track-sub">${t.members.length} คน${t.centers.length
+        ? ' · เซ็นเตอร์ ' + t.centers.map(id=>escapeHtml(getMember(id)?.nameTh||getMember(id)?.name||'')).join(', ')
+        : ''}</div>
+      <div class="grid-mini">
+        ${t.centers.map(id=>`<div class="is-center">${card(id)}</div>`).join('')}
+        ${rest.map(card).join('')}
+      </div>
+    </div>`;
+  };
 
   return `
   <button class="back-btn" data-action="go-back">← กลับ</button>
@@ -2098,17 +2272,12 @@ function renderSingleDetail(){
     <h2>${s.title}</h2>
     ${s.titleTh?`<p class="single-th">${s.titleTh}</p>`:''}
   </div>
-  ${!sb ? `
+  ${!tracks ? `
     <div class="empty-state">
       <p>ยังไม่มีข้อมูลเซ็มบัตสึของซิงเกิลนี้</p>
       <p class="muted-note">เพิ่มได้ที่ SEED_SENBATSU ในไฟล์ index.html</p>
-    </div>` : `
-    ${centers.length ? `
-      <h3 class="section-label">เซ็นเตอร์</h3>
-      <div class="grid-mini center-grid">${centers.map(card).join('')}</div>` : ''}
-    <h3 class="section-label">เซ็มบัตสึ (${sb.members.length} คน)</h3>
-    <div class="grid-mini">${rest.map(card).join('')}</div>
-  `}`;
+    </div>`
+  : tracks.map(renderTrack).join('')}`;
 }
 
 function renderDiscography(){
@@ -2120,12 +2289,15 @@ function renderDiscography(){
   <div class="timeline">
     ${singles.map(s=>{
       const g = getGroup(s.groupId);
-      const sb = SEED_SENBATSU[s.id];
+      const tracks = SEED_SENBATSU[s.id];
+      const lead = tracks && tracks[0];
+      const nick = id => { const m = getMember(id); return escapeHtml(m ? (m.nameTh||m.name) : ''); };
       return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${s.id}">
         <div class="timeline-year">${s.year} · ${g.name} · ซิงเกิลที่ ${s.num}</div>
         <div class="timeline-title">${s.title}${s.titleTh?' — '+s.titleTh:''}</div>
-        <div class="single-meta">${sb
-          ? `เซ็มบัตสึ ${sb.members.length} คน${sb.centers.length?' · เซ็นเตอร์ '+sb.centers.map(id=>escapeHtml(getMember(id)?.nameTh||getMember(id)?.name||'')).join(', '):''}`
+        <div class="single-meta">${lead
+          ? `เซ็มบัตสึ ${lead.members.length} คน${lead.centers.length?' · เซ็นเตอร์ '+lead.centers.map(nick).join(', '):''}`
+            + (tracks.length>1 ? ` · อีก ${tracks.length-1} เพลงรอง` : '')
           : 'ยังไม่มีข้อมูลเซ็มบัตสึ'}</div>
       </button>`;
     }).join('')}
