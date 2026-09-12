@@ -434,6 +434,26 @@
   .th-range{ margin-left:auto; color:var(--ink-soft); font-size:12.5px; white-space:nowrap; }
   .th-now{ color:var(--ink); font-weight:600; }
 
+  .works-count{ color:var(--ink-soft); font-size:12.5px; margin:6px 0 0; }
+  .work-list{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .work-row{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    background:var(--paper-dim); border:1px solid var(--line); border-radius:11px;
+    padding:9px 12px; cursor:pointer; font-family:inherit; color:var(--ink);
+  }
+  .work-row:hover{ border-color:var(--ink-soft); }
+  .work-row.is-centre{
+    border-color:var(--gold);
+    background:color-mix(in srgb, var(--gold) 12%, var(--paper-dim));
+  }
+  .work-main{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+  .work-track{ font-weight:600; font-size:14px; }
+  .work-from{ font-size:11.5px; color:var(--ink-soft); }
+  .work-centre{
+    flex:none; font-size:9.5px; font-weight:700; letter-spacing:.06em;
+    background:var(--gold); color:#fff; padding:3px 7px; border-radius:6px;
+  }
+
   .action-row{ display:flex; gap:10px; margin-top:26px; flex-wrap:wrap; }
   .btn-secondary{
     background:var(--paper-dim); color:var(--ink); border:1px solid var(--line);
@@ -2144,6 +2164,59 @@ function getGroupCaptainBadge(m){
   return null;
 }
 
+const ALL_WORKS = () => [...SEED_SINGLES, ...SEED_ALBUMS];
+const WORK_KIND = w => w.id.includes('-a') ? 'album' : 'single';
+
+function allTracks(){
+  const out = [];
+  for(const w of ALL_WORKS()){
+    for(const t of (SEED_SENBATSU[w.id] || [])) out.push({ work:w, ...t });
+  }
+  return out;
+}
+
+function worksOf(id){
+  return allTracks()
+    .filter(t => t.members.includes(id))
+    .map(t => ({ work:t.work, track:t.track, centre:t.centers.includes(id) }))
+    .sort((a,b) => b.work.year-a.work.year || b.work.num-a.work.num);
+}
+
+function renderBarLink(label, value, max, color, action, data){
+  const pct = max>0 ? Math.round(value/max*100) : 0;
+  const attrs = Object.entries(data)
+    .map(([k,v])=>`data-${k.replace(/[A-Z]/g, c=>'-'+c.toLowerCase())}="${escapeAttr(v)}"`).join(' ');
+  return `<button class="bar-row" style="--c:${color}" data-action="${action}" ${attrs}>
+    <span class="bar-label">${escapeHtml(label)}</span>
+    <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
+    <span class="bar-val">${value}</span></button>`;
+}
+
+function renderMemberWorks(m){
+  const works = worksOf(m.id);
+  if(!works.length) return `<h3 class="section-label">ผลงานเพลง</h3>
+    <p class="muted-note">ยังไม่มีเพลงที่บันทึกไว้</p>`;
+  const centres = works.filter(w=>w.centre).length;
+  const rows = works.map(w=>{
+    const kind = WORK_KIND(w.work)==='album' ? 'อัลบั้มที่' : 'ซิงเกิลที่';
+    // A title track shares its name with the release, so naming the release
+    // again would just repeat the line above it.
+    const from = w.track === w.work.title
+      ? `${kind} ${w.work.num} · ${w.work.year}`
+      : `${kind} ${w.work.num} · ${escapeHtml(w.work.title)} · ${w.work.year}`;
+    return `<button class="work-row${w.centre?' is-centre':''}" data-action="open-single" data-id="${w.work.id}">
+      <span class="work-main">
+        <span class="work-track">${escapeHtml(w.track)}</span>
+        <span class="work-from">${from}</span>
+      </span>
+      ${w.centre?'<span class="work-centre">CENTER</span>':''}
+    </button>`;
+  }).join('');
+  return `<h3 class="section-label">ผลงานเพลง</h3>
+    <p class="works-count">${works.length} เพลง${centres?` · เซ็นเตอร์ ${centres} เพลง`:''}</p>
+    <div class="work-list">${rows}</div>`;
+}
+
 function renderTeamHistory(m){
   const spans = SEED_TEAM_HISTORY[m.id];
   if(!spans || !spans.length) return '';
@@ -2359,6 +2432,7 @@ function renderDetailModal(){
           <div class="stat-cell"><div class="label">กรุ๊ปเลือด</div><div class="value">${m.blood||'-'}</div></div>
         </div>
         ${renderTeamHistory(m)}
+        ${renderMemberWorks(m)}
         <h3 class="section-label">ข้อเท็จจริง</h3>
         ${m.facts && m.facts.length ? `<ul class="facts-list">${m.facts.map(f=>`<li>${f}</li>`).join('')}</ul>` : `<p class="muted-note">ยังไม่มีข้อมูลเพิ่มเติม — กด "แก้ไขข้อมูล" เพื่อเพิ่ม</p>`}
         <div class="action-row">
@@ -2464,6 +2538,7 @@ function renderProfile(){
 
 const STATS_TABS = [
   { id:'overview',  label:'ภาพรวม' },
+  { id:'songs',     label:'เพลง' },
   { id:'birthdays', label:'วันเกิด' },
   { id:'timeline',  label:'ไทม์ไลน์' }
 ];
@@ -2531,6 +2606,59 @@ function renderStatsOverview(){
     ${buckets.map(([lo,hi,label])=>renderBar(label, ages.filter(a=>a>=lo&&a<=hi).length, maxBucket, 'var(--gold)',
         {ageMin:lo||'', ageMax:hi>=99?'':hi})).join('')}
     <p class="stats-note">นับจาก ${ages.length} คนที่มีข้อมูลวันเกิด</p>
+  </div>`;
+}
+
+function renderStatsSongs(){
+  const tracks = allTracks();
+  const appearances = new Map(), centres = new Map();
+  for(const t of tracks){
+    for(const id of t.members) appearances.set(id, (appearances.get(id)||0)+1);
+    for(const id of t.centers) centres.set(id, (centres.get(id)||0)+1);
+  }
+  // A track can be a solo or a duet, so the mean says more than the range alone.
+  const sizes = tracks.map(t=>t.members.length);
+  const mean = sizes.length ? Math.round(sizes.reduce((s,n)=>s+n,0)/sizes.length) : 0;
+
+  const top = (map, n) => [...map.entries()]
+    .filter(([id])=>getMember(id))
+    .sort((a,b)=> b[1]-a[1] || getMember(a[0]).name.localeCompare(getMember(b[0]).name))
+    .slice(0, n);
+  const byAppearance = top(appearances, 12);
+  const byCentre     = top(centres, 12);
+  const biggest = [...tracks].sort((a,b)=> b.members.length-a.members.length).slice(0, 8);
+
+  const label = t => `${t.track} · ${WORK_KIND(t.work)==='album'?'อัลบั้ม':'ซิงเกิล'}ที่ ${t.work.num}`;
+  const colour = id => getGroup(getMember(id).groupId).color;
+
+  return `
+  <div class="stat-grid">
+    <div class="stat-cell"><div class="label">เพลงทั้งหมด</div><div class="value">${tracks.length} เพลง</div></div>
+    <div class="stat-cell"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length + SEED_ALBUMS.length} ชิ้น</div></div>
+    <div class="stat-cell"><div class="label">มีเพลงอย่างน้อย 1</div><div class="value">${appearances.size} คน</div></div>
+    <div class="stat-cell"><div class="label">เซ็มบัตสึเฉลี่ย</div><div class="value">${mean} คน</div></div>
+  </div>
+
+  <div class="group-card" style="--c:var(--gold)">
+    <div class="group-head"><h2 style="font-size:21px;">ติดเพลงมากที่สุด</h2></div>
+    ${byAppearance.map(([id,n])=>renderBarLink(getMember(id).name+' · '+getMember(id).nameTh,
+        n, byAppearance[0][1], colour(id), 'open-member', {id})).join('')}
+    <p class="stats-note">นับทุกเพลงทั้งเพลงหลักและเพลงรอง รวมสมาชิกที่จบการศึกษาแล้ว</p>
+  </div>
+
+  <div class="group-card" style="--c:var(--gold)">
+    <div class="group-head"><h2 style="font-size:21px;">เป็นเซ็นเตอร์มากที่สุด</h2></div>
+    ${byCentre.length
+      ? byCentre.map(([id,n])=>renderBarLink(getMember(id).name+' · '+getMember(id).nameTh,
+          n, byCentre[0][1], colour(id), 'open-member', {id})).join('')
+      : '<p class="muted-note">ไม่มีข้อมูลเซ็นเตอร์</p>'}
+    <p class="stats-note">เพลงที่มีเซ็นเตอร์ร่วมกันหลายคน นับให้ทุกคน</p>
+  </div>
+
+  <div class="group-card" style="--c:var(--gold)">
+    <div class="group-head"><h2 style="font-size:21px;">เซ็มบัตสึมากที่สุด</h2></div>
+    ${biggest.map(t=>renderBarLink(label(t), t.members.length, biggest[0].members.length,
+        getGroup(t.work.groupId).color, 'open-single', {id:t.work.id})).join('')}
   </div>`;
 }
 
@@ -2632,6 +2760,7 @@ function renderStatsTimeline(){
 function renderStats(){
   const body = state.statsTab==='birthdays' ? renderStatsBirthdays()
              : state.statsTab==='timeline'  ? renderStatsTimeline()
+             : state.statsTab==='songs'     ? renderStatsSongs()
              : renderStatsOverview();
   return `
   <div class="filter-bar">
@@ -2767,14 +2896,14 @@ function renderDiscography(){
   </div>`;
 
   if(state.discTab==='albums'){
-    const albums = SEED_ALBUMS.filter(inGroup).sort((a,b)=> a.year-b.year || a.num-b.num);
+    const albums = SEED_ALBUMS.filter(inGroup).sort((a,b)=> b.year-a.year || b.num-a.num);
     return tabBar + `<div class="timeline">
       ${albums.map(a=>renderWorkRow(a,'album')).join('')}
     </div>
     <p class="muted-note" style="margin-top:10px;">อัลบั้มรวมเพลงจากซิงเกิลที่ออกก่อนหน้า และมีเพลงเฉพาะอัลบั้มเพิ่มมา — แสดงเฉพาะเพลงเฉพาะอัลบั้ม</p>`;
   }
   let singles = SEED_SINGLES.filter(inGroup);
-  singles.sort((a,b)=> a.year-b.year || a.num-b.num);
+  singles.sort((a,b)=> b.year-a.year || b.num-a.num);
   return tabBar + `
   <div class="timeline">
     ${singles.map(s=>renderWorkRow(s,'single')).join('')}
@@ -3337,6 +3466,7 @@ function bindDelegatedEvents(){
     else if(action==='open-single'){
       state.selectedSingle = el.dataset.id;
       state.view = 'single';
+      state.selectedId = null;
       render(); pushHistory();
     }
     else if(action==='drill'){
