@@ -451,12 +451,25 @@
   }
   .seat-badge{ position:relative; display:block; width:min(54px, 84%); }
   .seat.is-gap{ pointer-events:none; }
+  .seat-badge{ transition:transform .22s cubic-bezier(.34,1.4,.64,1); }
+  .seat:hover .seat-badge, .seat:focus-visible .seat-badge{ transform:scale(1.14); }
   .seat-face{
     width:100%; aspect-ratio:1; border-radius:50%;
-    overflow:hidden; border:2.5px solid #fff; background:var(--paper);
-    box-shadow:0 2px 8px rgba(0,0,0,.32); display:grid; place-items:center;
+    overflow:hidden; border:none; background:rgba(255,255,255,.12);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    box-shadow:0 0 0 1.5px rgba(255,255,255,.42), 0 3px 10px rgba(0,0,0,.26);
+    display:grid; place-items:center;
+    transition:box-shadow .22s ease;
   }
-  .seat.is-centre .seat-face{ border-color:var(--gold); box-shadow:0 0 0 3px var(--gold), 0 2px 9px rgba(0,0,0,.36); }
+  .seat:hover .seat-face, .seat:focus-visible .seat-face{
+    box-shadow:0 0 0 2px rgba(255,255,255,.85), 0 7px 20px rgba(0,0,0,.34);
+  }
+  .seat.is-centre .seat-face{
+    box-shadow:0 0 0 2.5px #fff, 0 0 0 5px var(--gold), 0 3px 11px rgba(0,0,0,.36);
+  }
+  .seat.is-centre:hover .seat-face{
+    box-shadow:0 0 0 2.5px #fff, 0 0 0 6px var(--gold), 0 8px 22px rgba(0,0,0,.4);
+  }
   /* .avatar-img inside is absolutely positioned, so this has to be the
      positioned, clipping ancestor or the photo escapes to the whole stage. */
   .seat-avatar{
@@ -470,15 +483,21 @@
   .seat-name{
     position:absolute; left:50%; bottom:-9px; transform:translateX(-50%);
     max-width:132%; padding:2px 8px; border-radius:999px;
-    background:var(--c); border:2px solid #fff; color:#fff;
+    /* tinted glass: enough of the group colour to still read as the group */
+    background:color-mix(in srgb, var(--c) 46%, rgba(255,255,255,.22));
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,.4); color:#fff;
     font-size:clamp(8.5px, calc(10.5px * var(--s)), 12px); font-weight:700; line-height:1.25;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-    box-shadow:0 2px 6px rgba(0,0,0,.3);
+    text-shadow:0 1px 2px rgba(0,0,0,.4);
+    box-shadow:0 2px 7px rgba(0,0,0,.22);
   }
-  .seat.is-centre .seat-name{ background:var(--gold); border-color:#fff; }
+  .seat.is-centre .seat-name{
+    background:var(--gold); border:2px solid #fff; text-shadow:none;
+  }
 
   .stage-toggle{
-    display:flex; align-items:center; gap:10px; width:100%; margin:12px 0 0;
+    display:flex; align-items:center; gap:10px; width:100%; margin:12px 0 12px;
     padding:10px 14px; border-radius:12px; cursor:pointer;
     background:var(--paper-dim); border:1px solid var(--line);
     font-family:inherit; color:var(--ink); text-align:left;
@@ -801,38 +820,37 @@
   .kami-feature-name{ font-family:'Noto Sans Thai',sans-serif; font-weight:700; font-size:18px; }
   .kami-feature-name span{ color:var(--ink-soft); font-weight:500; font-size:14px; }
 
-  /* A fixed column count rather than auto-fill, which left twelve members
-     strung across eleven columns with one stranded below. Flex rather than
-     grid so a short last row centres instead of hanging off the left. */
-  .grid-mini{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; }
-  .mini-card{ flex:0 0 calc((100% - 40px) / 6); }
-  @media (max-width:900px){
-    .grid-mini{ gap:7px; }
-    .mini-card{ flex-basis:calc((100% - 21px) / 4); }
-  }
-  @media (max-width:560px){
-    .mini-card{ flex-basis:calc((100% - 14px) / 3); }
-  }
+  /* The stage above already shows the faces at size. Down here the roster
+     only has to be scannable, so it is a wrapping row of chips rather than
+     a grid of cards — 16 members fit in three lines instead of five. */
+  .grid-mini{ display:flex; flex-wrap:wrap; gap:6px; }
   .mini-card{
-    position:relative; display:flex; flex-direction:column; align-items:center; gap:2px;
-    box-sizing:border-box;
-    text-align:center; padding:11px 6px 10px; min-width:0;
-    background:var(--card); border:1px solid var(--line); border-top:3px solid var(--c,var(--ink));
-    border-radius:10px; cursor:pointer;
+    position:relative; display:inline-flex; align-items:center; gap:7px;
+    box-sizing:border-box; padding:4px 11px 4px 4px; min-width:0; cursor:pointer;
+    background:var(--card); border:1px solid var(--line); border-radius:999px;
+    transition:border-color .16s ease, transform .16s ease;
   }
-  .mini-card:hover{ border-color:var(--c); }
-  .mini-card .avatar-sm{ margin:0 auto 5px; width:40px; height:40px; font-size:15px; }
-  .mini-crown{ position:absolute; top:6px; right:6px; width:13px; height:13px; color:var(--gold); }
+  .mini-card:hover{ border-color:var(--c); transform:translateY(-1px); }
+  .mini-card .avatar-sm{
+    width:28px; height:28px; font-size:12px; flex:none;
+    box-shadow:0 0 0 2px var(--c);
+  }
+  .mini-names{ display:flex; align-items:baseline; gap:5px; min-width:0; }
+  .mini-name{ font-size:12.5px; font-weight:700; line-height:1.2; white-space:nowrap; }
+  .mini-name-th{ font-size:11px; color:var(--ink-soft); line-height:1.2; white-space:nowrap; }
+  .mini-crown{ width:12px; height:12px; color:var(--gold); flex:none; }
   .mini-crown svg{ width:100%; height:100%; display:block; }
-  .mini-name{ font-size:12px; font-weight:700; line-height:1.2; max-width:100%;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .mini-name-th{ font-size:10.5px; color:var(--ink-soft); line-height:1.25; max-width:100%;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .mini-card.is-centre{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); }
-  .mini-centre{
-    margin-top:6px; font-family:'Noto Sans Thai',sans-serif;
-    font-size:7.5px; font-weight:800; letter-spacing:.5px;
-    background:var(--gold); color:#241a06; padding:2px 6px; border-radius:5px;
+  .mini-card.is-centre{
+    border-color:var(--gold); background:color-mix(in srgb, var(--gold) 12%, var(--card));
+  }
+  .mini-card.is-centre .mini-name{ color:var(--gold-ink, var(--ink)); }
+  .mini-card.is-centre .avatar-sm{ box-shadow:0 0 0 2px var(--gold); }
+  @media (max-width:560px){
+    .mini-name-th{ display:none; }
+    .grid-mini{ gap:5px; }
+    .mini-card{ padding:3px 9px 3px 3px; gap:6px; }
+    .mini-card .avatar-sm{ width:24px; height:24px; font-size:11px; }
+    .mini-name{ font-size:12px; }
   }
 
   /* auth */
@@ -2894,15 +2912,16 @@ function renderMiniCard(m, isCentre){
   const isKami = state.kamiOshi === m.id;
   return `
   <div class="mini-card${isCentre?' is-centre':''}" style="--c:${g.color}"
-    data-action="open-member" data-id="${m.id}">
-    ${isKami ? `<span class="mini-crown">${ICONS.crown}</span>` : ''}
+    data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name+' · '+(m.nameTh||''))}">
     <div class="avatar-sm" style="background:${g.color}">
       <span class="avatar-fallback">${m.nameTh?m.nameTh[0]:'?'}</span>
       ${m.photo ? `<img class="avatar-img" src="${escapeAttr(m.photo)}" alt="" onerror="this.remove()">` : ''}
     </div>
-    <div class="mini-name">${escapeHtml(m.name)}</div>
-    <div class="mini-name-th">${escapeHtml(m.nameTh || '')}</div>
-    ${isCentre ? '<span class="mini-centre">CENTER</span>' : ''}
+    <span class="mini-names">
+      <span class="mini-name">${escapeHtml(m.name)}</span>
+      <span class="mini-name-th">${escapeHtml(m.nameTh || '')}</span>
+    </span>
+    ${isKami ? `<span class="mini-crown">${ICONS.crown}</span>` : ''}
   </div>`;
 }
 
