@@ -476,6 +476,19 @@
   .bar-val{ font-size:12.5px; font-weight:600; }
   .stats-note{ color:var(--ink-soft); font-size:12.5px; margin:10px 0 0; }
 
+  /* discography rows and the line-up page */
+  button.single-row{
+    display:block; width:100%; text-align:left; background:none; border:none;
+    font:inherit; color:inherit; cursor:pointer; padding:0 6px 22px 0; margin-left:-6px;
+    padding-left:6px; border-radius:8px; transition:background .16s var(--ease-out);
+  }
+  .single-meta{ font-size:12px; color:var(--ink-soft); margin-top:3px; }
+  @media (hover:hover){ button.single-row:hover{ background:var(--paper-dim); } }
+  .single-head{ border-left:4px solid var(--c); padding:2px 0 2px 14px; margin:4px 0 6px; }
+  .single-head h2{ font-family:'Noto Sans Thai',sans-serif; font-weight:800; font-size:26px; margin:4px 0 0; }
+  .single-th{ color:var(--ink-soft); font-size:14.5px; margin:3px 0 0; }
+  .center-grid .mini-card{ border-width:1px 1px 1px 1px; border-top-width:3px; box-shadow:0 0 0 2px var(--gold) inset; }
+
   /* anything that jumps through to a filtered roster */
   button.bar-row{
     width:100%; background:none; border:none; padding:2px 4px; margin:0 -4px 5px;
@@ -531,6 +544,22 @@
   .bday-row:active{ background:var(--paper-dim); }
   .bday-row .day{ font-weight:700; width:26px; flex-shrink:0; color:var(--c,var(--ink)); }
   .bday-row .age{ margin-left:auto; font-size:12px; color:var(--ink-soft); flex-shrink:0; }
+  .age-step{ display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
+  .age-step .from{ opacity:.55; }
+  .age-step .arrow{ opacity:.5; font-size:11px; }
+  .age-step .to{ font-weight:700; color:var(--ink); }
+
+  /* today's birthday carries the row instead of a label */
+  .bday-row.is-today{ background:var(--bnk-soft); }
+  .bday-row.is-today .day,
+  .bday-row.is-today > span:not(.day):not(.age){ font-weight:800; }
+  .bday-row.is-today .age-step .to{
+    color:var(--c); font-size:14px;
+    animation:agePulse 1.6s var(--ease-out) infinite;
+  }
+  @keyframes agePulse{ 0%,100%{ transform:scale(1); } 45%{ transform:scale(1.22); } }
+  .bday-row.is-today .age-step .to::after{ content:' 🎂'; }
+  @media (prefers-reduced-motion:reduce){ .bday-row.is-today .age-step .to{ animation:none; } }
 
   /* history timeline */
   .year-block{ margin-bottom:4px; }
@@ -1081,6 +1110,83 @@ const SEED_SINGLES = [
   { id:'cgm-s4', groupId:'cgm48', num:4, title:'Mae Shika Mukanee', titleTh:'', year:2022 }
 ];
 
+// Senbatsu line-ups, from the Thai Wikipedia article for each single (the
+// member list of the title track; bolded names there mark the centre).
+// Singles with no entry here have no article section to take one from.
+const SEED_SENBATSU = {
+  'bnk-s1': { centers:['bnk-jennis'],
+    members:['bnk-cherprang', 'bnk-can', 'bnk-jaa', 'bnk-jan', 'bnk-jennis', 'bnk-kaew', 
+      'bnk-kaimook', 'bnk-miori', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-noey', 
+      'bnk-orn', 'bnk-pun', 'bnk-satchan', 'bnk-tarwaan'] },
+  'bnk-s2': { centers:['bnk-mobile'],
+    members:['bnk-cherprang', 'cgm-izurina', 'bnk-jan', 'bnk-jennis', 'bnk-kaew', 
+      'bnk-kaimook', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 
+      'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+  'bnk-s3': { centers:['bnk-music', 'bnk-noey'],
+    members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 
+      'bnk-korn', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 
+      'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+  'bnk-s4': { centers:['bnk-noey'],
+    members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 
+      'bnk-mind', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 
+      'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'cgm-aom', 'bnk-cake', 'bnk-faii', 
+      'bnk-minmin', 'bnk-phukkhom'] },
+  'bnk-s5': { centers:['bnk-pun'],
+    members:['bnk-cherprang', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 'bnk-mobile', 
+      'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-tarwaan', 
+      'bnk-june', 'bnk-fond', 'bnk-mewnich', 'bnk-wee'] },
+  'bnk-s6': { centers:['bnk-cherprang'],
+    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-kaimook', 'bnk-mind', 
+      'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn', 'bnk-pun', 'bnk-pupe', 
+      'bnk-tarwaan', 'bnk-natherine', 'bnk-wee'] },
+  'bnk-s7': { centers:['bnk-cherprang'],
+    members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kate', 
+      'bnk-mind', 'bnk-mobile', 'bnk-music', 'bnk-noey', 'bnk-orn', 'bnk-satchan', 
+      'bnk-bamboo', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-new', 'bnk-niky', 'bnk-oom', 
+      'bnk-piam', 'bnk-ratah', 'bnk-stang', 'bnk-view', 'bnk-wee'] },
+  'bnk-s8': { centers:['bnk-namneung'],
+    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-myyu', 'bnk-noey', 
+      'bnk-fond', 'bnk-gygee', 'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 
+      'bnk-namsai', 'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
+  'bnk-s9': { centers:['bnk-jane'],
+    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-june', 'bnk-kaew', 'bnk-minmin', 
+      'bnk-noey', 'bnk-pun', 'bnk-wee', 'bnk-fond', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 
+      'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
+  'bnk-s10': { centers:['bnk-mobile'],
+    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-minmin', 'bnk-noey', 
+      'bnk-pun', 'bnk-wee', 'bnk-gygee', 'bnk-kaimook', 'bnk-mobile', 'bnk-music', 
+      'bnk-namneung', 'bnk-orn', 'bnk-pupe', 'bnk-tarwaan'] },
+  'bnk-s11': { centers:['bnk-fond', 'bnk-music', 'bnk-paeyah', 'cgm-champoo'],
+    members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-minmin', 'bnk-miori', 
+      'bnk-noey', 'bnk-pun', 'bnk-wee', 'bnk-fond', 'bnk-gygee', 'bnk-mobile', 'bnk-music', 
+      'bnk-namneung', 'bnk-new', 'bnk-orn', 'bnk-phukkhom', 'bnk-pupe', 'bnk-stang', 
+      'bnk-tarwaan', 'bnk-fame', 'bnk-hoop', 'bnk-mean', 'bnk-paeyah', 'bnk-pampam', 
+      'bnk-peak', 'cgm-aom', 'cgm-champoo', 'cgm-fortune', 'cgm-kaning', 'cgm-marmink', 
+      'cgm-sita'] },
+  'bnk-s12': { centers:['bnk-mobile'],
+    members:['bnk-minmin', 'bnk-miori', 'bnk-noey', 'bnk-wee', 'bnk-fond', 'bnk-gygee', 
+      'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-pupe', 'bnk-tarwaan', 
+      'cgm-aom', 'cgm-kaning', 'cgm-marmink', 'cgm-pim'] },
+  'bnk-s13': { centers:['bnk-pancake'],
+    members:['bnk-cherprang', 'bnk-fame', 'bnk-minmin', 'bnk-miori', 'bnk-monet', 'bnk-wee', 
+      'bnk-hoop', 'bnk-fond', 'bnk-gygee', 'bnk-new', 'bnk-pampam', 'bnk-pancake', 
+      'bnk-paeyah', 'bnk-janry', 'bnk-l', 'bnk-patt'] },
+  'bnk-s18': { centers:['bnk-earn', 'bnk-popper'],
+    members:['bnk-earn', 'bnk-eve', 'bnk-hoop', 'bnk-janry', 'bnk-marine', 'bnk-emmy', 
+      'bnk-pancake', 'bnk-popper', 'bnk-yoghurt', 'bnk-arlee', 'bnk-galeya', 'bnk-saonoi'] },
+  'cgm-s2': { centers:['cgm-kaning', 'cgm-sita'],
+    members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-fortune', 'cgm-kaiwan', 'cgm-kaning', 
+      'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nenie', 'cgm-parima', 'cgm-pepo', 
+      'cgm-pim', 'cgm-punch', 'cgm-sita'] },
+  'cgm-s3': { centers:['cgm-kaning'],
+    members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fortune', 'cgm-jayda', 
+      'cgm-kaning', 'cgm-marmink', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-pepo', 'cgm-pim', 
+      'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+  'cgm-s4': { centers:['cgm-fortune'],
+    members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fortune', 'cgm-kaiwan', 'cgm-kaning', 
+      'cgm-marmink', 'cgm-nenie', 'cgm-punch', 'cgm-pim', 'cgm-sita', 'cgm-fahsai', 
+      'cgm-jayda', 'cgm-latin', 'cgm-mei', 'cgm-ping'] },
+};
 const ICONS = {
   members: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>`,
   membersFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>`,
@@ -1108,7 +1214,7 @@ let state = {
   favoritesOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
   showGraduated:false,
-  statsTab:'overview', advOpen:false,
+  statsTab:'overview', advOpen:false, selectedSingle:null,
   ageMin:'', ageMax:'', heightMin:'', heightMax:'', birthMonth:'all',
   theme: document.documentElement.dataset.theme || 'light'
 };
@@ -1281,7 +1387,7 @@ const NAV_OPTIONS = [
 function currentNavValue(){
   if(state.view==='browse') return state.favoritesOnly ? 'oshi' : 'browse';
   if(state.view==='groups') return 'groups';
-  if(state.view==='discography') return 'discography';
+  if(state.view==='discography' || state.view==='single') return 'discography';
   if(state.view==='stats') return 'stats';
   if(state.view==='profile') return 'profile';
   return 'browse';
@@ -1838,17 +1944,21 @@ function renderStatsBirthdays(){
   const whenLabel = d => d===0 ? 'วันนี้!' : d===1 ? 'พรุ่งนี้' : `อีก ${d} วัน`;
   // calcAge counts birthdays already had, so the next one is always one more —
   // except on the day itself, where it has just been counted.
-  const turning = (m, d) => { const a = calcAge(m.birthday); return a==null ? null : (d===0 ? a : a+1); };
+  const ageStep = (m, d) => {
+    const a = calcAge(m.birthday);
+    if(a==null) return '';
+    const [from, to] = d===0 ? [a-1, a] : [a, a+1];
+    return `<span class="age-step"><span class="from">${from}</span><span class="arrow">→</span><span class="to">${to}</span></span>`;
+  };
 
   return `
   <h3 class="section-label" style="margin-top:4px;">วันเกิดที่ใกล้ถึง</h3>
   <div class="bday-next">
     ${upcoming.map(({m,d})=>{
       const g = getGroup(m.groupId);
-      const t = turning(m, d);
       return `<button class="bday-chip ${d===0?'today':''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
         ${renderAvatar(m,'avatar-sm',g.color)}
-        <span><span class="when">${whenLabel(d)}${t!=null?` · ${d===0?'ครบ':'จะครบ'} ${t} ปี`:''}</span><span class="who" style="display:block;">${escapeHtml(m.nameTh||m.name)}</span></span>
+        <span><span class="when">${whenLabel(d)} · ${ageStep(m, d)}</span><span class="who" style="display:block;">${escapeHtml(m.nameTh||m.name)}</span></span>
       </button>`;
     }).join('')}
   </div>
@@ -1866,12 +1976,11 @@ function renderStatsBirthdays(){
       ${inMonth.map(m=>{
         const g = getGroup(m.groupId);
         const d = daysUntil(m);
-        const t = turning(m, d);
-        return `<button class="bday-row" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+        return `<button class="bday-row ${d===0?'is-today':''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
           <span class="day">${+m.birthday.slice(8)}</span>
           ${renderAvatar(m,'avatar-sm',g.color)}
           <span>${escapeHtml(m.nameTh||m.name)}</span>
-          <span class="age">${t!=null?`${d===0?'ครบ':'จะครบ'} ${t} ปี`:''}</span>
+          <span class="age">${ageStep(m, d)}</span>
         </button>`;
       }).join('')}
     </div>`;
@@ -1973,6 +2082,35 @@ function renderEditProfile(){
   </form>`;
 }
 
+function renderSingleDetail(){
+  const s = SEED_SINGLES.find(x=>x.id===state.selectedSingle);
+  if(!s) return '';
+  const g = getGroup(s.groupId);
+  const sb = SEED_SENBATSU[s.id];
+  const centers = sb ? sb.centers : [];
+  const rest = sb ? sb.members.filter(id=>!centers.includes(id)) : [];
+  const card = id => { const m = getMember(id); return m ? renderMiniCard(m) : ''; };
+
+  return `
+  <button class="back-btn" data-action="go-back">← กลับ</button>
+  <div class="single-head" style="--c:${g.color}">
+    <div class="timeline-year">${g.name} · ซิงเกิลที่ ${s.num} · ${s.year}</div>
+    <h2>${s.title}</h2>
+    ${s.titleTh?`<p class="single-th">${s.titleTh}</p>`:''}
+  </div>
+  ${!sb ? `
+    <div class="empty-state">
+      <p>ยังไม่มีข้อมูลเซ็มบัตสึของซิงเกิลนี้</p>
+      <p class="muted-note">เพิ่มได้ที่ SEED_SENBATSU ในไฟล์ index.html</p>
+    </div>` : `
+    ${centers.length ? `
+      <h3 class="section-label">เซ็นเตอร์</h3>
+      <div class="grid-mini center-grid">${centers.map(card).join('')}</div>` : ''}
+    <h3 class="section-label">เซ็มบัตสึ (${sb.members.length} คน)</h3>
+    <div class="grid-mini">${rest.map(card).join('')}</div>
+  `}`;
+}
+
 function renderDiscography(){
   let singles = SEED_SINGLES.slice();
   if(state.groupFilter!=='all') singles = singles.filter(s=>s.groupId===state.groupFilter);
@@ -1982,10 +2120,14 @@ function renderDiscography(){
   <div class="timeline">
     ${singles.map(s=>{
       const g = getGroup(s.groupId);
-      return `<div class="timeline-item" style="--c:${g.color}">
+      const sb = SEED_SENBATSU[s.id];
+      return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${s.id}">
         <div class="timeline-year">${s.year} · ${g.name} · ซิงเกิลที่ ${s.num}</div>
         <div class="timeline-title">${s.title}${s.titleTh?' — '+s.titleTh:''}</div>
-      </div>`;
+        <div class="single-meta">${sb
+          ? `เซ็มบัตสึ ${sb.members.length} คน${sb.centers.length?' · เซ็นเตอร์ '+sb.centers.map(id=>escapeHtml(getMember(id)?.nameTh||getMember(id)?.name||'')).join(', '):''}`
+          : 'ยังไม่มีข้อมูลเซ็มบัตสึ'}</div>
+      </button>`;
     }).join('')}
   </div>
   <p class="muted-note" style="margin-top:10px;">รายชื่อผลงานยังไม่ครบทุกซิงเกิล เพิ่มเติมได้ในโค้ดหากต้องการ</p>`;
@@ -2066,6 +2208,7 @@ function renderMain(){
     state.view==='groups' ? renderGroups() :
     state.view==='discography' ? renderDiscography() :
     state.view==='stats' ? renderStats() :
+    state.view==='single' ? renderSingleDetail() :
     state.view==='profile' ? renderProfile() :
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
@@ -2258,7 +2401,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','editingId','favoritesOnly','query','groupFilter',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle'];
 
 function navSnapshot(){
   const snap = {};
@@ -2534,6 +2677,11 @@ function bindDelegatedEvents(){
       state.genFilter = 'all';
       state.captainFilter = 'all';
       renderMain(); pushHistory();
+    }
+    else if(action==='open-single'){
+      state.selectedSingle = el.dataset.id;
+      state.view = 'single';
+      render(); pushHistory();
     }
     else if(action==='drill'){
       const d = el.dataset;
