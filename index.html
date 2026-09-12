@@ -499,7 +499,7 @@
   .stage-toggle{
     display:flex; align-items:center; gap:10px; width:100%; margin:12px 0 12px;
     padding:10px 14px; border-radius:12px; cursor:pointer;
-    background:var(--paper-dim); border:1px solid var(--line);
+    background:var(--card); border:1px solid var(--line);
     font-family:inherit; color:var(--ink); text-align:left;
   }
   .stage-toggle:hover{ border-color:var(--ink-soft); }
@@ -618,8 +618,15 @@
   .album-singles{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:4px; }
   .chip-link{ cursor:pointer; border:1px solid var(--line); font-family:'Noto Sans Thai',sans-serif; }
   @media (hover:hover){ .chip-link:hover{ background:var(--paper-dim); } }
-  .track-block{ margin:0 0 26px; }
-  .track-head{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin:18px 0 2px; }
+  /* Each track gets its own panel. Three tracks of near-identical chips ran
+     together as one field otherwise, with nothing saying where one ended. */
+  .track-block{
+    margin:0 0 14px; padding:14px 15px 16px;
+    background:var(--paper-dim); border:1px solid var(--line);
+    border-left:3px solid var(--c, var(--ink-soft)); border-radius:13px;
+  }
+  .track-block.is-lead{ border-left-color:var(--gold); }
+  .track-head{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin:0 0 2px; }
   .track-tag{
     flex-shrink:0; font-family:'Noto Sans Thai',sans-serif; font-size:10px; font-weight:700;
     padding:3px 8px; border-radius:5px; background:var(--paper-dim); color:var(--ink-soft);
@@ -3356,7 +3363,7 @@ function renderSingleDetail(){
     const rest = t.members.filter(id=>!t.centers.includes(id));
     const tag = isAlbum ? (i===0?'เพลงไตเติล':'เพลงในอัลบั้ม') : (i===0?'เพลงหลัก':'เพลงรอง');
     return `
-    <div class="track-block">
+    <div class="track-block${i===0?' is-lead':''}" style="--c:${getGroup(s.groupId).color}">
       <div class="track-head">
         <span class="track-tag ${i===0?'lead':''}">${tag}</span>
         <span class="track-name">${escapeHtml(t.track)}</span>
