@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>48thDB — 48 Thailand Database</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -123,7 +123,17 @@
   }
   .star-pop{ animation:starPop .55s var(--ease-out); }
   body.modal-locked{ position:fixed; left:0; right:0; overflow:hidden; }
-  html,body{margin:0;padding:0;}
+  /* The layout is built for one width and scrolls vertically. Panning the
+     whole page sideways or pinching it only ever leaves it off-centre, so
+     both are off — the scrollers inside the page are untouched. */
+  html,body{
+    margin:0; padding:0;
+    /* clip, not hidden: hidden would make these a scroll container and the
+       sticky header would stop sticking. */
+    overflow-x:clip;
+    overscroll-behavior-x:none;
+  }
+  body{ touch-action:manipulation; }
   body{
     font-family:'Noto Sans Thai',sans-serif;
     background:var(--bg-body);
@@ -4698,6 +4708,16 @@ function bindScrollPressGuard(){
   document.addEventListener('touchmove', mark, {passive:true});
 }
 
+/* iOS Safari ignores user-scalable, so the pinch is refused here instead.
+   Only multi-touch is blocked; one finger scrolls as normal. */
+function lockPinchZoom(){
+  ['gesturestart','gesturechange','gestureend'].forEach(type =>
+    document.addEventListener(type, e => e.preventDefault(), {passive:false}));
+  document.addEventListener('touchmove', e => {
+    if(e.touches.length > 1) e.preventDefault();
+  }, {passive:false});
+}
+
 // ============================= EVENTS (delegated) =============================
 const RIPPLE_SEL = '.btn-add,.btn-secondary,.btn-danger,.signin-btn,.pill,.gen-filter-chip,'
   + '.oshi-btn,.kami-btn,.team-row,.modal-close-btn,.profile-dropdown button';
@@ -4980,6 +5000,7 @@ async function init(){
   bindDelegatedEvents();
   initHistory();
   bindScrollPressGuard();
+  lockPinchZoom();
   let checkedInitialAuth = false;
 
   fbAuth.onAuthStateChanged(async (user) => {
