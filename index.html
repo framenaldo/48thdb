@@ -272,7 +272,7 @@
   }
   .dtable .row:last-child{ border-bottom:none; }
   .dtable .row:not(.head){ cursor:pointer; transition:background .12s ease; }
-  .dtable .row:not(.head):active{ background:var(--paper-dim); }
+  body:not(.is-scrolling) .dtable .row:not(.head):active{ background:var(--paper-dim); }
   .dtable .row.head{
     background:linear-gradient(135deg, rgba(255,111,165,.3), rgba(47,216,169,.26));
     backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%);
@@ -299,7 +299,7 @@
     width:158px; background:var(--card); border-right:1px solid var(--line);
   }
   .dtable .row.head .cell.sticky-name{ background:transparent; border-right:1px solid rgba(255,255,255,calc(.45*var(--glass-k))); }
-  .dtable .row:not(.head):active .cell.sticky-name{ background:var(--paper-dim); }
+  body:not(.is-scrolling) .dtable .row:not(.head):active .cell.sticky-name{ background:var(--paper-dim); }
   .col-group{ width:94px; }
   .col-team{ width:140px; }
   .col-gen{ width:56px; text-align:center; }
@@ -892,6 +892,9 @@
   .mini-name-th{ font-size:11px; color:var(--ink-soft); line-height:1.2; white-space:nowrap; }
   .mini-crown{ width:12px; height:12px; color:var(--gold); flex:none; }
   .mini-crown svg{ width:100%; height:100%; display:block; }
+  /* The oshi list mixes groups, so the chip border carries the group colour;
+     the crown is what marks the kami oshi. */
+  .grid-mini-oshi .mini-card{ border-color:var(--c); }
   .mini-card.is-centre{
     border-color:var(--gold); background:color-mix(in srgb, var(--gold) 12%, var(--card));
   }
@@ -1012,12 +1015,12 @@
     transform:scale(.93); transition-duration:.09s;
   }
   .btn-add:active{ box-shadow:0 2px 6px rgba(192,138,46,.3); }
-  .team-row:active, .mini-card:active, .kami-feature:active{
+  body:not(.is-scrolling) :is(.team-row, .mini-card, .kami-feature):active{
     transform:scale(.977); transition-duration:.09s;
   }
   /* rows are too wide to scale nicely — deepen the group tint instead */
-  .dtable .row:not(.head):active .cell,
-  .dtable .row:not(.head):active .cell.sticky-name{
+  body:not(.is-scrolling) .dtable .row:not(.head):active .cell,
+  body:not(.is-scrolling) .dtable .row:not(.head):active .cell.sticky-name{
     background:var(--paper-dim);
     background:color-mix(in srgb, var(--c) 26%, var(--card));
     transition-duration:.08s;
@@ -3025,7 +3028,7 @@ function renderProfile(){
   <h3 class="section-label">Kami Oshi ของคุณ</h3>
   ${kamiMember ? renderKamiOshiFeatured(kamiMember) : `<p class="muted-note">ยังไม่ได้เลือก Kami Oshi — เปิดโปรไฟล์สมาชิกแล้วกดปุ่มมงกุฎเพื่อเลือก (เลือกได้คนเดียว)</p>`}
   <h3 class="section-label">Oshi ทั้งหมด (${oshiMembers.length})</h3>
-  ${oshiMembers.length ? `<div class="grid-mini">${oshiMembers.map(renderMiniCard).join('')}</div>` : `<p class="muted-note">ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม</p>`}
+  ${oshiMembers.length ? `<div class="grid-mini grid-mini-oshi">${oshiMembers.map(m => renderMiniCard(m)).join('')}</div>` : `<p class="muted-note">ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม</p>`}
   `;
 }
 
@@ -3825,56 +3828,24 @@ function goBack(fallback){
   if(fallback){ fallback(); render(); }
 }
 
-// Drag in from the left edge to go back, the way native apps behave.
-function bindEdgeSwipeBack(){
-  const EDGE = 28, THRESHOLD = 90;
-  let startX = 0, startY = 0, dx = 0, tracking = false, committed = false;
+// Every mobile browser already has its own back gesture from the left edge,
+// and on iOS that system gesture cannot be preventDefault()ed. Running our
+// own on top of it meant one swipe fired both: history went back twice and
+// landed on the home screen, looking like the page had reloaded itself. The
+// platform gesture is left to do the job alone.
 
-  function shift(px, animate){
-    const app = document.getElementById('app');
-    if(!app) return;
-    app.style.transition = animate ? 'transform .24s var(--ease-out)' : '';
-    app.style.transform = px ? `translateX(${px}px)` : '';
-    app.style.boxShadow = px ? '-14px 0 34px rgba(28,19,41,.16)' : '';
-  }
-
-  document.addEventListener('touchstart', (e)=>{
-    if(e.touches.length !== 1){ tracking = false; return; }
-    const t = e.touches[0];
-    tracking = t.clientX <= EDGE && canGoBack();
-    committed = false; dx = 0;
-    if(tracking){ startX = t.clientX; startY = t.clientY; }
-  }, {passive:true});
-
-  document.addEventListener('touchmove', (e)=>{
-    if(!tracking) return;
-    const t = e.touches[0];
-    dx = t.clientX - startX;
-    const dy = t.clientY - startY;
-    if(!committed){
-      // Let a vertical scroll win; only claim the gesture once it is clearly
-      // a rightward drag, so the table can still be scrolled sideways.
-      if(Math.abs(dy) > Math.abs(dx)){ tracking = false; return; }
-      if(dx < 10) return;
-      committed = true;
-    }
-    e.preventDefault();
-    shift(Math.max(0, dx * 0.92), false);
-  }, {passive:false});
-
-  function finish(){
-    if(!tracking) return;
-    const shouldGo = committed && dx > THRESHOLD;
-    tracking = false; committed = false;
-    shift(0, true);
-    setTimeout(()=>{
-      const app = document.getElementById('app');
-      if(app){ app.style.transition = ''; app.style.boxShadow = ''; }
-    }, 260);
-    if(shouldGo) goBack();
-  }
-  document.addEventListener('touchend', finish, {passive:true});
-  document.addEventListener('touchcancel', finish, {passive:true});
+// iOS keeps :active on whatever the finger first touched while the page
+// scrolls, so a row lit up as if pressed halfway through a swipe. The press
+// styling is muted for as long as anything is scrolling.
+function bindScrollPressGuard(){
+  let t;
+  const mark = ()=>{
+    document.body.classList.add('is-scrolling');
+    clearTimeout(t);
+    t = setTimeout(()=>document.body.classList.remove('is-scrolling'), 140);
+  };
+  document.addEventListener('scroll', mark, {passive:true, capture:true});
+  document.addEventListener('touchmove', mark, {passive:true});
 }
 
 // ============================= EVENTS (delegated) =============================
@@ -4134,7 +4105,7 @@ function bindDelegatedEvents(){
 async function init(){
   bindDelegatedEvents();
   initHistory();
-  bindEdgeSwipeBack();
+  bindScrollPressGuard();
   let checkedInitialAuth = false;
 
   fbAuth.onAuthStateChanged(async (user) => {
