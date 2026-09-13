@@ -978,6 +978,31 @@
   }
   .ev-open::after{ content:' \203A'; font-weight:700; }
 
+  .sr-count{ margin:9px 0 0; font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+  .sr-more{ margin:4px 0 0; font-size:11.5px; color:var(--ink-soft); }
+  .sr-row{
+    display:block; width:100%; text-align:left; cursor:pointer; font:inherit; color:inherit;
+    margin:0 0 8px; padding:12px 14px;
+    background:var(--glass-card); border:1px solid var(--glass-edge);
+    backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border-radius:14px;
+    transition:transform .2s var(--ease-out), border-color .2s ease, box-shadow .2s var(--ease-out);
+  }
+  .sr-kind{
+    display:inline-block; font-size:10px; font-weight:800; letter-spacing:.05em;
+    color:#fff; background:var(--c); border-radius:999px; padding:2px 8px; margin-bottom:7px;
+  }
+  .sr-main{ display:block; font-size:15px; font-weight:800; line-height:1.35; letter-spacing:-.01em; }
+  .sr-sub{ display:block; margin-top:3px; font-size:11.5px; color:var(--ink-soft); line-height:1.45; }
+  @media (hover:hover){
+    .sr-row:hover{
+      transform:translateY(-2px);
+      border-color:color-mix(in srgb, var(--c) 55%, var(--glass-edge));
+      box-shadow:0 12px 26px rgba(var(--shadow-rgb),.12);
+    }
+  }
+  .sr-row:active{ transform:scale(.992); transition-duration:.09s; }
+
   /* ---- birthday sheet ---- */
   .evm-fest{
     position:relative; overflow:hidden;
@@ -2702,7 +2727,7 @@ function renderHeader(){
   return `
   <header class="top">
     <div class="wordmark" data-action="nav-select" data-value="feed" style="cursor:pointer;">48thDB<small>48 THAILAND DATABASE</small></div>
-    <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก..." value="${escapeAttr(state.query)}">
+    <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก เพลง งาน..." value="${escapeAttr(state.query)}">
     <button class="theme-btn" data-action="toggle-theme" aria-label="สลับธีมสว่าง/มืด">${state.theme==='dark'?ICONS.sun:ICONS.moon}</button>
     <button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>
     <div id="profile-slot"></div>
@@ -3445,6 +3470,103 @@ function startBirthdayFireworks(){
   window.addEventListener('resize', onResize);
   _fxStop = stop;
   raf = requestAnimationFrame(frame);
+}
+
+/* The search box reaches everything in the database, not just the member
+   table it used to filter, so it renders its own screen over whichever view
+   is current for as long as there is a query. */
+function searchEverything(q){
+  const ql = q.toLowerCase();
+  const hit = s => !!s && (String(s).toLowerCase().includes(ql) || String(s).includes(q));
+  const any = (...fields) => fields.some(hit);
+
+  return {
+    members: state.members.filter(m => any(m.name, m.nameTh, m.realName, m.realNameTh)),
+    tracks:  allTracks().filter(t => hit(t.track)),
+    works:   ALL_WORKS().filter(w => any(w.title, w.alt)),
+    events:  SEED_SCHEDULE.filter(e => any(e.title, e.venue)
+               || (e.info || []).some(hit) || (e.detail || []).some(hit)),
+    teams:   TEAMS.filter(t => hit(t.name)),
+    groups:  GROUPS.filter(g => any(g.name, g.full, g.desc))
+  };
+}
+
+function renderSearch(){
+  const q = state.query.trim();
+  const r = searchEverything(q);
+  const total = r.members.length + r.tracks.length + r.works.length
+    + r.events.length + r.teams.length + r.groups.length;
+  const iso = toYmd(todayStart());
+
+  // A broad query can match most of the database; showing every hit on every
+  // keystroke is slow to draw and useless to read, so each group shows the
+  // first few and says how many more there were.
+  const section = (label, items, cap, draw) => {
+    if(!items.length) return '';
+    const shown = items.slice(0, cap);
+    const rest = items.length - shown.length;
+    return `
+    <section class="feed-block">
+      <h2 class="section-label">${label} · ${items.length}</h2>
+      ${draw(shown)}
+      ${rest ? `<p class="sr-more">และอีก ${rest} รายการ — พิมพ์ให้เจาะจงขึ้นเพื่อดูทั้งหมด</p>` : ''}
+    </section>`;
+  };
+
+  const workRow = w => {
+    const g = getGroup(w.groupId);
+    const kind = WORK_KIND(w)==='album' ? 'อัลบั้ม' : 'ซิงเกิล';
+    return `<button class="sr-row" style="--c:${g.color}" data-action="open-single" data-id="${w.id}">
+      <span class="sr-kind">${kind}ที่ ${w.num}</span>
+      <span class="sr-main">${escapeHtml(w.title)}</span>
+      <span class="sr-sub">${escapeHtml(w.alt || '')}${w.alt?' · ':''}${g.name} · ${w.year}</span>
+    </button>`;
+  };
+
+  return `
+  <div class="feed-page">
+    <header class="feed-head">
+      <p class="feed-today">ผลการค้นหา</p>
+      <h1 class="feed-title">${escapeHtml(q)}</h1>
+      <p class="sr-count">${total ? 'พบ '+total+' รายการ' : 'ไม่พบอะไรที่ตรงกับคำนี้'}</p>
+    </header>
+
+    ${section('สมาชิก', r.members, 30, list =>
+      `<div class="grid-mini grid-mini-oshi">${list.map(m => renderMiniCard(m)).join('')}</div>`)}
+
+    ${section('เพลง', r.tracks, 15, list =>
+      list.map(t => {
+        const g = getGroup(t.work.groupId);
+        return `<button class="sr-row" style="--c:${g.color}" data-action="open-single" data-id="${t.work.id}">
+          <span class="sr-kind">เพลง</span>
+          <span class="sr-main">${escapeHtml(t.track)}</span>
+          <span class="sr-sub">${escapeHtml(t.work.title)} · ${g.name} · ${t.work.year}</span>
+        </button>`; }).join(''))}
+
+    ${section('ซิงเกิลและอัลบั้ม', r.works, 15, list => list.map(workRow).join(''))}
+
+    ${section('ตารางงาน', r.events, 10, list =>
+      list.map(e => renderEventCard(e, iso)).join(''))}
+
+    ${section('วงและทีม', [...r.groups, ...r.teams], 12, () =>
+      r.groups.map(g =>
+        `<button class="sr-row" style="--c:${g.color}" data-action="filter-team-direct"
+          data-group="${g.id}" data-team="all">
+          <span class="sr-kind">วง</span>
+          <span class="sr-main">${escapeHtml(g.name)}</span>
+          <span class="sr-sub">${escapeHtml(g.full)}</span>
+        </button>`).join('')
+      + r.teams.map(t => {
+        const g = getGroup(t.groupId);
+        return `<button class="sr-row" style="--c:${g?g.color:'var(--ink-soft)'}" data-action="filter-team-direct"
+          data-group="${t.groupId||'all'}" data-team="${t.id}">
+          <span class="sr-kind">ทีม</span>
+          <span class="sr-main">${escapeHtml(t.name)}</span>
+          <span class="sr-sub">${g?g.name:''}</span>
+        </button>`; }).join(''))}
+
+    ${total ? '' : `<p class="muted-note">ลองค้นด้วยชื่อสมาชิก ชื่อเพลง ชื่อซิงเกิล ชื่องาน หรือสถานที่</p>`}
+  </div>`;
 }
 
 function renderFeed(){
@@ -4290,7 +4412,8 @@ function renderMain(){
   if(navContainer) syncNav(navContainer);
   const main = document.getElementById('main');
   main.innerHTML =
-    (state.view==='feed' ? renderFeed() :
+    (state.query.trim() ? renderSearch() :
+    state.view==='feed' ? renderFeed() :
     state.view==='browse' ? renderBrowse() :
     state.view==='groups' ? renderGroups() :
     state.view==='discography' ? renderDiscography() :
@@ -4606,6 +4729,13 @@ function bindDelegatedEvents(){
     }
     const action = el.dataset.action;
     const id = el.dataset.id;
+
+    // Search results stand in for the current screen, so following one to
+    // somewhere else ends the search. Modals are not somewhere else: they
+    // open over the results and going back should still find them.
+    if(['nav-select','sub-tab','open-single','filter-team-direct','filter-to','drill'].includes(action)){
+      state.query = '';
+    }
 
     if(state.profileMenuOpen && action!=='toggle-profile-menu'){
       state.profileMenuOpen = false; renderProfileSlot();
