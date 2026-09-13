@@ -1031,17 +1031,14 @@
 
   /* the venue opens a map */
   .evm-map{
-    display:block; text-decoration:none; color:var(--ink-soft);
-    border-bottom:1px dashed color-mix(in srgb, var(--c) 45%, transparent);
-    padding-bottom:5px; width:fit-content; max-width:100%;
-    transition:color .16s ease, border-color .16s ease;
+    display:inline-flex; align-items:flex-start; gap:7px; text-decoration:none;
+    color:var(--ink-soft); max-width:100%;
+    transition:color .16s ease;
   }
-  .evm-map-cue{
-    display:block; margin-top:4px; font-size:11px; font-weight:700; color:var(--c);
-  }
-  .evm-map-cue::after{ content:' \2197'; }
+  .evm-map svg{ flex:none; width:15px; height:15px; margin-top:1px; color:var(--c); }
   @media (hover:hover){
-    .evm-map:hover{ color:var(--ink); border-bottom-color:var(--c); }
+    .evm-map:hover{ color:var(--ink); }
+    .evm-map:hover span{ text-decoration:underline; text-underline-offset:3px; }
   }
   @media (max-width:560px){
     .evm-fest-word{ font-size:35px; }
@@ -1049,7 +1046,16 @@
     .evm-fest-faces{ gap:12px; }
   }
 
-  .evm-date{ margin:0; font-size:12px; font-weight:700; color:var(--c); letter-spacing:.02em; }
+  .evm-date{
+    display:inline-flex; align-items:center; gap:7px; margin:0;
+    padding:5px 13px 5px 11px; border-radius:999px;
+    font-size:11.5px; font-weight:700; letter-spacing:.02em; color:var(--ink-soft);
+    background:var(--glass-card); border:1px solid var(--glass-edge);
+    backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%);
+  }
+  .evm-date::before{
+    content:''; flex:none; width:6px; height:6px; border-radius:50%; background:var(--c);
+  }
   .evm-title{ margin:6px 0 0; font-size:21px; font-weight:800; line-height:1.3; letter-spacing:-.01em; padding-right:34px; }
   .evm-venue{ margin:8px 0 0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
   .evm-head{
@@ -3320,7 +3326,9 @@ function renderEventModal(){
         <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
         <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
         ${ev.venue ? `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.venue)}"
-            target="_blank" rel="noopener noreferrer">${escapeHtml(ev.venue)}<span class="evm-map-cue">เปิดใน Google Maps</span></a>` : ''}
+            target="_blank" rel="noopener noreferrer" title="เปิดใน Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>${escapeHtml(ev.venue)}</span></a>` : ''}
         ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
           `<span class="ev-group" style="--c:${g.color}">${g.name}</span>`).join('')}</div>` : ''}
 
@@ -4261,9 +4269,14 @@ function syncBodyScrollLock(){
     document.body.classList.add('modal-locked');
     document.body.style.top = `-${state._savedScrollY}px`;
   } else if(!shouldLock && isLocked){
+    const y = state._savedScrollY || 0;
     document.body.classList.remove('modal-locked');
     document.body.style.top = '';
-    window.scrollTo(0, state._savedScrollY || 0);
+    // While the body was fixed the document was only a viewport tall. Reading
+    // a layout value forces that to be recalculated before the scroll, which
+    // would otherwise be clamped to the old height and land at the top.
+    void document.body.offsetHeight;
+    window.scrollTo(0, y);
   }
 }
 
@@ -4498,6 +4511,11 @@ let _navReady = false;
 let _navDepth = 0;
 
 function initHistory(){
+  // The app restores scroll itself. Left on 'auto' the browser also restores
+  // the position it recorded for the entry, a frame or two after popstate,
+  // overwriting ours — and for an entry pushed while a modal had the body
+  // fixed, the position it recorded is the top of the page.
+  if('scrollRestoration' in history) history.scrollRestoration = 'manual';
   history.replaceState({ snap:navSnapshot(), depth:0 }, '');
   _navReady = true;
   window.addEventListener('popstate', (e)=>{
@@ -4603,7 +4621,11 @@ function bindDelegatedEvents(){
       goBack(()=>{ state.view='browse'; state.selectedId=null; state.editingId=null; });
     }
     else if(action==='open-member'){
-      state.selectedId=id; state.editingId=null; renderMain(); pushHistory();
+      // Two sheets stacked on top of each other is not a place to be, so a
+      // member opened from inside an event replaces it. Going back returns
+      // to the event, since that is the entry underneath.
+      state.selectedId=id; state.editingId=null; state.selectedEvent=null;
+      renderMain(); pushHistory();
     }
     else if(action==='close-modal'){
       const insideCard = e.target.closest('.modal-glass-card');
