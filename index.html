@@ -724,6 +724,8 @@
     border-radius:10px; padding:9px 13px 9px 11px; font-family:'Noto Sans Thai',sans-serif;
     color:var(--ink); box-shadow:0 1px 3px rgba(var(--shadow-rgb),.08);
   }
+  .bday-chip{ transition:transform .2s var(--ease-out), border-color .2s ease, box-shadow .2s var(--ease-out); }
+  .bday-chip .who{ transition:color .2s ease; }
   .bday-chip .when{ font-size:11px; color:var(--ink-soft); }
   .bday-chip .who{ font-size:14px; font-weight:600; margin-top:1px; }
   .bday-chip.today{ border-color:var(--gold); background:var(--bnk-soft); }
@@ -961,6 +963,38 @@
   .ev-detail li{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; }
   .ev-mine{ margin:8px 0 0; font-size:11.5px; font-weight:700; color:var(--gold); }
 
+  .ev-card.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out), border-color .2s ease; }
+  .ev-more-people{
+    display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px;
+    font-size:11.5px; font-weight:700; color:var(--ink-soft);
+    background:var(--glass-card); border:1px solid var(--glass-edge);
+  }
+  .ev-open{
+    margin:10px 0 0; font-size:11.5px; font-weight:800; color:var(--c);
+    letter-spacing:.01em;
+  }
+  .ev-open::after{ content:' \203A'; font-weight:700; }
+
+  .evm-date{ margin:0; font-size:12px; font-weight:700; color:var(--c); letter-spacing:.02em; }
+  .evm-title{ margin:6px 0 0; font-size:21px; font-weight:800; line-height:1.3; letter-spacing:-.01em; padding-right:34px; }
+  .evm-venue{ margin:8px 0 0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
+  .evm-head{
+    margin:20px 0 9px; font-family:'Noto Sans Thai',sans-serif;
+    font-size:13px; font-weight:800; color:var(--ink);
+    display:flex; align-items:center; gap:8px;
+  }
+  .evm-head::before{
+    content:''; flex:none; width:3px; height:14px; border-radius:999px; background:var(--c);
+  }
+  @media (hover:hover){
+    .ev-card.is-openable:hover{
+      transform:translateY(-2px);
+      border-color:color-mix(in srgb, var(--c) 55%, var(--glass-edge));
+      box-shadow:0 12px 28px rgba(var(--shadow-rgb),.13);
+    }
+  }
+  .ev-card.is-openable:active{ transform:scale(.992); transition-duration:.09s; }
+
   .past-toggle{
     display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
     padding:11px 14px; cursor:pointer; font:inherit; color:var(--ink-soft);
@@ -981,6 +1015,12 @@
   .sub-tab.active{ background:var(--ink); color:var(--card); border-color:var(--ink); }
 
   @media (hover:hover){
+    .bday-chip:hover{
+      transform:translateY(-2px);
+      border-color:var(--c);
+      box-shadow:0 9px 22px rgba(var(--shadow-rgb),.13);
+    }
+    .bday-chip:hover .who{ color:var(--c); }
     .bday-today:hover .bday-today-face{
       transform:translateY(-3px) scale(1.04);
       box-shadow:0 0 0 3px var(--gold), 0 16px 32px rgba(var(--shadow-rgb),.24);
@@ -2430,7 +2470,7 @@ const ICONS = {
 
 // ============================= STATE =============================
 let state = {
-  view:'feed', pastOpen:false, membersTab:'about', members:[], oshi:[], kamiOshi:null,
+  view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
@@ -3111,8 +3151,12 @@ function renderEventCard(ev, todayIso){
   const groupTags = (ev.groups || []).map(getGroup).filter(Boolean);
   const accent = groupTags.length === 1 ? groupTags[0].color
     : (people.length ? getGroup(people[0].groupId).color : 'var(--ink-soft)');
+  const hasMore = eventHasMore(ev);
+  const shown = people.slice(0, 6);
+  const rest = people.length - shown.length;
   return `
-  <article class="ev-card${isNow?' is-now':''}" style="--c:${accent}">
+  <article class="ev-card${isNow?' is-now':''}${hasMore?' is-openable':''}" style="--c:${accent}"
+    ${hasMore ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="ev-date">
       <span class="ev-d">${eventDateLabel(ev)}</span>
       ${when ? `<span class="ev-when">${when}</span>` : ''}
@@ -3123,16 +3167,68 @@ function renderEventCard(ev, todayIso){
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
         `<span class="ev-group" style="--c:${g.color}">${g.name}</span>`).join('')}</div>` : ''}
       ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
-      ${people.length ? `<div class="ev-people">${people.map(m=>{
+      ${shown.length ? `<div class="ev-people">${shown.map(m=>{
         const g = getGroup(m.groupId);
         return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
           data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name)}">
           ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span>
-        </button>`; }).join('')}</div>` : ''}
-      ${ev.detail ? `<ul class="ev-detail">${ev.detail.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
+        </button>`; }).join('')}${rest>0?`<span class="ev-more-people">+${rest}</span>`:''}</div>` : ''}
       ${mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
+      ${hasMore ? `<p class="ev-open">ดูรายละเอียด</p>` : ''}
     </div>
   </article>`;
+}
+
+/* Anything with a line-up or a write-up opens; the "to be announced"
+   placeholders have nothing behind them yet, so they stay flat rather than
+   leading to an empty sheet. */
+function eventHasMore(ev){
+  return !!(ev.info || ev.detail || (ev.members || []).length);
+}
+
+function renderEventModal(){
+  const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
+  if(!ev) return '';
+  const people = (ev.members || []).map(getMember).filter(Boolean);
+  const groupTags = (ev.groups || []).map(getGroup).filter(Boolean);
+  const accent = groupTags.length === 1 ? groupTags[0].color
+    : (people.length ? getGroup(people[0].groupId).color : 'var(--ink-soft)');
+  const mine = people.filter(m => state.oshi.includes(m.id));
+  return `
+  <div class="modal-backdrop" data-action="close-modal">
+    <div class="modal-glass-card" data-stop-close="1" style="--c:${accent}">
+      <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="modal-scroll">
+        <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}</p>
+        <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
+        ${ev.venue ? `<p class="evm-venue">${escapeHtml(ev.venue)}</p>` : ''}
+        ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
+          `<span class="ev-group" style="--c:${g.color}">${g.name}</span>`).join('')}</div>` : ''}
+
+        ${ev.detail ? `
+        <h3 class="evm-head">กำหนดการ</h3>
+        <ul class="ev-detail">${ev.detail.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
+
+        ${ev.info ? `
+        <h3 class="evm-head">รายละเอียด</h3>
+        <ul class="ev-detail">${ev.info.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
+
+        ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
+
+        ${people.length ? `
+        <h3 class="evm-head">สมาชิกที่ร่วมงาน · ${people.length} คน</h3>
+        ${mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
+        <div class="ev-people">${people.map(m=>{
+          const g = getGroup(m.groupId);
+          return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
+            data-action="open-member" data-id="${m.id}">
+            ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span>
+          </button>`; }).join('')}</div>` : ''}
+      </div>
+    </div>
+  </div>`;
 }
 
 
@@ -4041,7 +4137,7 @@ function render(){
   renderMain();
 }
 function syncBodyScrollLock(){
-  const shouldLock = !!state.selectedId;
+  const shouldLock = !!state.selectedId || !!state.selectedEvent;
   const isLocked = document.body.classList.contains('modal-locked');
   if(shouldLock && !isLocked){
     state._savedScrollY = window.scrollY || window.pageYOffset || 0;
@@ -4074,7 +4170,8 @@ function renderMain(){
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
     renderForm())
-    + (state.selectedId ? renderDetailModal() : '');
+    + (state.selectedId ? renderDetailModal() : '')
+    + (state.selectedEvent ? renderEventModal() : '');
   if(state.view !== _lastRenderedView){
     main.classList.remove('view-fade-in');
     void main.offsetWidth;
@@ -4261,7 +4358,7 @@ function attachMainEvents(){
 // returns to wherever they came from rather than a hard-coded destination.
 // This drives the back buttons, the modal close, the edge-swipe gesture and
 // the browser/phone back button alike.
-const NAV_KEYS = ['view','selectedId','editingId','favoritesOnly','query','groupFilter',
+const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','query','groupFilter',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
   'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab'];
 
@@ -4275,6 +4372,7 @@ function navSnapshot(){
 // fields decide whether the user has actually moved somewhere else.
 function isSameScreen(a, b){
   return !!a && !!b && a.view===b.view && a.selectedId===b.selectedId
+    && a.selectedEvent===b.selectedEvent
     && a.editingId===b.editingId && a.favoritesOnly===b.favoritesOnly
     && a.showGraduated===b.showGraduated && a.selectedSingle===b.selectedSingle;
 }
@@ -4394,7 +4492,7 @@ function bindDelegatedEvents(){
       const insideCard = e.target.closest('.modal-glass-card');
       const onCloseBtn = e.target.closest('.modal-close-btn');
       if(insideCard && !onCloseBtn) return;
-      goBack(()=>{ state.selectedId = null; });
+      goBack(()=>{ state.selectedId = null; state.selectedEvent = null; });
     }
     else if(action==='filter-to'){
       const m = getMember(id);
@@ -4564,6 +4662,10 @@ function bindDelegatedEvents(){
         state.selectedId = null; state.editingId = null;
         render(); pushHistory();
       }
+    }
+    else if(action==='open-event'){
+      state.selectedEvent = el.dataset.id;
+      renderMain(); pushHistory();
     }
     else if(action==='sub-tab'){
       state.view = el.dataset.view;
