@@ -414,6 +414,28 @@
   .modal-close-btn svg{ width:16px; height:16px; }
   .modal-close-btn:active{ background:rgba(255,255,255,calc(.95*var(--glass-k))); }
 
+  .modal-share-btn{
+    position:absolute; top:14px; right:54px; z-index:2;
+    width:32px; height:32px; border-radius:50%;
+    background:rgba(255,255,255,calc(.7*var(--glass-k))); border:1px solid rgba(255,255,255,calc(.6*var(--glass-k)));
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.1);
+  }
+  .modal-share-btn svg{ width:15px; height:15px; }
+  .modal-share-btn:active{ background:rgba(255,255,255,calc(.95*var(--glass-k))); }
+
+  .toast{
+    position:fixed; left:50%; bottom:calc(var(--nav-h, 84px) + 18px);
+    transform:translate(-50%, 14px); z-index:200;
+    padding:11px 18px; border-radius:999px;
+    background:var(--glass-card); border:1px solid var(--glass-edge);
+    backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
+    font-family:'Noto Sans Thai',sans-serif; font-size:13.5px; font-weight:700; color:var(--ink);
+    box-shadow:0 10px 30px rgba(var(--shadow-rgb),.18);
+    opacity:0; pointer-events:none; transition:opacity .22s var(--ease-out), transform .22s var(--ease-out);
+  }
+  .toast.show{ opacity:1; transform:translate(-50%, 0); }
+
   .back-btn-sticky{
     position:sticky; top:132px; z-index:20;
     display:inline-flex; align-items:center; justify-content:center;
@@ -2595,6 +2617,7 @@ const SEED_SENBATSU = {
   ],
 };
 const ICONS = {
+  link:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>`,
   home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>`,
   homeFilled:`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3 3 10.5V20h18v-9.5L12 3Z"/></svg>`,
   members: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>`,
@@ -3372,6 +3395,7 @@ function renderEventModal(){
   return `
   <div class="modal-backdrop" data-action="close-modal">
     <div class="modal-glass-card" data-stop-close="1" style="--c:${accent}">
+      <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
@@ -3750,6 +3774,7 @@ function renderDetailModal(){
   return `
   <div class="modal-backdrop" data-action="close-modal">
     <div class="modal-glass-card" data-stop-close="1">
+      <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
@@ -4645,6 +4670,80 @@ const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
   'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab'];
 
+// A screen worth linking to gets a query string, so a shared link reopens
+// exactly what the sender was looking at. Only the query changes — the path
+// stays put, which is what lets this work on static hosting with no rewrites.
+const SHAREABLE_VIEWS = ['feed','browse','groups','discography','stats'];
+
+// Read at load time. The first history entry is written before the member list
+// has arrived, and writing it derives the address from a state that is still
+// empty — which erases the very query string this boot is supposed to honour.
+const BOOT_QUERY = location.search;
+
+function urlForSnapshot(snap){
+  const p = new URLSearchParams();
+  if(snap.selectedEvent)       p.set('e', snap.selectedEvent);
+  else if(snap.selectedId)     p.set('m', snap.selectedId);
+  else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
+  else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view))
+    p.set('v', snap.view);
+  const q = p.toString();
+  return location.pathname + (q ? '?' + q : '') ;
+}
+
+// Runs once at boot, after members are loaded so an id can be checked. An id
+// that matches nothing is ignored rather than left to render a blank screen.
+function applyUrlToState(){
+  const p = new URLSearchParams(BOOT_QUERY);
+  const ev = p.get('e'), mem = p.get('m'), sng = p.get('s'), view = p.get('v');
+
+  if(ev && SEED_SCHEDULE.some(x => x.id === ev)){ state.view='feed'; state.selectedEvent=ev; return; }
+  if(mem && (state.members||[]).some(x => x.id === mem)){
+    const m = getMember(mem);
+    state.view = 'browse';
+    state.showGraduated = !!(m && m.graduated);
+    state.selectedId = mem;
+    return;
+  }
+  if(sng && SEED_SINGLES.concat(SEED_ALBUMS).some(x => x.id === sng)){
+    state.view='single'; state.selectedSingle=sng; return;
+  }
+  if(view && SHAREABLE_VIEWS.includes(view)) state.view = view;
+}
+
+let _toastTimer = null;
+function toast(msg){
+  let el = document.querySelector('.toast');
+  if(!el){ el = document.createElement('div'); el.className='toast'; document.body.appendChild(el); }
+  el.textContent = msg;
+  requestAnimationFrame(()=> el.classList.add('show'));
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=> el.classList.remove('show'), 2000);
+}
+
+// Copies the link to whatever is on screen. navigator.share is offered first on
+// the phones that have it, since it reaches the apps people actually send links
+// through; the clipboard is the fallback everywhere else.
+async function shareCurrent(label){
+  const url = location.origin + urlForSnapshot(navSnapshot());
+  try{
+    if(navigator.share){ await navigator.share({ title:label || document.title, url }); return; }
+  }catch(err){ if(err && err.name === 'AbortError') return; }
+  try{
+    await navigator.clipboard.writeText(url);
+    toast('คัดลอกลิงก์แล้ว');
+  }catch(err){
+    // Clipboard access is refused on insecure origins and in some in-app
+    // browsers; selecting the text lets the user copy it by hand.
+    const ta = document.createElement('textarea');
+    ta.value = url; ta.style.cssText = 'position:fixed;top:50%;left:50%;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('คัดลอกลิงก์แล้ว'); }
+    catch(e2){ toast('คัดลอกไม่สำเร็จ'); }
+    ta.remove();
+  }
+}
+
 function navSnapshot(){
   const snap = {};
   NAV_KEYS.forEach(k => snap[k] = state[k]);
@@ -4662,6 +4761,7 @@ function isSameScreen(a, b){
 
 let _navReady = false;
 let _navDepth = 0;
+let _urlApplied = false;
 
 function initHistory(){
   // The app restores scroll itself. Left on 'auto' the browser also restores
@@ -4686,17 +4786,18 @@ function pushHistory(){
   if(!_navReady) return;
   const snap = navSnapshot();
   if(isSameScreen(history.state && history.state.snap, snap)){
-    history.replaceState({ snap, depth:_navDepth }, '');
+    history.replaceState({ snap, depth:_navDepth }, '', urlForSnapshot(snap));
     return;
   }
-  history.pushState({ snap, depth:++_navDepth }, '');
+  history.pushState({ snap, depth:++_navDepth }, '', urlForSnapshot(snap));
 }
 
 // Same screen, changed filters — keep the entry current so going back later
 // restores what was on screen instead of replaying every keystroke.
 function replaceHistory(){
   if(!_navReady) return;
-  history.replaceState({ snap:navSnapshot(), depth:_navDepth }, '');
+  const snap = navSnapshot();
+  history.replaceState({ snap, depth:_navDepth }, '', urlForSnapshot(snap));
 }
 
 function canGoBack(){ return _navDepth > 0; }
@@ -4810,6 +4911,11 @@ function bindDelegatedEvents(){
       // to the event, since that is the entry underneath.
       state.selectedId=id; state.editingId=null; state.selectedEvent=null;
       renderMain(); pushHistory();
+    }
+    else if(action==='share'){
+      const m = state.selectedId ? getMember(state.selectedId) : null;
+      const ev = state.selectedEvent ? SEED_SCHEDULE.find(x=>x.id===state.selectedEvent) : null;
+      shareCurrent(m ? `${m.nameTh} — 48thDB` : ev ? `${ev.title} — 48thDB` : '48thDB');
     }
     else if(action==='close-modal'){
       const insideCard = e.target.closest('.modal-glass-card');
@@ -5060,6 +5166,7 @@ async function init(){
     const oshiData = await loadOshiData();
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;
+    if(!_urlApplied){ _urlApplied = true; applyUrlToState(); replaceHistory(); }
     render();
   });
 }
