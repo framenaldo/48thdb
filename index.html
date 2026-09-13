@@ -433,6 +433,26 @@
   .modal-share-btn svg{ width:15px; height:15px; }
   .modal-share-btn:active{ background:rgba(255,255,255,calc(.95*var(--glass-k))); }
 
+  /* A shortcut out to the group's own app. It cannot show who is live — that
+     is closed to us — so it says what it is rather than pretending to know. */
+  .iam-link{
+    display:flex; align-items:center; gap:11px; margin:2px 0 16px;
+    padding:11px 14px; border-radius:15px;
+    background:var(--glass-card); border:1px solid var(--glass-edge);
+    text-decoration:none; color:inherit;
+  }
+  .iam-icon{
+    width:34px; height:34px; border-radius:9px; flex:none; display:block;
+    border:1px solid var(--line); background:#fff;
+  }
+  .iam-text{ display:flex; flex-direction:column; min-width:0; flex:1; }
+  .iam-name{
+    font-family:'Noto Sans Thai',sans-serif; font-size:14px; font-weight:800; color:var(--ink);
+  }
+  .iam-sub{ font-size:11.5px; color:var(--ink-soft); }
+  .iam-go{ flex:none; color:var(--ink-soft); font-size:15px; }
+  .iam-link:active{ background:var(--card); }
+
   .cal-wrap{
     background:var(--glass-card); border:1px solid var(--glass-edge);
     border-radius:18px; padding:14px 12px 12px; margin-top:10px;
@@ -4046,6 +4066,15 @@ function renderFeed(){
       <p class="feed-today">วัน${dayName}ที่ ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()+543}</p>
       <h1 class="feed-title">วันนี้ที่ 48</h1>
     </header>
+
+    <a class="iam-link" href="https://app.bnk48.com/" target="_blank" rel="noopener noreferrer">
+      <img class="iam-icon" src="iam48-icon.png" alt="" width="34" height="34">
+      <span class="iam-text">
+        <span class="iam-name">iAM48</span>
+        <span class="iam-sub">ดูไลฟ์และเธียเตอร์ในแอปของวง</span>
+      </span>
+      <span class="iam-go" aria-hidden="true">↗</span>
+    </a>
 
     ${todays.length ? `
     <section class="feed-block is-birthday">
