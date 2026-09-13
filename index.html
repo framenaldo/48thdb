@@ -433,6 +433,64 @@
   .modal-share-btn svg{ width:15px; height:15px; }
   .modal-share-btn:active{ background:rgba(255,255,255,calc(.95*var(--glass-k))); }
 
+  .cmp-open-btn{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:9px 15px; border-radius:999px;
+    border:1px solid var(--line); background:var(--card);
+    font-family:'Noto Sans Thai',sans-serif; font-size:13px; font-weight:700;
+    color:var(--ink); cursor:pointer;
+  }
+
+  .cmp-search{
+    width:100%; box-sizing:border-box; margin-top:4px;
+    padding:11px 15px; border-radius:999px;
+    border:1px solid var(--line); background:var(--card);
+    font-family:'Noto Sans Thai',sans-serif; font-size:14px; color:var(--ink);
+  }
+  .cmp-search:focus{ outline:none; border-color:var(--bnk); }
+
+  .cmp-heads{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:8px; margin-bottom:20px; }
+  .cmp-who{ text-align:center; min-width:0; }
+  .cmp-face{
+    width:84px; height:84px; margin:0 auto 9px; border-radius:50%;
+    overflow:hidden; border:3px solid var(--c); background:var(--card);
+  }
+  .cmp-face img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .cmp-name{ font-family:'Noto Sans Thai',sans-serif; font-size:16px; font-weight:800; color:var(--ink); }
+  .cmp-sub{ font-size:11.5px; color:var(--ink-soft); margin-top:1px; }
+  .cmp-vs{
+    font-size:11px; font-weight:800; letter-spacing:.08em; color:var(--ink-soft);
+    padding:5px 9px; border-radius:999px; border:1px solid var(--line); white-space:nowrap;
+  }
+
+  .cmp-rows{ border-top:1px solid var(--line); }
+  .cmp-row{
+    display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+    padding:11px 0 5px;
+  }
+  .cmp-val{
+    font-family:'Noto Sans Thai',sans-serif; font-size:14.5px; font-weight:700;
+    color:var(--ink); text-align:center; min-width:0; word-break:break-word;
+  }
+  .cmp-label{
+    font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--ink-soft); white-space:nowrap;
+  }
+  /* The difference is the reason for the screen, so it is spelled out rather
+     than left for the reader to work out from the two numbers. */
+  .cmp-note{
+    text-align:center; font-size:12px; color:var(--ink-soft);
+    padding-bottom:11px; border-bottom:1px solid var(--line);
+  }
+  .cmp-row:has(+ .cmp-note){ padding-bottom:0; }
+  .cmp-row:not(:has(+ .cmp-note)){ padding-bottom:11px; border-bottom:1px solid var(--line); }
+
+  .backup-card{
+    background:var(--glass-card); border:1px solid var(--glass-edge);
+    border-radius:16px; padding:16px;
+  }
+  .backup-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
   .toast{
     position:fixed; left:50%; bottom:calc(var(--nav-h, 84px) + 18px);
     transform:translate(-50%, 14px); z-index:200;
@@ -2651,6 +2709,7 @@ const ICONS = {
 // ============================= STATE =============================
 let state = {
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
+  compareWith:null, comparePicking:false, compareQuery:'',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
@@ -3049,6 +3108,166 @@ function renderMemberWorks(m){
   return `<h3 class="section-label">ผลงานเพลง</h3>
     <p class="works-count">${works.length} เพลง${centres?` · เซ็นเตอร์ ${centres} เพลง`:''}</p>
     <div class="work-list">${rows}</div>`;
+}
+
+
+// ============================= COMPARE =============================
+
+/** Whole months between two dates, so a gap reads as "1 ปี 4 เดือน". */
+function monthsBetween(aIso, bIso){
+  const a = new Date(aIso), b = new Date(bIso);
+  const [early, late] = a <= b ? [a, b] : [b, a];
+  let months = (late.getFullYear()-early.getFullYear())*12 + (late.getMonth()-early.getMonth());
+  if(late.getDate() < early.getDate()) months--;
+  return Math.max(0, months);
+}
+
+function humanMonths(months){
+  const y = Math.floor(months/12), mo = months%12;
+  if(!y && !mo) return 'เท่ากัน';
+  return [y ? `${y} ปี` : '', mo ? `${mo} เดือน` : ''].filter(Boolean).join(' ');
+}
+
+/** Earliest date the member is recorded as being with the group. */
+function joinedOn(m){
+  const hist = SEED_TEAM_HISTORY[m.id];
+  if(hist && hist.length) return hist.map(r=>r.from).filter(Boolean).sort()[0] || null;
+  return null;
+}
+
+function compareRows(a, b){
+  const rows = [];
+  const push = (label, left, right, note) => rows.push({ label, left, right, note });
+
+  const ga = getGroup(a.groupId), gb = getGroup(b.groupId);
+  push('วง', ga ? ga.name : '—', gb ? gb.name : '—',
+    a.groupId === b.groupId ? 'วงเดียวกัน' : 'คนละวง');
+
+  const ta = getTeam(a.teamId), tb = getTeam(b.teamId);
+  push('ทีม', ta ? ta.name : '—', tb ? tb.name : '—',
+    a.teamId && a.teamId === b.teamId ? 'ทีมเดียวกัน' : null);
+
+  push('รุ่น', `รุ่น ${a.gen}`, `รุ่น ${b.gen}`,
+    a.gen === b.gen ? 'รุ่นเดียวกัน' : `ห่างกัน ${Math.abs(a.gen-b.gen)} รุ่น`);
+
+  const ageGap = monthsBetween(a.birthday, b.birthday);
+  const older = a.birthday === b.birthday ? null : (a.birthday < b.birthday ? a : b);
+  push('อายุ', `${calcAge(a.birthday)} ปี`, `${calcAge(b.birthday)} ปี`,
+    older ? `${older.nameTh} โตกว่า ${humanMonths(ageGap)}` : 'เกิดวันเดียวกัน');
+
+  push('วันเกิด', formatDateShort(a.birthday), formatDateShort(b.birthday), null);
+
+  if(a.height && b.height){
+    const d = Math.abs(a.height-b.height);
+    const taller = a.height === b.height ? null : (a.height > b.height ? a : b);
+    push('ส่วนสูง', `${a.height} ซม.`, `${b.height} ซม.`,
+      taller ? `${taller.nameTh} สูงกว่า ${d} ซม.` : 'สูงเท่ากัน');
+  } else {
+    push('ส่วนสูง', a.height ? `${a.height} ซม.` : '—', b.height ? `${b.height} ซม.` : '—', null);
+  }
+
+  if(a.blood || b.blood)
+    push('กรุ๊ปเลือด', a.blood || '—', b.blood || '—',
+      a.blood && a.blood === b.blood ? 'กรุ๊ปเดียวกัน' : null);
+
+  const ja = joinedOn(a), jb = joinedOn(b);
+  if(ja && jb){
+    const today = new Date().toISOString().slice(0,10);
+    const gap = monthsBetween(ja, jb);
+    push('อยู่กับวงมา', humanMonths(monthsBetween(ja, today)), humanMonths(monthsBetween(jb, today)),
+      gap ? `เข้ามาห่างกัน ${humanMonths(gap)}` : 'เข้าวงพร้อมกัน');
+  }
+
+  const wa = worksOf(a.id), wb = worksOf(b.id);
+  push('ผลงานเพลง', `${wa.length} เพลง`, `${wb.length} เพลง`, null);
+
+  const ca = wa.filter(w=>w.centre).length, cb = wb.filter(w=>w.centre).length;
+  if(ca || cb) push('เซ็นเตอร์', `${ca} เพลง`, `${cb} เพลง`, null);
+
+  // Songs both of them are on is the thing a list of two profiles cannot show.
+  const shared = wa.filter(w => wb.some(x => x.work.id === w.work.id && x.track === w.track));
+  rows.shared = shared;
+  return rows;
+}
+
+function renderCompareHead(m){
+  const g = getGroup(m.groupId);
+  return `<div class="cmp-who" style="--c:${g?g.color:'var(--ink-soft)'}">
+    <div class="cmp-face">${m.photo ? `<img src="${m.photo}" alt="">` : ''}</div>
+    <div class="cmp-name">${escapeHtml(m.nameTh)}</div>
+    <div class="cmp-sub">${escapeHtml(m.name)}</div>
+  </div>`;
+}
+
+function renderCompareModal(){
+  const a = getMember(state.selectedId), b = getMember(state.compareWith);
+  if(!a || !b) return '';
+  const rows = compareRows(a, b);
+  const shared = rows.shared || [];
+
+  return `
+  <div class="modal-backdrop" data-action="close-compare">
+    <div class="modal-glass-card" data-stop-close="1">
+      <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
+      <button class="modal-close-btn" data-action="close-compare" title="ปิด" aria-label="ปิด">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="modal-scroll">
+        <div class="cmp-heads">
+          ${renderCompareHead(a)}
+          <div class="cmp-vs">เทียบ</div>
+          ${renderCompareHead(b)}
+        </div>
+        <div class="cmp-rows">
+          ${rows.map(r=>`
+            <div class="cmp-row">
+              <div class="cmp-val">${escapeHtml(String(r.left))}</div>
+              <div class="cmp-label">${escapeHtml(r.label)}</div>
+              <div class="cmp-val">${escapeHtml(String(r.right))}</div>
+            </div>
+            ${r.note ? `<div class="cmp-note">${escapeHtml(r.note)}</div>` : ''}
+          `).join('')}
+        </div>
+        <h3 class="section-label" style="margin-top:22px;">เพลงที่อยู่ด้วยกัน</h3>
+        ${shared.length
+          ? `<p class="works-count">${shared.length} เพลง</p>
+             <div class="work-list">${shared.map(w=>`
+               <button class="work-row" data-action="open-single" data-id="${w.work.id}">
+                 <span class="work-main">
+                   <span class="work-track">${escapeHtml(w.track)}</span>
+                   <span class="work-from">${WORK_KIND(w.work)==='album'?'อัลบั้มที่':'ซิงเกิลที่'} ${w.work.num} · ${w.work.year}</span>
+                 </span>
+               </button>`).join('')}</div>`
+          : `<p class="muted-note">ยังไม่เคยอยู่เพลงเดียวกัน</p>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderComparePicker(){
+  const a = getMember(state.selectedId);
+  if(!a) return '';
+  const q = (state.compareQuery || '').trim().toLowerCase();
+  const list = (state.members || [])
+    .filter(m => m.id !== a.id && !m.graduated)
+    .filter(m => !q || [m.name, m.nameTh, m.realName, m.realNameTh].some(s => (s||'').toLowerCase().includes(q)))
+    .sort((x,y) => x.name.localeCompare(y.name));
+
+  return `
+  <div class="modal-backdrop" data-action="close-compare">
+    <div class="modal-glass-card" data-stop-close="1">
+      <button class="modal-close-btn" data-action="close-compare" title="ปิด" aria-label="ปิด">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="modal-scroll">
+        <h3 class="section-label" style="margin-top:0;">เทียบ ${escapeHtml(a.nameTh)} กับใคร</h3>
+        <input class="cmp-search" id="cmp-search" type="text" placeholder="พิมพ์ชื่อ..." value="${escapeAttr(state.compareQuery||'')}">
+        ${list.length
+          ? `<div class="grid-mini" style="margin-top:12px;">${list.map(m=>renderMiniCard(m, false, 'pick-compare')).join('')}</div>`
+          : `<p class="muted-note">ไม่พบใครชื่อนี้</p>`}
+      </div>
+    </div>
+  </div>`;
 }
 
 const SOCIAL = {
@@ -3805,6 +4024,7 @@ function renderDetailModal(){
           <button class="kami-btn ${isKami?'active':''}" data-action="toggle-kami-oshi" data-id="${m.id}">
             <span class="crown-ico">${ICONS.crown}</span> ${isKami?'เป็น Kami Oshi':'ตั้งเป็น Kami Oshi'}
           </button>
+          <button class="cmp-open-btn" data-action="open-compare" data-id="${m.id}">เทียบกับคนอื่น</button>
         </div>
         ${renderSocial(m)}
         <div class="stat-grid">
@@ -3863,12 +4083,12 @@ function renderGroups(){
   }).join('');
 }
 
-function renderMiniCard(m, isCentre){
+function renderMiniCard(m, isCentre, action){
   const g = getGroup(m.groupId);
   const isKami = state.kamiOshi === m.id;
   return `
   <div class="mini-card${isCentre?' is-centre':''}" style="--c:${g.color}"
-    data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name+' · '+(m.nameTh||''))}">
+    data-action="${action || 'open-member'}" data-id="${m.id}" title="${escapeAttr(m.name+' · '+(m.nameTh||''))}">
     <div class="avatar-sm" style="background:${g.color}">
       <span class="avatar-fallback">${m.nameTh?m.nameTh[0]:'?'}</span>
       ${m.photo ? `<img class="avatar-img" src="${escapeAttr(m.photo)}" alt="" onerror="this.remove()">` : ''}
@@ -3927,6 +4147,17 @@ function renderProfile(){
   ${kamiMember ? renderKamiOshiFeatured(kamiMember) : `<p class="muted-note">ยังไม่ได้เลือก Kami Oshi — เปิดโปรไฟล์สมาชิกแล้วกดปุ่มมงกุฎเพื่อเลือก (เลือกได้คนเดียว)</p>`}
   <h3 class="section-label">Oshi ทั้งหมด (${oshiMembers.length})</h3>
   ${oshiMembers.length ? `<div class="grid-mini grid-mini-oshi">${oshiMembers.map(m => renderMiniCard(m)).join('')}</div>` : `<p class="muted-note">ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม</p>`}
+
+  <h3 class="section-label">สำรองข้อมูล</h3>
+  <div class="backup-card">
+    <p class="muted-note" style="margin:0 0 12px;">
+      บันทึก Oshi และ Kami Oshi เป็นไฟล์ไว้กับตัว ย้ายเครื่องหรือเปลี่ยนเบราว์เซอร์แล้วนำกลับเข้ามาได้
+    </p>
+    <div class="backup-actions">
+      <button class="btn-secondary" data-action="export-oshi">บันทึกเป็นไฟล์</button>
+      <button class="btn-secondary" data-action="import-oshi">นำไฟล์เข้า</button>
+    </div>
+  </div>
   `;
 }
 
@@ -4486,7 +4717,9 @@ function renderMain(){
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
     renderForm())
-    + (state.selectedId ? renderDetailModal() : '')
+    + (state.comparePicking ? renderComparePicker()
+       : state.compareWith && state.selectedId ? renderCompareModal()
+       : state.selectedId ? renderDetailModal() : '')
     + (state.selectedEvent ? renderEventModal() : '');
   if(state.view !== _lastRenderedView){
     main.classList.remove('view-fade-in');
@@ -4675,7 +4908,7 @@ function attachMainEvents(){
 // returns to wherever they came from rather than a hard-coded destination.
 // This drives the back buttons, the modal close, the edge-swipe gesture and
 // the browser/phone back button alike.
-const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','query','groupFilter',
+const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','query','groupFilter','compareWith','comparePicking',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
   'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab'];
 
@@ -4692,7 +4925,8 @@ const BOOT_QUERY = location.search;
 function urlForSnapshot(snap){
   const p = new URLSearchParams();
   if(snap.selectedEvent)       p.set('e', snap.selectedEvent);
-  else if(snap.selectedId)     p.set('m', snap.selectedId);
+  else if(snap.selectedId){    p.set('m', snap.selectedId);
+                               if(snap.compareWith) p.set('vs', snap.compareWith); }
   else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
   else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view))
     p.set('v', snap.view);
@@ -4712,12 +4946,68 @@ function applyUrlToState(){
     state.view = 'browse';
     state.showGraduated = !!(m && m.graduated);
     state.selectedId = mem;
+    const vs = p.get('vs');
+    if(vs && vs !== mem && (state.members||[]).some(x => x.id === vs)) state.compareWith = vs;
     return;
   }
   if(sng && SEED_SINGLES.concat(SEED_ALBUMS).some(x => x.id === sng)){
     state.view='single'; state.selectedSingle=sng; return;
   }
   if(view && SHAREABLE_VIEWS.includes(view)) state.view = view;
+}
+
+const BACKUP_FORMAT = '48thdb-oshi-1';
+
+function exportOshi(){
+  const payload = {
+    format: BACKUP_FORMAT,
+    savedAt: new Date().toISOString(),
+    kamiOshi: state.kamiOshi,
+    oshi: state.oshi,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `48thdb-oshi-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 1000);
+  toast(`บันทึก ${state.oshi.length} คนแล้ว`);
+}
+
+function importOshi(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.addEventListener('change', async ()=>{
+    const file = input.files && input.files[0];
+    if(!file) return;
+    let data;
+    try{ data = JSON.parse(await file.text()); }
+    catch(e){ toast('ไฟล์นี้อ่านไม่ออก'); return; }
+
+    if(!data || data.format !== BACKUP_FORMAT || !Array.isArray(data.oshi)){
+      toast('ไฟล์นี้ไม่ใช่ไฟล์สำรองของ 48thDB'); return;
+    }
+
+    // Only ids that match somebody are taken. A file naming members who have
+    // since been removed would otherwise leave entries that render as blanks.
+    const known = new Set((state.members || []).map(m => m.id));
+    const incoming = data.oshi.filter(id => typeof id === 'string' && known.has(id));
+    const skipped = data.oshi.length - incoming.length;
+
+    const merged = [...new Set([...state.oshi, ...incoming])];
+    const added = merged.length - state.oshi.length;
+    state.oshi = merged;
+    if(data.kamiOshi && known.has(data.kamiOshi)) state.kamiOshi = data.kamiOshi;
+
+    await saveOshiData();
+    renderMain();
+    toast(added
+      ? `เพิ่ม ${added} คน${skipped ? ` · ข้าม ${skipped} ที่ไม่รู้จัก` : ''}`
+      : 'มีครบอยู่แล้ว ไม่มีอะไรเพิ่ม');
+  });
+  input.click();
 }
 
 let _toastTimer = null;
@@ -4764,6 +5054,7 @@ function navSnapshot(){
 function isSameScreen(a, b){
   return !!a && !!b && a.view===b.view && a.selectedId===b.selectedId
     && a.selectedEvent===b.selectedEvent
+    && a.compareWith===b.compareWith && a.comparePicking===b.comparePicking
     && a.editingId===b.editingId && a.favoritesOnly===b.favoritesOnly
     && a.showGraduated===b.showGraduated && a.selectedSingle===b.selectedSingle;
 }
@@ -4919,8 +5210,26 @@ function bindDelegatedEvents(){
       // member opened from inside an event replaces it. Going back returns
       // to the event, since that is the entry underneath.
       state.selectedId=id; state.editingId=null; state.selectedEvent=null;
+      state.compareWith=null; state.comparePicking=false;
       renderMain(); pushHistory();
     }
+    else if(action==='open-compare'){
+      state.comparePicking = true; state.compareQuery = '';
+      renderMain(); pushHistory();
+    }
+    else if(action==='pick-compare'){
+      state.compareWith = id; state.comparePicking = false;
+      renderMain(); pushHistory();
+    }
+    else if(action==='close-compare'){
+      const insideCard = e.target.closest('.modal-glass-card');
+      const onBtn = e.target.closest('.modal-close-btn');
+      if(insideCard && !onBtn) return;
+      // Step back to the profile this started from rather than closing outright.
+      goBack(()=>{ state.comparePicking = false; state.compareWith = null; });
+    }
+    else if(action==='export-oshi'){ exportOshi(); }
+    else if(action==='import-oshi'){ importOshi(); }
     else if(action==='share'){
       const m = state.selectedId ? getMember(state.selectedId) : null;
       const ev = state.selectedEvent ? SEED_SCHEDULE.find(x=>x.id===state.selectedEvent) : null;
@@ -5133,6 +5442,13 @@ function bindDelegatedEvents(){
 
   document.body.addEventListener('input', (e)=>{
     if(e.target.id==='search-input'){ state.query = e.target.value; renderMain(); replaceHistory(); }
+    else if(e.target.id==='cmp-search'){
+      state.compareQuery = e.target.value;
+      const caret = e.target.selectionStart;
+      renderMain();
+      const again = document.getElementById('cmp-search');
+      if(again){ again.focus(); try{ again.setSelectionRange(caret, caret); }catch(err){} }
+    }
     else if(ADV_INPUTS[e.target.id]){
       state[ADV_INPUTS[e.target.id]] = e.target.value;
       const id = e.target.id, caret = e.target.selectionStart;
