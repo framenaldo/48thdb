@@ -728,6 +728,21 @@
 
   /* birthdays */
   .bday-next{ display:flex; gap:10px; overflow-x:auto; padding:2px 0 8px; -webkit-overflow-scrolling:touch; }
+  /* A chip sliced in half at the edge reads as broken rather than as "there
+     is more"; the row fades out instead, on whichever side still has chips
+     past it. */
+  .bday-next.fade-end:not(.fade-start){
+    -webkit-mask-image:linear-gradient(to right, #000 78%, transparent 100%);
+    mask-image:linear-gradient(to right, #000 78%, transparent 100%);
+  }
+  .bday-next.fade-start:not(.fade-end){
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 14%);
+    mask-image:linear-gradient(to right, transparent 0, #000 14%);
+  }
+  .bday-next.fade-start.fade-end{
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 14%, #000 78%, transparent 100%);
+    mask-image:linear-gradient(to right, transparent 0, #000 14%, #000 78%, transparent 100%);
+  }
   .bday-next::-webkit-scrollbar{ display:none; }
   .bday-chip{
     flex:0 0 auto; display:flex; align-items:center; gap:9px; cursor:pointer; text-align:left;
@@ -940,7 +955,11 @@
     border-color:color-mix(in srgb, var(--c) 50%, var(--glass-edge));
     box-shadow:0 5px 22px color-mix(in srgb, var(--c) 18%, transparent);
   }
-  .ev-date{ flex:none; width:68px; display:flex; flex-direction:column; gap:4px; padding-top:2px; }
+  .ev-date{
+    flex:none; width:68px; display:flex; flex-direction:column; gap:4px;
+    padding:2px 12px 2px 0;
+    border-right:1px solid color-mix(in srgb, var(--ink-soft) 20%, transparent);
+  }
   .ev-d{ font-size:15px; font-weight:800; line-height:1.2; letter-spacing:-.01em; }
   .ev-time{ font-size:11.5px; font-weight:700; color:var(--ink-soft); letter-spacing:.01em; }
   .ev-when{
@@ -1149,7 +1168,7 @@
     .bday-today{ flex:1 1 calc(50% - 5px); max-width:none; padding:4px 6px 8px; }
     .bday-today-face{ width:84px; height:84px; font-size:26px; }
     .ev-card{ padding:13px 13px; gap:11px; }
-    .ev-date{ width:64px; }
+    .ev-date{ width:64px; padding-right:10px; }
     .ev-d{ font-size:13.5px; }
     .ev-title{ font-size:14.5px; }
   }
@@ -4444,6 +4463,7 @@ function renderMain(){
   syncBodyScrollLock();
   attachMainEvents();
   startBirthdayFireworks();
+  bindEdgeFades();
 }
 
 function updateOshiButtonsFor(id){
@@ -4697,6 +4717,20 @@ function goBack(fallback){
 // iOS keeps :active on whatever the finger first touched while the page
 // scrolls, so a row lit up as if pressed halfway through a swipe. The press
 // styling is muted for as long as anything is scrolling.
+/* The mask has to know which side still has chips past it, which only the
+   scroll position can say. */
+function bindEdgeFades(){
+  document.querySelectorAll('.bday-next').forEach(row => {
+    const sync = () => {
+      const max = row.scrollWidth - row.clientWidth;
+      row.classList.toggle('fade-start', row.scrollLeft > 4);
+      row.classList.toggle('fade-end', max > 4 && row.scrollLeft < max - 4);
+    };
+    row.addEventListener('scroll', sync, {passive:true});
+    sync();
+  });
+}
+
 function bindScrollPressGuard(){
   let t;
   const mark = ()=>{
