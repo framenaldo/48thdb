@@ -930,6 +930,7 @@
   }
   .ev-date{ flex:none; width:68px; display:flex; flex-direction:column; gap:4px; padding-top:2px; }
   .ev-d{ font-size:15px; font-weight:800; line-height:1.2; letter-spacing:-.01em; }
+  .ev-time{ font-size:11.5px; font-weight:700; color:var(--ink-soft); letter-spacing:.01em; }
   .ev-when{
     display:inline-block; font-size:10px; font-weight:800; letter-spacing:.03em;
     color:#fff; background:var(--c); border-radius:999px; padding:2px 7px;
@@ -1968,22 +1969,36 @@ const SEED_SCHEDULE = [
     members:['bnk-pancake'] },
   { id:'ev-media-0908', start:'2026-09-08', title:'To be announced',
     venue:'Bangkok', tag:'media', tba:true },
-  { id:'ev-micha-patt-bday', start:'2026-09-12',
+  { id:'ev-micha-patt-bday', start:'2026-09-12', time:'13:00',
     title:'Micha BNK48 & Patt BNK48\'s Birthday Fanmeet',
-    venue:'the Bazaar hotel Bangkok, Bangkok',
-    members:['bnk-micha','bnk-patt','bnk-arlee','bnk-emmy','bnk-grape','bnk-marine','bnk-monet','bnk-sindy','bnk-wawa'] },
-  { id:'ev-berry-sindy-bday', start:'2026-09-12',
+    venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
+    members:['bnk-micha','bnk-patt','bnk-arlee','bnk-emmy','bnk-grape','bnk-marine','bnk-monet','bnk-sindy','bnk-jew'],
+    info:['Jew ขึ้นแสดงแทน Wawa ซึ่งถอนตัวจากทั้งสองรอบของวันที่ 12 ก.ย. ด้วยปัญหาสุขภาพ',
+      'บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
+      'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
+  { id:'ev-berry-sindy-bday', start:'2026-09-12', time:'17:00',
     title:'Berry BNK48 & Sindy BNK48\'s Birthday Fanmeet',
-    venue:'the Bazaar hotel Bangkok, Bangkok',
-    members:['bnk-berry','bnk-sindy','bnk-grape','bnk-inkcha','bnk-l','bnk-marine','bnk-palmmy','bnk-patt','bnk-proud','bnk-wawa'] },
-  { id:'ev-emmy-bday', start:'2026-09-13',
+    venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
+    members:['bnk-berry','bnk-sindy','bnk-grape','bnk-inkcha','bnk-l','bnk-marine','bnk-palmmy','bnk-patt','bnk-proud'],
+    info:['Wawa ถอนตัวด้วยปัญหาสุขภาพ รอบนี้แสดงต่อด้วยสมาชิกที่เหลือ ไม่มีคนขึ้นแทน',
+      'บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
+      'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
+  { id:'ev-emmy-bday', start:'2026-09-13', time:'13:00',
     title:'Emmy BNK48\'s Birthday Fanmeet',
-    venue:'the Bazaar hotel Bangkok, Bangkok',
-    members:['bnk-emmy','bnk-jew','bnk-micha','bnk-monet','bnk-palmmy','bnk-praew'] },
-  { id:'ev-hoop-bday-said', start:'2026-09-13',
-    title:'"My birthday is next week," Hoop said',
-    venue:'the Bazaar hotel Bangkok, Bangkok',
-    members:['bnk-hoop'] },
+    venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
+    members:['bnk-emmy','bnk-jew','bnk-micha','bnk-monet','bnk-palmmy','bnk-praew'],
+    info:['บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
+      'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
+  { id:'ev-hoop-bday-said', start:'2026-09-13', time:'17:00',
+    title:'"My Birthday is ... Next Week" Hoop Said',
+    venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
+    members:['bnk-hoop'],
+    info:['บัตร 999 บาท',
+      'ของที่ระลึก: รูปถ่ายหลังการแสดงรอบนั้น 1 ภาพ',
+      'ลุ้นรับรางวัลจาก Hoop 6 รางวัล',
+      'Hi-Bye VDO OK',
+      'บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
+      'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
   { id:'ev-getaway-pudthailee', start:'2026-09-18', end:'2026-09-20',
     title:'Get Away with Pudthailee',
     venue:'Hua Hin, Prachuap Khiri Khan',
@@ -3159,6 +3174,7 @@ function renderEventCard(ev, todayIso){
     ${hasMore ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="ev-date">
       <span class="ev-d">${eventDateLabel(ev)}</span>
+      ${ev.time ? `<span class="ev-time">${ev.time}</span>` : ''}
       ${when ? `<span class="ev-when">${when}</span>` : ''}
     </div>
     <div class="ev-body">
@@ -3201,7 +3217,7 @@ function renderEventModal(){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
       <div class="modal-scroll">
-        <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}</p>
+        <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
         <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
         ${ev.venue ? `<p class="evm-venue">${escapeHtml(ev.venue)}</p>` : ''}
         ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
