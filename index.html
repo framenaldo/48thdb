@@ -57,6 +57,8 @@
     /* One knob scales every frosted-white overlay, so the whole glass
        treatment can be dialled down at once for the dark palette. */
     --glass-k:1;
+    --glass-card:rgba(255,255,255,.58);
+    --glass-edge:rgba(255,255,255,.85);
     --shadow-rgb:28,19,41;
     --bg-body:
       radial-gradient(circle at 8% 8%, rgba(255,111,165,.35), transparent 40%),
@@ -89,6 +91,8 @@
     --danger-soft:#3B2020;
     --scrim:rgba(0,0,0,.62);
     --glass-k:.14;
+    --glass-card:rgba(255,255,255,.055);
+    --glass-edge:rgba(255,255,255,.12);
     --shadow-rgb:0,0,0;
     --bg-body:
       radial-gradient(circle at 8% 8%, rgba(255,111,165,.16), transparent 40%),
@@ -848,17 +852,15 @@
   .bday-today-grid{ display:flex; flex-wrap:wrap; gap:10px; }
   .bday-today{
     flex:1 1 150px; max-width:210px; display:flex; flex-direction:column; align-items:center;
-    gap:3px; padding:16px 12px 13px; cursor:pointer; text-align:center;
-    background:color-mix(in srgb, var(--c) 9%, var(--card));
-    border:1px solid color-mix(in srgb, var(--c) 42%, transparent);
-    border-radius:16px;
-    transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out);
+    gap:3px; padding:6px 10px 10px; cursor:pointer; text-align:center;
+    background:none; border:none;
+    transition:transform .2s var(--ease-out);
   }
   .bday-today-face{
-    width:74px; height:74px; border-radius:50%; position:relative; overflow:hidden;
-    display:grid; place-items:center; color:#fff; font-size:24px; font-weight:800;
-    box-shadow:0 0 0 2.5px var(--card), 0 0 0 5px var(--gold);
-    margin-bottom:7px;
+    width:96px; height:96px; border-radius:50%; position:relative; overflow:hidden;
+    display:grid; place-items:center; color:#fff; font-size:30px; font-weight:800;
+    box-shadow:0 0 0 3px var(--gold), 0 10px 26px rgba(var(--shadow-rgb),.18);
+    margin-bottom:11px;
   }
   .bday-today-name{ font-size:16px; font-weight:800; line-height:1.2; }
   .bday-today-sub{ font-size:11.5px; color:var(--ink-soft); }
@@ -869,27 +871,35 @@
   }
 
   .ev-card{
-    display:flex; gap:12px; padding:13px 14px; margin:0 0 9px;
-    background:var(--card); border:1px solid var(--line);
-    border-radius:14px;
-    background:linear-gradient(to right, var(--c) 0 4px, var(--card) 4px);
-    border-left-color:transparent;
+    display:flex; gap:14px; padding:15px 16px; margin:0 0 10px;
+    background:var(--glass-card);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid var(--glass-edge);
+    border-radius:17px;
+    box-shadow:0 5px 20px rgba(var(--shadow-rgb),.07);
   }
-  .ev-card.is-now{ box-shadow:0 0 0 1.5px color-mix(in srgb, var(--c) 55%, transparent); }
-  .ev-date{ flex:none; width:66px; display:flex; flex-direction:column; gap:3px; padding-top:1px; }
-  .ev-d{ font-size:13px; font-weight:800; line-height:1.25; }
+  /* Anything on today gets the group's colour on its edge; the rest stay
+     plain so the one happening now is the only thing shouting. */
+  .ev-card.is-now{
+    border-color:color-mix(in srgb, var(--c) 50%, var(--glass-edge));
+    box-shadow:0 5px 22px color-mix(in srgb, var(--c) 18%, transparent);
+  }
+  .ev-date{ flex:none; width:68px; display:flex; flex-direction:column; gap:4px; padding-top:2px; }
+  .ev-d{ font-size:15px; font-weight:800; line-height:1.2; letter-spacing:-.01em; }
   .ev-when{
-    font-size:10.5px; font-weight:700; color:var(--c);
-    padding:1px 0; letter-spacing:.02em;
+    display:inline-block; font-size:10px; font-weight:800; letter-spacing:.03em;
+    color:#fff; background:var(--c); border-radius:999px; padding:2px 7px;
+    align-self:flex-start; white-space:nowrap;
   }
   .ev-body{ min-width:0; flex:1; }
-  .ev-title{ margin:0; font-size:14.5px; font-weight:700; line-height:1.35; }
+  .ev-title{ margin:0; font-size:16px; font-weight:800; line-height:1.32; letter-spacing:-.01em; }
   .ev-tag{
     display:inline-block; font-size:9.5px; font-weight:800; letter-spacing:.06em;
     padding:2px 7px; border-radius:999px; margin-right:6px; vertical-align:1px;
     background:var(--paper-dim); color:var(--ink-soft);
   }
-  .ev-venue{ margin:4px 0 0; font-size:12px; color:var(--ink-soft); line-height:1.4; }
+  .ev-venue{ margin:6px 0 0; font-size:11.5px; color:var(--ink-soft); line-height:1.45; opacity:.9; }
   .ev-groups{ display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
   .ev-group{
     font-size:10px; font-weight:800; letter-spacing:.04em; padding:2px 8px;
@@ -900,7 +910,7 @@
   .ev-person{
     display:inline-flex; align-items:center; gap:5px; cursor:pointer;
     padding:3px 9px 3px 3px; border-radius:999px;
-    background:var(--card); border:1px solid color-mix(in srgb, var(--c) 40%, var(--line));
+    background:var(--glass-card); border:1px solid var(--glass-edge);
     font-size:11.5px; font-weight:700; color:inherit;
     transition:border-color .16s ease, transform .16s ease;
   }
@@ -914,7 +924,8 @@
     display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
     padding:11px 14px; cursor:pointer; font:inherit; color:var(--ink-soft);
     font-weight:700; font-size:13px;
-    background:var(--paper-dim); border:1px solid var(--line); border-radius:12px;
+    background:var(--glass-card); border:1px solid var(--glass-edge); border-radius:13px;
+    backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
   }
   .past-list{ margin-top:10px; }
 
@@ -935,11 +946,12 @@
   }
   @media (max-width:560px){
     .feed-title{ font-size:23px; }
-    .bday-today{ flex:1 1 calc(50% - 5px); max-width:none; padding:14px 8px 11px; }
-    .bday-today-face{ width:62px; height:62px; font-size:21px; }
-    .ev-card{ padding:11px 12px; gap:10px; }
-    .ev-date{ width:56px; }
-    .ev-title{ font-size:13.5px; }
+    .bday-today{ flex:1 1 calc(50% - 5px); max-width:none; padding:4px 6px 8px; }
+    .bday-today-face{ width:84px; height:84px; font-size:26px; }
+    .ev-card{ padding:13px 13px; gap:11px; }
+    .ev-date{ width:64px; }
+    .ev-d{ font-size:13.5px; }
+    .ev-title{ font-size:14.5px; }
   }
 
   /* oshi / kami oshi */
@@ -3118,18 +3130,6 @@ function renderFeed(){
       </div>
     </section>` : ''}
 
-    ${nowOn.length ? `
-    <section class="feed-block">
-      <h2 class="section-label">กำลังมีงานวันนี้</h2>
-      ${nowOn.map(e => renderEventCard(e, iso)).join('')}
-    </section>` : ''}
-
-    <section class="feed-block">
-      <h2 class="section-label">ตารางงานที่จะถึง</h2>
-      ${soon.length ? soon.map(e => renderEventCard(e, iso)).join('')
-        : `<p class="muted-note">ยังไม่มีงานที่ประกาศไว้ล่วงหน้า</p>`}
-    </section>
-
     <section class="feed-block">
       <h2 class="section-label">วันเกิดที่ใกล้ถึง</h2>
       <div class="bday-next">
@@ -3144,6 +3144,19 @@ function renderFeed(){
         }).join('')}
       </div>
     </section>
+
+    ${nowOn.length ? `
+    <section class="feed-block">
+      <h2 class="section-label">กำลังมีงานวันนี้</h2>
+      ${nowOn.map(e => renderEventCard(e, iso)).join('')}
+    </section>` : ''}
+
+    <section class="feed-block">
+      <h2 class="section-label">ตารางงานที่จะถึง</h2>
+      ${soon.length ? soon.map(e => renderEventCard(e, iso)).join('')
+        : `<p class="muted-note">ยังไม่มีงานที่ประกาศไว้ล่วงหน้า</p>`}
+    </section>
+
 
     ${past.length ? `
     <section class="feed-block">
