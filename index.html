@@ -849,7 +849,12 @@
   .feed-block{ margin:0 0 22px; }
   .feed-block .section-label{ margin:0 0 10px; }
 
-  .bday-today-grid{ display:flex; flex-wrap:wrap; gap:10px; }
+  .bday-today-wrap{ position:relative; }
+  .bday-fx{
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:0;
+  }
+  .bday-today-grid{ position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
   .bday-today{
     flex:1 1 150px; max-width:210px; display:flex; flex-direction:column; align-items:center;
     gap:3px; padding:6px 10px 10px; cursor:pointer; text-align:center;
@@ -858,6 +863,7 @@
   }
   .bday-today-face{
     width:96px; height:96px; border-radius:50%; position:relative; overflow:hidden;
+    transition:transform .26s var(--ease-out), box-shadow .26s var(--ease-out);
     display:grid; place-items:center; color:#fff; font-size:30px; font-weight:800;
     box-shadow:0 0 0 3px var(--gold), 0 10px 26px rgba(var(--shadow-rgb),.18);
     margin-bottom:11px;
@@ -940,7 +946,10 @@
   .sub-tab.active{ background:var(--ink); color:var(--card); border-color:var(--ink); }
 
   @media (hover:hover){
-    .bday-today:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(var(--shadow-rgb),.12); }
+    .bday-today:hover .bday-today-face{
+      transform:translateY(-3px) scale(1.04);
+      box-shadow:0 0 0 3px var(--gold), 0 16px 32px rgba(var(--shadow-rgb),.24);
+    }
     .ev-person:hover{ border-color:var(--c); transform:translateY(-1px); }
     .past-toggle:hover{ color:var(--ink); }
   }
@@ -3090,6 +3099,97 @@ function renderEventCard(ev, todayIso){
   </article>`;
 }
 
+
+/* A birthday only happens once a year, so the day's card gets fireworks.
+   Rockets rise from the bottom and burst in the group's colours. One rAF
+   loop that stops itself when the canvas leaves the page, so switching tabs
+   does not leave it spinning. */
+let _fxStop = null;
+function startBirthdayFireworks(){
+  if(_fxStop){ _fxStop(); _fxStop = null; }
+  const canvas = document.querySelector('.bday-fx');
+  if(!canvas) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const ctx = canvas.getContext('2d');
+  const COLOURS = GROUPS.map(g=>g.color).concat(['#E8C25A','#FFFFFF']);
+  let w = 0, h = 0, dpr = 1, raf = 0, running = true;
+  let rockets = [], sparks = [], next = 0;
+
+  function size(){
+    const r = canvas.getBoundingClientRect();
+    if(!r.width) return false;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = r.width; h = r.height;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return true;
+  }
+  if(!size()) return;
+
+  const rand = (a,b) => a + Math.random()*(b-a);
+
+  function launch(){
+    rockets.push({
+      x: rand(w*0.15, w*0.85), y: h,
+      vy: -rand(h*0.011, h*0.016),
+      target: rand(h*0.16, h*0.46),
+      colour: COLOURS[(Math.random()*COLOURS.length)|0]
+    });
+  }
+  function burst(r){
+    const n = 22 + ((Math.random()*10)|0);
+    for(let i=0; i<n; i++){
+      const a = (Math.PI*2*i)/n + rand(-0.09, 0.09);
+      const sp = rand(0.9, 2.7);
+      sparks.push({ x:r.x, y:r.y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp,
+        life:1, decay:rand(0.012, 0.024), colour:r.colour });
+    }
+  }
+
+  function frame(t){
+    if(!running) return;
+    if(!canvas.isConnected){ stop(); return; }
+    ctx.clearRect(0, 0, w, h);
+
+    if(t > next){ launch(); next = t + rand(650, 1500); }
+
+    rockets = rockets.filter(r=>{
+      r.y += r.vy; r.vy += 0.045;
+      const done = r.y <= r.target || r.vy >= 0;
+      if(done){ burst(r); return false; }
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = r.colour;
+      ctx.beginPath(); ctx.arc(r.x, r.y, 1.8, 0, Math.PI*2); ctx.fill();
+      return true;
+    });
+
+    sparks = sparks.filter(s=>{
+      s.x += s.vx; s.y += s.vy;
+      s.vy += 0.032; s.vx *= 0.985; s.vy *= 0.985;
+      s.life -= s.decay;
+      if(s.life <= 0) return false;
+      ctx.globalAlpha = Math.max(0, s.life);
+      ctx.fillStyle = s.colour;
+      ctx.beginPath(); ctx.arc(s.x, s.y, 1.9 * s.life + 0.5, 0, Math.PI*2); ctx.fill();
+      return true;
+    });
+
+    ctx.globalAlpha = 1;
+    raf = requestAnimationFrame(frame);
+  }
+
+  function onResize(){ size(); }
+  function stop(){
+    running = false;
+    cancelAnimationFrame(raf);
+    window.removeEventListener('resize', onResize);
+  }
+  window.addEventListener('resize', onResize);
+  _fxStop = stop;
+  raf = requestAnimationFrame(frame);
+}
+
 function renderFeed(){
   const today = todayStart();
   const iso = toYmd(today);
@@ -3115,6 +3215,8 @@ function renderFeed(){
     ${todays.length ? `
     <section class="feed-block">
       <h2 class="section-label">วันเกิดวันนี้</h2>
+      <div class="bday-today-wrap">
+      <canvas class="bday-fx" aria-hidden="true"></canvas>
       <div class="bday-today-grid">
         ${todays.map(m => {
           const g = getGroup(m.groupId);
@@ -3127,6 +3229,7 @@ function renderFeed(){
             <span class="bday-today-group" style="--c:${g.color}">${g.name}</span>
           </button>`;
         }).join('')}
+      </div>
       </div>
     </section>` : ''}
 
@@ -3944,6 +4047,7 @@ function renderMain(){
   }
   syncBodyScrollLock();
   attachMainEvents();
+  startBirthdayFireworks();
 }
 
 function updateOshiButtonsFor(id){
