@@ -713,7 +713,8 @@
   .bday-next::-webkit-scrollbar{ display:none; }
   .bday-chip{
     flex:0 0 auto; display:flex; align-items:center; gap:9px; cursor:pointer; text-align:left;
-    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--c,var(--ink));
+    border:1px solid var(--line); border-left-color:transparent;
+    background:linear-gradient(to right, var(--c,var(--ink)) 0 4px, var(--card) 4px);
     border-radius:10px; padding:9px 13px 9px 11px; font-family:'Noto Sans Thai',sans-serif;
     color:var(--ink); box-shadow:0 1px 3px rgba(var(--shadow-rgb),.08);
   }
@@ -836,6 +837,110 @@
   }
   .profile-dropdown button:hover{ background:var(--paper-dim); }
   .profile-dropdown button.danger{ color:var(--danger); }
+
+  /* ---------------------------- feed ---------------------------- */
+  .feed-head{ margin:2px 0 16px; }
+  .feed-today{ margin:0; font-size:12.5px; color:var(--ink-soft); letter-spacing:.02em; }
+  .feed-title{ margin:2px 0 0; font-size:27px; font-weight:800; letter-spacing:-.01em; }
+  .feed-block{ margin:0 0 22px; }
+  .feed-block .section-label{ margin:0 0 10px; }
+
+  .bday-today-grid{ display:flex; flex-wrap:wrap; gap:10px; }
+  .bday-today{
+    flex:1 1 150px; max-width:210px; display:flex; flex-direction:column; align-items:center;
+    gap:3px; padding:16px 12px 13px; cursor:pointer; text-align:center;
+    background:color-mix(in srgb, var(--c) 9%, var(--card));
+    border:1px solid color-mix(in srgb, var(--c) 42%, transparent);
+    border-radius:16px;
+    transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out);
+  }
+  .bday-today-face{
+    width:74px; height:74px; border-radius:50%; position:relative; overflow:hidden;
+    display:grid; place-items:center; color:#fff; font-size:24px; font-weight:800;
+    box-shadow:0 0 0 2.5px var(--card), 0 0 0 5px var(--gold);
+    margin-bottom:7px;
+  }
+  .bday-today-name{ font-size:16px; font-weight:800; line-height:1.2; }
+  .bday-today-sub{ font-size:11.5px; color:var(--ink-soft); }
+  .bday-today-age{ font-size:12.5px; font-weight:700; color:var(--gold); margin-top:2px; }
+  .bday-today-group{
+    margin-top:5px; font-size:10.5px; font-weight:800; letter-spacing:.04em;
+    padding:2px 9px; border-radius:999px; color:#fff; background:var(--c);
+  }
+
+  .ev-card{
+    display:flex; gap:12px; padding:13px 14px; margin:0 0 9px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:14px;
+    background:linear-gradient(to right, var(--c) 0 4px, var(--card) 4px);
+    border-left-color:transparent;
+  }
+  .ev-card.is-now{ box-shadow:0 0 0 1.5px color-mix(in srgb, var(--c) 55%, transparent); }
+  .ev-date{ flex:none; width:66px; display:flex; flex-direction:column; gap:3px; padding-top:1px; }
+  .ev-d{ font-size:13px; font-weight:800; line-height:1.25; }
+  .ev-when{
+    font-size:10.5px; font-weight:700; color:var(--c);
+    padding:1px 0; letter-spacing:.02em;
+  }
+  .ev-body{ min-width:0; flex:1; }
+  .ev-title{ margin:0; font-size:14.5px; font-weight:700; line-height:1.35; }
+  .ev-tag{
+    display:inline-block; font-size:9.5px; font-weight:800; letter-spacing:.06em;
+    padding:2px 7px; border-radius:999px; margin-right:6px; vertical-align:1px;
+    background:var(--paper-dim); color:var(--ink-soft);
+  }
+  .ev-venue{ margin:4px 0 0; font-size:12px; color:var(--ink-soft); line-height:1.4; }
+  .ev-groups{ display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+  .ev-group{
+    font-size:10px; font-weight:800; letter-spacing:.04em; padding:2px 8px;
+    border-radius:999px; color:#fff; background:var(--c);
+  }
+  .ev-tba{ margin:7px 0 0; font-size:12px; color:var(--ink-soft); font-style:italic; }
+  .ev-people{ display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
+  .ev-person{
+    display:inline-flex; align-items:center; gap:5px; cursor:pointer;
+    padding:3px 9px 3px 3px; border-radius:999px;
+    background:var(--card); border:1px solid color-mix(in srgb, var(--c) 40%, var(--line));
+    font-size:11.5px; font-weight:700; color:inherit;
+    transition:border-color .16s ease, transform .16s ease;
+  }
+  .ev-person .avatar-sm{ width:20px; height:20px; font-size:10px; flex:none; }
+  .ev-person.is-oshi{ border-color:var(--gold); background:color-mix(in srgb, var(--gold) 12%, var(--card)); }
+  .ev-detail{ margin:9px 0 0; padding-left:16px; }
+  .ev-detail li{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; }
+  .ev-mine{ margin:8px 0 0; font-size:11.5px; font-weight:700; color:var(--gold); }
+
+  .past-toggle{
+    display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
+    padding:11px 14px; cursor:pointer; font:inherit; color:var(--ink-soft);
+    font-weight:700; font-size:13px;
+    background:var(--paper-dim); border:1px solid var(--line); border-radius:12px;
+  }
+  .past-list{ margin-top:10px; }
+
+  /* the two screens sharing one nav tab */
+  .sub-tabs{ display:flex; gap:6px; margin:0 0 14px; }
+  .sub-tab{
+    flex:1; padding:9px 12px; cursor:pointer; font:inherit; font-weight:700; font-size:13.5px;
+    color:var(--ink-soft); background:var(--paper-dim);
+    border:1px solid var(--line); border-radius:11px;
+    transition:background .16s ease, color .16s ease, border-color .16s ease;
+  }
+  .sub-tab.active{ background:var(--ink); color:var(--card); border-color:var(--ink); }
+
+  @media (hover:hover){
+    .bday-today:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(var(--shadow-rgb),.12); }
+    .ev-person:hover{ border-color:var(--c); transform:translateY(-1px); }
+    .past-toggle:hover{ color:var(--ink); }
+  }
+  @media (max-width:560px){
+    .feed-title{ font-size:23px; }
+    .bday-today{ flex:1 1 calc(50% - 5px); max-width:none; padding:14px 8px 11px; }
+    .bday-today-face{ width:62px; height:62px; font-size:21px; }
+    .ev-card{ padding:11px 12px; gap:10px; }
+    .ev-date{ width:56px; }
+    .ev-title{ font-size:13.5px; }
+  }
 
   /* oshi / kami oshi */
   .crown-ico{ display:inline-flex; width:15px; height:15px; vertical-align:-2px; color:var(--gold); }
@@ -1725,6 +1830,79 @@ const SEED_ALBUMS = [
   { id:'cgm-a3', groupId:'cgm48', num:3, title:'Hokori no Oka', alt:'เนินเขาแห่งความฝัน', year:2025, singles:['cgm-s7', 'cgm-s8', 'cgm-s9'] },
 ];
 
+/* Event schedule, read from the posters in Documents/48TH/Schedule.
+   Past events are kept: they are what anniversary lookups will read.
+   `members` are ids so an event links to profiles; `groups` covers the
+   entries that name a whole group rather than a line-up. */
+const SEED_SCHEDULE = [
+  { id:'ev-nipponhaku-2026', start:'2026-08-28', end:'2026-08-30',
+    title:'NIPPON HAKU BANGKOK 2026',
+    venue:'Queen Sirikit National Convention Center, Bangkok',
+    groups:['bnk48','cgm48'],
+    members:['bnk-hoop','bnk-janry','bnk-l','cgm-lookked','cgm-nana','cgm-jingjing'],
+    detail:[
+      '30 ส.ค. — Pancake BNK48 Solo Single "Yume de Kiss me!" เวทีแรก',
+      '28 ส.ค. 10:00 Opening Ceremony — Hoop, Janry, L, Lookked, Nana, Jingjing',
+      '29 ส.ค. 18:30 CGM48 Performance Stage — CGM48 ทั้งวง',
+      '30 ส.ค. 20:00 BNK48 Performance Stage — BNK48 ทั้งวง'
+    ] },
+  { id:'ev-charity-football-2026', start:'2026-08-29',
+    title:'CHARITY FOOTBALL MATCH 2026',
+    venue:'Thunderdome Stadium, Nonthaburi',
+    members:['bnk-blythe','bnk-luksorn','bnk-mail','bnk-mint','bnk-mirin','bnk-praew'] },
+  { id:'ev-pancake-perfume', start:'2026-09-05',
+    title:'Pancake BNK48\'s Solo Single "Yume de Kiss me!" Perfume Crafting Workshop',
+    venue:'SIAMSQUARE Soi 10, Bangkok',
+    members:['bnk-pancake'] },
+  { id:'ev-media-0905', start:'2026-09-05', title:'To be announced',
+    venue:'Bangkok', tag:'media', tba:true },
+  { id:'ev-roadshow-0905', start:'2026-09-05', end:'2026-09-06',
+    title:'BNK48 6th Album "Ponytail to Shushu" Roadshow / CGM48 5th Generation "Kibou Ressha" Special Roadshow',
+    venue:'PRE-FUNCTION MCC HALL FL.4, THE MALL LIFESTORE NGAMWONGWAN, Nonthaburi',
+    members:['bnk-arlee','bnk-blythe','bnk-jew','bnk-khowjow','bnk-luksorn','bnk-praew','bnk-nall',
+      'cgm-chifa','cgm-lewlew','cgm-namphet','cgm-punpon','cgm-tara'],
+    detail:[
+      '5 ก.ย. — Arlee, Blythe, Jew, Khowjow, Luksorn, Praew, Chifa, Lewlew, Namphet, Punpon, Tara',
+      '6 ก.ย. — Blythe, Jew, Khowjow, Luksorn, Nall, Praew, Chifa, Lewlew, Namphet, Punpon, Tara'
+    ] },
+  { id:'ev-pancake-captured', start:'2026-09-06',
+    title:'Pancake BNK48\'s Solo Single "Yume de Kiss me!" Captured Moment',
+    venue:'UNION CO-EVENT STUDIO 5 FL., UNION MALL, Bangkok',
+    members:['bnk-pancake'] },
+  { id:'ev-media-0908', start:'2026-09-08', title:'To be announced',
+    venue:'Bangkok', tag:'media', tba:true },
+  { id:'ev-micha-patt-bday', start:'2026-09-12',
+    title:'Micha BNK48 & Patt BNK48\'s Birthday Fanmeet',
+    venue:'the Bazaar hotel Bangkok, Bangkok',
+    members:['bnk-micha','bnk-patt','bnk-arlee','bnk-emmy','bnk-grape','bnk-marine','bnk-monet','bnk-sindy','bnk-wawa'] },
+  { id:'ev-berry-sindy-bday', start:'2026-09-12',
+    title:'Berry BNK48 & Sindy BNK48\'s Birthday Fanmeet',
+    venue:'the Bazaar hotel Bangkok, Bangkok',
+    members:['bnk-berry','bnk-sindy','bnk-grape','bnk-inkcha','bnk-l','bnk-marine','bnk-palmmy','bnk-patt','bnk-proud','bnk-wawa'] },
+  { id:'ev-emmy-bday', start:'2026-09-13',
+    title:'Emmy BNK48\'s Birthday Fanmeet',
+    venue:'the Bazaar hotel Bangkok, Bangkok',
+    members:['bnk-emmy','bnk-jew','bnk-micha','bnk-monet','bnk-palmmy','bnk-praew'] },
+  { id:'ev-hoop-bday-said', start:'2026-09-13',
+    title:'"My birthday is next week," Hoop said',
+    venue:'the Bazaar hotel Bangkok, Bangkok',
+    members:['bnk-hoop'] },
+  { id:'ev-getaway-pudthailee', start:'2026-09-18', end:'2026-09-20',
+    title:'Get Away with Pudthailee',
+    venue:'Hua Hin, Prachuap Khiri Khan',
+    members:['bnk-hoop'] },
+  { id:'ev-roadshow-mbk', start:'2026-09-19', end:'2026-09-20',
+    title:'BNK48 6th Album "Ponytail to Shushu" Roadshow',
+    venue:'MBK Center, Bangkok', groups:['bnk48'], lineupTba:true },
+  { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27',
+    title:'CGM48 11th Single "Koi Tsunjatta — Let me know!" Roadshow',
+    venue:'Fashion Island, Bangkok', groups:['cgm48'], lineupTba:true },
+  { id:'ev-tba-0927', start:'2026-09-27', title:'To be announced',
+    venue:'Bangkok', tba:true },
+  { id:'ev-media-0930', start:'2026-09-30', title:'To be announced',
+    venue:'Bangkok', tag:'media', tba:true },
+];
+
 const SEED_SENBATSU = {
   'bnk-s1': [
     { track:'Aitakatta (อยากจะได้พบเธอ)', centers:['bnk-music'],
@@ -2172,6 +2350,8 @@ const SEED_SENBATSU = {
   ],
 };
 const ICONS = {
+  home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>`,
+  homeFilled:`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3 3 10.5V20h18v-9.5L12 3Z"/></svg>`,
   members: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>`,
   membersFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>`,
   favorites: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5l2.72 5.83 6.28.62-4.7 4.36 1.34 6.19L12 17.3l-5.64 3.2 1.34-6.19-4.7-4.36 6.28-.62z"/></svg>`,
@@ -2193,7 +2373,7 @@ const ICONS = {
 
 // ============================= STATE =============================
 let state = {
-  view:'browse', members:[], oshi:[], kamiOshi:null,
+  view:'feed', pastOpen:false, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
@@ -2330,7 +2510,7 @@ async function saveOshiData(){
 function renderHeader(){
   return `
   <header class="top">
-    <div class="wordmark" data-action="nav-select" data-value="browse" style="cursor:pointer;">48thDB<small>48 THAILAND DATABASE</small></div>
+    <div class="wordmark" data-action="nav-select" data-value="feed" style="cursor:pointer;">48thDB<small>48 THAILAND DATABASE</small></div>
     <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก..." value="${escapeAttr(state.query)}">
     <button class="theme-btn" data-action="toggle-theme" aria-label="สลับธีมสว่าง/มืด">${state.theme==='dark'?ICONS.sun:ICONS.moon}</button>
     <button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>
@@ -2362,14 +2542,15 @@ function renderProfileSlot(){
 }
 
 const NAV_OPTIONS = [
-  { value:'browse',      view:'browse', fav:false, icon:ICONS.members, iconActive:ICONS.membersFilled },
+  { value:'feed',        view:'feed', fav:false, icon:ICONS.home, iconActive:ICONS.homeFilled },
   { value:'groups',      view:'groups', fav:false, icon:ICONS.groups, iconActive:ICONS.groupsFilled },
   { value:'discography', view:'discography', fav:false, icon:ICONS.works, iconActive:ICONS.worksFilled },
   { value:'stats',       view:'stats', fav:false, icon:ICONS.stats, iconActive:ICONS.statsFilled },
   { value:'profile',     view:'profile', fav:false, icon:ICONS.profile, iconActive:ICONS.profileFilled }
 ];
 function currentNavValue(){
-  if(state.view==='browse') return state.favoritesOnly ? 'oshi' : 'browse';
+  if(state.view==='feed') return 'feed';
+  if(state.view==='browse') return state.favoritesOnly ? 'oshi' : 'groups';
   if(state.view==='groups') return 'groups';
   if(state.view==='discography' || state.view==='single') return 'discography';
   if(state.view==='stats') return 'stats';
@@ -2827,10 +3008,161 @@ function renderAdvFilters(){
   </div>`;
 }
 
+// ============================== FEED ==============================
+
+function todayStart(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+function toYmd(d){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')
+    + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+/* Days until the next occurrence, so December birthdays surface in January.
+   The feed and the stats page must agree, so they share this. */
+function daysUntilBirthday(m, today){
+  const [, mo, d] = m.birthday.split('-').map(Number);
+  let next = new Date(today.getFullYear(), mo-1, d);
+  if(next < today) next = new Date(today.getFullYear()+1, mo-1, d);
+  return Math.round((next - today)/86400000);
+}
+
+function eventLastDay(ev){ return ev.end || ev.start; }
+
+/* "28-30 ส.ค." for a run, "5 ก.ย." for a single day. */
+function eventDateLabel(ev){
+  const [, m1, d1] = ev.start.split('-').map(Number);
+  if(!ev.end) return d1 + ' ' + THAI_MONTHS[m1-1];
+  const [, m2, d2] = ev.end.split('-').map(Number);
+  return m1===m2 ? d1 + '-' + d2 + ' ' + THAI_MONTHS[m1-1]
+                 : d1 + ' ' + THAI_MONTHS[m1-1] + ' - ' + d2 + ' ' + THAI_MONTHS[m2-1];
+}
+
+function eventWhenLabel(ev, todayIso){
+  const last = eventLastDay(ev);
+  if(ev.start <= todayIso && last >= todayIso) return 'วันนี้';
+  const days = Math.round((parseYmd(ev.start) - parseYmd(todayIso)) / 86400000);
+  if(days === 1) return 'พรุ่งนี้';
+  if(days > 1) return 'อีก ' + days + ' วัน';
+  return '';
+}
+function parseYmd(s){ const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
+
+function renderEventCard(ev, todayIso){
+  const when = eventWhenLabel(ev, todayIso);
+  const isNow = ev.start <= todayIso && eventLastDay(ev) >= todayIso;
+  const people = (ev.members || []).map(getMember).filter(Boolean);
+  const mine = people.filter(m => state.oshi.includes(m.id));
+  const groupTags = (ev.groups || []).map(getGroup).filter(Boolean);
+  const accent = groupTags.length === 1 ? groupTags[0].color
+    : (people.length ? getGroup(people[0].groupId).color : 'var(--ink-soft)');
+  return `
+  <article class="ev-card${isNow?' is-now':''}" style="--c:${accent}">
+    <div class="ev-date">
+      <span class="ev-d">${eventDateLabel(ev)}</span>
+      ${when ? `<span class="ev-when">${when}</span>` : ''}
+    </div>
+    <div class="ev-body">
+      <h3 class="ev-title">${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}</h3>
+      ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
+      ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
+        `<span class="ev-group" style="--c:${g.color}">${g.name}</span>`).join('')}</div>` : ''}
+      ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
+      ${people.length ? `<div class="ev-people">${people.map(m=>{
+        const g = getGroup(m.groupId);
+        return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
+          data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name)}">
+          ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span>
+        </button>`; }).join('')}</div>` : ''}
+      ${ev.detail ? `<ul class="ev-detail">${ev.detail.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
+      ${mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
+    </div>
+  </article>`;
+}
+
+function renderFeed(){
+  const today = todayStart();
+  const iso = toYmd(today);
+  const dayName = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'][today.getDay()];
+
+  const withBday = activeMembers().filter(m => m.birthday);
+  const todays = withBday.filter(m => m.birthday.slice(5) === iso.slice(5));
+  const upcoming = withBday.map(m => ({ m, d: daysUntilBirthday(m, today) }))
+    .filter(x => x.d > 0).sort((a,b) => a.d - b.d).slice(0, 10);
+
+  const events = SEED_SCHEDULE.slice().sort((a,b) => a.start.localeCompare(b.start));
+  const nowOn = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
+  const soon = events.filter(e => e.start > iso);
+  const past = events.filter(e => eventLastDay(e) < iso).reverse();
+
+  return `
+  <div class="feed-page">
+    <header class="feed-head">
+      <p class="feed-today">วัน${dayName}ที่ ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()+543}</p>
+      <h1 class="feed-title">วันนี้ที่ 48</h1>
+    </header>
+
+    ${todays.length ? `
+    <section class="feed-block">
+      <h2 class="section-label">วันเกิดวันนี้</h2>
+      <div class="bday-today-grid">
+        ${todays.map(m => {
+          const g = getGroup(m.groupId);
+          const age = calcAge(m.birthday);
+          return `<button class="bday-today" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+            ${renderAvatar(m,'bday-today-face',g.color)}
+            <span class="bday-today-name">${escapeHtml(m.nameTh||m.name)}</span>
+            <span class="bday-today-sub">${escapeHtml(m.name)}</span>
+            ${age!=null ? `<span class="bday-today-age">อายุ ${age} ปี</span>` : ''}
+            <span class="bday-today-group" style="--c:${g.color}">${g.name}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </section>` : ''}
+
+    ${nowOn.length ? `
+    <section class="feed-block">
+      <h2 class="section-label">กำลังมีงานวันนี้</h2>
+      ${nowOn.map(e => renderEventCard(e, iso)).join('')}
+    </section>` : ''}
+
+    <section class="feed-block">
+      <h2 class="section-label">ตารางงานที่จะถึง</h2>
+      ${soon.length ? soon.map(e => renderEventCard(e, iso)).join('')
+        : `<p class="muted-note">ยังไม่มีงานที่ประกาศไว้ล่วงหน้า</p>`}
+    </section>
+
+    <section class="feed-block">
+      <h2 class="section-label">วันเกิดที่ใกล้ถึง</h2>
+      <div class="bday-next">
+        ${upcoming.map(({m,d}) => {
+          const g = getGroup(m.groupId);
+          const a = calcAge(m.birthday);
+          return `<button class="bday-chip" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+            ${renderAvatar(m,'avatar-sm',g.color)}
+            <span><span class="when">${d===1?'พรุ่งนี้':'อีก '+d+' วัน'}${a!=null?` · <span class="age-step"><span class="from">${a}</span><span class="arrow">→</span><span class="to">${a+1}</span></span>`:''}</span>
+            <span class="who" style="display:block;">${escapeHtml(m.nameTh||m.name)}</span></span>
+          </button>`;
+        }).join('')}
+      </div>
+    </section>
+
+    ${past.length ? `
+    <section class="feed-block">
+      <button class="past-toggle" data-action="toggle-past" aria-expanded="${state.pastOpen?'true':'false'}">
+        <span>งานที่ผ่านมา · ${past.length} งาน</span>
+        <span class="stage-caret${state.pastOpen?' is-open':''}" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </span>
+      </button>
+      ${state.pastOpen ? `<div class="past-list">${past.map(e => renderEventCard(e, iso)).join('')}</div>` : ''}
+    </section>` : ''}
+  </div>`;
+}
+
 function renderBrowse(){
   const list = filterAndSort();
   const teamsAvailable = state.groupFilter==='all' ? TEAMS : getTeamsForGroup(state.groupFilter);
   return `
+  ${renderMembersTabs()}
   <div class="filter-bar">
     ${renderGroupPills()}
     ${renderGraduatedPill()}
@@ -2936,8 +3268,16 @@ function renderDetailModal(){
   </div>`;
 }
 
+/* The member list and the group profiles share the second nav tab, so both
+   screens carry the same switch at the top. */
+function renderMembersTabs(){
+  const tab = (view, label) =>
+    `<button class="sub-tab${state.view===view?' active':''}" data-action="sub-tab" data-view="${view}">${label}</button>`;
+  return `<div class="sub-tabs">${tab('groups','ประวัติวง')}${tab('browse','สมาชิกทั้งหมด')}</div>`;
+}
+
 function renderGroups(){
-  return GROUPS.map(g=>{
+  return renderMembersTabs() + GROUPS.map(g=>{
     const teams = getTeamsForGroup(g.id);
     const count = activeMembers().filter(m=>m.groupId===g.id).length;
     const gradCount = state.members.filter(m=>m.groupId===g.id && m.graduated).length;
@@ -3572,7 +3912,8 @@ function renderMain(){
   if(navContainer) syncNav(navContainer);
   const main = document.getElementById('main');
   main.innerHTML =
-    (state.view==='browse' ? renderBrowse() :
+    (state.view==='feed' ? renderFeed() :
+    state.view==='browse' ? renderBrowse() :
     state.view==='groups' ? renderGroups() :
     state.view==='discography' ? renderDiscography() :
     state.view==='stats' ? renderStats() :
@@ -4070,6 +4411,15 @@ function bindDelegatedEvents(){
         state.selectedId = null; state.editingId = null;
         render(); pushHistory();
       }
+    }
+    else if(action==='sub-tab'){
+      state.view = el.dataset.view;
+      state.selectedId = null; state.editingId = null;
+      render(); pushHistory();
+    }
+    else if(action==='toggle-past'){
+      state.pastOpen = !state.pastOpen;
+      renderMain(); replaceHistory();
     }
     else if(action==='sort-column'){
       const col = el.dataset.column;
