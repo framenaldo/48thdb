@@ -433,6 +433,60 @@
   .modal-share-btn svg{ width:15px; height:15px; }
   .modal-share-btn:active{ background:rgba(255,255,255,calc(.95*var(--glass-k))); }
 
+  .cal-wrap{
+    background:var(--glass-card); border:1px solid var(--glass-edge);
+    border-radius:18px; padding:14px 12px 12px; margin-top:10px;
+  }
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .cal-title{ font-family:'Noto Sans Thai',sans-serif; font-size:15px; font-weight:800; color:var(--ink); }
+  .cal-nav{
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--line);
+    background:var(--card); color:var(--ink); font-size:19px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .cal-dow{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:4px;
+  }
+  .cal-dow span{
+    text-align:center; font-size:10.5px; font-weight:700; color:var(--ink-soft);
+  }
+  .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-cell{
+    position:relative; aspect-ratio:1; border:0; background:transparent; padding:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    border-radius:10px; cursor:default; font-family:'Noto Sans Thai',sans-serif;
+  }
+  .cal-cell.is-empty{ visibility:hidden; }
+  .cal-cell.has-any{ cursor:pointer; }
+  .cal-num{ font-size:13px; font-weight:600; color:var(--ink); }
+  .cal-cell:not(.has-any) .cal-num{ color:var(--ink-soft); opacity:.55; }
+  .cal-dots{ display:flex; gap:2px; height:5px; align-items:center; }
+  .cal-dots i{ width:5px; height:5px; border-radius:50%; display:block; }
+  .cal-dots i.is-bday{ background:var(--gold); }
+  .cal-cell.is-today{ background:color-mix(in srgb, var(--bnk) 13%, transparent); }
+  .cal-cell.is-today .cal-num{ color:var(--bnk); font-weight:800; }
+  .cal-cell.is-picked{ background:var(--ink); }
+  .cal-cell.is-picked .cal-num{ color:var(--paper); font-weight:800; }
+
+  .cal-hint{ text-align:center; margin:12px 0 2px; font-size:12px; }
+  .cal-day-detail{ margin-top:12px; border-top:1px solid var(--line); padding-top:11px; }
+  .cal-day-title{
+    font-family:'Noto Sans Thai',sans-serif; font-size:12.5px; font-weight:800;
+    color:var(--ink-soft); margin-bottom:8px;
+  }
+  .cal-item{
+    width:100%; box-sizing:border-box; display:flex; align-items:center; gap:9px;
+    text-align:left; padding:10px 12px; margin-bottom:6px;
+    border:1px solid var(--line); border-left:3px solid var(--c);
+    border-radius:11px; background:var(--card); cursor:pointer;
+    font-family:'Noto Sans Thai',sans-serif; font-size:13.5px; font-weight:600; color:var(--ink);
+  }
+  .cal-item-tag{
+    flex:none; font-size:10.5px; font-weight:800; color:var(--c);
+    background:color-mix(in srgb, var(--c) 13%, transparent);
+    padding:3px 7px; border-radius:999px;
+  }
+
   .cmp-open-btn{
     display:inline-flex; align-items:center; gap:7px;
     padding:9px 15px; border-radius:999px;
@@ -2710,6 +2764,7 @@ const ICONS = {
 let state = {
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
+  calMonth:null, calDay:null,
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
@@ -3110,6 +3165,110 @@ function renderMemberWorks(m){
     <div class="work-list">${rows}</div>`;
 }
 
+
+
+// ============================= CALENDAR =============================
+// The feed answers "what is next". A month at a glance answers the other
+// question — which days are busy, and what falls on the same day as what.
+
+const THAI_DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+
+function monthKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+
+function shiftMonth(key, by){
+  const [y, m] = key.split('-').map(Number);
+  const d = new Date(y, m-1+by, 1);
+  return monthKey(d);
+}
+
+/** Every day an event covers, not only the day it starts. */
+function eventDays(ev){
+  const out = [];
+  const last = eventLastDay(ev);
+  for(let d = new Date(ev.start+'T00:00:00'); toYmd(d) <= last; d.setDate(d.getDate()+1))
+    out.push(toYmd(d));
+  return out;
+}
+
+function calendarIndex(){
+  const events = {}, births = {};
+  SEED_SCHEDULE.forEach(ev => eventDays(ev).forEach(day => (events[day] ??= []).push(ev)));
+  activeMembers().filter(m => m.birthday)
+    .forEach(m => (births[m.birthday.slice(5)] ??= []).push(m));   // MM-DD, any year
+  return { events, births };
+}
+
+function renderCalendar(){
+  const today = toYmd(todayStart());
+  const key = state.calMonth || today.slice(0,7);
+  const [year, month] = key.split('-').map(Number);
+  const { events, births } = calendarIndex();
+
+  const first = new Date(year, month-1, 1);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const lead = first.getDay();
+
+  const cells = [];
+  for(let i=0; i<lead; i++) cells.push('<div class="cal-cell is-empty"></div>');
+
+  for(let day=1; day<=daysInMonth; day++){
+    const iso = `${key}-${String(day).padStart(2,'0')}`;
+    const evs = events[iso] || [];
+    const bds = births[iso.slice(5)] || [];
+    const classes = ['cal-cell'];
+    if(iso === today) classes.push('is-today');
+    if(state.calDay === iso) classes.push('is-picked');
+    if(evs.length || bds.length) classes.push('has-any');
+
+    // At most three dots: past that the row stops being readable and the count
+    // below the grid carries the detail anyway.
+    const dots = [
+      ...evs.slice(0,3).map(ev => {
+        const g = (ev.groups||[]).length===1 ? getGroup(ev.groups[0]) : null;
+        return `<i style="background:${g?g.color:'var(--ink-soft)'}"></i>`;
+      }),
+      ...(bds.length ? [`<i class="is-bday"></i>`] : []),
+    ].slice(0,4).join('');
+
+    cells.push(`<button class="${classes.join(' ')}" ${evs.length||bds.length?`data-action="pick-day" data-id="${iso}"`:''}>
+      <span class="cal-num">${day}</span>
+      <span class="cal-dots">${dots}</span>
+    </button>`);
+  }
+
+  const picked = state.calDay && state.calDay.startsWith(key) ? state.calDay : null;
+  const pickedEvs = picked ? (events[picked] || []) : [];
+  const pickedBds = picked ? (births[picked.slice(5)] || []) : [];
+
+  return `
+  <section class="cal-wrap">
+    <div class="cal-head">
+      <button class="cal-nav" data-action="cal-move" data-id="-1" aria-label="เดือนก่อนหน้า">‹</button>
+      <div class="cal-title">${MONTH_NAMES[month-1]} ${year}</div>
+      <button class="cal-nav" data-action="cal-move" data-id="1" aria-label="เดือนถัดไป">›</button>
+    </div>
+    <div class="cal-dow">${THAI_DOW.map(d=>`<span>${d}</span>`).join('')}</div>
+    <div class="cal-grid">${cells.join('')}</div>
+    ${picked ? `
+      <div class="cal-day-detail">
+        <div class="cal-day-title">${formatDate(picked)}</div>
+        ${pickedBds.map(m=>{
+          const g = getGroup(m.groupId);
+          return `<button class="cal-item" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+            <span class="cal-item-tag">วันเกิด</span>
+            <span>${escapeHtml(m.nameTh)} · ${escapeHtml(m.name)}</span>
+          </button>`;
+        }).join('')}
+        ${pickedEvs.map(ev=>{
+          const g = (ev.groups||[]).length===1 ? getGroup(ev.groups[0]) : null;
+          return `<button class="cal-item" style="--c:${g?g.color:'var(--ink-soft)'}" data-action="open-event" data-id="${ev.id}">
+            ${ev.time ? `<span class="cal-item-tag">${escapeHtml(ev.time)}</span>` : ''}
+            <span>${escapeHtml(ev.title)}</span>
+          </button>`;
+        }).join('')}
+      </div>` : `<p class="muted-note cal-hint">แตะวันที่มีจุดเพื่อดูว่ามีอะไร</p>`}
+  </section>`;
+}
 
 // ============================= COMPARE =============================
 
@@ -3918,6 +4077,11 @@ function renderFeed(){
       <h2 class="section-label">ตารางงานที่จะถึง</h2>
       ${soon.length ? soon.map(e => renderEventCard(e, iso)).join('')
         : `<p class="muted-note">ยังไม่มีงานที่ประกาศไว้ล่วงหน้า</p>`}
+    </section>
+
+    <section class="feed-block">
+      <h2 class="section-label">ปฏิทิน</h2>
+      ${renderCalendar()}
     </section>
 
 
@@ -4908,7 +5072,7 @@ function attachMainEvents(){
 // returns to wherever they came from rather than a hard-coded destination.
 // This drives the back buttons, the modal close, the edge-swipe gesture and
 // the browser/phone back button alike.
-const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','query','groupFilter','compareWith','comparePicking',
+const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
   'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab'];
 
@@ -5212,6 +5376,16 @@ function bindDelegatedEvents(){
       state.selectedId=id; state.editingId=null; state.selectedEvent=null;
       state.compareWith=null; state.comparePicking=false;
       renderMain(); pushHistory();
+    }
+    else if(action==='cal-move'){
+      const base = state.calMonth || toYmd(todayStart()).slice(0,7);
+      state.calMonth = shiftMonth(base, Number(id));
+      state.calDay = null;
+      renderMain(); replaceHistory();
+    }
+    else if(action==='pick-day'){
+      state.calDay = state.calDay === id ? null : id;
+      renderMain(); replaceHistory();
     }
     else if(action==='open-compare'){
       state.comparePicking = true; state.compareQuery = '';
