@@ -250,8 +250,6 @@
   /* Room to scroll past the end. Collapsing a stage plot makes the page
      shorter, and without slack the browser clamps the scroll and drags the
      reader up the page; with it, the panel they pressed stays put. */
-  .release-page{ padding-bottom:55vh; }
-
   .thead-sticky-outer{
     position:sticky; top:120px; z-index:15;
     margin:0 -16px; width:calc(100% + 32px);
@@ -332,7 +330,13 @@
     font-family:'Noto Sans Thai',sans-serif; font-size:10.5px; font-weight:600; color:#fff;
     padding:2px 6px; border-radius:7px; display:inline-block;
   }
-  .fav-btn-sm{ background:none; border:none; color:var(--gold); font-size:17px; cursor:pointer; padding:2px; line-height:1; }
+  .fav-btn-sm{ background:none; border:none; color:var(--gold); font-size:17px; cursor:pointer; padding:2px; line-height:1; position:relative; }
+  /* The star draws at 21px, which no fingertip can hit reliably. The overlay
+     gives it a 44px target without moving anything in the row. */
+  .fav-btn-sm::after{
+    content:''; position:absolute; left:50%; top:50%; width:44px; height:44px;
+    transform:translate(-50%,-50%);
+  }
 
   .avatar-sm, .detail-avatar{ position:relative; overflow:hidden; }
   .avatar-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
@@ -356,7 +360,9 @@
   /* detail view */
   .back-btn{
     background:none; border:none; font-family:'Noto Sans Thai',sans-serif; font-weight:600; font-size:14px;
-    color:var(--ink-soft); cursor:pointer; padding:0; margin-bottom:18px; display:inline-block;
+    color:var(--ink-soft); cursor:pointer; display:inline-block;
+    /* padding for the finger, negative margin so the label does not move */
+    padding:11px 12px; margin:-11px -12px 7px;
   }
   .back-btn:hover{ color:var(--ink); }
   .modal-backdrop{
@@ -677,7 +683,7 @@
 
   /* anything that jumps through to a filtered roster */
   button.bar-row{
-    width:100%; background:none; border:none; padding:2px 4px; margin:0 -4px 5px;
+    width:100%; background:none; border:none; padding:6px 4px; margin:0 -4px 0;
     border-radius:7px; cursor:pointer; font:inherit; color:inherit; text-align:left;
     transition:background .16s var(--ease-out);
   }
