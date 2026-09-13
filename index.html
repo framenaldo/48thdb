@@ -6,7 +6,7 @@
 <title>48thDB — 48 Thailand Database</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
 <!-- ===== FIREBASE SETUP =====
   1) Go to console.firebase.google.com -> create a project.
   2) Project settings -> your apps -> add a Web app -> copy the config object below.
@@ -59,6 +59,7 @@
     --glass-k:1;
     --glass-card:rgba(255,255,255,.58);
     --brand-a:#E4457E; --brand-mid:#A8619B; --brand-b:#2E8C82;
+    --fest-a:#F3DCEE; --fest-b:#E6D4F2; --fest-ink:#6B2E86;
     --glass-edge:rgba(255,255,255,.85);
     --shadow-rgb:28,19,41;
     --bg-body:
@@ -94,6 +95,7 @@
     --glass-k:.14;
     --glass-card:rgba(255,255,255,.055);
     --brand-a:#FF7FB0; --brand-mid:#C98FD0; --brand-b:#43D9AE;
+    --fest-a:#4A2F5C; --fest-b:#38294E; --fest-ink:#F0DBFA;
     --glass-edge:rgba(255,255,255,.12);
     --shadow-rgb:0,0,0;
     --bg-body:
@@ -975,6 +977,77 @@
     letter-spacing:.01em;
   }
   .ev-open::after{ content:' \203A'; font-weight:700; }
+
+  /* ---- birthday sheet ---- */
+  .evm-fest{
+    position:relative; overflow:hidden;
+    margin:-22px -18px 0; padding:22px 18px 0;
+    border-radius:23px 23px 0 0;
+    background:linear-gradient(165deg, var(--fest-a), var(--fest-b));
+    text-align:center;
+  }
+  .evm-fest-deco{ position:absolute; inset:0; pointer-events:none; }
+  .evm-fest-deco .cfi{
+    position:absolute; display:block; width:9px; height:13px; border-radius:2px; opacity:.75;
+  }
+  .cfi0{ background:#E4457E; }
+  .cfi1{ background:#7C4D9B; }
+  .cfi2{ background:#F0B840; }
+  .cfi3{ background:#2FD8A9; border-radius:50%; width:8px; height:8px; }
+  .cfi4{ background:#FFFFFF; border-radius:50%; width:7px; height:7px; }
+
+  .evm-fest-word{
+    position:relative; display:block;
+    font-family:'Pacifico', 'Noto Sans Thai', cursive;
+    font-size:42px; line-height:1.25; color:var(--fest-ink);
+    text-shadow:0 2px 0 rgba(255,255,255,.55);
+  }
+  .evm-fest-sub{
+    position:relative; display:block; margin-top:-4px;
+    font-size:13px; font-weight:800; letter-spacing:.42em; text-indent:.42em;
+    color:var(--fest-ink); opacity:.72;
+  }
+  .evm-fest-faces{
+    position:relative; display:flex; justify-content:center; gap:16px;
+    margin-top:16px; padding-bottom:18px;
+  }
+  .evm-fest-face{
+    background:none; border:none; padding:0; cursor:pointer; font:inherit;
+    display:flex; flex-direction:column; align-items:center; gap:7px;
+  }
+  .evm-face-img{
+    width:88px; height:88px; border-radius:50%; position:relative; overflow:hidden;
+    display:grid; place-items:center; color:#fff; font-size:28px; font-weight:800;
+    box-shadow:0 0 0 3.5px #fff, 0 10px 24px rgba(var(--shadow-rgb),.22);
+    transition:transform .26s var(--ease-out);
+  }
+  .evm-fest-name{
+    font-size:13px; font-weight:800; color:var(--fest-ink);
+    padding:2px 11px; border-radius:999px; background:rgba(255,255,255,.72);
+  }
+  @media (hover:hover){
+    .evm-fest-face:hover .evm-face-img{ transform:translateY(-3px) scale(1.045); }
+  }
+
+  /* the venue opens a map */
+  .evm-map{
+    display:block; text-decoration:none; color:var(--ink-soft);
+    border-bottom:1px dashed color-mix(in srgb, var(--c) 45%, transparent);
+    padding-bottom:5px; width:fit-content; max-width:100%;
+    transition:color .16s ease, border-color .16s ease;
+  }
+  .evm-map-cue{
+    display:block; margin-top:4px; font-size:11px; font-weight:700; color:var(--c);
+  }
+  .evm-map-cue::after{ content:' \2197'; }
+  @media (hover:hover){
+    .evm-map:hover{ color:var(--ink); border-bottom-color:var(--c); }
+  }
+  @media (max-width:560px){
+    .evm-fest-word{ font-size:35px; }
+    .evm-face-img{ width:76px; height:76px; font-size:24px; }
+    .evm-fest-faces{ gap:12px; }
+  }
 
   .evm-date{ margin:0; font-size:12px; font-weight:700; color:var(--c); letter-spacing:.02em; }
   .evm-title{ margin:6px 0 0; font-size:21px; font-weight:800; line-height:1.3; letter-spacing:-.01em; padding-right:34px; }
@@ -1969,27 +2042,27 @@ const SEED_SCHEDULE = [
     members:['bnk-pancake'] },
   { id:'ev-media-0908', start:'2026-09-08', title:'To be announced',
     venue:'Bangkok', tag:'media', tba:true },
-  { id:'ev-micha-patt-bday', start:'2026-09-12', time:'13:00',
+  { id:'ev-micha-patt-bday', theme:'birthday', celebrants:['bnk-micha','bnk-patt'], start:'2026-09-12', time:'13:00',
     title:'Micha BNK48 & Patt BNK48\'s Birthday Fanmeet',
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     members:['bnk-micha','bnk-patt','bnk-arlee','bnk-emmy','bnk-grape','bnk-marine','bnk-monet','bnk-sindy','bnk-jew'],
     info:['Jew ขึ้นแสดงแทน Wawa ซึ่งถอนตัวจากทั้งสองรอบของวันที่ 12 ก.ย. ด้วยปัญหาสุขภาพ',
       'บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
       'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
-  { id:'ev-berry-sindy-bday', start:'2026-09-12', time:'17:00',
+  { id:'ev-berry-sindy-bday', theme:'birthday', celebrants:['bnk-berry','bnk-sindy'], start:'2026-09-12', time:'17:00',
     title:'Berry BNK48 & Sindy BNK48\'s Birthday Fanmeet',
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     members:['bnk-berry','bnk-sindy','bnk-grape','bnk-inkcha','bnk-l','bnk-marine','bnk-palmmy','bnk-patt','bnk-proud'],
     info:['Wawa ถอนตัวด้วยปัญหาสุขภาพ รอบนี้แสดงต่อด้วยสมาชิกที่เหลือ ไม่มีคนขึ้นแทน',
       'บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
       'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
-  { id:'ev-emmy-bday', start:'2026-09-13', time:'13:00',
+  { id:'ev-emmy-bday', theme:'birthday', celebrants:['bnk-emmy'], start:'2026-09-13', time:'13:00',
     title:'Emmy BNK48\'s Birthday Fanmeet',
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     members:['bnk-emmy','bnk-jew','bnk-micha','bnk-monet','bnk-palmmy','bnk-praew'],
     info:['บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
       'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
-  { id:'ev-hoop-bday-said', start:'2026-09-13', time:'17:00',
+  { id:'ev-hoop-bday-said', theme:'birthday', celebrants:['bnk-hoop'], start:'2026-09-13', time:'17:00',
     title:'"My Birthday is ... Next Week" Hoop Said',
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     members:['bnk-hoop'],
@@ -3202,6 +3275,32 @@ function eventHasMore(ev){
   return !!(ev.info || ev.detail || (ev.members || []).length);
 }
 
+
+/* A birthday fanmeet gets a party header rather than the plain sheet: the
+   celebrants' own portraits under hand-lettering, with the confetti drawn in
+   CSS so it costs nothing to ship. */
+function renderBirthdayBanner(ev){
+  const faces = (ev.celebrants || []).map(getMember).filter(Boolean);
+  if(!faces.length) return '';
+  const confetti = [
+    [6,14,-18],[17,52,24],[29,9,42],[41,64,-9],[52,20,15],
+    [63,58,-33],[74,12,8],[85,46,29],[93,24,-14],[36,34,50],[58,38,-22],[81,66,12]
+  ].map(([x,y,r],i)=>
+    `<i class="cfi cfi${i%5}" style="left:${x}%;top:${y}%;transform:rotate(${r}deg)"></i>`).join('');
+  return `
+  <div class="evm-fest" aria-hidden="false">
+    <span class="evm-fest-deco" aria-hidden="true">${confetti}</span>
+    <span class="evm-fest-word">Birthday</span>
+    <span class="evm-fest-sub">FANMEET</span>
+    <span class="evm-fest-faces">${faces.map(m=>{
+      const g = getGroup(m.groupId);
+      return `<button class="evm-fest-face" style="--c:${g.color}" data-action="open-member" data-id="${m.id}"
+        title="${escapeAttr(m.name)}">${renderAvatar(m,'evm-face-img',g.color)}
+        <span class="evm-fest-name">${escapeHtml(m.nameTh||m.name)}</span></button>`;
+    }).join('')}</span>
+  </div>`;
+}
+
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
   if(!ev) return '';
@@ -3217,9 +3316,11 @@ function renderEventModal(){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
       <div class="modal-scroll">
+        ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : ''}
         <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
         <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
-        ${ev.venue ? `<p class="evm-venue">${escapeHtml(ev.venue)}</p>` : ''}
+        ${ev.venue ? `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.venue)}"
+            target="_blank" rel="noopener noreferrer">${escapeHtml(ev.venue)}<span class="evm-map-cue">เปิดใน Google Maps</span></a>` : ''}
         ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
           `<span class="ev-group" style="--c:${g.color}">${g.name}</span>`).join('')}</div>` : ''}
 
