@@ -1347,6 +1347,15 @@
     padding:2px 7px; border-radius:999px;
     background:var(--danger); color:var(--paper);
   }
+  /* A hairline under the title, fading out as it goes, so the name of the event
+     reads on its own before the venue and the lists below it start competing. */
+  .evm-rule{
+    height:1px; border:0; margin:12px 0 13px;
+    background:linear-gradient(90deg,
+      color-mix(in srgb, var(--ink) 22%, transparent),
+      color-mix(in srgb, var(--ink) 8%, transparent) 55%,
+      transparent);
+  }
   .evm-title{ margin:6px 0 0; font-size:21px; font-weight:800; line-height:1.3; letter-spacing:-.01em; padding-right:34px; }
   .evm-venue{ margin:8px 0 0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
   .evm-head{
@@ -3956,6 +3965,7 @@ function renderEventModal(){
             : ''}
         </div>
         <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
+        <hr class="evm-rule">
         ${ev.venue ? `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.venue)}"
             target="_blank" rel="noopener noreferrer" title="เปิดใน Google Maps">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
