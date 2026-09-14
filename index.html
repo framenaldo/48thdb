@@ -1372,7 +1372,26 @@
   .poster-full{
     max-width:100%; max-height:100%; width:auto; height:auto;
     object-fit:contain; border-radius:8px; display:block;
+    touch-action:none;           /* the gestures are ours, not the browser's */
+    transform-origin:center center;
+    will-change:transform;
+    user-select:none; -webkit-user-drag:none;
   }
+  .poster-viewer.is-zoomed{ cursor:grab; }
+
+  .ptr{
+    position:fixed; top:-46px; left:50%; z-index:55;
+    width:38px; height:38px; border-radius:50%;
+    transform:translateX(-50%);
+    background:var(--card); border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(var(--shadow-rgb),.18);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink-soft); opacity:0; pointer-events:none;
+  }
+  .ptr svg{ width:18px; height:18px; }
+  .ptr.is-ready{ color:var(--bnk); border-color:var(--bnk); }
+  .ptr.is-loading svg{ animation:ptrSpin .7s linear infinite; }
+  @keyframes ptrSpin{ to{ transform:rotate(360deg) } }
   .poster-close{
     position:absolute; top:16px; right:16px; z-index:1;
     width:38px; height:38px; border-radius:50%;
@@ -3370,6 +3389,151 @@ function renderMemberWorks(m){
 
 
 
+/* The page is locked against zooming, which is what stops the app sliding
+   around under a thumb. A poster is the one thing that has to zoom, so it does
+   its own: pinch to scale, drag to move once it is larger than the screen,
+   double tap to go in and out. A single tap still closes, but only at rest —
+   otherwise letting go of a drag would shut the picture. */
+/* An installed app has no address bar to pull on, so the gesture that means
+   "refresh" everywhere else had nowhere to live here. It only arms at the very
+   top of the page and only when nothing is open over it: a sheet fixes the body,
+   which would otherwise look exactly like being scrolled to the top. */
+function bindPullToRefresh(){
+  const TRIGGER = 70;
+  let startY = null, pulled = 0;
+
+  const pill = document.createElement('div');
+  pill.className = 'ptr';
+  pill.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.2-6.9"/><path d="M21 4v5h-5"/></svg>`;
+  document.body.appendChild(pill);
+
+  const armed = () => (window.scrollY || window.pageYOffset || 0) <= 0
+    && !document.body.classList.contains('modal-locked')
+    && !document.querySelector('.poster-viewer');
+
+  const draw = (d) => {
+    pulled = d;
+    pill.style.transform = `translateX(-50%) translateY(${Math.min(d, TRIGGER + 16)}px) rotate(${d * 3}deg)`;
+    pill.style.opacity = Math.min(1, d / (TRIGGER * 0.6));
+    pill.classList.toggle('is-ready', d >= TRIGGER);
+  };
+  const settle = () => {
+    pill.style.transition = 'transform .22s var(--ease-out), opacity .22s';
+    draw(0);
+    setTimeout(()=>{ pill.style.transition = ''; pill.classList.remove('is-ready'); }, 240);
+  };
+
+  document.addEventListener('touchstart', (e)=>{
+    startY = (armed() && e.touches.length === 1) ? e.touches[0].clientY : null;
+    pulled = 0;
+  }, { passive:true });
+
+  document.addEventListener('touchmove', (e)=>{
+    if(startY === null) return;
+    const d = e.touches[0].clientY - startY;
+    if(d <= 0 || !armed()){ if(pulled) settle(); startY = null; return; }
+    // Half distance, so it takes a deliberate pull rather than a stray swipe.
+    draw(d * 0.5);
+    if(e.cancelable) e.preventDefault();
+  }, { passive:false });
+
+  document.addEventListener('touchend', ()=>{
+    if(startY === null) return;
+    const go = pulled >= TRIGGER;
+    startY = null;
+    if(go){ pill.classList.add('is-loading'); location.reload(); }
+    else settle();
+  });
+
+  // A cancelled gesture is one the system took away — a call arriving, an edge
+  // swipe winning — not a decision to refresh. It puts the indicator back and
+  // reloads nothing.
+  document.addEventListener('touchcancel', ()=>{
+    if(startY === null) return;
+    startY = null;
+    settle();
+  });
+}
+
+function bindPosterZoom(){
+  const view = document.querySelector('.poster-viewer');
+  const img = view && view.querySelector('.poster-full');
+  if(!img) return;
+
+  let scale = 1, tx = 0, ty = 0;
+  let pinchFrom = 0, scaleFrom = 1, panFrom = null, dragged = false;
+
+  const limits = () => ({
+    x: Math.max(0, (img.clientWidth  * scale - view.clientWidth)  / 2),
+    y: Math.max(0, (img.clientHeight * scale - view.clientHeight) / 2),
+  });
+  const apply = () => {
+    scale = Math.min(5, Math.max(1, scale));
+    const l = limits();
+    tx = Math.min(l.x, Math.max(-l.x, tx));
+    ty = Math.min(l.y, Math.max(-l.y, ty));
+    img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    view.classList.toggle('is-zoomed', scale > 1.01);
+  };
+  const spread = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+
+  img.addEventListener('touchstart', (e)=>{
+    dragged = false;
+    if(e.touches.length === 2){ pinchFrom = spread(e.touches); scaleFrom = scale; panFrom = null; }
+    else if(e.touches.length === 1 && scale > 1.01){
+      panFrom = { x:e.touches[0].clientX - tx, y:e.touches[0].clientY - ty };
+    }
+  }, { passive:true });
+
+  img.addEventListener('touchmove', (e)=>{
+    if(e.touches.length === 2 && pinchFrom){
+      scale = scaleFrom * (spread(e.touches) / pinchFrom);
+      dragged = true; apply();
+      if(e.cancelable) e.preventDefault();
+    } else if(e.touches.length === 1 && panFrom){
+      tx = e.touches[0].clientX - panFrom.x;
+      ty = e.touches[0].clientY - panFrom.y;
+      dragged = true; apply();
+      if(e.cancelable) e.preventDefault();
+    }
+  }, { passive:false });
+
+  img.addEventListener('touchend', (e)=>{
+    if(e.touches.length) return;
+    pinchFrom = 0; panFrom = null;
+    if(scale <= 1.01){ scale = 1; tx = ty = 0; apply(); }
+  }, { passive:true });
+
+  /* Double tap zooms; a single tap on the picture does nothing. Closing on a
+     lone tap needed a timer to tell the two apart, and that timer kept winning
+     the race and shutting the poster mid-gesture. Image viewers everywhere else
+     work this way too: tap the surround to dismiss, never the picture.
+
+     The moment of the last tap lives on the element rather than in this closure,
+     so a re-render between the two halves of a double tap cannot forget it. */
+  img.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    if(dragged){ dragged = false; return; }
+    const now = Date.now();
+    const prev = Number(img.dataset.tapAt || 0);
+    if(now - prev < 320){
+      img.dataset.tapAt = 0;
+      if(scale > 1.01){ scale = 1; tx = ty = 0; } else scale = 2.5;
+      apply();
+      return;
+    }
+    img.dataset.tapAt = now;
+  });
+
+  // The dark surround dismisses, but only when it is itself what was tapped —
+  // the close button sits on it and has its own handler.
+  view.addEventListener('click', (e)=>{ if(e.target === view) closePoster(); });
+
+  apply();
+}
+
+function closePoster(){ goBack(()=>{ state.posterOf = null; }); }
+
 /* Opening a poster full screen. The larger copy is a second file fetched only
    here, so the sheet is not made to carry it just in case someone taps. */
 function renderPosterViewer(){
@@ -3377,7 +3541,7 @@ function renderPosterViewer(){
   if(!ev || !ev.poster || !ev.poster.img) return '';
   const full = ev.poster.img.replace(/\.jpg$/, '-full.jpg');
   return `
-  <div class="poster-viewer" data-action="close-poster">
+  <div class="poster-viewer">
     <button class="poster-close" data-action="close-poster" title="ปิด" aria-label="ปิด">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
@@ -5146,6 +5310,7 @@ function renderMain(){
   attachMainEvents();
   startBirthdayFireworks();
   bindEdgeFades();
+  bindPosterZoom();
 }
 
 function updateOshiButtonsFor(id){
@@ -5676,9 +5841,7 @@ function bindDelegatedEvents(){
     else if(action==='open-poster'){
       state.posterOf = id; renderMain(); pushHistory();
     }
-    else if(action==='close-poster'){
-      goBack(()=>{ state.posterOf = null; });
-    }
+    else if(action==='close-poster'){ closePoster(); }
     else if(action==='cal-move'){
       const base = state.calMonth || toYmd(todayStart()).slice(0,7);
       state.calMonth = shiftMonth(base, Number(id));
@@ -5999,6 +6162,7 @@ function registerServiceWorker(){
 async function init(){
   registerServiceWorker();
   watchForUpdates();
+  bindPullToRefresh();
   bindDelegatedEvents();
   initHistory();
   bindScrollPressGuard();

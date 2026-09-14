@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
@@ -61,14 +61,22 @@ async function staleWhileRevalidate(request) {
   return hit || (await network) || Response.error();
 }
 
-/** Icons and anything else of ours: cache once, it changes with a version bump. */
-async function cacheFirst(request) {
+/* Our own assets: serve what we have, then refresh it for next time.
+ *
+ * These used to be cache-first, on the reasoning that a changed icon would come
+ * with a version bump. It did not: a poster was replaced in place, the bump was
+ * forgotten, and every installed app kept serving the old picture with no way
+ * back short of clearing data. Revalidating costs one background request and
+ * removes that whole class of mistake — a replaced file heals itself on the
+ * next visit whether or not anyone remembered the version.
+ */
+async function assetFresh(request) {
   const cache = await caches.open(ASSETS);
   const hit = await cache.match(request);
-  if (hit) return hit;
-  const res = await fetch(request);
-  if (res && res.ok) cache.put(request, res.clone());
-  return res;
+  const network = fetch(request)
+    .then(res => { if (res && res.ok) cache.put(request, res.clone()); return res; })
+    .catch(() => null);
+  return hit || (await network) || Response.error();
 }
 
 self.addEventListener('fetch', (event) => {
@@ -81,7 +89,7 @@ self.addEventListener('fetch', (event) => {
 
   if (url.origin === self.location.origin) {
     if (url.pathname.endsWith('/sw.js')) return;   // never serve the worker from cache
-    event.respondWith(cacheFirst(request));
+    event.respondWith(assetFresh(request));
     return;
   }
 
