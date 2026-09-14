@@ -1362,7 +1362,7 @@
   /* Full screen, on top of the sheet it was opened from. Fixed to the viewport
      rather than the card, because the card is a scroll container. */
   .poster-viewer{
-    position:fixed; inset:0; z-index:60;
+    position:fixed; inset:0; z-index:70;
     background:rgba(8,6,12,.94);
     display:flex; align-items:center; justify-content:center;
     padding:18px; box-sizing:border-box; cursor:zoom-out;
@@ -5129,11 +5129,13 @@ function renderMain(){
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
     renderForm())
-    + (state.posterOf ? renderPosterViewer() : '')
     + (state.comparePicking ? renderComparePicker()
        : state.compareWith && state.selectedId ? renderCompareModal()
        : state.selectedId ? renderDetailModal() : '')
-    + (state.selectedEvent ? renderEventModal() : '');
+    + (state.selectedEvent ? renderEventModal() : '')
+    // Last, because it opens over a sheet. Sharing z-index 60 with the sheets
+    // meant whichever was written later won, and that was the sheet.
+    + (state.posterOf ? renderPosterViewer() : '');
   if(state.view !== _lastRenderedView){
     main.classList.remove('view-fade-in');
     void main.offsetWidth;
