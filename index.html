@@ -4438,15 +4438,6 @@ function renderFeed(){
       <h1 class="feed-title">วันนี้ที่ 48</h1>
     </header>
 
-    <a class="iam-link" href="https://app.bnk48.com/" target="_blank" rel="noopener noreferrer">
-      <img class="iam-icon" src="iam48-icon.png" alt="" width="34" height="34">
-      <span class="iam-text">
-        <span class="iam-name">iAM48</span>
-        <span class="iam-sub">ดูไลฟ์และเธียเตอร์ในแอปของวง</span>
-      </span>
-      <span class="iam-go" aria-hidden="true">↗</span>
-    </a>
-
     ${todays.length ? `
     <section class="feed-block is-birthday">
       <h2 class="section-label">วันเกิดวันนี้</h2>
@@ -4727,6 +4718,16 @@ function renderProfile(){
   ${kamiMember ? renderKamiOshiFeatured(kamiMember) : `<p class="muted-note">ยังไม่ได้เลือก Kami Oshi — เปิดโปรไฟล์สมาชิกแล้วกดปุ่มมงกุฎเพื่อเลือก (เลือกได้คนเดียว)</p>`}
   <h3 class="section-label">Oshi ทั้งหมด (${oshiMembers.length})</h3>
   ${oshiMembers.length ? `<div class="grid-mini grid-mini-oshi">${oshiMembers.map(m => renderMiniCard(m)).join('')}</div>` : `<p class="muted-note">ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม</p>`}
+
+  <h3 class="section-label">แอปของวง</h3>
+  <a class="iam-link" href="https://app.bnk48.com/" target="_blank" rel="noopener noreferrer">
+    <img class="iam-icon" src="iam48-icon.png" alt="" width="34" height="34">
+    <span class="iam-text">
+      <span class="iam-name">iAM48</span>
+      <span class="iam-sub">ดูไลฟ์และเธียเตอร์ในแอปของวง</span>
+    </span>
+    <span class="iam-go" aria-hidden="true">↗</span>
+  </a>
 
   <h3 class="section-label">สำรองข้อมูล</h3>
   <div class="backup-card">
