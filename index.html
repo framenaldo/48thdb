@@ -1305,7 +1305,7 @@
   .evm-date::before{
     content:''; flex:none; width:6px; height:6px; border-radius:50%; background:var(--c);
   }
-  .evm-meta{ display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
+  .evm-meta{ display:flex; flex-wrap:wrap; gap:7px; align-items:center; padding-right:76px; }
   /* The price is the thing people go looking for, so it sits next to the date
      rather than partway down a list of notices. */
   .evm-price{
@@ -1324,8 +1324,22 @@
     background:var(--c); border-color:var(--c);
     color:var(--paper);
   }
-  .evm-price-go{ font-size:12px; opacity:.85; }
   .evm-price.is-link:active{ filter:brightness(1.15); }
+  /* Booking having closed is a dead end, so it keeps its own red rather than
+     the sheet's accent and never links anywhere. It says the window shut, not
+     that the tickets ran out — those are different things to a fan deciding
+     whether it is worth asking around. */
+  .evm-price.is-closed{
+    color:var(--danger);
+    background:var(--danger-soft);
+    border-color:color-mix(in srgb, var(--danger) 38%, transparent);
+  }
+  .evm-price.is-closed .evm-amount{ text-decoration:line-through; opacity:.75; }
+  .evm-closed{
+    font-size:10px; font-weight:900; letter-spacing:.08em;
+    padding:2px 7px; border-radius:999px;
+    background:var(--danger); color:var(--paper);
+  }
   .evm-title{ margin:6px 0 0; font-size:21px; font-weight:800; line-height:1.3; letter-spacing:-.01em; padding-right:34px; }
   .evm-venue{ margin:8px 0 0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
   .evm-head{
@@ -2350,7 +2364,7 @@ const SEED_SCHEDULE = [
   { id:'ev-getaway-pudthailee', start:'2026-09-18', end:'2026-09-20',
     title:'Get Away with Pudthailee',
     venue:'Hua Hin, Prachuap Khiri Khan',
-    members:['bnk-hoop'] },
+    members:['bnk-hoop'], bookClosed:true },
   { id:'ev-roadshow-mbk', start:'2026-09-19', end:'2026-09-20', time:'12:00',
     title:'BNK48 6th Album "Ponytail to Shushu" Roadshow',
     venue:'Avenue A ชั้น G, MBK Center, Bangkok', groups:['bnk48'],
@@ -3922,11 +3936,16 @@ function renderEventModal(){
         ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : renderPosterBanner(ev)}
         <div class="evm-meta">
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
-          ${ev.price ? (ev.ticketUrl
+          ${ev.bookClosed
+            ? `<span class="evm-price is-closed">${ICONS.ticket}${ev.price
+                 ? `<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>` : ''}<span class="evm-closed">BOOK CLOSED</span></span>`
+            : ev.price && ev.ticketUrl
             ? `<a class="evm-price is-link" href="${escapeAttr(ev.ticketUrl)}" target="_blank" rel="noopener noreferrer">
-                 ${ICONS.ticket}<span>${escapeHtml(ev.price)} บาท</span><span class="evm-price-go" aria-hidden="true">↗</span>
+                 ${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>
                </a>`
-            : `<span class="evm-price">${ICONS.ticket}<span>${escapeHtml(ev.price)} บาท</span></span>`) : ''}
+            : ev.price
+            ? `<span class="evm-price">${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span></span>`
+            : ''}
         </div>
         <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
         ${ev.venue ? `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.venue)}"
