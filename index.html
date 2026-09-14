@@ -1312,6 +1312,17 @@
   .evm-date::before{
     content:''; flex:none; width:6px; height:6px; border-radius:50%; background:var(--c);
   }
+  .ev-starts{
+    font-size:10.5px; font-weight:800; letter-spacing:.02em;
+    color:var(--c); white-space:nowrap;
+  }
+  .evm-starts{
+    display:inline-flex; align-items:center; margin:0;
+    padding:5px 12px; border-radius:999px;
+    font-family:'Noto Sans Thai',sans-serif;
+    font-size:11.5px; font-weight:800; letter-spacing:.02em;
+    color:var(--paper); background:var(--c);
+  }
   .evm-meta{ display:flex; flex-wrap:wrap; gap:7px; align-items:center; padding-right:76px; }
   /* The price is the thing people go looking for, so it sits next to the date
      rather than partway down a list of notices. */
@@ -4073,6 +4084,54 @@ function eventDateLabel(ev){
                  : d1 + ' ' + THAI_MONTHS[m1-1] + ' - ' + d2 + ' ' + THAI_MONTHS[m2-1];
 }
 
+/* Everything that says "today" or "in N days" is worked out once, when the
+   screen is drawn. Left open overnight the app keeps yesterday's answer: the
+   birthdays of the new day never arrive, and a run that has started still reads
+   as upcoming. A ticker notices the date has turned and redraws — and on the way
+   past, moves the hours-and-minutes countdown on whatever is on today. */
+let _drawnDay = null;
+
+function startsInLabel(ms){
+  const mins = Math.floor(ms / 60000);
+  if(mins >= 60){
+    const h = Math.floor(mins / 60), m = mins % 60;
+    return `เริ่มใน ${h} ชม.` + (m ? ` ${m} นาที` : '');
+  }
+  return `เริ่มใน ${Math.max(1, mins)} นาที`;
+}
+
+/** The moment an event starts, for one that is on today and has a time. */
+function startsAt(ev, todayIso){
+  if(!ev.time || ev.start !== todayIso) return null;
+  const [hh, mm] = ev.time.split(':').map(Number);
+  if(!Number.isFinite(hh)) return null;
+  const d = parseYmd(ev.start);
+  d.setHours(hh, mm || 0, 0, 0);
+  return d.getTime();
+}
+
+function tickClock(){
+  document.querySelectorAll('[data-starts-at]').forEach(el=>{
+    const left = Number(el.dataset.startsAt) - Date.now();
+    el.textContent = left > 0 ? startsInLabel(left) : 'เริ่มแล้ว';
+  });
+
+  const now = toYmd(new Date());
+  if(!_drawnDay || now === _drawnDay) return;
+  // Redrawing under someone loses their place, so the date is left unturned
+  // until they have nothing open — the next tick finds it again.
+  if(state.selectedId || state.selectedEvent || state.posterOf || state.comparePicking) return;
+  if(document.activeElement && document.activeElement.tagName === 'INPUT') return;
+  render();
+}
+
+function startClock(){
+  setInterval(tickClock, 20000);
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'visible') tickClock();
+  });
+}
+
 function eventWhenLabel(ev, todayIso){
   const last = eventLastDay(ev);
   if(ev.start <= todayIso && last >= todayIso) return 'วันนี้';
@@ -4101,6 +4160,9 @@ function renderEventCard(ev, todayIso){
       <span class="ev-d">${eventDateLabel(ev)}</span>
       ${ev.time ? `<span class="ev-time">${ev.time}</span>` : ''}
       ${when ? `<span class="ev-when">${when}</span>` : ''}
+      ${(()=>{ const at = startsAt(ev, todayIso);
+        return at && at > Date.now()
+          ? `<span class="ev-starts" data-starts-at="${at}">${startsInLabel(at - Date.now())}</span>` : ''; })()}
     </div>
     <div class="ev-body">
       <h3 class="ev-title">${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}</h3>
@@ -4180,6 +4242,9 @@ function renderEventModal(){
         </button>` : ''}
         <div class="evm-meta">
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
+          ${(()=>{ const at = startsAt(ev, toYmd(todayStart()));
+            return at && at > Date.now()
+              ? `<span class="evm-starts" data-starts-at="${at}">${startsInLabel(at - Date.now())}</span>` : ''; })()}
           ${ev.bookClosed
             ? `<span class="evm-price is-closed">${ICONS.ticket}${ev.price
                  ? `<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>` : ''}<span class="evm-closed">BOOK CLOSED</span></span>`
@@ -5307,6 +5372,7 @@ function renderMain(){
     main.classList.add('view-fade-in');
     _lastRenderedView = state.view;
   }
+  _drawnDay = toYmd(new Date());
   syncBodyScrollLock();
   attachMainEvents();
   startBirthdayFireworks();
@@ -6164,6 +6230,7 @@ async function init(){
   registerServiceWorker();
   watchForUpdates();
   bindPullToRefresh();
+  startClock();
   bindDelegatedEvents();
   initHistory();
   bindScrollPressGuard();
