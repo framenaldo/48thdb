@@ -4897,11 +4897,7 @@ function syncBodyScrollLock(){
     const y = state._savedScrollY || 0;
     document.body.classList.remove('modal-locked');
     document.body.style.top = '';
-    // While the body was fixed the document was only a viewport tall. Reading
-    // a layout value forces that to be recalculated before the scroll, which
-    // would otherwise be clamped to the old height and land at the top.
-    void document.body.offsetHeight;
-    window.scrollTo(0, y);
+    scrollPageTo(y);
   }
 }
 
@@ -5272,13 +5268,49 @@ let _navReady = false;
 let _navDepth = 0;
 let _urlApplied = false;
 
+// The screen is already rebuilt by the time pushHistory runs, and replacing the
+// content clamps the scroll to whatever the new, often shorter, page allows —
+// so by then the position the user was at is gone. It is tracked as it changes
+// instead. While a modal has the body fixed this stops updating, which is what
+// we want: the value then still describes the page behind the modal.
+let _scrollY = 0;
+window.addEventListener('scroll', () => {
+  if(!document.body.classList.contains('modal-locked')) _scrollY = window.scrollY || 0;
+}, { passive:true });
+
+/* Landing on a remembered position, for a page that may not be its full height
+   yet. While the body was fixed behind a modal the document was only a viewport
+   tall, and a screen rebuilt a moment ago has not been laid out at all: reading
+   a layout value forces that first, or the scroll is clamped and lands at the
+   top. Photos and fonts can still be settling after that, so the position is
+   checked once more on the next frame. */
+function scrollPageTo(y){
+  void document.body.offsetHeight;
+  window.scrollTo(0, y);
+  requestAnimationFrame(() => {
+    if(Math.abs((window.scrollY || 0) - y) > 2) window.scrollTo(0, y);
+  });
+}
+
+function restoreScroll(y){
+  _scrollY = y;
+  if(document.body.classList.contains('modal-locked')){
+    // The page behind the modal is fixed in place; putting the offset back on
+    // the body is what makes closing the modal land where the user was.
+    state._savedScrollY = y;
+    document.body.style.top = `-${y}px`;
+    return;
+  }
+  scrollPageTo(y);
+}
+
 function initHistory(){
   // The app restores scroll itself. Left on 'auto' the browser also restores
   // the position it recorded for the entry, a frame or two after popstate,
   // overwriting ours — and for an entry pushed while a modal had the body
   // fixed, the position it recorded is the top of the page.
   if('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  history.replaceState({ snap:navSnapshot(), depth:0 }, '');
+  history.replaceState({ snap:navSnapshot(), depth:0, scrollY:0 }, '');
   _navReady = true;
   window.addEventListener('popstate', (e)=>{
     const snap = e.state && e.state.snap;
@@ -5287,6 +5319,7 @@ function initHistory(){
     NAV_KEYS.forEach(k => state[k] = snap[k]);
     state.profileMenuOpen = false;
     render();
+    restoreScroll((e.state && e.state.scrollY) || 0);
   });
 }
 
@@ -5295,10 +5328,17 @@ function pushHistory(){
   if(!_navReady) return;
   const snap = navSnapshot();
   if(isSameScreen(history.state && history.state.snap, snap)){
-    history.replaceState({ snap, depth:_navDepth }, '', urlForSnapshot(snap));
+    history.replaceState({ snap, depth:_navDepth, scrollY:_scrollY }, '', urlForSnapshot(snap));
     return;
   }
-  history.pushState({ snap, depth:++_navDepth }, '', urlForSnapshot(snap));
+  // Record where this screen was before leaving it, so coming back lands there.
+  if(history.state) history.replaceState({ ...history.state, scrollY:_scrollY }, '');
+
+  // A modal is drawn over the screen rather than replacing it, so the page
+  // behind it keeps its position; a new view starts at its own top.
+  const overlaid = document.body.classList.contains('modal-locked');
+  history.pushState({ snap, depth:++_navDepth, scrollY: overlaid ? _scrollY : 0 }, '', urlForSnapshot(snap));
+  if(!overlaid){ _scrollY = 0; window.scrollTo(0, 0); }
 }
 
 // Same screen, changed filters — keep the entry current so going back later
@@ -5306,7 +5346,7 @@ function pushHistory(){
 function replaceHistory(){
   if(!_navReady) return;
   const snap = navSnapshot();
-  history.replaceState({ snap, depth:_navDepth }, '', urlForSnapshot(snap));
+  history.replaceState({ snap, depth:_navDepth, scrollY:_scrollY }, '', urlForSnapshot(snap));
 }
 
 function canGoBack(){ return _navDepth > 0; }
