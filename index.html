@@ -467,6 +467,31 @@
   .iam-go{ flex:none; color:var(--ink-soft); font-size:15px; }
   .iam-link:active{ background:var(--card); }
 
+  /* A sheet can take the poster's colours the whole way down rather than only
+     at the top. Everything inside already draws from the theme tokens, so the
+     palette is swapped by redefining those on this one card — no element needs
+     to know it is on a themed sheet. The sheet stays light in either mode,
+     because the poster is a printed thing and that is what it looks like. */
+  .modal-glass-card.is-postered{
+    --ink:var(--sheet-ink);
+    --ink-soft:color-mix(in srgb, var(--sheet-ink) 66%, transparent);
+    --paper:var(--sheet-bg);
+    --card:color-mix(in srgb, #fff 64%, var(--sheet-bg));
+    --glass-card:color-mix(in srgb, #fff 58%, var(--sheet-bg));
+    --glass-edge:color-mix(in srgb, var(--sheet-ink) 15%, transparent);
+    --line:color-mix(in srgb, var(--sheet-ink) 14%, transparent);
+    --glass-k:1;
+    --danger:#B84545;
+    --danger-soft:#FBEAEA;
+    background:var(--sheet-bg);
+    color:var(--sheet-ink);
+  }
+  /* Headings and their marker stay on the sheet's own text colour, which is
+     chosen against the surface and so cannot disappear into it. A poster accent
+     is picked to read on the band — the festival's cream reads on its dark red
+     and vanishes on cream paper — so it is not safe to reuse down here. */
+  .modal-glass-card.is-postered .evm-head::before{ background:var(--ink); }
+
   .ev-poster{
     margin:0 0 18px; padding:20px 16px; border-radius:16px;
     background:linear-gradient(155deg, var(--from), var(--to));
@@ -2363,12 +2388,31 @@ const SEED_SCHEDULE = [
       'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
   { id:'ev-getaway-pudthailee', start:'2026-09-18', end:'2026-09-20',
     title:'Get Away with Pudthailee',
-    venue:'Hua Hin, Prachuap Khiri Khan',
-    members:['bnk-hoop'], price:'55,000', bookClosed:true },
+    venue:'Hua Hin, Prachuap Khiri Khan', groups:['bnk48'],
+    members:['bnk-hoop'], price:'55,000', bookClosed:true,
+    poster:{ from:'#8FD6EA', to:'#F5AECF', accent:'#7B5EA7',
+      surface:'#FDEFF6', ink:'#5A3A6E',
+      kicker:'Bangkok → Hua Hin', tagline:'3 วัน 2 คืน ริมทะเลหัวหิน' },
+    detail:[
+      'ห้องพักเดี่ยว 55,000 บาท · ห้องพักคู่ 100,000 บาท (2 ท่าน)',
+      'ที่พักโรงแรม 5 ดาวติดริมทะเล',
+      'อาหารรวม 8 มื้อ ไม่รวมมื้อเย็นของวันเดินทางกลับ',
+      'เดินทางไป-กลับโดยรถบัส',
+    ],
+    info:[
+      'สิทธิ์ในบัตร: บัตรเข้าร่วมกิจกรรมต่าง ๆ, Sunset Cheki Ticket, Morning Alarm, GoKart Activities',
+      'ของที่ระลึก: Welcome Card, Travel Tag, ชุดสังฆทาน, Group Shot Photo',
+      'Karaoke Duet with Hoop 1 เพลง ยาวไม่เกิน 4 นาที เข้าร่วมหรือไม่ก็ได้',
+      'Give & Take กิจกรรมแลกของขวัญกับฮูพ ของขวัญมูลค่าไม่เกิน 3,000 บาท และต้องระบุชื่อกับเบอร์โทรผู้มอบ',
+      'ของขวัญที่เกิน 3,000 บาท หรือเป็นของอันตราย ทีมงานขอสงวนสิทธิ์ไม่รับและจะส่งคืนภายหลัง',
+      'ต้องยืนยันตัวตนในแอป iAM48 และแสดงบัตรประชาชนที่ชื่อตรงกับบัตรที่ซื้อ เปลี่ยนชื่อผู้เข้าร่วมภายหลังไม่ได้',
+      'บัตรเปิดขาย 1 ส.ค. 2026 18:00 ทาง iAM48 Application',
+    ] },
   { id:'ev-roadshow-mbk', start:'2026-09-19', end:'2026-09-20', time:'12:00',
     title:'BNK48 6th Album "Ponytail to Shushu" Roadshow',
     venue:'Avenue A ชั้น G, MBK Center, Bangkok', groups:['bnk48'],
     poster:{ from:'#CFE3F2', to:'#8FB8D8', accent:'#20496E',
+      surface:'#F0F6FB', ink:'#1C3A56',
       kicker:'BNK48 6th Album', tagline:'Mini Concert & Group Hi-Touch' },
     members:['bnk-marine','bnk-niya','bnk-khaimook','bnk-micha','bnk-nammonn','bnk-galeya','bnk-neen'],
     memberDays:{ 'bnk-niya':'19 ก.ย.', 'bnk-khaimook':'20 ก.ย.' },
@@ -2396,6 +2440,7 @@ const SEED_SCHEDULE = [
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     groups:['bnk48'], members:['bnk-fame'],
     poster:{ from:'#EDF7FC', to:'#9FD4EE', accent:'#26324F',
+      surface:'#F3FAFE', ink:'#232E48',
       kicker:'First Fanmeet', tagline:'#FameFirstFanmeet · #FameBNK48' },
     price:'1,777', ticketUrl:'https://app.bnk48.com/performance',
     info:['แฟนมีตเดี่ยวครั้งแรกของเฟม',
@@ -2406,6 +2451,7 @@ const SEED_SCHEDULE = [
     title:'Nine Entertain 24th Anniversary Charity Concert',
     venue:'Bangkok', groups:['bnk48'],
     poster:{ from:'#F9C2DC', to:'#B978C6', accent:'#5E2260',
+      surface:'#FDF1F8', ink:'#53215A',
       kicker:'MCOT HD 30 · Nine Entertain · MCOT Event' },
     members:['bnk-niya','bnk-monet','bnk-micha','bnk-praew','bnk-yoghurt','bnk-pancake'],
     info:['คอนเสิร์ตการกุศลรวมศิลปินหลายวง BNK48 เป็นหนึ่งในนั้น'] },
@@ -2413,6 +2459,7 @@ const SEED_SCHEDULE = [
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
     poster:{ from:'#7E1512', to:'#140404', accent:'#EFDCAE',
+      surface:'#FAF2E4', ink:'#4E1512',
       kicker:'BNK48 & CGM48', tagline:'女神たちよ、世界へ響け！' },
     info:['ประกาศวันแล้ว รายละเอียดอื่นรอประกาศ'],
     lineupTba:true },
@@ -3927,7 +3974,7 @@ function renderEventModal(){
   const mine = people.filter(m => state.oshi.includes(m.id));
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card" data-stop-close="1" style="--c:${accent}${ev.poster?`; --poster-on:${ev.poster.accent}`:''}">
+    <div class="modal-glass-card${ev.poster&&ev.poster.surface?' is-postered':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --poster-on:${ev.poster.accent}`:''}${ev.poster&&ev.poster.surface?`; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
       <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
