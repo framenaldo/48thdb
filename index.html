@@ -1180,6 +1180,11 @@
     transition:border-color .16s ease, transform .16s ease;
   }
   .ev-person .avatar-sm{ width:20px; height:20px; font-size:10px; flex:none; }
+  .ev-person-day{
+    font-size:10px; font-weight:800; color:var(--c); flex:none;
+    background:color-mix(in srgb, var(--c) 14%, transparent);
+    padding:2px 6px; border-radius:999px;
+  }
   .ev-person.is-oshi{ border-color:var(--gold); background:color-mix(in srgb, var(--gold) 12%, var(--card)); }
   .ev-detail{ margin:9px 0 0; padding-left:16px; }
   .ev-detail li{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; }
@@ -2332,6 +2337,7 @@ const SEED_SCHEDULE = [
     poster:{ from:'#CFE3F2', to:'#8FB8D8', accent:'#20496E',
       kicker:'BNK48 6th Album', tagline:'Mini Concert & Group Hi-Touch' },
     members:['bnk-marine','bnk-niya','bnk-khaimook','bnk-micha','bnk-nammonn','bnk-galeya','bnk-neen'],
+    memberDays:{ 'bnk-niya':'19 ก.ย.', 'bnk-khaimook':'20 ก.ย.' },
     detail:[
       'รอบเวลาเดียวกันทั้งสองวัน 19 และ 20 ก.ย.',
       '12:00–13:00 Mini Concert',
@@ -3916,9 +3922,13 @@ function renderEventModal(){
         ${mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
         <div class="ev-people">${people.map(m=>{
           const g = getGroup(m.groupId);
+          // A run that does not have the same line-up every day says so on the
+          // chip itself; reading it off a note further up is easy to miss.
+          const day = ev.memberDays && ev.memberDays[m.id];
           return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
             data-action="open-member" data-id="${m.id}">
             ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span>
+            ${day ? `<span class="ev-person-day">${escapeHtml(day)}</span>` : ''}
           </button>`; }).join('')}</div>` : ''}
       </div>
     </div>
