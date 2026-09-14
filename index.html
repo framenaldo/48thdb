@@ -1347,6 +1347,15 @@
     padding:2px 7px; border-radius:999px;
     background:var(--danger); color:var(--paper);
   }
+  /* The poster itself, where we have one. It is a separate file rather than
+     part of the page, so it is fetched only when this sheet is opened and the
+     page itself stays the size it was. */
+  .evm-poster{
+    display:block; width:100%; height:auto; margin:0 0 16px;
+    border-radius:14px; border:1px solid var(--line);
+    background:color-mix(in srgb, var(--ink) 5%, transparent);
+  }
+
   /* A hairline under the title, fading out as it goes, so the name of the event
      reads on its own before the venue and the lists below it start competing. */
   .evm-rule{
@@ -2381,7 +2390,7 @@ const SEED_SCHEDULE = [
     title:'Get Away with Pudthailee',
     venue:'Hua Hin, Prachuap Khiri Khan', groups:['bnk48'],
     members:['bnk-hoop'], price:'55,000', bookClosed:true,
-    poster:{ accent:'#7B5EA7', surface:'#FDEFF6', ink:'#5A3A6E' },
+    poster:{ accent:'#7B5EA7', surface:'#FDEFF6', ink:'#5A3A6E', img:'posters/getaway-pudthailee.jpg' },
     detail:[
       'เดินทางจากกรุงเทพฯ ไปหัวหิน 3 วัน 2 คืน',
       'ห้องพักเดี่ยว 55,000 บาท · ห้องพักคู่ 100,000 บาท (2 ท่าน)',
@@ -2401,7 +2410,7 @@ const SEED_SCHEDULE = [
   { id:'ev-roadshow-mbk', start:'2026-09-19', end:'2026-09-20', time:'12:00',
     title:'BNK48 6th Album "Ponytail to Shushu" Roadshow',
     venue:'Avenue A ชั้น G, MBK Center, Bangkok', groups:['bnk48'],
-    poster:{ accent:'#20496E', surface:'#F0F6FB', ink:'#1C3A56' },
+    poster:{ accent:'#20496E', surface:'#F0F6FB', ink:'#1C3A56', img:'posters/roadshow-mbk.jpg' },
     members:['bnk-marine','bnk-niya','bnk-khaimook','bnk-micha','bnk-nammonn','bnk-galeya','bnk-neen'],
     memberDays:{ 'bnk-niya':'19 ก.ย.', 'bnk-khaimook':'20 ก.ย.' },
     detail:[
@@ -2427,7 +2436,7 @@ const SEED_SCHEDULE = [
     title:"Fame's Airline Fanmeet",
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     groups:['bnk48'], members:['bnk-fame'],
-    poster:{ accent:'#26324F', surface:'#F3FAFE', ink:'#232E48' },
+    poster:{ accent:'#26324F', surface:'#F3FAFE', ink:'#232E48', img:'posters/fame-fanmeet.jpg' },
     price:'1,777', ticketUrl:'https://app.bnk48.com/performance',
     info:['แฟนมีตเดี่ยวครั้งแรกของเฟม',
       'ของที่ได้ในบัตร: เซลฟีกับเฟม, Boarding Pass, Inhaler, Postcard',
@@ -3951,6 +3960,8 @@ function renderEventModal(){
       </button>
       <div class="modal-scroll">
         ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : ''}
+        ${ev.poster && ev.poster.img ? `<img class="evm-poster" src="${escapeAttr(ev.poster.img)}"
+          alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" loading="lazy" decoding="async">` : ''}
         <div class="evm-meta">
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
           ${ev.bookClosed
