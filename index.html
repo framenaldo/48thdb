@@ -1309,14 +1309,23 @@
   /* The price is the thing people go looking for, so it sits next to the date
      rather than partway down a list of notices. */
   .evm-price{
-    display:inline-flex; align-items:center; margin:0;
+    display:inline-flex; align-items:center; gap:5px; margin:0;
     padding:5px 12px; border-radius:999px;
     font-family:'Noto Sans Thai',sans-serif;
     font-size:11.5px; font-weight:800; letter-spacing:.02em;
-    color:var(--c);
+    color:var(--c); text-decoration:none;
     background:color-mix(in srgb, var(--c) 13%, transparent);
     border:1px solid color-mix(in srgb, var(--c) 32%, transparent);
   }
+  .evm-price svg{ width:13px; height:13px; flex:none; }
+  /* Filled in when it goes somewhere, so a price you can act on does not look
+     the same as one that is only being stated. */
+  .evm-price.is-link{
+    background:var(--c); border-color:var(--c);
+    color:var(--paper);
+  }
+  .evm-price-go{ font-size:12px; opacity:.85; }
+  .evm-price.is-link:active{ filter:brightness(1.15); }
   .evm-title{ margin:6px 0 0; font-size:21px; font-weight:800; line-height:1.3; letter-spacing:-.01em; padding-right:34px; }
   .evm-venue{ margin:8px 0 0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
   .evm-head{
@@ -2374,10 +2383,11 @@ const SEED_SCHEDULE = [
     groups:['bnk48'], members:['bnk-fame'],
     poster:{ from:'#EDF7FC', to:'#9FD4EE', accent:'#26324F',
       kicker:'First Fanmeet', tagline:'#FameFirstFanmeet · #FameBNK48' },
-    price:'1,777',
+    price:'1,777', ticketUrl:'https://app.bnk48.com/performance',
     info:['แฟนมีตเดี่ยวครั้งแรกของเฟม',
       'ของที่ได้ในบัตร: เซลฟีกับเฟม, Boarding Pass, Inhaler, Postcard',
-      'บัตรเปิดขาย 1 ก.ย. 2026 12:00 ทาง iAM48 Application'] },
+      'บัตรเปิดขายแล้ว ถึง 25 ก.ย. 2026 12:00',
+      'ซื้อได้ทาง app.bnk48.com หรือ iAM48 Application'] },
   { id:'ev-nine-charity', start:'2026-09-30', tag:'media',
     title:'Nine Entertain 24th Anniversary Charity Concert',
     venue:'Bangkok', groups:['bnk48'],
@@ -2841,6 +2851,7 @@ const SEED_SENBATSU = {
   ],
 };
 const ICONS = {
+  ticket:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5Z"/><path d="M14 6v2M14 11v2M14 16v2"/></svg>`,
   link:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>`,
   home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>`,
   homeFilled:`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3 3 10.5V20h18v-9.5L12 3Z"/></svg>`,
@@ -3911,7 +3922,11 @@ function renderEventModal(){
         ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : renderPosterBanner(ev)}
         <div class="evm-meta">
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
-          ${ev.price ? `<span class="evm-price">บัตร ${escapeHtml(ev.price)} บาท</span>` : ''}
+          ${ev.price ? (ev.ticketUrl
+            ? `<a class="evm-price is-link" href="${escapeAttr(ev.ticketUrl)}" target="_blank" rel="noopener noreferrer">
+                 ${ICONS.ticket}<span>${escapeHtml(ev.price)} บาท</span><span class="evm-price-go" aria-hidden="true">↗</span>
+               </a>`
+            : `<span class="evm-price">${ICONS.ticket}<span>${escapeHtml(ev.price)} บาท</span></span>`) : ''}
         </div>
         <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
         ${ev.venue ? `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.venue)}"
