@@ -1071,6 +1071,17 @@
   .profile-dropdown button.danger{ color:var(--danger); }
 
   /* ---------------------------- feed ---------------------------- */
+  .feed-scope{
+    display:inline-flex; gap:3px; margin-top:12px; padding:3px;
+    border-radius:999px; background:var(--glass-card); border:1px solid var(--glass-edge);
+  }
+  .scope-btn{
+    padding:6px 13px; border:0; border-radius:999px; background:none; cursor:pointer;
+    font-family:'Noto Sans Thai',sans-serif; font-size:12px; font-weight:700;
+    color:var(--ink-soft); white-space:nowrap;
+  }
+  .scope-btn.is-on{ background:var(--bnk); color:#fff; }
+
   .feed-head{ margin:4px 0 22px; }
   /* the date sits in the same frosted material as the cards below it */
   .feed-today{
@@ -2999,7 +3010,7 @@ let state = {
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null,
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
-  favoritesOnly:false, selectedId:null, editingId:null,
+  favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
   showGraduated:false,
   statsTab:'overview', advOpen:false, selectedSingle:null, discTab:'singles', stagesOpen:{},
@@ -3583,10 +3594,21 @@ function eventDays(ev){
   return out;
 }
 
+/* With the filter on, the schedule narrows to the people the reader follows.
+   An event whose line-up is still unannounced cannot be said to include them,
+   so it drops out — the filter only ever claims what the data actually says. */
+function hasMyOshi(ev){
+  return (ev.members || []).some(id => state.oshi.includes(id));
+}
+function isMyOshi(m){ return state.oshi.includes(m.id); }
+function filteringByOshi(){ return state.oshiOnly && state.oshi.length > 0; }
+
 function calendarIndex(){
   const events = {}, births = {};
-  SEED_SCHEDULE.forEach(ev => eventDays(ev).forEach(day => (events[day] ??= []).push(ev)));
-  activeMembers().filter(m => m.birthday)
+  const mine = filteringByOshi();
+  SEED_SCHEDULE.filter(ev => !mine || hasMyOshi(ev))
+    .forEach(ev => eventDays(ev).forEach(day => (events[day] ??= []).push(ev)));
+  activeMembers().filter(m => m.birthday).filter(m => !mine || isMyOshi(m))
     .forEach(m => (births[m.birthday.slice(5)] ??= []).push(m));   // MM-DD, any year
   return { events, births };
 }
@@ -4486,12 +4508,14 @@ function renderFeed(){
   const iso = toYmd(today);
   const dayName = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'][today.getDay()];
 
-  const withBday = activeMembers().filter(m => m.birthday);
+  const mine = filteringByOshi();
+  const withBday = activeMembers().filter(m => m.birthday).filter(m => !mine || isMyOshi(m));
   const todays = withBday.filter(m => m.birthday.slice(5) === iso.slice(5));
   const upcoming = withBday.map(m => ({ m, d: daysUntilBirthday(m, today) }))
     .filter(x => x.d > 0).sort((a,b) => a.d - b.d).slice(0, 10);
 
-  const events = SEED_SCHEDULE.slice().sort((a,b) => a.start.localeCompare(b.start));
+  const events = SEED_SCHEDULE.filter(e => !mine || hasMyOshi(e))
+    .slice().sort((a,b) => a.start.localeCompare(b.start));
   const nowOn = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
   const soon = events.filter(e => e.start > iso);
   const past = events.filter(e => eventLastDay(e) < iso).reverse();
@@ -4501,6 +4525,11 @@ function renderFeed(){
     <header class="feed-head">
       <p class="feed-today">วัน${dayName}ที่ ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()+543}</p>
       <h1 class="feed-title">วันนี้ที่ 48</h1>
+      ${state.oshi.length ? `
+      <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
+        <button class="scope-btn${state.oshiOnly?'':' is-on'}" data-action="set-oshi-only" data-id="0">ทั้งหมด</button>
+        <button class="scope-btn${state.oshiOnly?' is-on':''}" data-action="set-oshi-only" data-id="1">เฉพาะโอชิของฉัน</button>
+      </div>` : ''}
     </header>
 
     ${todays.length ? `
@@ -4548,7 +4577,9 @@ function renderFeed(){
     <section class="feed-block">
       <h2 class="section-label">ตารางงานที่จะถึง</h2>
       ${soon.length ? soon.map(e => renderEventCard(e, iso)).join('')
-        : `<p class="muted-note">ยังไม่มีงานที่ประกาศไว้ล่วงหน้า</p>`}
+        : `<p class="muted-note">${mine
+            ? 'ยังไม่มีงานที่โอชิของคุณไป — กด “ทั้งหมด” เพื่อดูทุกงาน'
+            : 'ยังไม่มีงานที่ประกาศไว้ล่วงหน้า'}</p>`}
     </section>
 
     <section class="feed-block">
@@ -5555,7 +5586,7 @@ function attachMainEvents(){
 // returns to wherever they came from rather than a hard-coded destination.
 // This drives the back buttons, the modal close, the edge-swipe gesture and
 // the browser/phone back button alike.
-const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
+const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
   'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf'];
 
@@ -5703,7 +5734,7 @@ function isSameScreen(a, b){
     && a.selectedEvent===b.selectedEvent
     && a.compareWith===b.compareWith && a.comparePicking===b.comparePicking
     && a.posterOf===b.posterOf
-    && a.editingId===b.editingId && a.favoritesOnly===b.favoritesOnly
+    && a.editingId===b.editingId && a.favoritesOnly===b.favoritesOnly && a.oshiOnly===b.oshiOnly
     && a.showGraduated===b.showGraduated && a.selectedSingle===b.selectedSingle;
 }
 
@@ -5909,6 +5940,11 @@ function bindDelegatedEvents(){
       state.posterOf = id; renderMain(); pushHistory();
     }
     else if(action==='close-poster'){ closePoster(); }
+    else if(action==='set-oshi-only'){
+      state.oshiOnly = id === '1';
+      state.calDay = null;   // the day that was open may not survive the filter
+      renderMain(); replaceHistory();
+    }
     else if(action==='cal-move'){
       const base = state.calMonth || toYmd(todayStart()).slice(0,7);
       state.calMonth = shiftMonth(base, Number(id));
