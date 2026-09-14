@@ -1347,6 +1347,40 @@
     padding:2px 7px; border-radius:999px;
     background:var(--danger); color:var(--paper);
   }
+  .evm-poster-btn{
+    display:block; width:100%; padding:0; border:0; background:none; cursor:zoom-in;
+  }
+  /* With a poster at the top the buttons sit over a photograph, which can be any
+     colour anywhere. A dark scrim and a white mark read on all of them, where
+     the sheet's own pale glass disappeared into the bright parts. */
+  .modal-glass-card.has-poster-img{
+    --chrome-bg:rgba(20,16,26,.55);
+    --chrome-edge:rgba(255,255,255,.3);
+    --chrome-fg:#fff;
+  }
+
+  /* Full screen, on top of the sheet it was opened from. Fixed to the viewport
+     rather than the card, because the card is a scroll container. */
+  .poster-viewer{
+    position:fixed; inset:0; z-index:60;
+    background:rgba(8,6,12,.94);
+    display:flex; align-items:center; justify-content:center;
+    padding:18px; box-sizing:border-box; cursor:zoom-out;
+    animation:posterIn .18s var(--ease-out);
+  }
+  @keyframes posterIn{ from{ opacity:0 } to{ opacity:1 } }
+  .poster-full{
+    max-width:100%; max-height:100%; width:auto; height:auto;
+    object-fit:contain; border-radius:8px; display:block;
+  }
+  .poster-close{
+    position:absolute; top:16px; right:16px; z-index:1;
+    width:38px; height:38px; border-radius:50%;
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25);
+    color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .poster-close svg{ width:18px; height:18px; }
+
   /* The poster itself, where we have one. It is a separate file rather than
      part of the page, so it is fetched only when this sheet is opened and the
      page itself stays the size it was. */
@@ -2453,7 +2487,7 @@ const SEED_SCHEDULE = [
   { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
-    poster:{ accent:'#8C2A22', surface:'#FAF2E4', ink:'#4E1512' },
+    poster:{ accent:'#8C2A22', surface:'#FAF2E4', ink:'#4E1512', img:'posters/election-fanfest.jpg' },
     info:['女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
       'ประกาศวันแล้ว รายละเอียดอื่นรอประกาศ'],
     lineupTba:true },
@@ -2933,7 +2967,7 @@ const ICONS = {
 let state = {
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
-  calMonth:null, calDay:null,
+  calMonth:null, calDay:null, posterOf:null,
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
@@ -3335,6 +3369,21 @@ function renderMemberWorks(m){
 }
 
 
+
+/* Opening a poster full screen. The larger copy is a second file fetched only
+   here, so the sheet is not made to carry it just in case someone taps. */
+function renderPosterViewer(){
+  const ev = SEED_SCHEDULE.find(e => e.id === state.posterOf);
+  if(!ev || !ev.poster || !ev.poster.img) return '';
+  const full = ev.poster.img.replace(/\.jpg$/, '-full.jpg');
+  return `
+  <div class="poster-viewer" data-action="close-poster">
+    <button class="poster-close" data-action="close-poster" title="ปิด" aria-label="ปิด">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <img class="poster-full" src="${escapeAttr(full)}" alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" decoding="async">
+  </div>`;
+}
 
 // ============================= CALENDAR =============================
 // The feed answers "what is next". A month at a glance answers the other
@@ -3953,15 +4002,18 @@ function renderEventModal(){
   const mine = people.filter(m => state.oshi.includes(m.id));
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card${ev.poster?' is-postered':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
+    <div class="modal-glass-card${ev.poster?' is-postered':''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
       <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
       <div class="modal-scroll">
         ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : ''}
-        ${ev.poster && ev.poster.img ? `<img class="evm-poster" src="${escapeAttr(ev.poster.img)}"
-          alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" loading="lazy" decoding="async">` : ''}
+        ${ev.poster && ev.poster.img ? `<button class="evm-poster-btn" data-action="open-poster" data-id="${ev.id}"
+          title="ดูโปสเตอร์เต็ม" aria-label="ดูโปสเตอร์เต็ม">
+          <img class="evm-poster" src="${escapeAttr(ev.poster.img)}"
+            alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" loading="lazy" decoding="async">
+        </button>` : ''}
         <div class="evm-meta">
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
           ${ev.bookClosed
@@ -5077,6 +5129,7 @@ function renderMain(){
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
     renderForm())
+    + (state.posterOf ? renderPosterViewer() : '')
     + (state.comparePicking ? renderComparePicker()
        : state.compareWith && state.selectedId ? renderCompareModal()
        : state.selectedId ? renderDetailModal() : '')
@@ -5270,7 +5323,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
@@ -5415,6 +5468,7 @@ function isSameScreen(a, b){
   return !!a && !!b && a.view===b.view && a.selectedId===b.selectedId
     && a.selectedEvent===b.selectedEvent
     && a.compareWith===b.compareWith && a.comparePicking===b.comparePicking
+    && a.posterOf===b.posterOf
     && a.editingId===b.editingId && a.favoritesOnly===b.favoritesOnly
     && a.showGraduated===b.showGraduated && a.selectedSingle===b.selectedSingle;
 }
@@ -5616,6 +5670,12 @@ function bindDelegatedEvents(){
       state.selectedId=id; state.editingId=null; state.selectedEvent=null;
       state.compareWith=null; state.comparePicking=false;
       renderMain(); pushHistory();
+    }
+    else if(action==='open-poster'){
+      state.posterOf = id; renderMain(); pushHistory();
+    }
+    else if(action==='close-poster'){
+      goBack(()=>{ state.posterOf = null; });
     }
     else if(action==='cal-move'){
       const base = state.calMonth || toYmd(todayStart()).slice(0,7);
@@ -5876,6 +5936,44 @@ function bindDelegatedEvents(){
 
 // Registered after load so it never competes with the first paint, and wrapped
 // because a worker is a progressive extra: if it fails, the site still works.
+/* Installed to a home screen, the app is not reloaded when you switch back to
+   it — it is still the page you left. A deploy therefore sits unseen until the
+   app is force-quit, which is what the owner was having to do every time. The
+   page's own ETag is recorded at startup and checked again whenever the app
+   comes back to the front. */
+let _deployTag = null;
+
+async function fetchDeployTag(){
+  try{
+    const res = await fetch('./', { method:'HEAD', cache:'no-store' });
+    return res.headers.get('etag') || res.headers.get('last-modified');
+  }catch(e){ return null; }
+}
+
+async function watchForUpdates(){
+  if(location.protocol !== 'https:') return;
+  _deployTag = await fetchDeployTag();
+  if(!_deployTag) return;   // nothing to compare against, so never guess
+
+  document.addEventListener('visibilitychange', async ()=>{
+    if(document.visibilityState !== 'visible') return;
+    if(navigator.onLine === false) return;
+
+    const tag = await fetchDeployTag();
+    if(!tag || tag === _deployTag) return;
+
+    // Reloading out from under someone loses their place, so it waits until
+    // they have nothing open. The tag is deliberately left as it was, which
+    // means the next time they come back the update is found again.
+    const busy = state.selectedId || state.selectedEvent || state.posterOf
+      || state.comparePicking || (document.activeElement && document.activeElement.tagName === 'INPUT');
+    if(busy) return;
+
+    _deployTag = tag;
+    location.reload();
+  });
+}
+
 function registerServiceWorker(){
   if(!('serviceWorker' in navigator)) return;
 
@@ -5898,6 +5996,7 @@ function registerServiceWorker(){
 // ============================= INIT =============================
 async function init(){
   registerServiceWorker();
+  watchForUpdates();
   bindDelegatedEvents();
   initHistory();
   bindScrollPressGuard();
