@@ -422,11 +422,6 @@
     --chrome-edge:rgba(255,255,255,calc(.6*var(--glass-k)));
     --chrome-fg:var(--ink);
   }
-  .modal-glass-card[style*="--poster-on"]{
-    --chrome-bg:color-mix(in srgb, var(--poster-on) 16%, transparent);
-    --chrome-edge:color-mix(in srgb, var(--poster-on) 34%, transparent);
-    --chrome-fg:var(--poster-on);
-  }
   .modal-close-btn{
     position:absolute; top:14px; right:14px; z-index:2;
     width:32px; height:32px; border-radius:50%;
@@ -491,19 +486,6 @@
      is picked to read on the band — the festival's cream reads on its dark red
      and vanishes on cream paper — so it is not safe to reuse down here. */
   .modal-glass-card.is-postered .evm-head::before{ background:var(--ink); }
-
-  .ev-poster{
-    margin:0 0 18px; padding:20px 16px; border-radius:16px;
-    background:linear-gradient(155deg, var(--from), var(--to));
-    color:var(--on); text-align:center;
-    display:flex; flex-direction:column; gap:5px;
-  }
-  .ev-poster-kicker{
-    font-size:10px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; opacity:.85;
-  }
-  .ev-poster-tagline{
-    font-family:'Noto Sans Thai',sans-serif; font-size:14px; font-weight:700; line-height:1.35;
-  }
 
   .cal-wrap{
     background:var(--glass-card); border:1px solid var(--glass-edge);
@@ -2390,10 +2372,9 @@ const SEED_SCHEDULE = [
     title:'Get Away with Pudthailee',
     venue:'Hua Hin, Prachuap Khiri Khan', groups:['bnk48'],
     members:['bnk-hoop'], price:'55,000', bookClosed:true,
-    poster:{ from:'#8FD6EA', to:'#F5AECF', accent:'#7B5EA7',
-      surface:'#FDEFF6', ink:'#5A3A6E',
-      kicker:'Bangkok → Hua Hin', tagline:'3 วัน 2 คืน ริมทะเลหัวหิน' },
+    poster:{ accent:'#7B5EA7', surface:'#FDEFF6', ink:'#5A3A6E' },
     detail:[
+      'เดินทางจากกรุงเทพฯ ไปหัวหิน 3 วัน 2 คืน',
       'ห้องพักเดี่ยว 55,000 บาท · ห้องพักคู่ 100,000 บาท (2 ท่าน)',
       'ที่พักโรงแรม 5 ดาวติดริมทะเล',
       'อาหารรวม 8 มื้อ ไม่รวมมื้อเย็นของวันเดินทางกลับ',
@@ -2411,9 +2392,7 @@ const SEED_SCHEDULE = [
   { id:'ev-roadshow-mbk', start:'2026-09-19', end:'2026-09-20', time:'12:00',
     title:'BNK48 6th Album "Ponytail to Shushu" Roadshow',
     venue:'Avenue A ชั้น G, MBK Center, Bangkok', groups:['bnk48'],
-    poster:{ from:'#CFE3F2', to:'#8FB8D8', accent:'#20496E',
-      surface:'#F0F6FB', ink:'#1C3A56',
-      kicker:'BNK48 6th Album', tagline:'Mini Concert & Group Hi-Touch' },
+    poster:{ accent:'#20496E', surface:'#F0F6FB', ink:'#1C3A56' },
     members:['bnk-marine','bnk-niya','bnk-khaimook','bnk-micha','bnk-nammonn','bnk-galeya','bnk-neen'],
     memberDays:{ 'bnk-niya':'19 ก.ย.', 'bnk-khaimook':'20 ก.ย.' },
     detail:[
@@ -2439,29 +2418,26 @@ const SEED_SCHEDULE = [
     title:"Fame's Airline Fanmeet",
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     groups:['bnk48'], members:['bnk-fame'],
-    poster:{ from:'#EDF7FC', to:'#9FD4EE', accent:'#26324F',
-      surface:'#F3FAFE', ink:'#232E48',
-      kicker:'First Fanmeet', tagline:'#FameFirstFanmeet · #FameBNK48' },
+    poster:{ accent:'#26324F', surface:'#F3FAFE', ink:'#232E48' },
     price:'1,777', ticketUrl:'https://app.bnk48.com/performance',
     info:['แฟนมีตเดี่ยวครั้งแรกของเฟม',
       'ของที่ได้ในบัตร: เซลฟีกับเฟม, Boarding Pass, Inhaler, Postcard',
       'บัตรเปิดขายแล้ว ถึง 25 ก.ย. 2026 12:00',
-      'ซื้อได้ทาง app.bnk48.com หรือ iAM48 Application'] },
+      'ซื้อได้ทาง app.bnk48.com หรือ iAM48 Application',
+      '#FameFirstFanmeet #FameBNK48'] },
   { id:'ev-nine-charity', start:'2026-09-30', tag:'media',
     title:'Nine Entertain 24th Anniversary Charity Concert',
     venue:'Bangkok', groups:['bnk48'],
-    poster:{ from:'#F9C2DC', to:'#B978C6', accent:'#5E2260',
-      surface:'#FDF1F8', ink:'#53215A',
-      kicker:'MCOT HD 30 · Nine Entertain · MCOT Event' },
+    poster:{ accent:'#5E2260', surface:'#FDF1F8', ink:'#53215A' },
     members:['bnk-niya','bnk-monet','bnk-micha','bnk-praew','bnk-yoghurt','bnk-pancake'],
-    info:['คอนเสิร์ตการกุศลรวมศิลปินหลายวง BNK48 เป็นหนึ่งในนั้น'] },
+    info:['คอนเสิร์ตการกุศลรวมศิลปินหลายวง BNK48 เป็นหนึ่งในนั้น',
+      'จัดโดย Nine Entertain และ MCOT Event · ออกอากาศทาง MCOT HD 30'] },
   { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
-    poster:{ from:'#7E1512', to:'#140404', accent:'#EFDCAE',
-      surface:'#FAF2E4', ink:'#4E1512',
-      kicker:'BNK48 & CGM48', tagline:'女神たちよ、世界へ響け！' },
-    info:['ประกาศวันแล้ว รายละเอียดอื่นรอประกาศ'],
+    poster:{ accent:'#8C2A22', surface:'#FAF2E4', ink:'#4E1512' },
+    info:['女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
+      'ประกาศวันแล้ว รายละเอียดอื่นรอประกาศ'],
     lineupTba:true },
 ];
 
@@ -3921,21 +3897,6 @@ function eventHasMore(ev){
 }
 
 
-/* An announced event carries its own look, and arriving at a plain white sheet
-   after seeing the poster loses that. The sheet opens instead with a band in the
-   poster's colours and the line the poster leads with. Only the band is themed:
-   the schedule and notices below stay on the normal surface, which is what keeps
-   them readable in either light or dark. The band repeats nothing from the sheet
-   — the title and date already sit directly beneath it. */
-function renderPosterBanner(ev){
-  const p = ev.poster;
-  if(!p) return '';
-  return `<div class="ev-poster" style="--from:${p.from}; --to:${p.to}; --on:${p.accent}">
-    ${p.kicker ? `<span class="ev-poster-kicker">${escapeHtml(p.kicker)}</span>` : ''}
-    ${p.tagline ? `<span class="ev-poster-tagline">${escapeHtml(p.tagline)}</span>` : ''}
-  </div>`;
-}
-
 /* A birthday fanmeet gets a party header rather than the plain sheet: the
    celebrants' own portraits under hand-lettering, with the confetti drawn in
    CSS so it costs nothing to ship. */
@@ -3974,13 +3935,13 @@ function renderEventModal(){
   const mine = people.filter(m => state.oshi.includes(m.id));
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card${ev.poster&&ev.poster.surface?' is-postered':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --poster-on:${ev.poster.accent}`:''}${ev.poster&&ev.poster.surface?`; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
+    <div class="modal-glass-card${ev.poster?' is-postered':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
       <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
       <div class="modal-scroll">
-        ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : renderPosterBanner(ev)}
+        ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : ''}
         <div class="evm-meta">
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
           ${ev.bookClosed
