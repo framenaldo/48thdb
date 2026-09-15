@@ -3591,9 +3591,16 @@ function bindPullToRefresh(){
     setTimeout(()=>{ pill.style.transition = ''; pill.classList.remove('is-ready'); }, 240);
   };
 
+  // The screen's edges belong to the system: iOS swipes back from the left edge,
+  // and every new screen opens scrolled to the top, which is exactly where a pull
+  // arms. A thumb swiping back drifts down as it goes, so a pull that started at
+  // the edge claimed the gesture and the back swipe was cancelled.
+  const EDGE = 28;
   document.addEventListener('touchstart', (e)=>{
-    startY = (armed(e.target) && e.touches.length === 1) ? e.touches[0].clientY : null;
-    startX = startY === null ? 0 : e.touches[0].clientX;
+    const x = e.touches[0] ? e.touches[0].clientX : 0;
+    const atEdge = x < EDGE || x > window.innerWidth - EDGE;
+    startY = (!atEdge && armed(e.target) && e.touches.length === 1) ? e.touches[0].clientY : null;
+    startX = startY === null ? 0 : x;
     locked = false; pulled = 0;
   }, { passive:true });
 
@@ -3606,7 +3613,8 @@ function bindPullToRefresh(){
     // gesture is going before claiming it, that drift was blocking the swipe.
     if(!locked){
       if(Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-      if(Math.abs(dx) >= Math.abs(dy) || dy <= 0){ startY = null; return; }
+      // Only a clearly downward drag is a pull; anything diagonal is left alone.
+      if(dy <= 0 || dy < Math.abs(dx) * 1.4){ startY = null; return; }
       locked = true;
     }
     if(dy <= 0 || !armed(e.target)){ if(pulled) settle(); startY = null; return; }
