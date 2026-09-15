@@ -1187,7 +1187,9 @@
   .ev-group{
     font-size:10px; font-weight:800; letter-spacing:.04em; padding:2px 8px;
     border-radius:999px; color:#fff; background:var(--c);
+    border:0; font-family:inherit; line-height:inherit; cursor:pointer;
   }
+  .cal-item.is-past{ opacity:.62; }
   .ev-tba{ margin:7px 0 0; font-size:12px; color:var(--ink-soft); font-style:italic; }
   .ev-people{ display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
   .ev-person{
@@ -3739,10 +3741,12 @@ function compareRows(a, b){
   const ga = getGroup(a.groupId), gb = getGroup(b.groupId);
   push('วง', ga ? ga.name : '—', gb ? gb.name : '—',
     a.groupId === b.groupId ? 'วงเดียวกัน' : 'คนละวง');
+  rows[rows.length-1].html = [ga ? linkGroup(ga) : '—', gb ? linkGroup(gb) : '—'];
 
   const ta = getTeam(a.teamId), tb = getTeam(b.teamId);
   push('ทีม', ta ? ta.name : '—', tb ? tb.name : '—',
     a.teamId && a.teamId === b.teamId ? 'ทีมเดียวกัน' : null);
+  rows[rows.length-1].html = [ta ? linkTeam(ta) : '—', tb ? linkTeam(tb) : '—'];
 
   push('รุ่น', `รุ่น ${a.gen}`, `รุ่น ${b.gen}`,
     a.gen === b.gen ? 'รุ่นเดียวกัน' : `ห่างกัน ${Math.abs(a.gen-b.gen)} รุ่น`);
@@ -3818,9 +3822,9 @@ function renderCompareModal(){
         <div class="cmp-rows">
           ${rows.map(r=>`
             <div class="cmp-row">
-              <div class="cmp-val">${escapeHtml(String(r.left))}</div>
+              <div class="cmp-val">${r.html ? r.html[0] : escapeHtml(String(r.left))}</div>
               <div class="cmp-label">${escapeHtml(r.label)}</div>
-              <div class="cmp-val">${escapeHtml(String(r.right))}</div>
+              <div class="cmp-val">${r.html ? r.html[1] : escapeHtml(String(r.right))}</div>
             </div>
             ${r.note ? `<div class="cmp-note">${escapeHtml(r.note)}</div>` : ''}
           `).join('')}
@@ -3991,7 +3995,7 @@ function renderTeamHistory(m){
     const end = s.to ? formatDateShort(s.to) : `<span class="th-now">ปัจจุบัน</span>`;
     return `<li>
       <span class="th-dot" style="background:${colour}"></span>
-      <span class="th-team">${t ? t.name : s.team}</span>
+      <span class="th-team">${t ? linkTeam(t) : escapeHtml(s.team)}</span>
       <span class="th-range mono">${formatDateShort(s.from)} – ${end}</span>
     </li>`;
   }).join('');
@@ -4219,7 +4223,7 @@ function renderEventCard(ev, todayIso){
       <h3 class="ev-title">${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
-        `<span class="ev-group" style="--c:${g.color}">${g.name}</span>`).join('')}</div>` : ''}
+        groupTag(g)).join('')}</div>` : ''}
       ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
       ${shown.length ? `<div class="ev-people">${shown.map(m=>{
         const g = getGroup(m.groupId);
@@ -4313,7 +4317,7 @@ function renderEventModal(){
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
             <span>${escapeHtml(ev.venue)}</span></a>` : ''}
         ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
-          `<span class="ev-group" style="--c:${g.color}">${g.name}</span>`).join('')}</div>` : ''}
+          groupTag(g)).join('')}</div>` : ''}
 
         ${ev.detail ? `
         <h3 class="evm-head">กำหนดการ</h3>
@@ -4710,7 +4714,7 @@ function renderDetailModal(){
             <div>${badges.join('')}</div>
           </div>
         </div>
-        ${m.transfer ? `<div class="grad-note transfer-note"><span class="grad-cap">${ICONS.transfer}</span>ย้ายวงจาก ${getGroup(m.transfer.fromGroupId).name} (รุ่น ${m.transfer.fromGen}) เมื่อ ${formatDateShort(m.transfer.date)}</div>` : ''}
+        ${m.transfer ? `<div class="grad-note transfer-note"><span class="grad-cap">${ICONS.transfer}</span>ย้ายวงจาก ${linkGroup(getGroup(m.transfer.fromGroupId))} (รุ่น ${m.transfer.fromGen}) เมื่อ ${formatDateShort(m.transfer.date)}</div>` : ''}
         ${m.graduated ? `<div class="grad-note"><span class="grad-cap">${ICONS.cap}</span>จบการศึกษาเมื่อ ${formatDateShort(m.graduated)}</div>` : ''}
         <div class="oshi-actions">
           <button class="oshi-btn ${isOshi?'active':''}" data-action="toggle-oshi" data-id="${m.id}">
@@ -4729,6 +4733,7 @@ function renderDetailModal(){
           <div class="stat-cell"><div class="label">กรุ๊ปเลือด</div><div class="value">${m.blood||'-'}</div></div>
         </div>
         ${renderTeamHistory(m)}
+        ${renderMemberEvents(m)}
         ${renderMemberWorks(m)}
         <h3 class="section-label">ข้อเท็จจริง</h3>
         ${m.facts && m.facts.length ? `<ul class="facts-list">${m.facts.map(f=>`<li>${f}</li>`).join('')}</ul>` : `<p class="muted-note">ยังไม่มีข้อมูลเพิ่มเติม — กด "แก้ไขข้อมูล" เพื่อเพิ่ม</p>`}
@@ -4762,10 +4767,10 @@ function renderGroups(){
       </div>
       <p>${g.desc}</p>
       <div class="chip-row" style="margin-bottom:14px;">
-        <span class="chip">กัปตัน: ${g.captain||'-'}</span>
-        ${g.viceCaptain?`<span class="chip">รองกัปตัน: ${g.viceCaptain}</span>`:''}
-        <span class="chip">${count} คน</span>
-        ${gradCount?`<span class="chip">จบแล้ว ${gradCount} คน</span>`:''}
+        <span class="chip">กัปตัน: ${g.captain ? linkMember(memberNamed(g.captain, g.id), g.captain) : '-'}</span>
+        ${g.viceCaptain?`<span class="chip">รองกัปตัน: ${linkMember(memberNamed(g.viceCaptain, g.id), g.viceCaptain)}</span>`:''}
+        <button class="chip chip-link" data-action="drill" data-group="${g.id}">${count} คน</button>
+        ${gradCount?`<button class="chip chip-link" data-action="drill" data-group="${g.id}" data-grad="1">จบแล้ว ${gradCount} คน</button>`:''}
       </div>
       ${teams.map(t=>{
         const tc = activeMembers().filter(m=>m.teamId===t.id).length;
@@ -4946,8 +4951,8 @@ function renderStatsOverview(){
       <div class="group-head"><h2 style="font-size:21px;">เพลง</h2>
         <button class="link-inline" data-action="stats-tab" data-value="songs">ดูทั้งหมด →</button></div>
       <div class="stat-grid" style="margin-bottom:4px;">
-        <div class="stat-cell"><div class="label">เพลงทั้งหมด</div><div class="value">${tracks.length} เพลง</div></div>
-        <div class="stat-cell"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length+SEED_ALBUMS.length} ชิ้น</div></div>
+        <button class="stat-cell" data-action="stats-tab" data-value="songs"><div class="label">เพลงทั้งหมด</div><div class="value">${tracks.length} เพลง</div></button>
+        <button class="stat-cell" data-action="nav-select" data-value="discography"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length+SEED_ALBUMS.length} ชิ้น</div></button>
         <div class="stat-cell"><div class="label">เซ็มบัตสึเฉลี่ย</div><div class="value">${mean} คน</div></div>
         <div class="stat-cell"><div class="label">มีเพลงอย่างน้อย 1</div><div class="value">${appearances.size} คน</div></div>
       </div>
@@ -4990,7 +4995,7 @@ function renderStatsSongs(){
   return `
   <div class="stat-grid">
     <div class="stat-cell"><div class="label">เพลงทั้งหมด</div><div class="value">${tracks.length} เพลง</div></div>
-    <div class="stat-cell"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length + SEED_ALBUMS.length} ชิ้น</div></div>
+    <button class="stat-cell" data-action="nav-select" data-value="discography"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length + SEED_ALBUMS.length} ชิ้น</div></button>
     <div class="stat-cell"><div class="label">มีเพลงอย่างน้อย 1</div><div class="value">${appearances.size} คน</div></div>
     <div class="stat-cell"><div class="label">เซ็มบัตสึเฉลี่ย</div><div class="value">${mean} คน</div></div>
   </div>
@@ -5139,6 +5144,63 @@ function renderStatsBirthdays(){
   }).join('')}`;
 }
 
+/* Wherever a group, team, member, release or event is named, it can be
+   followed. These are the one way each kind of thing is linked, so a name looks
+   and behaves the same on every screen it turns up on. */
+function linkGroup(g, text){
+  if(!g) return escapeHtml(text || '');
+  return `<button class="link-inline" data-action="filter-team-direct" data-group="${g.id}" data-team="all">${escapeHtml(text ?? g.name)}</button>`;
+}
+function linkTeam(t, text){
+  if(!t) return escapeHtml(text || '');
+  return `<button class="link-inline" data-action="filter-team-direct" data-group="${t.groupId}" data-team="${t.id}">${escapeHtml(text ?? t.name)}</button>`;
+}
+function linkMember(m, text){
+  if(!m) return escapeHtml(text || '');
+  return `<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(text ?? (m.nameTh || m.name))}</button>`;
+}
+function linkWork(w, text){
+  if(!w) return escapeHtml(text || '');
+  return `<button class="link-inline" data-action="open-single" data-id="${w.id}">${escapeHtml(text ?? w.title)}</button>`;
+}
+/** Captains are stored by name rather than id. */
+function memberNamed(name, groupId){
+  return name ? state.members.find(m => m.name === name && (!groupId || m.groupId === groupId)) : null;
+}
+function groupTag(g){
+  return `<button class="ev-group" style="--c:${g.color}" data-action="filter-team-direct" data-group="${g.id}" data-team="all">${g.name}</button>`;
+}
+
+/* The events a member is booked for. The data always said who was at an event;
+   nothing on a member's own page said which events they were at. */
+/* Following a link out of a sheet goes to another screen, so nothing that was
+   drawn over the old one may linger over the new one. Back still returns to it:
+   the sheet is its own history entry. */
+function leaveOverlays(){
+  state.selectedId = null; state.selectedEvent = null; state.editingId = null;
+  state.compareWith = null; state.comparePicking = false; state.posterOf = null;
+}
+
+function renderMemberEvents(m){
+  const iso = toYmd(todayStart());
+  const evs = SEED_SCHEDULE.filter(e => (e.members || []).includes(m.id));
+  if(!evs.length) return '';
+  const upcoming = evs.filter(e => eventLastDay(e) >= iso).sort((a,b) => a.start.localeCompare(b.start));
+  const past = evs.filter(e => eventLastDay(e) < iso).sort((a,b) => b.start.localeCompare(a.start));
+  const row = (e, isPast) => {
+    const g = (e.groups || []).length === 1 ? getGroup(e.groups[0]) : getGroup(m.groupId);
+    const day = e.memberDays && e.memberDays[m.id];
+    return `<button class="cal-item${isPast ? ' is-past' : ''}" style="--c:${g ? g.color : 'var(--ink-soft)'}"
+      data-action="open-event" data-id="${e.id}">
+      <span class="cal-item-tag">${day || eventDateLabel(e)}</span>
+      <span>${escapeHtml(e.title)}</span>
+    </button>`;
+  };
+  return `<h3 class="section-label">งานที่ร่วม</h3>
+    ${upcoming.length ? upcoming.map(e => row(e, false)).join('') : '<p class="muted-note">ยังไม่มีงานที่จะถึง</p>'}
+    ${past.length ? `<p class="works-count" style="margin-top:12px;">ที่ผ่านมา</p>${past.map(e => row(e, true)).join('')}` : ''}`;
+}
+
 function renderStatsTimeline(){
   // One entry per year, merging what the database actually knows: group
   // debuts, single releases and graduations.
@@ -5157,18 +5219,18 @@ function renderStatsTimeline(){
       return `<div class="timeline-item" style="--c:var(--ink-soft)">
         <div class="year-head">${y}</div>
         ${e.debuts.map(g=>`<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
-          <span><b>${g.name}</b> เดบิวต์ · ${formatDate(g.debut)}</span></div>`).join('')}
+          <span><b>${linkGroup(g)}</b> เดบิวต์ · ${formatDate(g.debut)}</span></div>`).join('')}
         ${e.singles.length ? GROUPS.map(g=>{
           const ss = e.singles.filter(s=>s.groupId===g.id).sort((a,b)=>a.num-b.num);
           if(!ss.length) return '';
           return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
-            <span>${g.name} ปล่อย ${ss.length} ซิงเกิล <span class="ev-names">${ss.map(s=>escapeHtml(s.title)).join(' · ')}</span></span></div>`;
+            <span>${linkGroup(g)} ปล่อย ${ss.length} ซิงเกิล <span class="ev-names">${ss.map(s=>linkWork(s)).join(' · ')}</span></span></div>`;
         }).join('') : ''}
         ${GROUPS.map(g=>{
           const gs = byGroup(g.id);
           if(!gs.length) return '';
           return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
-            <span>${gs.length} คนจบการศึกษาจาก ${g.name}
+            <span>${gs.length} คนจบการศึกษาจาก ${linkGroup(g)}
             <span class="ev-names">${gs.map(m=>`<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(m.nameTh||m.name)}</button>`).join(' · ')}</span></span></div>`;
         }).join('')}
       </div>`;
@@ -5254,7 +5316,7 @@ function renderSingleDetail(){
         <span class="track-name">${escapeHtml(t.track)}</span>
       </div>
       <div class="track-sub">${t.members.length} คน${t.centers.length
-        ? ' · เซ็นเตอร์ ' + t.centers.map(id=>escapeHtml(getMember(id)?.nameTh||getMember(id)?.name||'')).join(', ')
+        ? ' · เซ็นเตอร์ ' + t.centers.map(id=>linkMember(getMember(id))).join(', ')
         : ''}</div>
       <div class="grid-mini">
         ${t.centers.map(id=>card(id, true)).join('')}
@@ -5268,10 +5330,18 @@ function renderSingleDetail(){
   <div class="release-page">
   <button class="back-btn" data-action="go-back">← กลับ</button>
   <div class="single-head" style="--c:${g.color}">
-    <div class="timeline-year">${g.name} · ${isAlbum?'อัลบั้มที่':'ซิงเกิลที่'} ${s.num} · ${s.year}</div>
+    <div class="timeline-year">${linkGroup(g)} · ${isAlbum?'อัลบั้มที่':'ซิงเกิลที่'} ${s.num} · ${s.year}</div>
     <h2>${escapeHtml(s.title)}</h2>
     ${s.alt?`<p class="single-th">${escapeHtml(s.alt)}</p>`:''}
   </div>
+  ${(()=>{ // an album lists its singles; a single should lead back to its album too
+    if(isAlbum) return '';
+    const albums = SEED_ALBUMS.filter(a => (a.singles || []).includes(s.id));
+    return albums.length ? `
+    <h3 class="section-label">อยู่ในอัลบั้ม</h3>
+    <div class="album-singles">
+      ${albums.map(a=>`<button class="chip chip-link" data-action="open-single" data-id="${a.id}">${escapeHtml(a.title)}</button>`).join('')}
+    </div>` : ''; })()}
   ${isAlbum && s.singles.length ? `
     <h3 class="section-label">ซิงเกิลที่รวมอยู่ในอัลบั้ม</h3>
     <div class="album-singles">
@@ -6144,7 +6214,7 @@ function bindDelegatedEvents(){
     else if(action==='open-single'){
       state.selectedSingle = el.dataset.id;
       state.view = 'single';
-      state.selectedId = null;
+      leaveOverlays();
       render(); pushHistory();
     }
     else if(action==='drill'){
@@ -6162,13 +6232,15 @@ function bindDelegatedEvents(){
       // narrowing is visible rather than mysterious.
       state.advOpen = !!(d.ageMin || d.ageMax || d.month);
       state.view = 'browse'; state.favoritesOnly = false;
-      state.selectedId = null; state.query = '';
+      leaveOverlays(); state.query = '';
       render(); pushHistory();
     }
     else if(action==='filter-team-direct'){
       state.groupFilter = el.dataset.group;
       state.teamFilter = el.dataset.team;
       state.view = 'browse'; state.favoritesOnly = false;
+      state.showGraduated = false; state.genFilter = 'all'; state.captainFilter = 'all';
+      leaveOverlays();
       render(); pushHistory();
     }
     else if(action==='nav-select'){
@@ -6176,7 +6248,7 @@ function bindDelegatedEvents(){
       if(opt){
         state.view = opt.view;
         state.favoritesOnly = opt.fav;
-        state.selectedId = null; state.editingId = null;
+        leaveOverlays();
         render(); pushHistory();
       }
     }
