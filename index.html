@@ -1190,13 +1190,47 @@
     border:0; font-family:inherit; line-height:inherit; cursor:pointer;
   }
   .cal-item.is-past{ opacity:.62; }
+  .cal-item.is-today{
+    border-width:1px 1px 1px 4px;
+    background:color-mix(in srgb, var(--c) 12%, var(--card));
+  }
 
-  .org-groups{ display:grid; grid-template-columns:1fr; gap:14px; }
-  @media (min-width:760px){ .org-groups{ grid-template-columns:1fr 1fr; align-items:start; } }
-  .org-tree{ --org-line:color-mix(in srgb, var(--c) 45%, transparent); padding-bottom:18px; }
-  .org-tier{ position:relative; display:flex; justify-content:center; gap:10px; padding-top:24px; }
+  /* A grid item is as wide as its content by default, and the chart's content is
+     wider than a phone on purpose — so the columns are told they may be narrower,
+     leaving the frame to scroll and zoom instead of the card spilling off screen. */
+  .org-groups{ display:grid; grid-template-columns:minmax(0, 1fr); gap:14px; }
+  .org-groups > .org-tree{ min-width:0; overflow:hidden; }
+  @media (min-width:760px){ .org-groups{ grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); align-items:start; } }
+  .org-tree{ --org-line:color-mix(in srgb, var(--c) 45%, transparent); padding-bottom:14px; }
+  .org-tree .group-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+
+  .org-legend{
+    display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:0 0 6px;
+    font-size:11.5px; font-weight:700; color:var(--ink-soft);
+  }
+  .org-key{ display:inline-flex; align-items:center; gap:5px; }
+  .org-key-arrow{ opacity:.5; }
+  .rank-swatch{ width:14px; height:14px; border-radius:4px; display:inline-block; box-sizing:border-box; }
+  .org-hint{ margin:0 0 12px; font-size:11.5px; color:var(--ink-soft); }
+
+  .org-zoom{ display:inline-flex; gap:4px; flex:none; }
+  .org-zoom button{
+    min-width:32px; height:30px; padding:0 9px; border-radius:999px; cursor:pointer;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    font-family:'Noto Sans Thai',sans-serif; font-size:13px; font-weight:800;
+  }
+
+  /* The frame scrolls both ways once the tree is larger than it. */
+  .org-viewport{
+    overflow:auto; max-height:72vh; margin:0 -4px; padding:4px;
+    overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+  }
+  .org-canvas{ padding:0 12px; box-sizing:border-box; }
+
+  .org-tier{ position:relative; display:flex; justify-content:center; gap:12px; padding-top:24px; }
   .org-tier.is-first{ padding-top:4px; }
   .org-slot{ position:relative; flex:0 1 150px; min-width:0; display:flex; flex-direction:column; align-items:center; }
+  .org-tier.is-teams > .org-slot{ flex:0 0 250px; }
   .org-tier.is-wide > .org-slot{ flex:1 1 auto; }
   /* The lines: a stem down from the tier above, a bar across from the first
      child's centre to the last's, and a stub up from each child to the bar. */
@@ -1207,7 +1241,7 @@
   .org-tier:not(.is-first)::before{ top:0; left:50%; }
   .org-tier:not(.is-first) > .org-slot::before{ top:-12px; left:50%; }
   .org-tier:not(.is-first) > .org-slot::after{
-    content:''; position:absolute; top:-13px; left:-5px; right:-5px; height:2px; background:var(--org-line);
+    content:''; position:absolute; top:-13px; left:-6px; right:-6px; height:2px; background:var(--org-line);
   }
   .org-tier > .org-slot:first-child::after{ left:50%; }
   .org-tier > .org-slot:last-child::after{ right:50%; }
@@ -1217,31 +1251,59 @@
     width:100%; max-width:150px; box-sizing:border-box; margin:0;
     display:flex; flex-direction:column; align-items:center; gap:3px;
     padding:10px 8px 9px; border-radius:14px; text-align:center;
-    background:var(--card); border:1px solid color-mix(in srgb, var(--c) 35%, var(--line));
-    font-family:'Noto Sans Thai',sans-serif; color:var(--ink); cursor:pointer;
+    font-family:'Noto Sans Thai',sans-serif; cursor:pointer;
   }
-  .org-tier.is-first .org-node{
-    border:2px solid var(--gold); box-shadow:0 6px 18px rgba(var(--shadow-rgb),.14);
-  }
-  /* An unfilled seat reads as unfilled even at the top, where filled seats get gold. */
-  .org-node.is-empty,
-  .org-tier.is-first .org-node.is-empty{ cursor:default; border-style:dashed; background:transparent; box-shadow:none; }
   .org-avatar{
     position:relative; overflow:hidden; width:46px; height:46px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; margin-bottom:3px;
     font-family:'Noto Sans Thai',sans-serif; font-weight:700; font-size:18px; color:#fff;
   }
-  .org-role{ font-size:10.5px; font-weight:800; line-height:1.25; color:var(--c); }
-  .org-tier.is-first .org-role{ color:var(--gold); }
+  .org-role{ font-size:10.5px; font-weight:800; line-height:1.25; }
   .org-name{ font-size:13.5px; font-weight:800; line-height:1.2; overflow-wrap:anywhere; }
-  .org-node.is-empty .org-name{ font-weight:600; color:var(--ink-soft); }
   .org-past{ margin-top:7px; font-size:11.5px; color:var(--ink-soft); text-align:center; }
-  .org-trainees{
-    width:100%; box-sizing:border-box; padding:11px 12px; border-radius:14px;
-    border:1px dashed color-mix(in srgb, var(--c) 40%, var(--line));
+
+  /* Rank as colour, strongest at the top. The fills for the upper ranks are a
+     shade darker than the group colour so white text on them stays readable. */
+  .org-node.rank-1, .rank-swatch.rank-1{
+    background:color-mix(in srgb, var(--gold) 18%, var(--card)); border:2px solid var(--gold);
+    color:var(--ink); box-shadow:0 6px 18px rgba(var(--shadow-rgb),.14);
   }
-  .org-trainees-head{ font-size:12px; font-weight:800; color:var(--c); margin-bottom:7px; text-align:center; }
-  .org-trainees .ev-people{ justify-content:center; margin-top:0; }
+  .org-node.rank-1 .org-role{ color:var(--gold); }
+  .org-node.rank-2, .rank-swatch.rank-2{
+    background:color-mix(in srgb, var(--c) 80%, #000); border:1px solid transparent; color:#fff;
+  }
+  .org-node.rank-2 .org-role{ color:rgba(255,255,255,.86); }
+  .org-node.rank-3, .rank-swatch.rank-3{
+    background:color-mix(in srgb, var(--c) 18%, var(--card));
+    border:1px solid color-mix(in srgb, var(--c) 55%, var(--line)); color:var(--ink);
+  }
+  .org-node.rank-3 .org-role{ color:var(--c); }
+  .org-members, .rank-swatch.rank-4{
+    background:color-mix(in srgb, var(--c) 7%, transparent);
+    border:1px solid color-mix(in srgb, var(--c) 24%, var(--line));
+  }
+  .org-trainees, .rank-swatch.rank-5{
+    background:transparent; border:1px dashed color-mix(in srgb, var(--c) 40%, var(--line));
+  }
+  .org-node.is-empty{
+    background:transparent !important; border:1px dashed color-mix(in srgb, var(--c) 45%, var(--line)) !important;
+    box-shadow:none !important; color:var(--ink-soft); cursor:default;
+  }
+  .org-node.is-empty .org-role{ color:var(--ink-soft) !important; }
+  .org-node.is-empty .org-name{ font-weight:600; }
+
+  .org-team{ width:100%; display:flex; flex-direction:column; align-items:center; gap:0; }
+  .org-team-name{ font-size:12px; font-weight:800; color:var(--c); margin-bottom:7px; text-align:center; }
+  .org-leads{ display:flex; gap:8px; justify-content:center; width:100%; position:relative; padding-bottom:14px; }
+  .org-leads .org-node{ flex:1 1 0; }
+  .org-leads::after{
+    content:''; position:absolute; left:50%; bottom:0; width:2px; height:14px; margin-left:-1px; background:var(--org-line);
+  }
+  .org-leads:last-child{ padding-bottom:0; }
+  .org-leads:last-child::after{ display:none; }
+  .org-members, .org-trainees{ width:100%; box-sizing:border-box; padding:10px; border-radius:14px; }
+  .org-members .ev-people, .org-trainees .ev-people{ justify-content:center; margin-top:0; }
+  .org-members .ev-person{ background:color-mix(in srgb, var(--c) 13%, var(--card)); }
   .ev-tba{ margin:7px 0 0; font-size:12px; color:var(--ink-soft); font-style:italic; }
   .ev-people{ display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
   .ev-person{
@@ -3495,9 +3557,16 @@ function bindPullToRefresh(){
   pill.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.2-6.9"/><path d="M21 4v5h-5"/></svg>`;
   document.body.appendChild(pill);
 
-  const armed = () => (window.scrollY || window.pageYOffset || 0) <= 0
+  // A pull that starts inside a frame scrolled away from its own top is that
+  // frame's scroll, not a refresh — the zoomed position chart is one.
+  const scrolledFrame = el => {
+    for(; el && el !== document.body; el = el.parentElement) if(el.scrollTop > 0) return true;
+    return false;
+  };
+  const armed = target => (window.scrollY || window.pageYOffset || 0) <= 0
     && !document.body.classList.contains('modal-locked')
-    && !document.querySelector('.poster-viewer');
+    && !document.querySelector('.poster-viewer')
+    && !scrolledFrame(target);
 
   // It slides out from under the sticky header rather than being drawn across
   // it, which is where the rest of the app's chrome already lives.
@@ -3516,7 +3585,7 @@ function bindPullToRefresh(){
   };
 
   document.addEventListener('touchstart', (e)=>{
-    startY = (armed() && e.touches.length === 1) ? e.touches[0].clientY : null;
+    startY = (armed(e.target) && e.touches.length === 1) ? e.touches[0].clientY : null;
     startX = startY === null ? 0 : e.touches[0].clientX;
     locked = false; pulled = 0;
   }, { passive:true });
@@ -3533,7 +3602,7 @@ function bindPullToRefresh(){
       if(Math.abs(dx) >= Math.abs(dy) || dy <= 0){ startY = null; return; }
       locked = true;
     }
-    if(dy <= 0 || !armed()){ if(pulled) settle(); startY = null; return; }
+    if(dy <= 0 || !armed(e.target)){ if(pulled) settle(); startY = null; return; }
     // Half distance, so it takes a deliberate pull rather than a stray swipe.
     draw(dy * 0.5);
     if(e.cancelable) e.preventDefault();
@@ -4848,60 +4917,158 @@ function renderGroups(){
   }).join('');
 }
 
-/* Who answers to whom, drawn as a family tree: the manager, then the group's
-   captain and vice, then each team's, then the trainees who have not been placed
-   in a team yet. One tree per group; every person on it opens their profile. */
+/* Who answers to whom, drawn as a family tree: the manager, the group's captain
+   and vice, each team with its captain and vice over the rest of its members,
+   then the trainees not yet placed in a team — everyone, once. Rank reads as
+   colour as well as position: the higher the seat, the stronger its fill.
+   Every person opens their profile.
+
+   With everyone on it the tree is wider than a phone, so each is drawn at a
+   fixed size inside its own frame and can be zoomed: pinched, with the
+   buttons, or ctrl-scrolled on a trackpad. It opens fitted to the frame. */
+const ORG_TEAM_W = 250, ORG_GAP = 12, ORG_PAD = 12;
+const _orgZoom = {};
+
 function renderOrgChart(){
-  const node = (m, role, g) => m
-    ? `<button class="org-node" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+  const node = (m, role, g, rank) => m
+    ? `<button class="org-node rank-${rank}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
         ${renderAvatar(m, 'org-avatar', g.color)}
         <span class="org-role">${role}</span>
         <span class="org-name">${escapeHtml(m.nameTh || m.name)}</span>
       </button>`
-    : `<div class="org-node is-empty" style="--c:${g.color}">
+    : `<div class="org-node rank-${rank} is-empty" style="--c:${g.color}">
         <span class="org-role">${role}</span>
         <span class="org-name">ยังไม่มีข้อมูล</span>
       </div>`;
   const tier = (slots, cls) => slots.length
     ? `<div class="org-tier${cls ? ' ' + cls : ''}">${slots.map(s => `<div class="org-slot">${s}</div>`).join('')}</div>`
     : '';
+  const chips = (list, g) => list.map(m => `<button class="ev-person" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+      ${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(m.nameTh || m.name)}</span></button>`).join('');
 
   const tree = g => {
     const held = SHIHAININ.filter(r => r.groupId === g.id);
     const now = held.find(r => r.current);
     const before = held.filter(r => !r.current).map(r => getMember(r.memberId)).filter(Boolean);
-    const top = node(now && getMember(now.memberId), 'ชิไฮนิน', g)
+    const top = node(now && getMember(now.memberId), 'ชิไฮนิน', g, 1)
       + (before.length ? `<div class="org-past">ก่อนหน้า ${before.map(m => linkMember(m)).join(' · ')}</div>` : '');
 
     const captains = [];
-    if(g.captain) captains.push(node(memberNamed(g.captain, g.id), 'กัปตันวง', g));
-    if(g.viceCaptain) captains.push(node(memberNamed(g.viceCaptain, g.id), 'รองกัปตันวง', g));
+    if(g.captain) captains.push(node(memberNamed(g.captain, g.id), 'กัปตันวง', g, 2));
+    if(g.viceCaptain) captains.push(node(memberNamed(g.viceCaptain, g.id), 'รองกัปตันวง', g, 2));
 
-    const teamLeads = [];
-    getTeamsForGroup(g.id).filter(t => !/trainee/.test(t.id)).forEach(t => {
-      if(t.captain) teamLeads.push(node(memberNamed(t.captain, g.id), `กัปตัน ${escapeHtml(t.name)}`, g));
-      if(t.viceCaptain) teamLeads.push(node(memberNamed(t.viceCaptain, g.id), `รองกัปตัน ${escapeHtml(t.name)}`, g));
+    // Everyone appears once, in the highest seat they hold: a group captain who
+    // also belongs to a team is drawn as group captain, not again in that team.
+    const placedAbove = new Set([memberNamed(g.captain, g.id), memberNamed(g.viceCaptain, g.id)].filter(Boolean));
+    const teams = getTeamsForGroup(g.id).filter(t => !/trainee/.test(t.id));
+    const teamCols = teams.map(t => {
+      const cap = memberNamed(t.captain, g.id), vice = memberNamed(t.viceCaptain, g.id);
+      const roster = activeMembers().filter(m => m.teamId === t.id);
+      const rest = roster
+        .filter(m => m !== cap && m !== vice && !placedAbove.has(m))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      // A team with no vice on record still shows the seat, so the gap is visible.
+      return `<div class="org-team">
+        <div class="org-team-name">${linkTeam(t)} · ${roster.length} คน</div>
+        <div class="org-leads">
+          ${node(cap, 'กัปตันทีม', g, 3)}
+          ${node(vice, 'รองกัปตันทีม', g, 3)}
+        </div>
+        ${rest.length ? `<div class="org-members"><div class="ev-people">${chips(rest, g)}</div></div>` : ''}
+      </div>`;
     });
 
     const traineeTeam = getTeamsForGroup(g.id).find(t => /trainee/.test(t.id));
     const trainees = activeMembers().filter(m => m.groupId === g.id && /trainee/.test(m.teamId || ''))
       .sort((a, b) => a.name.localeCompare(b.name));
     const traineeBox = trainees.length ? `<div class="org-trainees">
-        <div class="org-trainees-head">${traineeTeam ? linkTeam(traineeTeam, 'เด็กฝึก') : 'เด็กฝึก'} · ${trainees.length} คน</div>
-        <div class="ev-people">${trainees.map(m => `<button class="ev-person" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
-          ${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(m.nameTh || m.name)}</span></button>`).join('')}</div>
+        <div class="org-team-name">${traineeTeam ? linkTeam(traineeTeam, 'เด็กฝึก') : 'เด็กฝึก'} · ${trainees.length} คน</div>
+        <div class="ev-people">${chips(trainees, g)}</div>
       </div>` : '';
 
+    const width = Math.max(370, teams.length * ORG_TEAM_W + (teams.length - 1) * ORG_GAP) + ORG_PAD * 2;
     return `<div class="group-card org-tree" style="--c:${g.color}">
-      <div class="group-head"><h2 style="color:${g.color}">${linkGroup(g)}</h2></div>
-      ${tier([top], 'is-first')}
-      ${tier(captains)}
-      ${tier(teamLeads)}
-      ${tier(traineeBox ? [traineeBox] : [], 'is-wide')}
+      <div class="group-head">
+        <h2 style="color:${g.color}">${linkGroup(g)}</h2>
+        <div class="org-zoom" data-group="${g.id}">
+          <button type="button" data-org-zoom="out" aria-label="ซูมออก">−</button>
+          <button type="button" data-org-zoom="fit" aria-label="พอดีกรอบ">พอดี</button>
+          <button type="button" data-org-zoom="in" aria-label="ซูมเข้า">+</button>
+        </div>
+      </div>
+      <div class="org-viewport" data-group="${g.id}">
+        <div class="org-canvas" data-w="${width}" style="width:${width}px">
+          ${tier([top], 'is-first')}
+          ${tier(captains)}
+          ${tier(teamCols, 'is-teams')}
+          ${tier(traineeBox ? [traineeBox] : [], 'is-wide')}
+        </div>
+      </div>
     </div>`;
   };
 
-  return renderMembersTabs() + `<div class="org-groups">${GROUPS.map(tree).join('')}</div>`;
+  const legend = [['ชิไฮนิน', 1], ['กัปตันวง', 2], ['กัปตันทีม', 3], ['สมาชิกทีม', 4], ['เด็กฝึก', 5]];
+  return renderMembersTabs() + `
+    <div class="org-legend" style="--c:${GROUPS[0].color}">
+      ${legend.map(([label, r]) => `<span class="org-key"><i class="rank-swatch rank-${r}"></i>${label}</span>`).join('<span class="org-key-arrow">›</span>')}
+    </div>
+    <p class="org-hint">บีบนิ้วหรือกด + − เพื่อซูม · แตะชื่อเพื่อดูโปรไฟล์</p>
+    <div class="org-groups">${GROUPS.map(tree).join('')}</div>`;
+}
+
+function bindOrgZoom(){
+  document.querySelectorAll('.org-viewport').forEach(vp => {
+    const canvas = vp.querySelector('.org-canvas');
+    const gid = vp.dataset.group;
+    const w = Number(canvas.dataset.w);
+    const fit = Math.min(1, vp.clientWidth / w);
+    let z = Math.min(2, Math.max(fit, _orgZoom[gid] || fit));
+
+    const apply = () => {
+      canvas.style.zoom = z;
+      _orgZoom[gid] = z;
+    };
+    // Zoom about a point in the frame, so what is under the fingers stays there.
+    const zoomTo = (nz, fx, fy) => {
+      nz = Math.min(2, Math.max(fit, nz));
+      const cx = (vp.scrollLeft + fx) / z, cy = (vp.scrollTop + fy) / z;
+      z = nz; apply();
+      vp.scrollLeft = cx * z - fx;
+      vp.scrollTop = cy * z - fy;
+    };
+    apply();
+
+    let pinch = null;
+    const spread = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    vp.addEventListener('touchstart', e => {
+      if(e.touches.length !== 2) return;
+      const r = vp.getBoundingClientRect();
+      pinch = { d: spread(e.touches), z,
+        fx: (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left,
+        fy: (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top };
+    }, { passive:true });
+    vp.addEventListener('touchmove', e => {
+      if(!pinch || e.touches.length !== 2) return;
+      if(e.cancelable) e.preventDefault();
+      zoomTo(pinch.z * spread(e.touches) / pinch.d, pinch.fx, pinch.fy);
+    }, { passive:false });
+    vp.addEventListener('touchend', e => { if(e.touches.length < 2) pinch = null; });
+    vp.addEventListener('wheel', e => {
+      if(!e.ctrlKey) return;                       // a trackpad pinch arrives as ctrl+wheel
+      e.preventDefault();
+      const r = vp.getBoundingClientRect();
+      zoomTo(z * (1 - e.deltaY * 0.01), e.clientX - r.left, e.clientY - r.top);
+    }, { passive:false });
+
+    const bar = document.querySelector(`.org-zoom[data-group="${gid}"]`);
+    if(bar) bar.onclick = e => {
+      const b = e.target.closest('[data-org-zoom]');
+      if(!b) return;
+      const cx = vp.clientWidth / 2, cy = Math.min(vp.clientHeight, 240) / 2;
+      if(b.dataset.orgZoom === 'fit'){ zoomTo(fit, 0, 0); vp.scrollLeft = 0; vp.scrollTop = 0; }
+      else zoomTo(z * (b.dataset.orgZoom === 'in' ? 1.25 : 0.8), cx, cy);
+    };
+  });
 }
 
 function renderMiniCard(m, isCentre, action){
@@ -5294,8 +5461,6 @@ function groupTag(g){
   return `<button class="ev-group" style="--c:${g.color}" data-action="filter-team-direct" data-group="${g.id}" data-team="all">${g.name}</button>`;
 }
 
-/* The events a member is booked for. The data always said who was at an event;
-   nothing on a member's own page said which events they were at. */
 /* Following a link out of a sheet goes to another screen, so nothing that was
    drawn over the old one may linger over the new one. Back still returns to it:
    the sheet is its own history entry. */
@@ -5304,25 +5469,46 @@ function leaveOverlays(){
   state.compareWith = null; state.comparePicking = false; state.posterOf = null;
 }
 
+/* The events a member is booked for, split by where they sit in time. An event
+   happening today is neither upcoming nor past, so it gets its own heading at the
+   top — with the live countdown to its start if it has a time, or which day of
+   the run it is. When the day ends, the clock's redraw moves it to past. */
 function renderMemberEvents(m){
   const iso = toYmd(todayStart());
   const evs = SEED_SCHEDULE.filter(e => (e.members || []).includes(m.id));
   if(!evs.length) return '';
-  const upcoming = evs.filter(e => eventLastDay(e) >= iso).sort((a,b) => a.start.localeCompare(b.start));
+  const today = evs.filter(e => e.start <= iso && eventLastDay(e) >= iso);
+  const upcoming = evs.filter(e => e.start > iso).sort((a,b) => a.start.localeCompare(b.start));
   const past = evs.filter(e => eventLastDay(e) < iso).sort((a,b) => b.start.localeCompare(a.start));
-  const row = (e, isPast) => {
+
+  const colour = e => {
     const g = (e.groups || []).length === 1 ? getGroup(e.groups[0]) : getGroup(m.groupId);
-    const day = e.memberDays && e.memberDays[m.id];
-    return `<button class="cal-item${isPast ? ' is-past' : ''}" style="--c:${g ? g.color : 'var(--ink-soft)'}"
-      data-action="open-event" data-id="${e.id}">
-      <span class="cal-item-tag">${day || eventDateLabel(e)}</span>
-      <span>${escapeHtml(e.title)}</span>
+    return g ? g.color : 'var(--ink-soft)';
+  };
+  const dayOfRun = e => {
+    if(!e.end) return 'วันนี้';
+    const n = Math.round((parseYmd(iso) - parseYmd(e.start)) / 86400000) + 1;
+    const total = Math.round((parseYmd(e.end) - parseYmd(e.start)) / 86400000) + 1;
+    return `วันที่ ${n} จาก ${total}`;
+  };
+  const row = (e, kind) => {
+    const at = kind === 'today' ? startsAt(e, iso) : null;
+    const personal = e.memberDays && e.memberDays[m.id];
+    const tag = kind === 'today'
+      ? (at ? `<span class="cal-item-tag" data-starts-at="${at}">${startsLabel(at)}</span>`
+            : `<span class="cal-item-tag">${dayOfRun(e)}</span>`)
+      : `<span class="cal-item-tag">${personal || eventDateLabel(e)}</span>`;
+    return `<button class="cal-item${kind === 'past' ? ' is-past' : ''}${kind === 'today' ? ' is-today' : ''}"
+      style="--c:${colour(e)}" data-action="open-event" data-id="${e.id}">
+      ${tag}<span>${escapeHtml(e.title)}</span>
     </button>`;
   };
-  // Past events get their own heading, so "upcoming" never heads something that has already happened.
-  return `<h3 class="section-label">งานที่จะถึง</h3>
-    ${upcoming.length ? upcoming.map(e => row(e, false)).join('') : '<p class="muted-note">ยังไม่มีงานที่จะถึง</p>'}
-    ${past.length ? `<h3 class="section-label">งานที่ผ่านมา</h3>${past.map(e => row(e, true)).join('')}` : ''}`;
+
+  return `
+    ${today.length ? `<h3 class="section-label">วันนี้</h3>${today.map(e => row(e, 'today')).join('')}` : ''}
+    ${upcoming.length ? `<h3 class="section-label">งานที่จะถึง</h3>${upcoming.map(e => row(e, 'up')).join('')}`
+      : today.length ? '' : `<h3 class="section-label">งานที่จะถึง</h3><p class="muted-note">ยังไม่มีงานที่จะถึง</p>`}
+    ${past.length ? `<h3 class="section-label">งานที่ผ่านมา</h3>${past.map(e => row(e, 'past')).join('')}` : ''}`;
 }
 
 function renderStatsTimeline(){
@@ -5632,6 +5818,7 @@ function renderMain(){
   startBirthdayFireworks();
   bindEdgeFades();
   bindPosterZoom();
+  bindOrgZoom();
 }
 
 function updateOshiButtonsFor(id){
