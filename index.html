@@ -1304,85 +1304,6 @@
   .org-members, .org-trainees{ width:100%; box-sizing:border-box; padding:10px; border-radius:14px; }
   .org-members .ev-people, .org-trainees .ev-people{ justify-content:center; margin-top:0; }
   .org-members .ev-person{ background:color-mix(in srgb, var(--c) 13%, var(--card)); }
-  /* ================= Balanced design (preview) =================
-     Frames on groups, not on every item. A list is one panel with hairlines
-     between its rows instead of a stack of little cards; a set of related
-     buttons is one bar with dividers instead of three separate pills; tabs are
-     one track with the chosen one lifted. Tables stay tables. What goes is the
-     frame around things that are only labels — names, dates, social handles. */
-
-  /* member chips: a face and a name, no pill around them */
-  :root[data-design="balanced"] .ev-person,
-  :root[data-design="balanced"] .mini-card{ border-color:transparent; background:none; box-shadow:none; padding-left:0; }
-  :root[data-design="balanced"] .ev-more-people{ border-color:transparent; background:none; }
-  /* the centre keeps a mark of her own once the pills are gone */
-  :root[data-design="balanced"] .mini-card.is-centre{ background:color-mix(in srgb, var(--gold) 18%, transparent); padding-left:4px; }
-  :root[data-design="balanced"] .mini-card.is-centre .mini-name{ color:color-mix(in srgb, var(--gold) 75%, var(--ink)); }
-  :root[data-design="balanced"] .org-members .ev-person{ background:none; }
-
-  /* runs of rows become one panel divided by hairlines */
-  :root[data-design="balanced"] .work-list{ gap:0; }
-  :root[data-design="balanced"] .work-row, :root[data-design="balanced"] .cal-item, :root[data-design="balanced"] .sr-row, :root[data-design="balanced"] .team-row{
-    margin:0; border-radius:0; box-shadow:none; background:var(--card);
-    -webkit-backdrop-filter:none; backdrop-filter:none;
-    border:1px solid var(--line); border-top-width:0;
-  }
-  :root[data-design="balanced"] :is(.work-row, .cal-item, .sr-row, .team-row):first-child,
-  :root[data-design="balanced"] :not(.work-row, .cal-item, .sr-row, .team-row) + :is(.work-row, .cal-item, .sr-row, .team-row){
-    border-top-width:1px; border-top-left-radius:14px; border-top-right-radius:14px;
-  }
-  :root[data-design="balanced"] :is(.work-row, .cal-item, .sr-row, .team-row):not(:has(+ .work-row, + .cal-item, + .sr-row, + .team-row)){
-    border-bottom-left-radius:14px; border-bottom-right-radius:14px; margin-bottom:8px;
-  }
-  :root[data-design="balanced"] .cal-item{ border-left-width:1px; }
-  :root[data-design="balanced"] .cal-item.is-today{ background:color-mix(in srgb, var(--c) 10%, var(--card)); }
-  :root[data-design="balanced"] .cal-item-tag{ min-width:72px; }
-
-  /* the three actions on a profile: one bar, split by dividers */
-  :root[data-design="balanced"] .oshi-actions{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:0; margin:16px 0 4px;
-    border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card);
-  }
-  :root[data-design="balanced"] .oshi-btn, :root[data-design="balanced"] .kami-btn, :root[data-design="balanced"] .cmp-open-btn{
-    flex-direction:column; justify-content:center; align-items:center; gap:3px; text-align:center;
-    border:0; border-radius:0; box-shadow:none; background:none;
-    padding:9px 6px; font-size:12px; line-height:1.25; margin:0;
-  }
-  :root[data-design="balanced"] .oshi-btn span, :root[data-design="balanced"] .kami-btn .crown-ico{ font-size:17px; line-height:1; }
-  :root[data-design="balanced"] .kami-btn, :root[data-design="balanced"] .cmp-open-btn{ border-left:1px solid var(--line); }
-  :root[data-design="balanced"] .oshi-btn.active{ background:var(--bnk-soft); }
-  :root[data-design="balanced"] .kami-btn.active{ background:#FBF0DC; }
-
-  /* handles are links, not buttons */
-  :root[data-design="balanced"] .social-chip{ border-color:transparent; background:none; padding-left:0; margin-right:10px; }
-
-  /* tabs: one track, the chosen one lifted out of it */
-  :root[data-design="balanced"] .sub-tabs, :root[data-design="balanced"] .feed-scope, :root[data-design="balanced"] .subtab-bar{
-    display:inline-flex; gap:2px; padding:3px; border:0; border-radius:12px;
-    background:color-mix(in srgb, var(--ink) 7%, transparent);
-  }
-  :root[data-design="balanced"] .sub-tabs{ display:flex; }
-  :root[data-design="balanced"] .sub-tab, :root[data-design="balanced"] .scope-btn, :root[data-design="balanced"] .subtab{
-    border:0; border-radius:9px; background:none; box-shadow:none; color:var(--ink-soft); padding:7px 13px;
-  }
-  :root[data-design="balanced"] .sub-tab{ flex:1; }
-  :root[data-design="balanced"] .sub-tab.active, :root[data-design="balanced"] .scope-btn.is-on, :root[data-design="balanced"] .subtab.active{
-    background:var(--card); color:var(--ink); box-shadow:0 1px 3px rgba(var(--shadow-rgb),.14);
-  }
-
-  /* dates and toggles that are only labels lose their pill */
-  :root[data-design="balanced"] .feed-today, :root[data-design="balanced"] .evm-date{
-    background:none; border:0; padding-left:0; -webkit-backdrop-filter:none; backdrop-filter:none;
-  }
-  :root[data-design="balanced"] .past-toggle{
-    background:none; border:0; border-top:1px solid var(--line); border-radius:0;
-    -webkit-backdrop-filter:none; backdrop-filter:none;
-  }
-
-  /* panels that hold a group keep their frame, just quieter */
-  :root[data-design="balanced"] .ev-card{ box-shadow:none; }
-  :root[data-design="balanced"] .bday-chip{ border-color:transparent; box-shadow:none; }
-  :root[data-design="balanced"] .track-block{ border:0; background:var(--paper-dim); }
   .ev-tba{ margin:7px 0 0; font-size:12px; color:var(--ink-soft); font-style:italic; }
   .ev-people{ display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
   .ev-person{
@@ -1958,10 +1879,6 @@
     var t; try{ t = localStorage.getItem('48thdb-theme'); }catch(e){}
     if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t;
-    // Design preview: ?design=minimal turns it on and remembers it, ?design=classic turns it off.
-    var d = new URLSearchParams(location.search).get('design');
-    try{ if(d) localStorage.setItem('48thdb-design', d); d = localStorage.getItem('48thdb-design'); }catch(e){}
-    if(d === 'balanced') document.documentElement.dataset.design = 'balanced';
   })();
 </script>
 </head>
