@@ -1304,90 +1304,85 @@
   .org-members, .org-trainees{ width:100%; box-sizing:border-box; padding:10px; border-radius:14px; }
   .org-members .ev-people, .org-trainees .ev-people{ justify-content:center; margin-top:0; }
   .org-members .ev-person{ background:color-mix(in srgb, var(--c) 13%, var(--card)); }
-  /* ================= Minimal design (preview) =================
-     Boxes only where something is a separate layer — the sheets and the nav.
-     Lists become rows divided by a hairline; chips become avatar and name;
-     secondary buttons become text; tabs become an underline. Hierarchy is
-     carried by type, spacing and a touch of colour instead of frames. */
-  :root[data-design="minimal"] .ev-card,
-  :root[data-design="minimal"] .sr-row{
-    background:none; -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:none;
-    border:0; border-bottom:1px solid var(--line); border-radius:0; margin:0; padding:16px 2px;
-  }
-  :root[data-design="minimal"] .ev-card.is-now{ box-shadow:none; border-bottom-color:var(--line); }
-  :root[data-design="minimal"] .ev-date{ border-right:0; }
-  :root[data-design="minimal"] .ev-when{ background:none; color:var(--c); padding:0; }
-  :root[data-design="minimal"] .ev-group{ background:none; color:var(--c); padding:0; margin-right:8px; }
-  :root[data-design="minimal"] .ev-person,
-  :root[data-design="minimal"] .mini-card{ background:none !important; border:0; box-shadow:none; padding:2px 10px 2px 0; }
-  :root[data-design="minimal"] .ev-person.is-oshi{ color:var(--gold); }
-  :root[data-design="minimal"] .ev-more-people{ background:none; border:0; padding:4px 0; }
-  :root[data-design="minimal"] .bday-chip{ background:none; border:0; box-shadow:none; padding:4px 16px 4px 0; }
-  :root[data-design="minimal"] .work-list{ gap:0; }
-  :root[data-design="minimal"] .work-row,
-  :root[data-design="minimal"] .cal-item,
-  :root[data-design="minimal"] .team-row{
-    background:none; border:0; border-bottom:1px solid var(--line); border-radius:0; margin:0; padding:12px 2px;
-  }
-  :root[data-design="minimal"] .cal-item-tag{ background:none; padding:0; min-width:74px; }
-  :root[data-design="minimal"] .stat-grid{ background:none; border:0; border-radius:0; gap:16px 12px; }
-  :root[data-design="minimal"] .stat-cell{ background:none; border:0; padding:0; text-align:left; }
-  :root[data-design="minimal"] .oshi-btn,
-  :root[data-design="minimal"] .kami-btn,
-  :root[data-design="minimal"] .cmp-open-btn,
-  :root[data-design="minimal"] .social-chip{
-    background:none !important; border:0; box-shadow:none; padding:6px 0; margin-right:16px; border-radius:0;
-  }
-  :root[data-design="minimal"] .oshi-btn.active,
-  :root[data-design="minimal"] .kami-btn.active{ color:var(--ink); font-weight:800; }
-  :root[data-design="minimal"] .badge{ background:none !important; color:var(--ink-soft); padding:0; margin-right:14px; font-weight:700; }
-  :root[data-design="minimal"] .badge.kami-badge{ color:var(--gold); }
-  :root[data-design="minimal"] .group-card{
-    background:none; box-shadow:none; border-radius:0; border-top:0; padding:8px 0 24px; border-bottom:1px solid var(--line);
-  }
-  :root[data-design="minimal"] .chip{ background:none; border:0; padding:0; margin-right:14px; }
-  :root[data-design="minimal"] .cal-wrap,
-  :root[data-design="minimal"] .backup-card{ background:none; border:0; padding:4px 0 0; -webkit-backdrop-filter:none; backdrop-filter:none; }
-  :root[data-design="minimal"] .evm-date{ background:none; border:0; padding:0; -webkit-backdrop-filter:none; backdrop-filter:none; }
-  :root[data-design="minimal"] .past-toggle{
-    background:none; border:0; -webkit-backdrop-filter:none; backdrop-filter:none; justify-content:flex-start; padding:8px 2px;
-  }
-  :root[data-design="minimal"] .track-block{ background:none; border:0; border-bottom:1px solid var(--line); border-radius:0; padding:14px 0 20px; }
-  :root[data-design="minimal"] .iam-link{ background:none; border:0; border-bottom:1px solid var(--line); border-radius:0; padding:12px 2px; }
-  :root[data-design="minimal"] .btn-secondary{ background:none; border:0; padding:8px 0; margin-right:18px; text-decoration:underline; text-underline-offset:4px; }
-  :root[data-design="minimal"] .signin-btn,
-  :root[data-design="minimal"] .theme-btn{ background:none; border:0; }
+  /* ================= Balanced design (preview) =================
+     Frames on groups, not on every item. A list is one panel with hairlines
+     between its rows instead of a stack of little cards; a set of related
+     buttons is one bar with dividers instead of three separate pills; tabs are
+     one track with the chosen one lifted. Tables stay tables. What goes is the
+     frame around things that are only labels — names, dates, social handles. */
 
-  :root[data-design="minimal"] .feed-scope,
-  :root[data-design="minimal"] .sub-tabs{ background:none; border:0; border-bottom:1px solid var(--line); border-radius:0; padding:0; gap:22px; }
-  :root[data-design="minimal"] .scope-btn,
-  :root[data-design="minimal"] .sub-tab,
-  :root[data-design="minimal"] .subtab{
-    flex:none; background:none !important; border:0; border-radius:0; padding:9px 0; margin:0 0 -1px;
-    border-bottom:2px solid transparent; color:var(--ink-soft);
-  }
-  :root[data-design="minimal"] .subtab{ margin-right:20px; }
-  :root[data-design="minimal"] .scope-btn.is-on,
-  :root[data-design="minimal"] .sub-tab.active,
-  :root[data-design="minimal"] .subtab.active{ color:var(--ink); border-bottom-color:var(--bnk); }
-  :root[data-design="minimal"] .pill{ border:0; background:none; padding:6px 10px; }
+  /* member chips: a face and a name, no pill around them */
+  :root[data-design="balanced"] .ev-person,
+  :root[data-design="balanced"] .mini-card{ border-color:transparent; background:none; box-shadow:none; padding-left:0; }
+  :root[data-design="balanced"] .ev-more-people{ border-color:transparent; background:none; }
+  /* the centre keeps a mark of her own once the pills are gone */
+  :root[data-design="balanced"] .mini-card.is-centre{ background:color-mix(in srgb, var(--gold) 18%, transparent); padding-left:4px; }
+  :root[data-design="balanced"] .mini-card.is-centre .mini-name{ color:color-mix(in srgb, var(--gold) 75%, var(--ink)); }
+  :root[data-design="balanced"] .org-members .ev-person{ background:none; }
 
-  /* The chart: rank moves from filled boxes onto the ring around each face. */
-  :root[data-design="minimal"] .org-node{ background:none !important; border:0 !important; box-shadow:none !important; color:var(--ink) !important; padding:4px 2px; }
-  :root[data-design="minimal"] .org-node .org-role{ color:var(--c) !important; }
-  :root[data-design="minimal"] .org-node.rank-1 .org-role{ color:var(--gold) !important; }
-  :root[data-design="minimal"] .org-avatar{ box-shadow:0 0 0 2px var(--card), 0 0 0 3px color-mix(in srgb, var(--c) 40%, transparent); }
-  :root[data-design="minimal"] .org-node.rank-1 .org-avatar{ box-shadow:0 0 0 2px var(--card), 0 0 0 5px var(--gold); }
-  :root[data-design="minimal"] .org-node.rank-2 .org-avatar{ box-shadow:0 0 0 2px var(--card), 0 0 0 5px var(--c); }
-  :root[data-design="minimal"] .org-node.rank-1 .org-name{ font-size:15px; }
-  :root[data-design="minimal"] .org-node.is-empty::before{
-    content:''; width:46px; height:46px; margin-bottom:3px; border-radius:50%;
-    border:1.5px dashed color-mix(in srgb, var(--c) 50%, var(--line)); box-sizing:border-box;
+  /* runs of rows become one panel divided by hairlines */
+  :root[data-design="balanced"] .work-list{ gap:0; }
+  :root[data-design="balanced"] .work-row, :root[data-design="balanced"] .cal-item, :root[data-design="balanced"] .sr-row, :root[data-design="balanced"] .team-row{
+    margin:0; border-radius:0; box-shadow:none; background:var(--card);
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+    border:1px solid var(--line); border-top-width:0;
   }
-  :root[data-design="minimal"] .org-members,
-  :root[data-design="minimal"] .org-trainees{ background:none; border:0; padding:6px 0 0; }
-  :root[data-design="minimal"] .rank-swatch{ border-radius:50%; }
-  :root[data-design="minimal"] .feed-today{ background:none; border:0; padding:0; -webkit-backdrop-filter:none; backdrop-filter:none; }
+  :root[data-design="balanced"] :is(.work-row, .cal-item, .sr-row, .team-row):first-child,
+  :root[data-design="balanced"] :not(.work-row, .cal-item, .sr-row, .team-row) + :is(.work-row, .cal-item, .sr-row, .team-row){
+    border-top-width:1px; border-top-left-radius:14px; border-top-right-radius:14px;
+  }
+  :root[data-design="balanced"] :is(.work-row, .cal-item, .sr-row, .team-row):not(:has(+ .work-row, + .cal-item, + .sr-row, + .team-row)){
+    border-bottom-left-radius:14px; border-bottom-right-radius:14px; margin-bottom:8px;
+  }
+  :root[data-design="balanced"] .cal-item{ border-left-width:1px; }
+  :root[data-design="balanced"] .cal-item.is-today{ background:color-mix(in srgb, var(--c) 10%, var(--card)); }
+  :root[data-design="balanced"] .cal-item-tag{ min-width:72px; }
+
+  /* the three actions on a profile: one bar, split by dividers */
+  :root[data-design="balanced"] .oshi-actions{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:0; margin:16px 0 4px;
+    border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card);
+  }
+  :root[data-design="balanced"] .oshi-btn, :root[data-design="balanced"] .kami-btn, :root[data-design="balanced"] .cmp-open-btn{
+    flex-direction:column; justify-content:center; align-items:center; gap:3px; text-align:center;
+    border:0; border-radius:0; box-shadow:none; background:none;
+    padding:9px 6px; font-size:12px; line-height:1.25; margin:0;
+  }
+  :root[data-design="balanced"] .oshi-btn span, :root[data-design="balanced"] .kami-btn .crown-ico{ font-size:17px; line-height:1; }
+  :root[data-design="balanced"] .kami-btn, :root[data-design="balanced"] .cmp-open-btn{ border-left:1px solid var(--line); }
+  :root[data-design="balanced"] .oshi-btn.active{ background:var(--bnk-soft); }
+  :root[data-design="balanced"] .kami-btn.active{ background:#FBF0DC; }
+
+  /* handles are links, not buttons */
+  :root[data-design="balanced"] .social-chip{ border-color:transparent; background:none; padding-left:0; margin-right:10px; }
+
+  /* tabs: one track, the chosen one lifted out of it */
+  :root[data-design="balanced"] .sub-tabs, :root[data-design="balanced"] .feed-scope, :root[data-design="balanced"] .subtab-bar{
+    display:inline-flex; gap:2px; padding:3px; border:0; border-radius:12px;
+    background:color-mix(in srgb, var(--ink) 7%, transparent);
+  }
+  :root[data-design="balanced"] .sub-tabs{ display:flex; }
+  :root[data-design="balanced"] .sub-tab, :root[data-design="balanced"] .scope-btn, :root[data-design="balanced"] .subtab{
+    border:0; border-radius:9px; background:none; box-shadow:none; color:var(--ink-soft); padding:7px 13px;
+  }
+  :root[data-design="balanced"] .sub-tab{ flex:1; }
+  :root[data-design="balanced"] .sub-tab.active, :root[data-design="balanced"] .scope-btn.is-on, :root[data-design="balanced"] .subtab.active{
+    background:var(--card); color:var(--ink); box-shadow:0 1px 3px rgba(var(--shadow-rgb),.14);
+  }
+
+  /* dates and toggles that are only labels lose their pill */
+  :root[data-design="balanced"] .feed-today, :root[data-design="balanced"] .evm-date{
+    background:none; border:0; padding-left:0; -webkit-backdrop-filter:none; backdrop-filter:none;
+  }
+  :root[data-design="balanced"] .past-toggle{
+    background:none; border:0; border-top:1px solid var(--line); border-radius:0;
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+  }
+
+  /* panels that hold a group keep their frame, just quieter */
+  :root[data-design="balanced"] .ev-card{ box-shadow:none; }
+  :root[data-design="balanced"] .bday-chip{ border-color:transparent; box-shadow:none; }
+  :root[data-design="balanced"] .track-block{ border:0; background:var(--paper-dim); }
   .ev-tba{ margin:7px 0 0; font-size:12px; color:var(--ink-soft); font-style:italic; }
   .ev-people{ display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
   .ev-person{
@@ -1966,7 +1961,7 @@
     // Design preview: ?design=minimal turns it on and remembers it, ?design=classic turns it off.
     var d = new URLSearchParams(location.search).get('design');
     try{ if(d) localStorage.setItem('48thdb-design', d); d = localStorage.getItem('48thdb-design'); }catch(e){}
-    if(d === 'minimal') document.documentElement.dataset.design = 'minimal';
+    if(d === 'balanced') document.documentElement.dataset.design = 'balanced';
   })();
 </script>
 </head>
