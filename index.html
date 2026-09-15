@@ -1190,6 +1190,58 @@
     border:0; font-family:inherit; line-height:inherit; cursor:pointer;
   }
   .cal-item.is-past{ opacity:.62; }
+
+  .org-groups{ display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:760px){ .org-groups{ grid-template-columns:1fr 1fr; align-items:start; } }
+  .org-tree{ --org-line:color-mix(in srgb, var(--c) 45%, transparent); padding-bottom:18px; }
+  .org-tier{ position:relative; display:flex; justify-content:center; gap:10px; padding-top:24px; }
+  .org-tier.is-first{ padding-top:4px; }
+  .org-slot{ position:relative; flex:0 1 150px; min-width:0; display:flex; flex-direction:column; align-items:center; }
+  .org-tier.is-wide > .org-slot{ flex:1 1 auto; }
+  /* The lines: a stem down from the tier above, a bar across from the first
+     child's centre to the last's, and a stub up from each child to the bar. */
+  .org-tier:not(.is-first)::before,
+  .org-tier:not(.is-first) > .org-slot::before{
+    content:''; position:absolute; width:2px; height:12px; margin-left:-1px; background:var(--org-line);
+  }
+  .org-tier:not(.is-first)::before{ top:0; left:50%; }
+  .org-tier:not(.is-first) > .org-slot::before{ top:-12px; left:50%; }
+  .org-tier:not(.is-first) > .org-slot::after{
+    content:''; position:absolute; top:-13px; left:-5px; right:-5px; height:2px; background:var(--org-line);
+  }
+  .org-tier > .org-slot:first-child::after{ left:50%; }
+  .org-tier > .org-slot:last-child::after{ right:50%; }
+  .org-tier > .org-slot:only-child::after{ display:none; }
+
+  .org-node{
+    width:100%; max-width:150px; box-sizing:border-box; margin:0;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:10px 8px 9px; border-radius:14px; text-align:center;
+    background:var(--card); border:1px solid color-mix(in srgb, var(--c) 35%, var(--line));
+    font-family:'Noto Sans Thai',sans-serif; color:var(--ink); cursor:pointer;
+  }
+  .org-tier.is-first .org-node{
+    border:2px solid var(--gold); box-shadow:0 6px 18px rgba(var(--shadow-rgb),.14);
+  }
+  /* An unfilled seat reads as unfilled even at the top, where filled seats get gold. */
+  .org-node.is-empty,
+  .org-tier.is-first .org-node.is-empty{ cursor:default; border-style:dashed; background:transparent; box-shadow:none; }
+  .org-avatar{
+    position:relative; overflow:hidden; width:46px; height:46px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; margin-bottom:3px;
+    font-family:'Noto Sans Thai',sans-serif; font-weight:700; font-size:18px; color:#fff;
+  }
+  .org-role{ font-size:10.5px; font-weight:800; line-height:1.25; color:var(--c); }
+  .org-tier.is-first .org-role{ color:var(--gold); }
+  .org-name{ font-size:13.5px; font-weight:800; line-height:1.2; overflow-wrap:anywhere; }
+  .org-node.is-empty .org-name{ font-weight:600; color:var(--ink-soft); }
+  .org-past{ margin-top:7px; font-size:11.5px; color:var(--ink-soft); text-align:center; }
+  .org-trainees{
+    width:100%; box-sizing:border-box; padding:11px 12px; border-radius:14px;
+    border:1px dashed color-mix(in srgb, var(--c) 40%, var(--line));
+  }
+  .org-trainees-head{ font-size:12px; font-weight:800; color:var(--c); margin-bottom:7px; text-align:center; }
+  .org-trainees .ev-people{ justify-content:center; margin-top:0; }
   .ev-tba{ margin:7px 0 0; font-size:12px; color:var(--ink-soft); font-style:italic; }
   .ev-people{ display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
   .ev-person{
@@ -1790,6 +1842,16 @@ const TEAMS = [
   { id:'trainee-bnk', groupId:'bnk48', name:'เด็กฝึก (Trainee)', captain:null, viceCaptain:null },
   { id:'teamc', groupId:'cgm48', name:'Team C', captain:'Jingjing', viceCaptain:'Prae' },
   { id:'trainee-cgm', groupId:'cgm48', name:'เด็กฝึก (Trainee)', captain:null, viceCaptain:null }
+];
+
+/* 支配人 — the group's manager, above every captain, and held by a graduate
+   rather than a current member. Most recent first within each group. No dates:
+   none were given, and a guessed one would read as fact. CGM48's current holder
+   is not recorded, so the chart says so rather than leaving the seat implied. */
+const SHIHAININ = [
+  { groupId:'bnk48', memberId:'bnk-popper',    current:true  },
+  { groupId:'bnk48', memberId:'bnk-cherprang', current:false },
+  { groupId:'cgm48', memberId:'cgm-izurina',   current:false },
 ];
 
 const SEED_MEMBERS = [
@@ -3190,7 +3252,7 @@ const NAV_OPTIONS = [
 function currentNavValue(){
   if(state.view==='feed') return 'feed';
   if(state.view==='browse') return state.favoritesOnly ? 'oshi' : 'groups';
-  if(state.view==='groups') return 'groups';
+  if(state.view==='groups' || state.view==='org') return 'groups';
   if(state.view==='discography' || state.view==='single') return 'discography';
   if(state.view==='stats') return 'stats';
   if(state.view==='profile') return 'profile';
@@ -4696,6 +4758,9 @@ function renderDetailModal(){
   else if(g.viceCaptain===m.name) badges.push(`<button class="badge badge-link" style="background:var(--gold)" data-action="filter-to" data-scope="captain" data-captain-type="group-vc" data-id="${m.id}">รองกัปตันวง</button>`);
   if(t && t.captain===m.name) badges.push(`<button class="badge badge-link" style="background:var(--gold)" data-action="filter-to" data-scope="captain" data-captain-type="team-captain" data-id="${m.id}">กัปตันทีม</button>`);
   else if(t && t.viceCaptain===m.name) badges.push(`<button class="badge badge-link" style="background:var(--gold)" data-action="filter-to" data-scope="captain" data-captain-type="team-vc" data-id="${m.id}">รองกัปตันทีม</button>`);
+  SHIHAININ.filter(r => r.memberId === m.id).forEach(r => {
+    badges.push(`<button class="badge badge-link" style="background:var(--gold)" data-action="sub-tab" data-view="org">${r.current ? 'ชิไฮนิน' : 'อดีตชิไฮนิน'} ${getGroup(r.groupId).name}</button>`);
+  });
   if(isKami) badges.push(`<span class="badge kami-badge">${ICONS.crown} Kami Oshi ของคุณ</span>`);
 
   return `
@@ -4751,7 +4816,7 @@ function renderDetailModal(){
 function renderMembersTabs(){
   const tab = (view, label) =>
     `<button class="sub-tab${state.view===view?' active':''}" data-action="sub-tab" data-view="${view}">${label}</button>`;
-  return `<div class="sub-tabs">${tab('groups','ประวัติวง')}${tab('browse','สมาชิกทั้งหมด')}</div>`;
+  return `<div class="sub-tabs">${tab('groups','ประวัติวง')}${tab('org','ตำแหน่ง')}${tab('browse','สมาชิกทั้งหมด')}</div>`;
 }
 
 function renderGroups(){
@@ -4781,6 +4846,62 @@ function renderGroups(){
       }).join('')}
     </div>`;
   }).join('');
+}
+
+/* Who answers to whom, drawn as a family tree: the manager, then the group's
+   captain and vice, then each team's, then the trainees who have not been placed
+   in a team yet. One tree per group; every person on it opens their profile. */
+function renderOrgChart(){
+  const node = (m, role, g) => m
+    ? `<button class="org-node" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+        ${renderAvatar(m, 'org-avatar', g.color)}
+        <span class="org-role">${role}</span>
+        <span class="org-name">${escapeHtml(m.nameTh || m.name)}</span>
+      </button>`
+    : `<div class="org-node is-empty" style="--c:${g.color}">
+        <span class="org-role">${role}</span>
+        <span class="org-name">ยังไม่มีข้อมูล</span>
+      </div>`;
+  const tier = (slots, cls) => slots.length
+    ? `<div class="org-tier${cls ? ' ' + cls : ''}">${slots.map(s => `<div class="org-slot">${s}</div>`).join('')}</div>`
+    : '';
+
+  const tree = g => {
+    const held = SHIHAININ.filter(r => r.groupId === g.id);
+    const now = held.find(r => r.current);
+    const before = held.filter(r => !r.current).map(r => getMember(r.memberId)).filter(Boolean);
+    const top = node(now && getMember(now.memberId), 'ชิไฮนิน', g)
+      + (before.length ? `<div class="org-past">ก่อนหน้า ${before.map(m => linkMember(m)).join(' · ')}</div>` : '');
+
+    const captains = [];
+    if(g.captain) captains.push(node(memberNamed(g.captain, g.id), 'กัปตันวง', g));
+    if(g.viceCaptain) captains.push(node(memberNamed(g.viceCaptain, g.id), 'รองกัปตันวง', g));
+
+    const teamLeads = [];
+    getTeamsForGroup(g.id).filter(t => !/trainee/.test(t.id)).forEach(t => {
+      if(t.captain) teamLeads.push(node(memberNamed(t.captain, g.id), `กัปตัน ${escapeHtml(t.name)}`, g));
+      if(t.viceCaptain) teamLeads.push(node(memberNamed(t.viceCaptain, g.id), `รองกัปตัน ${escapeHtml(t.name)}`, g));
+    });
+
+    const traineeTeam = getTeamsForGroup(g.id).find(t => /trainee/.test(t.id));
+    const trainees = activeMembers().filter(m => m.groupId === g.id && /trainee/.test(m.teamId || ''))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    const traineeBox = trainees.length ? `<div class="org-trainees">
+        <div class="org-trainees-head">${traineeTeam ? linkTeam(traineeTeam, 'เด็กฝึก') : 'เด็กฝึก'} · ${trainees.length} คน</div>
+        <div class="ev-people">${trainees.map(m => `<button class="ev-person" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+          ${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(m.nameTh || m.name)}</span></button>`).join('')}</div>
+      </div>` : '';
+
+    return `<div class="group-card org-tree" style="--c:${g.color}">
+      <div class="group-head"><h2 style="color:${g.color}">${linkGroup(g)}</h2></div>
+      ${tier([top], 'is-first')}
+      ${tier(captains)}
+      ${tier(teamLeads)}
+      ${tier(traineeBox ? [traineeBox] : [], 'is-wide')}
+    </div>`;
+  };
+
+  return renderMembersTabs() + `<div class="org-groups">${GROUPS.map(tree).join('')}</div>`;
 }
 
 function renderMiniCard(m, isCentre, action){
@@ -5165,7 +5286,9 @@ function linkWork(w, text){
 }
 /** Captains are stored by name rather than id. */
 function memberNamed(name, groupId){
-  return name ? state.members.find(m => m.name === name && (!groupId || m.groupId === groupId)) : null;
+  if(!name) return null;
+  const same = state.members.filter(m => m.name === name && (!groupId || m.groupId === groupId));
+  return same.find(m => !m.graduated) || same[0] || null;
 }
 function groupTag(g){
   return `<button class="ev-group" style="--c:${g.color}" data-action="filter-team-direct" data-group="${g.id}" data-team="all">${g.name}</button>`;
@@ -5196,9 +5319,10 @@ function renderMemberEvents(m){
       <span>${escapeHtml(e.title)}</span>
     </button>`;
   };
-  return `<h3 class="section-label">งานที่ร่วม</h3>
+  // Past events get their own heading, so "upcoming" never heads something that has already happened.
+  return `<h3 class="section-label">งานที่จะถึง</h3>
     ${upcoming.length ? upcoming.map(e => row(e, false)).join('') : '<p class="muted-note">ยังไม่มีงานที่จะถึง</p>'}
-    ${past.length ? `<p class="works-count" style="margin-top:12px;">ที่ผ่านมา</p>${past.map(e => row(e, true)).join('')}` : ''}`;
+    ${past.length ? `<h3 class="section-label">งานที่ผ่านมา</h3>${past.map(e => row(e, true)).join('')}` : ''}`;
 }
 
 function renderStatsTimeline(){
@@ -5481,6 +5605,7 @@ function renderMain(){
     state.view==='feed' ? renderFeed() :
     state.view==='browse' ? renderBrowse() :
     state.view==='groups' ? renderGroups() :
+    state.view==='org' ? renderOrgChart() :
     state.view==='discography' ? renderDiscography() :
     state.view==='stats' ? renderStats() :
     state.view==='single' ? renderSingleDetail() :
@@ -5691,7 +5816,7 @@ const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
 // stays put, which is what lets this work on static hosting with no rewrites.
-const SHAREABLE_VIEWS = ['feed','browse','groups','discography','stats'];
+const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats'];
 
 // Read at load time. The first history entry is written before the member list
 // has arrived, and writing it derives the address from a state that is still
@@ -6258,7 +6383,7 @@ function bindDelegatedEvents(){
     }
     else if(action==='sub-tab'){
       state.view = el.dataset.view;
-      state.selectedId = null; state.editingId = null;
+      leaveOverlays();
       render(); pushHistory();
     }
     else if(action==='toggle-past'){
