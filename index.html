@@ -598,6 +598,7 @@
     border-radius:16px; padding:16px;
   }
   .backup-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .app-version{ margin:26px 0 6px; text-align:center; font-size:11.5px; color:var(--ink-soft); }
 
   .toast{
     position:fixed; left:50%; bottom:calc(var(--nav-h, 84px) + 18px);
@@ -3620,8 +3621,11 @@ function bindPullToRefresh(){
     if(dy <= 0 || !armed(e.target)){ if(pulled) settle(); startY = null; return; }
     // Half distance, so it takes a deliberate pull rather than a stray swipe.
     draw(dy * 0.5);
-    if(e.cancelable) e.preventDefault();
-  }, { passive:false });
+    // Deliberately passive, and never preventDefault: this only watches. Claiming
+    // the drag is what cancelled iOS's back swipe, and at the top of the page
+    // there is nothing to stop anyway — iOS simply rubber-bands, which is the
+    // native look of a pull.
+  }, { passive:true });
 
   document.addEventListener('touchend', ()=>{
     if(startY === null) return;
@@ -5171,6 +5175,14 @@ function renderProfile(){
       <button class="btn-secondary" data-action="import-oshi">นำไฟล์เข้า</button>
     </div>
   </div>
+  ${(()=>{
+    // When the page was deployed, straight from the server's Last-Modified — so
+    // "did my phone get the update?" can be answered by looking, not guessing.
+    const d = new Date(document.lastModified);
+    if(isNaN(d)) return '';
+    const hh = String(d.getHours()).padStart(2,'0'), mm = String(d.getMinutes()).padStart(2,'0');
+    return `<p class="app-version">เวอร์ชันเว็บ ${d.getDate()} ${THAI_MONTHS[d.getMonth()]} ${d.getFullYear()+543} · ${hh}:${mm} น.</p>`;
+  })()}
   `;
 }
 
