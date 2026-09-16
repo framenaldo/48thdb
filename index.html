@@ -140,7 +140,10 @@
     /* clip, not hidden: hidden would make these a scroll container and the
        sticky header would stop sticking. */
     overflow-x:clip;
-    overscroll-behavior-x:none;
+    /* No overscroll-behavior-x here. Safari reads it on the root as "no
+       sideways overscroll at all", and its back swipe is sideways overscroll:
+       in a browser tab the page could not be swiped back. The installed app
+       was unaffected, which hid it. clip alone already stops the drift. */
   }
   body{ touch-action:manipulation; }
   body{
