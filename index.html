@@ -327,6 +327,17 @@
   }
   .dtable .row.head .cell.sticky-name{ background:transparent; border-right:1px solid rgba(255,255,255,calc(.45*var(--glass-k))); }
   body:not(.is-scrolling) .dtable .row:not(.head):active .cell.sticky-name{ background:var(--paper-dim); }
+  /* On a phone the name column is a big share of the screen, so it is cut to
+     what the longest Thai full name actually measures (123px of text plus the
+     avatar and the padding). The longest English names run past that and end
+     in an ellipsis; on a wider screen nothing has to. */
+  @media (max-width:560px){
+    .dtable .cell.sticky-name{ width:176px; }
+    /* Latin full names run about half again as long as the Thai ones, so
+       English gets a little more of the screen — not enough for the very
+       longest, which still end in an ellipsis. */
+    html[lang="en"] .dtable .cell.sticky-name{ width:200px; }
+  }
   .col-group{ width:80px; }
   .col-team{ width:106px; }
   .col-gen{ width:56px; text-align:center; }
