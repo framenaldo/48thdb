@@ -3804,6 +3804,7 @@ const EN_FRAGMENTS = [
   [/อดีตชิไฮนิน/g, 'Former shihainin'],
   [/ชิไฮนิน/g, 'Shihainin'],
   [/ย้ายวงจาก/g, 'Moved from'],
+  [/ย้ายจาก/g, 'Moved from'],
   [/\(รุ่น (\d+)\) เมื่อ /g, (_, n) => `(Gen ${n}) on `],
   [/รุ่น (\d+)/g, (_, n) => `Gen ${n}`],
   [/รองกัปตัน/g, 'Vice-captain'],
@@ -4158,6 +4159,12 @@ function filterAndSort(){
   list.sort(cmp);
   if(state.sortDir==='desc') list.reverse();
   return list;
+}
+
+/** The quieter line under a member's name: their real name, in the language
+    being read. Falls back to the other language, then to nothing at all. */
+function secondName(m){
+  return (isEN() ? (m.realName || m.realNameTh) : (m.realNameTh || m.realName)) || '';
 }
 
 function renderAvatar(m, cls, bg, styleExtra){
@@ -4899,7 +4906,7 @@ function renderRow(m){
       ${renderAvatar(m, 'avatar-sm', g.color)}
       <div class="name-block">
         <div class="name-en">${m.name}${m.transfer?`<span class="grad-tag transfer-tag" title="ย้ายจาก ${getGroup(m.transfer.fromGroupId).name} เมื่อ ${formatDateShort(m.transfer.date)}">${ICONS.transfer}</span>`:''}${m.graduated?`<span class="grad-tag" title="จบการศึกษา ${formatDateShort(m.graduated)}">${ICONS.cap}</span>`:''}</div>
-        <div class="name-th">${m.nameTh}</div>
+        <div class="name-th">${escapeHtml(secondName(m))}</div>
       </div>
     </div>
     <div class="cell col-group"><span class="group-chip" style="background:${g.color}">${g.name}</span>${badgeHtml(groupBadge, groupBadge==='C'?'#C08A2E':'#9AA0A8')}</div>
@@ -5559,9 +5566,9 @@ function renderDetailModal(){
           ${renderAvatar(m, 'detail-avatar', g.color)}
           <div style="flex:1;min-width:200px;">
             <div class="detail-name-th">${m.nameTh}</div>
-            <div class="detail-name-en">${m.name}${isEN()
-              ? (m.realName ? ' · ' + m.realName : (m.realNameTh ? ' · ' + m.realNameTh : ''))
-              : (m.realNameTh?' · '+m.realNameTh:'') + (m.realName?' ('+m.realName+')':'')}</div>
+            <div class="detail-name-en">${isEN()
+              ? (secondName(m) || m.name)
+              : m.name + (m.realNameTh?' · '+m.realNameTh:'') + (m.realName?' ('+m.realName+')':'')}</div>
             <div>${badges.join('')}</div>
           </div>
         </div>
@@ -5800,7 +5807,7 @@ function renderMiniCard(m, isCentre, action){
     </div>
     <span class="mini-names">
       <span class="mini-name">${escapeHtml(m.name)}</span>
-      <span class="mini-name-th">${escapeHtml(m.nameTh || '')}</span>
+      <span class="mini-name-th">${isEN() ? '' : escapeHtml(m.nameTh || '')}</span>
     </span>
     ${isKami ? `<span class="mini-crown">${ICONS.crown}</span>` : ''}
   </div>`;
@@ -5813,7 +5820,7 @@ function renderKamiOshiFeatured(m){
   <div class="kami-feature" data-action="open-member" data-id="${m.id}">
     ${renderAvatar(m, 'detail-avatar', g.color, 'width:60px;height:60px;font-size:24px;')}
     <div style="flex:1;min-width:0;">
-      <div class="kami-feature-name">${m.name} <span>· ${m.nameTh}</span></div>
+      <div class="kami-feature-name">${m.name}${secondName(m) ? ` <span>· ${escapeHtml(secondName(m))}</span>` : ''}</div>
       <div class="chip-row"><span class="chip">${g.name}</span><span class="chip">${t?t.name:'-'}</span></div>
     </div>
   </div>`;
