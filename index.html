@@ -3445,6 +3445,7 @@ const EN = {
   'ข้อเท็จจริง (บรรทัดละ 1 ข้อ)': 'Facts (one per line)',
   'ลานกิจกรรม': 'Event Plaza',
   'ลานโปรโมชั่น': 'Promotion Area',
+  'ซิงเกิลและอัลบั้ม': 'Singles and albums',
 
   /* Prose that lives in the data: what members are known for, and what a
      ticket actually gets you. Names, songs and venues stay as they are. */
@@ -3753,6 +3754,8 @@ const EN_PATTERNS = [
   [rx('ห่างกัน (\\d+) รุ่น'), m => `${m[1]} ${plural(m[1],'generation','generations')} apart`],
   [rx('เข้ามาห่างกัน (.+)'), m => `Joined ${enPart(m[1])} apart`],
   [rx('เทียบ (.+) กับใคร'), m => `Compare ${enPart(m[1])} with`],
+  /* Search groups its hits as "<what> · <how many>" */
+  [rx('(.+) · (\\d+)'), m => { const w = toEn(m[1]); return w == null ? null : `${w} · ${m[2]}`; }],
 
   /* found by reading the app in English */
   [rx('(.+) · (.+)'), m => (EN[m[2]] === m[1] ? m[1] : null)],
@@ -3805,6 +3808,7 @@ const EN_FRAGMENTS = [
   [/ลานโปรโมชั่น/g, 'Promotion Area'],
   [/ชั้น (\S+)/g, (_, f) => `Floor ${f}`],
   [/ทั้งวง/g, 'the whole group'],
+  [/ไทป์ ([A-Z])/g, (_, t) => `Type ${t}`],
   [/ซิงเกิลที่ (\d+)/g, (_, n) => `Single ${n}`],
   [/อัลบั้มที่ (\d+)/g, (_, n) => `Album ${n}`],
   [/เซ็มบัตสึ (\d+) คน/g, (_, n) => `Senbatsu of ${n}`],
