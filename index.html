@@ -3143,6 +3143,236 @@ const SEED_SENBATSU = {
         'cgm-pim', 'cgm-sita', 'cgm-emma', 'cgm-lingling', 'cgm-mei', 'cgm-ploen' ] },
   ],
 };
+
+/* Releases outside the numbered singles and albums: special singles, and the
+   digital singles that come out between them. Read from each release's page on
+   the AKB48 wiki (akb48.fandom.com). Centres are only filled in where that page
+   names them. They live apart from SEED_SINGLES so the song statistics keep
+   counting the main releases only — Happy New Year alone has 82 singers. A
+   release sung by both groups lists both in `groups`; `groupId` is the first,
+   for colour. */
+const SEED_SPECIALS = [
+  { id:'bnk-sp-touchbyheart', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
+    title:'Touch By Heart', alt:'หัวใจใกล้กัน', date:'2020-04-02', year:2020,
+    note:'ออกเพื่อให้กำลังใจช่วงโควิด-19 อัดไว้หลายเวอร์ชันหลายภาษา',
+    tracks:[
+      { track:'Touch By Heart', centers:[],
+        members:['bnk-cherprang', 'bnk-jennis', 'bnk-pun', 'bnk-pupe', 'bnk-tarwaan', 'cgm-aom', 'cgm-izurina'] },
+      { track:'Kokoro de Furete (Japanese ver.)', centers:[],
+        members:['bnk-miori', 'bnk-jaa', 'bnk-kaimook', 'bnk-music', 'bnk-satchan', 'cgm-izurina'] },
+      { track:'Touch By Heart (Lanna Version)', centers:[],
+        members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+      { track:'Touch By Heart (Special Version)', centers:[],
+        members:['bnk-cherprang', 'bnk-faii', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kate', 'bnk-kheng', 'bnk-korn', 'bnk-minmin', 'bnk-miori', 'bnk-myyu', 'bnk-niky', 'bnk-noey', 'bnk-panda', 'bnk-piam', 'bnk-pun', 'bnk-wee', 'bnk-bamboo', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-kaimook', 'bnk-mewnich', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-new', 'bnk-nine', 'bnk-orn', 'bnk-phukkhom', 'bnk-pupe', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-fifa', 'bnk-khamin', 'bnk-mind', 'bnk-pakwan', 'bnk-ratah', 'bnk-view', 'cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+      { track:'Touch By Heart (English Version)', centers:[],
+        members:['bnk-kaew', 'bnk-noey', 'bnk-namneung', 'bnk-orn', 'bnk-tarwaan'] },
+      { track:'Yong Xin Gan Wu (Chinese ver.)', centers:[],
+        members:['bnk-jane', 'bnk-kate', 'bnk-wee', 'bnk-gygee', 'bnk-mewnich', 'bnk-phukkhom', 'bnk-pakwan'] },
+      { track:'Touch By Heart (Esan Version)', centers:[],
+        members:['bnk-kaew', 'bnk-noey', 'bnk-kaimook', 'bnk-mobile', 'bnk-namneung', 'bnk-namsai', 'bnk-pupe', 'bnk-tarwaan'] },
+      { track:'Touch By Heart (BNK48 x Grab Version)', centers:[],
+        members:['bnk-cherprang', 'bnk-jennis', 'bnk-kaew', 'bnk-noey', 'bnk-pun', 'bnk-jaa', 'bnk-mobile', 'bnk-music', 'bnk-orn', 'bnk-tarwaan'] },
+    ] },
+  { id:'bnk-sp-canyou', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Can you..?', alt:'เธอนั่นแหละ', date:'2020-09-17', year:2020,
+    tracks:[
+      { track:'Can you..? – เธอนั่นแหละ', centers:[],
+        members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-kaew', 'bnk-noey', 'bnk-pun', 'bnk-wee', 'bnk-fond', 'bnk-mewnich', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-orn', 'bnk-phukkhom', 'bnk-pupe', 'bnk-tarwaan'] },
+    ] },
+  { id:'bnk-sp-mamamilk', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Ma Ma Milk', alt:'', date:'2020-11-27', year:2020,
+    tracks:[
+      { track:'Ma Ma Milk', centers:[],
+        members:['bnk-cherprang', 'bnk-jane', 'bnk-minmin', 'bnk-wee', 'bnk-bamboo', 'bnk-gygee', 'bnk-mewnich', 'bnk-mobile', 'bnk-music', 'bnk-phukkhom', 'bnk-pupe', 'bnk-tarwaan'] },
+    ] },
+  { id:'cgm-sp-letsgo', groupId:'cgm48', groups:['cgm48'], kind:'digital',
+    title:'Let\'s go all the way', alt:'ไปต่อ', date:'2021-03-09', year:2021,
+    note:'feat. DIAMOND MQT',
+    tracks:[
+      { track:'Let\'s go all the way – ไปต่อ', centers:[],
+        members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+    ] },
+  { id:'bnk-sp-cheers', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Cheers', alt:'เสียงเชียร์', date:'2021-10-07', year:2021,
+    tracks:[
+      { track:'Cheers – เสียงเชียร์', centers:[],
+        members:['bnk-jane', 'bnk-jennis', 'bnk-noey', 'bnk-pun', 'bnk-mobile', 'bnk-music'] },
+    ] },
+  { id:'bnk-sp-happynewyear', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
+    title:'Happy New Year', alt:'สวัสดีปีใหม่', date:'2021-12-13', year:2021,
+    tracks:[
+      { track:'Happy New Year – สวัสดีปีใหม่', centers:[],
+        members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kate', 'bnk-korn', 'bnk-minmin', 'bnk-miori', 'bnk-myyu', 'bnk-niky', 'bnk-noey', 'bnk-panda', 'bnk-piam', 'bnk-pun', 'bnk-wee', 'bnk-bamboo', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-new', 'bnk-nine', 'bnk-orn', 'bnk-phukkhom', 'bnk-pupe', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-jaokhem', 'bnk-kaofrang', 'bnk-khamin', 'bnk-mean', 'bnk-mind', 'bnk-monet', 'bnk-paeyah', 'bnk-pakwan', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-popper', 'bnk-ratah', 'bnk-view', 'bnk-yayee', 'bnk-yoghurt', 'cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+    ] },
+  { id:'bnk-sp-mhokkob', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'หมกกบ', alt:'Mhok Kob', date:'2022-06-04', year:2022,
+    tracks:[
+      { track:'หมกกบ', centers:[],
+        members:['bnk-wee', 'bnk-gygee', 'bnk-mobile', 'bnk-namneung', 'bnk-pupe'] },
+    ] },
+  { id:'bnk-sp-monrak', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'มนต์รักจิ้งหรีด', alt:'Mon Rak Jing Rit', date:'2022-06-25', year:2022,
+    tracks:[
+      { track:'มนต์รักจิ้งหรีด', centers:[],
+        members:['bnk-wee', 'bnk-gygee', 'bnk-mobile'] },
+    ] },
+  { id:'bnk-sp-jiwarudays', groupId:'bnk48', groups:['bnk48'], kind:'special',
+    title:'Jiwaru DAYS', alt:'', date:'2022-12-21', year:2022,
+    note:'ซิงเกิลพิเศษรุ่น 1 — ซิงเกิลอำลาของสมาชิกรุ่น 1',
+    tracks:[
+      { track:'Jiwaru DAYS', centers:['bnk-mobile', 'bnk-music', 'bnk-pupe'],
+        members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kate', 'bnk-korn', 'bnk-miori', 'bnk-noey', 'bnk-piam', 'bnk-pun', 'bnk-jaa', 'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-orn', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'bnk-mind'] },
+      { track:'Pioneer', centers:['bnk-pun', 'bnk-jennis'],
+        members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kate', 'bnk-korn', 'bnk-miori', 'bnk-noey', 'bnk-piam', 'bnk-pun', 'bnk-jaa', 'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-orn', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'bnk-mind'] },
+      { track:'Sakura no Ki ni Narou', centers:['bnk-kaew'],
+        members:['bnk-cherprang', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kate', 'bnk-korn', 'bnk-miori', 'bnk-noey', 'bnk-piam', 'bnk-pun', 'bnk-jaa', 'bnk-kaimook', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-orn', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'bnk-mind'] },
+    ] },
+  { id:'bnk-sp-jinglebells', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Jingle Bells', alt:'', date:'2024-01-05', year:2024,
+    tracks:[
+      { track:'Jingle Bells', centers:[],
+        members:['bnk-earn', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-mean', 'bnk-minmin', 'bnk-miori', 'bnk-monet', 'bnk-myyu', 'bnk-niky', 'bnk-panda', 'bnk-peak', 'bnk-wee', 'bnk-yayee', 'bnk-earth', 'bnk-eve', 'bnk-fond', 'bnk-gygee', 'bnk-jaokhem', 'bnk-kaofrang', 'bnk-khamin', 'bnk-new', 'bnk-nine', 'bnk-paeyah', 'bnk-pakwan', 'bnk-pancake', 'bnk-phukkhom', 'bnk-popper', 'bnk-ratah', 'bnk-satchan', 'bnk-yoghurt', 'bnk-berry', 'bnk-emmy', 'bnk-janry', 'bnk-l', 'bnk-marine', 'bnk-micha', 'bnk-nene', 'bnk-palmmy', 'bnk-patt', 'bnk-sindy', 'bnk-wawa'] },
+    ] },
+  { id:'cgm-sp-jinglebells', groupId:'cgm48', groups:['cgm48'], kind:'digital',
+    title:'Jingle Bells', alt:'', date:'2024-01-05', year:2024,
+    tracks:[
+      { track:'Jingle Bells', centers:[],
+        members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fortune', 'cgm-izurina', 'cgm-jingjing', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-lookked', 'cgm-marmink', 'cgm-nenie', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita', 'cgm-emma', 'cgm-fahsai', 'cgm-ginna', 'cgm-jjae', 'cgm-latin', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nana', 'cgm-nena', 'cgm-papang'] },
+    ] },
+  { id:'bnk-sp-nayak', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
+    title:'น่ายักแบบนี้ เป็นของเธอนะ', alt:'Na Yak Baeb Ni Pen Khong Thoe Na', date:'2024-05-13', year:2024,
+    note:'ยูนิต มหาเทวีนางสงกรานต์ 48 · feat. เก่ง ธชย',
+    tracks:[
+      { track:'น่ายักแบบนี้ เป็นของเธอนะ', centers:['cgm-champoo'],
+        members:['bnk-hoop', 'cgm-champoo', 'cgm-kaning', 'cgm-lookked', 'cgm-nenie', 'cgm-sita'] },
+    ] },
+  { id:'bnk-sp-sportsday', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
+    title:'Sports Day 2024: Neko Wars', alt:'', date:'2024-07-28', year:2024,
+    note:'เพลงประจำงานกีฬาสี Sports Day 2024',
+    tracks:[
+      { track:'Sports Day 2024: Neko Wars (Official Theme Song)', centers:[],
+        members:['bnk-mean', 'bnk-monet', 'bnk-satchan', 'bnk-yoghurt', 'bnk-micha', 'bnk-nall', 'bnk-nammonn', 'bnk-niya', 'bnk-proud', 'bnk-sindy', 'bnk-hoop', 'bnk-yayee', 'bnk-earth', 'bnk-janry', 'bnk-khaimook', 'bnk-marine', 'bnk-mayji', 'bnk-neen', 'bnk-patt', 'bnk-peak', 'bnk-eve', 'bnk-kaofrang', 'bnk-pancake', 'bnk-emmy', 'bnk-jew', 'bnk-l', 'bnk-nana', 'bnk-nene', 'bnk-wawa', 'bnk-earn', 'bnk-fame', 'bnk-grace', 'bnk-jaokhem', 'bnk-popper', 'bnk-arlee', 'bnk-berry', 'bnk-galeya', 'bnk-palmmy', 'bnk-saonoi', 'cgm-fortune', 'cgm-kyla', 'cgm-nana', 'cgm-sita', 'cgm-fahsai', 'cgm-ginna', 'cgm-champoo', 'cgm-jingjing', 'cgm-marmink', 'cgm-nenie', 'cgm-pim', 'cgm-punch', 'cgm-papang', 'cgm-angel', 'cgm-izurina', 'cgm-kaiwan', 'cgm-jjae', 'cgm-meen', 'cgm-nena', 'cgm-kaning', 'cgm-lookked', 'cgm-ping', 'cgm-emma', 'cgm-latin', 'cgm-mei'] },
+    ] },
+  { id:'cgm-sp-mysakura', groupId:'cgm48', groups:['cgm48'], kind:'digital',
+    title:'My Sakura', alt:'', date:'2024-12-02', year:2024,
+    note:'เพลงเดี่ยวของอิซึรินะ',
+    tracks:[
+      { track:'My Sakura', centers:[],
+        members:['cgm-izurina'] },
+    ] },
+  { id:'bnk-sp-whisperroar', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'WHISPER ROAR', alt:'', date:'2024-12-20', year:2024,
+    note:'เพลงหลักของสเตจ BNK48 1st Stage',
+    tracks:[
+      { track:'WHISPER ROAR', centers:[],
+        members:['bnk-eve', 'bnk-hoop', 'bnk-janry', 'bnk-mean', 'bnk-patt', 'bnk-peak', 'bnk-wawa', 'bnk-emmy', 'bnk-grace', 'bnk-popper', 'bnk-nall', 'bnk-saonoi'] },
+    ] },
+  { id:'bnk-sp-rumor', groupId:'bnk48', groups:['bnk48'], kind:'special',
+    title:'RUMOR', alt:'', date:'2025-03-29', year:2025,
+    note:'รางวัลจากโหวตเพลงพิเศษ BNK48 & CGM48 Request Hour 2024',
+    tracks:[
+      { track:'RUMOR', centers:['bnk-monet'],
+        members:['bnk-earn', 'bnk-eve', 'bnk-fame', 'bnk-hoop', 'bnk-janry', 'bnk-mean', 'bnk-monet', 'bnk-patt', 'bnk-peak', 'bnk-wawa', 'bnk-yayee', 'bnk-grace', 'bnk-micha'] },
+    ] },
+  { id:'bnk-sp-lokenee', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
+    title:'โลกนี้ก็แค่ปากซอย', alt:'Loke Nee Kau Khae Paak Soy', date:'2025-04-07', year:2025,
+    note:'ร่วมกับ Nok Air',
+    tracks:[] },
+  { id:'cgm-sp-sadcupid', groupId:'cgm48', groups:['cgm48'], kind:'digital',
+    title:'Sad Cupid', alt:'', date:'2025-06-27', year:2025,
+    tracks:[
+      { track:'Sad Cupid', centers:[],
+        members:['cgm-champoo', 'cgm-kaning', 'cgm-nenie', 'cgm-sita'] },
+    ] },
+  { id:'cgm-sp-kazewomatsu', groupId:'cgm48', groups:['cgm48'], kind:'special',
+    title:'Kaze wo Matsu', alt:'ความทรงจำในสายลม', date:'2025-08-02', year:2025,
+    note:'ซิงเกิลพิเศษรุ่น 1 — ซิงเกิลอำลาของสมาชิกรุ่น 1',
+    tracks:[
+      { track:'Kaze wo Matsu – ความทรงจำในสายลม', centers:['cgm-ping'],
+        members:['cgm-angel', 'cgm-champoo', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-nenie', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita', 'cgm-fahsai', 'cgm-jjae', 'cgm-meen', 'cgm-mei', 'cgm-nena'] },
+    ] },
+  { id:'bnk-sp-ohmypumpkin', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Oh my pumpkin!', alt:'', date:'2025-08-13', year:2025,
+    note:'เพลงฉลองครบรอบ 20 ปี AKB48',
+    tracks:[
+      { track:'Oh my pumpkin!', centers:['bnk-hoop'],
+        members:['bnk-earn', 'bnk-hoop', 'bnk-janry', 'bnk-marine', 'bnk-mean', 'bnk-monet', 'bnk-grace', 'bnk-l', 'bnk-pancake', 'bnk-blythe', 'bnk-galeya', 'bnk-praew'] },
+    ] },
+  { id:'cgm-sp-ohmypumpkin', groupId:'cgm48', groups:['cgm48'], kind:'digital',
+    title:'Oh my pumpkin!', alt:'', date:'2025-08-13', year:2025,
+    note:'เพลงฉลองครบรอบ 20 ปี AKB48',
+    tracks:[
+      { track:'Oh my pumpkin!', centers:['cgm-lookked'],
+        members:['cgm-jingjing', 'cgm-kwan', 'cgm-lookked', 'cgm-nana', 'cgm-prae', 'cgm-runma', 'cgm-else', 'cgm-emma', 'cgm-ginna', 'cgm-lingling', 'cgm-ploen', 'cgm-shenae'] },
+    ] },
+  { id:'bnk-sp-hipchain', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Hip Chain', alt:'', date:'2025-10-04', year:2025,
+    tracks:[
+      { track:'Hip Chain', centers:[],
+        members:['bnk-hoop', 'bnk-pancake', 'bnk-popper'] },
+    ] },
+  { id:'bnk-sp-kangaroo', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'special',
+    title:'12-gatsu no Kangaroo', alt:'จิงโจ้น้อยเดือนธันวาคม', date:'2025-12-01', year:2025,
+    note:'ซิงเกิลร่วม BNK48 & CGM48',
+    tracks:[
+      { track:'12-gatsu no Kangaroo – จิงโจ้น้อยเดือนธันวาคม', centers:['bnk-blythe', 'cgm-nisha'],
+        members:['bnk-marine', 'bnk-arlee', 'bnk-berry', 'bnk-l', 'bnk-blythe', 'bnk-mayji', 'bnk-mirin', 'bnk-nammonn', 'cgm-lookked', 'cgm-ginna', 'cgm-lingling', 'cgm-nisha'] },
+    ] },
+  { id:'bnk-sp-skylantern', groupId:'bnk48', groups:['bnk48'], kind:'special',
+    title:'Sky Lantern Wish', alt:'คำอธิษฐานใต้แสงโคม', date:'2026-01-24', year:2026,
+    note:'ซิงเกิลร่วม BNK48 & TSH48 (เซี่ยงไฮ้) โครงการทูตวัฒนธรรมไทย-จีน',
+    tracks:[
+      { track:'Sky Lantern Wish – คำอธิษฐานใต้แสงโคม', centers:['bnk-niya'],
+        members:['bnk-hoop', 'bnk-grace', 'bnk-galeya', 'bnk-jew', 'bnk-nall', 'bnk-niya'] },
+    ] },
+  { id:'bnk-sp-celebration', groupId:'bnk48', groups:['bnk48'], kind:'special',
+    title:'Celebration', alt:'', date:'2026-02-08', year:2026,
+    note:'ซิงเกิลพิเศษรุ่น 3 — ทุกคนเป็นเซ็นเตอร์',
+    tracks:[
+      { track:'Celebration', centers:[],
+        members:['bnk-earn', 'bnk-eve', 'bnk-fame', 'bnk-hoop', 'bnk-mean', 'bnk-monet', 'bnk-peak', 'bnk-yayee', 'bnk-earth', 'bnk-grace', 'bnk-kaofrang', 'bnk-pancake', 'bnk-yoghurt'] },
+    ] },
+  { id:'bnk-sp-shot', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Shot!!!!', alt:'', date:'2026-02-25', year:2026,
+    tracks:[
+      { track:'Shot!!!!', centers:[],
+        members:['bnk-blythe', 'bnk-grape', 'bnk-mail', 'bnk-mirin'] },
+    ] },
+  { id:'bnk-sp-cry', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Cry', alt:'', date:'2026-03-20', year:2026,
+    note:'เพลงเดี่ยวของแจนรี่',
+    tracks:[
+      { track:'Cry', centers:[],
+        members:['bnk-janry'] },
+    ] },
+  { id:'bnk-sp-kimigairu', groupId:'bnk48', groups:['bnk48'], kind:'special',
+    title:'Kimi ga Iru Dake de', alt:'แค่เพียงมีเธอ', date:'2026-03-27', year:2026,
+    note:'โครงการพิเศษไทย-ญี่ปุ่น ร่วมกับ Tatsuya Ishii และลำไย ไหทองคำ',
+    tracks:[
+      { track:'Kimi ga Iru Dake de – แค่เพียงมีเธอ', centers:['bnk-rose'],
+        members:['bnk-hoop', 'bnk-arlee', 'bnk-luksorn', 'bnk-nall', 'bnk-nammonn', 'bnk-praew', 'bnk-rose', 'bnk-saonoi'] },
+    ] },
+  { id:'cgm-sp-maliremix', groupId:'cgm48', groups:['cgm48'], kind:'digital',
+    title:'มะลิ (Remix Version)', alt:'Mali (Remix Version)', date:'2026-04-10', year:2026,
+    tracks:[
+      { track:'มะลิ (Remix Version)', centers:['cgm-kaning'],
+        members:['cgm-aom', 'cgm-angel', 'cgm-champoo', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-kaning', 'cgm-marmink', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+    ] },
+  { id:'cgm-sp-daimairemix', groupId:'cgm48', groups:['cgm48'], kind:'digital',
+    title:'ได้(ด้าย)ไหม (Remix Version)', alt:'Dai (Daai) Mai (Remix Version)', date:'2026-04-10', year:2026,
+    tracks:[
+      { track:'ได้(ด้าย)ไหม (Remix Version)', centers:['cgm-nisha', 'cgm-ploen'],
+        members:['cgm-jingjing', 'cgm-kwan', 'cgm-lookked', 'cgm-nana', 'cgm-prae', 'cgm-else', 'cgm-emma', 'cgm-ginna', 'cgm-lingling', 'cgm-nisha', 'cgm-ploen', 'cgm-shenae'] },
+    ] },
+  { id:'bnk-sp-ramwong', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'รำวง Matsuri', alt:'Ram Wong Matsuri', date:'2026-07-20', year:2026,
+    note:'โครงการพิเศษไทย-ญี่ปุ่น ร่วมกับ Tatsuya Ishii',
+    tracks:[
+      { track:'รำวง Matsuri', centers:[],
+        members:['bnk-hoop', 'bnk-luksorn', 'bnk-praew', 'bnk-arlee', 'bnk-saonoi', 'bnk-nall', 'bnk-nammonn', 'bnk-rose'] },
+    ] },
+];
+SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 const ICONS = {
   ticket:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5Z"/><path d="M14 6v2M14 11v2M14 16v2"/></svg>`,
   link:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>`,
@@ -3452,6 +3682,28 @@ const EN = {
   'ลานกิจกรรม': 'Event Plaza',
   'ลานโปรโมชั่น': 'Promotion Area',
   'ซิงเกิลและอัลบั้ม': 'Singles and albums',
+  'เพลงพิเศษ': 'Specials',
+  'ซิงเกิลพิเศษ': 'Special single',
+  'ซิงเกิลดิจิทัล': 'Digital single',
+  'ยังไม่ทราบรายชื่อผู้ร้อง': 'Singers not yet known',
+  'ซิงเกิลพิเศษและซิงเกิลดิจิทัลนอกเหนือจากซิงเกิลและอัลบั้มหลัก — ไม่นับรวมในสถิติเพลง':
+    'Special and digital singles, outside the main singles and albums — not counted in the song statistics',
+  'ออกเพื่อให้กำลังใจช่วงโควิด-19 อัดไว้หลายเวอร์ชันหลายภาษา':
+    'Released to lift spirits during COVID-19, recorded in several versions and languages',
+  'ซิงเกิลพิเศษรุ่น 1 — ซิงเกิลอำลาของสมาชิกรุ่น 1': 'Generation 1 special single — their farewell single',
+  'รางวัลจากโหวตเพลงพิเศษ BNK48 & CGM48 Request Hour 2024': 'Won the special song vote at BNK48 & CGM48 Request Hour 2024',
+  'ยูนิต มหาเทวีนางสงกรานต์ 48 · feat. เก่ง ธชย': 'By the unit Maha Tevi Nang Songkran 48 · feat. Keng Tachaya',
+  'เพลงประจำงานกีฬาสี Sports Day 2024': 'Theme song of Sports Day 2024',
+  'เพลงเดี่ยวของอิซึรินะ': "Izurina's solo song",
+  'เพลงหลักของสเตจ BNK48 1st Stage': 'The main song of BNK48 1st Stage',
+  'ร่วมกับ Nok Air': 'With Nok Air',
+  'เพลงฉลองครบรอบ 20 ปี AKB48': "Celebrating AKB48's 20th anniversary",
+  'ซิงเกิลร่วม BNK48 & CGM48': 'A joint BNK48 & CGM48 single',
+  'ซิงเกิลร่วม BNK48 & TSH48 (เซี่ยงไฮ้) โครงการทูตวัฒนธรรมไทย-จีน': 'A joint single with TSH48 (Shanghai), for the Thai-Chinese Cultural Ambassador Project',
+  'ซิงเกิลพิเศษรุ่น 3 — ทุกคนเป็นเซ็นเตอร์': 'Generation 3 special single — everyone is centre',
+  'เพลงเดี่ยวของแจนรี่': "Janry's solo song",
+  'โครงการพิเศษไทย-ญี่ปุ่น ร่วมกับ Tatsuya Ishii และลำไย ไหทองคำ': 'A Thai-Japanese project with Tatsuya Ishii and Lamyai Haithongkham',
+  'โครงการพิเศษไทย-ญี่ปุ่น ร่วมกับ Tatsuya Ishii': 'A Thai-Japanese project with Tatsuya Ishii',
 
   /* Prose that lives in the data: what members are known for, and what a
      ticket actually gets you. Names, songs and venues stay as they are. */
@@ -3826,6 +4078,8 @@ const EN_FRAGMENTS = [
   [/ทั้งวง/g, 'the whole group'],
   [/ไทป์ ([A-Z])/g, (_, t) => `Type ${t}`],
   [/ซิงเกิลที่ (\d+)/g, (_, n) => `Single ${n}`],
+  [/ซิงเกิลพิเศษ/g, 'Special single'],
+  [/ซิงเกิลดิจิทัล/g, 'Digital single'],
   [/อัลบั้มที่ (\d+)/g, (_, n) => `Album ${n}`],
   [/เซ็มบัตสึ (\d+) คน/g, (_, n) => `Senbatsu of ${n}`],
   [/เซ็นเตอร์ (\d+) เพลง/g, (_, n) => `${n} as centre`],
@@ -4225,21 +4479,40 @@ function getGroupCaptainBadge(m){
 }
 
 const ALL_WORKS = () => [...SEED_SINGLES, ...SEED_ALBUMS];
-const WORK_KIND = w => w.id.includes('-a') ? 'album' : 'single';
+/* The id used to decide this with includes('-a'), which a special such as
+   bnk-sp-all-the-way would have tripped. Specials say what they are. */
+const WORK_KIND = w => w.kind || (/-a\d+$/.test(w.id) ? 'album' : 'single');
+const isSpecialWork = w => ['special', 'digital'].includes(WORK_KIND(w));
+const findWork = id => ALL_WORKS().find(w => w.id === id) || SEED_SPECIALS.find(w => w.id === id);
+const workGroups = w => w.groups || [w.groupId];
+const workGroupNames = w => workGroups(w).map(id => getGroup(id).name).join(' × ');
 
-function allTracks(){
+/** How a release is referred to: its number when it has one, its kind when not. */
+function workLabel(w){
+  const k = WORK_KIND(w);
+  return k === 'album' ? `อัลบั้มที่ ${w.num}`
+       : k === 'single' ? `ซิงเกิลที่ ${w.num}`
+       : k === 'special' ? 'ซิงเกิลพิเศษ' : 'ซิงเกิลดิจิทัล';
+}
+
+/** Every track of the main releases; the statistics read only these. Pass
+    true to take the special releases in as well. */
+function allTracks(withSpecials){
   const out = [];
-  for(const w of ALL_WORKS()){
+  for(const w of withSpecials ? [...ALL_WORKS(), ...SEED_SPECIALS] : ALL_WORKS()){
     for(const t of (SEED_SENBATSU[w.id] || [])) out.push({ work:w, ...t });
   }
   return out;
 }
 
-function worksOf(id){
-  return allTracks()
+/** A member's tracks: 'main' (the default), 'special', or 'all'. */
+function worksOf(id, which = 'main'){
+  return allTracks(which !== 'main')
     .filter(t => t.members.includes(id))
+    .filter(t => which === 'all' || (which === 'special') === isSpecialWork(t.work))
     .map(t => ({ work:t.work, track:t.track, centre:t.centers.includes(id) }))
-    .sort((a,b) => b.work.year-a.work.year || b.work.num-a.work.num);
+    .sort((a,b) => b.work.year-a.work.year || (b.work.num||0)-(a.work.num||0)
+      || String(b.work.date||'').localeCompare(String(a.work.date||'')));
 }
 
 function renderBarLink(label, value, max, color, action, data){
@@ -4254,16 +4527,14 @@ function renderBarLink(label, value, max, color, action, data){
 
 function renderMemberWorks(m){
   const works = worksOf(m.id);
-  if(!works.length) return `<h3 class="section-label">ผลงานเพลง</h3>
-    <p class="muted-note">ยังไม่มีเพลงที่บันทึกไว้</p>`;
-  const centres = works.filter(w=>w.centre).length;
-  const rows = works.map(w=>{
-    const kind = WORK_KIND(w.work)==='album' ? 'อัลบั้มที่' : 'ซิงเกิลที่';
+  const specials = worksOf(m.id, 'special');
+  const row = w=>{
     // A title track shares its name with the release, so naming the release
     // again would just repeat the line above it.
-    const from = w.track === w.work.title
-      ? `${kind} ${w.work.num} · ${w.work.year}`
-      : `${kind} ${w.work.num} · ${escapeHtml(w.work.title)} · ${w.work.year}`;
+    const sameName = w.track === w.work.title || w.track.startsWith(w.work.title + ' – ');
+    const from = sameName
+      ? `${workLabel(w.work)} · ${w.work.year}`
+      : `${workLabel(w.work)} · ${escapeHtml(w.work.title)} · ${w.work.year}`;
     return `<button class="work-row${w.centre?' is-centre':''}" data-action="open-single" data-id="${w.work.id}">
       <span class="work-main">
         <span class="work-track">${escapeHtml(w.track)}</span>
@@ -4271,10 +4542,21 @@ function renderMemberWorks(m){
       </span>
       ${w.centre?'<span class="work-centre">CENTER</span>':''}
     </button>`;
-  }).join('');
+  };
+  const count = list => {
+    const c = list.filter(w=>w.centre).length;
+    return `<p class="works-count">${list.length} เพลง${c?` · เซ็นเตอร์ ${c} เพลง`:''}</p>`;
+  };
+  // Kept apart so the count here agrees with the song statistics, which only
+  // read the main releases.
+  const extra = specials.length ? `<h3 class="section-label">เพลงพิเศษ</h3>
+    ${count(specials)}
+    <div class="work-list">${specials.map(row).join('')}</div>` : '';
+  if(!works.length) return `<h3 class="section-label">ผลงานเพลง</h3>
+    <p class="muted-note">ยังไม่มีเพลงที่บันทึกไว้</p>` + extra;
   return `<h3 class="section-label">ผลงานเพลง</h3>
-    <p class="works-count">${works.length} เพลง${centres?` · เซ็นเตอร์ ${centres} เพลง`:''}</p>
-    <div class="work-list">${rows}</div>`;
+    ${count(works)}
+    <div class="work-list">${works.map(row).join('')}</div>` + extra;
 }
 
 
@@ -4661,7 +4943,7 @@ function compareRows(a, b){
       gap ? `เข้ามาห่างกัน ${humanMonths(gap)}` : 'เข้าวงพร้อมกัน');
   }
 
-  const wa = worksOf(a.id), wb = worksOf(b.id);
+  const wa = worksOf(a.id, 'all'), wb = worksOf(b.id, 'all');
   push('ผลงานเพลง', `${wa.length} เพลง`, `${wb.length} เพลง`, null);
 
   const ca = wa.filter(w=>w.centre).length, cb = wb.filter(w=>w.centre).length;
@@ -4718,7 +5000,7 @@ function renderCompareModal(){
                <button class="work-row" data-action="open-single" data-id="${w.work.id}">
                  <span class="work-main">
                    <span class="work-track">${escapeHtml(w.track)}</span>
-                   <span class="work-from">${WORK_KIND(w.work)==='album'?'อัลบั้มที่':'ซิงเกิลที่'} ${w.work.num} · ${w.work.year}</span>
+                   <span class="work-from">${workLabel(w.work)} · ${w.work.year}</span>
                  </span>
                </button>`).join('')}</div>`
           : `<p class="muted-note">ยังไม่เคยอยู่เพลงเดียวกัน</p>`}
@@ -5332,8 +5614,8 @@ function searchEverything(q){
 
   return {
     members: state.members.filter(m => any(m.name, m.nameTh, m.realName, m.realNameTh)),
-    tracks:  allTracks().filter(t => hit(t.track)),
-    works:   ALL_WORKS().filter(w => any(w.title, w.alt)),
+    tracks:  allTracks(true).filter(t => hit(t.track)),
+    works:   [...ALL_WORKS(), ...SEED_SPECIALS].filter(w => any(w.title, w.alt)),
     events:  SEED_SCHEDULE.filter(e => any(e.title, e.venue)
                || (e.info || []).some(hit) || (e.detail || []).some(hit)),
     teams:   TEAMS.filter(t => hit(t.name)),
@@ -5365,11 +5647,10 @@ function renderSearch(){
 
   const workRow = w => {
     const g = getGroup(w.groupId);
-    const kind = WORK_KIND(w)==='album' ? 'อัลบั้ม' : 'ซิงเกิล';
     return `<button class="sr-row" style="--c:${g.color}" data-action="open-single" data-id="${w.id}">
-      <span class="sr-kind">${kind}ที่ ${w.num}</span>
+      <span class="sr-kind">${workLabel(w)}</span>
       <span class="sr-main">${escapeHtml(w.title)}</span>
-      <span class="sr-sub">${escapeHtml(w.alt || '')}${w.alt?' · ':''}${g.name} · ${w.year}</span>
+      <span class="sr-sub">${escapeHtml(w.alt || '')}${w.alt?' · ':''}${workGroupNames(w)} · ${w.year}</span>
     </button>`;
   };
 
@@ -5390,7 +5671,7 @@ function renderSearch(){
         return `<button class="sr-row" style="--c:${g.color}" data-action="open-single" data-id="${t.work.id}">
           <span class="sr-kind">เพลง</span>
           <span class="sr-main">${escapeHtml(t.track)}</span>
-          <span class="sr-sub">${escapeHtml(t.work.title)} · ${g.name} · ${t.work.year}</span>
+          <span class="sr-sub">${escapeHtml(t.work.title)} · ${workGroupNames(t.work)} · ${t.work.year}</span>
         </button>`; }).join(''))}
 
     ${section('ซิงเกิลและอัลบั้ม', r.works, 15, list => list.map(workRow).join(''))}
@@ -6371,9 +6652,9 @@ function renderEditProfile(){
 }
 
 function renderSingleDetail(){
-  const isAlbum = /-a\d+$/.test(state.selectedSingle||'');
-  const s = (isAlbum?SEED_ALBUMS:SEED_SINGLES).find(x=>x.id===state.selectedSingle);
+  const s = findWork(state.selectedSingle);
   if(!s) return '';
+  const isAlbum = WORK_KIND(s) === 'album';
   const g = getGroup(s.groupId);
   const tracks = SEED_SENBATSU[s.id];
   const card = (id, isCentre) => { const m = getMember(id); return m ? renderMiniCard(m, isCentre) : ''; };
@@ -6403,9 +6684,10 @@ function renderSingleDetail(){
   <div class="release-page">
   <button class="back-btn" data-action="go-back">← กลับ</button>
   <div class="single-head" style="--c:${g.color}">
-    <div class="timeline-year">${linkGroup(g)} · ${isAlbum?'อัลบั้มที่':'ซิงเกิลที่'} ${s.num} · ${s.year}</div>
+    <div class="timeline-year">${workGroups(s).map(id => linkGroup(getGroup(id))).join(' × ')} · ${workLabel(s)} · ${s.year}</div>
     <h2>${escapeHtml(s.title)}</h2>
     ${s.alt?`<p class="single-th">${escapeHtml(s.alt)}</p>`:''}
+    ${s.note?`<p class="muted-note">${escapeHtml(s.note)}</p>`:''}
   </div>
   ${(()=>{ // an album lists its singles; a single should lead back to its album too
     if(isAlbum) return '';
@@ -6421,30 +6703,33 @@ function renderSingleDetail(){
       ${s.singles.map(sid=>{ const x=SEED_SINGLES.find(y=>y.id===sid); return x
         ? `<button class="chip chip-link" data-action="open-single" data-id="${x.id}">${escapeHtml(x.title)}</button>` : ''; }).join('')}
     </div>` : ''}
-  ${!tracks ? `
+  ${!tracks || !tracks.length ? (isSpecialWork(s) ? `
+    <div class="empty-state"><p>ยังไม่ทราบรายชื่อผู้ร้อง</p></div>` : `
     <div class="empty-state">
       <p>ยังไม่มีข้อมูลเซ็มบัตสึของซิงเกิลนี้</p>
       <p class="muted-note">เพิ่มได้ที่ SEED_SENBATSU ในไฟล์ index.html</p>
-    </div>`
+    </div>`)
   : tracks.map(renderTrack).join('')}</div>`;
 }
 
-const DISC_TABS = [{ id:'singles', label:'ซิงเกิล' }, { id:'albums', label:'อัลบั้ม' }];
+const DISC_TABS = [{ id:'singles', label:'ซิงเกิล' }, { id:'albums', label:'อัลบั้ม' }, { id:'specials', label:'เพลงพิเศษ' }];
 
 function renderWorkRow(w, kind){
   const g = getGroup(w.groupId);
   const tracks = SEED_SENBATSU[w.id];
   const lead = tracks && tracks[0];
   const nick = id => { const m = getMember(id); return escapeHtml(m ? (m.nameTh||m.name) : ''); };
-  const label = kind==='album' ? 'อัลบั้มที่' : 'ซิงเกิลที่';
+  // Only a numbered single or a special single has a senbatsu; a digital
+  // single just has the people who sang it.
+  const who = kind==='album' ? 'เพลงประจำอัลบั้ม ' : kind==='digital' ? '' : 'เซ็มบัตสึ ';
   return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${w.id}">
-    <div class="timeline-year">${w.year} · ${g.name} · ${label} ${w.num}</div>
+    <div class="timeline-year">${w.year} · ${workGroupNames(w)} · ${workLabel(w)}</div>
     <div class="timeline-title">${escapeHtml(w.title)}${w.alt?` <span class="title-alt">${escapeHtml(w.alt)}</span>`:''}</div>
     <div class="single-meta">${lead
-      ? `${kind==='album'?'เพลงประจำอัลบั้ม':'เซ็มบัตสึ'} ${lead.members.length} คน`
+      ? `${who}${lead.members.length} คน`
         + (lead.centers.length?' · เซ็นเตอร์ '+lead.centers.map(nick).join(', '):'')
         + (tracks.length>1 ? ` · อีก ${tracks.length-1} เพลง` : '')
-      : 'ยังไม่มีข้อมูลเซ็มบัตสึ'}</div>
+      : isSpecialWork(w) ? 'ยังไม่ทราบรายชื่อผู้ร้อง' : 'ยังไม่มีข้อมูลเซ็มบัตสึ'}</div>
   </button>`;
 }
 
@@ -6465,6 +6750,15 @@ function renderDiscography(){
       ${albums.map(a=>renderWorkRow(a,'album')).join('')}
     </div>
     <p class="muted-note" style="margin-top:10px;">อัลบั้มรวมเพลงจากซิงเกิลที่ออกก่อนหน้า และมีเพลงเฉพาะอัลบั้มเพิ่มมา — แสดงเฉพาะเพลงเฉพาะอัลบั้ม</p>`;
+  }
+  if(state.discTab==='specials'){
+    const specials = SEED_SPECIALS
+      .filter(w => state.groupFilter==='all' || workGroups(w).includes(state.groupFilter))
+      .sort((a,b)=> b.date.localeCompare(a.date));
+    return tabBar + `<div class="timeline">
+      ${specials.map(w=>renderWorkRow(w, WORK_KIND(w))).join('')}
+    </div>
+    <p class="muted-note" style="margin-top:10px;">ซิงเกิลพิเศษและซิงเกิลดิจิทัลนอกเหนือจากซิงเกิลและอัลบั้มหลัก — ไม่นับรวมในสถิติเพลง</p>`;
   }
   let singles = SEED_SINGLES.filter(inGroup);
   singles.sort((a,b)=> b.year-a.year || b.num-a.num);
@@ -6804,7 +7098,7 @@ function applyUrlToState(){
     if(vs && vs !== mem && (state.members||[]).some(x => x.id === vs)) state.compareWith = vs;
     return;
   }
-  if(sng && SEED_SINGLES.concat(SEED_ALBUMS).some(x => x.id === sng)){
+  if(sng && findWork(sng)){
     state.view='single'; state.selectedSingle=sng; return;
   }
   if(view && SHAREABLE_VIEWS.includes(view)) state.view = view;
