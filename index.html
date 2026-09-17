@@ -2689,7 +2689,7 @@ const SEED_SCHEDULE = [
   { id:'ev-nine-charity', start:'2026-09-30', time:'13:00', tag:'media',
     title:'Nine Entertain 24th Anniversary Charity Concert',
     venue:'Parc Paragon, Bangkok', groups:['bnk48'],
-    poster:{ accent:'#5E2260', surface:'#FDF1F8', ink:'#53215A' },
+    poster:{ accent:'#9B3FB5', surface:'#FCEAF3', ink:'#5A2466', img:'posters/nine-charity.jpg' },
     members:['bnk-niya','bnk-monet','bnk-micha','bnk-praew','bnk-yoghurt','bnk-pancake'],
     info:['คอนเสิร์ตการกุศลรวมศิลปินหลายวง BNK48 เป็นหนึ่งในนั้น',
       'งานจัด 13:00–22:00 น. — ยังไม่ประกาศเวลาขึ้นเวทีของ BNK48',
@@ -4149,6 +4149,8 @@ const EN_PATTERNS = [
   [rx('เริ่มใน (\\d+) ชม\\.'), m => `Starts in ${m[1]} h`],
   [rx('เริ่มใน (\\d+) นาที'), m => `Starts in ${m[1]} min`],
   [rx('อีก (\\d+) วัน( ·)?'), m => `in ${m[1]} days${m[2] ? ' ·' : ''}`],
+  /* a label followed by a separator whose next part is its own element */
+  [rx('(.+) ·'), m => { const w = toEn(m[1]); return w == null ? null : `${w} ·`; }],
   [rx('วันที่ (\\d+) จาก (\\d+)'), m => `Day ${m[1]} of ${m[2]}`],
 
   /* counts */
