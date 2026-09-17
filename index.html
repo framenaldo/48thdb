@@ -803,15 +803,17 @@
     .stage{ aspect-ratio:1/1; min-height:260px; }
   }
 
-  .social-row{ display:flex; flex-wrap:wrap; gap:7px; margin:14px 0 2px; }
+  .social-row{ display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 2px; }
   .social-chip{
-    display:inline-flex; align-items:center; gap:6px; max-width:100%;
-    padding:6px 11px 6px 8px; border-radius:999px; text-decoration:none;
-    border:1px solid var(--line); background:var(--paper-dim); color:var(--ink);
-    font-size:12.5px; font-weight:600;
+    display:inline-flex; align-items:center; justify-content:center;
+    width:42px; height:42px; border-radius:50%; text-decoration:none;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    box-shadow:0 2px 8px rgba(var(--shadow-rgb),.08);
+    transition:transform .18s var(--ease-out), border-color .18s ease, background .18s ease;
   }
-  .social-chip:hover{ border-color:var(--c); color:var(--c); }
-  .social-ico{ width:15px; height:15px; flex:none; color:var(--c); }
+  .social-chip:hover{ border-color:var(--c); background:color-mix(in srgb, var(--c) 8%, var(--card)); }
+  .social-chip:active{ transform:scale(.9); transition-duration:.08s; }
+  .social-ico{ width:19px; height:19px; flex:none; color:var(--c); }
   .social-ico svg{ width:100%; height:100%; display:block; }
   .social-handle{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:15ch; }
 
@@ -1801,13 +1803,17 @@
   .crown-ico{ display:inline-flex; width:15px; height:15px; vertical-align:-2px; color:var(--gold); }
   .crown-ico svg{ width:100%; height:100%; display:block; }
   .fav-btn-sm.is-oshi{ color:var(--gold); }
-  .oshi-actions{ display:flex; gap:8px; flex-wrap:wrap; margin:16px 0 4px; }
+  /* Two buttons of the same size, side by side, whatever their labels say. */
+  .oshi-actions{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin:16px 0 4px; }
   .oshi-btn, .kami-btn{
-    display:flex; align-items:center; gap:6px;
-    font-family:'Noto Sans Thai',sans-serif; font-weight:600; font-size:13px;
-    padding:8px 16px; border-radius:20px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:7px; min-width:0;
+    font-family:'Noto Sans Thai',sans-serif; font-weight:600; font-size:13.5px; white-space:nowrap;
+    padding:11px 12px; border-radius:14px; cursor:pointer;
     background:var(--card); border:1px solid var(--line); color:var(--ink-soft);
+    box-shadow:0 2px 8px rgba(var(--shadow-rgb),.06);
+    transition:transform .18s var(--ease-out), background .18s ease, border-color .18s ease;
   }
+  .oshi-btn:active, .kami-btn:active{ transform:scale(.96); transition-duration:.08s; }
   .oshi-btn span{ color:var(--gold); font-size:16px; }
   .oshi-btn.active{ background:var(--bnk-soft); border-color:var(--bnk); color:var(--ink); }
   .kami-btn.active{ background:#FBF0DC; border-color:var(--gold); color:var(--ink); }
@@ -2104,6 +2110,7 @@
       padding:0 110px 22px 0; border-bottom:1px solid var(--line); margin-bottom:24px;
     }
     .is-member-sheet .sheet-top > .detail-head{ grid-row:span 3; margin:0; }
+    .is-member-sheet .sheet-top > .oshi-actions{ width:min(440px, 38vw); }
     .is-member-sheet .sheet-top > .oshi-actions, .is-member-sheet .sheet-top > .social-row,
     .is-member-sheet .sheet-top > .grad-note{ justify-self:end; margin:0; }
     .is-member-sheet .sheet-body{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:0 clamp(24px, 2.4vw, 40px); align-items:start; }
@@ -5574,9 +5581,10 @@ function renderSocial(m){
       // A channel id is not a name, so show the platform instead of 24 characters
       // of base64. An @handle reads fine as it is.
       const shown = handle.startsWith('channel/') ? s.label : handle.replace(/^@/,'');
+      // Just the logo: the handle is in the tooltip and read out by screen readers.
       return `<a class="social-chip" style="--c:${s.colour}" href="${escapeAttr(s.url(handle))}"
-        target="_blank" rel="noopener noreferrer" title="${s.label}: ${escapeAttr(handle)}">
-        <span class="social-ico">${s.icon}</span><span class="social-handle">${escapeHtml(shown)}</span>
+        target="_blank" rel="noopener noreferrer" title="${s.label}: ${escapeAttr(shown)}" aria-label="${s.label}: ${escapeAttr(shown)}">
+        <span class="social-ico">${s.icon}</span>
       </a>`;
     }).join('')}
   </div>`;
