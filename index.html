@@ -1404,6 +1404,21 @@
   .today-hero .ev-groups{ margin-bottom:10px; }
   .today-hero-open{ margin:12px 0 0; font-size:13.5px; font-weight:700; color:var(--c); }
   .today-hero-open::after{ content:' ›'; }
+  .slot-table{ display:flex; flex-direction:column; gap:8px; margin:6px 0 4px; }
+  .slot-row{
+    display:flex; gap:12px; align-items:flex-start; padding:10px 12px;
+    border:1px solid var(--line); border-radius:14px;
+    background:color-mix(in srgb, var(--c) 4%, transparent);
+  }
+  .slot-row.is-today{ border-color:color-mix(in srgb, var(--c) 60%, var(--line)); background:color-mix(in srgb, var(--c) 12%, transparent); }
+  .slot-row.is-done{ opacity:.55; }
+  .slot-when{ flex:0 0 86px; display:flex; flex-direction:column; gap:2px; }
+  .slot-date{ font-weight:700; font-size:14px; color:var(--c); }
+  .slot-time{ font-size:12.5px; color:var(--ink-soft); }
+  .slot-now{ align-self:flex-start; margin-top:3px; padding:1px 8px; border-radius:999px; background:var(--c); color:#fff; font-size:11px; font-weight:700; }
+  .slot-who{ display:flex; flex-wrap:wrap; gap:6px; min-width:0; }
+  .slot-who .ev-person{ margin:0; }
+  .evm-related{ display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 6px; }
   .ev-card.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out), border-color .2s ease; }
   .ev-more-people{
     display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px;
@@ -2670,12 +2685,33 @@ const SEED_SCHEDULE = [
       'บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
       'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
   { id:'ev-lanna-tsukimi', start:'2026-09-17', time:'15:00',
-    title:'Lanna Tsukimi Fest',
+    title:'Lanna Tsukimi Fest', related:['ev-hachicha-tsukimi'],
     venue:'ลานกิจกรรม ชั้น G, Central Chiangmai Airport, Chiang Mai', groups:['cgm48'],
     members:['cgm-emma','cgm-jingjing','cgm-lewlew'],
     poster:{ accent:'#9C2F45', surface:'#FBF1EC', ink:'#3F2433', img:'posters/lanna-tsukimi.jpg', w:1440, h:1440 },
     detail:['15:00 พิธีเปิด — พบกับสมาชิก CGM48'],
     info:['เทศกาลชมจันทร์สไตล์ล้านนา จัดโดย Central Pattana'] },
+  /* A booth staffed in turns: `slots` says who is there, which day, and when.
+     `members` is filled in from the slots below the list. */
+  { id:'ev-hachicha-tsukimi', start:'2026-09-17', end:'2026-09-24',
+    title:'Hachi Cha Booth with Special Guest',
+    venue:'ลานกิจกรรม ชั้น G, Central Chiangmai Airport, Chiang Mai', groups:['cgm48'],
+    related:['ev-lanna-tsukimi'],
+    poster:{ accent:'#1E6B45', surface:'#EEF6EF', ink:'#173F2B', img:'posters/hachicha-tsukimi.jpg', w:1562, h:1562 },
+    slots:[
+      { date:'2026-09-17', time:'18:00', until:'19:00', members:['cgm-jingjing','cgm-emma','cgm-lewlew'] },
+      { date:'2026-09-18', time:'18:00', until:'19:00', members:['cgm-satangpound','cgm-punpon'] },
+      { date:'2026-09-19', time:'11:00', until:'12:00', members:['cgm-else','cgm-kwan'] },
+      { date:'2026-09-19', time:'16:00', until:'17:00', members:['cgm-tara','cgm-ploen'] },
+      { date:'2026-09-20', time:'11:00', until:'12:00', members:['cgm-namphet','cgm-hongyok'] },
+      { date:'2026-09-20', time:'16:00', until:'17:00', members:['cgm-valentine','cgm-ginna'] },
+      { date:'2026-09-21', time:'18:00', until:'19:00', members:['cgm-shenae','cgm-chifa'] },
+      { date:'2026-09-22', time:'16:00', until:'17:00', members:['cgm-nisha','cgm-else'] },
+      { date:'2026-09-23', time:'18:00', until:'19:00', members:['cgm-praifa','cgm-prae'] },
+      { date:'2026-09-24', time:'18:00', until:'19:00', members:['cgm-lookked','cgm-nana'] },
+    ],
+    info:['Hachi Cha แบรนด์ชาเขียวของ iAM ออกบูธตามงานต่าง ๆ',
+      'บูธนี้อยู่ในงาน Lanna Tsukimi Fest และมีสมาชิก CGM48 มาขายน้ำตามตาราง'] },
   { id:'ev-getaway-pudthailee', start:'2026-09-18', end:'2026-09-20',
     title:'Get Away with Pudthailee',
     venue:'Hua Hin, Prachuap Khiri Khan', groups:['bnk48'],
@@ -2749,6 +2785,9 @@ const SEED_SCHEDULE = [
       'ประกาศวันแล้ว รายละเอียดอื่นรอประกาศ'],
     lineupTba:true },
 ];
+SEED_SCHEDULE.forEach(e => {
+  if(e.slots && !e.members) e.members = [...new Set(e.slots.flatMap(s => s.members))];
+});
 
 const SEED_SENBATSU = {
   'bnk-s1': [
@@ -3831,6 +3870,13 @@ const EN = {
   'ลานโปรโมชั่น': 'Promotion Area',
   'ซิงเกิลและอัลบั้ม': 'Singles and albums',
   'งานวันนี้': 'Happening today',
+  'อยู่ที่บูธตอนนี้': 'At the booth now',
+  'รอบวันนี้จบแล้ว': "Today's turn is over",
+  'ตารางสมาชิกประจำบูธ': 'Who is at the booth',
+  'ตอนนี้': 'Now',
+  'งานที่เกี่ยวข้อง': 'Related events',
+  'Hachi Cha แบรนด์ชาเขียวของ iAM ออกบูธตามงานต่าง ๆ': "Hachi Cha, iAM's green tea brand, runs a booth at many events",
+  'บูธนี้อยู่ในงาน Lanna Tsukimi Fest และมีสมาชิก CGM48 มาขายน้ำตามตาราง': 'This booth is at Lanna Tsukimi Fest, with CGM48 members serving drinks on the schedule below',
   'กำลังจัดอยู่': 'On now',
   'เพลงพิเศษ': 'Specials',
   'ซิงเกิลพิเศษ': 'Special single',
@@ -5584,7 +5630,30 @@ function startsInLabel(ms){
 /** Today's start time for an event running today and carrying a time. A run
     over several days repeats its time each day — the roadshow is the same
     programme on both dates — so every day of it counts down, not only the first. */
+/* Rotas. A slot is { date, time, until, members }. */
+const slotsOn = (ev, iso) => (ev.slots || []).filter(s => s.date === iso)
+  .sort((a, b) => a.time.localeCompare(b.time));
+const slotsFor = (ev, id) => (ev.slots || []).filter(s => s.members.includes(id))
+  .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+const slotTime = (iso, hhmm) => { const d = parseYmd(iso); const [h, m] = hhmm.split(':').map(Number); d.setHours(h, m || 0, 0, 0); return d.getTime(); };
+
+/** Today's slots and where the clock is among them: the one on now, the next
+    one to start, or null for both once the day's last has ended. */
+function slotNow(ev, iso){
+  const today = slotsOn(ev, iso);
+  const now = Date.now();
+  return {
+    today,
+    current: today.find(s => slotTime(iso, s.time) <= now && now < slotTime(iso, s.until)) || null,
+    next: today.find(s => slotTime(iso, s.time) > now) || null,
+  };
+}
+
 function startsAt(ev, todayIso){
+  if(ev.slots){
+    const { next } = slotNow(ev, todayIso);
+    return next ? slotTime(todayIso, next.time) : null;
+  }
   if(!ev.time || ev.start > todayIso || eventLastDay(ev) < todayIso) return null;
   const [hh, mm] = ev.time.split(':').map(Number);
   if(!Number.isFinite(hh)) return null;
@@ -5675,7 +5744,10 @@ function renderEventCard(ev, todayIso){
    their own shape — the image sits whole over a blurred copy of itself rather
    than being cropped to fit a box. */
 function renderTodayHero(ev, todayIso){
-  const people = (ev.members || []).map(getMember).filter(Boolean);
+  // A rota shows only who is on today, and today's hours.
+  const rota = ev.slots ? slotNow(ev, todayIso) : null;
+  const people = (rota ? [...new Set(rota.today.flatMap(s => s.members))] : (ev.members || []))
+    .map(getMember).filter(Boolean);
   const groupTags = (ev.groups || []).map(getGroup).filter(Boolean);
   const accent = (ev.poster && ev.poster.accent)
     || (groupTags.length === 1 ? groupTags[0].color
@@ -5684,9 +5756,11 @@ function renderTodayHero(ev, todayIso){
   const at = startsAt(ev, todayIso);
   const dayOf = ev.end ? Math.round((parseYmd(todayIso) - parseYmd(ev.start)) / 86400000) + 1 : 0;
   const days = ev.end ? Math.round((parseYmd(ev.end) - parseYmd(ev.start)) / 86400000) + 1 : 0;
-  const status = at
-    ? `<span data-starts-at="${at}">${startsLabel(at)}</span>`
+  const status = rota && rota.current ? 'อยู่ที่บูธตอนนี้'
+    : at ? `<span data-starts-at="${at}">${startsLabel(at)}</span>`
+    : rota && rota.today.length ? 'รอบวันนี้จบแล้ว'
     : (ev.time ? 'กำลังจัดอยู่' : 'วันนี้');
+  const hours = rota ? rota.today.map(s => `${s.time}–${s.until}`).join(', ') : (ev.time || '');
   const shown = people.slice(0, 8);
   const rest = people.length - shown.length;
   const open = eventHasMore(ev);
@@ -5696,7 +5770,7 @@ function renderTodayHero(ev, todayIso){
     <div class="today-hero-body">
       <p class="today-hero-status"><span class="today-live" aria-hidden="true"></span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</p>
       <h3 class="today-hero-title">${escapeHtml(ev.title)}</h3>
-      <p class="today-hero-meta">${ev.time ? `${ev.time} น.` : ''}${ev.time && ev.venue ? ' · ' : ''}${ev.venue ? escapeHtml(ev.venue) : ''}</p>
+      <p class="today-hero-meta">${hours ? `${hours} น.` : ''}${hours && ev.venue ? ' · ' : ''}${ev.venue ? escapeHtml(ev.venue) : ''}</p>
     </div>
     ${img ? `<div class="today-hero-art" style="--art:url('${escapeAttr(img)}')">
       <img src="${escapeAttr(img)}"${ev.poster.w ? ` width="${ev.poster.w}" height="${ev.poster.h}"` : ''} alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" decoding="async">
@@ -5745,6 +5819,30 @@ function renderBirthdayBanner(ev){
         <span class="evm-fest-name">${escapeHtml(m.nameTh||m.name)}</span></button>`;
     }).join('')}</span>
   </div>`;
+}
+
+/** Who is at the booth when: one row per slot, today's picked out, finished
+    ones dimmed. Tapping a name opens that member. */
+function renderSlotTable(ev){
+  const iso = toYmd(todayStart());
+  const now = Date.now();
+  const M = monthsShort();
+  const rows = ev.slots.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(s => {
+    const [, mo, d] = s.date.split('-').map(Number);
+    const done = slotTime(s.date, s.until) <= now;
+    const on = !done && slotTime(s.date, s.time) <= now;
+    const who = s.members.map(getMember).filter(Boolean).map(m => {
+      const g = getGroup(m.groupId);
+      return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
+        data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span></button>`;
+    }).join('');
+    return `<div class="slot-row${s.date === iso ? ' is-today' : ''}${done ? ' is-done' : ''}${on ? ' is-on' : ''}">
+      <div class="slot-when"><span class="slot-date">${d} ${M[mo-1]}</span><span class="slot-time">${s.time}–${s.until}</span>
+        ${on ? '<span class="slot-now">ตอนนี้</span>' : s.date === iso && !done ? '<span class="slot-now">วันนี้</span>' : ''}</div>
+      <div class="slot-who">${who}</div>
+    </div>`;
+  }).join('');
+  return `<h3 class="evm-head">ตารางสมาชิกประจำบูธ</h3><div class="slot-table">${rows}</div>`;
 }
 
 function renderEventModal(){
@@ -5796,6 +5894,8 @@ function renderEventModal(){
         ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
           groupTag(g)).join('')}</div>` : ''}
 
+        ${ev.slots ? renderSlotTable(ev) : ''}
+
         ${ev.detail ? `
         <h3 class="evm-head">กำหนดการ</h3>
         <ul class="ev-detail">${ev.detail.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
@@ -5805,6 +5905,11 @@ function renderEventModal(){
         <ul class="ev-detail">${ev.info.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
 
         ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
+
+        ${(ev.related || []).map(id => SEED_SCHEDULE.find(e => e.id === id)).filter(Boolean).length ? `
+        <h3 class="evm-head">งานที่เกี่ยวข้อง</h3>
+        <div class="evm-related">${ev.related.map(id => SEED_SCHEDULE.find(e => e.id === id)).filter(Boolean).map(r =>
+          `<button class="chip chip-link" data-action="open-event" data-id="${r.id}">${escapeHtml(r.title)} · ${eventDateLabel(r)}</button>`).join('')}</div>` : ''}
 
         ${people.length ? `
         <h3 class="evm-head">สมาชิกที่ร่วมงาน · ${people.length} คน</h3>
@@ -6835,7 +6940,19 @@ function leaveOverlays(){
    the run it is. When the day ends, the clock's redraw moves it to past. */
 function renderMemberEvents(m){
   const iso = toYmd(todayStart());
-  const evs = SEED_SCHEDULE.filter(e => (e.members || []).includes(m.id));
+  // On a rota what counts is her own turn, not the whole run: a booth that
+  // opened on the 17th is not "today" for someone whose slot is the 22nd.
+  const evs = SEED_SCHEDULE.filter(e => (e.members || []).includes(m.id)).map(e => {
+    if(!e.slots) return e;
+    const mine = slotsFor(e, m.id);
+    const next = mine.find(s => s.date >= iso) || mine[mine.length - 1];
+    return Object.assign(Object.create(e), {
+      start: next.date, end: undefined,
+      memberDays: { [m.id]: mine.filter(s => s.date >= iso).map(s => {
+        const [, mo, d] = s.date.split('-').map(Number);
+        return `${d} ${monthsShort()[mo-1]} ${s.time}`; }).join(', ') || null },
+    });
+  });
   if(!evs.length) return '';
   const today = evs.filter(e => e.start <= iso && eventLastDay(e) >= iso);
   const upcoming = evs.filter(e => e.start > iso).sort((a,b) => a.start.localeCompare(b.start));
