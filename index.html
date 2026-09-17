@@ -2776,9 +2776,32 @@ const SEED_SCHEDULE = [
     info:['คอนเสิร์ตการกุศลรวมศิลปินหลายวง BNK48 เป็นหนึ่งในนั้น',
       'งานจัด 13:00–22:00 น. — ยังไม่ประกาศเวลาขึ้นเวทีของ BNK48',
       'จัดโดย Nine Entertain และ MCOT Event · ออกอากาศทาง MCOT HD 30'] },
+  /* A span of weeks rather than a day out: `period` keeps it off the large
+     "today" card, which would otherwise be taken over for a month and a half. */
+  { id:'ev-election-voting', start:'2026-10-01', end:'2026-11-12', period:true,
+    title:'BNK48 & CGM48 Senbatsu General Election 2026 · Voting', groups:['bnk48','cgm48'],
+    related:['ev-election-fanfest','ev-election-results'],
+    poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-2026.jpg', w:1638, h:2048 },
+    links:[{ label:'คลิปประกาศ', url:'https://youtu.be/Xr381KDpZps' }],
+    info:['ช่วงโหวต 1 ต.ค. – 12 พ.ย. 2026',
+      'Top 12 เซ็มบัตสึได้ไปถ่าย MV ที่ญี่ปุ่น',
+      'Kami7 Special Project — เพลงร่วมกับ AKB48',
+      'ประกาศในงาน BNK48 & CGM48 Bon Odori 2026',
+      '#BNK48CGM48_GE2026'] },
+  { id:'ev-election-results', start:'2026-11-14',
+    title:'BNK48 & CGM48 Senbatsu General Election 2026 · Final Results', groups:['bnk48','cgm48'],
+    related:['ev-election-voting','ev-election-fanfest'],
+    poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-2026.jpg', w:1638, h:2048 },
+    links:[{ label:'คลิปประกาศ', url:'https://youtu.be/Xr381KDpZps' }],
+    info:['ประกาศผลการเลือกตั้งอันดับสุดท้าย',
+      'Top 12 เซ็มบัตสึได้ไปถ่าย MV ที่ญี่ปุ่น',
+      'Kami7 Special Project — เพลงร่วมกับ AKB48',
+      'รายละเอียดสถานที่และเวลารอประกาศ',
+      '#BNK48CGM48_GE2026'] },
   { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
+    related:['ev-election-voting','ev-election-results'],
     poster:{ accent:'#8C2A22', surface:'#FAF2E4', ink:'#4E1512', img:'posters/election-fanfest.jpg', w:1281, h:1600 },
     info:['女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
       'ประกาศวันแล้ว รายละเอียดอื่นรอประกาศ'],
@@ -3874,6 +3897,15 @@ const EN = {
   'ตารางสมาชิกประจำบูธ': 'Who is at the booth',
   'ตอนนี้': 'Now',
   'งานที่เกี่ยวข้อง': 'Related events',
+  'ช่วงที่เปิดอยู่': 'Open now',
+  'วันสุดท้าย': 'Last day',
+  'คลิปประกาศ ↗': 'Announcement video ↗',
+  'ช่วงโหวต 1 ต.ค. – 12 พ.ย. 2026': 'Voting runs 1 Oct – 12 Nov 2026',
+  'Top 12 เซ็มบัตสึได้ไปถ่าย MV ที่ญี่ปุ่น': 'The top 12 senbatsu shoot their music video in Japan',
+  'Kami7 Special Project — เพลงร่วมกับ AKB48': 'Kami7 Special Project — a collaboration song with AKB48',
+  'ประกาศในงาน BNK48 & CGM48 Bon Odori 2026': 'Announced at BNK48 & CGM48 Bon Odori 2026',
+  'ประกาศผลการเลือกตั้งอันดับสุดท้าย': 'The final results are announced',
+  'รายละเอียดสถานที่และเวลารอประกาศ': 'Venue and time still to be announced',
   'ราคาเริ่มต้น 145 บาท': 'From 145 THB',
   'กำลังจัดอยู่': 'On now',
   'เพลงพิเศษ': 'Specials',
@@ -4296,6 +4328,7 @@ const EN_PATTERNS = [
   [rx('(\\d+) คนจบการศึกษาจาก'), m => `${m[1]} graduated from`],
   [rx('เดบิวต์ · (.+)'), m => `Debut · ${enPart(m[1])}`],
   [rx('(\\d+) วันที่ซ้ำกัน'), m => `${m[1]} shared ${plural(m[1],'day','days')}`],
+  [rx('เหลือ (\\d+) วัน'), m => `${m[1]} ${plural(m[1],'day','days')} left`],
   [rx('(\\d+) วัน'), m => `${m[1]} ${plural(m[1],'day','days')}`],
   [rx('(\\d+) คน ทุกวง รวมที่จบแล้ว'), m => `${m[1]} across both groups, graduates included`],
   [rx('(.+) ชั้น (\\S+), (.+)'), m => `${enPart(m[1])}, Floor ${m[2]}, ${m[3]}`],
@@ -5107,7 +5140,10 @@ function calendarIndex(){
   const events = {}, births = {};
   const mine = filteringByOshi();
   SEED_SCHEDULE.filter(ev => !mine || hasMyOshi(ev))
-    .forEach(ev => eventDays(ev).forEach(day => (events[day] ??= []).push(ev)));
+    // A period marks the day it opens and the day it closes; a dot on every
+    // day of a six-week vote would hide the days something actually happens.
+    .forEach(ev => (ev.period ? [...new Set([ev.start, eventLastDay(ev)])] : eventDays(ev))
+      .forEach(day => (events[day] ??= []).push(ev)));
   activeMembers().filter(m => m.birthday).filter(m => !mine || isMyOshi(m))
     .forEach(m => (births[m.birthday.slice(5)] ??= []).push(m));   // MM-DD, any year
   return { events, births };
@@ -5690,7 +5726,11 @@ function startClock(){
 
 function eventWhenLabel(ev, todayIso){
   const last = eventLastDay(ev);
-  if(ev.start <= todayIso && last >= todayIso) return 'วันนี้';
+  if(ev.start <= todayIso && last >= todayIso){
+    if(!ev.period) return 'วันนี้';
+    const left = Math.round((parseYmd(last) - parseYmd(todayIso)) / 86400000);
+    return left === 0 ? 'วันสุดท้าย' : `เหลือ ${left} วัน`;
+  }
   const days = Math.round((parseYmd(ev.start) - parseYmd(todayIso)) / 86400000);
   if(days === 1) return 'พรุ่งนี้';
   if(days > 1) return 'อีก ' + days + ' วัน';
@@ -5903,6 +5943,9 @@ function renderEventModal(){
         <ul class="ev-detail">${ev.info.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
 
         ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
+
+        ${(ev.links || []).length ? `<div class="evm-related">${ev.links.map(l =>
+          `<a class="chip chip-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)} ↗</a>`).join('')}</div>` : ''}
 
         ${(ev.related || []).map(id => SEED_SCHEDULE.find(e => e.id === id)).filter(Boolean).length ? `
         <h3 class="evm-head">งานที่เกี่ยวข้อง</h3>
@@ -6127,7 +6170,9 @@ function renderFeed(){
 
   const events = SEED_SCHEDULE.filter(e => !mine || hasMyOshi(e))
     .slice().sort((a,b) => a.start.localeCompare(b.start));
-  const nowOn = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
+  const running = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
+  const nowOn = running.filter(e => !e.period);
+  const periods = running.filter(e => e.period);
   const soon = events.filter(e => e.start > iso);
   const past = events.filter(e => eventLastDay(e) < iso).reverse();
 
@@ -6147,6 +6192,12 @@ function renderFeed(){
     <section class="feed-block today-hero-block">
       <h2 class="section-label">งานวันนี้</h2>
       ${nowOn.map(e => renderTodayHero(e, iso)).join('')}
+    </section>` : ''}
+
+    ${periods.length ? `
+    <section class="feed-block">
+      <h2 class="section-label">ช่วงที่เปิดอยู่</h2>
+      ${periods.map(e => renderEventCard(e, iso)).join('')}
     </section>` : ''}
 
     ${todays.length ? `
