@@ -290,7 +290,7 @@
   .sheet-body{ display:flex; flex-direction:column; }
   .sec-stats{ order:1; } .sec-history{ order:2; } .sec-events{ order:3; } .sec-works{ order:4; } .sec-facts{ order:5; } .sec-actions{ order:6; }
   .feed-main, .feed-side{ display:contents; }
-  .today-hero-block{ order:1; } .is-periods{ order:2; } .is-bday-today{ order:3; }
+  .today-hero-block{ order:1; } .is-over-today{ order:1; } .is-periods{ order:2; } .is-bday-today{ order:3; }
   .is-bday-next{ order:4; } .is-schedule{ order:5; } .is-calendar{ order:6; } .is-past{ order:7; }
 
 
@@ -2069,9 +2069,9 @@
     .today-hero-block{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 560px), 1fr)); gap:16px; }
     .today-hero-block > .section-label{ grid-column:1 / -1; margin-bottom:0; }
     .today-hero-block .today-hero{ margin:0; }
-    .is-schedule, .is-periods, .past-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap:12px 14px; align-items:start; }
-    .is-schedule > .section-label, .is-periods > .section-label, .is-schedule > .muted-note{ grid-column:1 / -1; }
-    .is-schedule .ev-card, .is-periods .ev-card, .past-list .ev-card{ margin:0; }
+    .is-schedule, .is-periods, .is-over-today, .past-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap:12px 14px; align-items:start; }
+    .is-schedule > .section-label, .is-periods > .section-label, .is-over-today > .section-label, .is-schedule > .muted-note{ grid-column:1 / -1; }
+    .is-schedule .ev-card, .is-periods .ev-card, .is-over-today .ev-card, .past-list .ev-card{ margin:0; }
 
     .group-cards{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap:0 20px; align-items:start; }
 
@@ -4068,6 +4068,8 @@ const EN = {
   'ลานโปรโมชั่น': 'Promotion Area',
   'ซิงเกิลและอัลบั้ม': 'Singles and albums',
   'งานวันนี้': 'Happening today',
+  'จบไปแล้ววันนี้': 'Over for today',
+  'จบแล้ว': 'Over',
   'อยู่ที่บูธตอนนี้': 'At the booth now',
   'รอบวันนี้จบแล้ว': "Today's turn is over",
   'ตารางสมาชิกประจำบูธ': 'Who is at the booth',
@@ -5860,6 +5862,21 @@ function slotNow(ev, iso){
   };
 }
 
+/* When today's part of an event is over. A rota ends with its last turn of
+   the day; an event can say `until:'HH:MM'`; one with only a start time is
+   taken to run two hours; one with no time at all runs all day (null). */
+const DEFAULT_RUN_MS = 2 * 3600000;
+function endsAtToday(ev, iso){
+  if(ev.slots){
+    const today = slotsOn(ev, iso);
+    return today.length ? slotTime(iso, today[today.length - 1].until) : slotTime(iso, '00:00');
+  }
+  if(ev.until) return slotTime(iso, ev.until);
+  if(ev.time) return slotTime(iso, ev.time) + DEFAULT_RUN_MS;
+  return null;
+}
+const doneForToday = (ev, iso) => { const end = endsAtToday(ev, iso); return end != null && end <= Date.now(); };
+
 function startsAt(ev, todayIso){
   if(ev.slots){
     const { next } = slotNow(ev, todayIso);
@@ -5879,6 +5896,7 @@ function startsLabel(at){
   return left > 0 ? startsInLabel(left) : 'เริ่มแล้ว';
 }
 
+let _feedLiveKey = null;
 function tickClock(){
   syncTicker();
   document.querySelectorAll('[data-starts-at]').forEach(el=>{
@@ -5887,6 +5905,12 @@ function tickClock(){
   });
 
   const now = toYmd(new Date());
+  if(state.view === 'feed' && !state.query && !state.selectedId && !state.selectedEvent && !state.posterOf) {
+    const iso = toYmd(todayStart());
+    const live = SEED_SCHEDULE.filter(e => (!filteringByOshi() || hasMyOshi(e)) && !e.period
+      && e.start <= iso && eventLastDay(e) >= iso && !doneForToday(e, iso)).sort((a,b) => a.start.localeCompare(b.start)).map(e => e.id).join(',');
+    if(_feedLiveKey !== null && live !== _feedLiveKey){ renderMain(); return; }
+  }
   if(!_drawnDay || now === _drawnDay) return;
   // Redrawing under someone loses their place, so the date is left unturned
   // until they have nothing open — the next tick finds it again.
@@ -5917,9 +5941,13 @@ function eventWhenLabel(ev, todayIso){
 function parseYmd(s){ const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
 
 function renderEventCard(ev, todayIso){
-  const when = eventWhenLabel(ev, todayIso);
-  const isNow = ev.start <= todayIso && eventLastDay(ev) >= todayIso;
-  const people = (ev.members || []).map(getMember).filter(Boolean);
+  const runsToday = ev.start <= todayIso && eventLastDay(ev) >= todayIso;
+  const over = runsToday && !ev.period && doneForToday(ev, todayIso);
+  const when = over ? 'จบแล้ว' : eventWhenLabel(ev, todayIso);
+  const isNow = runsToday && !over;
+  // a rota on the day it ran: the people who were there, not the whole run
+  const ids = over && ev.slots ? [...new Set(slotsOn(ev, todayIso).flatMap(s => s.members))] : (ev.members || []);
+  const people = ids.map(getMember).filter(Boolean);
   const mine = people.filter(m => state.oshi.includes(m.id));
   const groupTags = (ev.groups || []).map(getGroup).filter(Boolean);
   const accent = groupTags.length === 1 ? groupTags[0].color
@@ -5936,7 +5964,7 @@ function renderEventCard(ev, todayIso){
       ${when ? `<span class="ev-when">${when}</span>` : ''}
     </div>
     <div class="ev-body">
-      ${(()=>{ const at = startsAt(ev, todayIso);
+      ${(()=>{ const at = over ? null : startsAt(ev, todayIso);
         return at ? `<span class="ev-starts" data-starts-at="${at}">${startsLabel(at)}</span>` : ''; })()}
       <h3 class="ev-title">${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
@@ -6355,7 +6383,9 @@ function renderFeed(){
   const events = SEED_SCHEDULE.filter(e => !mine || hasMyOshi(e))
     .slice().sort((a,b) => a.start.localeCompare(b.start));
   const running = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
-  const nowOn = running.filter(e => !e.period);
+  const nowOn = running.filter(e => !e.period && !doneForToday(e, iso));
+  const overToday = running.filter(e => !e.period && doneForToday(e, iso));
+  _feedLiveKey = nowOn.map(e => e.id).join(',');
   const periods = running.filter(e => e.period);
   const soon = events.filter(e => e.start > iso);
   const past = events.filter(e => eventLastDay(e) < iso).reverse();
@@ -6377,6 +6407,12 @@ function renderFeed(){
     <section class="feed-block today-hero-block">
       <h2 class="section-label">งานวันนี้</h2>
       ${nowOn.map(e => renderTodayHero(e, iso)).join('')}
+    </section>` : ''}
+
+    ${overToday.length ? `
+    <section class="feed-block is-over-today">
+      <h2 class="section-label">จบไปแล้ววันนี้</h2>
+      ${overToday.map(e => renderEventCard(e, iso)).join('')}
     </section>` : ''}
 
     ${periods.length ? `
@@ -7544,6 +7580,7 @@ function tickerItems(){
       continue;
     }
     if(mine && !hasMyOshi(e)) continue;
+    if(doneForToday(e, iso)) continue;
     const at = e.time ? slotTime(iso, e.time) : null;
     const started = !at || at <= now;
     items.push({ kind: started ? 'live' : 'today', to: ev(e), parts: [
