@@ -284,6 +284,11 @@
      its place with `order`, so the side column's birthdays still come before
      the schedule. From a laptop up the page uses the width it is given. */
   .feed-cols{ display:flex; flex-direction:column; }
+  /* order only reaches boxes that exist, so the sections stay blocks and only
+     the column wrappers dissolve */
+  .sheet-top, .sheet-col, .evm-layout, .evm-media, .evm-body{ display:contents; }
+  .sheet-body{ display:flex; flex-direction:column; }
+  .sec-stats{ order:1; } .sec-history{ order:2; } .sec-events{ order:3; } .sec-works{ order:4; } .sec-facts{ order:5; } .sec-actions{ order:6; }
   .feed-main, .feed-side{ display:contents; }
   .today-hero-block{ order:1; } .is-periods{ order:2; } .is-bday-today{ order:3; }
   .is-bday-next{ order:4; } .is-schedule{ order:5; } .is-calendar{ order:6; } .is-past{ order:7; }
@@ -432,7 +437,7 @@
   @keyframes modalFadeIn{ from{opacity:0;} to{opacity:1;} }
   @keyframes modalPopIn{ from{transform:scale(.94) translateY(10px);opacity:0;} to{transform:scale(1) translateY(0);opacity:1;} }
   .modal-glass-card{
-    position:relative; width:100%; max-width:460px; max-height:calc(100% - 8px);
+    position:relative; width:100%; max-width:460px; max-height:calc(100% - 8px); overflow:hidden;
     background:rgba(255,255,255,calc(.7*var(--glass-k)));
     backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%);
     border:1px solid rgba(255,255,255,calc(.55*var(--glass-k)));
@@ -2085,6 +2090,39 @@
 
     .modal-glass-card{ max-width:640px; }
     .modal-scroll{ padding:26px 26px 32px; }
+
+    /* Sheets open wide on a computer and lay their content out in columns. */
+    .modal-glass-card.is-wide{ max-width:min(1440px, 94vw); max-height:min(92vh, 1100px); }
+    .is-event-sheet .ev-detail, .is-event-sheet .ev-detail li{ font-size:15px; line-height:1.65; }
+    .is-event-sheet .evm-head{ font-size:15px; }
+    .modal-glass-card.is-wide .modal-scroll{ padding:32px clamp(28px, 2.6vw, 44px) 36px; flex:1 1 auto; }
+
+    .is-member-sheet .sheet-top{
+      display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:10px 28px; align-items:center;
+      padding:0 110px 22px 0; border-bottom:1px solid var(--line); margin-bottom:24px;
+    }
+    .is-member-sheet .sheet-top > .detail-head{ grid-row:span 3; margin:0; }
+    .is-member-sheet .sheet-top > .oshi-actions, .is-member-sheet .sheet-top > .social-row,
+    .is-member-sheet .sheet-top > .grad-note{ justify-self:end; margin:0; }
+    .is-member-sheet .sheet-body{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:0 clamp(24px, 2.4vw, 40px); align-items:start; }
+    .is-member-sheet .sheet-col{ display:block; min-width:0; }
+    .is-member-sheet .sheet-col > :first-child, .is-member-sheet .sheet-col > :first-child > .section-label:first-child{ margin-top:0; }
+    .is-event-sheet .evm-title{ font-size:clamp(24px, 2vw, 32px); line-height:1.25; }
+    .is-member-sheet .stat-grid{ margin-top:0; }
+    .is-member-sheet .stat-cell{ flex-basis:120px; }
+    .is-member-sheet .stat-cell.stat-wide{ flex-basis:100%; }
+
+    .is-event-sheet:not(.is-postered):not(:has(.has-media)){ max-width:820px; }
+    .evm-layout.has-media{ display:grid; grid-template-columns:minmax(0, 46fr) minmax(0, 54fr); gap:0 clamp(28px, 3vw, 48px); align-items:start; }
+    .evm-layout.has-media .evm-media{ display:block; position:sticky; top:0; }
+    .evm-layout.has-media .evm-body{ display:block; min-width:0; padding-top:4px; }
+    .evm-layout.has-media .evm-poster{ margin:0; max-height:calc(min(92vh, 1100px) - 72px); width:auto; max-width:100%; margin-inline:auto; }
+  }
+  @media (min-width:1024px) and (max-width:1279px){
+    .is-member-sheet .sheet-body{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .is-member-sheet .sheet-col-c{ grid-column:1 / -1; }
+  }
+  @media (min-width:1024px){
   }
   @media (min-width:1600px){
     .modal-glass-card{ max-width:720px; }
@@ -6026,18 +6064,22 @@ function renderEventModal(){
   const mine = people.filter(m => state.oshi.includes(m.id));
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card${ev.poster?' is-postered':''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
+    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
       <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
       <div class="modal-scroll">
+        <div class="evm-layout${(ev.poster && ev.poster.img) || ev.theme==='birthday' ? ' has-media' : ''}">
+        <div class="evm-media">
         ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : ''}
         ${ev.poster && ev.poster.img ? `<button class="evm-poster-btn" data-action="open-poster" data-id="${ev.id}"
           title="ดูโปสเตอร์เต็ม" aria-label="ดูโปสเตอร์เต็ม">
           <img class="evm-poster" src="${escapeAttr(ev.poster.img)}"${ev.poster.w ? ` width="${ev.poster.w}" height="${ev.poster.h}"` : ''}
             alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" loading="lazy" decoding="async">
         </button>` : ''}
+        </div>
+        <div class="evm-body">
         <div class="evm-meta">
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}</p>
           ${(()=>{ const at = startsAt(ev, toYmd(todayStart()));
@@ -6095,6 +6137,8 @@ function renderEventModal(){
             ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span>
             ${day ? `<span class="ev-person-day">${escapeHtml(day)}</span>` : ''}
           </button>`; }).join('')}</div>` : ''}
+        </div>
+        </div>
       </div>
     </div>
   </div>`;
@@ -6467,12 +6511,13 @@ function renderDetailModal(){
 
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card" data-stop-close="1">
+    <div class="modal-glass-card is-wide is-member-sheet" data-stop-close="1">
       <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
       <div class="modal-scroll">
+        <div class="sheet-top">
         <div class="detail-head">
           ${renderAvatar(m, 'detail-avatar', g.color)}
           <div style="flex:1;min-width:200px;">
@@ -6492,10 +6537,14 @@ function renderDetailModal(){
           <button class="kami-btn ${isKami?'active':''}" data-action="toggle-kami-oshi" data-id="${m.id}">
             <span class="crown-ico">${ICONS.crown}</span> ${isKami?'เป็น Kami Oshi':'ตั้งเป็น Kami Oshi'}
           </button>
-          <button class="cmp-open-btn" data-action="open-compare" data-id="${m.id}">เทียบกับคนอื่น</button>
+          <!-- The comparison stays in the code (and reachable by a ?vs= link) but has
+               no button: the owner does not want visitors to see members compared. -->
         </div>
         ${renderSocial(m)}
-        <div class="stat-grid">
+        </div>
+        <div class="sheet-body">
+        <div class="sheet-col sheet-col-a">
+        <div class="stat-grid sec-stats">
           <div class="stat-cell"><div class="label">วันเกิด</div><div class="value">${formatDate(m.birthday)}</div></div>
           <div class="stat-cell"><div class="label">อายุ</div><div class="value">${age!==null?age+' ปี':'-'}</div></div>
           <div class="stat-cell"><div class="label">ส่วนสูง</div><div class="value">${m.height?m.height+' ซม.':'-'}</div></div>
@@ -6504,14 +6553,18 @@ function renderDetailModal(){
           <div class="stat-cell stat-wide"><div class="label">งานอดิเรก</div><div class="value">${escapeHtml(m.hobby||'-')}</div></div>
           <div class="stat-cell stat-wide"><div class="label">สิ่งที่ชอบ</div><div class="value">${escapeHtml(m.likes||'-')}</div></div>
         </div>
-        ${renderTeamHistory(m)}
-        ${renderMemberEvents(m)}
-        ${renderMemberWorks(m)}
+        <div class="sec-history">${renderTeamHistory(m)}</div>
+        <div class="sec-facts">
         <h3 class="section-label">ข้อเท็จจริง</h3>
         ${m.facts && m.facts.length ? `<ul class="facts-list">${m.facts.map(f=>`<li>${f}</li>`).join('')}</ul>` : `<p class="muted-note">ยังไม่มีข้อมูลเพิ่มเติม — กด "แก้ไขข้อมูล" เพื่อเพิ่ม</p>`}
-        <div class="action-row">
+        </div>
+        <div class="action-row sec-actions">
           <button class="btn-secondary" data-action="edit-member" data-id="${m.id}">แก้ไขข้อมูล</button>
           <button class="btn-danger" data-action="delete-member" data-id="${m.id}">ลบสมาชิก</button>
+        </div>
+        </div>
+        <div class="sheet-col sheet-col-b"><div class="sec-events">${renderMemberEvents(m)}</div></div>
+        <div class="sheet-col sheet-col-c"><div class="sec-works">${renderMemberWorks(m)}</div></div>
         </div>
       </div>
     </div>
