@@ -1404,6 +1404,54 @@
   .today-hero .ev-groups{ margin-bottom:10px; }
   .today-hero-open{ margin:12px 0 0; font-size:13.5px; font-weight:700; color:var(--c); }
   .today-hero-open::after{ content:' ›'; }
+  /* LED sign: amber letters glowing on black, a fine dot grid over them. */
+  .ticker{
+    position:relative; display:flex; align-items:stretch; width:100%;
+    margin:0; padding:0; border:0; text-align:left;
+    background:#120605; border-bottom:1px solid #3b120b;
+    box-shadow:inset 0 1px 0 rgba(255,140,60,.12), inset 0 -8px 16px rgba(0,0,0,.45);
+  }
+  .ticker-item{ display:inline-flex; align-items:center; gap:9px; }
+  .ticker-kind{
+    padding:2px 8px; border-radius:6px; background:var(--k); color:#fff;
+    font-size:11.5px; font-weight:800; letter-spacing:.6px; text-shadow:none;
+    box-shadow:0 0 10px color-mix(in srgb, var(--k) 70%, transparent);
+  }
+  .ticker-link{
+    all:unset; cursor:pointer; color:inherit; font:inherit; text-shadow:inherit; border-radius:4px;
+    position:relative; z-index:3;
+  }
+  .ticker-link:active{ filter:brightness(1.35); }
+  .ticker-dot-sep{ color:#8a5a2a; }
+  .ticker-close{
+    position:relative; z-index:3; flex:0 0 auto; width:38px; border:0; margin:0; padding:0;
+    background:#120605; color:#c9a27a; font-size:20px; line-height:1; cursor:pointer;
+    box-shadow:-6px 0 12px rgba(0,0,0,.6);
+  }
+  .ticker-close:active{ color:#fff; background:#2a0e09; }
+  .ticker-badge{
+    position:relative; z-index:3; flex:0 0 auto; display:flex; align-items:center; gap:6px;
+    padding:0 12px 0 14px; background:#C8231A; color:#fff;
+    font-family:'Noto Sans Thai',sans-serif; font-size:12.5px; font-weight:800; letter-spacing:.8px;
+    box-shadow:6px 0 12px rgba(0,0,0,.5);
+  }
+  .ticker-dot{ width:7px; height:7px; border-radius:50%; background:#fff; animation:today-pulse 1.4s ease-out infinite; }
+  .ticker-window{ position:relative; flex:1 1 auto; overflow:hidden; }
+  .ticker-window::after{
+    content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+    background-image:radial-gradient(rgba(0,0,0,.55) 0.9px, transparent 1.2px);
+    background-size:3px 3px;
+  }
+  .ticker-track{ display:flex; width:max-content; animation:ticker-run var(--dur) linear infinite; }
+  .ticker:hover .ticker-track{ animation-play-state:paused; }
+  .ticker-run{
+    display:flex; align-items:center; gap:14px; padding:9px 14px 9px 14px; white-space:nowrap;
+    font-family:'Noto Sans Thai',sans-serif; font-size:15px; font-weight:800; letter-spacing:.5px;
+    color:#FFB23E; text-shadow:0 0 5px rgba(255,170,50,.9), 0 0 14px rgba(255,90,20,.5);
+  }
+  .ticker-sep{ color:#FF4A36; text-shadow:0 0 6px rgba(255,60,40,.9); font-size:12px; }
+  @keyframes ticker-run{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce){ .ticker-track{ animation:none; } .ticker-dot{ animation:none; } }
   .slot-table{ display:flex; flex-direction:column; gap:8px; margin:6px 0 4px; }
   .slot-row{
     display:flex; gap:12px; align-items:flex-start; padding:10px 12px;
@@ -2656,6 +2704,7 @@ const SEED_SCHEDULE = [
   { id:'ev-media-0908', start:'2026-09-08', title:'To be announced',
     venue:'Bangkok', tag:'media', tba:true },
   { id:'ev-micha-patt-bday', theme:'birthday', celebrants:['bnk-micha','bnk-patt'], start:'2026-09-12', time:'13:00',
+    sales:{ from:'2026-08-27T12:00' },
     title:'Micha BNK48 & Patt BNK48\'s Birthday Fanmeet',
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     members:['bnk-micha','bnk-patt','bnk-arlee','bnk-emmy','bnk-grape','bnk-marine','bnk-monet','bnk-sindy','bnk-jew'],
@@ -2663,6 +2712,7 @@ const SEED_SCHEDULE = [
       'บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
       'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
   { id:'ev-berry-sindy-bday', theme:'birthday', celebrants:['bnk-berry','bnk-sindy'], start:'2026-09-12', time:'17:00',
+    sales:{ from:'2026-08-27T12:00' },
     title:'Berry BNK48 & Sindy BNK48\'s Birthday Fanmeet',
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     members:['bnk-berry','bnk-sindy','bnk-grape','bnk-inkcha','bnk-l','bnk-marine','bnk-palmmy','bnk-patt','bnk-proud'],
@@ -2670,12 +2720,14 @@ const SEED_SCHEDULE = [
       'บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
       'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
   { id:'ev-emmy-bday', theme:'birthday', celebrants:['bnk-emmy'], start:'2026-09-13', time:'13:00',
+    sales:{ from:'2026-08-27T12:00' },
     title:'Emmy BNK48\'s Birthday Fanmeet',
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     members:['bnk-emmy','bnk-jew','bnk-micha','bnk-monet','bnk-palmmy','bnk-praew'],
     info:['บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application',
       'ไม่มีการถ่ายทอดสดทาง iAM Application'] },
   { id:'ev-hoop-bday-said', theme:'birthday', celebrants:['bnk-hoop'], start:'2026-09-13', time:'17:00',
+    sales:{ from:'2026-08-27T12:00' },
     title:'"My Birthday is ... Next Week" Hoop Said',
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     members:['bnk-hoop'], price:'999',
@@ -2712,6 +2764,7 @@ const SEED_SCHEDULE = [
     ],
     info:['ราคาเริ่มต้น 145 บาท'] },
   { id:'ev-getaway-pudthailee', start:'2026-09-18', end:'2026-09-20',
+    sales:{ from:'2026-08-01T18:00' },
     title:'Get Away with Pudthailee',
     venue:'Hua Hin, Prachuap Khiri Khan', groups:['bnk48'],
     members:['bnk-hoop'], price:'55,000', bookClosed:true,
@@ -2758,6 +2811,7 @@ const SEED_SCHEDULE = [
     title:'CGM48 11th Single "Koi Tsunjatta — Let me know!" Roadshow',
     venue:'Fashion Island, Bangkok', groups:['cgm48'], lineupTba:true },
   { id:'ev-fame-fanmeet', start:'2026-09-27',
+    sales:{ to:'2026-09-25T12:00' },
     title:"Fame's Airline Fanmeet",
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     groups:['bnk48'], members:['bnk-fame'],
@@ -2779,6 +2833,7 @@ const SEED_SCHEDULE = [
   /* A span of weeks rather than a day out: `period` keeps it off the large
      "today" card, which would otherwise be taken over for a month and a half. */
   { id:'ev-election-voting', start:'2026-10-01', end:'2026-11-12', period:true,
+    ticker:{ name:'Senbatsu General Election 2026', results:'ev-election-results' },
     title:'BNK48 & CGM48 Senbatsu General Election 2026 · Voting', groups:['bnk48','cgm48'],
     related:['ev-election-fanfest','ev-election-results'],
     poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-2026.jpg', w:1638, h:2048 },
@@ -5703,6 +5758,7 @@ function startsLabel(at){
 }
 
 function tickClock(){
+  syncTicker();
   document.querySelectorAll('[data-starts-at]').forEach(el=>{
     el.textContent = startsLabel(Number(el.dataset.startsAt));
     localize(el.parentElement || el);
@@ -7298,9 +7354,155 @@ function renderForm(){
 // ============================= RENDER: ROOT =============================
 const ADV_INPUTS = { 'age-min':'ageMin', 'age-max':'ageMax', 'height-min':'heightMin', 'height-max':'heightMax' };
 const NAV_HIDDEN_VIEWS = ['auth','editprofile','form'];
+/* The running sign under the header: whatever is worth knowing right now,
+   most pressing first, never more than four at a time. Each item names what it
+   is about and opens it. Built on every draw, but only swapped in when its
+   words change, so the scroll does not jump back to the start on a tap. */
+const TICKER_KINDS = {
+  live:   { th:'LIVE',     en:'LIVE',     color:'#1E9E57' },
+  today:  { th:'วันนี้',     en:'TODAY',    color:'#138A8A' },
+  news:   { th:'ประกาศ',    en:'NEWS',     color:'#3A66D6' },
+  hbd:    { th:'HBD',      en:'HBD',      color:'#E0457B' },
+  ticket: { th:'บัตร',      en:'TICKETS',  color:'#C8961E' },
+  vote:   { th:'โหวต',      en:'VOTE',     color:'#C8231A' },
+  result: { th:'ผลโหวต',    en:'RESULTS',  color:'#C8231A' },
+};
+const TICKER_MAX = 4;
+
+function tickerHidden(){
+  try{ return localStorage.getItem('48thdb-ticker-hidden') === toYmd(new Date()); }catch(e){ return false; }
+}
+
+function tickerItems(){
+  const iso = toYmd(todayStart());
+  const en = isEN();
+  const now = Date.now();
+  const mine = filteringByOshi();
+  const day = s => { const [, m, d] = s.slice(0,10).split('-').map(Number); return `${d} ${monthsShort()[m-1]}`; };
+  const daysTo = s => Math.round((parseYmd(s.slice(0,10)) - parseYmd(iso)) / 86400000);
+  const hm = s => s.slice(11, 16);
+  const nick = m => m.nameTh && !en ? m.nameTh : m.name;
+  const ev = (e) => ({ action:'open-event', id:e.id });
+  const items = [];
+
+  // 1. on now, or on later today
+  for(const e of SEED_SCHEDULE.filter(e => !e.period && e.start <= iso && eventLastDay(e) >= iso)){
+    if(e.slots){
+      const { current, next } = slotNow(e, iso);
+      const s = current || next;
+      if(!s) continue;
+      const who = s.members.map(getMember).filter(Boolean);
+      if(mine && !who.some(isMyOshi)) continue;
+      items.push({ kind: current ? 'live' : 'today', to: ev(e), parts: [
+        current ? (en ? `Now at ${e.title}` : `ตอนนี้ที่ ${e.title}`) : (en ? `${s.time} · ${e.title}` : `${s.time} น. · ${e.title}`),
+        who.map(nick).join(' · '),
+        current ? (en ? `until ${s.until}` : `ถึง ${s.until} น.`) : null ] });
+      continue;
+    }
+    if(mine && !hasMyOshi(e)) continue;
+    const at = e.time ? slotTime(iso, e.time) : null;
+    const started = !at || at <= now;
+    items.push({ kind: started ? 'live' : 'today', to: ev(e), parts: [
+      started ? e.title : (en ? `${e.time} · ${e.title}` : `${e.time} น. · ${e.title}`),
+      e.venue || null ] });
+  }
+
+  // what is on right now goes ahead of what is only later today (sort is stable)
+  items.sort((a, b) => (a.kind === 'today') - (b.kind === 'today'));
+
+  // 2. announcements written into an event: { from, to, th, en }
+  for(const e of SEED_SCHEDULE.filter(e => e.announce)){
+    if(mine && !hasMyOshi(e)) continue;
+    for(const a of e.announce.filter(a => a.from <= iso && a.to >= iso))
+      items.push({ kind:'news', to: ev(e), parts: [en ? (a.en || a.th) : a.th] });
+  }
+
+  // 3. birthdays today
+  const born = activeMembers().filter(m => m.birthday && m.birthday.slice(5) === iso.slice(5))
+    .filter(m => !mine || isMyOshi(m));
+  if(born.length) items.push({ kind:'hbd', parts: [
+    en ? 'Happy birthday' : 'สุขสันต์วันเกิด',
+    ...born.map(m => { const a = calcAge(m.birthday);
+      return { text: `${nick(m)}${a != null ? (en ? ` (${a})` : ` อายุ ${a} ปี`) : ''}`, action:'open-member', id:m.id }; }) ] });
+
+  // 4. ticket sales opening today, or closing within three days
+  for(const e of SEED_SCHEDULE.filter(e => e.sales && !e.bookClosed)){
+    if(mine && !hasMyOshi(e)) continue;
+    const { from, to } = e.sales;
+    if(from && from.slice(0,10) === iso && slotTime(iso, hm(from)) > now - 3600000)
+      items.push({ kind:'ticket', to: ev(e), parts: [e.title, en ? `Tickets on sale today ${hm(from)}` : `เปิดขายบัตรวันนี้ ${hm(from)} น.`] });
+    if(to){
+      const k = daysTo(to);
+      if(k >= 0 && k <= 3 && slotTime(to.slice(0,10), hm(to)) > now)
+        items.push({ kind:'ticket', to: ev(e), parts: [e.title,
+          k === 0 ? (en ? `Ticket sales close today ${hm(to)}` : `ปิดขายบัตรวันนี้ ${hm(to)} น.`)
+                  : (en ? `Ticket sales close in ${k} ${k === 1 ? 'day' : 'days'} (${day(to)} ${hm(to)})` : `ปิดขายบัตรอีก ${k} วัน (${day(to)} ${hm(to)} น.)`)] });
+    }
+  }
+
+  // 5. a vote: open, on its last day, or waiting on results
+  for(const e of SEED_SCHEDULE.filter(e => e.ticker)){
+    const results = SEED_SCHEDULE.find(r => r.id === e.ticker.results);
+    const last = eventLastDay(e);
+    const res = results ? (en ? `Results ${day(results.start)}` : `ประกาศผล ${day(results.start)}`) : null;
+    if(e.start <= iso && last >= iso){
+      const left = daysTo(last);
+      items.push({ kind:'vote', to: ev(e), parts: left === 0
+        ? [en ? 'Last day to vote!' : 'วันสุดท้าย! ปิดโหวตวันนี้', e.ticker.name, res]
+        : [en ? 'Voting is open' : 'เปิดโหวตแล้ว', e.ticker.name,
+           en ? `${left} ${left === 1 ? 'day' : 'days'} left` : `เหลืออีก ${left} วัน`, res] });
+    } else if(results && last < iso && results.start >= iso){
+      const k = daysTo(results.start);
+      items.push({ kind:'result', to: ev(results), parts: [e.ticker.name,
+        k === 0 ? (en ? 'Results today!' : 'ประกาศผลวันนี้!')
+                : (en ? `Voting has closed · results in ${k} ${k === 1 ? 'day' : 'days'}` : `ปิดโหวตแล้ว · ประกาศผลอีก ${k} วัน`)] });
+    }
+  }
+
+  return items.map(it => ({ ...it, parts: it.parts.filter(Boolean) })).slice(0, TICKER_MAX);
+}
+
+function renderTicker(){
+  if(tickerHidden()) return '';
+  const items = tickerItems();
+  if(!items.length) return '';
+  const en = isEN();
+  const part = (p, to) => {
+    const text = typeof p === 'string' ? p : p.text;
+    const act = typeof p === 'string' ? to : { action:p.action, id:p.id };
+    return act
+      ? `<button class="ticker-link" data-action="${act.action}" data-id="${escapeAttr(act.id)}">${escapeHtml(text)}</button>`
+      : `<span>${escapeHtml(text)}</span>`;
+  };
+  const run = items.map(it => {
+    const k = TICKER_KINDS[it.kind];
+    return `<span class="ticker-item"><span class="ticker-kind" style="--k:${k.color}">${en ? k.en : k.th}</span>${
+      it.parts.map(p => part(p, it.to)).join('<span class="ticker-dot-sep" aria-hidden="true">·</span>')}</span>`;
+  }).join('<span class="ticker-sep" aria-hidden="true">✦</span>') + '<span class="ticker-sep" aria-hidden="true">✦</span>';
+  const words = items.flatMap(it => it.parts.map(p => typeof p === 'string' ? p : p.text)).join(' ');
+  const secs = Math.max(14, Math.round(words.length * 0.3));
+  return `<div class="ticker" role="region" aria-label="${en ? 'Updates' : 'อัปเดต'}">
+    <span class="ticker-badge"><span class="ticker-dot"></span>48</span>
+    <span class="ticker-window"><span class="ticker-track" style="--dur:${secs}s">
+      <span class="ticker-run">${run}</span><span class="ticker-run" aria-hidden="true">${run}</span>
+    </span></span>
+    <button class="ticker-close" data-action="hide-ticker" title="${en ? 'Hide until tomorrow' : 'ซ่อนถึงพรุ่งนี้'}" aria-label="${en ? 'Hide until tomorrow' : 'ซ่อนถึงพรุ่งนี้'}">×</button>
+  </div>`;
+}
+
+function syncTicker(){
+  const slot = document.getElementById('ticker-slot');
+  if(!slot) return;
+  const html = renderTicker();
+  if(slot.dataset.html === html) return;
+  slot.dataset.html = html;
+  slot.innerHTML = html;
+  localize(slot);
+}
+
 function render(){
   const app = document.getElementById('app');
-  app.innerHTML = renderHeader() + '<div id="nav-container"></div><main id="main"></main>';
+  app.innerHTML = renderHeader() + '<div id="ticker-slot"></div><div id="nav-container"></div><main id="main"></main>';
   renderProfileSlot();
   renderMain();
 }
@@ -7355,6 +7557,7 @@ function renderMain(){
     _lastRenderedView = state.view;
   }
   _drawnDay = toYmd(new Date());
+  syncTicker();
   localize(document.getElementById('app'));
   syncBodyScrollLock();
   attachMainEvents();
@@ -7903,6 +8106,10 @@ function bindDelegatedEvents(){
       state.oshiOnly = id === '1';
       state.calDay = null;   // the day that was open may not survive the filter
       renderMain(); replaceHistory();
+    }
+    else if(action==='hide-ticker'){
+      try{ localStorage.setItem('48thdb-ticker-hidden', toYmd(new Date())); }catch(err){}
+      syncTicker();
     }
     else if(action==='toggle-lang'){
       state.lang = isEN() ? 'th' : 'en';
