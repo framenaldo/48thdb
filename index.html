@@ -531,7 +531,8 @@
      so a themed card sits among the others instead of glaring. (The opened
      sheet stays light, like the printed poster.) Accent-coloured text is
      lifted towards white so a navy or maroon accent still reads. */
-  :root[data-theme="dark"] .ev-card.is-themed, :root[data-theme="dark"] .today-hero.is-themed{
+  :root[data-theme="dark"] .ev-card.is-themed, :root[data-theme="dark"] .today-hero.is-themed,
+  :root[data-theme="dark"] .modal-glass-card.is-postered{
     --sheet-dark:color-mix(in srgb, var(--pc) 26%, #15111b);
     --ink:color-mix(in srgb, var(--sheet-bg) 90%, #fff);
     --ink-soft:color-mix(in srgb, var(--sheet-bg) 62%, #8a8497);
@@ -549,6 +550,19 @@
   }
   /* filled pills keep the true accent under their white text; only text
      drawn in the accent is lifted */
+  :root[data-theme="dark"] .modal-glass-card.is-postered{
+    box-shadow:0 20px 60px rgba(0,0,0,.55);
+    --danger:#F28B8B;
+    --danger-soft:color-mix(in srgb, #B84545 30%, var(--sheet-dark));
+  }
+  :root[data-theme="dark"] .is-postered .evm-price.is-link,
+  :root[data-theme="dark"] .is-postered .evm-closed{ color:#fff; }
+  :root[data-theme="dark"] .is-postered .evm-closed{ background:#B84545; }
+  :root[data-theme="dark"] .is-postered .evm-price:not(.is-link):not(.is-closed),
+  :root[data-theme="dark"] .is-postered .evm-map svg,
+  :root[data-theme="dark"] .is-postered .slot-date,
+  :root[data-theme="dark"] .is-postered .ev-starts,
+  :root[data-theme="dark"] .is-postered .evm-related .chip-link,
   :root[data-theme="dark"] .ev-card.is-themed .ev-open,
   :root[data-theme="dark"] .today-hero.is-themed .today-hero-open,
   :root[data-theme="dark"] .ev-card.is-themed .ev-d{ color:var(--c-text); }
@@ -6137,7 +6151,7 @@ function renderEventModal(){
   const mine = people.filter(m => state.oshi.includes(m.id));
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
+    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
       <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
