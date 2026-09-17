@@ -502,7 +502,8 @@
      palette is swapped by redefining those on this one card — no element needs
      to know it is on a themed sheet. The sheet stays light in either mode,
      because the poster is a printed thing and that is what it looks like. */
-  .modal-glass-card.is-postered{
+  .modal-glass-card.is-postered, .ev-card.is-themed, .today-hero.is-themed{
+    --paper-dim:color-mix(in srgb, var(--sheet-ink) 8%, var(--sheet-bg));
     --ink:var(--sheet-ink);
     --ink-soft:color-mix(in srgb, var(--sheet-ink) 66%, transparent);
     --paper:var(--sheet-bg);
@@ -521,6 +522,38 @@
      is picked to read on the band — the festival's cream reads on its dark red
      and vanishes on cream paper — so it is not safe to reuse down here. */
   .modal-glass-card.is-postered .evm-head::before{ background:var(--ink); }
+  /* The same palette on the cards in the feed, so an event looks like itself
+     before it is opened. */
+  .ev-card.is-themed{ border-color:color-mix(in srgb, var(--c) 32%, transparent); box-shadow:0 5px 20px color-mix(in srgb, var(--c) 14%, transparent); }
+  .ev-card.is-themed.is-now{ border-color:color-mix(in srgb, var(--c) 60%, transparent); }
+  .today-hero.is-themed{ background:var(--sheet-bg); }
+  /* In dark mode the feed cards go dark too, tinted with the event's colour,
+     so a themed card sits among the others instead of glaring. (The opened
+     sheet stays light, like the printed poster.) Accent-coloured text is
+     lifted towards white so a navy or maroon accent still reads. */
+  :root[data-theme="dark"] .ev-card.is-themed, :root[data-theme="dark"] .today-hero.is-themed{
+    --sheet-dark:color-mix(in srgb, var(--pc) 26%, #15111b);
+    --ink:color-mix(in srgb, var(--sheet-bg) 90%, #fff);
+    --ink-soft:color-mix(in srgb, var(--sheet-bg) 62%, #8a8497);
+    --paper:var(--sheet-dark);
+    --paper-dim:color-mix(in srgb, var(--pc) 34%, #15111b);
+    --card:color-mix(in srgb, var(--pc) 30%, #1c1724);
+    --glass-card:var(--sheet-dark);
+    --glass-edge:color-mix(in srgb, var(--pc) 45%, rgba(255,255,255,.14));
+    --line:rgba(255,255,255,.12);
+    --c-text:color-mix(in srgb, var(--pc) 45%, #fff);
+    background:var(--sheet-dark);
+    color:var(--ink);
+    border-color:color-mix(in srgb, var(--pc) 55%, rgba(255,255,255,.2));
+    box-shadow:0 6px 22px color-mix(in srgb, var(--pc) 22%, transparent);
+  }
+  /* filled pills keep the true accent under their white text; only text
+     drawn in the accent is lifted */
+  :root[data-theme="dark"] .ev-card.is-themed .ev-open,
+  :root[data-theme="dark"] .today-hero.is-themed .today-hero-open,
+  :root[data-theme="dark"] .ev-card.is-themed .ev-d{ color:var(--c-text); }
+  :root[data-theme="dark"] .ev-card.is-themed .ev-when,
+  :root[data-theme="dark"] .today-hero.is-themed .today-hero-status{ box-shadow:0 0 0 1px rgba(255,255,255,.18); }
 
   .cal-wrap{
     background:var(--glass-card); border:1px solid var(--glass-edge);
@@ -5950,13 +5983,15 @@ function renderEventCard(ev, todayIso){
   const people = ids.map(getMember).filter(Boolean);
   const mine = people.filter(m => state.oshi.includes(m.id));
   const groupTags = (ev.groups || []).map(getGroup).filter(Boolean);
-  const accent = groupTags.length === 1 ? groupTags[0].color
+  const accent = ev.poster ? ev.poster.accent
+    : groupTags.length === 1 ? groupTags[0].color
     : (people.length ? getGroup(people[0].groupId).color : 'var(--ink-soft)');
+  const theme = ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : '';
   const hasMore = eventHasMore(ev);
   const shown = people.slice(0, 6);
   const rest = people.length - shown.length;
   return `
-  <article class="ev-card${isNow?' is-now':''}${hasMore?' is-openable':''}" style="--c:${accent}"
+  <article class="ev-card${isNow?' is-now':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}" style="--c:${accent}${theme}"
     ${hasMore ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="ev-date">
       <span class="ev-d">${eventDateLabel(ev)}</span>
@@ -6009,7 +6044,7 @@ function renderTodayHero(ev, todayIso){
   const rest = people.length - shown.length;
   const open = eventHasMore(ev);
   return `
-  <article class="today-hero${open ? ' is-openable' : ''}" style="--c:${accent}"
+  <article class="today-hero${open ? ' is-openable' : ''}${ev.poster ? ' is-themed' : ''}" style="--c:${accent}${ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : ''}"
     ${open ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="today-hero-body">
       <p class="today-hero-status"><span class="today-live" aria-hidden="true"></span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</p>
