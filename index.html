@@ -446,7 +446,8 @@
     animation:modalPopIn .22s cubic-bezier(.22,1,.36,1);
     display:flex; flex-direction:column;
   }
-  .modal-scroll{ overflow-y:auto; padding:22px 18px 28px; -webkit-overflow-scrolling:touch; }
+  /* A sheet only ever scrolls up and down; anything too wide wraps instead. */
+  .modal-scroll{ overflow-y:auto; overflow-x:hidden; overscroll-behavior-x:none; touch-action:pan-y; padding:22px 18px 28px; -webkit-overflow-scrolling:touch; }
   /* The close and share buttons sit over whatever is at the top of the sheet.
      On a themed sheet that is the poster band, and the usual near-transparent
      glass leaves them invisible against it — so the colours are variables the
@@ -1498,6 +1499,7 @@
   .slot-who{ display:flex; flex-wrap:wrap; gap:6px; min-width:0; }
   .slot-who .ev-person{ margin:0; }
   .evm-related{ display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 6px; }
+  .evm-related .chip{ white-space:normal; max-width:100%; text-align:left; line-height:1.4; }
   .ev-card.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out), border-color .2s ease; }
   .ev-more-people{
     display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px;
