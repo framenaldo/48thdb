@@ -908,6 +908,9 @@
   .group-head{ display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
   .group-head h2{ margin:0; font-size:27px; font-family:'Noto Sans Thai',sans-serif; font-weight:800; }
   .group-card p{ font-size:14.5px; line-height:1.6; margin:6px 0 12px; }
+  .official-colour{ display:flex; align-items:center; gap:9px; margin:-2px 0 14px; font-size:13px; color:var(--ink-soft); }
+  .official-colour b{ color:var(--ink); font-weight:700; }
+  .official-swatch{ width:22px; height:22px; border-radius:7px; flex:none; box-shadow:inset 0 0 0 1px rgba(0,0,0,.12), 0 2px 6px rgba(var(--shadow-rgb),.15); }
   .team-row{
     width:100%; display:flex; justify-content:space-between; align-items:center;
     background:var(--paper-dim); border:none; border-radius:7px; padding:11px 15px; margin-bottom:6px;
@@ -2202,11 +2205,15 @@ const GROUPS = [
   { id:'bnk48', name:'BNK48', full:'Bangkok48', color:'#E4457E', soft:'#FBE4EE',
     debut:'2017-08-08', theater:'BNK48 The Campus',
     captain:'Hoop', viceCaptain:null,
-    desc:'วงไอดอลหญิงจากกรุงเทพฯ ซิงเกิลแรก "อยากจะได้พบเธอ" วางจำหน่ายสิงหาคม 2017 เป็นวงน้องสาวลำดับที่ 3 ของ AKB48 (ญี่ปุ่น) สีประจำวงคือ Orchid' },
+    // Official colours as the AKB48 wiki's group infoboxes give them. `color`
+    // above is the site's own accent for the group, not the official one.
+    official:{ th:'ม่วงกล้วยไม้', en:'Orchid', hex:'#C995C1' },
+    desc:'วงไอดอลหญิงจากกรุงเทพฯ ซิงเกิลแรก "อยากจะได้พบเธอ" วางจำหน่ายสิงหาคม 2017 เป็นวงน้องสาวลำดับที่ 3 ของ AKB48 (ญี่ปุ่น) สีประจำวงคือสีม่วงกล้วยไม้ (Orchid) ดอกไม้ที่คนไทยคุ้นเคย' },
   { id:'cgm48', name:'CGM48', full:'Chiang Mai48', color:'#2E8C82', soft:'#E1F1EE',
     debut:'2020-02-09', theater:'-',
     captain:'Lookked', viceCaptain:'Nana',
-    desc:'วงไอดอลหญิงจากเชียงใหม่ เดบิวต์ด้วยซิงเกิล "Chiang Mai 106" กุมภาพันธ์ 2020 เป็นวงน้องสาวของ BNK48 และวงน้องสาวลำดับที่ 7 ของ AKB48 สีประจำวงคือ Tradewind' }
+    official:{ th:'เขียวมิ้นต์', en:'Mint', hex:'#3CC2B1' },
+    desc:'วงไอดอลหญิงจากเชียงใหม่ เดบิวต์ด้วยซิงเกิล "Chiang Mai 106" กุมภาพันธ์ 2020 เป็นวงน้องสาวของ BNK48 และวงน้องสาวลำดับที่ 7 ของ AKB48 สีประจำวงคือสีเขียวมิ้นต์ (Mint)' }
 ];
 
 const TEAMS = [
@@ -2964,17 +2971,11 @@ const SEED_SCHEDULE = [
       '12:00–13:00 Mini Concert',
       '14:00–15:00 Group Hi-Touch',
       '15:30–16:30 Merchandise & Hachi Cha',
-      '17:00–18:00 Group Hi-Touch',
-    ],
+      '17:00–18:00 Group Hi-Touch'],
     info:[
       'วันที่ 20 ก.ย. Khaimook ขึ้นแสดงและร่วมกิจกรรมแทน Niya ซึ่งติดภารกิจส่วนตัว — วันที่ 19 ก.ย. ยังเป็น Niya ตามเดิม',
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
-      'เข้า Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก',
-      'Zone 1 โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ',
-      'Zone 2 โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้',
-      'Zone 3 โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้',
-      'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม',
-    ] },
+      'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
   { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27',
     title:'CGM48 11th Single "Koi Tsunjatta — Let me know!" Roadshow',
     venue:'Fashion Island, Bangkok', groups:['cgm48'], lineupTba:true },
@@ -4115,6 +4116,7 @@ const EN = {
   'ลานโปรโมชั่น': 'Promotion Area',
   'ซิงเกิลและอัลบั้ม': 'Singles and albums',
   'งานวันนี้': 'Happening today',
+  'สีประจำวง': 'Official colour',
   'จบไปแล้ววันนี้': 'Over for today',
   'จบแล้ว': 'Over',
   'อยู่ที่บูธตอนนี้': 'At the booth now',
@@ -4447,10 +4449,10 @@ const EN = {
   'ทุกเดือน': 'Every month',
   'กัปตัน:': 'Captain:',
   'รองกัปตัน:': 'Vice-captain:',
-  'วงไอดอลหญิงจากกรุงเทพฯ ซิงเกิลแรก "อยากจะได้พบเธอ" วางจำหน่ายสิงหาคม 2017 เป็นวงน้องสาวลำดับที่ 3 ของ AKB48 (ญี่ปุ่น) สีประจำวงคือ Orchid':
-    'A girl idol group from Bangkok. Its first single, "Aitakatta", came out in August 2017. The third sister group of AKB48 (Japan); its colour is Orchid.',
-  'วงไอดอลหญิงจากเชียงใหม่ เดบิวต์ด้วยซิงเกิล "Chiang Mai 106" กุมภาพันธ์ 2020 เป็นวงน้องสาวของ BNK48 และวงน้องสาวลำดับที่ 7 ของ AKB48 สีประจำวงคือ Tradewind':
-    'A girl idol group from Chiang Mai. It debuted with the single "Chiang Mai 106" in February 2020. A sister group of BNK48 and the seventh sister group of AKB48; its colour is Tradewind.',
+  'วงไอดอลหญิงจากกรุงเทพฯ ซิงเกิลแรก "อยากจะได้พบเธอ" วางจำหน่ายสิงหาคม 2017 เป็นวงน้องสาวลำดับที่ 3 ของ AKB48 (ญี่ปุ่น) สีประจำวงคือสีม่วงกล้วยไม้ (Orchid) ดอกไม้ที่คนไทยคุ้นเคย':
+    'A girl idol group from Bangkok. Its first single, "Aitakatta", came out in August 2017. The third sister group of AKB48 (Japan); its colour is orchid purple, after the flower so familiar in Thailand.',
+  'วงไอดอลหญิงจากเชียงใหม่ เดบิวต์ด้วยซิงเกิล "Chiang Mai 106" กุมภาพันธ์ 2020 เป็นวงน้องสาวของ BNK48 และวงน้องสาวลำดับที่ 7 ของ AKB48 สีประจำวงคือสีเขียวมิ้นต์ (Mint)':
+    'A girl idol group from Chiang Mai. It debuted with the single "Chiang Mai 106" in February 2020. A sister group of BNK48 and the seventh sister group of AKB48; its colour is mint green.',
   '24 กุมภาพันธ์ ตรงกับวันศิลปินแห่งชาติ ซึ่งกำหนดตามวันพระราชสมภพของรัชกาลที่ 2 — และวาเลนไทน์เกิดวันที่ 14 กุมภาพันธ์ ตรงกับชื่อตัวเองพอดี':
     '24 February is National Artist Day in Thailand, set by the birthday of King Rama II — and Valentine was born on 14 February, matching her name exactly',
 };
@@ -6686,6 +6688,8 @@ function renderGroups(){
         <span class="mono" style="font-size:12px;color:var(--ink-soft);">เดบิวต์ ${formatDate(g.debut)}</span>
       </div>
       <p>${g.desc}</p>
+      ${g.official ? `<div class="official-colour"><span class="official-swatch" style="background:${g.official.hex}"></span>
+        <span>สีประจำวง <b>${isEN() ? g.official.en : g.official.th}</b> · ${g.official.en} ${g.official.hex}</span></div>` : ''}
       <div class="chip-row" style="margin-bottom:14px;">
         <span class="chip">กัปตัน: ${g.captain ? linkMember(memberNamed(g.captain, g.id), g.captain) : '-'}</span>
         ${g.viceCaptain?`<span class="chip">รองกัปตัน: ${linkMember(memberNamed(g.viceCaptain, g.id), g.viceCaptain)}</span>`:''}
