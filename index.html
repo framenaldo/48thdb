@@ -2626,14 +2626,14 @@ const SEED_SCHEDULE = [
     title:'Lanna Tsukimi Fest',
     venue:'ลานกิจกรรม ชั้น G, Central Chiangmai Airport, Chiang Mai', groups:['cgm48'],
     members:['cgm-emma','cgm-jingjing','cgm-lewlew'],
-    poster:{ accent:'#9C2F45', surface:'#FBF1EC', ink:'#3F2433', img:'posters/lanna-tsukimi.jpg' },
+    poster:{ accent:'#9C2F45', surface:'#FBF1EC', ink:'#3F2433', img:'posters/lanna-tsukimi.jpg', w:1440, h:1440 },
     detail:['15:00 พิธีเปิด — พบกับสมาชิก CGM48'],
     info:['เทศกาลชมจันทร์สไตล์ล้านนา จัดโดย Central Pattana'] },
   { id:'ev-getaway-pudthailee', start:'2026-09-18', end:'2026-09-20',
     title:'Get Away with Pudthailee',
     venue:'Hua Hin, Prachuap Khiri Khan', groups:['bnk48'],
     members:['bnk-hoop'], price:'55,000', bookClosed:true,
-    poster:{ accent:'#7B5EA7', surface:'#FDEFF6', ink:'#5A3A6E', img:'posters/getaway-pudthailee.jpg' },
+    poster:{ accent:'#7B5EA7', surface:'#FDEFF6', ink:'#5A3A6E', img:'posters/getaway-pudthailee.jpg', w:1067, h:1600 },
     detail:[
       'เดินทางจากกรุงเทพฯ ไปหัวหิน 3 วัน 2 คืน',
       'ห้องพักเดี่ยว 55,000 บาท · ห้องพักคู่ 100,000 บาท (2 ท่าน)',
@@ -2653,7 +2653,7 @@ const SEED_SCHEDULE = [
   { id:'ev-roadshow-mbk', start:'2026-09-19', end:'2026-09-20', time:'12:00',
     title:'BNK48 6th Album "Ponytail to Shushu" Roadshow',
     venue:'Avenue A ชั้น G, MBK Center, Bangkok', groups:['bnk48'],
-    poster:{ accent:'#20496E', surface:'#F0F6FB', ink:'#1C3A56', img:'posters/roadshow-mbk.jpg' },
+    poster:{ accent:'#20496E', surface:'#F0F6FB', ink:'#1C3A56', img:'posters/roadshow-mbk.jpg', w:2000, h:1334 },
     members:['bnk-marine','bnk-niya','bnk-khaimook','bnk-micha','bnk-nammonn','bnk-galeya','bnk-neen'],
     memberDays:{ 'bnk-niya':'19 ก.ย.', 'bnk-khaimook':'20 ก.ย.' },
     detail:[
@@ -2679,7 +2679,7 @@ const SEED_SCHEDULE = [
     title:"Fame's Airline Fanmeet",
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     groups:['bnk48'], members:['bnk-fame'],
-    poster:{ accent:'#26324F', surface:'#F3FAFE', ink:'#232E48', img:'posters/fame-fanmeet.jpg' },
+    poster:{ accent:'#26324F', surface:'#F3FAFE', ink:'#232E48', img:'posters/fame-fanmeet.jpg', w:1638, h:2048 },
     price:'1,777', ticketUrl:'https://app.bnk48.com/performance',
     info:['แฟนมีตเดี่ยวครั้งแรกของเฟม',
       'ของที่ได้ในบัตร: เซลฟีกับเฟม, Boarding Pass, Inhaler, Postcard',
@@ -2689,7 +2689,7 @@ const SEED_SCHEDULE = [
   { id:'ev-nine-charity', start:'2026-09-30', time:'13:00', tag:'media',
     title:'Nine Entertain 24th Anniversary Charity Concert',
     venue:'Parc Paragon, Bangkok', groups:['bnk48'],
-    poster:{ accent:'#9B3FB5', surface:'#FCEAF3', ink:'#5A2466', img:'posters/nine-charity.jpg' },
+    poster:{ accent:'#9B3FB5', surface:'#FCEAF3', ink:'#5A2466', img:'posters/nine-charity.jpg', w:1040, h:1040 },
     members:['bnk-niya','bnk-monet','bnk-micha','bnk-praew','bnk-yoghurt','bnk-pancake'],
     info:['คอนเสิร์ตการกุศลรวมศิลปินหลายวง BNK48 เป็นหนึ่งในนั้น',
       'งานจัด 13:00–22:00 น. — ยังไม่ประกาศเวลาขึ้นเวทีของ BNK48',
@@ -2697,7 +2697,7 @@ const SEED_SCHEDULE = [
   { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
-    poster:{ accent:'#8C2A22', surface:'#FAF2E4', ink:'#4E1512', img:'posters/election-fanfest.jpg' },
+    poster:{ accent:'#8C2A22', surface:'#FAF2E4', ink:'#4E1512', img:'posters/election-fanfest.jpg', w:1281, h:1600 },
     info:['女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
       'ประกาศวันแล้ว รายละเอียดอื่นรอประกาศ'],
     lineupTba:true },
@@ -4967,7 +4967,8 @@ function closePoster(){ goBack(()=>{ state.posterOf = null; }); }
 function renderPosterViewer(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.posterOf);
   if(!ev || !ev.poster || !ev.poster.img) return '';
-  const full = ev.poster.img.replace(/\.jpg$/, '-full.jpg');
+  // One file for both: the poster as it was published, at its own size.
+  const full = ev.poster.img;
   return `
   <div class="poster-viewer">
     <button class="poster-close" data-action="close-poster" title="ปิด" aria-label="ปิด">
@@ -5675,7 +5676,7 @@ function renderEventModal(){
         ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : ''}
         ${ev.poster && ev.poster.img ? `<button class="evm-poster-btn" data-action="open-poster" data-id="${ev.id}"
           title="ดูโปสเตอร์เต็ม" aria-label="ดูโปสเตอร์เต็ม">
-          <img class="evm-poster" src="${escapeAttr(ev.poster.img)}"
+          <img class="evm-poster" src="${escapeAttr(ev.poster.img)}"${ev.poster.w ? ` width="${ev.poster.w}" height="${ev.poster.h}"` : ''}
             alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" loading="lazy" decoding="async">
         </button>` : ''}
         <div class="evm-meta">
