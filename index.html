@@ -1429,6 +1429,17 @@
     box-shadow:-6px 0 12px rgba(0,0,0,.6);
   }
   .ticker-close:active{ color:#fff; background:#2a0e09; }
+  .ticker-close svg{ width:18px; height:18px; display:block; margin:auto; }
+  .ticker.is-folded{ cursor:pointer; }
+  .ticker.is-folded .ticker-badge{ padding-block:0; font-size:11px; }
+  .ticker.is-folded .ticker-close{ display:flex; align-items:center; }
+  .ticker-folded-text{
+    flex:1 1 auto; display:flex; align-items:center; gap:7px; padding:5px 12px; overflow:hidden; white-space:nowrap;
+    font-family:'Noto Sans Thai',sans-serif; font-size:12.5px; font-weight:700; color:#FFB23E;
+    text-shadow:0 0 5px rgba(255,170,50,.7);
+  }
+  .ticker-folded-text .ticker-kind{ font-size:10px; padding:1px 6px; }
+  .ticker.is-folded:active{ filter:brightness(1.2); }
   .ticker-badge{
     position:relative; z-index:3; flex:0 0 auto; display:flex; align-items:center; gap:6px;
     padding:0 12px 0 14px; background:#C8231A; color:#fff;
@@ -7369,8 +7380,10 @@ const TICKER_KINDS = {
 };
 const TICKER_MAX = 4;
 
-function tickerHidden(){
-  try{ return localStorage.getItem('48thdb-ticker-hidden') === toYmd(new Date()); }catch(e){ return false; }
+/* Folded or open is the reader's choice and stays that way until they change
+   it; folded, the sign keeps a slim bar saying how many updates are waiting. */
+function tickerFolded(){
+  try{ return localStorage.getItem('48thdb-ticker-folded') === '1'; }catch(e){ return false; }
 }
 
 function tickerItems(){
@@ -7463,10 +7476,19 @@ function tickerItems(){
 }
 
 function renderTicker(){
-  if(tickerHidden()) return '';
   const items = tickerItems();
   if(!items.length) return '';
   const en = isEN();
+  const chevron = up => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${up ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6'}"/></svg>`;
+  if(tickerFolded()){
+    return `<button class="ticker is-folded" data-action="toggle-ticker" aria-expanded="false"
+      aria-label="${en ? 'Show updates' : 'แสดงอัปเดต'}">
+      <span class="ticker-badge"><span class="ticker-dot"></span>48</span>
+      <span class="ticker-folded-text">${en ? `${items.length} ${items.length === 1 ? 'update' : 'updates'}` : `อัปเดต ${items.length} เรื่อง`}
+        ${[...new Set(items.map(it => it.kind))].map(k => `<span class="ticker-kind" style="--k:${TICKER_KINDS[k].color}">${en ? TICKER_KINDS[k].en : TICKER_KINDS[k].th}</span>`).join('')}</span>
+      <span class="ticker-close">${chevron(false)}</span>
+    </button>`;
+  }
   const part = (p, to) => {
     const text = typeof p === 'string' ? p : p.text;
     const act = typeof p === 'string' ? to : { action:p.action, id:p.id };
@@ -7486,7 +7508,7 @@ function renderTicker(){
     <span class="ticker-window"><span class="ticker-track" style="--dur:${secs}s">
       <span class="ticker-run">${run}</span><span class="ticker-run" aria-hidden="true">${run}</span>
     </span></span>
-    <button class="ticker-close" data-action="hide-ticker" title="${en ? 'Hide until tomorrow' : 'ซ่อนถึงพรุ่งนี้'}" aria-label="${en ? 'Hide until tomorrow' : 'ซ่อนถึงพรุ่งนี้'}">×</button>
+    <button class="ticker-close" data-action="toggle-ticker" aria-expanded="true" title="${en ? 'Fold' : 'หุบ'}" aria-label="${en ? 'Fold updates' : 'หุบอัปเดต'}">${chevron(true)}</button>
   </div>`;
 }
 
@@ -8107,8 +8129,8 @@ function bindDelegatedEvents(){
       state.calDay = null;   // the day that was open may not survive the filter
       renderMain(); replaceHistory();
     }
-    else if(action==='hide-ticker'){
-      try{ localStorage.setItem('48thdb-ticker-hidden', toYmd(new Date())); }catch(err){}
+    else if(action==='toggle-ticker'){
+      try{ localStorage.setItem('48thdb-ticker-folded', tickerFolded() ? '0' : '1'); }catch(err){}
       syncTicker();
     }
     else if(action==='toggle-lang'){
