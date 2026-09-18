@@ -562,10 +562,6 @@
   :root[data-theme="dark"] .is-postered .evm-map svg,
   :root[data-theme="dark"] .is-postered .evm-online svg,
   :root[data-theme="dark"] .is-postered .slot-date,
-  :root[data-theme="dark"] .is-postered .tl-when,
-  :root[data-theme="dark"] .is-postered .tl-next,
-  :root[data-theme="dark"] .is-postered .tl-month-head,
-  :root[data-theme="dark"] .is-postered .tl-row.is-on .tl-title,
   :root[data-theme="dark"] .is-postered .ev-starts,
   :root[data-theme="dark"] .is-postered .evm-related .chip-link,
   :root[data-theme="dark"] .ev-card.is-themed .ev-open,
@@ -1555,85 +1551,98 @@
   .slot-now{ align-self:flex-start; margin-top:3px; padding:1px 8px; border-radius:999px; background:var(--c); color:#fff; font-size:11px; font-weight:700; }
   .slot-who{ display:flex; flex-wrap:wrap; gap:6px; min-width:0; }
   .slot-who .ev-person{ margin:0; }
-  /* The campaign timeline: a block per month, and inside it one framed row per
-     step, coloured down its left edge by what kind of step it is. On a phone
-     the row stacks so the title has the full width to itself. */
-  .tl-month{ margin:0; }
-  .tl-month-head{ margin:16px 0 8px; font-size:13.5px; font-weight:800; color:var(--c); }
-  .tl-legend{ display:flex; flex-wrap:wrap; gap:4px 14px; margin:8px 0 2px; }
-  .tl-leg{ display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; color:var(--ink-soft); }
-  .tl-leg i{ width:9px; height:9px; border-radius:50%; background:var(--k); flex:none; }
-  /* An opening or a closing keeps its colour and its place on the rail, but
-     drops the card: one quiet line beside a smaller dot. */
-  .tl-row.is-minor .tl-rail::after{ width:9px; height:9px; margin:-4.5px 0 0 -4.5px; }
-  .tl-row.is-minor .tl-when{ font-size:12px; }
-  .tl-row.is-minor .tl-what{
-    margin:0 0 9px; padding:6px 11px;
-    border:1px solid var(--line); border-left:3px solid var(--k); border-radius:11px;
-    background:color-mix(in srgb, var(--c) 3%, transparent);
+  /* The timeline page. Dates down the left, a rail of dots beside them, then
+     one bar per stretch of the campaign that stays open for weeks, the way the
+     official poster draws them, and the steps themselves on the right. */
+  .tlp{ --tlp-date:58px; --tlp-lane:9px; --tlp-dot:15px; max-width:1040px; margin-inline:auto; }
+  .tlp-head{ display:flex; gap:16px; align-items:flex-start; margin:2px 0 18px; }
+  .tlp-poster-btn{
+    flex:0 0 108px; padding:0; border:1px solid var(--line); border-radius:12px;
+    background:none; cursor:pointer; overflow:hidden; line-height:0;
   }
-  .tl-row.is-minor .tl-title{
-    display:inline; margin:0; font-size:12.5px; font-weight:600; color:var(--ink-soft);
+  .tlp-poster{ display:block; width:100%; height:auto; }
+  .tlp-headtext{ min-width:0; }
+  .tlp-kicker{ margin:0; font-size:12px; font-weight:800; letter-spacing:.08em; color:var(--ink-soft); }
+  .tlp-title{ margin:2px 0 0; font-size:clamp(19px, 4.4vw, 27px); font-weight:800; line-height:1.25; color:var(--pc, var(--ink)); }
+  .tlp-span{ margin:4px 0 0; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+  .tlp-legend{ display:flex; flex-direction:column; gap:5px; margin:11px 0 0; }
+  .tlp-leg{ display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:700; color:var(--ink-soft); line-height:1.35; }
+  .tlp-leg i{ width:14px; height:8px; border-radius:3px; background:var(--bar); flex:none; }
+
+  .tlp-grid{ display:grid; align-items:start; column-gap:0; }
+  /* a bar runs from the row its stretch opens on to the row it closes on: the
+     grid rows put it there, the margins line it up with the dots */
+  .tlp-bar{
+    align-self:stretch; justify-self:center; width:7px; border-radius:4px;
+    background:var(--bar); margin-top:var(--tlp-dot); margin-bottom:calc(-1 * var(--tlp-dot));
   }
-  .tl-row.is-minor .tl-time{ margin:0 5px 0 0; font-size:12px; }
-  .tl-row.is-minor.is-on .tl-title{ color:var(--c); font-weight:700; }
-  .tl-past-btn{
-    display:inline-flex; align-items:center; gap:6px; margin:2px 0 2px; padding:5px 12px;
-    border:1px solid var(--line); border-radius:999px; background:var(--glass-card);
-    font:inherit; font-size:12px; font-weight:700; color:var(--ink-soft); cursor:pointer;
+  .tlp-bar.is-over{ opacity:.4; }
+  .tlp-bar.is-open{ box-shadow:0 0 0 2px color-mix(in srgb, var(--bar) 28%, transparent); }
+  .tlp-when{
+    grid-column:1; display:flex; flex-direction:column; align-items:flex-end;
+    padding:7px 9px 0 0; text-align:right; font-size:12px; font-weight:800;
+    color:var(--ink); line-height:1.35;
   }
-  .tl-past-btn:hover{ color:var(--ink); border-color:color-mix(in srgb, var(--c) 40%, var(--line)); }
-  .ge-timeline{ list-style:none; display:flex; flex-direction:column; gap:0; margin:0; padding:0; }
-  /* The rail runs down the first column and joins between rows because the
-     space under a card is the card's own margin, inside the row. */
-  .tl-row{ --dot:8px; display:grid; grid-template-columns:20px minmax(0, 1fr); grid-template-rows:auto auto; column-gap:10px; }
-  .tl-row.is-done{ opacity:.55; }
-  .tl-rail{ grid-column:1; grid-row:1 / span 2; position:relative; }
-  .tl-rail::before{
+  .tlp-when.is-done{ opacity:.5; }
+  .tl-to{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .tlp-rail{ grid-column:2; position:relative; align-self:stretch; }
+  .tlp-rail::before{
     content:''; position:absolute; left:50%; top:0; bottom:0; width:2px;
-    transform:translateX(-50%); background:color-mix(in srgb, var(--c) 42%, transparent);
+    transform:translateX(-50%); background:var(--line);
   }
-  .tl-row:first-child .tl-rail::before{ top:var(--dot); }
-  .tl-row:last-child .tl-rail::before{ bottom:calc(100% - var(--dot)); }
-  .tl-rail::after{
-    content:''; position:absolute; left:50%; top:var(--dot); width:11px; height:11px;
-    margin:-5.5px 0 0 -5.5px; border-radius:50%; background:var(--k);
-    box-shadow:0 0 0 3px var(--sheet-bg, var(--paper));
+  .tlp-grid > .tlp-rail:first-of-type::before{ top:var(--tlp-dot); }
+  .tlp-grid > .tlp-rail:last-of-type::before{ bottom:calc(100% - var(--tlp-dot)); }
+  .tlp-rail::after{
+    content:''; position:absolute; left:50%; top:var(--tlp-dot); width:10px; height:10px;
+    margin:-5px 0 0 -5px; border-radius:50%; background:var(--k); box-shadow:0 0 0 3px var(--paper);
   }
-  .tl-row.is-on .tl-rail::after{
-    box-shadow:0 0 0 3px var(--sheet-bg, var(--paper)), 0 0 0 6px color-mix(in srgb, var(--k) 32%, transparent);
-  }
-  .tl-when{
-    grid-column:2; grid-row:1; display:flex; flex-wrap:wrap; align-items:baseline; gap:0 6px;
-    padding:0 0 3px; font-size:13px; font-weight:800; color:var(--c); line-height:1.35;
-  }
-  .tl-to{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }
-  .tl-what{
-    grid-column:2; grid-row:2; display:block; width:100%; margin:0 0 10px;
-    padding:10px 13px; text-align:left; font:inherit; color:inherit;
+  .tlp-rail.is-done::after{ opacity:.45; }
+
+  .tlp-card{
+    grid-column:-2; display:block; width:100%; margin:0 0 10px 14px; padding:10px 13px;
+    text-align:left; font:inherit; color:inherit;
     border:1px solid var(--line); border-left:4px solid var(--k); border-radius:14px;
-    background:color-mix(in srgb, var(--c) 4%, transparent);
+    background:color-mix(in srgb, var(--k) 5%, transparent);
   }
-  .tl-row.is-on .tl-what{
-    border-color:color-mix(in srgb, var(--k) 55%, var(--line)); border-left-color:var(--k);
-    background:color-mix(in srgb, var(--k) 12%, transparent);
-  }
-  .tl-what.is-link{ cursor:pointer; transition:background .15s ease, border-color .15s ease; }
-  .tl-what.is-link:hover{
-    background:color-mix(in srgb, var(--k) 12%, transparent);
+  .tlp-card.is-done{ opacity:.5; }
+  .tlp-card.is-link{ cursor:pointer; transition:background .15s ease, border-color .15s ease; }
+  .tlp-card.is-link:hover{
+    background:color-mix(in srgb, var(--k) 13%, transparent);
     border-color:color-mix(in srgb, var(--k) 40%, var(--line));
   }
+  .tlp-card.is-on{
+    border-color:color-mix(in srgb, var(--k) 55%, var(--line));
+    background:color-mix(in srgb, var(--k) 14%, transparent);
+  }
+  /* an opening or a closing keeps its frame, just a smaller one */
+  .tlp-card.is-minor{ margin-bottom:9px; padding:6px 11px; border-left-width:3px; border-radius:11px; }
+  .tlp-card.is-minor .tl-title{ display:inline; margin:0; font-size:12.5px; font-weight:600; color:var(--ink-soft); }
+  .tlp-card.is-minor .tl-time{ margin:0 5px 0 0; font-size:12px; }
+  .tlp-card.is-minor.is-on .tl-title{ color:var(--k); font-weight:700; }
+
   .tl-kind{
     display:inline-block; padding:2px 8px; border-radius:999px; background:var(--k);
     color:#fff; font-size:10.5px; font-weight:800;
   }
   .tl-time{ margin-left:6px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
   .tl-now, .tl-next{ margin-left:6px; padding:2px 7px; border-radius:999px; font-size:10.5px; font-weight:800; }
-  .tl-now{ background:var(--c); color:#fff; }
-  .tl-next{ border:1px solid color-mix(in srgb, var(--c) 45%, var(--line)); color:var(--c); }
+  .tl-now{ background:var(--k); color:#fff; }
+  .tl-next{ border:1px solid color-mix(in srgb, var(--k) 45%, var(--line)); color:var(--k); }
   .tl-title{ display:block; margin-top:4px; font-size:14.5px; font-weight:700; line-height:1.45; }
   .tl-venue, .tl-note{ display:block; margin-top:3px; font-size:12.5px; color:var(--ink-soft); line-height:1.45; }
-  .tl-row.is-on .tl-title{ color:var(--c); }
+  .tlp-card.is-on .tl-title{ color:var(--k); }
+  .tl-jump{ margin:2px 0 6px; }
+
+  /* the way in, in the header */
+  .tlp-btn{
+    flex-shrink:0; height:34px; padding:0 13px; border-radius:999px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px; color:var(--ink);
+    font-family:'Noto Sans Thai',sans-serif; font-size:12.5px; font-weight:800;
+    background:rgba(255,255,255,calc(.5*var(--glass-k)));
+    border:1px solid rgba(255,255,255,calc(.7*var(--glass-k)));
+  }
+  .tlp-btn svg{ width:16px; height:16px; flex:none; }
+  .tlp-btn:hover{ background:rgba(255,255,255,calc(.75*var(--glass-k))); }
   .evm-related{ display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 6px; }
   .evm-related .chip{ white-space:normal; max-width:100%; text-align:left; line-height:1.4; }
   .ev-card.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out), border-color .2s ease; }
@@ -2226,17 +2235,13 @@
     .dtable .col-height, .dtable.grad-mode .col-height{ width:max(108px, calc(var(--tw) * .115)); }
     .dtable .col-fav{ width:max(36px, calc(var(--tw) * .05)); }
     .modal-glass-card .stat-cell{ flex-basis:130px; }
-    /* room enough to put the dates in a column of their own beside the rail */
-    .tl-row{ grid-template-columns:84px 20px minmax(0, 1fr); grid-template-rows:auto; }
-    .tl-when{
-      grid-column:1; grid-row:1; flex-direction:column; align-items:flex-end;
-      gap:0; padding:9px 0 0; text-align:right;
-    }
-    .tl-rail{ grid-column:2; grid-row:1; }
-    .tl-what{ grid-column:3; grid-row:1; padding:11px 14px; }
-    .tl-row{ --dot:20px; }
-    .tl-row.is-minor{ --dot:15px; }
-    .tl-row.is-minor .tl-when{ padding-top:6px; }
+    /* room enough for wider dates and wider bars */
+    .tlp{ --tlp-date:86px; --tlp-lane:13px; }
+    .tlp-when{ font-size:13px; padding-right:12px; }
+    .tlp-card{ margin-left:20px; padding:11px 14px; }
+    .tlp-poster-btn{ flex-basis:168px; }
+    .tlp-head{ gap:24px; margin-bottom:24px; }
+    .tlp-legend{ flex-direction:row; flex-wrap:wrap; gap:6px 20px; }
 
     /* songs: singles, albums and specials as three columns */
     .disc-tabs{ display:none; }
@@ -3264,6 +3269,21 @@ const TIMELINES = {
       venue:'iAM48 Application', ev:'ev-ge6-myo2' },
   ],
 };
+/* The bars that run beside the dates, the way the official poster draws them:
+   each one a stretch of the campaign that is open for weeks at a time. */
+const TIMELINE_PAGES = {
+  ge2026: {
+    kicker:'BNK48 & CGM48',
+    title:'Senbatsu General Election 2026',
+    poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-2026.jpg', w:1638, h:2048 },
+    bars:[
+      { th:'ช่วงโหวต', from:'2026-10-01', to:'2026-11-12', color:'#C2A868' },
+      { th:'พรีออเดอร์ซิงเกิลพิเศษ Physical Edition', from:'2026-09-26', to:'2026-10-30', color:'#4A9BD8' },
+      { th:'พรีออเดอร์ Digital Edition และ Special Photoset', from:'2026-09-26', to:'2026-11-10', color:'#D8C93F' },
+      { th:'ช่วงแลกบัตร Meeting You Online', from:'2026-10-07', to:'2026-11-24', color:'#7FB750' },
+    ],
+  },
+};
 /* One colour per strand, so a reader can follow the single, or the vote, or
    Meeting You Online, straight down the page. */
 const TL_TRACKS = {
@@ -3989,7 +4009,7 @@ const ICONS = {
 let state = {
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
-  calMonth:null, calDay:null, posterOf:null, tlPast:false,
+  calMonth:null, calDay:null, posterOf:null, timelineId:null,
   lang:'th',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
@@ -4377,9 +4397,13 @@ const EN = {
   'ช่วงที่เปิดอยู่': 'Open now',
   'วันสุดท้าย': 'Last day',
   'คลิปประกาศ ↗': 'Announcement video ↗',
-  'ไทม์ไลน์ทั้งงาน': 'Full timeline',
+  'ไทม์ไลน์ทั้งงาน →': 'Full timeline →',
+  'ไทม์ไลน์ GE2026': 'GE2026 timeline',
+  'ไม่พบไทม์ไลน์': 'No timeline found',
   'การโหวต': 'Voting',
-  'ซ่อนรายการที่ผ่านไปแล้ว': 'Hide what has passed',
+  'พรีออเดอร์ซิงเกิลพิเศษ Physical Edition': 'Pre-order, special single Physical Edition',
+  'พรีออเดอร์ Digital Edition และ Special Photoset': 'Pre-order, Digital Edition and Special Photoset',
+  'ช่วงแลกบัตร Meeting You Online': 'Redeeming period for Meeting You Online tickets',
   'ถัดไป': 'Next',
   'เริ่ม': 'Start',
   'สิ้นสุด': 'End',
@@ -4838,7 +4862,6 @@ const EN_PATTERNS = [
   /* a label followed by a separator whose next part is its own element */
   [rx('(.+) ·'), m => { const w = toEn(m[1]); return w == null ? null : `${w} ·`; }],
   [rx('วันที่ (\\d+) จาก (\\d+)'), m => `Day ${m[1]} of ${m[2]}`],
-  [rx('ดูรายการที่ผ่านไปแล้ว \\((\\d+)\\)'), m => `Show what has passed (${m[1]})`],
 
   /* counts */
   [rx('เซ็มบัตสึ (\\d+) คน'), m => `Senbatsu of ${m[1]}`],
@@ -5166,6 +5189,9 @@ function renderHeader(){
   <header class="top">
     <div class="wordmark" data-action="nav-select" data-value="feed" style="cursor:pointer;">48thDB<small>48 THAILAND DATABASE</small></div>
     <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก เพลง งาน..." value="${escapeAttr(state.query)}">
+    <button class="tlp-btn" data-action="open-timeline" data-id="ge2026" title="ไทม์ไลน์ Senbatsu General Election 2026">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4v16"/><circle cx="5" cy="8" r="1.6"/><circle cx="5" cy="16" r="1.6"/><path d="M10 8h9M10 16h6"/></svg>
+      <span>ไทม์ไลน์ GE2026</span></button>
     <button class="theme-btn" data-action="toggle-theme" aria-label="สลับธีมสว่าง/มืด">${state.theme==='dark'?ICONS.sun:ICONS.moon}</button>
     <button class="lang-btn" data-action="toggle-lang" aria-label="เปลี่ยนภาษา">${isEN()?'ไทย':'EN'}</button>
     <button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>
@@ -6475,36 +6501,39 @@ function renderSlotTable(ev){
   return `<h3 class="evm-head">ตารางสมาชิกประจำบูธ</h3><div class="slot-table">${rows}</div>`;
 }
 
-/* Two months of deadlines read better in pieces, so the timeline is split by
-   month, each step a framed row coloured by its kind. What has already passed
-   is folded away until the reader asks for it, leaving only what is left. */
-function renderTimeline(id){
-  const items = TIMELINES[id];
-  if(!items) return '';
+/* A page of its own for a campaign that runs for months: the dates down the
+   left, the stretches that stay open drawn as bars beside them the way the
+   official poster draws them, and every step a card you can open. */
+function renderTimelinePage(){
+  const key = state.timelineId || 'ge2026';
+  const page = TIMELINE_PAGES[key], items = TIMELINES[key];
+  if(!page || !items) return `<p class="empty">ไม่พบไทม์ไลน์</p>`;
   const iso = toYmd(todayStart());
   const M = monthsShort();
   const day = s => { const [, m, d] = s.split('-').map(Number); return `${d} ${M[m-1]}`; };
   const endOf = it => it.to || it.d;
-  const passed = items.filter(it => endOf(it) < iso);
-  const shown = state.tlPast || !passed.length ? items : items.filter(it => endOf(it) >= iso);
-  const ahead = shown.filter(it => endOf(it) >= iso);
+  const firstRow = d => items.findIndex(it => it.d === d);
+  const lastRow  = d => items.reduce((k, it, n) => it.d === d ? n : k, -1);
+  const ahead = items.filter(it => endOf(it) >= iso);
   const nextD = ahead.length ? ahead[0].d : '';
 
-  const months = [];
-  for(const it of shown){
-    const key = it.d.slice(0, 7);
-    if(!months.length || months[months.length-1].key !== key) months.push({ key, items:[] });
-    months[months.length-1].items.push(it);
-  }
+  const bars = page.bars.map(b => {
+    const a = firstRow(b.from), z = lastRow(b.to);
+    if(a < 0 || z < 0) return '';
+    const over = b.to < iso;
+    const open = b.from <= iso && b.to >= iso;
+    return `<span class="tlp-bar${over ? ' is-over' : ''}${open ? ' is-open' : ''}"
+      style="--bar:${b.color}; grid-row:${a + 1} / ${z + 1}"
+      title="${escapeAttr(b.th)} · ${day(b.from)} – ${day(b.to)}"></span>`;
+  }).join('');
 
-  const row = it => {
+  const rows = items.map((it, n) => {
     const k = TL_KINDS[it.kind] || TL_KINDS.event;
     const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
     const minor = !!TL_MINOR[it.kind];
     const done = endOf(it) < iso;
     const on = it.d <= iso && endOf(it) >= iso;
     const next = !on && !done && it.d === nextD;
-    // a deadline says what it is in its own title, so it needs no badge
     const body = `${minor ? '' : `<span class="tl-kind">${k.th}</span>`}
       ${it.time ? `<span class="tl-time">${it.time} น.</span>` : ''}
       ${it.part ? `<span class="tl-time">${escapeHtml(it.part)}</span>` : ''}
@@ -6512,29 +6541,36 @@ function renderTimeline(id){
       <span class="tl-title">${escapeHtml(it.title)}</span>
       ${it.venue ? `<span class="tl-venue">${escapeHtml(it.venue)}</span>` : ''}
       ${it.note ? `<span class="tl-note">${escapeHtml(it.note)}</span>` : ''}`;
-    return `<li class="tl-row${minor ? ' is-minor' : ''}${done ? ' is-done' : ''}${on ? ' is-on' : ''}${next ? ' is-next' : ''}" style="--k:${tr.color}">
-      <span class="tl-when">${day(it.d)}${it.to ? `<span class="tl-to">– ${day(it.to)}</span>` : ''}</span>
-      <span class="tl-rail" aria-hidden="true"></span>
-      ${it.ev ? `<button class="tl-what is-link" data-action="open-event" data-id="${it.ev}">${body}</button>`
-              : `<span class="tl-what">${body}</span>`}
-    </li>`;
-  };
-
-  const blocks = months.map(mo => {
-    const [y, m] = mo.key.split('-').map(Number);
-    return `<div class="tl-month">
-      <h4 class="tl-month-head">${MONTH_NAMES[m-1]} ${y + 543}</h4>
-      <ol class="ge-timeline">${mo.items.map(row).join('')}</ol>
-    </div>`;
+    const cls = `tlp-card${minor ? ' is-minor' : ''}${on ? ' is-on' : ''}`;
+    return `<span class="tlp-when${done ? ' is-done' : ''}" style="grid-row:${n + 1}">
+        ${day(it.d)}${it.to ? `<span class="tl-to">– ${day(it.to)}</span>` : ''}</span>
+      <span class="tlp-rail${done ? ' is-done' : ''}" style="grid-row:${n + 1}; --k:${tr.color}" aria-hidden="true"></span>
+      ${it.ev ? `<button class="${cls} is-link${done ? ' is-done' : ''}" style="grid-row:${n + 1}; --k:${tr.color}"
+          data-action="open-event" data-id="${it.ev}">${body}</button>`
+        : `<span class="${cls}${done ? ' is-done' : ''}" style="grid-row:${n + 1}; --k:${tr.color}">${body}</span>`}`;
   }).join('');
 
-  const tracks = [...new Set(shown.map(it => it.track))].filter(t => TL_TRACKS[t]);
-  return `<h3 class="evm-head">ไทม์ไลน์ทั้งงาน</h3>
-    <div class="tl-legend">${tracks.map(t =>
-      `<span class="tl-leg" style="--k:${TL_TRACKS[t].color}"><i></i>${TL_TRACKS[t].th}</span>`).join('')}</div>
-    ${passed.length ? `<button class="tl-past-btn" data-action="toggle-tl-past">${
-      state.tlPast ? 'ซ่อนรายการที่ผ่านไปแล้ว' : `ดูรายการที่ผ่านไปแล้ว (${passed.length})`}</button>` : ''}
-    ${blocks}`;
+  const span = `${day(items[0].d)} – ${day(endOf(items[items.length-1]))} ${enYear(items[0].d.slice(0,4)) + 543}`;
+  return `
+  <section class="tlp" style="--pc:${page.poster.accent}">
+    <div class="tlp-head">
+      <button class="tlp-poster-btn" data-action="open-poster" data-id="ev-election-voting"
+        title="ดูโปสเตอร์เต็ม" aria-label="ดูโปสเตอร์เต็ม">
+        <img class="tlp-poster" src="${escapeAttr(page.poster.img)}" width="${page.poster.w}" height="${page.poster.h}"
+          alt="โปสเตอร์ ${escapeAttr(page.title)}" decoding="async">
+      </button>
+      <div class="tlp-headtext">
+        <p class="tlp-kicker">${escapeHtml(page.kicker)}</p>
+        <h1 class="tlp-title">${escapeHtml(page.title)}</h1>
+        <p class="tlp-span">${span}</p>
+        <div class="tlp-legend">${page.bars.map(b =>
+          `<span class="tlp-leg" style="--bar:${b.color}"><i></i>${escapeHtml(b.th)}</span>`).join('')}</div>
+      </div>
+    </div>
+    <div class="tlp-grid" style="grid-template-columns:var(--tlp-date) 18px repeat(${page.bars.length}, var(--tlp-lane)) minmax(0, 1fr)">
+      ${bars}${rows}
+    </div>
+  </section>`;
 }
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
@@ -6606,7 +6642,8 @@ function renderEventModal(){
         <h3 class="evm-head">${escapeHtml(s.head)}</h3>
         <ul class="ev-detail">${s.lines.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>`).join('')}
 
-        ${ev.timeline ? renderTimeline(ev.timeline) : ''}
+        ${ev.timeline ? `<button class="chip chip-link tl-jump" data-action="open-timeline" data-id="${ev.timeline}">
+          ไทม์ไลน์ทั้งงาน →</button>` : ''}
 
         ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
 
@@ -8181,6 +8218,7 @@ function renderMain(){
   main.innerHTML =
     (state.query.trim() ? renderSearch() :
     state.view==='feed' ? renderFeed() :
+    state.view==='timeline' ? renderTimelinePage() :
     state.view==='browse' ? renderBrowse() :
     state.view==='groups' ? renderGroups() :
     state.view==='org' ? renderOrgChart() :
@@ -8397,12 +8435,12 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','timelineId'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
 // stays put, which is what lets this work on static hosting with no rewrites.
-const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats'];
+const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','timeline'];
 
 // Read at load time. The first history entry is written before the member list
 // has arrived, and writing it derives the address from a state that is still
@@ -8440,7 +8478,7 @@ function applyUrlToState(){
   if(sng && findWork(sng)){
     state.view='single'; state.selectedSingle=sng; return;
   }
-  if(view && SHAREABLE_VIEWS.includes(view)) state.view = view;
+  if(view && SHAREABLE_VIEWS.includes(view)){ state.view = view; if(view === 'timeline') state.timelineId = 'ge2026'; }
 }
 
 const BACKUP_FORMAT = '48thdb-oshi-1';
@@ -8755,9 +8793,12 @@ function bindDelegatedEvents(){
       state.calDay = null;   // the day that was open may not survive the filter
       renderMain(); replaceHistory();
     }
-    else if(action==='toggle-tl-past'){
-      state.tlPast = !state.tlPast;
-      renderMain();
+    else if(action==='open-timeline'){
+      state.timelineId = id || 'ge2026';
+      state.view = 'timeline';
+      state.selectedEvent = null; state.selectedId = null; state.editingId = null;
+      state.query = '';
+      render(); pushHistory();
     }
     else if(action==='toggle-ticker'){
       try{ localStorage.setItem('48thdb-ticker-folded', tickerFolded() ? '0' : '1'); }catch(err){}
