@@ -41,20 +41,26 @@ def read(vid):
                     'length': int(v.get('lengthSeconds') or 0)}
         except Exception as e:
             err = e
-            time.sleep(3 * (attempt + 1))
+            time.sleep(2)
     raise err
 
 
 def main():
     old = json.loads(OUT.read_text(encoding='utf-8')) if OUT.exists() else {'videos': {}}
     videos, failed = {}, []
-    for vid in video_ids():
+    ids = video_ids()
+    for n, vid in enumerate(ids):
         try:
             videos[vid] = read(vid)
         except Exception as e:
             failed.append(f'{vid}: {e}')
             if vid in old['videos']:
                 videos[vid] = old['videos'][vid]     # keep the last good count
+            # YouTube turns some servers away outright; if the first few all
+            # fail, the rest will too, so keep yesterday's numbers and stop
+            if len(failed) == n + 1 and len(failed) >= 5:
+                print('YouTube is refusing this machine; keeping the previous counts')
+                return
         time.sleep(1.2)
     if not videos:
         raise SystemExit('nothing read; leaving the old file alone')

@@ -1610,7 +1610,7 @@
     background-image:radial-gradient(rgba(0,0,0,.55) 0.9px, transparent 1.2px);
     background-size:3px 3px;
   }
-  .ticker-track{ display:flex; width:max-content; animation:ticker-run var(--dur) linear infinite; }
+  .ticker-track{ display:flex; width:max-content; animation:ticker-run var(--dur) linear infinite; will-change:transform; }
   .ticker:hover .ticker-track{ animation-play-state:paused; }
   .ticker-run{
     display:flex; align-items:center; gap:14px; padding:9px 14px 9px 14px; white-space:nowrap;
@@ -8897,6 +8897,14 @@ function syncTicker(){
   slot.dataset.html = html;
   slot.innerHTML = html;
   localize(slot);
+  // Every screen change rebuilds the page, ticker and all, which used to start
+  // the text from the beginning again. Its position is taken from the clock
+  // instead, so a rebuilt ticker picks up exactly where the old one was.
+  const track = slot.querySelector('.ticker-track');
+  if(track){
+    const secs = parseFloat(track.style.getPropertyValue('--dur')) || 20;
+    track.style.animationDelay = `-${((Date.now() / 1000) % secs).toFixed(3)}s`;
+  }
 }
 
 function render(){
