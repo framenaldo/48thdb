@@ -891,6 +891,17 @@
   .lv-when{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
   .lv-text{ font-size:13px; line-height:1.45; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .lv-foot{ margin:8px 0 0; font-size:11px; color:var(--ink-soft); }
+  /* a song's way to YouTube, beside its name */
+  .yt-btn{
+    display:inline-flex; align-items:center; gap:6px; margin-left:auto; flex:none;
+    padding:4px 11px 4px 8px; border-radius:999px; text-decoration:none;
+    font-size:12px; font-weight:800; color:var(--ink);
+    background:var(--glass-card); border:1px solid var(--line);
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .yt-btn svg{ width:20px; height:20px; display:block; }
+  .yt-btn:hover{ border-color:#FF0000; }
+  .yt-btn:active{ transform:scale(.95); }
   .social-row{ display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 2px; }
   .social-chip{
     display:inline-flex; align-items:center; justify-content:center;
@@ -8242,6 +8253,160 @@ function renderEditProfile(){
   </form>`;
 }
 
+/* A video for each song, keyed by release and track position: the official MV
+   where there is one, otherwise the group's own performance, lyric or special
+   video. Found by searching YouTube and keeping only uploads from the BNK48
+   and CGM48 channels whose title names the song (checked 19 Sep 2026). */
+const SEED_YOUTUBE = {
+  'bnk-s1#0':['o1V-e5l5YQU','mv'],
+  'bnk-s1#1':['8BY1sLEFDJE','live'],
+  'bnk-s1#2':['M-DfHYCoIB4','mv'],
+  'bnk-s2#0':['mfqJyKm20Z4','mv'],
+  'bnk-s2#1':['zVJIc_Dvo2E','live'],
+  'bnk-s3#0':['IMx1ojx2fiE','mv'],
+  'bnk-s3#1':['jMa88SrDlYU','video'],
+  'bnk-s3#2':['sKi9ZQ74Z7g','live'],
+  'bnk-s3#3':['awJd6vaaZlc','mv'],
+  'bnk-s4#0':['iByxlVvWrww','mv'],
+  'bnk-s4#1':['A2VrbwgWjT0','mv'],
+  'bnk-s4#2':['su_ZmVg0nw0','mv'],
+  'bnk-s5#0':['mo4l8f_VZXo','mv'],
+  'bnk-s5#1':['rgWNVok5kIQ','mv'],
+  'bnk-s5#2':['KE5PdRLYCf8','live'],
+  'bnk-s6#0':['IptefJ9C4PY','mv'],
+  'bnk-s6#1':['zy5qrmNrUbE','mv'],
+  'bnk-s6#2':['pS0KL3hk26Y','mv'],
+  'bnk-s7#0':['ks1Sx1lYXEk','mv'],
+  'bnk-s7#1':['nhzfTOAzmjk','mv'],
+  'bnk-s7#2':['UXaCT96UGAM','mv'],
+  'bnk-s7#3':['bYy7XIqozbs','mv'],
+  'bnk-s7#4':['Iw39saG2ZGU','lyric'],
+  'bnk-s8#0':['_jmHOW6X4V0','mv'],
+  'bnk-s8#1':['Ek8itihPQgE','mv'],
+  'bnk-s8#2':['75IrWu_sEiE','mv'],
+  'bnk-s9#0':['d1lgOyQvkug','mv'],
+  'bnk-s9#1':['O8rkVS19Gk4','mv'],
+  'bnk-s9#2':['L3efeK0s5BE','mv'],
+  'bnk-s10#0':['I64YL2424eU','mv'],
+  'bnk-s10#1':['NzAqV54soaA','live'],
+  'bnk-s10#2':['tRbmLCQut0I','mv'],
+  'bnk-s10#3':['dj0C-wr1jRU','live'],
+  'bnk-s11#0':['FppYrZtcAO0','mv'],
+  'bnk-s11#1':['3GqOucQvkVA','live'],
+  'bnk-s12#0':['6mZagYSymB4','mv'],
+  'bnk-s12#1':['Zjww83YiHmc','mv'],
+  'bnk-s12#2':['wO7kV905DnA','mv'],
+  'bnk-s13#0':['vFkKaOmLEoY','mv'],
+  'bnk-s14#0':['cmoUEQ9tQP4','mv'],
+  'bnk-s15#0':['kcP5auJvdHc','mv'],
+  'bnk-s16#0':['5Z-gvAGQueA','mv'],
+  'bnk-s17#0':['VJiLD4D8f7U','mv'],
+  'bnk-s18#0':['nasBsbihuHo','mv'],
+  'bnk-s18#1':['a9Iw1_OXsZQ','live'],
+  'bnk-s18#2':['X-bUORbma9M','live'],
+  'bnk-s19#0':['FQOnJPeaPmc','mv'],
+  'bnk-s19#1':['dXW-czcpif8','mv'],
+  'bnk-s19#2':['F7FdGXAKEFo','mv'],
+  'bnk-s20#0':['a5bPbwk0F7k','mv'],
+  'bnk-s20#1':['hRKIxcSHex8','live'],
+  'bnk-s20#2':['jRVOQHriw2w','mv'],
+  'cgm-s1#0':['WrwVUUpzkOI','mv'],
+  'cgm-s1#1':['X6R59NrJBRU','live'],
+  'cgm-s2#0':['WFpgQL8fk2Q','mv'],
+  'cgm-s2#1':['Ur8vHWibwRo','live'],
+  'cgm-s2#2':['d44cQAMHU1c','mv'],
+  'cgm-s3#0':['kmYwCR7XZSM','mv'],
+  'cgm-s3#1':['Hu-tX5plaYA','live'],
+  'cgm-s3#2':['CTw2I3T3Xtg','mv'],
+  'cgm-s4#0':['Wb_4uhAEaSc','mv'],
+  'cgm-s4#1':['Ju3T4Vm1CUs','live'],
+  'cgm-s4#2':['wQyyXdG0VUw','live'],
+  'cgm-s5#0':['Lig4-YucAbo','mv'],
+  'cgm-s5#1':['QKxeUo76evc','live'],
+  'cgm-s5#2':['1lFvoD3TT6U','live'],
+  'cgm-s6#0':['roez953rLCI','mv'],
+  'cgm-s6#1':['SiBPSkl_rn0','live'],
+  'cgm-s6#2':['pD9TJLNsvoM','mv'],
+  'cgm-s7#0':['6O2ZGJWHQ3w','mv'],
+  'cgm-s7#1':['xwTIzZVpy1Q','live'],
+  'cgm-s7#2':['gpSt3YN6HKA','live'],
+  'cgm-s8#0':['p_lkkhY5RGs','mv'],
+  'cgm-s8#1':['Fw7AQ8hz_JU','mv'],
+  'cgm-s8#2':['ThJLPLd0Jfo','video'],
+  'cgm-s8#3':['fiGdTMSMBgs','live'],
+  'cgm-s9#0':['sadWF6TG78Y','mv'],
+  'cgm-s9#1':['XdjicOUR6_U','live'],
+  'cgm-s9#2':['VKVDztfJ9i4','live'],
+  'cgm-s10#0':['nWPeawAIMl0','mv'],
+  'cgm-s10#1':['18aYhasU9M4','live'],
+  'cgm-s10#2':['iw8eQvDuN6U','mv'],
+  'cgm-s11#0':['AsYP1WDrhTU','mv'],
+  'cgm-s11#1':['-xKqiSaR1Jc','live'],
+  'cgm-s11#2':['-HNfFArKiPQ','mv'],
+  'bnk-a1#0':['4TKCbe8jyRI','mv'],
+  'bnk-a2#0':['WrRLfGZNu1E','mv'],
+  'bnk-a2#1':['SPZNSJ5NmJU','mv'],
+  'bnk-a2#2':['Gho7MGWbfAA','mv'],
+  'bnk-a3#0':['bTBPXxIPSfw','mv'],
+  'bnk-a3#1':['NQnHJ7CdUuE','mv'],
+  'bnk-a3#2':['lqREjjIa3b8','mv'],
+  'bnk-a4#0':['omy8iR0-xys','mv'],
+  'bnk-a5#0':['ymTOSdkUWBs','mv'],
+  'bnk-a6#0':['g3RrDbY7FEk','mv'],
+  'cgm-a1#0':['BWDfOgXnXxw','mv'],
+  'cgm-a1#1':['OPBlXn39yK8','video'],
+  'cgm-a2#0':['c11rhJArDSw','mv'],
+  'cgm-a3#0':['gCY5tBmzATk','mv'],
+  'bnk-sp-touchbyheart#0':['YaDTkAjec88','mv'],
+  'bnk-sp-touchbyheart#1':['l7jLrNpsu7U','lyric'],
+  'bnk-sp-touchbyheart#2':['QkB3rv8ps9A','lyric'],
+  'bnk-sp-touchbyheart#3':['T5ZkqCbbI2c','lyric'],
+  'bnk-sp-touchbyheart#4':['5ZOzZPzZ-zg','lyric'],
+  'bnk-sp-touchbyheart#5':['R2TkUzUd73M','lyric'],
+  'bnk-sp-touchbyheart#6':['CYpWLjYKyE0','lyric'],
+  'bnk-sp-touchbyheart#7':['YaDTkAjec88','mv'],
+  'bnk-sp-canyou#0':['NQnHJ7CdUuE','mv'],
+  'bnk-sp-mamamilk#0':['lqREjjIa3b8','mv'],
+  'cgm-sp-letsgo#0':['HqNpgoPoXxo','mv'],
+  'bnk-sp-cheers#0':['4PcJrK1PqD8','mv'],
+  'bnk-sp-happynewyear#0':['om8vJGrrRvs','mv'],
+  'bnk-sp-mhokkob#0':['3basTFl8WFw','mv'],
+  'bnk-sp-monrak#0':['sZ6cvhWYM6Y','mv'],
+  'bnk-sp-jiwarudays#0':['TXFZtepXlzk','mv'],
+  'bnk-sp-jiwarudays#1':['rUmPtU3mBWY','live'],
+  'bnk-sp-jiwarudays#2':['OOxFBnPrRKU','live'],
+  'bnk-sp-jinglebells#0':['Dti-t6vdlFc','video'],
+  'cgm-sp-jinglebells#0':['UzqWqTNn6eo','video'],
+  'bnk-sp-nayak#0':['ozm2GPr6ly8','mv'],
+  'bnk-sp-sportsday#0':['hNgw9OPtFWw','mv'],
+  'cgm-sp-mysakura#0':['LYwn1J5AbAM','video'],
+  'bnk-sp-whisperroar#0':['fJu1bGFfIWY','video'],
+  'bnk-sp-rumor#0':['Pcbp5MYnHJA','mv'],
+  'cgm-sp-sadcupid#0':['3TuZ8eqd04Y','mv'],
+  'cgm-sp-kazewomatsu#0':['yTCc2ItvdDU','mv'],
+  'bnk-sp-ohmypumpkin#0':['3P_EBAcNvO4','live'],
+  'cgm-sp-ohmypumpkin#0':['K18FCSTiSI4','live'],
+  'bnk-sp-hipchain#0':['iVTtkhHT3P4','mv'],
+  'bnk-sp-kangaroo#0':['YOTH5HIeEZM','live'],
+  'bnk-sp-skylantern#0':['HpQ9B13uv0w','mv'],
+  'bnk-sp-celebration#0':['mV-OxpZZEm4','mv'],
+  'bnk-sp-cry#0':['12VmOt8T5jk','mv'],
+  'bnk-sp-kimigairu#0':['GZDde4_izAw','mv'],
+  'cgm-sp-maliremix#0':['QMqby5BvIJ0','video'],
+  'cgm-sp-daimairemix#0':['uqdjTzZw4Mc','video'],
+  'bnk-sp-ramwong#0':['-dR3WbLrVPQ','video'],
+};
+const YT_KIND = { mv:['MV','MV'], live:['ดูการแสดง','Performance'], lyric:['Lyric Video','Lyric video'], video:['วิดีโอ','Video'] };
+const YT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FF0000" d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8C22 15.2 22 12 22 12s0-3.2-.4-4.8z"/><path fill="#fff" d="M10 15.5v-7l6 3.5z"/></svg>';
+function renderYouTube(workId, i, trackName){
+  const yt = SEED_YOUTUBE[`${workId}#${i}`];
+  if(!yt) return '';
+  const [vid, kind] = yt;
+  const label = (YT_KIND[kind] || YT_KIND.video)[isEN() ? 1 : 0];
+  return `<a class="yt-btn" href="https://www.youtube.com/watch?v=${escapeAttr(vid)}" target="_blank" rel="noopener noreferrer"
+    title="YouTube: ${escapeAttr(trackName)}" aria-label="YouTube ${escapeAttr(label)}: ${escapeAttr(trackName)}">${YT_ICON}<span>${label}</span></a>`;
+}
+
 function renderSingleDetail(){
   const s = findWork(state.selectedSingle);
   if(!s) return '';
@@ -8259,6 +8424,7 @@ function renderSingleDetail(){
       <div class="track-head">
         <span class="track-tag ${i===0?'lead':''}">${tag}</span>
         <span class="track-name">${escapeHtml(t.track)}</span>
+        ${renderYouTube(s.id, i, t.track)}
       </div>
       <div class="track-sub">${t.members.length} คน${t.centers.length
         ? ' · เซ็นเตอร์ ' + t.centers.map(id=>linkMember(getMember(id))).join(', ')
