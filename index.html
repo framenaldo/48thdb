@@ -3152,9 +3152,19 @@ const SEED_SCHEDULE = [
       'วันที่ 20 ก.ย. Khaimook ขึ้นแสดงและร่วมกิจกรรมแทน Niya ซึ่งติดภารกิจส่วนตัว — วันที่ 19 ก.ย. ยังเป็น Niya ตามเดิม',
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
       'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
-  { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27',
+  { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27', time:'12:00',
     title:'CGM48 11th Single "Koi Tsunjatta — Let me know!" Roadshow',
-    venue:'Fashion Island, Bangkok', groups:['cgm48'], lineupTba:true },
+    venue:'Grand Station ชั้น 2, Fashion Island, Bangkok', groups:['cgm48'],
+    poster:{ accent:'#8E1E2E', surface:'#F8EEF0', ink:'#3A0F18', img:'posters/roadshow-fashionisland.jpg', w:2048, h:2048 },
+    members:['cgm-ginna','cgm-kwan','cgm-jingjing','cgm-nisha','cgm-ploen','cgm-hongyok'],
+    detail:[
+      'รอบเวลาเดียวกันทั้งสองวัน 26 และ 27 ก.ย.',
+      '12:00–13:00 Mini Concert',
+      '14:00–15:00 Group Hi-Touch',
+      '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
+      '17:00–18:00 Group Hi-Touch'],
+    info:[
+      'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน'] },
   { id:'ev-fame-fanmeet', start:'2026-09-27',
     sales:{ to:'2026-09-25T12:00' },
     title:"Fame's Airline Fanmeet",
@@ -4826,6 +4836,8 @@ const EN = {
     'Eight meals included; dinner on the return day is not',
   'เดินทางไป-กลับโดยรถบัส':
     'Return travel by coach',
+  'รอบเวลาเดียวกันทั้งสองวัน 26 และ 27 ก.ย.': 'The same times on both days, 26 and 27 Sep',
+  '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha': '15:30–16:30 Meet the members at the Merchandise and Hachi Cha stands',
   'รอบเวลาเดียวกันทั้งสองวัน 19 และ 20 ก.ย.':
     'The same times on both days, 19 and 20 Sep',
   'Give & Take กิจกรรมแลกของขวัญกับฮูพ ของขวัญมูลค่าไม่เกิน 3,000 บาท และต้องระบุชื่อกับเบอร์โทรผู้มอบ':
