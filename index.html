@@ -1565,13 +1565,12 @@
   .tl-leg i{ width:9px; height:9px; border-radius:50%; background:var(--k); flex:none; }
   /* An opening or a closing keeps its colour and its place on the rail, but
      drops the card: one quiet line beside a smaller dot. */
-  .tl-row.is-minor{ --dot:9px; grid-template-columns:20px auto minmax(0, 1fr); grid-template-rows:auto; align-items:baseline; }
-  .tl-row.is-minor .tl-rail{ grid-column:1; grid-row:1; align-self:stretch; }
-  .tl-row.is-minor .tl-rail::after{ width:7px; height:7px; margin:-3.5px 0 0 -3.5px; }
-  .tl-row.is-minor .tl-when{ grid-column:2; grid-row:1; padding:0 8px 0 0; font-size:12px; }
+  .tl-row.is-minor .tl-rail::after{ width:9px; height:9px; margin:-4.5px 0 0 -4.5px; }
+  .tl-row.is-minor .tl-when{ font-size:12px; }
   .tl-row.is-minor .tl-what{
-    grid-column:3; grid-row:1; margin:0 0 9px; padding:0;
-    border:0; background:none;
+    margin:0 0 9px; padding:6px 11px;
+    border:1px solid var(--line); border-left:3px solid var(--k); border-radius:11px;
+    background:color-mix(in srgb, var(--c) 3%, transparent);
   }
   .tl-row.is-minor .tl-title{
     display:inline; margin:0; font-size:12.5px; font-weight:600; color:var(--ink-soft);
@@ -1587,7 +1586,7 @@
   .ge-timeline{ list-style:none; display:flex; flex-direction:column; gap:0; margin:0; padding:0; }
   /* The rail runs down the first column and joins between rows because the
      space under a card is the card's own margin, inside the row. */
-  .tl-row{ --dot:8px; display:grid; grid-template-columns:20px minmax(0, 1fr); grid-template-rows:auto auto; }
+  .tl-row{ --dot:8px; display:grid; grid-template-columns:20px minmax(0, 1fr); grid-template-rows:auto auto; column-gap:10px; }
   .tl-row.is-done{ opacity:.55; }
   .tl-rail{ grid-column:1; grid-row:1 / span 2; position:relative; }
   .tl-rail::before{
@@ -2231,15 +2230,13 @@
     .tl-row{ grid-template-columns:84px 20px minmax(0, 1fr); grid-template-rows:auto; }
     .tl-when{
       grid-column:1; grid-row:1; flex-direction:column; align-items:flex-end;
-      gap:0; padding:9px 10px 0 0; text-align:right;
+      gap:0; padding:9px 0 0; text-align:right;
     }
     .tl-rail{ grid-column:2; grid-row:1; }
     .tl-what{ grid-column:3; grid-row:1; padding:11px 14px; }
     .tl-row{ --dot:20px; }
-    .tl-row.is-minor{ --dot:10px; grid-template-columns:84px 20px minmax(0, 1fr); }
-    .tl-row.is-minor .tl-when{ grid-column:1; padding:0 10px 0 0; }
-    .tl-row.is-minor .tl-rail{ grid-column:2; }
-    .tl-row.is-minor .tl-what{ grid-column:3; }
+    .tl-row.is-minor{ --dot:15px; }
+    .tl-row.is-minor .tl-when{ padding-top:6px; }
 
     /* songs: singles, albums and specials as three columns */
     .disc-tabs{ display:none; }
