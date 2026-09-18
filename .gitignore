@@ -1,2 +1,4 @@
 .DS_Store
 .firebase/
+.smoke/
+node_modules/
