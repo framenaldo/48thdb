@@ -1648,6 +1648,15 @@
   }
   .tl-icon svg{ width:18px; height:18px; display:block; }
   .tl-icon.is-img img{ width:21px; height:21px; border-radius:50%; display:block; object-fit:cover; }
+  .ev-icon{
+    display:inline-flex; align-items:center; justify-content:center; vertical-align:-4px;
+    width:21px; height:21px; margin-right:6px; color:var(--c);
+  }
+  .ev-icon svg{ width:18px; height:18px; display:block; }
+  .ev-icon.is-img img{ width:21px; height:21px; display:block; }
+  .ev-icon.is-hero{ width:23px; height:23px; margin-right:7px; vertical-align:-4px; }
+  .ev-icon.is-hero svg{ width:20px; height:20px; }
+  .ev-icon.is-hero img{ width:23px; height:23px; }
 
   /* The shop: one card per thing on sale, the poster beside what it costs. */
   .shop{ max-width:1040px; margin-inline:auto; }
@@ -1658,10 +1667,19 @@
     border:1px solid var(--line); border-radius:18px; background:var(--glass-card);
   }
   .shop-card.is-over{ opacity:.6; }
-  .shop-thumb{
-    align-self:start; padding:0; border:1px solid var(--line); border-radius:12px;
-    background:none; cursor:pointer; overflow:hidden; line-height:0;
+  .shop-card.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out), border-color .2s ease; }
+  @media (hover:hover){
+    .shop-card.is-openable:hover{
+      transform:translateY(-2px); border-color:color-mix(in srgb, var(--c) 40%, var(--line));
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+    }
   }
+  .shop-card.is-openable:active{ transform:translateY(0); }
+  .shop-thumb{
+    display:block; align-self:start; border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; line-height:0;
+  }
+  .shop-open{ pointer-events:none; }
   .shop-thumb img{ display:block; width:100%; height:auto; }
   .shop-body{ min-width:0; }
   .shop-meta{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0; }
@@ -6457,7 +6475,7 @@ function renderEventCard(ev, todayIso){
     <div class="ev-body">
       ${(()=>{ const at = over ? null : startsAt(ev, todayIso);
         return at ? `<span class="ev-starts" data-starts-at="${at}">${startsLabel(at)}</span>` : ''; })()}
-      <h3 class="ev-title">${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}</h3>
+      <h3 class="ev-title">${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
         groupTag(g)).join('')}</div>` : ''}
@@ -6504,7 +6522,7 @@ function renderTodayHero(ev, todayIso){
     ${open ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="today-hero-body">
       <p class="today-hero-status"><span class="today-live" aria-hidden="true"></span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</p>
-      <h3 class="today-hero-title">${escapeHtml(ev.title)}</h3>
+      <h3 class="today-hero-title">${renderEventIcon(ev, 'ev-icon is-hero')}${escapeHtml(ev.title)}</h3>
       <p class="today-hero-meta">${hours ? `${hours} น.` : ''}${hours && ev.venue ? ' · ' : ''}${ev.venue ? escapeHtml(ev.venue) : ''}</p>
     </div>
     ${img ? `<div class="today-hero-art" style="--art:url('${escapeAttr(img)}')">
@@ -6618,12 +6636,12 @@ function renderShopPage(){
       : state === 'soon'
       ? (till <= 1 ? 'เปิดพรุ่งนี้' : `เปิดในอีก ${till} วัน`)
       : 'ปิดรับแล้ว';
-    return `<article class="shop-card is-${state}" style="--c:${e.poster ? e.poster.accent : 'var(--ink-soft)'}">
-      ${e.poster && e.poster.img ? `<button class="shop-thumb" data-action="open-event" data-id="${e.id}"
-        aria-label="${escapeAttr(s.name)}">
+    return `<article class="shop-card is-${state} is-openable" style="--c:${e.poster ? e.poster.accent : 'var(--ink-soft)'}"
+      data-action="open-event" data-id="${e.id}">
+      ${e.poster && e.poster.img ? `<span class="shop-thumb">
         <img src="${escapeAttr(e.poster.img)}" width="${e.poster.w}" height="${e.poster.h}"
           alt="${escapeAttr(s.name)}" loading="lazy" decoding="async">
-      </button>` : ''}
+      </span>` : ''}
       <div class="shop-body">
         <p class="shop-meta"><span class="shop-kind">${escapeHtml(s.kind)}</span>
           <span class="shop-status">${status}</span></p>
@@ -6634,7 +6652,7 @@ function renderShopPage(){
           ${s.deliver ? `<li>ส่งสินค้า ${escapeHtml(s.deliver)}</li>` : ''}
           ${s.shopName ? `<li>ทาง ${escapeHtml(s.shopName)}</li>` : ''}
         </ul>
-        <button class="chip chip-link" data-action="open-event" data-id="${e.id}">ดูรายละเอียด →</button>
+        <span class="chip chip-link shop-open">ดูรายละเอียด →</span>
       </div>
     </article>`;
   };
