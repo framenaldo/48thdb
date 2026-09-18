@@ -15,6 +15,7 @@ import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -34,18 +35,48 @@ const VIEWS = [
   { name: '06-discography', url: '?v=discography' },
   { name: '07-stats', url: '?v=stats' },
   { name: '08-feed-dark', url: '?v=feed', dark: true },
+  // Rendering a view is only half of it: the handlers live in a different file
+  // from the markup now, and a name that failed to carry across would only show
+  // up on a click.
+  {
+    name: '09-interactions',
+    url: '?v=browse',
+    async drive(page) {
+      // A row of the member table, not just the first match: the earlier ones
+      // are links inside the birthday ticker, which scrolls and so never holds
+      // still long enough to be clicked.
+      await page.locator('.row[data-action="open-member"]').first().click({ timeout: 5000 });
+      await page.waitForTimeout(400);
+      // The X, not the backdrop: a backdrop click lands on the card sitting on
+      // top of it, which the handler deliberately ignores.
+      await page.locator('.modal-close-btn').first().click({ timeout: 5000 });
+      await page.waitForTimeout(300);
+      await page.fill('#search-input', 'เฟม');
+      await page.waitForTimeout(400);
+      await page.fill('#search-input', '');
+      await page.click('[data-action="toggle-theme"]');
+      await page.waitForTimeout(300);
+    },
+  },
 ];
 
 function serve() {
   const server = createServer(async (req, res) => {
     const rel = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html';
+    let body;
     try {
-      const body = await readFile(path.join(ROOT, rel));
-      res.writeHead(200, { 'content-type': TYPES[path.extname(rel)] || 'application/octet-stream' });
-      res.end(body);
+      body = await readFile(path.join(ROOT, rel));
     } catch {
       res.writeHead(404).end('not found');
+      return;
     }
+    // Hosting answers with an ETag per file and the app's update check reads
+    // them, so the test server has to have them too or that path goes untested.
+    res.writeHead(200, {
+      'content-type': TYPES[path.extname(rel)] || 'application/octet-stream',
+      etag: `"${createHash('sha1').update(body).digest('hex').slice(0, 16)}"`,
+    });
+    res.end(req.method === 'HEAD' ? undefined : body);
   });
   return new Promise(resolve => server.listen(0, () => resolve(server)));
 }
@@ -69,8 +100,12 @@ async function capture(label) {
     });
     const page = await ctx.newPage();
     const errors = [];
+    // "Failed to load resource" on its own never says which one, so the status
+    // line is recorded next to it.
     page.on('console', m => m.type() === 'error' && errors.push(m.text()));
     page.on('pageerror', e => errors.push(String(e)));
+    page.on('response', r => r.status() >= 400 &&
+      errors.push(`HTTP ${r.status()} ${r.url().replace(/^http:\/\/127\.0\.0\.1:\d+/, '')}`));
 
     // The three gstatic SDKs become one local stub; everything else off-origin
     // (fonts, Firestore) is answered with an empty 200 so runs neither depend
@@ -87,11 +122,15 @@ async function capture(label) {
     await page.waitForFunction(() => !document.querySelector('#app .loading'), null, { timeout: 15000 })
       .catch(() => errors.push('TIMEOUT: app never rendered'));
     await page.waitForTimeout(600);   // let entrance animations settle
+    if (view.drive) await view.drive(page).catch(e => errors.push(`DRIVE: ${e.message.split('\n')[0]}`));
 
     report[view.name] = {
       errors,
       title: await page.title(),
       text: (await page.locator('#app').innerText()).replace(/\s+/g, ' ').trim().slice(0, 400),
+      // Not part of the fingerprint — it changes whenever a file does. What
+      // matters is that the update check still resolves to something.
+      deployTag: Boolean(await page.evaluate(() => fetchDeployTag())),
       counts: await page.evaluate(() => ({
         elements: document.querySelectorAll('#app *').length,
         images: document.images.length,
@@ -108,11 +147,13 @@ async function capture(label) {
   server.close();
   fs.writeFileSync(path.join(outDir, 'report.json'), JSON.stringify(report, null, 2));
 
-  const failed = Object.entries(report).filter(([, r]) => r.errors.length || r.counts.brokenImages.length);
+  const failed = Object.entries(report).filter(([, r]) =>
+    r.errors.length || r.counts.brokenImages.length || !r.deployTag);
   console.log(`\n${label}: ${Object.keys(report).length} views → .smoke/${label}/`);
   for (const [name, r] of Object.entries(report)) {
     console.log(`  ${r.errors.length || r.counts.brokenImages.length ? '✗' : '✓'} ${name}  ` +
       `${r.counts.elements} el, ${r.counts.images} img` +
+      (r.deployTag ? '' : ', NO DEPLOY TAG') +
       (r.counts.brokenImages.length ? `, ${r.counts.brokenImages.length} BROKEN` : '') +
       (r.errors.length ? `\n      ${r.errors.slice(0, 3).join('\n      ')}` : ''));
   }

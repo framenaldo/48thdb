@@ -6,7 +6,11 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "README.md"
+      "README.md",
+      "docs/**",
+      "tools/**",
+      "package.json",
+      "package-lock.json"
     ]
   }
 }

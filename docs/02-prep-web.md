@@ -7,67 +7,79 @@
 - แก้รูปคนเดียว = ไฟล์ทั้งก้อนเปลี่ยน = ผู้ใช้ทุกคนโหลดใหม่ 1.4 MB
 - Apple/Google ไม่ได้ห้าม แต่รีวิวเวอร์เปิดแล้วค้าง = ความประทับใจแรกเสีย
 
-## ขั้นที่ 1 — แยกไฟล์ (ครึ่งวัน)
+## ขั้นที่ 1 — แยกไฟล์ ✅ ทำแล้ว
 
-เป้าหมาย:
+หน้าตาโปรเจกต์ตอนนี้:
 
 ```
-src/
-├── index.html      ← เหลือแต่โครง HTML (~200 บรรทัด)
-├── css/app.css     ← ทุกอย่างในแท็ก <style>
+48thdb/
+├── index.html      ← เหลือ 50 บรรทัด (โครง + แท็ก script/link)
+├── css/app.css     ← ทุกอย่างที่เคยอยู่ใน <style>  (107 KB)
 ├── js/
 │   ├── firebase.js ← config + init
-│   ├── data.js     ← SEED_* ทั้งหมด (ชั่วคราว ก่อนย้ายขึ้น Firestore)
-│   ├── i18n.js     ← EN, TH_*, localize()
-│   ├── ui.js       ← render*, การ์ด, โมดัล
-│   └── app.js      ← state, router, bootstrap
-└── assets/         ← รูป
+│   ├── data.js     ← GROUPS, TEAMS, SEED_* ทั้งหมด  (177 KB)
+│   ├── state.js    ← state + applyTheme + getter สั้น ๆ
+│   ├── i18n.js     ← EN, การแปลง TH↔EN, ฟอร์แมตวันที่  (71 KB)
+│   ├── storage.js  ← ทุกอย่างที่คุยกับ Firestore
+│   ├── render.js   ← การ์ด โมดัล ปฏิทิน เปรียบเทียบ  (48 KB)
+│   ├── feed.js     ← หน้าฟีด งาน วันเกิด  (98 KB)
+│   └── app.js      ← render root, history, event, init  (48 KB)
+├── assets/members/ ← รูปเมมเบอร์ 58 ไฟล์
+└── tools/          ← สคริปต์ช่วยงาน (ดูข้างล่าง)
 ```
 
-วิธีทำแบบไม่พัง: ทำทีละก้อน commit ทีละก้อน เปิดเว็บเช็กทุกครั้ง
-ลำดับที่ปลอดภัยที่สุดคือ CSS ก่อน (ย้ายไม่กระทบ logic) → data → i18n → ui → app
+ไฟล์ JS ทุกอันเป็นสคริปต์ธรรมดา (ไม่ใช่ ES module) โหลดเรียงกันใน `index.html`
+ตัวแปรและฟังก์ชันจึงยังเห็นกันหมดเหมือนตอนอยู่ไฟล์เดียว — **ลำดับของแท็ก
+`<script>` สำคัญ** ถ้าสลับ `data.js` ไปไว้หลัง `app.js` แอปจะพัง
 
-> บอกผมได้ ผมแยกให้ในรีโปนี้ได้เลย ใช้เวลาไม่นาน และเช็กว่าหน้าตาไม่เพี้ยนให้ด้วย
+### ตัวช่วยที่ได้มาด้วย: `tools/smoke.mjs`
 
-## ขั้นที่ 2 — เอารูปออกจาก base64 ไป Firebase Storage (1 วัน)
+การแก้แบบย้ายโค้ดไปมาแบบนี้ ดู diff ไม่ได้ว่าหน้าตาเปลี่ยนไหม เลยมีตัวทดสอบให้:
 
-### 2.1 เปิด Storage
-
-Firebase Console → Build → Storage → Get started → เลือก region `asia-southeast1`
-(สิงคโปร์ ใกล้ไทยสุด)
-
-### 2.2 สคริปต์แปลง base64 → ไฟล์จริง
-
-สร้าง `tools/extract-images.mjs`
-
-```js
-// ดึง data:image ทุกอันใน index.html ออกมาเป็นไฟล์ แล้วแทนที่ด้วย URL
-import fs from 'node:fs';
-
-const html = fs.readFileSync('index.html', 'utf8');
-const BASE = 'https://firebasestorage.googleapis.com/v0/b/<BUCKET>/o/members%2F';
-let out = html, n = 0;
-
-// จับคู่ id ของเมมเบอร์กับรูปที่อยู่ในบล็อกเดียวกัน
-out = out.replace(/id:\s*'([a-z0-9-]+)'([\s\S]{0,400}?)photo:\s*'data:image\/(\w+);base64,([^']+)'/g,
-  (m, id, mid, ext, b64) => {
-    fs.mkdirSync('assets/members', { recursive: true });
-    fs.writeFileSync(`assets/members/${id}.${ext}`, Buffer.from(b64, 'base64'));
-    n++;
-    return `id: '${id}'${mid}photo: 'assets/members/${id}.${ext}'`;
-  });
-
-fs.writeFileSync('index.html', out);
-console.log(`แยกรูปแล้ว ${n} ไฟล์`);
+```bash
+node tools/smoke.mjs before     # ถ่ายภาพ 8 หน้าหลักไว้ก่อนแก้
+# ...แก้โค้ด...
+node tools/smoke.mjs after      # ถ่ายอีกรอบ
+node tools/smoke.mjs --diff before after
 ```
+
+มันเปิดหน้าเว็บจริงใน Chromium ถ่ายสกรีนช็อตลง `.smoke/` และเทียบจำนวนอิลิเมนต์
+ข้อความ รูปที่โหลดไม่ขึ้น และ error ใน console ให้
+สำคัญ: มันรันกับ `tools/firebase-stub.js` **ไม่ใช่ Firebase จริง** จะได้ไม่ไปเขียนทับ
+ข้อมูลโอชิของผู้ใช้จริงตอนทดสอบ
+
+> ต้องมี playwright: `npm i -D playwright` (Chromium มีในเครื่องอยู่แล้วถ้าลง Chrome)
+
+## ขั้นที่ 2 — เอารูปออกจาก base64 ✅ ทำแล้ว (เหลือขั้นบีบรูป)
+
+รูปเมมเบอร์ 58 ใบ (604 KB) ออกมาอยู่ที่ `assets/members/<id>.jpg` แล้ว
+`index.html` จาก 1,376 KB เหลือ 559 KB และหลังแยกไฟล์ JS/CSS ออกไปอีก เหลือ 2.7 KB
+
+สคริปต์ที่ใช้คือ `tools/extract-images.mjs` (เก็บไว้เผื่อมีรูป base64 หลุดเข้ามาอีก)
+และ `<img>` ของอวาตาร์ทุกจุดได้ `loading="lazy" decoding="async"` แล้ว
+= รูปของเมมเบอร์ที่ยังไม่เลื่อนไปถึงจะไม่ถูกโหลด
+
+**สิ่งที่ยังควรทำต่อบนเครื่อง Mac** (ทำในคอนเทนเนอร์นี้ไม่ได้ ไม่มี imagemagick):
+บีบรูปให้เล็กลงอีก ดูขั้นที่ 2.2 ข้างล่าง — ตอนนี้เฉลี่ยใบละ ~10 KB ซึ่งโอเคอยู่แล้ว
+ทำหรือไม่ทำก็ได้
+
+<details>
+<summary>รายละเอียดวิธีทำ (เผื่ออยากรู้ว่าทำยังไง / ทำซ้ำในอนาคต)</summary>
+
+### 2.1 สคริปต์แปลง base64 → ไฟล์จริง
 
 ```bash
 node tools/extract-images.mjs
-ls -la assets/members | head          # ดูว่าได้รูปจริง
-du -sh index.html                     # ควรเหลือ ~200–300 KB
 ```
 
-### 2.3 บีบรูปก่อนอัปโหลด
+มันไล่หา `photo:'data:image/...;base64,...'` ทุกจุด เขียนออกเป็นไฟล์ตาม `id` ของเมมเบอร์
+แล้วแทนที่ด้วย path — เขียนทับ `index.html` เลย ฉะนั้น **commit ก่อนรัน** จะได้ย้อนได้
+
+จุดที่เกือบพลาด: ตอนแรกใช้ `[\s\S]*?` คั่นระหว่าง `id:` กับ `photo:` ทำให้ `id:` ของ
+ก้อน `GROUPS` ด้านบนไปจับคู่กับรูปของเมมเบอร์คนแรก เลยข้ามรูปนั้นไปหนึ่งใบ
+ตอนนี้ใช้ `[^{}]*?` คือห้ามข้ามปีกกา = ต้องอยู่ในอ็อบเจ็กต์เดียวกันเท่านั้น
+
+### 2.2 บีบรูปก่อนอัปโหลด (ทำบน Mac, ยังไม่ได้ทำ)
 
 ```bash
 brew install imagemagick webp
@@ -79,7 +91,7 @@ rm assets/members/*.png assets/members/*.jpg 2>/dev/null
 du -sh assets/members    # รูป 60 คน ควรอยู่ราว 2–4 MB รวมกัน
 ```
 
-### 2.4 เลือกที่เก็บ
+### 2.3 เลือกที่เก็บ (ตอนนี้ใช้ทาง A อยู่)
 
 มีสองทาง เลือกอย่างใดอย่างหนึ่ง
 
@@ -113,21 +125,21 @@ service firebase.storage {
 }
 ```
 
-### 2.5 โหลดรูปแบบขี้เกียจ (lazy)
-
-ในโค้ดที่สร้าง `<img>` ใส่สองอย่างนี้ทุกที่:
+### 2.4 โหลดรูปแบบขี้เกียจ (lazy) — ทำแล้ว
 
 ```html
-<img src="assets/members/emmy.webp" loading="lazy" decoding="async"
-     width="200" height="200" alt="เอ็มมี่">
+<img class="avatar-img" src="assets/members/bnk-emmy.jpg" alt=""
+     loading="lazy" decoding="async" onerror="this.remove()">
 ```
 
 `loading="lazy"` = รูปที่ยังไม่เลื่อนไปถึงจะไม่โหลด
-`width/height` = กันจอกระตุก (layout shift) ตอนรูปเข้ามา
+ถ้าจะทำต่อ: ใส่ `width`/`height` ให้รูปด้วย จะกันจอกระตุก (layout shift) ตอนรูปเข้ามา
+
+</details>
 
 ## ขั้นที่ 3 — ย้ายข้อมูลที่เปลี่ยนบ่อยขึ้น Firestore (2–3 วัน)
 
-ตอนนี้ `SEED_SCHEDULE` (บรรทัด ~2844) อยู่ในโค้ด แปลว่ามีงานใหม่ทีต้องแก้โค้ด
+ตอนนี้ `SEED_SCHEDULE` (อยู่ใน `js/data.js`) ยังอยู่ในโค้ด แปลว่ามีงานใหม่ทีต้องแก้โค้ด
 ย้ายขึ้น Firestore แล้วจะอัปเดตจากมือถือได้ ไม่ต้องเปิดคอม (ดู `05-updates.md`)
 
 ### 3.1 โครงฐานข้อมูลที่ควรเป็น
@@ -157,13 +169,17 @@ echo "tools/serviceAccount.json" >> .gitignore   # ห้าม commit เด็
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
 
 initializeApp({ cert: JSON.parse(readFileSync('tools/serviceAccount.json', 'utf8')) });
 const db = getFirestore();
 
-// export SEED_SCHEDULE ออกมาจาก data.js ก่อน (ขั้นที่ 1)
-const { SEED_SCHEDULE, SEED_SINGLES, SEED_ALBUMS, SEED_SENBATSU } =
-  await import('../src/js/data.js');
+// js/data.js เป็นสคริปต์ธรรมดา ไม่ใช่ ES module (ตั้งใจ — เบราว์เซอร์โหลดเรียงกัน)
+// ฝั่ง node เลยรันมันในแซนด์บ็อกซ์แล้วหยิบตัวแปรออกมา แทนที่จะ import
+const ctx = { console };
+vm.createContext(ctx);
+vm.runInContext(readFileSync('js/data.js', 'utf8'), ctx);
+const { SEED_SCHEDULE, SEED_SINGLES, SEED_ALBUMS, SEED_SENBATSU } = ctx;
 
 async function push(name, rows, idOf) {
   let batch = db.batch(), i = 0;

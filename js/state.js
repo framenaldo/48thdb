@@ -1,0 +1,38 @@
+// ============================= STATE =============================
+let state = {
+  view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
+  compareWith:null, comparePicking:false, compareQuery:'',
+  calMonth:null, calDay:null, posterOf:null,
+  lang:'th',
+  query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
+  favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
+  account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
+  showGraduated:false,
+  statsTab:'overview', advOpen:false, selectedSingle:null, discTab:'singles', stagesOpen:{},
+  ageMin:'', ageMax:'', heightMin:'', heightMax:'', birthMonth:'all',
+  theme: document.documentElement.dataset.theme || 'light'
+};
+
+function applyTheme(theme){
+  state.theme = theme;
+  document.documentElement.dataset.theme = theme;
+  try{ localStorage.setItem('48thdb-theme', theme); }catch(e){}
+  const btn = document.querySelector('.theme-btn');
+  if(btn) btn.innerHTML = theme==='dark' ? ICONS.sun : ICONS.moon;
+}
+
+// ============================= HELPERS =============================
+function getGroup(id){ return GROUPS.find(g=>g.id===id); }
+function getTeam(id){ return TEAMS.find(t=>t.id===id); }
+function getTeamsForGroup(gid){ return TEAMS.filter(t=>t.groupId===gid); }
+function getMember(id){ return state.members.find(m=>m.id===id); }
+
+/* ============================ LANGUAGE ============================
+   Thai is the source: every string in this file is written in Thai, and English
+   is produced from it by one table. Nothing that has no entry is touched, which
+   is what keeps song titles, venues and people's names in their own language.
+
+   Translation happens on the rendered page rather than at each of the ~580
+   places a string is written, so there is one place to correct a wording rather
+   than a hunt through the markup. Whole text nodes are matched, never fragments,
+   so a phrase can never be half-replaced inside a longer sentence. */

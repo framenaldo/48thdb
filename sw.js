@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v3';
+const VERSION = 'v4';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
@@ -20,13 +20,27 @@ const CACHEABLE_HOSTS = [
   'www.gstatic.com',
 ];
 
+// The page used to carry its own styles and scripts, so caching it cached the
+// whole app. Now that they are separate files they have to be named here, or a
+// first visit that goes offline before they are requested leaves an installed
+// app that opens to an empty shell.
+const SHELL = [
+  './css/app.css',
+  './js/firebase.js', './js/data.js', './js/state.js', './js/i18n.js',
+  './js/storage.js', './js/render.js', './js/feed.js', './js/app.js',
+];
+
 self.addEventListener('install', (event) => {
   // Take over as soon as the new worker is ready rather than waiting for every
   // tab to close, so a fix is not held hostage by a forgotten open tab.
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(PAGES).then(cache => cache.addAll(['./', './index.html']).catch(() => {}))
-  );
+  event.waitUntil((async () => {
+    const pages = await caches.open(PAGES);
+    await pages.addAll(['./', './index.html']).catch(() => {});
+    // Into ASSETS, because that is where the fetch handler looks for them.
+    const assets = await caches.open(ASSETS);
+    await assets.addAll(SHELL).catch(() => {});
+  })());
 });
 
 self.addEventListener('activate', (event) => {
