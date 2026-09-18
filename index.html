@@ -852,6 +852,30 @@
     .stage{ aspect-ratio:1/1; min-height:260px; }
   }
 
+  /* ---- the stats page's live tab ---- */
+  .lv-peak{ font-size:20px; }
+  /* names of pairs and counts with their unit need more room than the other tabs' bars */
+  .lv-stats-page .bar-row{ grid-template-columns:minmax(96px, 36%) minmax(0, 1fr) auto; }
+  .lv-stats-page .bar-val{ min-width:56px; text-align:right; white-space:nowrap; }
+  .lv-chart-wide{ height:150px; }
+  .lv-heat{
+    display:grid; grid-template-columns:30px repeat(24, minmax(0, 1fr)); gap:2px; align-items:center;
+    font-variant-numeric:tabular-nums;
+  }
+  .lv-heat-hr{ font-size:9.5px; color:var(--ink-soft); text-align:left; }
+  .lv-heat-day{ font-size:10.5px; font-weight:700; color:var(--ink-soft); }
+  .lv-heat-cell{
+    aspect-ratio:1; border-radius:3px;
+    background:color-mix(in srgb, #E4457E calc(var(--a) * 100%), color-mix(in srgb, var(--ink) 6%, transparent));
+  }
+  .lv-top-slots{ margin:12px 0 0; padding-left:20px; font-size:13px; line-height:1.7; color:var(--ink-soft); }
+  .lv-top-slots strong{ color:var(--ink); }
+  .lv-days{ display:flex; flex-direction:column; gap:10px; }
+  .lv-day{ padding:10px 12px; border:1px solid var(--line); border-radius:14px; }
+  .lv-day-head{ display:flex; justify-content:space-between; gap:10px; font-size:13.5px; font-weight:700; }
+  .lv-day-head strong{ color:var(--ink); white-space:nowrap; }
+  .lv-day-names{ margin-top:4px; font-size:12.5px; line-height:1.7; color:var(--ink-soft); }
+  .lv-day-names .link-inline{ color:var(--c); }
   /* ---- a member's lives: four figures, a year of months, the latest three ---- */
   .lv{ margin-top:6px; }
   .lv-head{ display:flex; align-items:center; gap:10px; }
@@ -4545,6 +4569,7 @@ const EN = {
   'วันสุดท้าย': 'Last day',
   'คลิปประกาศ ↗': 'Announcement video ↗',
   'ไทม์ไลน์ทั้งงาน →': 'Full timeline →',
+  'ไลฟ์': 'Lives',
   'ไทม์ไลน์ GE2026': 'GE2026 timeline',
   'ไม่พบไทม์ไลน์': 'No timeline found',
   'ร้านค้า': 'Shop',
@@ -7792,7 +7817,8 @@ const STATS_TABS = [
   { id:'overview',  label:'ภาพรวม' },
   { id:'songs',     label:'เพลง' },
   { id:'birthdays', label:'วันเกิด' },
-  { id:'timeline',  label:'ไทม์ไลน์' }
+  { id:'timeline',  label:'ไทม์ไลน์' },
+  { id:'lives',     label:'ไลฟ์' }
 ];
 
 function renderBar(label, value, max, color, drill){
@@ -8194,10 +8220,114 @@ function renderStatsTimeline(){
   </div>`;
 }
 
+/* Everyone's iAM48 lives together, from the `stats` block the nightly job
+   writes into data/lives.json. Start times are all that is published, so every
+   figure here is about when and how often. */
+function renderStatsLives(){
+  if(!LIVES){ loadLives(); return `<p class="muted-note">${isEN() ? 'Loading…' : 'กำลังโหลด...'}</p>`; }
+  const S = LIVES.stats;
+  if(!S) return `<p class="muted-note">${isEN() ? 'No live data yet.' : 'ยังไม่มีข้อมูลไลฟ์'}</p>`;
+  const en = isEN();
+  const M = monthsShort();
+  const DAYS = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  const DAYS_LONG = en ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+    : ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
+  const nick = id => { const m = getMember(id); return m ? (en ? m.name : (m.nameTh || m.name)) : id; };
+  const colour = id => { const m = getMember(id); return m ? getGroup(m.groupId).color : 'var(--ink-soft)'; };
+  const pairColour = (a, b) => { const x = getMember(a), y = getMember(b);
+    return x && y && x.groupId === y.groupId ? getGroup(x.groupId).color : 'var(--gold)'; };
+  const unit = (n, th, one, many) => en ? `${n} ${n === 1 ? one : many}` : `${n} ${th}`;
+  const since = new Date(S.since);
+  const hh = n => `${String(n).padStart(2,'0')}:00`;
+
+  // the busiest hour of the week, and the three busiest slots in words for a phone
+  const slots = [];
+  S.heat.forEach((row, d) => row.forEach((n, hr) => slots.push({ d, hr, n })));
+  slots.sort((a, b) => b.n - a.n);
+  const peak = slots[0];
+  const heatMax = Math.max(1, peak.n);
+
+  // twelve months, all members together
+  const now = new Date();
+  const months = [];
+  for(let i = 11; i >= 0; i--){
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}`;
+    months.push({ n: S.months[key] || 0, label: M[d.getMonth()], year: d.getFullYear(), current: i === 0 });
+  }
+  const mTop = Math.max(1, ...months.map(x => x.n));
+
+  const memberBars = (rows, th, one, many) => rows.filter(([id, n]) => n && getMember(id)).map(([id, n]) =>
+    renderBarLink(nick(id), n, rows[0][1], colour(id), 'open-member', { id })
+      .replace(`<span class="bar-val">${n}</span>`, `<span class="bar-val">${unit(n, th, one, many)}</span>`)).join('');
+  const pairBars = (rows, th, one, many) => rows.filter(r => getMember(r[0]) && getMember(r[1])).map(([a, b, n]) =>
+    renderBar(`${nick(a)} × ${nick(b)}`, n, rows[0][2], pairColour(a, b))
+      .replace(`<span class="bar-val">${n}</span>`, `<span class="bar-val">${unit(n, th, one, many)}</span>`)).join('');
+  const card = (title, body, note) => `<div class="group-card" style="--c:var(--gold)">
+    <div class="group-head"><h2 style="font-size:21px;">${title}</h2></div>${body}
+    ${note ? `<p class="stats-note">${note}</p>` : ''}</div>`;
+  const fmtDate = iso => { const d = new Date(iso + 'T00:00:00');
+    return `${en ? '' : DAYS_LONG[d.getDay()] + 'ที่ '}${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()}`; };
+  const upd = LIVES.updated ? new Date(LIVES.updated) : null;
+
+  return `<div class="lv-stats-page">
+  <div class="stat-grid">
+    <div class="stat-cell"><div class="label">${en ? 'All lives' : 'ไลฟ์ทั้งหมด'}</div><div class="value">${S.total.toLocaleString()}</div></div>
+    <div class="stat-cell"><div class="label">${en ? `In ${now.getFullYear()}` : `ในปี ${now.getFullYear()}`}</div><div class="value">${S.year.toLocaleString()}</div></div>
+    <div class="stat-cell"><div class="label">${en ? 'Last 30 days' : '30 วันล่าสุด'}</div><div class="value">${S.last30.toLocaleString()}</div></div>
+    <div class="stat-cell"><div class="label">${en ? 'Busiest hour' : 'ช่วงที่ไลฟ์มากที่สุด'}</div><div class="value lv-peak">${DAYS[peak.d]} ${hh(peak.hr)}</div></div>
+  </div>
+
+  ${card(en ? 'Lives per month, everyone' : 'ไลฟ์รวมทุกคน รายเดือน', `
+    <div class="lv-chart lv-chart-wide" style="--c:var(--gold)">${months.map(x => {
+      const tip = `${x.label} ${x.year} · ${x.n}${x.current ? (en ? ' so far' : ' (เดือนนี้)') : ''}`;
+      return `<div class="lv-col${x.current ? ' is-current' : ''}" title="${escapeAttr(tip)}" aria-label="${escapeAttr(tip)}" role="img">
+        <span class="lv-val">${x.n}</span>
+        <span class="lv-bar" style="height:${x.n ? Math.max(4, Math.round(x.n / mTop * 100)) : 0}%"></span>
+        <span class="lv-mon">${x.label}</span></div>`; }).join('')}</div>`,
+    en ? 'The current month is still counting.' : 'เดือนปัจจุบันยังนับไม่ครบเดือน')}
+
+  ${card(en ? 'When the members go live' : 'วันและเวลาที่สมาชิกไลฟ์', `
+    <div class="lv-heat" role="table" aria-label="${en ? 'Lives by day and hour' : 'จำนวนไลฟ์ตามวันและชั่วโมง'}">
+      <span class="lv-heat-corner"></span>
+      ${Array.from({ length: 24 }, (_, hr) => `<span class="lv-heat-hr">${hr % 3 === 0 ? hr : ''}</span>`).join('')}
+      ${S.heat.map((row, d) => `<span class="lv-heat-day">${DAYS[d]}</span>${row.map((n, hr) =>
+        `<span class="lv-heat-cell" style="--a:${n ? (0.08 + 0.92 * n / heatMax).toFixed(3) : 0}"
+          title="${DAYS_LONG[d]} ${hh(hr)}–${hh((hr + 1) % 24)} · ${n}"></span>`).join('')}`).join('')}
+    </div>
+    <ol class="lv-top-slots">${slots.slice(0, 3).map(x =>
+      `<li><strong>${DAYS_LONG[x.d]} ${hh(x.hr)}–${hh((x.hr + 1) % 24)}${en ? '' : ' น.'}</strong> · ${unit(x.n, 'ไลฟ์', 'live', 'lives')}</li>`).join('')}</ol>`,
+    en ? 'Thai time. The darker the square, the more lives start in that hour.' : 'เวลาไทย ยิ่งช่องเข้มยิ่งมีไลฟ์เริ่มในชั่วโมงนั้นมาก')}
+
+  ${card(en ? 'Most lives, all time' : 'ไลฟ์มากที่สุด ตลอดกาล', memberBars(S.topAll, 'ไลฟ์', 'live', 'lives'),
+    en ? `Counted from ${M[since.getMonth()]} ${since.getFullYear()}, as far back as the app keeps.` : `นับตั้งแต่ ${M[since.getMonth()]} ${since.getFullYear()} เท่าที่แอปเก็บไว้ สมาชิกที่เข้ามาทีหลังจึงมีเวลานับน้อยกว่า`)}
+  ${card(en ? 'Most lives, last 30 days' : 'ไลฟ์มากที่สุด 30 วันล่าสุด', memberBars(S.top30, 'ไลฟ์', 'live', 'lives'))}
+
+  ${card(en ? 'Most often live on the same day' : 'คู่ที่ไลฟ์วันเดียวกันบ่อยที่สุด', pairBars(S.sameDay, 'วัน', 'day', 'days'),
+    en ? 'Days on which both went live, at any time.' : 'นับวันที่ทั้งสองคนไลฟ์ ไม่ว่าจะเวลาไหนของวัน')}
+  ${card(en ? 'Most often live at the same time' : 'คู่ที่เริ่มไลฟ์เวลาเดียวกันบ่อยที่สุด', pairBars(S.together, 'ครั้ง', 'time', 'times'),
+    en ? 'Lives that started within 15 minutes of each other.' : 'นับครั้งที่เริ่มไลฟ์ห่างกันไม่เกิน 15 นาที')}
+
+  ${card(en ? 'Days the most members went live' : 'วันที่มีสมาชิกไลฟ์มากที่สุด', `<div class="lv-days">${S.busiestDays.slice(0, 6).map(([d, ids]) => {
+      const shown = ids.filter(getMember);
+      return `<div class="lv-day"><div class="lv-day-head"><span>${fmtDate(d)}</span><strong>${unit(shown.length, 'คน', 'member', 'members')}</strong></div>
+        <div class="lv-day-names">${shown.map(id => `<button class="link-inline" data-action="open-member" data-id="${id}" style="--c:${colour(id)}">${escapeHtml(nick(id))}</button>`).join(' · ')}</div></div>`;
+    }).join('')}</div>`)}
+
+  ${card(en ? 'Longest run of days in a row' : 'ไลฟ์ติดต่อกันหลายวันที่สุด', memberBars(S.streaks, 'วัน', 'day', 'days'))}
+  ${card(en ? 'Most lives in a single day' : 'ไลฟ์หลายครั้งที่สุดในวันเดียว', memberBars(S.mostInDay, 'ครั้ง', 'time', 'times'))}
+  ${card(en ? 'Live on her own birthday' : 'ไลฟ์ในวันเกิดตัวเองบ่อยที่สุด', memberBars(S.birthday, 'ปี', 'year', 'years'),
+    en ? 'Birthdays on which she went live.' : 'นับปีที่ไลฟ์ในวันเกิดของตัวเอง')}
+
+  <p class="stats-note">${en ? 'From the iAM48 catch-up lists of the current members' : 'ข้อมูลจากหน้า Catch-up ของ iAM48 เฉพาะสมาชิกปัจจุบัน'}${upd ? ` · ${en ? 'updated' : 'อัปเดต'} ${upd.getDate()} ${M[upd.getMonth()]} ${String(upd.getHours()).padStart(2,'0')}:${String(upd.getMinutes()).padStart(2,'0')}${en ? '' : ' น.'}` : ''}</p>
+  </div>`;
+}
+
 function renderStats(){
   const body = state.statsTab==='birthdays' ? renderStatsBirthdays()
              : state.statsTab==='timeline'  ? renderStatsTimeline()
              : state.statsTab==='songs'     ? renderStatsSongs()
+             : state.statsTab==='lives'     ? renderStatsLives()
              : renderStatsOverview();
   return `
   <div class="filter-bar">
