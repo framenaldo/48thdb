@@ -1558,6 +1558,7 @@
   /* The campaign timeline: a block per month, and inside it one framed row per
      step, coloured down its left edge by what kind of step it is. On a phone
      the row stacks so the title has the full width to itself. */
+  .tl-month{ margin:0; }
   .tl-month-head{
     display:flex; align-items:baseline; justify-content:space-between; gap:10px;
     margin:16px 0 8px; font-size:13.5px; font-weight:800; color:var(--c);
@@ -1569,27 +1570,46 @@
     font:inherit; font-size:12px; font-weight:700; color:var(--ink-soft); cursor:pointer;
   }
   .tl-past-btn:hover{ color:var(--ink); border-color:color-mix(in srgb, var(--c) 40%, var(--line)); }
-  .ge-timeline{ list-style:none; display:flex; flex-direction:column; gap:8px; margin:0; padding:0; }
-  .tl-row{
-    display:block; padding:10px 13px; border:1px solid var(--line);
-    border-left:4px solid var(--k); border-radius:14px;
-    background:color-mix(in srgb, var(--c) 4%, transparent);
-  }
+  .ge-timeline{ list-style:none; display:flex; flex-direction:column; gap:0; margin:0; padding:0; }
+  /* The rail runs down the first column and joins between rows because the
+     space under a card is the card's own margin, inside the row. */
+  .tl-row{ display:grid; grid-template-columns:20px minmax(0, 1fr); grid-template-rows:auto auto; }
   .tl-row.is-done{ opacity:.55; }
-  .tl-row.is-on{
-    border-color:color-mix(in srgb, var(--k) 55%, var(--line)); border-left-color:var(--k);
-    background:color-mix(in srgb, var(--k) 12%, transparent);
+  .tl-rail{ grid-column:1; grid-row:1 / span 2; position:relative; }
+  .tl-rail::before{
+    content:''; position:absolute; left:50%; top:0; bottom:0; width:2px;
+    transform:translateX(-50%); background:color-mix(in srgb, var(--c) 42%, transparent);
+  }
+  .tl-row:first-child .tl-rail::before{ top:8px; }
+  .tl-row:last-child .tl-rail::before{ bottom:calc(100% - 8px); }
+  .tl-rail::after{
+    content:''; position:absolute; left:50%; top:8px; width:11px; height:11px;
+    margin:-5.5px 0 0 -5.5px; border-radius:50%; background:var(--k);
+    box-shadow:0 0 0 3px var(--sheet-bg, var(--paper));
+  }
+  .tl-row.is-on .tl-rail::after{
+    box-shadow:0 0 0 3px var(--sheet-bg, var(--paper)), 0 0 0 6px color-mix(in srgb, var(--k) 32%, transparent);
   }
   .tl-when{
-    display:flex; flex-wrap:wrap; align-items:baseline; gap:0 6px;
-    font-size:13px; font-weight:800; color:var(--c); line-height:1.35;
+    grid-column:2; grid-row:1; display:flex; flex-wrap:wrap; align-items:baseline; gap:0 6px;
+    padding:0 0 3px; font-size:13px; font-weight:800; color:var(--c); line-height:1.35;
   }
   .tl-to{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }
   .tl-what{
-    display:block; width:100%; margin:3px 0 0; padding:0; text-align:left;
-    font:inherit; color:inherit; background:none; border:0;
+    grid-column:2; grid-row:2; display:block; width:100%; margin:0 0 10px;
+    padding:10px 13px; text-align:left; font:inherit; color:inherit;
+    border:1px solid var(--line); border-left:4px solid var(--k); border-radius:14px;
+    background:color-mix(in srgb, var(--c) 4%, transparent);
   }
-  .tl-what.is-link{ cursor:pointer; }
+  .tl-row.is-on .tl-what{
+    border-color:color-mix(in srgb, var(--k) 55%, var(--line)); border-left-color:var(--k);
+    background:color-mix(in srgb, var(--k) 12%, transparent);
+  }
+  .tl-what.is-link{ cursor:pointer; transition:background .15s ease, border-color .15s ease; }
+  .tl-what.is-link:hover{
+    background:color-mix(in srgb, var(--k) 12%, transparent);
+    border-color:color-mix(in srgb, var(--k) 40%, var(--line));
+  }
   .tl-kind{
     display:inline-block; padding:2px 8px; border-radius:999px; background:var(--k);
     color:#fff; font-size:10.5px; font-weight:800;
@@ -2193,9 +2213,17 @@
     .dtable .col-height, .dtable.grad-mode .col-height{ width:max(108px, calc(var(--tw) * .115)); }
     .dtable .col-fav{ width:max(36px, calc(var(--tw) * .05)); }
     .modal-glass-card .stat-cell{ flex-basis:130px; }
-    .tl-row{ display:grid; grid-template-columns:92px minmax(0, 1fr); gap:0 14px; align-items:start; padding:11px 14px; }
-    .tl-when{ flex-direction:column; gap:0; padding-top:1px; }
-    .tl-what{ margin:0; }
+    /* room enough to put the dates in a column of their own beside the rail */
+    .tl-row{ grid-template-columns:84px 20px minmax(0, 1fr); grid-template-rows:auto; }
+    .tl-when{
+      grid-column:1; grid-row:1; flex-direction:column; align-items:flex-end;
+      gap:0; padding:9px 10px 0 0; text-align:right;
+    }
+    .tl-rail{ grid-column:2; grid-row:1; }
+    .tl-what{ grid-column:3; grid-row:1; padding:11px 14px; }
+    .tl-row:first-child .tl-rail::before{ top:20px; }
+    .tl-row:last-child .tl-rail::before{ bottom:calc(100% - 20px); }
+    .tl-rail::after{ top:20px; }
 
     /* songs: singles, albums and specials as three columns */
     .disc-tabs{ display:none; }
@@ -6456,6 +6484,7 @@ function renderTimeline(id){
       ${it.note ? `<span class="tl-note">${escapeHtml(it.note)}</span>` : ''}`;
     return `<li class="tl-row${done ? ' is-done' : ''}${on ? ' is-on' : ''}${next ? ' is-next' : ''}" style="--k:${k.color}">
       <span class="tl-when">${day(it.d)}${it.to ? `<span class="tl-to">– ${day(it.to)}</span>` : ''}</span>
+      <span class="tl-rail" aria-hidden="true"></span>
       ${it.ev ? `<button class="tl-what is-link" data-action="open-event" data-id="${it.ev}">${body}</button>`
               : `<span class="tl-what">${body}</span>`}
     </li>`;
