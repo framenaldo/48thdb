@@ -1560,6 +1560,24 @@
      the row stacks so the title has the full width to itself. */
   .tl-month{ margin:0; }
   .tl-month-head{ margin:16px 0 8px; font-size:13.5px; font-weight:800; color:var(--c); }
+  .tl-legend{ display:flex; flex-wrap:wrap; gap:4px 14px; margin:8px 0 2px; }
+  .tl-leg{ display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .tl-leg i{ width:9px; height:9px; border-radius:50%; background:var(--k); flex:none; }
+  /* An opening or a closing keeps its colour and its place on the rail, but
+     drops the card: one quiet line beside a smaller dot. */
+  .tl-row.is-minor{ --dot:9px; grid-template-columns:20px auto minmax(0, 1fr); grid-template-rows:auto; align-items:baseline; }
+  .tl-row.is-minor .tl-rail{ grid-column:1; grid-row:1; align-self:stretch; }
+  .tl-row.is-minor .tl-rail::after{ width:7px; height:7px; margin:-3.5px 0 0 -3.5px; }
+  .tl-row.is-minor .tl-when{ grid-column:2; grid-row:1; padding:0 8px 0 0; font-size:12px; }
+  .tl-row.is-minor .tl-what{
+    grid-column:3; grid-row:1; margin:0 0 9px; padding:0;
+    border:0; background:none;
+  }
+  .tl-row.is-minor .tl-title{
+    display:inline; margin:0; font-size:12.5px; font-weight:600; color:var(--ink-soft);
+  }
+  .tl-row.is-minor .tl-time{ margin:0 5px 0 0; font-size:12px; }
+  .tl-row.is-minor.is-on .tl-title{ color:var(--c); font-weight:700; }
   .tl-past-btn{
     display:inline-flex; align-items:center; gap:6px; margin:2px 0 2px; padding:5px 12px;
     border:1px solid var(--line); border-radius:999px; background:var(--glass-card);
@@ -1569,17 +1587,17 @@
   .ge-timeline{ list-style:none; display:flex; flex-direction:column; gap:0; margin:0; padding:0; }
   /* The rail runs down the first column and joins between rows because the
      space under a card is the card's own margin, inside the row. */
-  .tl-row{ display:grid; grid-template-columns:20px minmax(0, 1fr); grid-template-rows:auto auto; }
+  .tl-row{ --dot:8px; display:grid; grid-template-columns:20px minmax(0, 1fr); grid-template-rows:auto auto; }
   .tl-row.is-done{ opacity:.55; }
   .tl-rail{ grid-column:1; grid-row:1 / span 2; position:relative; }
   .tl-rail::before{
     content:''; position:absolute; left:50%; top:0; bottom:0; width:2px;
     transform:translateX(-50%); background:color-mix(in srgb, var(--c) 42%, transparent);
   }
-  .tl-row:first-child .tl-rail::before{ top:8px; }
-  .tl-row:last-child .tl-rail::before{ bottom:calc(100% - 8px); }
+  .tl-row:first-child .tl-rail::before{ top:var(--dot); }
+  .tl-row:last-child .tl-rail::before{ bottom:calc(100% - var(--dot)); }
   .tl-rail::after{
-    content:''; position:absolute; left:50%; top:8px; width:11px; height:11px;
+    content:''; position:absolute; left:50%; top:var(--dot); width:11px; height:11px;
     margin:-5.5px 0 0 -5.5px; border-radius:50%; background:var(--k);
     box-shadow:0 0 0 3px var(--sheet-bg, var(--paper));
   }
@@ -2217,9 +2235,11 @@
     }
     .tl-rail{ grid-column:2; grid-row:1; }
     .tl-what{ grid-column:3; grid-row:1; padding:11px 14px; }
-    .tl-row:first-child .tl-rail::before{ top:20px; }
-    .tl-row:last-child .tl-rail::before{ bottom:calc(100% - 20px); }
-    .tl-rail::after{ top:20px; }
+    .tl-row{ --dot:20px; }
+    .tl-row.is-minor{ --dot:10px; grid-template-columns:84px 20px minmax(0, 1fr); }
+    .tl-row.is-minor .tl-when{ grid-column:1; padding:0 10px 0 0; }
+    .tl-row.is-minor .tl-rail{ grid-column:2; }
+    .tl-row.is-minor .tl-what{ grid-column:3; }
 
     /* songs: singles, albums and specials as three columns */
     .disc-tabs{ display:none; }
@@ -3216,42 +3236,57 @@ SEED_SCHEDULE.forEach(e => {
 
 /* The election is not one day but two months of deadlines, so the events that
    belong to it share one timeline, keyed by `timeline` on the event. */
+/* The election is not one day but two months of deadlines, so the events that
+   belong to it share one timeline, keyed by `timeline` on the event. Each step
+   carries the strand of the campaign it belongs to (`track`), which is what
+   gives it its colour; `kind` only says what sort of step it is. */
 const TIMELINES = {
   ge2026: [
-    { d:'2026-09-26', time:'12:00', kind:'start',
+    { d:'2026-09-26', time:'12:00', kind:'start', track:'single',
       title:'เปิดพรีออเดอร์ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"',
       note:'Physical Edition, Digital Edition และ Special Photoset', ev:'ev-ge6-single' },
-    { d:'2026-10-01', time:'12:00', kind:'vote', title:'เปิดโหวต', ev:'ev-election-voting' },
-    { d:'2026-10-03', to:'2026-10-04', kind:'event', title:'BNK48 & CGM48 Fan Festival 2026',
+    { d:'2026-10-01', time:'12:00', kind:'vote', track:'vote', title:'เปิดโหวต', ev:'ev-election-voting' },
+    { d:'2026-10-03', to:'2026-10-04', kind:'event', track:'event', title:'BNK48 & CGM48 Fan Festival 2026',
       venue:'MCC Hall, The Mall Lifestore Bangkapi', ev:'ev-election-fanfest',
       note:'3 ต.ค. ประกาศผลโหวต 48 ชั่วโมงแรก และเปิดตัวเพลง "Kimi to Doko ka e Ikitai" ครั้งแรก' },
-    { d:'2026-10-07', time:'12:00', kind:'start', title:'เปิดให้แลกบัตร Meeting You Online' },
-    { d:'2026-10-30', time:'23:00', kind:'end', title:'ปิดพรีออเดอร์ซิงเกิลพิเศษ Physical Edition', ev:'ev-ge6-single' },
-    { d:'2026-10-31', to:'2026-11-01', kind:'event', title:'Handshake Event ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"',
+    { d:'2026-10-07', time:'12:00', kind:'start', track:'myo', title:'เปิดให้แลกบัตร Meeting You Online' },
+    { d:'2026-10-30', time:'23:00', kind:'end', track:'single', title:'ปิดพรีออเดอร์ซิงเกิลพิเศษ Physical Edition', ev:'ev-ge6-single' },
+    { d:'2026-10-31', to:'2026-11-01', kind:'event', track:'single', title:'Handshake Event ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"',
       venue:'MCC Hall, The Mall Lifestore Ngamwongwan', ev:'ev-ge6-handshake' },
-    { d:'2026-11-03', time:'23:00', kind:'end', title:'ปิดแลกบัตร Meeting You Online [Round 1]' },
-    { d:'2026-11-05', to:'2026-11-08', kind:'online', title:'Meeting You Online [Round 1]',
+    { d:'2026-11-03', time:'23:00', kind:'end', track:'myo', title:'ปิดแลกบัตร Meeting You Online [Round 1]' },
+    { d:'2026-11-05', to:'2026-11-08', kind:'online', track:'myo', title:'Meeting You Online [Round 1]',
       venue:'iAM48 Application', ev:'ev-ge6-myo1' },
-    { d:'2026-11-10', time:'23:00', kind:'end', title:'ปิดพรีออเดอร์ Digital Edition และ Special Photoset', ev:'ev-ge6-photoset' },
-    { d:'2026-11-12', time:'21:00', kind:'vote', title:'ปิดโหวต', ev:'ev-election-voting' },
-    { d:'2026-11-14', part:'รอบกลางวัน', kind:'concert', title:'BNK48 & CGM48 Concert 2026', ev:'ev-concert-2026' },
-    { d:'2026-11-14', part:'รอบค่ำ', kind:'result',
+    { d:'2026-11-10', time:'23:00', kind:'end', track:'single', title:'ปิดพรีออเดอร์ Digital Edition และ Special Photoset', ev:'ev-ge6-photoset' },
+    { d:'2026-11-12', time:'21:00', kind:'vote', track:'vote', title:'ปิดโหวต', ev:'ev-election-voting' },
+    { d:'2026-11-14', part:'รอบกลางวัน', kind:'concert', track:'event', title:'BNK48 & CGM48 Concert 2026', ev:'ev-concert-2026' },
+    { d:'2026-11-14', part:'รอบค่ำ', kind:'result', track:'vote',
       title:'ประกาศผล Senbatsu General Election 2026', ev:'ev-election-results' },
-    { d:'2026-11-15', kind:'event', title:'Senbatsu General Election 2026 : Heart to Heart', ev:'ev-ge6-heart' },
-    { d:'2026-11-24', time:'23:00', kind:'end', title:'ปิดแลกบัตร Meeting You Online [Round 2]' },
-    { d:'2026-11-26', to:'2026-11-29', kind:'online', title:'Meeting You Online [Round 2]',
+    { d:'2026-11-15', kind:'event', track:'event', title:'Senbatsu General Election 2026 : Heart to Heart', ev:'ev-ge6-heart' },
+    { d:'2026-11-24', time:'23:00', kind:'end', track:'myo', title:'ปิดแลกบัตร Meeting You Online [Round 2]' },
+    { d:'2026-11-26', to:'2026-11-29', kind:'online', track:'myo', title:'Meeting You Online [Round 2]',
       venue:'iAM48 Application', ev:'ev-ge6-myo2' },
   ],
 };
-const TL_KINDS = {
-  start:   { th:'เริ่ม',       color:'#1E9E57' },
-  end:     { th:'สิ้นสุด',     color:'#C8231A' },
-  vote:    { th:'ช่วงโหวต',    color:'#C8961E' },
-  event:   { th:'งานอีเวนต์',  color:'#3A66D6' },
-  online:  { th:'ออนไลน์',     color:'#138A8A' },
-  concert: { th:'คอนเสิร์ต',   color:'#8E44AD' },
-  result:  { th:'ประกาศผล',    color:'#C8231A' },
+/* One colour per strand, so a reader can follow the single, or the vote, or
+   Meeting You Online, straight down the page. */
+const TL_TRACKS = {
+  vote:   { th:'การโหวต',            color:'#C8961E' },
+  single: { th:'ซิงเกิลพิเศษ',        color:'#3A66D6' },
+  myo:    { th:'Meeting You Online', color:'#1E9E57' },
+  event:  { th:'งานอีเวนต์',          color:'#8E44AD' },
 };
+const TL_KINDS = {
+  start:   { th:'เริ่ม' },
+  end:     { th:'สิ้นสุด' },
+  vote:    { th:'ช่วงโหวต' },
+  event:   { th:'งานอีเวนต์' },
+  online:  { th:'ออนไลน์' },
+  concert: { th:'คอนเสิร์ต' },
+  result:  { th:'ประกาศผล' },
+};
+/* Opening and closing dates matter, but they are not the day out: they read as
+   one quiet line instead of a card. */
+const TL_MINOR = { start:1, end:1 };
 
 const SEED_SENBATSU = {
   'bnk-s1': [
@@ -4346,6 +4381,7 @@ const EN = {
   'วันสุดท้าย': 'Last day',
   'คลิปประกาศ ↗': 'Announcement video ↗',
   'ไทม์ไลน์ทั้งงาน': 'Full timeline',
+  'การโหวต': 'Voting',
   'ซ่อนรายการที่ผ่านไปแล้ว': 'Hide what has passed',
   'ถัดไป': 'Next',
   'เริ่ม': 'Start',
@@ -6466,17 +6502,20 @@ function renderTimeline(id){
 
   const row = it => {
     const k = TL_KINDS[it.kind] || TL_KINDS.event;
+    const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
+    const minor = !!TL_MINOR[it.kind];
     const done = endOf(it) < iso;
     const on = it.d <= iso && endOf(it) >= iso;
     const next = !on && !done && it.d === nextD;
-    const body = `<span class="tl-kind">${k.th}</span>
+    // a deadline says what it is in its own title, so it needs no badge
+    const body = `${minor ? '' : `<span class="tl-kind">${k.th}</span>`}
       ${it.time ? `<span class="tl-time">${it.time} น.</span>` : ''}
       ${it.part ? `<span class="tl-time">${escapeHtml(it.part)}</span>` : ''}
       ${on ? '<span class="tl-now">วันนี้</span>' : next ? '<span class="tl-next">ถัดไป</span>' : ''}
       <span class="tl-title">${escapeHtml(it.title)}</span>
       ${it.venue ? `<span class="tl-venue">${escapeHtml(it.venue)}</span>` : ''}
       ${it.note ? `<span class="tl-note">${escapeHtml(it.note)}</span>` : ''}`;
-    return `<li class="tl-row${done ? ' is-done' : ''}${on ? ' is-on' : ''}${next ? ' is-next' : ''}" style="--k:${k.color}">
+    return `<li class="tl-row${minor ? ' is-minor' : ''}${done ? ' is-done' : ''}${on ? ' is-on' : ''}${next ? ' is-next' : ''}" style="--k:${tr.color}">
       <span class="tl-when">${day(it.d)}${it.to ? `<span class="tl-to">– ${day(it.to)}</span>` : ''}</span>
       <span class="tl-rail" aria-hidden="true"></span>
       ${it.ev ? `<button class="tl-what is-link" data-action="open-event" data-id="${it.ev}">${body}</button>`
@@ -6492,7 +6531,10 @@ function renderTimeline(id){
     </div>`;
   }).join('');
 
+  const tracks = [...new Set(shown.map(it => it.track))].filter(t => TL_TRACKS[t]);
   return `<h3 class="evm-head">ไทม์ไลน์ทั้งงาน</h3>
+    <div class="tl-legend">${tracks.map(t =>
+      `<span class="tl-leg" style="--k:${TL_TRACKS[t].color}"><i></i>${TL_TRACKS[t].th}</span>`).join('')}</div>
     ${passed.length ? `<button class="tl-past-btn" data-action="toggle-tl-past">${
       state.tlPast ? 'ซ่อนรายการที่ผ่านไปแล้ว' : `ดูรายการที่ผ่านไปแล้ว (${passed.length})`}</button>` : ''}
     ${blocks}`;
