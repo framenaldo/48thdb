@@ -403,6 +403,11 @@
   .avatar-sm, .detail-avatar{ position:relative; overflow:hidden; }
   .avatar-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .avatar-fallback{ position:relative; z-index:0; }
+  .avatar-sm, .detail-avatar, .org-avatar, .seat-avatar, .bday-today-face, .evm-face-img{ container-type:inline-size; }
+  .avatar-name{
+    font-size:min(calc(150cqi / var(--n)), 34cqi); line-height:1; font-weight:700;
+    white-space:nowrap; letter-spacing:-.01em; max-width:92%; overflow:hidden; text-overflow:clip;
+  }
 
   .chip-row{ display:flex; gap:5px; margin-top:9px; flex-wrap:wrap; }
   .chip{
@@ -924,6 +929,7 @@
     transition:border-color .15s ease, transform .15s ease;
   }
   .yt-btn svg{ width:20px; height:20px; display:block; }
+  .yt-views{ padding-left:7px; border-left:1px solid var(--line); font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
   .yt-btn:hover{ border-color:#FF0000; }
   .yt-btn:active{ transform:scale(.95); }
   .social-row{ display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 2px; }
@@ -5581,11 +5587,18 @@ function secondName(m){
   return (isEN() ? (m.realName || m.realNameTh) : (m.realNameTh || m.realName)) || '';
 }
 
+/* Without a photo a circle carries the member's whole nickname, sized to fit
+   it, since a lone initial says nothing on a stage plan full of them. Thai
+   vowel and tone marks take no width, so they are left out of the count. */
+function avatarName(m){
+  const name = (isEN() ? (m.name || m.nameTh) : (m.nameTh || m.name)) || '?';
+  const width = name.replace(/[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/g, '').length;
+  return `<span class="avatar-fallback avatar-name" style="--n:${Math.max(width, 2)}">${escapeHtml(name)}</span>`;
+}
+
 function renderAvatar(m, cls, bg, styleExtra){
-  const first = isEN() ? (m.name || m.nameTh) : (m.nameTh || m.name);
-  const initial = first ? first[0] : '?';
   return `<div class="${cls}" style="background:${bg};${styleExtra||''}">
-    <span class="avatar-fallback">${initial}</span>
+    ${avatarName(m)}
     ${m.photo ? `<img class="avatar-img" src="${escapeAttr(m.photo)}" alt="" onerror="this.remove()">` : ''}
   </div>`;
 }
@@ -8528,13 +8541,37 @@ const SEED_YOUTUBE = {
 };
 const YT_KIND = { mv:['MV','MV'], live:['ดูการแสดง','Performance'], lyric:['Lyric Video','Lyric video'], video:['วิดีโอ','Video'] };
 const YT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FF0000" d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8C22 15.2 22 12 22 12s0-3.2-.4-4.8z"/><path fill="#fff" d="M10 15.5v-7l6 3.5z"/></svg>';
+/* View counts come from data/youtube.json, which the nightly job refreshes;
+   YouTube cannot be asked from the page itself. */
+let YT_STATS = null, _ytLoading = false;
+function loadYouTubeStats(){
+  if(YT_STATS || _ytLoading) return;
+  _ytLoading = true;
+  fetch('data/youtube.json', { cache:'no-cache' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single') renderMain(); })
+    .catch(() => { YT_STATS = { videos:{} }; })
+    .finally(() => { _ytLoading = false; });
+}
+/* 206,864,587 reads as "206.9 ล้าน" or "206.9M"; the exact figure is in the tooltip. */
+function shortViews(n){
+  const f = (v, d) => (Math.round(v / d * 10) / 10).toLocaleString(undefined, { maximumFractionDigits:1 });
+  if(isEN()) return n >= 1e9 ? f(n,1e9)+'B' : n >= 1e6 ? f(n,1e6)+'M' : n >= 1e3 ? f(n,1e3)+'K' : String(n);
+  return n >= 1e6 ? f(n,1e6)+' ล้าน' : n >= 1e5 ? f(n,1e5)+' แสน' : n >= 1e4 ? f(n,1e4)+' หมื่น' : n >= 1e3 ? f(n,1e3)+' พัน' : String(n);
+}
 function renderYouTube(workId, i, trackName){
   const yt = SEED_YOUTUBE[`${workId}#${i}`];
   if(!yt) return '';
+  if(!YT_STATS) loadYouTubeStats();
   const [vid, kind] = yt;
   const label = (YT_KIND[kind] || YT_KIND.video)[isEN() ? 1 : 0];
+  const st = YT_STATS && YT_STATS.videos && YT_STATS.videos[vid];
+  const views = st ? (isEN() ? `${shortViews(st.views)} views`
+    : st.views >= 1e3 ? `${shortViews(st.views)}วิว` : `${st.views} วิว`) : '';   // "206.9 ล้านวิว"
+  const exact = st ? ` · ${st.views.toLocaleString()} ${isEN() ? 'views' : 'วิว'}` : '';
   return `<a class="yt-btn" href="https://www.youtube.com/watch?v=${escapeAttr(vid)}" target="_blank" rel="noopener noreferrer"
-    title="YouTube: ${escapeAttr(trackName)}" aria-label="YouTube ${escapeAttr(label)}: ${escapeAttr(trackName)}">${YT_ICON}<span>${label}</span></a>`;
+    title="YouTube: ${escapeAttr(trackName)}${exact}" aria-label="YouTube ${escapeAttr(label)}: ${escapeAttr(trackName)}${exact}">${YT_ICON}<span>${label}</span>${
+    views ? `<span class="yt-views">${views}</span>` : ''}</a>`;
 }
 
 function renderSingleDetail(){
@@ -8842,7 +8879,7 @@ function renderTicker(){
       it.parts.map(p => part(p, it.to)).join('<span class="ticker-dot-sep" aria-hidden="true">·</span>')}</span>`;
   }).join('<span class="ticker-sep" aria-hidden="true">✦</span>') + '<span class="ticker-sep" aria-hidden="true">✦</span>';
   const words = items.flatMap(it => it.parts.map(p => typeof p === 'string' ? p : p.text)).join(' ');
-  const secs = Math.max(14, Math.round(words.length * 0.3));
+  const secs = Math.max(10, Math.round(words.length * 0.22));   // about a third quicker than it was
   return `<div class="ticker" role="region" aria-label="${en ? 'Updates' : 'อัปเดต'}">
     <span class="ticker-badge"><span class="ticker-dot"></span>48</span>
     <span class="ticker-window"><span class="ticker-track" style="--dur:${secs}s">
