@@ -51,7 +51,13 @@ node tools/smoke.mjs --diff before after
 - ข้อความใน UI เขียนภาษาไทย คำแปลอังกฤษอยู่ใน `js/i18n.js` (ตาราง `EN`)
 - รูปใหม่ใส่เป็นไฟล์ใน `assets/` ห้ามฝัง base64 กลับเข้าโค้ด
 
+## ข้อมูลงาน (events)
+
+อ่านผ่าน `allEvents()` / `getEvent(id)` เท่านั้น **ห้ามอ่าน `SEED_SCHEDULE` ตรง ๆ**
+มันคืนข้อมูลจาก Firestore ถ้ามี ไม่มีก็ตกกลับไปที่ seed ใน `js/data.js`
+แอดมิน (มี doc ใน `admins/{uid}`) แก้ได้จากในแอป — ฟอร์มอยู่ที่ `renderEventForm()`
+
 ## สิ่งที่ยังค้าง
 
-ดู `docs/README.md` หัวข้อ "ทำไปแล้วเท่าไหร่" — ขั้นถัดไปคือย้าย `SEED_SCHEDULE`
-ขึ้น Firestore + ทำหน้าแอดมิน (`docs/02-prep-web.md` ขั้นที่ 3, `docs/05-updates.md`)
+ดู `docs/README.md` หัวข้อ "ทำไปแล้วเท่าไหร่" — ขั้นถัดไปคือ bookmark งาน/เพลง,
+Sign in with Apple และปุ่มลบบัญชี (`docs/02-prep-web.md` ขั้นที่ 4–5)
