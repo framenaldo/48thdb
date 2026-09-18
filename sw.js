@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v9';
+const VERSION = 'v10';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
@@ -79,6 +79,18 @@ async function assetFresh(request) {
   return hit || (await network) || Response.error();
 }
 
+/** Data that changes daily: network first, the last good copy offline. */
+async function dataFirst(request) {
+  const cache = await caches.open(ASSETS);
+  try {
+    const fresh = await fetch(request);
+    if (fresh && fresh.ok) cache.put(request, fresh.clone());
+    return fresh;
+  } catch (err) {
+    return (await cache.match(request)) || Response.error();
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
@@ -89,6 +101,8 @@ self.addEventListener('fetch', (event) => {
 
   if (url.origin === self.location.origin) {
     if (url.pathname.endsWith('/sw.js')) return;   // never serve the worker from cache
+    // data/ is rebuilt daily; yesterday's copy is only for when there is no network
+    if (url.pathname.includes('/data/')) { event.respondWith(dataFirst(request)); return; }
     event.respondWith(assetFresh(request));
     return;
   }

@@ -289,7 +289,7 @@
      the column wrappers dissolve */
   .sheet-top, .sheet-col, .evm-layout, .evm-media, .evm-body{ display:contents; }
   .sheet-body{ display:flex; flex-direction:column; }
-  .sec-stats{ order:1; } .sec-history{ order:2; } .sec-events{ order:3; } .sec-works{ order:4; } .sec-facts{ order:5; } .sec-actions{ order:6; }
+  .sec-stats{ order:1; } .sec-history{ order:2; } .sec-events{ order:3; } .sec-lives{ order:3; } .sec-works{ order:4; } .sec-facts{ order:5; } .sec-actions{ order:6; }
   .feed-main, .feed-side{ display:contents; }
   .today-hero-block{ order:1; } .is-over-today{ order:1; } .is-periods{ order:2; } .is-bday-today{ order:3; }
   .is-bday-next{ order:4; } .is-schedule{ order:5; } .is-calendar{ order:6; } .is-past{ order:7; }
@@ -852,6 +852,44 @@
     .stage{ aspect-ratio:1/1; min-height:260px; }
   }
 
+  /* ---- a member's lives: four figures, a year of months, the latest three ---- */
+  .lv{ margin-top:6px; }
+  .lv-head{ display:flex; align-items:center; gap:10px; }
+  .lv-now{
+    display:inline-flex; align-items:center; gap:6px; padding:2px 10px; border-radius:999px;
+    background:#E0243A; color:#fff; font-size:11px; font-weight:800; text-decoration:none;
+  }
+  .lv-now::before{ content:''; width:7px; height:7px; border-radius:50%; background:#fff; animation:lv-pulse 1.4s ease-in-out infinite; }
+  @keyframes lv-pulse{ 50%{ opacity:.35; } }
+  .lv-stats{
+    display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:1px;
+    border:1px solid var(--line); border-radius:16px; overflow:hidden; background:var(--line);
+  }
+  .lv-stat{ display:flex; flex-direction:column; gap:2px; padding:11px 13px; background:var(--card, #fff); }
+  .lv-k{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .lv-v{ font-size:22px; font-weight:800; line-height:1.2; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .lv-v.is-text{ font-size:16px; }
+  .lv-s{ font-size:11.5px; color:var(--ink-soft); }
+  .lv-chart-title{ margin:14px 0 6px; font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .lv-chart{
+    display:grid; grid-template-columns:repeat(12, minmax(0, 1fr)); gap:4px; align-items:end;
+    height:118px; padding:8px 8px 0; border:1px solid var(--line); border-radius:14px;
+  }
+  .lv-col{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; min-width:0; }
+  .lv-val{ min-height:15px; font-size:10.5px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .lv-bar{ display:block; width:min(100%, 18px); border-radius:4px 4px 0 0; background:var(--c); max-height:calc(100% - 34px); }
+  .lv-col.is-current .lv-bar{ background:color-mix(in srgb, var(--c) 45%, transparent); }
+  .lv-mon{ margin:4px 0 6px; font-size:9.5px; color:var(--ink-soft); white-space:nowrap; }
+  .lv-col:hover .lv-bar{ filter:brightness(1.1); }
+  .lv-list{ display:flex; flex-direction:column; gap:6px; }
+  .lv-item{
+    display:flex; flex-direction:column; gap:2px; padding:8px 12px; text-decoration:none; color:inherit;
+    border:1px solid var(--line); border-left:3px solid var(--c); border-radius:12px;
+  }
+  .lv-item:hover{ background:color-mix(in srgb, var(--c) 7%, transparent); }
+  .lv-when{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .lv-text{ font-size:13px; line-height:1.45; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lv-foot{ margin:8px 0 0; font-size:11px; color:var(--ink-soft); }
   .social-row{ display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 2px; }
   .social-chip{
     display:inline-flex; align-items:center; justify-content:center;
@@ -6111,6 +6149,84 @@ const SOCIAL = {
 const iamUrl = m => m && !m.graduated && m.groupId && m.name
   ? `https://app.bnk48.com/members/${m.groupId}/${m.name.toLowerCase().replace(/[^a-z0-9]/g, '')}` : '';
 
+/* A member's lives in the iAM48 app, from data/lives.json, which a daily
+   job rebuilds from the app's public catch-up list. Only start times and
+   captions are published, so this is how often and when, never how long or
+   how many watched. The file is fetched the first time a sheet asks for it. */
+let LIVES = null, _livesLoading = false;
+function loadLives(){
+  if(LIVES || _livesLoading) return;
+  _livesLoading = true;
+  fetch('data/lives.json', { cache:'no-cache' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => { LIVES = d || { members:{} }; if(state.selectedId) renderMain(); })
+    .catch(() => { LIVES = { members:{} }; })
+    .finally(() => { _livesLoading = false; });
+}
+
+function renderMemberLives(m){
+  if(!m || m.graduated) return '';
+  if(!LIVES){ loadLives(); return ''; }
+  const L = LIVES.members && LIVES.members[m.id];
+  if(!L || !L.total) return '';
+  const en = isEN();
+  const M = monthsShort();
+  const g = getGroup(m.groupId);
+  const now = new Date();
+  const day0 = d => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+  const last = new Date(L.last);
+  const ago = Math.round((day0(now) - day0(last)) / 86400000);
+  const agoText = ago <= 0 ? (en ? 'Today' : 'วันนี้') : ago === 1 ? (en ? 'Yesterday' : 'เมื่อวาน')
+    : en ? `${ago} days ago` : `${ago} วันก่อน`;
+  const hh = L.hours.indexOf(Math.max(...L.hours));
+  const peak = `${String(hh).padStart(2,'0')}:00–${String((hh + 1) % 24).padStart(2,'0')}:00${en ? '' : ' น.'}`;
+  const first = new Date(L.first);
+  const since = `${M[first.getMonth()]} ${first.getFullYear()}`;
+
+  // the last twelve months, this one included, oldest first
+  const months = [];
+  for(let i = 11; i >= 0; i--){
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}`;
+    months.push({ key, n: L.months[key] || 0, label: M[d.getMonth()], year: d.getFullYear(), current: i === 0 });
+  }
+  const top = Math.max(1, ...months.map(x => x.n));
+  const peakMonth = months.reduce((a, b) => b.n > a.n ? b : a, months[0]);
+  const bars = months.map(x => {
+    const tip = `${x.label} ${x.year} · ${x.n} ${en ? (x.n === 1 ? 'live' : 'lives') : 'ไลฟ์'}${x.current ? (en ? ' so far' : ' (เดือนนี้)') : ''}`;
+    const show = x.n && (x === peakMonth || x.current);
+    return `<div class="lv-col${x.current ? ' is-current' : ''}" title="${escapeAttr(tip)}" aria-label="${escapeAttr(tip)}" role="img">
+      <span class="lv-val">${show ? x.n : ''}</span>
+      <span class="lv-bar" style="height:${x.n ? Math.max(4, Math.round(x.n / top * 100)) : 0}%"></span>
+      <span class="lv-mon">${x.label}</span>
+    </div>`;
+  }).join('');
+
+  const fmt = iso => { const d = new Date(iso);
+    return `${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()} · ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}${en ? '' : ' น.'}`; };
+  const recent = (L.recent || []).slice(0, 3).map(r =>
+    `<a class="lv-item" href="https://app.bnk48.com/member-playback/${r.id}" target="_blank" rel="noopener noreferrer">
+      <span class="lv-when">${fmt(r.at)}</span>
+      <span class="lv-text">${escapeHtml(r.text || (en ? '(no caption)' : '(ไม่มีข้อความ)'))}</span>
+    </a>`).join('');
+  const upd = LIVES.updated ? new Date(LIVES.updated) : null;
+
+  return `<section class="lv" style="--c:${g ? g.color : 'var(--ink-soft)'}">
+    <h3 class="section-label lv-head">${en ? 'Lives on iAM48' : 'ไลฟ์ใน iAM48'}
+      ${L.liveNow ? `<a class="lv-now" href="${escapeAttr(iamUrl(m))}" target="_blank" rel="noopener noreferrer">${en ? 'Live now' : 'กำลังไลฟ์'}</a>` : ''}</h3>
+    <div class="lv-stats">
+      <div class="lv-stat"><span class="lv-k">${en ? 'All lives' : 'ไลฟ์ทั้งหมด'}</span><span class="lv-v">${L.total.toLocaleString()}</span><span class="lv-s">${en ? 'since' : 'ตั้งแต่'} ${since}</span></div>
+      <div class="lv-stat"><span class="lv-k">${en ? 'Last 30 days' : '30 วันล่าสุด'}</span><span class="lv-v">${L.last30 ?? 0}</span><span class="lv-s">${en ? 'lives' : 'ไลฟ์'}</span></div>
+      <div class="lv-stat"><span class="lv-k">${en ? 'Latest live' : 'ไลฟ์ล่าสุด'}</span><span class="lv-v is-text">${agoText}</span><span class="lv-s">${last.getDate()} ${M[last.getMonth()]}</span></div>
+      <div class="lv-stat"><span class="lv-k">${en ? 'Usually live' : 'ช่วงที่ไลฟ์บ่อย'}</span><span class="lv-v is-text">${peak}</span><span class="lv-s">${en ? 'Thai time' : 'เวลาไทย'}</span></div>
+    </div>
+    <p class="lv-chart-title">${en ? 'Lives per month, last 12 months' : 'จำนวนไลฟ์รายเดือน ย้อนหลัง 12 เดือน'}</p>
+    <div class="lv-chart">${bars}</div>
+    ${recent ? `<p class="lv-chart-title">${en ? 'Catch up on the latest' : 'ดูย้อนหลังล่าสุด'}</p><div class="lv-list">${recent}</div>` : ''}
+    <p class="lv-foot">${en ? 'From the iAM48 catch-up list' : 'ข้อมูลจากหน้า Catch-up ของ iAM48'}${upd ? ` · ${en ? 'updated' : 'อัปเดต'} ${upd.getDate()} ${M[upd.getMonth()]} ${String(upd.getHours()).padStart(2,'0')}:${String(upd.getMinutes()).padStart(2,'0')}${en ? '' : ' น.'}` : ''}</p>
+  </section>`;
+}
+
 function renderSocial(m){
   const links = SEED_SOCIAL[m.id] || [];
   const iam = iamUrl(m);
@@ -7363,7 +7479,7 @@ function renderDetailModal(){
           <button class="btn-danger" data-action="delete-member" data-id="${m.id}">ลบสมาชิก</button>
         </div>
         </div>
-        <div class="sheet-col sheet-col-b"><div class="sec-events">${renderMemberEvents(m)}</div></div>
+        <div class="sheet-col sheet-col-b"><div class="sec-events">${renderMemberEvents(m)}</div><div class="sec-lives">${renderMemberLives(m)}</div></div>
         <div class="sheet-col sheet-col-c"><div class="sec-works">${renderMemberWorks(m)}</div></div>
         </div>
       </div>
