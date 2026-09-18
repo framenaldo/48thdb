@@ -1681,6 +1681,11 @@
     overflow:hidden; line-height:0;
   }
   .shop-open{ pointer-events:none; }
+  .shop-actions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .shop-buy{
+    background:var(--c); color:#fff; border-color:transparent; font-weight:800; text-decoration:none;
+  }
+  .shop-buy:hover{ filter:brightness(1.08); }
   .shop-thumb img{ display:block; width:100%; height:auto; }
   .shop-body{ min-width:0; }
   .shop-meta{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0; }
@@ -4499,6 +4504,7 @@ const EN = {
   'ปิดรับแล้ว': 'Closed',
   'เปิดพรุ่งนี้': 'Opens tomorrow',
   'ทาง iAM Shop': 'From the iAM Shop',
+  'ซื้อที่ iAM Shop ↗': 'Buy at the iAM Shop ↗',
   '272 – 420 บาท': '272 – 420 THB',
   '270 บาท': '270 THB',
   'การโหวต': 'Voting',
@@ -6622,6 +6628,11 @@ function renderSlotTable(ev){
 /* Everything on sale, newest window first: what it is, what it costs, how long
    it is open and when it ships. The detail lives in the event sheet, so a card
    is a way in rather than a page of its own. */
+/* Where each shop actually sells. An item can carry its own `url`; otherwise
+   the shop it is sold through decides. */
+const SHOP_URLS = { 'iAM Shop':'https://app.bnk48.com/shop' };
+const shopUrl = s => s && (s.url || SHOP_URLS[s.shopName]) || '';
+
 function shopStatus(e, now){
   const s = e.shop;
   const from = slotTime(s.from.slice(0,10), s.from.slice(11,16));
@@ -6670,7 +6681,11 @@ function renderShopPage(){
           ${s.deliver ? `<li>ส่งสินค้า ${escapeHtml(s.deliver)}</li>` : ''}
           ${s.shopName ? `<li>ทาง ${escapeHtml(s.shopName)}</li>` : ''}
         </ul>
-        <span class="chip chip-link shop-open">ดูรายละเอียด →</span>
+        <div class="shop-actions">
+          ${shopUrl(s) && state !== 'over' ? `<a class="chip shop-buy" href="${escapeAttr(shopUrl(s))}" target="_blank" rel="noopener noreferrer"
+            data-action="external">ซื้อที่ ${escapeHtml(s.shopName)} ↗</a>` : ''}
+          <span class="chip chip-link shop-open">ดูรายละเอียด →</span>
+        </div>
       </div>
     </article>`;
   };
@@ -6879,6 +6894,8 @@ function renderEventModal(){
 
         ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
 
+        ${ev.shop && shopUrl(ev.shop) && shopStatus(ev, Date.now()).state !== 'over' ? `<div class="evm-related">
+          <a class="chip shop-buy" href="${escapeAttr(shopUrl(ev.shop))}" target="_blank" rel="noopener noreferrer">ซื้อที่ ${escapeHtml(ev.shop.shopName)} ↗</a></div>` : ''}
         ${(ev.links || []).length ? `<div class="evm-related">${ev.links.map(l =>
           `<a class="chip chip-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)} ↗</a>`).join('')}</div>` : ''}
 
