@@ -564,6 +564,8 @@
   :root[data-theme="dark"] .is-postered .slot-date,
   :root[data-theme="dark"] .is-postered .tl-when,
   :root[data-theme="dark"] .is-postered .tl-next,
+  :root[data-theme="dark"] .is-postered .tl-month-head,
+  :root[data-theme="dark"] .is-postered .tl-row.is-on .tl-title,
   :root[data-theme="dark"] .is-postered .ev-starts,
   :root[data-theme="dark"] .is-postered .evm-related .chip-link,
   :root[data-theme="dark"] .ev-card.is-themed .ev-open,
@@ -1553,34 +1555,41 @@
   .slot-now{ align-self:flex-start; margin-top:3px; padding:1px 8px; border-radius:999px; background:var(--c); color:#fff; font-size:11px; font-weight:700; }
   .slot-who{ display:flex; flex-wrap:wrap; gap:6px; min-width:0; }
   .slot-who .ev-person{ margin:0; }
-  /* The campaign timeline: date column, a rail with a dot per step, the step
-     itself on the right. The rail is drawn on the middle column so it runs
-     unbroken between rows of any height. */
-  .ge-timeline{ list-style:none; margin:8px 0 4px; padding:0; }
-  .tl-row{ display:grid; grid-template-columns:76px 20px minmax(0, 1fr); align-items:stretch; }
+  /* The campaign timeline: a block per month, and inside it one framed row per
+     step, coloured down its left edge by what kind of step it is. On a phone
+     the row stacks so the title has the full width to itself. */
+  .tl-month-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    margin:16px 0 8px; font-size:13.5px; font-weight:800; color:var(--c);
+  }
+  .tl-month-left{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .tl-past-btn{
+    display:inline-flex; align-items:center; gap:6px; margin:2px 0 2px; padding:5px 12px;
+    border:1px solid var(--line); border-radius:999px; background:var(--glass-card);
+    font:inherit; font-size:12px; font-weight:700; color:var(--ink-soft); cursor:pointer;
+  }
+  .tl-past-btn:hover{ color:var(--ink); border-color:color-mix(in srgb, var(--c) 40%, var(--line)); }
+  .ge-timeline{ list-style:none; display:flex; flex-direction:column; gap:8px; margin:0; padding:0; }
+  .tl-row{
+    display:block; padding:10px 13px; border:1px solid var(--line);
+    border-left:4px solid var(--k); border-radius:14px;
+    background:color-mix(in srgb, var(--c) 4%, transparent);
+  }
+  .tl-row.is-done{ opacity:.55; }
+  .tl-row.is-on{
+    border-color:color-mix(in srgb, var(--k) 55%, var(--line)); border-left-color:var(--k);
+    background:color-mix(in srgb, var(--k) 12%, transparent);
+  }
   .tl-when{
-    display:flex; flex-direction:column; padding:9px 8px 0 0; text-align:right;
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:0 6px;
     font-size:13px; font-weight:800; color:var(--c); line-height:1.35;
   }
-  .tl-to{ font-size:12px; font-weight:700; color:var(--ink-soft); }
-  .tl-rail{ position:relative; }
-  .tl-rail::before{
-    content:''; position:absolute; left:50%; top:0; bottom:0; width:2px;
-    transform:translateX(-50%); background:color-mix(in srgb, var(--c) 22%, transparent);
-  }
-  .tl-row:first-child .tl-rail::before{ top:15px; }
-  .tl-row:last-child .tl-rail::before{ bottom:calc(100% - 15px); }
-  .tl-rail::after{
-    content:''; position:absolute; left:50%; top:15px; width:11px; height:11px;
-    margin:-5.5px 0 0 -5.5px; border-radius:50%; background:var(--k);
-    box-shadow:0 0 0 3px var(--sheet-bg, var(--paper));
-  }
+  .tl-to{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }
   .tl-what{
-    display:block; width:100%; padding:6px 12px 14px; text-align:left;
-    font:inherit; color:inherit; background:none; border:0; border-radius:12px;
+    display:block; width:100%; margin:3px 0 0; padding:0; text-align:left;
+    font:inherit; color:inherit; background:none; border:0;
   }
-  .tl-what.is-link{ cursor:pointer; transition:background .15s ease; }
-  .tl-what.is-link:hover{ background:color-mix(in srgb, var(--c) 8%, transparent); }
+  .tl-what.is-link{ cursor:pointer; }
   .tl-kind{
     display:inline-block; padding:2px 8px; border-radius:999px; background:var(--k);
     color:#fff; font-size:10.5px; font-weight:800;
@@ -1589,13 +1598,9 @@
   .tl-now, .tl-next{ margin-left:6px; padding:2px 7px; border-radius:999px; font-size:10.5px; font-weight:800; }
   .tl-now{ background:var(--c); color:#fff; }
   .tl-next{ border:1px solid color-mix(in srgb, var(--c) 45%, var(--line)); color:var(--c); }
-  .tl-title{ display:block; margin-top:5px; font-size:14.5px; font-weight:700; line-height:1.45; }
+  .tl-title{ display:block; margin-top:4px; font-size:14.5px; font-weight:700; line-height:1.45; }
   .tl-venue, .tl-note{ display:block; margin-top:3px; font-size:12.5px; color:var(--ink-soft); line-height:1.45; }
-  .tl-row.is-done{ opacity:.5; }
   .tl-row.is-on .tl-title{ color:var(--c); }
-  .tl-row.is-on .tl-rail::after{
-    box-shadow:0 0 0 3px var(--sheet-bg, var(--paper)), 0 0 0 6px color-mix(in srgb, var(--k) 32%, transparent);
-  }
   .evm-related{ display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 6px; }
   .evm-related .chip{ white-space:normal; max-width:100%; text-align:left; line-height:1.4; }
   .ev-card.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out), border-color .2s ease; }
@@ -2188,6 +2193,9 @@
     .dtable .col-height, .dtable.grad-mode .col-height{ width:max(108px, calc(var(--tw) * .115)); }
     .dtable .col-fav{ width:max(36px, calc(var(--tw) * .05)); }
     .modal-glass-card .stat-cell{ flex-basis:130px; }
+    .tl-row{ display:grid; grid-template-columns:92px minmax(0, 1fr); gap:0 14px; align-items:start; padding:11px 14px; }
+    .tl-when{ flex-direction:column; gap:0; padding-top:1px; }
+    .tl-what{ margin:0; }
 
     /* songs: singles, albums and specials as three columns */
     .disc-tabs{ display:none; }
@@ -3925,7 +3933,7 @@ const ICONS = {
 let state = {
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
-  calMonth:null, calDay:null, posterOf:null,
+  calMonth:null, calDay:null, posterOf:null, tlPast:false,
   lang:'th',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
@@ -4314,6 +4322,8 @@ const EN = {
   'วันสุดท้าย': 'Last day',
   'คลิปประกาศ ↗': 'Announcement video ↗',
   'ไทม์ไลน์ทั้งงาน': 'Full timeline',
+  'ผ่านไปแล้ว': 'All passed',
+  'ซ่อนรายการที่ผ่านไปแล้ว': 'Hide what has passed',
   'ถัดไป': 'Next',
   'เริ่ม': 'Start',
   'สิ้นสุด': 'End',
@@ -4772,6 +4782,8 @@ const EN_PATTERNS = [
   /* a label followed by a separator whose next part is its own element */
   [rx('(.+) ·'), m => { const w = toEn(m[1]); return w == null ? null : `${w} ·`; }],
   [rx('วันที่ (\\d+) จาก (\\d+)'), m => `Day ${m[1]} of ${m[2]}`],
+  [rx('เหลือ (\\d+) รายการ'), m => `${m[1]} left`],
+  [rx('ดูรายการที่ผ่านไปแล้ว \\((\\d+)\\)'), m => `Show what has passed (${m[1]})`],
 
   /* counts */
   [rx('เซ็มบัตสึ (\\d+) คน'), m => `Senbatsu of ${m[1]}`],
@@ -6408,40 +6420,62 @@ function renderSlotTable(ev){
   return `<h3 class="evm-head">ตารางสมาชิกประจำบูธ</h3><div class="slot-table">${rows}</div>`;
 }
 
-/* A row per step of a long campaign: the date on the left, a rail down the
-   middle, the step on the right. Steps already past are dimmed and the one
-   running today is picked out, so what is left to do reads at a glance. */
+/* Two months of deadlines read better in pieces, so the timeline is split by
+   month, each step a framed row coloured by its kind. What has already passed
+   is folded away until the reader asks for it, leaving only what is left. */
 function renderTimeline(id){
   const items = TIMELINES[id];
   if(!items) return '';
   const iso = toYmd(todayStart());
   const M = monthsShort();
   const day = s => { const [, m, d] = s.split('-').map(Number); return `${d} ${M[m-1]}`; };
-  const upcoming = items.filter(it => (it.to || it.d) >= iso);
-  const nextD = upcoming.length ? upcoming[0].d : '';
-  const rows = items.map(it => {
+  const endOf = it => it.to || it.d;
+  const passed = items.filter(it => endOf(it) < iso);
+  const shown = state.tlPast || !passed.length ? items : items.filter(it => endOf(it) >= iso);
+  const ahead = shown.filter(it => endOf(it) >= iso);
+  const nextD = ahead.length ? ahead[0].d : '';
+
+  const months = [];
+  for(const it of shown){
+    const key = it.d.slice(0, 7);
+    if(!months.length || months[months.length-1].key !== key) months.push({ key, items:[] });
+    months[months.length-1].items.push(it);
+  }
+
+  const row = it => {
     const k = TL_KINDS[it.kind] || TL_KINDS.event;
-    const last = it.to || it.d;
-    const done = last < iso;
-    const on = it.d <= iso && last >= iso;
+    const done = endOf(it) < iso;
+    const on = it.d <= iso && endOf(it) >= iso;
     const next = !on && !done && it.d === nextD;
     const body = `<span class="tl-kind">${k.th}</span>
-        ${it.time ? `<span class="tl-time">${it.time} น.</span>` : ''}
-        ${it.part ? `<span class="tl-time">${escapeHtml(it.part)}</span>` : ''}
-        ${on ? '<span class="tl-now">วันนี้</span>' : next ? '<span class="tl-next">ถัดไป</span>' : ''}
-        <span class="tl-title">${escapeHtml(it.title)}</span>
-        ${it.venue ? `<span class="tl-venue">${escapeHtml(it.venue)}</span>` : ''}
-        ${it.note ? `<span class="tl-note">${escapeHtml(it.note)}</span>` : ''}`;
+      ${it.time ? `<span class="tl-time">${it.time} น.</span>` : ''}
+      ${it.part ? `<span class="tl-time">${escapeHtml(it.part)}</span>` : ''}
+      ${on ? '<span class="tl-now">วันนี้</span>' : next ? '<span class="tl-next">ถัดไป</span>' : ''}
+      <span class="tl-title">${escapeHtml(it.title)}</span>
+      ${it.venue ? `<span class="tl-venue">${escapeHtml(it.venue)}</span>` : ''}
+      ${it.note ? `<span class="tl-note">${escapeHtml(it.note)}</span>` : ''}`;
     return `<li class="tl-row${done ? ' is-done' : ''}${on ? ' is-on' : ''}${next ? ' is-next' : ''}" style="--k:${k.color}">
       <span class="tl-when">${day(it.d)}${it.to ? `<span class="tl-to">– ${day(it.to)}</span>` : ''}</span>
-      <span class="tl-rail" aria-hidden="true"></span>
       ${it.ev ? `<button class="tl-what is-link" data-action="open-event" data-id="${it.ev}">${body}</button>`
               : `<span class="tl-what">${body}</span>`}
     </li>`;
-  }).join('');
-  return `<h3 class="evm-head">ไทม์ไลน์ทั้งงาน</h3><ol class="ge-timeline">${rows}</ol>`;
-}
+  };
 
+  const blocks = months.map(mo => {
+    const [y, m] = mo.key.split('-').map(Number);
+    const left = mo.items.filter(it => endOf(it) >= iso).length;
+    return `<div class="tl-month">
+      <h4 class="tl-month-head"><span>${MONTH_NAMES[m-1]} ${y + 543}</span>
+        <span class="tl-month-left">${left ? `เหลือ ${left} รายการ` : 'ผ่านไปแล้ว'}</span></h4>
+      <ol class="ge-timeline">${mo.items.map(row).join('')}</ol>
+    </div>`;
+  }).join('');
+
+  return `<h3 class="evm-head">ไทม์ไลน์ทั้งงาน</h3>
+    ${passed.length ? `<button class="tl-past-btn" data-action="toggle-tl-past">${
+      state.tlPast ? 'ซ่อนรายการที่ผ่านไปแล้ว' : `ดูรายการที่ผ่านไปแล้ว (${passed.length})`}</button>` : ''}
+    ${blocks}`;
+}
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
   if(!ev) return '';
@@ -8660,6 +8694,10 @@ function bindDelegatedEvents(){
       state.oshiOnly = id === '1';
       state.calDay = null;   // the day that was open may not survive the filter
       renderMain(); replaceHistory();
+    }
+    else if(action==='toggle-tl-past'){
+      state.tlPast = !state.tlPast;
+      renderMain();
     }
     else if(action==='toggle-ticker'){
       try{ localStorage.setItem('48thdb-ticker-folded', tickerFolded() ? '0' : '1'); }catch(err){}
