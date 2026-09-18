@@ -309,6 +309,8 @@ function renderEventModal(){
   <div class="modal-backdrop" data-action="close-modal">
     <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
       <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
+      ${state.isAdmin ? `<button class="modal-edit-btn" data-action="edit-event" data-id="${escapeAttr(ev.id)}"
+        title="แก้ไขงานนี้" aria-label="แก้ไขงานนี้">แก้ไข</button>` : ''}
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
@@ -600,6 +602,7 @@ function renderFeed(){
     <header class="feed-head">
       <p class="feed-today">วัน${dayName}ที่ ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()+543}</p>
       <h1 class="feed-title">วันนี้ที่ 48</h1>
+      ${state.isAdmin ? `<button class="btn-add feed-add-event" data-action="add-event">+ เพิ่มงาน</button>` : ''}
       ${state.oshi.length ? `
       <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
         <button class="scope-btn${state.oshiOnly?'':' is-on'}" data-action="set-oshi-only" data-id="0">ทั้งหมด</button>
@@ -1734,4 +1737,68 @@ function renderForm(){
       <button type="button" class="btn-secondary" data-action="cancel-form">ยกเลิก</button>
     </div>
   </form>`;
+}
+
+/* ---------------------- Event editing (admins) ----------------------
+   The whole point of moving the schedule into Firestore: this screen writes
+   to it, and everyone else's copy follows within a refresh. It is deliberately
+   the same shape as the member form — same field grid, same buttons — because
+   it is the same job and does not need a second set of habits. */
+function renderEventForm(){
+  const editing = state.editingEvent ? getEvent(state.editingEvent) : null;
+  const e = editing || { id:'', title:'', start:'', end:'', time:'', venue:'', mapUrl:'', members:[] };
+  const chosen = new Set(e.members || []);
+  const byGroup = GROUPS.map(g => ({
+    group: g,
+    members: activeMembers().filter(m => m.groupId === g.id)
+      .sort((a, b) => (a.name || '').localeCompare(b.name || '')),
+  })).filter(x => x.members.length);
+
+  return `
+  <button class="back-btn" type="button" data-action="cancel-event-form">← ยกเลิก</button>
+  <h2 class="display" style="margin:0 0 18px;font-size:22px;">${editing ? 'แก้ไขงาน' : 'เพิ่มงานใหม่'}</h2>
+  <form id="event-form" novalidate>
+    <div class="form-grid">
+      <div class="form-field full"><label>ชื่องาน</label>
+        <input name="title" required value="${escapeAttr(e.title)}"></div>
+      <div class="form-field"><label>วันเริ่ม</label>
+        <input name="start" type="date" required value="${escapeAttr((e.start || '').slice(0,10))}"></div>
+      <div class="form-field"><label>วันจบ (เว้นว่างถ้าวันเดียว)</label>
+        <input name="end" type="date" value="${escapeAttr((e.end || '').slice(0,10))}"></div>
+      <div class="form-field"><label>เวลา</label>
+        <input name="time" type="time" value="${escapeAttr(e.time || '')}"></div>
+      <div class="form-field"><label>สถานที่</label>
+        <input name="venue" value="${escapeAttr(e.venue || '')}"></div>
+      <div class="form-field full"><label>ลิงก์แผนที่ (วางลิงก์จาก Google Maps — เว้นว่างได้)</label>
+        <input name="mapUrl" type="url" placeholder="https://maps.app.goo.gl/..." value="${escapeAttr(e.mapUrl || '')}"></div>
+      <div class="form-field full"><label>สมาชิกที่ร่วมงาน (${chosen.size} คน)</label>
+        <div class="member-picker">
+          ${byGroup.map(({ group, members }) => `
+            <p class="member-picker-group" style="--c:${group.color}">${group.name}</p>
+            ${members.map(m => `
+              <label class="member-pick">
+                <input type="checkbox" name="members" value="${escapeAttr(m.id)}" ${chosen.has(m.id) ? 'checked' : ''}>
+                <span>${escapeHtml(m.name)}${m.nameTh ? ` · ${escapeHtml(m.nameTh)}` : ''}</span>
+              </label>`).join('')}`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="action-row">
+      <button type="submit" class="btn-add">บันทึก</button>
+      <button type="button" class="btn-secondary" data-action="cancel-event-form">ยกเลิก</button>
+      ${editing ? `<button type="button" class="btn-danger" data-action="delete-event"
+        data-id="${escapeAttr(editing.id)}">ลบงานนี้</button>` : ''}
+    </div>
+  </form>`;
+}
+
+/* A readable id beats a timestamp when the next person is looking at the
+   database by hand: the date sorts it, the title says what it is. */
+function eventIdFrom(start, title){
+  const slug = (title || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9ก-๙\s-]/g, '')
+    .trim().replace(/\s+/g, '-')
+    .slice(0, 40);
+  return `${start}-${slug || 'event'}`;
 }

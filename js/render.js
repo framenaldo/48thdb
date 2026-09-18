@@ -6,7 +6,7 @@ function renderHeader(){
     <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก เพลง งาน..." value="${escapeAttr(state.query)}">
     <button class="theme-btn" data-action="toggle-theme" aria-label="สลับธีมสว่าง/มืด">${state.theme==='dark'?ICONS.sun:ICONS.moon}</button>
     <button class="lang-btn" data-action="toggle-lang" aria-label="เปลี่ยนภาษา">${isEN()?'ไทย':'EN'}</button>
-    <button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>
+    ${state.isAdmin ? `<button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>` : ''}
     <div id="profile-slot"></div>
   </header>`;
 }

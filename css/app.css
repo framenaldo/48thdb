@@ -2143,3 +2143,36 @@
   @media (min-width:1600px){
     .modal-glass-card{ max-width:720px; }
   }
+
+  /* ---- Editing the schedule (admins only) ----
+     Borrowed wholesale from the member form: same grid, same buttons, same
+     tokens. Only the member picker is new, and it is a list of checkboxes
+     because that is what reads and taps well on a phone. */
+  .feed-add-event{ position:absolute; top:0; right:0; }
+  .feed-head{ position:relative; }
+
+  .modal-edit-btn{
+    position:absolute; top:14px; right:94px; z-index:2;
+    height:32px; padding:0 14px; border-radius:16px;
+    background:var(--chrome-bg); border:1px solid var(--chrome-edge);
+    font-family:'Noto Sans Thai',sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--chrome-fg); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.1);
+  }
+  .modal-edit-btn:active{ background:rgba(255,255,255,calc(.95*var(--glass-k))); }
+
+  .member-picker{
+    max-height:320px; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    border:1px solid var(--line); border-radius:9px; background:var(--card);
+    padding:6px 10px 10px;
+  }
+  .member-picker-group{
+    position:sticky; top:0; z-index:1; margin:0 -10px 4px; padding:7px 10px 5px;
+    background:var(--card); color:var(--c); font-size:11.5px; font-weight:700;
+    letter-spacing:.04em; border-bottom:1px solid var(--line);
+  }
+  .member-picker-group ~ .member-picker-group{ margin-top:10px; }
+  .member-pick{
+    display:flex; align-items:center; gap:9px; padding:6px 2px;
+    font-size:13.5px; color:var(--ink); cursor:pointer;
+  }
+  .member-pick input{ width:17px; height:17px; accent-color:var(--bnk); flex:none; }

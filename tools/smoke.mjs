@@ -75,6 +75,47 @@ const VIEWS = [
     },
     expect: ['งานทดสอบจากฐานข้อมูล', 'งานทดสอบใบที่สอง'],
   },
+  // The write path, end to end: signed in as an admin, add an event through
+  // the form and expect the feed to show what the database now holds. The
+  // editing screens are the reason the schedule moved at all, so they are
+  // worth a case that actually fills the form in.
+  {
+    name: '11-admin-adds-event',
+    url: '?v=feed',
+    user: { uid: 'stub-admin', isAnonymous: false, displayName: 'แอดมินทดสอบ', email: 'admin@example.com' },
+    fixture: {
+      meta: [{ id: 'version', data: 1 }],
+      admins: [{ id: 'stub-admin', name: 'แอดมินทดสอบ' }],
+      events: [{ id: 'seed-ev', title: 'งานที่มีอยู่ก่อน', start: '2026-10-01', end: '2026-10-01', members: [] }],
+    },
+    async drive(page) {
+      await page.click('[data-action="add-event"]', { timeout: 5000 });
+      await page.fill('input[name="title"]', 'งานที่แอดมินเพิ่งเพิ่ม');
+      await page.fill('input[name="start"]', '2026-11-20');
+      await page.fill('input[name="venue"]', 'ลานทดสอบการเขียน');
+      await page.locator('input[name="members"]').first().check();
+      await page.click('#event-form button[type="submit"]');
+      await page.waitForTimeout(900);
+      // It saves, reopens what was saved, and the sheet is closed here so the
+      // screenshot shows the feed the rest of the world would see.
+      await page.locator('.modal-close-btn').first().click({ timeout: 5000 });
+      await page.waitForTimeout(400);
+    },
+    expect: ['งานที่แอดมินเพิ่งเพิ่ม', 'งานที่มีอยู่ก่อน', '+ เพิ่มงาน'],
+  },
+  // The form itself, on a phone — the member picker is a long list inside a
+  // page that also scrolls, which is exactly the layout that goes wrong.
+  {
+    name: '12-event-form',
+    url: '?v=feed',
+    user: { uid: 'stub-admin', isAnonymous: false, displayName: 'แอดมินทดสอบ', email: 'admin@example.com' },
+    fixture: { admins: [{ id: 'stub-admin' }] },
+    async drive(page) {
+      await page.click('[data-action="add-event"]', { timeout: 5000 });
+      await page.waitForTimeout(400);
+    },
+    expect: ['เพิ่มงานใหม่', 'สมาชิกที่ร่วมงาน', 'บันทึก'],
+  },
 ];
 
 /* Playwright expects the exact browser build its own version pins, and the
@@ -132,6 +173,7 @@ async function capture(label) {
     });
     const page = await ctx.newPage();
     if (view.fixture) await page.addInitScript(data => { window.__STUB_DATA__ = data; }, view.fixture);
+    if (view.user) await page.addInitScript(user => { window.__STUB_USER__ = user; }, view.user);
     const errors = [];
     // "Failed to load resource" on its own never says which one, so the status
     // line is recorded next to it.

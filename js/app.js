@@ -1,6 +1,6 @@
 // ============================= RENDER: ROOT =============================
 const ADV_INPUTS = { 'age-min':'ageMin', 'age-max':'ageMax', 'height-min':'heightMin', 'height-max':'heightMax' };
-const NAV_HIDDEN_VIEWS = ['auth','editprofile','form'];
+const NAV_HIDDEN_VIEWS = ['auth','editprofile','form','eventform'];
 /* The running sign under the header: whatever is worth knowing right now,
    most pressing first, never more than four at a time. Each item names what it
    is about and opens it. Built on every draw, but only swapped in when its
@@ -201,6 +201,7 @@ function renderMain(){
     state.view==='profile' ? renderProfile() :
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
+    state.view==='eventform' ? renderEventForm() :
     renderForm())
     + (state.comparePicking ? renderComparePicker()
        : state.compareWith && state.selectedId ? renderCompareModal()
@@ -346,6 +347,57 @@ function attachMainEvents(){
           statusEl.style.display = 'block';
         }
       }
+    });
+  }
+
+  const eventForm = document.getElementById('event-form');
+  if(eventForm){
+    const count = eventForm.querySelector('.form-field.full label');
+    eventForm.addEventListener('change', (ev)=>{
+      // Keep the running count in the label honest as boxes are ticked.
+      if(ev.target.name !== 'members' || !count) return;
+      const n = eventForm.querySelectorAll('input[name="members"]:checked').length;
+      count.textContent = count.textContent.replace(/\(\d+ คน\)/, `(${n} คน)`);
+    });
+
+    eventForm.addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      if(!state.isAdmin){ alert('ต้องเข้าสู่ระบบด้วยบัญชีแอดมินก่อน'); return; }
+
+      const fd = new FormData(eventForm);
+      const title = (fd.get('title') || '').trim();
+      const start = fd.get('start') || '';
+      if(!title || !start){ alert('กรุณากรอกชื่องานและวันเริ่ม'); return; }
+
+      const end = fd.get('end') || start;
+      if(end < start){ alert('วันจบอยู่ก่อนวันเริ่ม'); return; }
+
+      const existing = state.editingEvent ? getEvent(state.editingEvent) : null;
+      const data = {
+        // An id is a name in the database, so it is written once and kept:
+        // renaming an event would otherwise leave the old document behind.
+        id: existing ? existing.id : eventIdFrom(start, title),
+        title, start, end,
+        time: fd.get('time') || null,
+        venue: (fd.get('venue') || '').trim() || null,
+        mapUrl: (fd.get('mapUrl') || '').trim() || null,
+        members: fd.getAll('members'),
+      };
+
+      const submit = eventForm.querySelector('button[type="submit"]');
+      if(submit){ submit.disabled = true; submit.textContent = 'กำลังบันทึก...'; }
+      try{
+        await saveEventDoc(data);
+        await refreshEvents();
+      }catch(err){
+        alert('บันทึกไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+        if(submit){ submit.disabled = false; submit.textContent = 'บันทึก'; }
+        return;
+      }
+      state.view = 'feed';
+      state.editingEvent = null;
+      state.selectedEvent = data.id;   // open what was just saved, to check it
+      render();
     });
   }
 
@@ -888,6 +940,26 @@ function bindDelegatedEvents(){
       state.authMode = el.dataset.mode;
       renderMain();
     }
+    else if(action==='add-event'){
+      state.view='eventform'; state.editingEvent=null; state.selectedEvent=null;
+      render(); pushHistory();
+    }
+    else if(action==='edit-event'){
+      state.view='eventform'; state.editingEvent=id; state.selectedEvent=null;
+      render(); pushHistory();
+    }
+    else if(action==='cancel-event-form'){
+      goBack(()=>{ state.view='feed'; state.editingEvent=null; });
+    }
+    else if(action==='delete-event'){
+      const ev = getEvent(id);
+      if(!ev || !confirm(`ลบงาน "${ev.title}" ถาวร ยืนยันไหม?`)) return;
+      try{
+        await deleteEventDoc(id);
+        await refreshEvents();
+      }catch(err){ alert('ลบไม่สำเร็จ: ' + (err && err.message ? err.message : err)); return; }
+      state.view='feed'; state.editingEvent=null; render();
+    }
     else if(action==='add-new'){
       state.view='form'; state.editingId=null; render(); pushHistory();
     }
@@ -1152,6 +1224,7 @@ async function init(){
     if(state.events === null){
       try{ state.events = await loadEvents(); }catch(e){ state.events = null; }
     }
+    state.isAdmin = await loadIsAdmin();
     const oshiData = await loadOshiData();
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;

@@ -159,3 +159,45 @@ async function loadEvents(){
     return cached ? cached.events : null;
   }
 }
+
+/* Who may edit. A document under admins/ whose id is the uid; its contents do
+   not matter, only that it exists — the same check the security rules make, so
+   the screen and the database agree on who is an editor. */
+async function loadIsAdmin(){
+  const user = fbAuth.currentUser;
+  if(!user || user.isAnonymous) return false;
+  try{
+    const doc = await fbDb.collection('admins').doc(user.uid).get();
+    return doc.exists;
+  }catch(e){ return false; }   // rules refused: not an admin
+}
+
+/* Bumping the counter is what tells every other reader to refetch; without it
+   an edit would sit behind their cached copy until it happened to expire. */
+async function bumpDataVersion(){
+  try{
+    await fbDb.doc('meta/version').set({
+      data: firebase.firestore.FieldValue.increment(1),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }, { merge:true });
+  }catch(e){}
+}
+
+async function saveEventDoc(event){
+  await fbDb.collection('events').doc(event.id).set(event, { merge:true });
+  await bumpDataVersion();
+  try{ localStorage.removeItem(EVENTS_CACHE_KEY); }catch(e){}
+}
+
+async function deleteEventDoc(id){
+  await fbDb.collection('events').doc(id).delete();
+  await bumpDataVersion();
+  try{ localStorage.removeItem(EVENTS_CACHE_KEY); }catch(e){}
+}
+
+/* After an edit the whole list is read back rather than patched in memory, so
+   what is on screen is what the database actually holds — including whatever
+   someone else changed in the meantime. */
+async function refreshEvents(){
+  try{ state.events = await loadEvents(); }catch(e){}
+}

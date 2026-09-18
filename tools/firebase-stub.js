@@ -17,6 +17,20 @@
     store[col] = new Map(rows.map((row) => [row.id, row]));
   }
 
+  /* Just enough FieldValue for what the app writes: an increment and a
+     timestamp. Without them a save would throw where the real SDK succeeds,
+     and the test would be passing on the wrong path. */
+  const SENTINEL = Symbol('sentinel');
+  const applySentinels = (data, previous = {}) => {
+    const out = {};
+    for (const [key, value] of Object.entries(data || {})) {
+      if (value && value[SENTINEL] === 'increment') out[key] = (previous[key] || 0) + value.by;
+      else if (value && value[SENTINEL] === 'timestamp') out[key] = new Date().toISOString();
+      else out[key] = value;
+    }
+    return out;
+  };
+
   const snap = (data) => ({
     exists: data !== undefined,
     data: () => data,
@@ -28,7 +42,9 @@
       async get() { return snap(store[col]?.get(id)); },
       async set(data, opts) {
         const map = (store[col] = store[col] || new Map());
-        map.set(id, opts && opts.merge ? { ...(map.get(id) || {}), ...data } : data);
+        const previous = map.get(id) || {};
+        const clean = applySentinels(data, previous);
+        map.set(id, opts && opts.merge ? { ...previous, ...clean } : clean);
       },
       async delete() { store[col]?.delete(id); },
     };
@@ -60,7 +76,9 @@
   });
 
   const listeners = [];
-  let current = null;
+  // A test can start already signed in — an admin, say, which is the only way
+  // to reach the editing screens.
+  let current = window.__STUB_USER__ || null;
   const emit = () => listeners.forEach((fn) => fn(current));
 
   const auth = () => ({
@@ -84,6 +102,12 @@
 
   auth.GoogleAuthProvider = function () {};
   auth.EmailAuthProvider = { credential: (email, password) => ({ email, password }) };
+
+  firestore.FieldValue = {
+    increment: (by) => ({ [SENTINEL]: 'increment', by }),
+    serverTimestamp: () => ({ [SENTINEL]: 'timestamp' }),
+    delete: () => undefined,
+  };
 
   window.firebase = {
     initializeApp: () => {},

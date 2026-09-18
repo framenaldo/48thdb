@@ -14,7 +14,11 @@ let state = {
   // Null until Firestore answers. Everything reads the schedule through
   // allEvents(), which falls back to the seed, so the page renders the same
   // whether the collection has been filled in yet or not.
-  events: null
+  events: null,
+  // Set from the admins collection after sign-in. The editing screens are
+  // hidden unless it is true — the rules refuse the write either way, so an
+  // ungated button was only ever an offer the database would turn down.
+  isAdmin: false, editingEvent: null
 };
 
 function applyTheme(theme){
