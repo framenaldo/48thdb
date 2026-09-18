@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v7';
+const VERSION = 'v8';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
