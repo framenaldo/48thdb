@@ -4,12 +4,13 @@
   "private": true,
   "description": "48thDB — ฐานข้อมูลสมาชิก ตารางงาน และผลงานเพลงของ BNK48 และ CGM48",
   "scripts": {
+    "lint": "node tools/lint.mjs",
     "smoke": "node tools/smoke.mjs",
     "extract-images": "node tools/extract-images.mjs",
     "serve": "firebase serve --only hosting",
     "deploy": "firebase deploy --only hosting"
   },
   "devDependencies": {
-    "playwright": "^1.56.1"
+    "playwright": "1.56.1"
   }
 }

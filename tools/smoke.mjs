@@ -60,6 +60,21 @@ const VIEWS = [
   },
 ];
 
+/* Playwright expects the exact browser build its own version pins, and the
+ * web container ships one that was installed for the pinned version. If the
+ * two ever drift apart, fall back to whatever Chromium the image does have
+ * rather than downloading 150 MB to discover it was there all along. */
+async function launchChromium() {
+  try {
+    return await chromium.launch();
+  } catch (err) {
+    const fallback = process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium';
+    if (!fs.existsSync(fallback)) throw err;
+    console.warn(`playwright ไม่เจอเบราว์เซอร์ของตัวเอง — ใช้ ${fallback} แทน`);
+    return chromium.launch({ executablePath: fallback });
+  }
+}
+
 function serve() {
   const server = createServer(async (req, res) => {
     const rel = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html';
@@ -87,7 +102,7 @@ async function capture(label) {
 
   const server = await serve();
   const base = `http://127.0.0.1:${server.address().port}/`;
-  const browser = await chromium.launch();
+  const browser = await launchChromium();
   const report = {};
 
   for (const view of VIEWS) {

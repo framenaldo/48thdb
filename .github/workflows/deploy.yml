@@ -1,0 +1,38 @@
+# Publishes the site when main moves.
+#
+# The point is that a change can go from a phone to the live site without a
+# laptop in between: merge into main, and the deploy happens here rather than
+# from someone's machine with their personal Firebase login.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:      # ปุ่ม deploy เองจากหน้า Actions
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      # A red check is a reason not to publish, so the same checks run first.
+      - run: npm run lint
+      - run: npm run smoke predeploy
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: thdatabase
+          target: main
+          channelId: live

@@ -1,0 +1,38 @@
+# Runs the same two checks a session runs before pushing, on every branch and
+# pull request. The screenshots are kept as an artifact: when a check fails on
+# a change to the UI, the picture is usually the whole answer.
+name: CI
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Only Chromium, and only the browser: the smoke test launches nothing else.
+      - run: npx playwright install --with-deps chromium
+
+      - name: ตรวจไวยากรณ์และลำดับสคริปต์
+        run: npm run lint
+
+      - name: เปิดหน้าเว็บจริงแล้วถ่ายทุกหน้า
+        run: npm run smoke ci
+
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: .smoke/ci/
+          retention-days: 14

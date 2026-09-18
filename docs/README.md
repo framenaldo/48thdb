@@ -17,12 +17,14 @@ Firebase project `thdatabase`)
 | [07-playstore.md](07-playstore.md) | Google Play: บัญชี closed testing ปล่อยจริง | 2–4 สัปดาห์ (รอเทสต์ 14 วัน) |
 | [08-legal.md](08-legal.md) | ลิขสิทธิ์ BNK48/CGM48, PDPA, Privacy Policy | ต้องอ่านก่อนส่งรีวิว |
 | [09-checklist.md](09-checklist.md) | เช็กลิสต์ก่อนกดส่ง | — |
+| [10-cloud.md](10-cloud.md) | ทำงานบนคลาวด์: CI, deploy อัตโนมัติ, hook, ข้อจำกัด | ตั้งค่าแล้ว |
 
 ## ทำไปแล้วเท่าไหร่
 
 - ✅ `02` ขั้นที่ 1 — แยก `index.html` เป็น `css/app.css` + `js/*.js` 7 ไฟล์
 - ✅ `02` ขั้นที่ 2 — รูปเมมเบอร์ออกจาก base64 ไป `assets/members/` + lazy loading
 - ✅ ตัวทดสอบ `tools/smoke.mjs` — ถ่ายภาพ 9 สถานการณ์แล้วเทียบก่อน/หลังแก้
+- ✅ ตั้งค่าทำงานบนคลาวด์ — `CLAUDE.md`, hook, CI + deploy อัตโนมัติ (`10-cloud.md`)
 - ⬜ `02` ขั้นที่ 3 เป็นต้นไป (Firestore Rules, ย้ายข้อมูล, หน้าแอดมิน) — **ต้องเริ่มที่ Rules ก่อน**
 
 ## สรุปสั้นที่สุด ถ้าอ่านได้บรรทัดเดียว
