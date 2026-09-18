@@ -4,11 +4,18 @@
  * never touches the real project: the live Firestore holds everyone's oshi
  * lists and the members the app reconciles on every load, and a refactor is
  * not a good reason to write to it. An empty members collection is also the
- * most useful fixture — loadMembers() then falls back to the seed data in
- * index.html, which is exactly the data a refactor must not change.
+ * most useful fixture — loadMembers() and loadEvents() then fall back to the
+ * seed in js/data.js, which is exactly the data a refactor must not change.
  */
 (function () {
   const store = { members: new Map(), users: new Map() };
+
+  /* A test can hand the stub a database to start from — smoke.mjs sets this
+     before any script runs. Without it the collections are empty, which is the
+     state a project is in before anything has been migrated. */
+  for (const [col, rows] of Object.entries(window.__STUB_DATA__ || {})) {
+    store[col] = new Map(rows.map((row) => [row.id, row]));
+  }
 
   const snap = (data) => ({
     exists: data !== undefined,

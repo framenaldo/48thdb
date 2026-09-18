@@ -179,7 +179,9 @@ const db = getFirestore();
 const ctx = { console };
 vm.createContext(ctx);
 vm.runInContext(readFileSync('js/data.js', 'utf8'), ctx);
-const { SEED_SCHEDULE, SEED_SINGLES, SEED_ALBUMS, SEED_SENBATSU } = ctx;
+// `const` ในสคริปต์ไม่ได้ไปเกาะบนอ็อบเจ็กต์ ctx ต้องอ่านค่ากลับด้วยการ eval ชื่อมัน
+const [SEED_SCHEDULE, SEED_SINGLES, SEED_ALBUMS, SEED_SENBATSU] =
+  vm.runInContext('[SEED_SCHEDULE, SEED_SINGLES, SEED_ALBUMS, SEED_SENBATSU]', ctx);
 
 async function push(name, rows, idOf) {
   let batch = db.batch(), i = 0;

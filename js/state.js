@@ -10,7 +10,11 @@ let state = {
   showGraduated:false,
   statsTab:'overview', advOpen:false, selectedSingle:null, discTab:'singles', stagesOpen:{},
   ageMin:'', ageMax:'', heightMin:'', heightMax:'', birthMonth:'all',
-  theme: document.documentElement.dataset.theme || 'light'
+  theme: document.documentElement.dataset.theme || 'light',
+  // Null until Firestore answers. Everything reads the schedule through
+  // allEvents(), which falls back to the seed, so the page renders the same
+  // whether the collection has been filled in yet or not.
+  events: null
 };
 
 function applyTheme(theme){
@@ -26,6 +30,14 @@ function getGroup(id){ return GROUPS.find(g=>g.id===id); }
 function getTeam(id){ return TEAMS.find(t=>t.id===id); }
 function getTeamsForGroup(gid){ return TEAMS.filter(t=>t.groupId===gid); }
 function getMember(id){ return state.members.find(m=>m.id===id); }
+
+/* The schedule, from wherever it currently lives.
+   A new event used to mean editing js/data.js and deploying, which put a
+   fixture change behind a code release — and, once the app is in a store,
+   behind a review. The events collection is the editable copy; the seed stays
+   as the offline fallback and as what a fresh project starts from. */
+function allEvents(){ return state.events && state.events.length ? state.events : SEED_SCHEDULE; }
+function getEvent(id){ return allEvents().find(e => e.id === id); }
 
 /* ============================ LANGUAGE ============================
    Thai is the source: every string in this file is written in Thai, and English

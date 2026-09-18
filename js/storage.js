@@ -111,3 +111,51 @@ async function saveOshiData(){
     );
   }catch(e){}
 }
+
+/* ---------------------------- Events ----------------------------
+   The schedule is the one part of the data that changes every week, and it
+   used to change by editing js/data.js. Read from Firestore it can change
+   from a phone instead — but only ever additively: an empty collection, a
+   refused read or no network all fall back to the seed, so the page shows a
+   schedule under every failure rather than an empty feed.
+
+   meta/version is a counter anything that edits the data bumps. Reading that
+   one document tells us whether the cached copy is still good, which turns the
+   usual open of the app into a single document read instead of one per event. */
+const EVENTS_CACHE_KEY = '48thdb-events-1';
+
+function readEventsCache(){
+  try{ return JSON.parse(localStorage.getItem(EVENTS_CACHE_KEY) || 'null'); }catch(e){ return null; }
+}
+
+function writeEventsCache(version, events){
+  try{ localStorage.setItem(EVENTS_CACHE_KEY, JSON.stringify({ version, events })); }catch(e){}
+}
+
+async function fetchDataVersion(){
+  try{
+    const doc = await fbDb.doc('meta/version').get();
+    return doc.exists ? (doc.data().data ?? 0) : 0;
+  }catch(e){ return null; }   // unknown, which is not the same as unchanged
+}
+
+/* Returns the events to render, or null to mean "keep using the seed". */
+async function loadEvents(){
+  const cached = readEventsCache();
+  const version = await fetchDataVersion();
+
+  // Version unreadable (offline, rules) — a cached copy still beats nothing.
+  if(version === null) return cached ? cached.events : null;
+  if(cached && cached.version === version && cached.events.length) return cached.events;
+
+  try{
+    const snap = await fbDb.collection('events').get();
+    const events = snap.docs.map(d => d.data()).filter(e => e && e.id && e.start);
+    if(!events.length) return null;              // not migrated yet: seed stands
+    events.sort((a, b) => a.start < b.start ? -1 : a.start > b.start ? 1 : 0);
+    writeEventsCache(version, events);
+    return events;
+  }catch(e){
+    return cached ? cached.events : null;
+  }
+}

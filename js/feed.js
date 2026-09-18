@@ -110,7 +110,7 @@ function tickClock(){
   const now = toYmd(new Date());
   if(state.view === 'feed' && !state.query && !state.selectedId && !state.selectedEvent && !state.posterOf) {
     const iso = toYmd(todayStart());
-    const live = SEED_SCHEDULE.filter(e => (!filteringByOshi() || hasMyOshi(e)) && !e.period
+    const live = allEvents().filter(e => (!filteringByOshi() || hasMyOshi(e)) && !e.period
       && e.start <= iso && eventLastDay(e) >= iso && !doneForToday(e, iso)).sort((a,b) => a.start.localeCompare(b.start)).map(e => e.id).join(',');
     if(_feedLiveKey !== null && live !== _feedLiveKey){ renderMain(); return; }
   }
@@ -295,7 +295,7 @@ function renderSlotTable(ev){
 }
 
 function renderEventModal(){
-  const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
+  const ev = getEvent(state.selectedEvent);
   if(!ev) return '';
   const people = (ev.members || []).map(getMember).filter(Boolean);
   const groupTags = (ev.groups || []).map(getGroup).filter(Boolean);
@@ -362,9 +362,9 @@ function renderEventModal(){
         ${(ev.links || []).length ? `<div class="evm-related">${ev.links.map(l =>
           `<a class="chip chip-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)} ↗</a>`).join('')}</div>` : ''}
 
-        ${(ev.related || []).map(id => SEED_SCHEDULE.find(e => e.id === id)).filter(Boolean).length ? `
+        ${(ev.related || []).map(id => getEvent(id)).filter(Boolean).length ? `
         <h3 class="evm-head">งานที่เกี่ยวข้อง</h3>
-        <div class="evm-related">${ev.related.map(id => SEED_SCHEDULE.find(e => e.id === id)).filter(Boolean).map(r =>
+        <div class="evm-related">${ev.related.map(id => getEvent(id)).filter(Boolean).map(r =>
           `<button class="chip chip-link" data-action="open-event" data-id="${r.id}">${escapeHtml(r.title)} · ${eventDateLabel(r)}</button>`).join('')}</div>` : ''}
 
         ${people.length ? `
@@ -490,7 +490,7 @@ function searchEverything(q){
     members: state.members.filter(m => any(m.name, m.nameTh, m.realName, m.realNameTh)),
     tracks:  allTracks(true).filter(t => hit(t.track)),
     works:   [...ALL_WORKS(), ...SEED_SPECIALS].filter(w => any(w.title, w.alt)),
-    events:  SEED_SCHEDULE.filter(e => any(e.title, e.venue)
+    events:  allEvents().filter(e => any(e.title, e.venue)
                || (e.info || []).some(hit) || (e.detail || []).some(hit)),
     teams:   TEAMS.filter(t => hit(t.name)),
     groups:  GROUPS.filter(g => any(g.name, g.full, g.desc))
@@ -585,7 +585,7 @@ function renderFeed(){
   const upcoming = withBday.map(m => ({ m, d: daysUntilBirthday(m, today) }))
     .filter(x => x.d > 0).sort((a,b) => a.d - b.d).slice(0, 10);
 
-  const events = SEED_SCHEDULE.filter(e => !mine || hasMyOshi(e))
+  const events = allEvents().filter(e => !mine || hasMyOshi(e))
     .slice().sort((a,b) => a.start.localeCompare(b.start));
   const running = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
   const nowOn = running.filter(e => !e.period && !doneForToday(e, iso));
@@ -1431,7 +1431,7 @@ function renderMemberEvents(m){
   const iso = toYmd(todayStart());
   // On a rota what counts is her own turn, not the whole run: a booth that
   // opened on the 17th is not "today" for someone whose slot is the 22nd.
-  const evs = SEED_SCHEDULE.filter(e => (e.members || []).includes(m.id)).map(e => {
+  const evs = allEvents().filter(e => (e.members || []).includes(m.id)).map(e => {
     if(!e.slots) return e;
     const mine = slotsFor(e, m.id);
     const next = mine.find(s => s.date >= iso) || mine[mine.length - 1];

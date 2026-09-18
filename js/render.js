@@ -491,7 +491,7 @@ function closePoster(){ goBack(()=>{ state.posterOf = null; }); }
 /* Opening a poster full screen. The larger copy is a second file fetched only
    here, so the sheet is not made to carry it just in case someone taps. */
 function renderPosterViewer(){
-  const ev = SEED_SCHEDULE.find(e => e.id === state.posterOf);
+  const ev = getEvent(state.posterOf);
   if(!ev || !ev.poster || !ev.poster.img) return '';
   // One file for both: the poster as it was published, at its own size.
   const full = ev.poster.img;
@@ -539,7 +539,7 @@ function filteringByOshi(){ return state.oshiOnly && state.oshi.length > 0; }
 function calendarIndex(){
   const events = {}, births = {};
   const mine = filteringByOshi();
-  SEED_SCHEDULE.filter(ev => !mine || hasMyOshi(ev))
+  allEvents().filter(ev => !mine || hasMyOshi(ev))
     // A period marks the day it opens and the day it closes; a dot on every
     // day of a six-week vote would hide the days something actually happens.
     .forEach(ev => (ev.period ? [...new Set([ev.start, eventLastDay(ev)])] : eventDays(ev))

@@ -58,6 +58,23 @@ const VIEWS = [
       await page.waitForTimeout(300);
     },
   },
+  // The other half of the schedule move: with events in the database, the feed
+  // has to show those and not the seed's. Nothing else proves the read path —
+  // every case above renders identically whether it worked or fell back.
+  {
+    name: '10-events-from-db',
+    url: '?v=feed',
+    fixture: {
+      meta: [{ id: 'version', data: 7 }],
+      events: [
+        { id: 'stub-ev-1', title: 'งานทดสอบจากฐานข้อมูล', start: '2026-09-18', end: '2026-09-18',
+          time: '18:00', venue: 'ลานทดสอบ', members: [] },
+        { id: 'stub-ev-2', title: 'งานทดสอบใบที่สอง', start: '2026-12-24', end: '2026-12-24',
+          venue: 'ลานทดสอบ', members: [] },
+      ],
+    },
+    expect: ['งานทดสอบจากฐานข้อมูล', 'งานทดสอบใบที่สอง'],
+  },
 ];
 
 /* Playwright expects the exact browser build its own version pins, and the
@@ -114,6 +131,7 @@ async function capture(label) {
       timezoneId: 'Asia/Bangkok',
     });
     const page = await ctx.newPage();
+    if (view.fixture) await page.addInitScript(data => { window.__STUB_DATA__ = data; }, view.fixture);
     const errors = [];
     // "Failed to load resource" on its own never says which one, so the status
     // line is recorded next to it.
@@ -138,6 +156,11 @@ async function capture(label) {
       .catch(() => errors.push('TIMEOUT: app never rendered'));
     await page.waitForTimeout(600);   // let entrance animations settle
     if (view.drive) await view.drive(page).catch(e => errors.push(`DRIVE: ${e.message.split('\n')[0]}`));
+
+    const body = (await page.locator('#app').innerText()).replace(/\s+/g, ' ');
+    for (const wanted of view.expect || []) {
+      if (!body.includes(wanted)) errors.push(`EXPECT: ไม่เจอ "${wanted}" ในหน้า`);
+    }
 
     report[view.name] = {
       errors,

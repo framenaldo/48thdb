@@ -35,7 +35,7 @@ function tickerItems(){
   const items = [];
 
   // 1. on now, or on later today
-  for(const e of SEED_SCHEDULE.filter(e => !e.period && e.start <= iso && eventLastDay(e) >= iso)){
+  for(const e of allEvents().filter(e => !e.period && e.start <= iso && eventLastDay(e) >= iso)){
     if(e.slots){
       const { current, next } = slotNow(e, iso);
       const s = current || next;
@@ -61,7 +61,7 @@ function tickerItems(){
   items.sort((a, b) => (a.kind === 'today') - (b.kind === 'today'));
 
   // 2. announcements written into an event: { from, to, th, en }
-  for(const e of SEED_SCHEDULE.filter(e => e.announce)){
+  for(const e of allEvents().filter(e => e.announce)){
     if(mine && !hasMyOshi(e)) continue;
     for(const a of e.announce.filter(a => a.from <= iso && a.to >= iso))
       items.push({ kind:'news', to: ev(e), parts: [en ? (a.en || a.th) : a.th] });
@@ -76,7 +76,7 @@ function tickerItems(){
       return { text: `${nick(m)}${a != null ? (en ? ` (${a})` : ` อายุ ${a} ปี`) : ''}`, action:'open-member', id:m.id }; }) ] });
 
   // 4. ticket sales opening today, or closing within three days
-  for(const e of SEED_SCHEDULE.filter(e => e.sales && !e.bookClosed)){
+  for(const e of allEvents().filter(e => e.sales && !e.bookClosed)){
     if(mine && !hasMyOshi(e)) continue;
     const { from, to } = e.sales;
     if(from && from.slice(0,10) === iso && slotTime(iso, hm(from)) > now - 3600000)
@@ -91,8 +91,8 @@ function tickerItems(){
   }
 
   // 5. a vote: open, on its last day, or waiting on results
-  for(const e of SEED_SCHEDULE.filter(e => e.ticker)){
-    const results = SEED_SCHEDULE.find(r => r.id === e.ticker.results);
+  for(const e of allEvents().filter(e => e.ticker)){
+    const results = getEvent(e.ticker.results);
     const last = eventLastDay(e);
     const res = results ? (en ? `Results ${day(results.start)}` : `ประกาศผล ${day(results.start)}`) : null;
     if(e.start <= iso && last >= iso){
@@ -438,7 +438,7 @@ function applyUrlToState(){
   const p = new URLSearchParams(BOOT_QUERY);
   const ev = p.get('e'), mem = p.get('m'), sng = p.get('s'), view = p.get('v');
 
-  if(ev && SEED_SCHEDULE.some(x => x.id === ev)){ state.view='feed'; state.selectedEvent=ev; return; }
+  if(ev && allEvents().some(x => x.id === ev)){ state.view='feed'; state.selectedEvent=ev; return; }
   if(mem && (state.members||[]).some(x => x.id === mem)){
     const m = getMember(mem);
     state.view = 'browse';
@@ -805,7 +805,7 @@ function bindDelegatedEvents(){
     else if(action==='import-oshi'){ importOshi(); }
     else if(action==='share'){
       const m = state.selectedId ? getMember(state.selectedId) : null;
-      const ev = state.selectedEvent ? SEED_SCHEDULE.find(x=>x.id===state.selectedEvent) : null;
+      const ev = state.selectedEvent ? getEvent(state.selectedEvent) : null;
       shareCurrent(m ? `${m.nameTh} — 48thDB` : ev ? `${ev.title} — 48thDB` : '48thDB');
     }
     else if(action==='close-modal'){
@@ -1145,6 +1145,12 @@ async function init(){
       try{ state.members = await loadMembers(); }
       catch(e){ state.members = SEED_ALL_MEMBERS.slice(); }
       learnNames();
+    }
+    // Events are read alongside the members rather than after them: both are
+    // needed for the first draw, and one after the other would show the feed
+    // twice. A failure here leaves state.events null, which means the seed.
+    if(state.events === null){
+      try{ state.events = await loadEvents(); }catch(e){ state.events = null; }
     }
     const oshiData = await loadOshiData();
     state.oshi = oshiData.oshi;
