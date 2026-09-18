@@ -1632,6 +1632,58 @@
   .tl-venue, .tl-note{ display:block; margin-top:3px; font-size:12.5px; color:var(--ink-soft); line-height:1.45; }
   .tlp-card.is-on .tl-title{ color:var(--k); }
   .tl-jump{ margin:2px 0 6px; }
+  /* the badge that gives a sheet its face */
+  .evm-icon{
+    flex:none; width:38px; height:38px; border-radius:50%; display:inline-flex;
+    align-items:center; justify-content:center; color:var(--c);
+    background:color-mix(in srgb, var(--c) 13%, transparent);
+    border:1px solid color-mix(in srgb, var(--c) 28%, var(--line));
+  }
+  .evm-icon svg{ width:20px; height:20px; display:block; }
+  .evm-icon.is-img{ background:none; border:0; }
+  .evm-icon.is-img img{ width:38px; height:38px; border-radius:50%; display:block; object-fit:cover; }
+  .tl-icon{
+    display:inline-flex; align-items:center; justify-content:center; vertical-align:-5px;
+    width:22px; height:22px; margin-right:6px; color:var(--k);
+  }
+  .tl-icon svg{ width:18px; height:18px; display:block; }
+  .tl-icon.is-img img{ width:21px; height:21px; border-radius:50%; display:block; object-fit:cover; }
+
+  /* The shop: one card per thing on sale, the poster beside what it costs. */
+  .shop{ max-width:1040px; margin-inline:auto; }
+  .shop-note{ margin:5px 0 0; font-size:13px; color:var(--ink-soft); }
+  .shop-grid{ display:grid; gap:14px; margin-top:16px; }
+  .shop-card{
+    display:grid; grid-template-columns:100px minmax(0, 1fr); gap:14px; padding:12px;
+    border:1px solid var(--line); border-radius:18px; background:var(--glass-card);
+  }
+  .shop-card.is-over{ opacity:.6; }
+  .shop-thumb{
+    align-self:start; padding:0; border:1px solid var(--line); border-radius:12px;
+    background:none; cursor:pointer; overflow:hidden; line-height:0;
+  }
+  .shop-thumb img{ display:block; width:100%; height:auto; }
+  .shop-body{ min-width:0; }
+  .shop-meta{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0; }
+  .shop-kind{ padding:2px 9px; border-radius:999px; background:var(--c); color:#fff; font-size:10.5px; font-weight:800; }
+  .shop-status{ font-size:11.5px; font-weight:800; color:var(--ink-soft); }
+  .shop-card.is-open .shop-status{ color:#1B8E52; }
+  .shop-card.is-over .shop-status{ color:#C8231A; }
+  .shop-title{ margin:7px 0 0; font-size:16px; font-weight:800; line-height:1.35; }
+  .shop-price{ margin:4px 0 0; font-size:15px; font-weight:800; color:var(--c); }
+  .shop-facts{ margin:8px 0 10px; padding-left:16px; font-size:12.5px; color:var(--ink-soft); line-height:1.65; }
+  .shop-btn{
+    position:relative; flex-shrink:0; width:34px; height:34px; border-radius:50%; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; padding:0; color:var(--ink);
+    background:rgba(255,255,255,calc(.5*var(--glass-k)));
+    border:1px solid rgba(255,255,255,calc(.7*var(--glass-k)));
+  }
+  .shop-btn svg{ width:17px; height:17px; display:block; }
+  .shop-dot{
+    position:absolute; top:-4px; right:-4px; min-width:17px; height:17px; padding:0 4px;
+    border-radius:999px; background:var(--gold); color:#241a06;
+    font-size:10.5px; font-weight:800; line-height:17px; text-align:center;
+  }
 
   /* the way in, in the header */
   .tlp-btn{
@@ -2242,6 +2294,8 @@
     .tlp-poster-btn{ flex-basis:168px; }
     .tlp-head{ gap:24px; margin-bottom:24px; }
     .tlp-legend{ flex-direction:row; flex-wrap:wrap; gap:6px 20px; }
+    .shop-grid{ grid-template-columns:repeat(auto-fill, minmax(min(100%, 440px), 1fr)); }
+    .shop-card{ grid-template-columns:124px minmax(0, 1fr); }
 
     /* songs: singles, albums and specials as three columns */
     .disc-tabs{ display:none; }
@@ -3125,6 +3179,12 @@ const SEED_SCHEDULE = [
       'รับของจากมือสมาชิกเอง พร้อมถ่าย 2-Shot ด้วยโทรศัพท์ของตัวเอง',
       'ถ้าไม่ประสงค์ถ่ายภาพร่วมกับสมาชิก จะได้เป็นไฟล์ภาพสมาชิกถือของรางวัลจากกล้องของทีมงานแทน',
       'วันรับของรางวัลและรายละเอียดเพิ่มเติมรอประกาศอีกครั้ง'] }] },
+  { id:'ev-concert-2026', start:'2026-11-14', part:'รอบกลางวัน', tba:true,
+    title:'BNK48 & CGM48 Concert 2026', groups:['bnk48','cgm48'],
+    timeline:'ge2026', related:['ev-election-results','ev-ge6-heart'],
+    info:['จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ',
+      'รายละเอียดสถานที่และเวลารอประกาศ'],
+    lineupTba:true },
   { id:'ev-election-results', start:'2026-11-14', part:'รอบค่ำ',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 · Final Results', groups:['bnk48','cgm48'], tba:true,
     related:['ev-election-voting','ev-election-fanfest','ev-concert-2026','ev-ge6-heart'],
@@ -3152,6 +3212,9 @@ const SEED_SCHEDULE = [
      with the election rather than in the discography until they are released. */
   { id:'ev-ge6-single', start:'2026-09-26', end:'2026-10-30', period:true,
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" · Pre-Order',
+    shop:{ name:'ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"', kind:'ซิงเกิลพิเศษ',
+      price:'272 – 420 บาท', from:'2026-09-26T12:00', to:'2026-10-30T23:00',
+      deliver:'30 พ.ย. 2026 เป็นต้นไป', shopName:'iAM Shop' },
     groups:['bnk48','cgm48'], timeline:'ge2026',
     related:['ev-election-voting','ev-ge6-photoset','ev-ge6-handshake','ev-ge6-myo1','ev-ge6-myo2'],
     announce:[
@@ -3184,6 +3247,9 @@ const SEED_SCHEDULE = [
     ] },
   { id:'ev-ge6-photoset', start:'2026-09-26', end:'2026-11-10', period:true,
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Special Photoset',
+    shop:{ name:'Special Photoset GE2026', kind:'รูปสะสม',
+      price:'270 บาท', from:'2026-09-26T12:00', to:'2026-11-10T23:00',
+      deliver:'11 ธ.ค. 2026 เป็นต้นไป', shopName:'iAM Shop' },
     groups:['bnk48','cgm48'], price:'270', timeline:'ge2026',
     related:['ev-election-voting','ev-ge6-single'],
     announce:[{ from:'2026-11-07', to:'2026-11-10', th:'ปิดพรีออเดอร์ Special Photoset 10 พ.ย. 23:00 น.',
@@ -3217,12 +3283,6 @@ const SEED_SCHEDULE = [
     info:['แลกบัตรได้ถึง 24 พ.ย. 2026 23:00 น.',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
       'รอบเวลารอประกาศอีกครั้ง'],
-    lineupTba:true },
-  { id:'ev-concert-2026', start:'2026-11-14', part:'รอบกลางวัน', tba:true,
-    title:'BNK48 & CGM48 Concert 2026', groups:['bnk48','cgm48'],
-    timeline:'ge2026', related:['ev-election-results','ev-ge6-heart'],
-    info:['จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ',
-      'รายละเอียดสถานที่และเวลารอประกาศ'],
     lineupTba:true },
   { id:'ev-ge6-heart', start:'2026-11-15', tba:true,
     title:'BNK48 & CGM48 Senbatsu General Election 2026 : Heart to Heart',
@@ -4400,6 +4460,17 @@ const EN = {
   'ไทม์ไลน์ทั้งงาน →': 'Full timeline →',
   'ไทม์ไลน์ GE2026': 'GE2026 timeline',
   'ไม่พบไทม์ไลน์': 'No timeline found',
+  'ร้านค้า': 'Shop',
+  'สินค้าและพรีออเดอร์ที่เปิดอยู่ตอนนี้': 'Merchandise and pre-orders open right now',
+  'ตอนนี้ยังไม่มีสินค้าที่เปิดขาย': 'Nothing is on sale at the moment',
+  'ดูรายละเอียด →': 'See the details →',
+  'ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"': 'Special single "Kimi to Doko ka e Ikitai"',
+  'รูปสะสม': 'Photos',
+  'ปิดรับแล้ว': 'Closed',
+  'เปิดพรุ่งนี้': 'Opens tomorrow',
+  'ทาง iAM Shop': 'From the iAM Shop',
+  '272 – 420 บาท': '272 – 420 THB',
+  '270 บาท': '270 THB',
   'การโหวต': 'Voting',
   'พรีออเดอร์ซิงเกิลพิเศษ Physical Edition': 'Pre-order, special single Physical Edition',
   'พรีออเดอร์ Digital Edition และ Special Photoset': 'Pre-order, Digital Edition and Special Photoset',
@@ -4862,6 +4933,9 @@ const EN_PATTERNS = [
   /* a label followed by a separator whose next part is its own element */
   [rx('(.+) ·'), m => { const w = toEn(m[1]); return w == null ? null : `${w} ·`; }],
   [rx('วันที่ (\\d+) จาก (\\d+)'), m => `Day ${m[1]} of ${m[2]}`],
+  /* the shop */
+  [rx('เปิดอยู่ · เหลืออีก (\\d+) วัน'), m => `Open · ${m[1]} ${plural(m[1],'day','days')} left`],
+  [rx('เปิดในอีก (\\d+) วัน'), m => `Opens in ${m[1]} ${plural(m[1],'day','days')}`],
 
   /* counts */
   [rx('เซ็มบัตสึ (\\d+) คน'), m => `Senbatsu of ${m[1]}`],
@@ -5192,6 +5266,11 @@ function renderHeader(){
     <button class="tlp-btn" data-action="open-timeline" data-id="ge2026" title="ไทม์ไลน์ Senbatsu General Election 2026">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4v16"/><circle cx="5" cy="8" r="1.6"/><circle cx="5" cy="16" r="1.6"/><path d="M10 8h9M10 16h6"/></svg>
       <span>ไทม์ไลน์ GE2026</span></button>
+    <button class="shop-btn" data-action="nav-shop" title="ร้านค้า" aria-label="ร้านค้า">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>
+      ${(() => { const n = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
+        return n ? `<span class="shop-dot">${n}</span>` : ''; })()}
+    </button>
     <button class="theme-btn" data-action="toggle-theme" aria-label="สลับธีมสว่าง/มืด">${state.theme==='dark'?ICONS.sun:ICONS.moon}</button>
     <button class="lang-btn" data-action="toggle-lang" aria-label="เปลี่ยนภาษา">${isEN()?'ไทย':'EN'}</button>
     <button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>
@@ -6504,6 +6583,74 @@ function renderSlotTable(ev){
 /* A page of its own for a campaign that runs for months: the dates down the
    left, the stretches that stay open drawn as bars beside them the way the
    official poster draws them, and every step a card you can open. */
+/* Everything on sale, newest window first: what it is, what it costs, how long
+   it is open and when it ships. The detail lives in the event sheet, so a card
+   is a way in rather than a page of its own. */
+function shopStatus(e, now){
+  const s = e.shop;
+  const from = slotTime(s.from.slice(0,10), s.from.slice(11,16));
+  const to   = slotTime(s.to.slice(0,10), s.to.slice(11,16));
+  return { from, to, state: now < from ? 'soon' : now > to ? 'over' : 'open' };
+}
+
+function renderShopPage(){
+  const now = Date.now();
+  const iso = toYmd(todayStart());
+  const M = monthsShort();
+  const en = isEN();
+  const when = s => {
+    const [d, t] = s.split('T');
+    const [, m, dd] = d.split('-').map(Number);
+    return `${dd} ${M[m-1]}${t ? ' ' + t + (en ? '' : ' น.') : ''}`;
+  };
+  const daysTo = ms => Math.ceil((ms - now) / 86400000);
+  const items = SEED_SCHEDULE.filter(e => e.shop)
+    .map(e => ({ e, ...shopStatus(e, now) }))
+    .sort((a, b) => (a.state === b.state ? a.to - b.to
+      : ({ open:0, soon:1, over:2 })[a.state] - ({ open:0, soon:1, over:2 })[b.state]));
+
+  const card = ({ e, from, to, state }) => {
+    const s = e.shop;
+    const left = daysTo(to);
+    const till = daysTo(from);
+    const status = state === 'open'
+      ? (left <= 1 ? 'วันสุดท้าย' : `เปิดอยู่ · เหลืออีก ${left} วัน`)
+      : state === 'soon'
+      ? (till <= 1 ? 'เปิดพรุ่งนี้' : `เปิดในอีก ${till} วัน`)
+      : 'ปิดรับแล้ว';
+    return `<article class="shop-card is-${state}" style="--c:${e.poster ? e.poster.accent : 'var(--ink-soft)'}">
+      ${e.poster && e.poster.img ? `<button class="shop-thumb" data-action="open-event" data-id="${e.id}"
+        aria-label="${escapeAttr(s.name)}">
+        <img src="${escapeAttr(e.poster.img)}" width="${e.poster.w}" height="${e.poster.h}"
+          alt="${escapeAttr(s.name)}" loading="lazy" decoding="async">
+      </button>` : ''}
+      <div class="shop-body">
+        <p class="shop-meta"><span class="shop-kind">${escapeHtml(s.kind)}</span>
+          <span class="shop-status">${status}</span></p>
+        <h3 class="shop-title">${escapeHtml(s.name)}</h3>
+        <p class="shop-price">${escapeHtml(s.price)}</p>
+        <ul class="shop-facts">
+          <li>${en ? 'On sale' : 'สั่งซื้อ'} ${when(s.from)} – ${when(s.to)}</li>
+          ${s.deliver ? `<li>ส่งสินค้า ${escapeHtml(s.deliver)}</li>` : ''}
+          ${s.shopName ? `<li>ทาง ${escapeHtml(s.shopName)}</li>` : ''}
+        </ul>
+        <button class="chip chip-link" data-action="open-event" data-id="${e.id}">ดูรายละเอียด →</button>
+      </div>
+    </article>`;
+  };
+
+  return `
+  <section class="shop">
+    <header class="feed-head">
+      <p class="feed-today">48thDB</p>
+      <h1 class="feed-title">ร้านค้า</h1>
+      <p class="shop-note">สินค้าและพรีออเดอร์ที่เปิดอยู่ตอนนี้</p>
+    </header>
+    ${items.length ? `<div class="shop-grid">${items.map(card).join('')}</div>`
+      : `<p class="muted-note">ตอนนี้ยังไม่มีสินค้าที่เปิดขาย</p>`}
+  </section>`;
+}
+
 function renderTimelinePage(){
   const key = state.timelineId || 'ge2026';
   const page = TIMELINE_PAGES[key], items = TIMELINES[key];
@@ -6534,7 +6681,8 @@ function renderTimelinePage(){
     const done = endOf(it) < iso;
     const on = it.d <= iso && endOf(it) >= iso;
     const next = !on && !done && it.d === nextD;
-    const body = `${minor ? '' : `<span class="tl-kind">${k.th}</span>`}
+    const ico = minor ? '' : renderEventIcon(SEED_SCHEDULE.find(e => e.id === it.ev), 'tl-icon');
+    const body = `${ico}${minor ? '' : `<span class="tl-kind">${k.th}</span>`}
       ${it.time ? `<span class="tl-time">${it.time} น.</span>` : ''}
       ${it.part ? `<span class="tl-time">${escapeHtml(it.part)}</span>` : ''}
       ${on ? '<span class="tl-now">วันนี้</span>' : next ? '<span class="tl-next">ถัดไป</span>' : ''}
@@ -6550,7 +6698,8 @@ function renderTimelinePage(){
         : `<span class="${cls}${done ? ' is-done' : ''}" style="grid-row:${n + 1}; --k:${tr.color}">${body}</span>`}`;
   }).join('');
 
-  const span = `${day(items[0].d)} – ${day(endOf(items[items.length-1]))} ${enYear(items[0].d.slice(0,4)) + 543}`;
+  const yr = +items[0].d.slice(0,4);
+  const span = `${day(items[0].d)} – ${day(endOf(items[items.length-1]))} ${isEN() ? yr : yr + 543}`;
   return `
   <section class="tlp" style="--pc:${page.poster.accent}">
     <div class="tlp-head">
@@ -6572,6 +6721,52 @@ function renderTimelinePage(){
     </div>
   </section>`;
 }
+/* A face for each kind of outing, so a sheet is recognisable before it is read.
+   Line art in the site's own weight, except the GE6 token, which is the real
+   coin off the official poster. */
+const EV_ICONS = {
+  token:     '<img src="posters/ge6-token.png" width="196" height="196" alt="" decoding="async">',
+  trophy:    '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22"/><path d="M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  mic:       '<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4M9 21h6"/>',
+  handshake: '<path d="m11 17 1.6 1.6a1.4 1.4 0 0 0 2-2"/><path d="m13.6 14.4 2.4 2.4a1.4 1.4 0 0 0 2-2l-3.7-3.7a2.8 2.8 0 0 0-4 0l-.8.8a1.4 1.4 0 1 1-2-2L10.2 7a5.5 5.5 0 0 1 6.7-.8l.4.2a2 2 0 0 0 1.3.3L21 6.4"/><path d="M3 6.4 2.2 14l6 6a1.4 1.4 0 0 0 2-2"/><path d="M3 5.6h7"/>',
+  videocall: '<rect x="4" y="2" width="13" height="20" rx="2.6"/><rect x="7" y="6" width="7" height="6" rx="1.4"/><path d="m17 8.6 3-1.6v6l-3-1.6"/><path d="M9.5 18.5h2"/>',
+  heart:     '<path d="M19.5 13.6c1.4-1.4 2.5-2.9 2.5-5A4.8 4.8 0 0 0 17.2 4C15.6 4 14.3 4.8 12 7 9.7 4.8 8.4 4 6.8 4A4.8 4.8 0 0 0 2 8.6c0 2.1 1.1 3.6 2.5 5L12 21Z"/>',
+  sparkles:  '<path d="m12 3-1.7 5a2 2 0 0 1-1.3 1.3L4 11l5 1.7a2 2 0 0 1 1.3 1.3L12 19l1.7-5a2 2 0 0 1 1.3-1.3L20 11l-5-1.7A2 2 0 0 1 13.7 8Z"/><path d="M19 17.5 19.6 19l1.5.5-1.5.6L19 21.6 18.4 20l-1.5-.5 1.5-.6Z"/>',
+  disc:      '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.6"/><path d="M12 3a9 9 0 0 1 8.5 6"/>',
+  photos:    '<rect x="3" y="3" width="14" height="14" rx="2.4"/><path d="M7 21h12a2 2 0 0 0 2-2V7"/><circle cx="8.2" cy="8.2" r="1.5"/><path d="m3.4 14.4 3.2-3.2 4 4"/>',
+  cup:       '<path d="M5 8h11v6a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5Z"/><path d="M16 9.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 2.5 7.5 5M12 2.5 11.5 5"/>',
+  ball:      '<circle cx="12" cy="12" r="9"/><path d="m12 7.5 3.6 2.6-1.4 4.2H9.8L8.4 10.1Z"/><path d="M12 3v4.5M3.6 9.6l4.8.5M20.4 9.6l-4.8.5M6.8 19.6 9.8 14.3M17.2 19.6l-3-5.3"/>',
+  plane:     '<path d="M10.5 13.5 3 11.2l18-7.2-7.2 18-2.3-7.5Z"/><path d="m10.5 13.5 3.8-3.8"/>',
+  tv:        '<rect x="2.5" y="6.5" width="19" height="13" rx="2.4"/><path d="m8 2.5 4 4 4-4"/>',
+  cake:      '<path d="M4 15.5c1.6 0 1.6 1.5 3.2 1.5s1.6-1.5 3.2-1.5 1.6 1.5 3.2 1.5 1.6-1.5 3.2-1.5 1.6 1.5 3.2 1.5"/><path d="M4 21h16"/><path d="M5 17.6V12a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5.6"/><path d="M12 10V7M9 10V8M15 10V8"/>',
+};
+/* Which face belongs to which outing. Anything without one falls back to its
+   tag or its theme, and otherwise simply has none. */
+const EVENT_ICON = {
+  'ev-election-voting':'token', 'ev-election-results':'trophy', 'ev-election-fanfest':'sparkles',
+  'ev-ge6-single':'disc', 'ev-ge6-photoset':'photos', 'ev-ge6-handshake':'handshake',
+  'ev-ge6-myo1':'videocall', 'ev-ge6-myo2':'videocall', 'ev-concert-2026':'mic', 'ev-ge6-heart':'heart',
+  'ev-roadshow-mbk':'mic', 'ev-roadshow-fashionisland':'mic', 'ev-roadshow-0905':'mic',
+  'ev-nine-charity':'mic', 'ev-charity-football-2026':'ball', 'ev-fame-fanmeet':'heart',
+  'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
+  'ev-getaway-pudthailee':'plane', 'ev-pancake-perfume':'sparkles', 'ev-pancake-captured':'photos',
+};
+function eventIconName(ev){
+  if(!ev) return '';
+  if(EVENT_ICON[ev.id]) return EVENT_ICON[ev.id];
+  if(ev.theme === 'birthday') return 'cake';
+  if(ev.tag === 'media') return 'tv';
+  return '';
+}
+function renderEventIcon(ev, cls){
+  const name = eventIconName(ev);
+  if(!name) return '';
+  const art = EV_ICONS[name];
+  const img = art.startsWith('<img');
+  return `<span class="${cls}${img ? ' is-img' : ''}" aria-hidden="true">${img ? art
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${art}</svg>`}</span>`;
+}
+
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
   if(!ev) return '';
@@ -6602,6 +6797,7 @@ function renderEventModal(){
         </div>
         <div class="evm-body">
         <div class="evm-meta">
+          ${renderEventIcon(ev, 'evm-icon')}
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}${ev.part?' · '+escapeHtml(ev.part):''}</p>
           ${(()=>{ const at = startsAt(ev, toYmd(todayStart()));
             return at ? `<span class="evm-starts" data-starts-at="${at}">${startsLabel(at)}</span>` : ''; })()}
@@ -6873,7 +7069,8 @@ function renderFeed(){
   const upcoming = withBday.map(m => ({ m, d: daysUntilBirthday(m, today) }))
     .filter(x => x.d > 0).sort((a,b) => a.d - b.d).slice(0, 10);
 
-  const events = SEED_SCHEDULE.filter(e => !mine || hasMyOshi(e))
+  // Things on sale have a shop of their own; the feed is for what happens.
+  const events = SEED_SCHEDULE.filter(e => !e.shop && (!mine || hasMyOshi(e)))
     .slice().sort((a,b) => a.start.localeCompare(b.start));
   const running = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
   const nowOn = running.filter(e => !e.period && !doneForToday(e, iso));
@@ -8219,6 +8416,7 @@ function renderMain(){
     (state.query.trim() ? renderSearch() :
     state.view==='feed' ? renderFeed() :
     state.view==='timeline' ? renderTimelinePage() :
+    state.view==='shop' ? renderShopPage() :
     state.view==='browse' ? renderBrowse() :
     state.view==='groups' ? renderGroups() :
     state.view==='org' ? renderOrgChart() :
@@ -8440,7 +8638,7 @@ const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
 // stays put, which is what lets this work on static hosting with no rewrites.
-const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','timeline'];
+const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','timeline','shop'];
 
 // Read at load time. The first history entry is written before the member list
 // has arrived, and writing it derives the address from a state that is still
@@ -8792,6 +8990,12 @@ function bindDelegatedEvents(){
       state.oshiOnly = id === '1';
       state.calDay = null;   // the day that was open may not survive the filter
       renderMain(); replaceHistory();
+    }
+    else if(action==='nav-shop'){
+      state.view = 'shop';
+      state.selectedEvent = null; state.selectedId = null; state.editingId = null;
+      state.query = '';
+      render(); pushHistory();
     }
     else if(action==='open-timeline'){
       state.timelineId = id || 'ge2026';
