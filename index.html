@@ -1559,11 +1559,7 @@
      step, coloured down its left edge by what kind of step it is. On a phone
      the row stacks so the title has the full width to itself. */
   .tl-month{ margin:0; }
-  .tl-month-head{
-    display:flex; align-items:baseline; justify-content:space-between; gap:10px;
-    margin:16px 0 8px; font-size:13.5px; font-weight:800; color:var(--c);
-  }
-  .tl-month-left{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .tl-month-head{ margin:16px 0 8px; font-size:13.5px; font-weight:800; color:var(--c); }
   .tl-past-btn{
     display:inline-flex; align-items:center; gap:6px; margin:2px 0 2px; padding:5px 12px;
     border:1px solid var(--line); border-radius:999px; background:var(--glass-card);
@@ -4350,7 +4346,6 @@ const EN = {
   'วันสุดท้าย': 'Last day',
   'คลิปประกาศ ↗': 'Announcement video ↗',
   'ไทม์ไลน์ทั้งงาน': 'Full timeline',
-  'ผ่านไปแล้ว': 'All passed',
   'ซ่อนรายการที่ผ่านไปแล้ว': 'Hide what has passed',
   'ถัดไป': 'Next',
   'เริ่ม': 'Start',
@@ -4810,7 +4805,6 @@ const EN_PATTERNS = [
   /* a label followed by a separator whose next part is its own element */
   [rx('(.+) ·'), m => { const w = toEn(m[1]); return w == null ? null : `${w} ·`; }],
   [rx('วันที่ (\\d+) จาก (\\d+)'), m => `Day ${m[1]} of ${m[2]}`],
-  [rx('เหลือ (\\d+) รายการ'), m => `${m[1]} left`],
   [rx('ดูรายการที่ผ่านไปแล้ว \\((\\d+)\\)'), m => `Show what has passed (${m[1]})`],
 
   /* counts */
@@ -6492,10 +6486,8 @@ function renderTimeline(id){
 
   const blocks = months.map(mo => {
     const [y, m] = mo.key.split('-').map(Number);
-    const left = mo.items.filter(it => endOf(it) >= iso).length;
     return `<div class="tl-month">
-      <h4 class="tl-month-head"><span>${MONTH_NAMES[m-1]} ${y + 543}</span>
-        <span class="tl-month-left">${left ? `เหลือ ${left} รายการ` : 'ผ่านไปแล้ว'}</span></h4>
+      <h4 class="tl-month-head">${MONTH_NAMES[m-1]} ${y + 543}</h4>
       <ol class="ge-timeline">${mo.items.map(row).join('')}</ol>
     </div>`;
   }).join('');
