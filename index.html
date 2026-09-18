@@ -877,6 +877,7 @@
   }
   .lv-col{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; min-width:0; }
   .lv-val{ min-height:15px; font-size:10.5px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .lv-col.is-zero .lv-val{ color:var(--ink-soft); font-weight:600; opacity:.6; }
   .lv-bar{ display:block; width:min(100%, 18px); border-radius:4px 4px 0 0; background:var(--c); max-height:calc(100% - 34px); }
   .lv-col.is-current .lv-bar{ background:color-mix(in srgb, var(--c) 45%, transparent); }
   .lv-mon{ margin:4px 0 6px; font-size:9.5px; color:var(--ink-soft); white-space:nowrap; }
@@ -6191,12 +6192,10 @@ function renderMemberLives(m){
     months.push({ key, n: L.months[key] || 0, label: M[d.getMonth()], year: d.getFullYear(), current: i === 0 });
   }
   const top = Math.max(1, ...months.map(x => x.n));
-  const peakMonth = months.reduce((a, b) => b.n > a.n ? b : a, months[0]);
   const bars = months.map(x => {
     const tip = `${x.label} ${x.year} · ${x.n} ${en ? (x.n === 1 ? 'live' : 'lives') : 'ไลฟ์'}${x.current ? (en ? ' so far' : ' (เดือนนี้)') : ''}`;
-    const show = x.n && (x === peakMonth || x.current);
-    return `<div class="lv-col${x.current ? ' is-current' : ''}" title="${escapeAttr(tip)}" aria-label="${escapeAttr(tip)}" role="img">
-      <span class="lv-val">${show ? x.n : ''}</span>
+    return `<div class="lv-col${x.current ? ' is-current' : ''}${x.n ? '' : ' is-zero'}" title="${escapeAttr(tip)}" aria-label="${escapeAttr(tip)}" role="img">
+      <span class="lv-val">${x.n}</span>
       <span class="lv-bar" style="height:${x.n ? Math.max(4, Math.round(x.n / top * 100)) : 0}%"></span>
       <span class="lv-mon">${x.label}</span>
     </div>`;
