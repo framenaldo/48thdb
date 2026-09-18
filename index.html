@@ -864,6 +864,8 @@
   .social-chip:active{ transform:scale(.9); transition-duration:.08s; }
   .social-ico{ width:19px; height:19px; flex:none; color:var(--c); }
   .social-ico svg{ width:100%; height:100%; display:block; }
+  .social-chip.is-iam{ --c:#C8A04A; }
+  .social-ico img{ width:100%; height:100%; display:block; border-radius:5px; }
   .social-handle{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:15ch; }
 
   .works-count{ color:var(--ink-soft); font-size:12.5px; margin:6px 0 0; }
@@ -6104,10 +6106,19 @@ const SOCIAL = {
     icon:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8C22 15.2 22 12 22 12s0-3.2-.4-4.8zM10 15.5v-7l6 3.5z"/></svg>` },
 };
 
+/* Every current member has a page in the iAM48 app at
+   /members/<group>/<nickname>; all 58 were checked to open the right person. */
+const iamUrl = m => m && !m.graduated && m.groupId && m.name
+  ? `https://app.bnk48.com/members/${m.groupId}/${m.name.toLowerCase().replace(/[^a-z0-9]/g, '')}` : '';
+
 function renderSocial(m){
-  const links = SEED_SOCIAL[m.id];
-  if(!links || !links.length) return '';
+  const links = SEED_SOCIAL[m.id] || [];
+  const iam = iamUrl(m);
+  if(!links.length && !iam) return '';
   return `<div class="social-row">
+    ${iam ? `<a class="social-chip is-iam" href="${escapeAttr(iam)}" target="_blank" rel="noopener noreferrer"
+        title="iAM48: ${escapeAttr(m.name)}" aria-label="iAM48: ${escapeAttr(m.name)}">
+        <span class="social-ico"><img src="iam48-icon.png" width="96" height="96" alt=""></span></a>` : ''}
     ${links.map(([p, handle])=>{
       const s = SOCIAL[p];
       if(!s) return '';
