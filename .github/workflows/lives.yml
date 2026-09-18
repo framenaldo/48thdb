@@ -32,6 +32,8 @@ jobs:
       - name: Collect YouTube views
         continue-on-error: true      # a refused YouTube must not hold back the live stats
         timeout-minutes: 12
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python3 scripts/collect-youtube.py
 
       - name: Publish if anything changed
