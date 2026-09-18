@@ -174,6 +174,7 @@
     font-family:'Noto Sans Thai',sans-serif; font-weight:800; font-size:21px; letter-spacing:.3px;
     display:flex; flex-direction:column; line-height:1.15; margin-right:4px;
   }
+  .logo-mark{ display:block; height:27px; width:auto; color:var(--ink); }
   .wordmark small{
     font-family:'Noto Sans Thai',sans-serif; font-weight:500; font-size:9px; letter-spacing:2.5px;
     color:var(--ink-soft); margin-top:5px;
@@ -5279,7 +5280,7 @@ async function saveOshiData(){
 function renderHeader(){
   return `
   <header class="top">
-    <div class="wordmark" data-action="nav-select" data-value="feed" style="cursor:pointer;">48thDB<small>48 THAILAND DATABASE</small></div>
+    <div class="wordmark" data-action="nav-select" data-value="feed" style="cursor:pointer;">${LOGO_SVG}<small>48 THAILAND DATABASE</small></div>
     <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก เพลง งาน..." value="${escapeAttr(state.query)}">
     <button class="tlp-btn" data-action="open-timeline" data-id="ge2026" title="ไทม์ไลน์ Senbatsu General Election 2026">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4v16"/><circle cx="5" cy="8" r="1.6"/><circle cx="5" cy="16" r="1.6"/><path d="M10 8h9M10 16h6"/></svg>
@@ -5318,6 +5319,13 @@ function renderProfileSlot(){
       </div>` : ''}
     </div>`;
 }
+
+/* The 48thDb logo, drawn by the owner in ITC Avant Garde and turned into
+   outlines here so it looks the same without the font. It takes the text
+   colour, so it is black on the light theme and white on the dark one. */
+const LOGO_PATH = 'M27.75 103.52L29.80 103.52L29.80 93.67L34.93 93.67L34.93 91.82L29.80 91.82L29.80 52.90L27.00 52.90L1.27 91.89L1.27 93.67L27.75 93.67ZM3.67 91.82L27.75 55.36L27.75 91.82ZM36.85 63.91C36.85 68.63 39.93 73.01 44.24 74.86C38.08 76.84 33.77 82.45 33.63 89.22C33.84 97.71 40.54 104.41 49.02 104.41C57.51 104.41 64.21 97.71 64.42 89.22C64.28 82.38 59.90 76.77 53.81 74.86C58.12 73.01 61.20 68.63 61.20 63.91C61.20 57.27 55.73 52.01 49.02 52.01C42.32 52.01 36.85 57.55 36.85 63.84ZM38.90 63.98C38.90 58.30 43.35 53.85 49.02 53.85C54.70 53.85 59.15 58.30 59.15 63.98C59.15 69.59 54.70 74.04 49.02 74.04C43.35 74.04 38.90 69.59 38.90 64.05ZM35.68 89.22C35.68 81.77 41.57 75.88 49.02 75.88C56.48 75.88 62.36 81.77 62.36 89.22C62.36 96.68 56.48 102.56 49.02 102.56C41.57 102.56 35.68 96.68 35.68 89.29ZM64.16 65.84L64.67 65.84L64.67 56.77L67.11 56.77L67.11 56.30L64.67 56.30L64.67 52.52L64.16 52.52L64.16 56.30L62.06 56.30L62.06 56.77L64.16 56.77ZM68.84 65.84L69.35 65.84L69.35 60.35C69.35 59.14 69.72 58.21 70.39 57.56C71.06 56.91 72.03 56.55 73.22 56.53C74.60 56.53 75.56 56.97 76.19 57.70C76.82 58.46 77.09 59.52 77.09 60.80L77.09 65.84L77.59 65.84L77.59 60.80C77.59 59.36 77.27 58.19 76.55 57.36C75.83 56.53 74.75 56.07 73.22 56.07C71.70 56.03 69.98 56.75 69.35 58.23L69.35 56.34L69.35 52.52L68.84 52.52ZM79.99 103.52L94.29 103.52C110.22 103.52 119.80 94.15 119.80 78.21C119.80 70.20 117.41 63.91 113.03 59.60C108.65 55.22 102.29 52.90 94.29 52.90L79.99 52.90ZM82.04 54.74L94.29 54.74C101.74 54.74 107.56 56.93 111.59 60.97C115.63 65.07 117.75 70.96 117.75 78.35C117.75 92.98 108.92 101.67 94.29 101.67L82.04 101.67ZM121.17 103.52L123.09 103.52L123.09 94.15C126.37 100.65 132.39 104.41 140.05 104.41C151.95 104.41 159.14 95.17 159.14 85.39C159.14 75.40 151.75 66.37 140.05 66.37C131.30 66.51 125.75 71.23 123.09 76.84L123.09 67.26L123.09 52.90L121.17 52.90ZM157.22 85.39C157.15 93.60 151.54 102.63 139.85 102.63C129.86 102.63 122.88 94.76 122.88 85.39C122.88 75.47 130.34 68.15 140.05 68.15C149.49 68.15 157.22 75.20 157.22 85.32Z';
+const LOGO_SVG = `<svg class="logo-mark" viewBox="0.4 51.4 159.4 53.6" role="img" aria-label="48thDb">
+  <path d="${LOGO_PATH}" fill="currentColor" stroke="currentColor" stroke-miterlimit="10"/></svg>`;
 
 const NAV_OPTIONS = [
   { value:'feed',        view:'feed', fav:false, icon:ICONS.home, iconActive:ICONS.homeFilled },
