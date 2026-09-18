@@ -4321,6 +4321,7 @@ const EN = {
   'งานที่จะถึง': 'Upcoming events',
   'ยังไม่มีงานที่จะถึง': 'No upcoming events',
   'งานที่ผ่านมา': 'Past events',
+  'งานล่าสุด': 'Latest event',
   'วันนี้': 'Today',
   'พรุ่งนี้': 'Tomorrow',
   'เริ่มแล้ว': 'Started',
@@ -7965,7 +7966,12 @@ function renderMemberEvents(m){
   if(!evs.length) return '';
   const today = evs.filter(e => e.start <= iso && eventLastDay(e) >= iso);
   const upcoming = evs.filter(e => e.start > iso).sort((a,b) => a.start.localeCompare(b.start));
-  const past = evs.filter(e => eventLastDay(e) < iso).sort((a,b) => b.start.localeCompare(a.start));
+  // Only the most recent outing is worth keeping on a member's card, and only
+  // while it is still recent; after a month it has nothing left to say.
+  const PAST_DAYS = 30;
+  const past = evs.filter(e => eventLastDay(e) < iso
+      && (parseYmd(iso) - parseYmd(eventLastDay(e))) / 86400000 <= PAST_DAYS)
+    .sort((a,b) => eventLastDay(b).localeCompare(eventLastDay(a))).slice(0, 1);
 
   const colour = e => {
     const g = (e.groups || []).length === 1 ? getGroup(e.groups[0]) : getGroup(m.groupId);
@@ -7994,7 +8000,7 @@ function renderMemberEvents(m){
     ${today.length ? `<h3 class="section-label">วันนี้</h3>${today.map(e => row(e, 'today')).join('')}` : ''}
     ${upcoming.length ? `<h3 class="section-label">งานที่จะถึง</h3>${upcoming.map(e => row(e, 'up')).join('')}`
       : today.length ? '' : `<h3 class="section-label">งานที่จะถึง</h3><p class="muted-note">ยังไม่มีงานที่จะถึง</p>`}
-    ${past.length ? `<h3 class="section-label">งานที่ผ่านมา</h3>${past.map(e => row(e, 'past')).join('')}` : ''}`;
+    ${past.length ? `<h3 class="section-label">งานล่าสุด</h3>${past.map(e => row(e, 'past')).join('')}` : ''}`;
 }
 
 function renderStatsTimeline(){
