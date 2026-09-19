@@ -1,4 +1,4 @@
-/* 48thDB service worker.
+/* 48thDb service worker.
  *
  * The point of caching here is that the site opens without a connection. The
  * trap is the other half of that bargain: a cache-first page would keep serving

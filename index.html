@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>48thDB — 48 Thailand Database</title>
+<title>48thDb — 48 Thailand Database</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#FFF3F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16111E" media="(prefers-color-scheme: dark)">
@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="48thDB">
+<meta name="apple-mobile-web-app-title" content="48thDb">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
@@ -4836,7 +4836,7 @@ const EN = {
   'บันทึกเป็นไฟล์': 'Save to a file',
   'นำไฟล์เข้า': 'Load a file',
   'ไฟล์นี้อ่านไม่ออก': 'That file could not be read',
-  'ไฟล์นี้ไม่ใช่ไฟล์สำรองของ 48thDB': 'That is not a 48thDB backup file',
+  'ไฟล์นี้ไม่ใช่ไฟล์สำรองของ 48thDb': 'That is not a 48thDb backup file',
   'มีครบอยู่แล้ว ไม่มีอะไรเพิ่ม': 'All of them were already saved',
   'ยังไม่ได้เลือก Kami Oshi — เปิดโปรไฟล์สมาชิกแล้วกดปุ่มมงกุฎเพื่อเลือก (เลือกได้คนเดียว)': 'No kami oshi yet — open a member and tap the crown to choose one (only one at a time)',
   'ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม': 'No oshi yet — tap the ☆ on a member to add one',
@@ -6591,7 +6591,7 @@ function renderCalendarPage(){
   return `
   <section class="calp">
     <header class="feed-head">
-      <p class="feed-today">48thDB</p>
+      <p class="feed-today">48thDb</p>
       <h1 class="feed-title">ปฏิทิน</h1>
       ${state.oshi.length ? `
       <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
@@ -7463,7 +7463,7 @@ function renderShopPage(){
   return `
   <section class="shop">
     <header class="feed-head">
-      <p class="feed-today">48thDB</p>
+      <p class="feed-today">48thDb</p>
       <h1 class="feed-title">ร้านค้า</h1>
       <p class="shop-note">สินค้าและพรีออเดอร์ที่เปิดอยู่ตอนนี้</p>
     </header>
@@ -10178,7 +10178,7 @@ function importOshi(){
     catch(e){ toast('ไฟล์นี้อ่านไม่ออก'); return; }
 
     if(!data || data.format !== BACKUP_FORMAT || !Array.isArray(data.oshi)){
-      toast('ไฟล์นี้ไม่ใช่ไฟล์สำรองของ 48thDB'); return;
+      toast('ไฟล์นี้ไม่ใช่ไฟล์สำรองของ 48thDb'); return;
     }
 
     // Only ids that match somebody are taken. A file naming members who have
@@ -10344,7 +10344,7 @@ async function drawMemberCard(g, m, url){
   g.beginPath(); g.arc(P + R, 80 + R, R + 8, 0, Math.PI * 2); g.fillStyle = c; g.fill();
   shareFace(g, m, im, P, 80, R * 2, c);
   const tx = P + R * 2 + 40, tw = SHARE_W - P - tx;
-  shareText(g, `48thDB · ${en ? 'PROFILE' : 'โปรไฟล์'}`, tx, 118, '800 26px "Noto Sans Thai", sans-serif', shareMix(c.startsWith('#') ? c : '#E4457E', .45));
+  shareText(g, `48thDb · ${en ? 'PROFILE' : 'โปรไฟล์'}`, tx, 118, '800 26px "Noto Sans Thai", sans-serif', shareMix(c.startsWith('#') ? c : '#E4457E', .45));
   let fs = 96; g.font = `800 ${fs}px "Noto Sans Thai", sans-serif`;
   const big = en ? m.name : (m.nameTh || m.name);
   while(g.measureText(big).width > tw && fs > 50){ fs -= 4; g.font = `800 ${fs}px "Noto Sans Thai", sans-serif`; }
@@ -10585,7 +10585,7 @@ function statsBase(g, kicker, title){
   shareGlow(g, 120, 140, 520, '#FF6FA5', .45);
   shareGlow(g, 980, 520, 560, '#3CC4A5', .30);
   shareGlow(g, 300, 1250, 520, '#7A5CFF', .25);
-  shareText(g, `48thDB · ${en ? 'STATS' : 'สถิติ'} · ${kicker}`, 60, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
+  shareText(g, `48thDb · ${en ? 'STATS' : 'สถิติ'} · ${kicker}`, 60, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
   g.font = '800 66px "Noto Sans Thai", sans-serif';
   shareText(g, shareWrap(g, title, SHARE_W - 120, 1)[0], 60, 168, '800 66px "Noto Sans Thai", sans-serif', '#ffffff');
   shareText(g, (en ? 'As of ' : 'ข้อมูล ณ ') + shareThaiDate(new Date()), 60, 214, '600 28px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.65)');
@@ -10757,7 +10757,7 @@ async function drawStatsCard(g, url){
     g.strokeStyle = 'rgba(255,255,255,.12)'; g.lineWidth = 2; shareRound(g, x, y, w, hh, 28); g.stroke(); };
 
   // head
-  shareText(g, en ? '48thDB · STATS' : '48thDB · สถิติ', P, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
+  shareText(g, en ? '48thDb · STATS' : '48thDb · สถิติ', P, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
   shareText(g, en ? 'BNK48 & CGM48 in numbers' : 'BNK48 & CGM48 ในตัวเลข', P, 168, '800 66px "Noto Sans Thai", sans-serif', '#ffffff');
   shareText(g, (en ? 'As of ' : 'ข้อมูล ณ ') + shareThaiDate(new Date()), P, 214, '600 28px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.65)');
 
@@ -11113,7 +11113,7 @@ async function drawBoxCard(g, sub){
   const en = isEN();
   await shareEnsureData();
   const box = sub.node, head = box.querySelector('.group-head');
-  const title = ((head && head.querySelector('h2, .link-h2')) || {}).textContent || '48thDB';
+  const title = ((head && head.querySelector('h2, .link-h2')) || {}).textContent || '48thDb';
   let subtitle = '';
   if(head){ const cl = head.cloneNode(true); cl.querySelectorAll('h2, .link-h2, .box-share-btn, :scope > .link-inline').forEach(x => x.remove());
     subtitle = cl.textContent.replace(/\s+/g, ' ').trim(); }
@@ -11122,7 +11122,7 @@ async function drawBoxCard(g, sub){
   const tmp = document.createElement('canvas'); tmp.width = SHARE_W; tmp.height = 4200;
   const t = tmp.getContext('2d');
   const tab = (STATS_TABS.find(x => x.id === state.statsTab) || { label: '' }).label;
-  shareText(t, `48thDB · ${en ? 'STATS' : 'สถิติ'}${tab ? ' · ' + tab : ''}`, 60, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
+  shareText(t, `48thDb · ${en ? 'STATS' : 'สถิติ'}${tab ? ' · ' + tab : ''}`, 60, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
   t.font = '800 62px "Noto Sans Thai", sans-serif';
   const tl = shareWrap(t, title.trim(), SHARE_W - 120, 2);
   let y = 100;
@@ -11144,15 +11144,15 @@ function shareSubject(){
   const url = location.origin + urlForSnapshot(navSnapshot());
   const m = state.selectedId ? getMember(state.selectedId) : null;
   const ev = state.selectedEvent ? SEED_SCHEDULE.find(x => x.id === state.selectedEvent) : null;
-  if(m) return { kind:'member', m, url, title:`${nickName(m)} — 48thDB`, file:`48thdb-${m.name || m.id}` };
-  if(ev) return { kind:'event', ev, url, title:`${ev.title} — 48thDB`, file:`48thdb-${ev.id}` };
+  if(m) return { kind:'member', m, url, title:`${nickName(m)} — 48thDb`, file:`48thdb-${m.name || m.id}` };
+  if(ev) return { kind:'event', ev, url, title:`${ev.title} — 48thDb`, file:`48thdb-${ev.id}` };
   if(state.view === 'single' && state.selectedSingle){ const s = findWork(state.selectedSingle);
-    if(s) return { kind:'single', s, url, title:`${s.title} — 48thDB`, file:`48thdb-${s.id}` }; }
-  if(state.view === 'timeline') return { kind:'ge', url, title:'Senbatsu General Election 2026 — 48thDB', file:'48thdb-ge2026' };
-  if(state.view === 'stats') return { kind:'stats', cat: state.statsTab || 'overview', url, title:'สถิติ BNK48 & CGM48 — 48thDB', file:'48thdb-stats' };
-  if(state.view === 'feed') return { kind:'today', url, title:'วันนี้ที่ 48 — 48thDB', file:`48thdb-today-${toYmd(todayStart())}` };
+    if(s) return { kind:'single', s, url, title:`${s.title} — 48thDb`, file:`48thdb-${s.id}` }; }
+  if(state.view === 'timeline') return { kind:'ge', url, title:'Senbatsu General Election 2026 — 48thDb', file:'48thdb-ge2026' };
+  if(state.view === 'stats') return { kind:'stats', cat: state.statsTab || 'overview', url, title:'สถิติ BNK48 & CGM48 — 48thDb', file:'48thdb-stats' };
+  if(state.view === 'feed') return { kind:'today', url, title:'วันนี้ที่ 48 — 48thDb', file:`48thdb-today-${toYmd(todayStart())}` };
   const names = { feed:'วันนี้ที่ 48', browse:'สมาชิกทั้งหมด', groups:'ประวัติวง', org:'ตำแหน่ง', discography:'ผลงานเพลง', stats:'สถิติ', shop:'ร้านค้า', calendar:'ปฏิทิน' };
-  return { kind:'page', url, title:`${names[state.view] || '48thDB'} — 48thDB`, file:`48thdb-${state.view}` };
+  return { kind:'page', url, title:`${names[state.view] || '48thDb'} — 48thDb`, file:`48thdb-${state.view}` };
 }
 
 async function buildShareCard(sub){
@@ -11167,7 +11167,7 @@ async function buildShareCard(sub){
   else if(sub.kind === 'stats') await ({ lives: drawStatsLivesCard, songs: drawStatsSongsCard, birthdays: drawStatsBirthdaysCard,
       timeline: drawStatsTimelineCard }[sub.cat] || drawStatsCard)(g, sub.url);
   else if(sub.kind === 'today') await drawTodayCard(g, sub.url);
-  else await drawPageCard(g, sub.title.replace(/ — 48thDB$/, ''), sub.url);
+  else await drawPageCard(g, sub.title.replace(/ — 48thDb$/, ''), sub.url);
   return new Promise(res => c.toBlob(res, 'image/png'));
 }
 
@@ -11559,9 +11559,9 @@ function bindDelegatedEvents(){
     else if(action==='share-box'){
       const node = document.querySelector(`.group-card[data-box="${id}"]`);
       if(node){
-        const t = (node.querySelector('.group-head h2, .group-head .link-h2') || {}).textContent || '48thDB';
+        const t = (node.querySelector('.group-head h2, .group-head .link-h2') || {}).textContent || '48thDb';
         openShareSheet({ kind:'box', node, url: location.origin + urlForSnapshot(navSnapshot()),
-          title:`${t.trim()} — 48thDB`, file:`48thdb-${(state.statsTab || 'stats')}-${id}` });
+          title:`${t.trim()} — 48thDb`, file:`48thdb-${(state.statsTab || 'stats')}-${id}` });
       }
     }
     else if(action==='close-modal'){

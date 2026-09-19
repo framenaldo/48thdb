@@ -19,7 +19,7 @@ import urllib.request
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'data' / 'lives.json'
 TZ = dt.timezone(dt.timedelta(hours=7))          # the members live in Thailand
-HEADERS = {'User-Agent': 'Mozilla/5.0 (48thDB live stats; github.com/framenaldo/48thdb)',
+HEADERS = {'User-Agent': 'Mozilla/5.0 (48thDb live stats; github.com/framenaldo/48thdb)',
            'Accept': 'application/json'}
 
 
