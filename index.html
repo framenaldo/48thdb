@@ -1401,6 +1401,17 @@
   .theme-btn svg{ width:17px; height:17px; display:block; }
   /* Thai and English sit at different sizes; the switch keeps its own width so
      the header does not jump when the label changes. */
+  .lang-wrap{ position:relative; flex-shrink:0; }
+  .lang-menu{ position:absolute; top:calc(100% + 8px); right:0; z-index:80; min-width:210px;
+    padding:6px; border-radius:18px; background:var(--paper); border:1px solid var(--line); box-shadow:0 12px 32px rgba(0,0,0,.18);
+    display:flex; flex-direction:column; gap:2px; }
+  .lang-opt{ display:flex; align-items:baseline; gap:10px; padding:9px 12px; border-radius:12px; border:0; background:none;
+    color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+  .lang-opt b{ min-width:48px; font-size:13.5px; }
+  .lang-opt span{ font-size:12.5px; color:var(--ink-soft); }
+  .lang-opt:hover{ background:var(--card); }
+  .lang-opt.is-on{ background:var(--ink); color:var(--paper); }
+  .lang-opt.is-on span{ color:inherit; opacity:.8; }
   .lang-btn{
     min-width:46px;
     flex-shrink:0; height:34px; padding:0 12px; border-radius:999px; cursor:pointer;
@@ -4474,7 +4485,7 @@ let state = {
   lang:'th',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
-  account:null, profileMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
+  account:null, profileMenuOpen:false, langMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
   showGraduated:false,
   statsTab:'overview', advOpen:false, selectedSingle:null, discTab:'singles', stagesOpen:{},
   ageMin:'', ageMax:'', heightMin:'', heightMax:'', birthMonth:'all',
@@ -5411,13 +5422,77 @@ const EN_PATTERNS = [
 ];
 
 function isEN(){ return state.lang === 'en'; }
+/* The third setting, EN/TH: names, song titles and places in English — a song
+   the way streaming lists it, the other language after it in brackets — and
+   everything else in Thai. The page is drawn in Thai and a last pass swaps
+   those three kinds of words. */
+function isMix(){ return state.lang === 'mix'; }
+const LANGS = [
+  { id:'th',  label:'TH',    name:'ภาษาไทย' },
+  { id:'mix', label:'EN/TH', name:'ชื่ออังกฤษ · เนื้อหาไทย' },
+  { id:'en',  label:'EN',    name:'English' },
+];
+/* Songs stored in Thai only, with the name streaming uses. Filled in by hand
+   as the names are confirmed; anything missing stays in Thai. */
+const SONG_EN = {};
+const TH_RE = /[฀-๿]/, LATIN_RE = /[A-Za-z]/;
+function mixTitle(t){
+  if(!t || !TH_RE.test(t)) return t;
+  if(SONG_EN[t]) return `${SONG_EN[t]} (${t})`;
+  // "Romaji – Thai" becomes "Romaji (Thai)"
+  const dash = t.match(/^(.*?[A-Za-z].*?)\s+[–-]\s+(.+)$/);
+  if(dash && !TH_RE.test(dash[1]) && TH_RE.test(dash[2])) return `${dash[1]} (${dash[2]})`;
+  return t;
+}
+function mixVenue(v){
+  if(!v || !TH_RE.test(v)) return v;
+  return v.replace(/ลานกิจกรรม/g, 'Event Space').replace(/ชั้น\s*([A-Za-z0-9]+)/g, 'Floor $1')
+    .replace(/ห้าง/g, '').replace(/\s{2,}/g, ' ').trim();
+}
+let MIX = null, MIX_SUBS = null;
+function buildMix(){
+  MIX = {}; const subs = new Map();
+  (state.members || []).forEach(m => { if(m.nameTh && m.name) MIX[m.nameTh] = m.name;
+    if(m.realNameTh && m.realName) MIX[m.realNameTh] = m.realName; });
+  TEAMS.forEach(t => { if(t.nameEn) MIX[t.name] = t.nameEn; });
+  const works = [...ALL_WORKS(), ...SEED_SPECIALS];
+  works.forEach(w => {
+    if(TH_RE.test(w.title) && w.alt && !TH_RE.test(w.alt)){ SONG_EN[w.title] = SONG_EN[w.title] || w.alt; }
+  });
+  works.forEach(w => { const x = mixTitle(w.title); if(x !== w.title){ MIX[w.title] = x; if(w.title.length >= 6) subs.set(w.title, x); } });
+  Object.values(SEED_SENBATSU).flat().forEach(t => { const x = mixTitle(t.track); if(x !== t.track){ MIX[t.track] = x; if(t.track.length >= 6) subs.set(t.track, x); } });
+  SEED_SCHEDULE.forEach(e => [e.venue].filter(Boolean).forEach(v => { const x = mixVenue(v); if(x !== v) subs.set(v, x); }));
+  // longest first, so a title is not half-replaced by a shorter one inside it
+  MIX_SUBS = [...subs.entries()].sort((a, b) => b[0].length - a[0].length);
+}
+function mixLocalize(root){
+  if(!MIX) buildMix();
+  const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: n => (n.parentElement && /^(SCRIPT|STYLE|INPUT|TEXTAREA)$/.test(n.parentElement.tagName))
+      ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+  const seen = []; for(let n = walk.nextNode(); n; n = walk.nextNode()) seen.push(n);
+  for(const n of seen){
+    const raw = n.nodeValue; if(!TH_RE.test(raw)) continue;
+    const key = raw.trim().replace(/\s+/g, ' ');
+    let out = MIX[key];
+    if(out == null){
+      let s = raw;
+      // a Thai title already set in brackets after its romaji is left alone
+      for(const [a, b] of MIX_SUBS) if(s.includes(a) && !s.includes(b) && !s.includes('(' + a)) s = s.split(a).join(b);
+      if(s !== raw){ n.nodeValue = s; }
+      continue;
+    }
+    const [, before, , after] = raw.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    n.nodeValue = before + out + after;
+  }
+}
 
 const META_DESC_TH = 'ฐานข้อมูลสมาชิก ตารางงาน และผลงานเพลงของ BNK48 และ CGM48';
 
 /** Marks the page as the language being read, for anything outside the body:
     screen readers, the share sheet, and a browser offering to translate. */
 function applyDocumentLanguage(){
-  document.documentElement.lang = state.lang;
+  document.documentElement.lang = isEN() ? 'en' : 'th';
   const meta = document.querySelector('meta[name="description"]');
   if(meta) meta.content = isEN() ? (EN[META_DESC_TH] || META_DESC_TH) : META_DESC_TH;
 }
@@ -5440,6 +5515,7 @@ function toEn(s){
 /* Members, teams and groups carry their own English, so the table does not have
    to list 158 nicknames. Built once, after the data has loaded. */
 function learnNames(){
+  MIX = null;
   (state.members || []).forEach(m => { if(m.nameTh && m.name) EN[m.nameTh] = m.name; });
   TEAMS.forEach(t => { if(t.nameEn) EN[t.name] = t.nameEn; });
 }
@@ -5493,6 +5569,7 @@ function enFragments(s){
 const LOCALIZE_ATTRS = ['title', 'aria-label', 'placeholder', 'alt'];
 
 function localize(root){
+  if(root && isMix()) return mixLocalize(root);
   if(!isEN() || !root) return;
   const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode: n => (n.parentElement && /^(SCRIPT|STYLE)$/.test(n.parentElement.tagName))
@@ -5710,7 +5787,11 @@ function renderHeader(){
         return n ? `<span class="shop-dot">${n}</span>` : ''; })()}
     </button>
     <button class="theme-btn" data-action="toggle-theme" aria-label="สลับธีมสว่าง/มืด">${state.theme==='dark'?ICONS.sun:ICONS.moon}</button>
-    <button class="lang-btn" data-action="toggle-lang" aria-label="เปลี่ยนภาษา">${isEN()?'ไทย':'EN'}</button>
+    <div class="lang-wrap">
+      <button class="lang-btn" data-action="toggle-lang-menu" aria-label="เลือกภาษา" aria-expanded="${state.langMenuOpen ? 'true' : 'false'}">${(LANGS.find(l => l.id === state.lang) || LANGS[0]).label}</button>
+      ${state.langMenuOpen ? `<div class="lang-menu" role="menu">${LANGS.map(l => `<button class="lang-opt${l.id === state.lang ? ' is-on' : ''}" role="menuitemradio" aria-checked="${l.id === state.lang}"
+        data-action="set-lang" data-id="${l.id}"><b>${l.label}</b><span>${l.name}</span></button>`).join('')}</div>` : ''}
+    </div>
     <button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>
     <div id="profile-slot"></div>
   </header>`;
@@ -5902,18 +5983,18 @@ function filterAndSort(){
     being read. Falls back to the other language, then to nothing at all. */
 /* The nickname in the language the site is set to. */
 function nickName(m){
-  return (isEN() ? (m.name || m.nameTh) : (m.nameTh || m.name)) || '';
+  return ((isEN() || isMix()) ? (m.name || m.nameTh) : (m.nameTh || m.name)) || '';
 }
 
 function secondName(m){
-  return (isEN() ? (m.realName || m.realNameTh) : (m.realNameTh || m.realName)) || '';
+  return ((isEN() || isMix()) ? (m.realName || m.realNameTh) : (m.realNameTh || m.realName)) || '';
 }
 
 /* Without a photo a circle carries the member's whole nickname, sized to fit
    it, since a lone initial says nothing on a stage plan full of them. Thai
    vowel and tone marks take no width, so they are left out of the count. */
 function avatarName(m){
-  const name = (isEN() ? (m.name || m.nameTh) : (m.nameTh || m.name)) || '?';
+  const name = ((isEN() || isMix()) ? (m.name || m.nameTh) : (m.nameTh || m.name)) || '?';
   const width = name.replace(/[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/g, '').length;
   return `<span class="avatar-fallback avatar-name" style="--n:${Math.max(width, 2)}">${escapeHtml(name)}</span>`;
 }
@@ -8369,7 +8450,7 @@ function renderMiniCard(m, isCentre, action){
   <div class="mini-card${isCentre?' is-centre':''}" style="--c:${g.color}"
     data-action="${action || 'open-member'}" data-id="${m.id}" title="${escapeAttr(m.name+' · '+(m.nameTh||''))}">
     <div class="avatar-sm" style="background:${g.color}">
-      <span class="avatar-fallback">${(isEN() ? (m.name||m.nameTh) : (m.nameTh||m.name) || '?')[0]}</span>
+      <span class="avatar-fallback">${(nickName(m) || '?')[0]}</span>
       ${m.photo ? `<img class="avatar-img" src="${escapeAttr(m.photo)}" alt="" onerror="this.remove()">` : ''}
     </div>
     <span class="mini-names">
@@ -11284,8 +11365,10 @@ function bindDelegatedEvents(){
     const el = e.target.closest('[data-action]');
     if(!el){
       if(state.profileMenuOpen){ state.profileMenuOpen=false; renderProfileSlot(); }
+      if(state.langMenuOpen){ state.langMenuOpen=false; render(); }
       return;
     }
+    if(state.langMenuOpen && !['toggle-lang-menu','set-lang'].includes(el.dataset.action)){ state.langMenuOpen = false; render(); }
     const action = el.dataset.action;
     const id = el.dataset.id;
 
@@ -11364,8 +11447,14 @@ function bindDelegatedEvents(){
       try{ localStorage.setItem('48thdb-ticker-folded', tickerFolded() ? '0' : '1'); }catch(err){}
       syncTicker();
     }
-    else if(action==='toggle-lang'){
-      state.lang = isEN() ? 'th' : 'en';
+    else if(action==='toggle-lang-menu'){
+      state.langMenuOpen = !state.langMenuOpen;
+      render();
+    }
+    else if(action==='set-lang' || action==='toggle-lang'){
+      state.langMenuOpen = false;
+      state.lang = action === 'set-lang' ? id : (isEN() ? 'th' : 'en');
+      MIX = null;
       try{ localStorage.setItem('48thdb-lang', state.lang); }catch(e){}
       applyDocumentLanguage();
       render();
