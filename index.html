@@ -1978,6 +1978,59 @@
   }
 
   /* the way in, in the header */
+  /* the GE2026 button and page */
+  .ge-btn{
+    flex-shrink:0; height:34px; padding:0 12px 0 8px; border-radius:999px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px; border:0;
+    background:linear-gradient(135deg, #D0202C, #8E0E17); color:#fff;
+    font-family:'Noto Sans Thai',sans-serif; font-size:12.5px; font-weight:800; letter-spacing:.02em;
+    box-shadow:0 3px 10px rgba(179,18,30,.35), inset 0 1px 0 rgba(255,255,255,.22);
+    transition:transform .15s var(--ease-out), filter .15s ease;
+  }
+  .ge-btn img{ height:22px; width:auto; display:block; filter:drop-shadow(0 1px 1px rgba(0,0,0,.4)); }
+  @media (hover:hover){ .ge-btn:hover{ filter:brightness(1.08); } }
+  .ge-btn:active{ transform:scale(.96); }
+  .ge-btn.is-on{ box-shadow:0 0 0 2px var(--paper), 0 0 0 4px #B3121E; }
+  .ge-page{ max-width:1040px; margin-inline:auto; }
+  .ge-hero{ position:relative; overflow:hidden; border-radius:22px; margin:4px 0 16px; background:#2A0508; color:#fff; }
+  .ge-hero-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 30%; opacity:.55; filter:saturate(1.2); }
+  .ge-hero::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(60,4,8,.25), rgba(40,2,6,.85)); }
+  .ge-hero-in{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:14px; padding:26px 18px 20px; text-align:center; }
+  .ge-logo{ width:min(440px, 86%); height:auto; filter:drop-shadow(0 4px 12px rgba(0,0,0,.55)); }
+  .ge-keys{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; }
+  .ge-key{ display:flex; flex-direction:column; align-items:center; gap:1px; padding:7px 14px; border-radius:14px; cursor:pointer;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.28); color:#fff; font:inherit; font-size:14px; font-weight:800; }
+  .ge-key small{ font-size:10.5px; font-weight:700; opacity:.8; letter-spacing:.04em; }
+  .ge-count{ display:flex; align-items:baseline; justify-content:center; gap:8px; flex-wrap:wrap; }
+  .ge-count-label{ font-size:14px; font-weight:800; opacity:.9; }
+  .ge-count-num{ font-size:44px; font-weight:800; line-height:1; color:#FFD98A; text-shadow:0 2px 12px rgba(0,0,0,.45); }
+  .ge-count-unit{ font-size:14px; font-weight:700; opacity:.9; }
+  .ge-tabs .sub-tab.active{ background:var(--ge); border-color:var(--ge); color:#fff; }
+  .ge-page .section-label{ margin-top:18px; }
+  .ge-next{ display:flex; flex-direction:column; gap:8px; }
+  .ge-next-row{ display:flex; gap:12px; align-items:center; width:100%; padding:10px 13px; text-align:left;
+    border:1px solid var(--line); border-left:4px solid var(--k); border-radius:14px; background:var(--glass-card); color:inherit; font:inherit; }
+  button.ge-next-row{ cursor:pointer; }
+  .ge-next-when{ flex:none; width:78px; display:flex; flex-direction:column; line-height:1.3; }
+  .ge-next-when b{ font-size:15px; }
+  .ge-next-when small{ font-size:11.5px; color:var(--ge); font-weight:800; }
+  .ge-next-what{ font-size:14px; font-weight:700; line-height:1.4; }
+  .ge-next-what small{ color:var(--ink-soft); font-weight:600; }
+  .ge-more{ margin-top:10px; }
+  .ge-shop{ display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:10px; }
+  .ge-shop-card{ display:flex; gap:10px; align-items:center; padding:8px; border:1px solid var(--line); border-radius:14px;
+    background:var(--glass-card); color:inherit; font:inherit; text-align:left; cursor:pointer; }
+  .ge-shop-card img{ width:56px; height:56px; object-fit:cover; border-radius:10px; flex:none; }
+  .ge-shop-card span{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .ge-shop-card b{ font-size:13.5px; line-height:1.35; }
+  .ge-shop-card small{ font-size:13px; font-weight:800; color:var(--c); }
+  .tlp.is-in-hub .tlp-legend{ margin:0 0 14px; }
+  @media (max-width:560px){
+    .ge-btn{ padding:0 10px 0 7px; }
+    .ge-btn img{ height:19px; }
+    .ge-hero-in{ padding:20px 14px 16px; gap:12px; }
+    .ge-count-num{ font-size:38px; }
+  }
   .tlp-btn{
     flex-shrink:0; height:34px; padding:0 13px; border-radius:999px; cursor:pointer;
     display:inline-flex; align-items:center; gap:7px; color:var(--ink);
@@ -4373,7 +4426,7 @@ let state = {
   isOwner:false, pending:[],
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
-  calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null,
+  calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview',
   lang:'th',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
@@ -5601,9 +5654,8 @@ function renderHeader(){
   <header class="top">
     <div class="wordmark" data-action="nav-select" data-value="feed" style="cursor:pointer;">${LOGO_SVG}</div>
     <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก เพลง งาน..." value="${escapeAttr(state.query)}">
-    <button class="tlp-btn" data-action="open-timeline" data-id="ge2026" title="ไทม์ไลน์ Senbatsu General Election 2026">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4v16"/><circle cx="5" cy="8" r="1.6"/><circle cx="5" cy="16" r="1.6"/><path d="M10 8h9M10 16h6"/></svg>
-      <span>ไทม์ไลน์ GE2026</span></button>
+    <button class="ge-btn${state.view==='timeline' ? ' is-on' : ''}" data-action="open-ge" title="Senbatsu General Election 2026">
+      <img src="posters/ge2026-logo.png" width="640" height="242" alt="" decoding="async"><span>GE2026</span></button>
     <button class="shop-btn cal-btn${state.view==='calendar' ? ' is-on' : ''}" data-action="nav-calendar" title="ปฏิทิน" aria-label="ปฏิทิน">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
     </button>
@@ -7227,7 +7279,7 @@ function renderShopPage(){
   </section>`;
 }
 
-function renderTimelinePage(){
+function renderTimelinePage(inHub){
   const key = state.timelineId || 'ge2026';
   const page = TIMELINE_PAGES[key], items = TIMELINES[key];
   if(!page || !items) return `<p class="empty">ไม่พบไทม์ไลน์</p>`;
@@ -7283,6 +7335,14 @@ function renderTimelinePage(){
 
   const yr = +items[0].d.slice(0,4);
   const span = `${day(items[0].d)} – ${day(endOf(items[items.length-1]))} ${isEN() ? yr : yr + 543}`;
+  if(inHub) return `
+  <section class="tlp is-in-hub" style="--pc:${page.poster.accent}">
+    <div class="tlp-legend">${page.bars.map(b =>
+      `<span class="tlp-leg" style="--bar:${b.color}"><i></i>${escapeHtml(b.th)}</span>`).join('')}</div>
+    <div class="tlp-grid" style="grid-template-columns:var(--tlp-date) 18px repeat(${page.bars.length}, var(--tlp-lane)) minmax(0, 1fr)">
+      ${bars}${rows}
+    </div>
+  </section>`;
   return `
   <section class="tlp" style="--pc:${page.poster.accent}">
     <div class="tlp-head">
@@ -7304,6 +7364,81 @@ function renderTimelinePage(){
     </div>
   </section>`;
 }
+/* The election's own page: the logo, where the campaign stands today, and
+   three tabs — a summary, the full timeline, and every outing tied to it. */
+const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo.png', red:'#B3121E',
+  vote:'ev-election-voting', results:'ev-election-results' };
+function renderGEPage(){
+  const en = isEN();
+  const iso = toYmd(todayStart());
+  const tab = state.geTab || 'overview';
+  const items = TIMELINES[GE_PAGE.key] || [];
+  const events = SEED_SCHEDULE.filter(e => e.timeline === GE_PAGE.key)
+    .sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'));
+  const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote);
+  const results = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
+  const M = monthsShort();
+  const dm = s => { const d = parseYmd(s); return `${d.getDate()} ${M[d.getMonth()]}`; };
+  const daysTo = s => Math.round((parseYmd(s) - parseYmd(iso)) / 864e5);
+  const inDays = n => n === 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : (en ? `in ${n} days` : `ในอีก ${n} วัน`);
+
+  // where the campaign stands
+  let phase, big, sub;
+  if(vote && iso < vote.start){ phase = en ? 'Voting opens in' : 'เปิดโหวตในอีก'; big = daysTo(vote.start); sub = dm(vote.start); }
+  else if(vote && iso <= eventLastDay(vote)){ phase = en ? 'Voting closes in' : 'ปิดโหวตในอีก'; big = daysTo(eventLastDay(vote)); sub = dm(eventLastDay(vote)); }
+  else if(results && iso <= results.start){ phase = en ? 'Final results in' : 'ประกาศผลในอีก'; big = daysTo(results.start); sub = dm(results.start); }
+  const countdown = phase ? `<div class="ge-count">
+      <span class="ge-count-label">${big === 0 ? phase.replace(/ in$|ในอีก$/, '') : phase}</span>
+      <span class="ge-count-num">${big === 0 ? (en ? 'Today' : 'วันนี้') : big}</span>
+      <span class="ge-count-unit">${big === 0 ? sub : (en ? `days · ${sub}` : `วัน · ${sub}`)}</span></div>`
+    : `<div class="ge-count"><span class="ge-count-label">${en ? 'The results are in' : 'ประกาศผลแล้ว'}</span></div>`;
+
+  const hero = `<div class="ge-hero" style="--ge:${GE_PAGE.red}">
+    <img class="ge-hero-bg" src="posters/election-2026.jpg" alt="" aria-hidden="true" decoding="async">
+    <div class="ge-hero-in">
+      <img class="ge-logo" src="${GE_PAGE.logo}" width="640" height="242" alt="BNK48 & CGM48 Senbatsu General Election 2026">
+      <div class="ge-keys">
+        ${vote ? `<button class="ge-key" data-action="open-event" data-id="${vote.id}"><small>${en ? 'Voting' : 'ช่วงโหวต'}</small>${dm(vote.start)} – ${dm(eventLastDay(vote))}</button>` : ''}
+        ${results ? `<button class="ge-key" data-action="open-event" data-id="${results.id}"><small>${en ? 'Final results' : 'ประกาศผล'}</small>${dm(results.start)}</button>` : ''}
+      </div>
+      ${countdown}
+    </div>
+  </div>`;
+
+  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['timeline', en ? 'Timeline' : 'ไทม์ไลน์'], ['events', en ? 'All events' : 'งานทั้งหมด']]
+    .map(([v, l]) => `<button class="sub-tab${tab === v ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}</button>`).join('')}</div>`;
+
+  let body = '';
+  if(tab === 'timeline') body = renderTimelinePage(true);
+  else if(tab === 'events'){
+    const ahead = events.filter(e => eventLastDay(e) >= iso), past = events.filter(e => eventLastDay(e) < iso);
+    body = `${ahead.map(e => renderEventCard(e, iso)).join('')}
+      ${past.length ? `<h3 class="section-label">${en ? 'Over' : 'จบไปแล้ว'}</h3>${past.map(e => renderEventCard(e, iso)).join('')}` : ''}`;
+  } else {
+    const next = items.filter(it => (it.to || it.d) >= iso).slice(0, 4);
+    const shop = events.filter(e => e.shop && shopStatus(e, Date.now()).state !== 'over');
+    const nowOn = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
+    body = `
+      ${nowOn.length ? `<h3 class="section-label">${en ? 'On now' : 'เปิดอยู่ตอนนี้'}</h3>${nowOn.map(e => renderEventCard(e, iso)).join('')}` : ''}
+      <h3 class="section-label">${en ? 'Coming up' : 'ขั้นต่อไป'}</h3>
+      <div class="ge-next">${next.map(it => {
+        const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
+        const n = daysTo(it.d);
+        const inner = `<span class="ge-next-when"><b>${dm(it.d)}</b>${n >= 0 ? `<small>${inDays(n)}</small>` : `<small>${en ? 'running' : 'กำลังดำเนินอยู่'}</small>`}</span>
+          <span class="ge-next-what">${escapeHtml(it.title)}${it.time ? ` <small>${it.time}${en ? '' : ' น.'}</small>` : ''}</span>`;
+        return it.ev ? `<button class="ge-next-row" style="--k:${tr.color}" data-action="open-event" data-id="${it.ev}">${inner}</button>`
+          : `<div class="ge-next-row" style="--k:${tr.color}">${inner}</div>`;
+      }).join('')}</div>
+      <button class="chip chip-link ge-more" data-action="ge-tab" data-value="timeline">${en ? 'Full timeline →' : 'ดูไทม์ไลน์ทั้งหมด →'}</button>
+      ${shop.length ? `<h3 class="section-label">${en ? 'On sale' : 'สินค้าที่เปิดขาย'}</h3>
+        <div class="ge-shop">${shop.map(e => `<button class="ge-shop-card" style="--c:${e.poster ? e.poster.accent : GE_PAGE.red}" data-action="open-event" data-id="${e.id}">
+          ${e.poster && e.poster.img ? `<img src="${escapeAttr(e.poster.img)}" alt="" loading="lazy" decoding="async">` : ''}
+          <span><b>${escapeHtml(e.shop.name)}</b><small>${escapeHtml(e.shop.price)}</small></span></button>`).join('')}</div>` : ''}`;
+  }
+
+  return `<section class="ge-page" style="--ge:${GE_PAGE.red}">${hero}${tabs}${body}</section>`;
+}
+
 /* A face for each kind of outing, so a sheet is recognisable before it is read.
    Line art in the site's own weight, except the GE6 token, which is the real
    coin off the official poster. */
@@ -9524,7 +9659,7 @@ function renderMain(){
   main.innerHTML =
     (state.query.trim() ? renderSearch() :
     state.view==='feed' ? renderFeed() :
-    state.view==='timeline' ? renderTimelinePage() :
+    state.view==='timeline' ? renderGEPage() :
     state.view==='shop' ? renderShopPage() :
     state.view==='calendar' ? renderCalendarPage() :
     state.view==='browse' ? renderBrowse() :
@@ -9763,7 +9898,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','timelineId','dayOf'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','timelineId','dayOf','geTab'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
@@ -9909,7 +10044,7 @@ function isSameScreen(a, b){
   return !!a && !!b && a.view===b.view && a.selectedId===b.selectedId
     && a.selectedEvent===b.selectedEvent
     && a.compareWith===b.compareWith && a.comparePicking===b.comparePicking
-    && a.posterOf===b.posterOf && a.dayOf===b.dayOf
+    && a.posterOf===b.posterOf && a.dayOf===b.dayOf && a.geTab===b.geTab
     && a.editingId===b.editingId && a.favoritesOnly===b.favoritesOnly && a.oshiOnly===b.oshiOnly
     && a.showGraduated===b.showGraduated && a.selectedSingle===b.selectedSingle;
 }
@@ -10137,8 +10272,19 @@ function bindDelegatedEvents(){
       state.query = '';
       render(); pushHistory();
     }
+    else if(action==='open-ge'){
+      state.timelineId = 'ge2026'; state.geTab = 'overview';
+      state.view = 'timeline';
+      state.selectedEvent = null; state.selectedId = null; state.editingId = null;
+      state.query = '';
+      render(); pushHistory();
+    }
+    else if(action==='ge-tab'){
+      state.geTab = el.dataset.value;
+      renderMain(); replaceHistory();
+    }
     else if(action==='open-timeline'){
-      state.timelineId = id || 'ge2026';
+      state.timelineId = id || 'ge2026'; state.geTab = 'timeline';
       state.view = 'timeline';
       state.selectedEvent = null; state.selectedId = null; state.editingId = null;
       state.query = '';
