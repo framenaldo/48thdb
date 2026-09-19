@@ -612,7 +612,7 @@
   .cal-cell.is-picked .cal-num{ color:var(--paper); font-weight:800; }
 
   /* the calendar page */
-  .cal-btn.is-on{ background:var(--ink); color:var(--paper); }
+  .cal-btn.is-on, .shop-btn.is-on{ background:var(--ink); color:var(--paper); }
   .calp{ max-width:1100px; margin-inline:auto; }
   .calp-bar{ display:flex; align-items:center; gap:10px; margin:14px 0 10px; }
   .calp-month{ margin:0; font-size:22px; font-weight:800; min-width:170px; text-align:center; }
@@ -5874,7 +5874,7 @@ function renderHeader(){
     <button class="shop-btn cal-btn${state.view==='calendar' ? ' is-on' : ''}" data-action="nav-calendar" title="ปฏิทิน" aria-label="ปฏิทิน">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
     </button>
-    <button class="shop-btn" data-action="nav-shop" title="ร้านค้า" aria-label="ร้านค้า">
+    <button class="shop-btn${state.view==='shop' ? ' is-on' : ''}" data-action="nav-shop" title="ร้านค้า" aria-label="ร้านค้า">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>
       ${(() => { const n = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
         return n ? `<span class="shop-dot">${n}</span>` : ''; })()}
@@ -9953,6 +9953,9 @@ function renderMain(){
   syncTicker();
   localize(document.getElementById('app'));
   syncBodyScrollLock();
+  // the header's page buttons show where you are, whichever way you got there
+  const hb = (sel, on) => { const b = document.querySelector(sel); if(b) b.classList.toggle('is-on', on); };
+  hb('.cal-btn', state.view === 'calendar'); hb('.shop-btn:not(.cal-btn)', state.view === 'shop'); hb('.ge-btn', state.view === 'timeline');
   if(state.view === 'stats') addBoxShareButtons(main);
   attachMainEvents();
   startBirthdayFireworks();
