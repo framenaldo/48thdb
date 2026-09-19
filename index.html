@@ -682,6 +682,35 @@
   .cmp-row:has(+ .cmp-note){ padding-bottom:0; }
   .cmp-row:not(:has(+ .cmp-note)){ padding-bottom:11px; border-bottom:1px solid var(--line); }
 
+  /* the owner's review queue */
+  .pd-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .pd-list{ display:flex; flex-direction:column; gap:12px; margin-bottom:8px; }
+  .pd-card{ padding:14px; border:1px solid var(--line); border-radius:18px; background:var(--glass-card); }
+  .pd-meta{ display:flex; align-items:center; gap:8px; margin:0; font-size:15px; }
+  .pd-kind{ padding:2px 10px; border-radius:999px; color:#fff; font-size:11px; font-weight:800; background:#3A66D6; }
+  .pd-kind.is-add{ background:#1B8E52; }
+  .pd-by{ margin:4px 0 10px; font-size:12px; color:var(--ink-soft); }
+  .pd-rows{ display:flex; flex-direction:column; gap:6px; }
+  .pd-row{ display:grid; grid-template-columns:110px minmax(0,1fr) 16px minmax(0,1fr); gap:8px; align-items:start;
+    padding:7px 10px; border-radius:10px; background:rgba(127,127,127,.07); font-size:13px; }
+  .pd-row.is-add{ grid-template-columns:110px minmax(0,1fr); }
+  .pd-label{ font-weight:800; color:var(--ink-soft); font-size:12px; }
+  .pd-old{ color:var(--ink-soft); text-decoration:line-through; text-decoration-color:rgba(200,35,26,.55); overflow-wrap:anywhere; }
+  .pd-arrow{ color:var(--ink-soft); }
+  .pd-new{ font-weight:700; overflow-wrap:anywhere; }
+  .pd-empty{ color:var(--ink-soft); font-weight:400; }
+  .pd-photo{ width:56px; height:56px; object-fit:cover; border-radius:10px; display:block; }
+  .pd-actions{ display:flex; gap:8px; margin-top:12px; }
+  .mini-avatar-btn{ position:relative; }
+  .pd-dot{ position:absolute; top:-4px; right:-4px; min-width:17px; height:17px; padding:0 4px; border-radius:999px;
+    background:#C8231A; color:#fff; font-size:10.5px; font-weight:800; line-height:17px; text-align:center; }
+  .form-review-note{ margin:-8px 0 16px; padding:9px 12px; border-radius:12px; font-size:13px;
+    background:color-mix(in srgb, var(--gold) 16%, transparent); border:1px solid color-mix(in srgb, var(--gold) 40%, transparent); }
+  @media (max-width:560px){
+    .pd-row{ grid-template-columns:1fr; gap:2px; }
+    .pd-row.is-add{ grid-template-columns:1fr; }
+    .pd-arrow{ display:none; }
+  }
   .backup-card{
     background:var(--glass-card); border:1px solid var(--glass-edge);
     border-radius:16px; padding:16px;
@@ -4240,6 +4269,7 @@ const ICONS = {
 
 // ============================= STATE =============================
 let state = {
+  isOwner:false, pending:[],
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null,
@@ -4581,6 +4611,12 @@ const EN = {
   'กำลังบันทึก...': 'Saving…',
   'เกิดข้อผิดพลาด:': 'Something went wrong:',
   'บันทึก': 'Save',
+  'ส่งให้ตรวจ': 'Send for review',
+  'ข้อมูลที่ส่งจะรอผู้ดูแลตรวจก่อน แล้วจึงขึ้นเว็บ': 'What you send waits for the site owner to review before it goes live',
+  'ส่งให้ผู้ดูแลตรวจแล้ว จะขึ้นเว็บเมื่ออนุมัติ': 'Sent for review — it goes live once approved',
+  'เข้าสู่ระบบก่อนเพิ่มหรือแก้ไขข้อมูล': 'Sign in to add or edit details',
+  'เข้าสู่ระบบก่อนส่งข้อมูล': 'Sign in before sending',
+  'ส่งข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง': 'Could not send — please try again',
   'ยกเลิก': 'Cancel',
   'กรุณากรอกชื่อเล่น (อังกฤษ และ ไทย) ก่อนบันทึก': 'Please fill in both nicknames (English and Thai) before saving',
   'แอปของวง': 'The group\'s app',
@@ -5358,6 +5394,7 @@ async function loadMembers(){
   let stored = snap.docs.map(d => d.data());
 
   if(stored.length === 0){
+    if(!state.isOwner) return SEED_ALL_MEMBERS.slice();
     const batch = fbDb.batch();
     SEED_ALL_MEMBERS.forEach(m => batch.set(fbDb.collection('members').doc(m.id), m));
     await batch.commit();
@@ -5409,9 +5446,28 @@ async function loadMembers(){
       }
     }
   }
-  if(changed){ try{ await batch.commit(); }catch(e){} }
+  if(changed && state.isOwner){ try{ await batch.commit(); }catch(e){} }
   return stored;
 }
+/* Only the owner may change the shared member list; the Firestore rules say
+   who that is and let only them read the admin collection. So a read that
+   succeeds is the proof — the answer never lives in this public page. */
+async function checkOwner(){
+  const u = fbAuth.currentUser;
+  if(!u || u.isAnonymous) return false;
+  try{ await fbDb.collection('admin').doc('owner').get(); return true; }
+  catch(e){ return false; }
+}
+async function loadPending(){
+  if(!state.isOwner){ state.pending = []; return; }
+  try{
+    const snap = await fbDb.collection('pending').get();
+    state.pending = snap.docs.map(d => ({ id:d.id, ...d.data() }))
+      .sort((a, b) => ((a.at && a.at.seconds) || 0) - ((b.at && b.at.seconds) || 0));
+  }catch(e){ state.pending = []; }
+}
+const plain = o => o ? JSON.parse(JSON.stringify(o)) : null;   // Firestore refuses undefined
+
 async function saveMembers(members){
   const batch = fbDb.batch();
   members.forEach(m => batch.set(fbDb.collection('members').doc(m.id), m));
@@ -5469,12 +5525,12 @@ function renderProfileSlot(){
   const initial = state.account.name ? state.account.name[0].toUpperCase() : '?';
   slot.innerHTML = `
     <div class="profile-slot-wrap">
-      <button class="mini-avatar-btn" data-action="toggle-profile-menu"><span class="mini-avatar">${initial}</span></button>
+      <button class="mini-avatar-btn" data-action="toggle-profile-menu"><span class="mini-avatar">${initial}</span>${state.isOwner && state.pending.length ? `<span class="pd-dot">${state.pending.length}</span>` : ''}</button>
       ${state.profileMenuOpen ? `
       <div class="profile-dropdown">
         <div class="dropdown-name">${escapeHtml(state.account.name)}</div>
         <div class="dropdown-email">${escapeHtml(state.account.email)}</div>
-        <button data-action="nav" data-view="profile">ดูโปรไฟล์</button>
+        <button data-action="nav" data-view="profile">ดูโปรไฟล์${state.isOwner && state.pending.length ? ` · รอตรวจ ${state.pending.length}` : ''}</button>
         <button data-action="nav" data-view="editprofile">แก้ไขข้อมูลส่วนตัว</button>
         <button data-action="sign-out" class="danger">ออกจากระบบ</button>
       </div>` : ''}
@@ -7681,7 +7737,7 @@ function renderDetailModal(){
         </div>
         <div class="action-row sec-actions">
           <button class="btn-secondary" data-action="edit-member" data-id="${m.id}">แก้ไขข้อมูล</button>
-          <button class="btn-danger" data-action="delete-member" data-id="${m.id}">ลบสมาชิก</button>
+          ${state.isOwner ? `<button class="btn-danger" data-action="delete-member" data-id="${m.id}">ลบสมาชิก</button>` : ''}
         </div>
         </div>
         <div class="sheet-col sheet-col-b"><div class="sec-events">${renderMemberEvents(m)}</div><div class="sec-lives">${renderMemberLives(m)}</div></div>
@@ -7918,6 +7974,50 @@ function renderKamiOshiFeatured(m){
   </div>`;
 }
 
+/* Changes other people sent in, waiting for the owner. Only the owner sees
+   this, and only the rules let them read it. */
+const PENDING_FIELDS = [
+  ['name','ชื่อเล่น (อังกฤษ)'], ['nameTh','ชื่อเล่น (ไทย)'], ['realName','ชื่อจริง (อังกฤษ)'], ['realNameTh','ชื่อจริง (ไทย)'],
+  ['groupId','วง'], ['teamId','ทีม'], ['gen','รุ่น'], ['birthday','วันเกิด'], ['height','ส่วนสูง'], ['blood','กรุ๊ปเลือด'],
+  ['hometown','บ้านเกิด'], ['hobby','งานอดิเรก'], ['likes','สิ่งที่ชอบ'], ['photo','รูป'], ['facts','ข้อเท็จจริง'],
+];
+function pendingValue(k, v){
+  if(v === null || v === undefined || v === '' || (Array.isArray(v) && !v.length)) return '<span class="pd-empty">—</span>';
+  if(k === 'groupId') return escapeHtml((getGroup(v) || {}).name || v);
+  if(k === 'teamId') return escapeHtml((getTeam(v) || {}).name || v);
+  if(k === 'birthday') return escapeHtml(formatDateShort(v));
+  if(k === 'photo') return `<img class="pd-photo" src="${escapeAttr(v)}" alt="" loading="lazy">`;
+  if(Array.isArray(v)) return v.map(x => escapeHtml(String(x))).join('<br>');
+  return escapeHtml(String(v));
+}
+function renderPendingQueue(){
+  if(!state.isOwner) return '';
+  const items = state.pending;
+  const card = p => {
+    const before = p.before || {};
+    const rows = PENDING_FIELDS.filter(([k]) => p.kind === 'add'
+        ? !(p.data[k] === null || p.data[k] === undefined || p.data[k] === '' || (Array.isArray(p.data[k]) && !p.data[k].length))
+        : JSON.stringify(p.data[k]) !== JSON.stringify(before[k]))
+      .map(([k, label]) => `<div class="pd-row${p.kind === 'add' ? ' is-add' : ''}"><div class="pd-label">${label}</div>
+        ${p.kind === 'edit' ? `<div class="pd-old">${pendingValue(k, before[k])}</div><div class="pd-arrow">→</div>` : ''}
+        <div class="pd-new">${pendingValue(k, p.data[k])}</div></div>`).join('');
+    const when = p.at && p.at.seconds ? new Date(p.at.seconds * 1000) : null;
+    return `<article class="pd-card">
+      <p class="pd-meta"><span class="pd-kind is-${p.kind}">${p.kind === 'add' ? 'เพิ่มสมาชิก' : 'แก้ไขข้อมูล'}</span>
+        <b>${escapeHtml(p.data.nameTh || p.data.name || '')}</b></p>
+      <p class="pd-by">ส่งโดย ${escapeHtml((p.by && (p.by.name || p.by.email)) || '-')}${when ? ` · ${formatDateShort(when.toISOString().slice(0,10))} ${String(when.getHours()).padStart(2,'0')}:${String(when.getMinutes()).padStart(2,'0')} น.` : ''}</p>
+      <div class="pd-rows">${rows || '<p class="muted-note">ไม่มีช่องที่เปลี่ยน</p>'}</div>
+      <div class="pd-actions">
+        <button class="btn-add" data-action="approve-pending" data-id="${p.id}">อนุมัติ</button>
+        <button class="btn-danger" data-action="reject-pending" data-id="${p.id}">ไม่อนุมัติ</button>
+      </div>
+    </article>`;
+  };
+  return `<div class="pd-head"><h3 class="section-label">รอตรวจ (${items.length})</h3>
+      <button class="chip chip-link" data-action="refresh-pending">รีเฟรช</button></div>
+    ${items.length ? `<div class="pd-list">${items.map(card).join('')}</div>` : `<p class="muted-note">ยังไม่มีข้อมูลที่รอตรวจ</p>`}`;
+}
+
 function renderProfile(){
   const loggedIn = state.account && state.account.loggedIn;
   const kamiMember = state.kamiOshi ? getMember(state.kamiOshi) : null;
@@ -7947,6 +8047,7 @@ function renderProfile(){
 
   return `
   ${accountBlock}
+  ${renderPendingQueue()}
   <h3 class="section-label">Kami Oshi ของคุณ</h3>
   ${kamiMember ? renderKamiOshiFeatured(kamiMember) : `<p class="muted-note">ยังไม่ได้เลือก Kami Oshi — เปิดโปรไฟล์สมาชิกแล้วกดปุ่มมงกุฎเพื่อเลือก (เลือกได้คนเดียว)</p>`}
   <h3 class="section-label">Oshi ทั้งหมด (${oshiMembers.length})</h3>
@@ -8858,6 +8959,7 @@ function renderForm(){
   return `
   <button class="back-btn" type="button" data-action="cancel-form">\u2190 ยกเลิก</button>
   <h2 class="display" style="margin:0 0 18px;font-size:22px;">${editing?'แก้ไขข้อมูลสมาชิก':'เพิ่มสมาชิกใหม่'}</h2>
+  ${state.isOwner ? '' : `<p class="form-review-note">ข้อมูลที่ส่งจะรอผู้ดูแลตรวจก่อน แล้วจึงขึ้นเว็บ</p>`}
   <form id="member-form" novalidate>
     <div class="form-grid">
       <div class="form-field"><label>ชื่อเล่น (อังกฤษ)</label><input name="name" required value="${escapeAttr(m.name)}"></div>
@@ -8890,7 +8992,7 @@ function renderForm(){
       <div class="form-field full"><label>ข้อเท็จจริง (บรรทัดละ 1 ข้อ)</label><textarea name="facts" rows="4">${(m.facts||[]).join('\n')}</textarea></div>
     </div>
     <div class="action-row">
-      <button type="submit" class="btn-add">บันทึก</button>
+      <button type="submit" class="btn-add">${state.isOwner ? 'บันทึก' : 'ส่งให้ตรวจ'}</button>
       <button type="button" class="btn-secondary" data-action="cancel-form">ยกเลิก</button>
     </div>
   </form>`;
@@ -9295,13 +9397,32 @@ function attachMainEvents(){
       photo: (fd.get('photo')||'').trim() || null,
       facts: (fd.get('facts')||'').split('\n').map(s=>s.trim()).filter(Boolean)
     };
-    if(state.editingId){
-      const idx = state.members.findIndex(x=>x.id===state.editingId);
-      if(idx>=0) state.members[idx] = data;
-    } else {
-      state.members.push(data);
+    const before = state.editingId ? getMember(state.editingId) : null;
+    if(!state.isOwner){
+      if(!(state.account && state.account.loggedIn)){ toast('เข้าสู่ระบบก่อนส่งข้อมูล'); return; }
+      try{
+        await fbDb.collection('pending').add({
+          kind: before ? 'edit' : 'add', memberId: data.id, data: plain(data), before: plain(before),
+          by: { uid: state.account.uid, name: state.account.name || '', email: state.account.email || '' },
+          at: firebase.firestore.FieldValue.serverTimestamp(), status: 'pending',
+        });
+      }catch(err){ alert('ส่งข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง'); return; }
+      state.view = 'browse';
+      state.selectedId = before ? before.id : null;
+      state.editingId = null;
+      renderMain(); replaceHistory();
+      toast('ส่งให้ผู้ดูแลตรวจแล้ว จะขึ้นเว็บเมื่ออนุมัติ');
+      return;
     }
-    await fbDb.collection('members').doc(data.id).set(data);
+    // an edit keeps whatever the form does not show (history, graduation…)
+    const saved = before ? { ...plain(before), ...data } : data;
+    if(before){
+      const idx = state.members.findIndex(x=>x.id===before.id);
+      if(idx>=0) state.members[idx] = saved;
+    } else {
+      state.members.push(saved);
+    }
+    await fbDb.collection('members').doc(saved.id).set(plain(saved));
     state.view = 'browse';
     state.selectedId = data.id;
     state.editingId = null;
@@ -9810,6 +9931,14 @@ function bindDelegatedEvents(){
       state.authMode = el.dataset.mode;
       renderMain();
     }
+    else if(action==='add-new' && !(state.account && state.account.loggedIn)){
+      toast('เข้าสู่ระบบก่อนเพิ่มหรือแก้ไขข้อมูล');
+      state.view='auth'; state.selectedId=null; render(); pushHistory();
+    }
+    else if(action==='edit-member' && !(state.account && state.account.loggedIn)){
+      toast('เข้าสู่ระบบก่อนเพิ่มหรือแก้ไขข้อมูล');
+      state.view='auth'; state.selectedId=null; render(); pushHistory();
+    }
     else if(action==='add-new'){
       state.view='form'; state.editingId=null; render(); pushHistory();
     }
@@ -9818,12 +9947,40 @@ function bindDelegatedEvents(){
     }
     else if(action==='delete-member'){
       const m = getMember(id);
-      if(m && confirm(`ยืนยันการลบ ${m.nameTh}?`)){
+      if(m && state.isOwner && confirm(`ยืนยันการลบ ${m.nameTh}?`)){
         state.members = state.members.filter(x=>x.id!==id);
         await deleteMemberDoc(id);
         state.view='browse'; state.selectedId=null;
         render(); replaceHistory();
       }
+    }
+    else if(action==='approve-pending' || action==='reject-pending'){
+      const p = state.pending.find(x => x.id === id);
+      if(!p || !state.isOwner) return;
+      el.disabled = true;
+      try{
+        if(action==='approve-pending'){
+          const cur = getMember(p.memberId);
+          let next;
+          if(p.kind === 'edit' && cur){
+            // apply only what the contributor changed, onto today's copy
+            next = plain(cur);
+            for(const k of Object.keys(p.data))
+              if(JSON.stringify(p.data[k]) !== JSON.stringify((p.before || {})[k])) next[k] = p.data[k];
+          } else next = plain(p.data);
+          await fbDb.collection('members').doc(next.id).set(next);
+          const idx = state.members.findIndex(x => x.id === next.id);
+          if(idx >= 0) state.members[idx] = next; else state.members.push(next);
+          learnNames();
+        }
+        await fbDb.collection('pending').doc(p.id).delete();
+        state.pending = state.pending.filter(x => x.id !== p.id);
+        toast(action==='approve-pending' ? 'อนุมัติแล้ว ขึ้นเว็บแล้ว' : 'ไม่อนุมัติ ลบคำขอแล้ว');
+      }catch(err){ alert('ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง'); }
+      render();
+    }
+    else if(action==='refresh-pending'){
+      await loadPending(); render();
     }
     else if(action==='cancel-form'){
       goBack(()=>{
@@ -10051,6 +10208,8 @@ async function init(){
     } else {
       state.account = null;
     }
+    state.isOwner = await checkOwner();
+    await loadPending();
     if(!state.members || !state.members.length){
       try{ state.members = await loadMembers(); }
       catch(e){ state.members = SEED_ALL_MEMBERS.slice(); }
