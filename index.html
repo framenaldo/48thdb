@@ -1736,7 +1736,16 @@
     0%{ box-shadow:0 0 0 0 rgba(255,255,255,.8); }
     100%{ box-shadow:0 0 0 9px rgba(255,255,255,0); }
   }
-  @media (prefers-reduced-motion: reduce){ .today-live{ animation:none; } }
+  /* waiting for today's start: a still dot; on right now: a red dot that blinks */
+  .today-hero-status:not(.is-live) .today-live{ animation:none; opacity:.75; }
+  .today-hero-status.is-live .today-live{
+    background:#FF3B30; box-shadow:0 0 0 2px #fff, 0 0 10px 3px rgba(255,59,48,.9);
+    animation:today-blink 1s steps(1, end) infinite;
+  }
+  .today-hero-status.is-live{ animation:today-glow 2s ease-in-out infinite; }
+  @keyframes today-blink{ 0%{ opacity:1; } 50%{ opacity:.15; } }
+  @keyframes today-glow{ 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.18); } }
+  @media (prefers-reduced-motion: reduce){ .today-live, .today-hero-status.is-live{ animation:none; } }
   .today-hero-title{
     margin:0 0 6px; font-family:'Noto Sans Thai',sans-serif;
     font-size:clamp(21px, 5.6vw, 27px); line-height:1.22; font-weight:800; color:var(--ink);
@@ -7307,6 +7316,8 @@ function renderTodayHero(ev, todayIso){
     : at ? `<span data-starts-at="${at}">${startsLabel(at)}</span>`
     : rota && rota.today.length ? 'รอบวันนี้จบแล้ว'
     : (ev.time ? 'กำลังจัดอยู่' : 'วันนี้');
+  // on right now: the booth is open, or the day's show has begun
+  const live = !!(rota && rota.current) || (!at && !(rota && rota.today.length) && !!ev.time);
   const hours = rota ? rota.today.map(s => `${s.time}–${s.until}`).join(', ') : (ev.time || '');
   const shown = people.slice(0, 8);
   const rest = people.length - shown.length;
@@ -7315,7 +7326,7 @@ function renderTodayHero(ev, todayIso){
   <article class="today-hero${open ? ' is-openable' : ''}${ev.poster ? ' is-themed' : ''}" style="--c:${accent}${ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : ''}"
     ${open ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="today-hero-body">
-      <p class="today-hero-status"><span class="today-live" aria-hidden="true"></span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</p>
+      <p class="today-hero-status${live ? ' is-live' : ''}"><span class="today-live" aria-hidden="true"></span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</p>
       <h3 class="today-hero-title">${renderEventIcon(ev, 'ev-icon is-hero')}${escapeHtml(ev.title)}</h3>
       <p class="today-hero-meta">${hours ? `${hours} น.` : ''}${hours && ev.venue ? ' · ' : ''}${ev.venue ? escapeHtml(ev.venue) : ''}</p>
     </div>
