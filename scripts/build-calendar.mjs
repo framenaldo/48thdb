@@ -73,7 +73,7 @@ function vevents(ev){
   const where = ev.venue || ev.online || '';
   const base = (uid, extra) => [
     `UID:${uid}@48thdb`, `DTSTAMP:${ymd(ev.start)}T000000Z`,
-    `SUMMARY:${esc((ev.part ? `${ev.title} · ${ev.part}` : ev.title))}`,
+    `SUMMARY:${esc(ev.bar || (ev.part ? `${ev.title} · ${ev.part}` : ev.title))}`,   // the short name the site's calendar uses, when there is one
     where ? `LOCATION:${esc(where)}` : null,
     `DESCRIPTION:${esc(describe(ev, extra))}`,
     `URL:${SITE}?e=${ev.id}`,
