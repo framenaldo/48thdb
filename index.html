@@ -1818,7 +1818,10 @@
   .shop-buy:hover{ filter:brightness(1.08); transform:translateY(-1px);
     box-shadow:0 9px 22px color-mix(in srgb, var(--bc) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.25); }
   .shop-buy:active{ transform:translateY(1px) scale(.98); box-shadow:0 2px 6px color-mix(in srgb, var(--bc) 35%, transparent); }
-  .shop-actions .shop-buy{ flex:none; }
+  .shop-actions .shop-buy{ flex:none; min-height:34px; padding:0 14px; gap:6px; font-size:13px;
+    box-shadow:0 3px 9px color-mix(in srgb, var(--bc) 30%, transparent), inset 0 1px 0 rgba(255,255,255,.25); }
+  .shop-actions .shop-buy svg{ width:15px; height:15px; }
+  .shop-actions .shop-buy-arrow{ font-size:11.5px; }
   .shop-actions .shop-open{ background:none; border:0; box-shadow:none; padding:0 4px; }
   .evm-related .shop-buy{ line-height:1; }
   .shop-thumb img{ display:block; width:100%; height:auto; }
