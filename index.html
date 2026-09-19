@@ -611,6 +611,84 @@
   .cal-cell.is-picked{ background:var(--ink); }
   .cal-cell.is-picked .cal-num{ color:var(--paper); font-weight:800; }
 
+  /* the calendar page */
+  .cal-btn.is-on{ background:var(--ink); color:var(--paper); }
+  .calp{ max-width:1100px; margin-inline:auto; }
+  .calp-bar{ display:flex; align-items:center; gap:10px; margin:14px 0 10px; }
+  .calp-month{ margin:0; font-size:22px; font-weight:800; min-width:170px; text-align:center; }
+  .calp-today{ margin-left:auto; }
+  .calp-board{ background:var(--glass-card); border:1px solid var(--glass-edge); border-radius:20px; padding:10px; }
+  .calp-dow, .calp-grid{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:4px; }
+  .calp-dow span{ text-align:center; font-size:12px; font-weight:800; color:var(--ink-soft); padding:2px 0 6px; }
+  .calp-dow span.is-weekend{ color:var(--bnk); }
+  .calp-cell{
+    min-height:118px; display:flex; flex-direction:column; align-items:stretch; gap:3px; padding:6px;
+    border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink);
+    font:inherit; text-align:left; cursor:pointer; min-width:0;
+    transition:transform .15s var(--ease-out), box-shadow .15s ease;
+  }
+  .calp-cell.is-empty{ background:transparent; border-color:transparent; }
+  @media (hover:hover){ .calp-cell:not(.is-empty):hover{ transform:translateY(-1px); box-shadow:0 6px 16px rgba(0,0,0,.08); } }
+  .calp-cell:not(.is-empty):active{ transform:scale(.97); }
+  .calp-cell.is-gone{ opacity:.62; }
+  .calp-num{ font-size:13px; font-weight:800; width:24px; height:24px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; flex:none; }
+  .calp-cell[data-weekend] .calp-num{ color:var(--bnk); }
+  .calp-cell.is-today{ border-color:var(--bnk); box-shadow:0 0 0 1px var(--bnk) inset; }
+  .calp-cell.is-today .calp-num{ background:var(--bnk); color:#fff; }
+  .calp-items{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .calp-item{
+    display:block; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    font-size:11px; font-weight:700; line-height:1.35; padding:2px 6px; border-radius:6px;
+    background:color-mix(in srgb, var(--k) 16%, transparent); color:var(--ink);
+    border-left:3px solid var(--k);
+  }
+  .calp-item.is-period{ background:transparent; border:1px dashed color-mix(in srgb, var(--k) 70%, transparent); font-weight:600; }
+  .calp-item.is-bday{ background:color-mix(in srgb, var(--gold) 20%, transparent); border-left-color:var(--gold); }
+  .calp-more{ font-size:10.5px; font-weight:800; color:var(--ink-soft); padding-left:4px; }
+  .calp-dots{ display:none; }
+  .calp-legend{ display:flex; flex-wrap:wrap; gap:6px 16px; margin:10px 2px 4px; font-size:12px; color:var(--ink-soft); }
+  .calp-legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .calp-legend i{ width:14px; height:10px; border-radius:3px; display:inline-block; }
+  .calp-legend i.is-bday{ background:color-mix(in srgb, var(--gold) 45%, transparent); }
+  .calp-legend i.is-period{ border:1px dashed var(--ink-soft); }
+  .calp-agenda{ display:flex; flex-direction:column; gap:8px; }
+  .calp-ag-row{
+    display:flex; gap:12px; align-items:flex-start; width:100%; padding:10px 12px; text-align:left;
+    border:1px solid var(--line); border-radius:14px; background:var(--glass-card); color:inherit; font:inherit; cursor:pointer;
+  }
+  .calp-ag-row.is-gone{ opacity:.6; }
+  .calp-ag-row.is-today{ border-color:var(--bnk); }
+  .calp-ag-date{ flex:none; width:40px; display:flex; flex-direction:column; align-items:center; line-height:1.15; }
+  .calp-ag-date b{ font-size:20px; }
+  .calp-ag-date small{ font-size:11px; color:var(--ink-soft); font-weight:700; }
+  .calp-ag-list{ display:flex; flex-direction:column; gap:5px; min-width:0; flex:1; }
+  .calp-ag-item{ font-size:13.5px; font-weight:700; line-height:1.4; padding-left:9px; border-left:3px solid var(--k); }
+  .calp-ag-item small{ color:var(--ink-soft); font-weight:600; }
+  .calp-ag-item .ev-icon{ vertical-align:-4px; margin-right:4px; }
+  @media (max-width:700px){
+    .calp-board{ padding:6px; border-radius:16px; }
+    .calp-dow, .calp-grid{ gap:3px; }
+    .calp-cell{ min-height:74px; padding:4px 3px; border-radius:9px; }
+    .calp-num{ width:21px; height:21px; font-size:12px; margin:0 auto; }
+    .calp-item{ font-size:9.5px; padding:1px 3px; border-radius:4px; border-left-width:2px; }
+    .calp-items .calp-item:nth-child(n+3){ display:none; }
+    .calp-month{ font-size:18px; min-width:0; flex:1; }
+  }
+  @media (max-width:420px){
+    .calp-cell{ min-height:62px; }
+    .calp-items{ display:none; }
+    .calp-dots{ display:flex; justify-content:center; gap:3px; margin-top:auto; padding-bottom:3px; }
+    .calp-dots i{ width:6px; height:6px; border-radius:50%; display:block; }
+  }
+  .ov-views .bar-val{ white-space:nowrap; min-width:max-content; }
+  .ov-fact{ margin:10px 0 0; font-size:13px; color:var(--ink-soft); }
+  .ov-fact b{ color:var(--ink); }
+  .stat-cell .value.ov-next{ font-size:14px; line-height:1.35; }
+  .ov-bdays{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .ov-bday{ padding:5px 11px; border-radius:999px; border:1px solid color-mix(in srgb, var(--c) 45%, var(--line));
+    background:color-mix(in srgb, var(--c) 10%, transparent); color:var(--ink); font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+  .ov-bday b{ color:var(--c); margin-right:2px; }
   .cal-hint{ text-align:center; margin:12px 0 2px; font-size:12px; }
   .cal-day-detail{ margin-top:12px; border-top:1px solid var(--line); padding-top:11px; }
   .cal-day-title{
@@ -4670,6 +4748,7 @@ const EN = {
   'ไทม์ไลน์ทั้งงาน →': 'Full timeline →',
   'ไลฟ์': 'Lives',
   'ไทม์ไลน์ GE2026': 'GE2026 timeline',
+  'ในเดือนนี้': 'This month',
   'ดูทุกอย่างในวันนี้': 'Everything on this day',
   'ไม่พบไทม์ไลน์': 'No timeline found',
   'ร้านค้า': 'Shop',
@@ -5502,6 +5581,9 @@ function renderHeader(){
     <button class="tlp-btn" data-action="open-timeline" data-id="ge2026" title="ไทม์ไลน์ Senbatsu General Election 2026">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4v16"/><circle cx="5" cy="8" r="1.6"/><circle cx="5" cy="16" r="1.6"/><path d="M10 8h9M10 16h6"/></svg>
       <span>ไทม์ไลน์ GE2026</span></button>
+    <button class="shop-btn cal-btn${state.view==='calendar' ? ' is-on' : ''}" data-action="nav-calendar" title="ปฏิทิน" aria-label="ปฏิทิน">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+    </button>
     <button class="shop-btn" data-action="nav-shop" title="ร้านค้า" aria-label="ร้านค้า">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>
       ${(() => { const n = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
@@ -6140,6 +6222,91 @@ function renderCalendar(){
   </section>`;
 }
 
+/* The calendar as a page of its own: a month you can read at a glance, each
+   day naming what is on it, and a tap opening the whole day. */
+function renderCalendarPage(){
+  const en = isEN();
+  const today = toYmd(todayStart());
+  const key = state.calMonth || today.slice(0,7);
+  const [year, month] = key.split('-').map(Number);
+  const { events, births } = calendarIndex();
+  const first = new Date(year, month-1, 1);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const lead = first.getDay();
+  const DOW = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  const colourOf = ev => { const g = (ev.groups||[]).length===1 ? getGroup(ev.groups[0]) : null;
+    return ev.poster && ev.poster.accent || (g ? g.color : 'var(--ink-soft)'); };
+  const mark = (ev, iso) => ev.period ? (iso === ev.start ? (en ? 'opens · ' : 'เปิด · ') : (en ? 'closes · ' : 'ปิด · ')) : '';
+
+  const cells = [];
+  for(let i=0; i<lead; i++) cells.push('<div class="calp-cell is-empty"></div>');
+  for(let day=1; day<=daysInMonth; day++){
+    const iso = `${key}-${String(day).padStart(2,'0')}`;
+    const evs = (events[iso] || []).slice().sort((a,b) => (a.period?1:0)-(b.period?1:0) || (a.time||'99').localeCompare(b.time||'99'));
+    const bds = births[iso.slice(5)] || [];
+    const items = [
+      ...bds.map(m => `<span class="calp-item is-bday" style="--k:${getGroup(m.groupId).color}">🎂 ${escapeHtml(nickName(m))}</span>`),
+      ...evs.map(ev => `<span class="calp-item${ev.period ? ' is-period' : ''}" style="--k:${colourOf(ev)}">${mark(ev, iso)}${escapeHtml(ev.title)}</span>`),
+    ];
+    const MAX = 3;
+    const dotColours = [...bds.map(() => 'var(--gold)'), ...evs.map(colourOf)].slice(0, 4);
+    const cls = ['calp-cell'];
+    if(iso === today) cls.push('is-today');
+    if(iso < today) cls.push('is-gone');
+    if(items.length) cls.push('has-any');
+    const dow = (lead + day - 1) % 7;
+    cells.push(`<button class="${cls.join(' ')}" data-action="open-day" data-id="${iso}"${dow===0||dow===6 ? ' data-weekend="1"' : ''}>
+      <span class="calp-num">${day}</span>
+      <span class="calp-items">${items.slice(0, MAX).join('')}${items.length > MAX ? `<span class="calp-more">+${items.length - MAX}</span>` : ''}</span>
+      <span class="calp-dots">${dotColours.map(c => `<i style="background:${c}"></i>`).join('')}</span>
+    </button>`);
+  }
+  const tail = (7 - (lead + daysInMonth) % 7) % 7;
+  for(let i=0; i<tail; i++) cells.push('<div class="calp-cell is-empty"></div>');
+
+  // the month as a list underneath, for reading on a phone
+  const agenda = [];
+  for(let day=1; day<=daysInMonth; day++){
+    const iso = `${key}-${String(day).padStart(2,'0')}`;
+    const evs = events[iso] || [], bds = births[iso.slice(5)] || [];
+    if(!evs.length && !bds.length) continue;
+    const dd = new Date(year, month-1, day);
+    agenda.push(`<button class="calp-ag-row${iso === today ? ' is-today' : ''}${iso < today ? ' is-gone' : ''}" data-action="open-day" data-id="${iso}">
+      <span class="calp-ag-date"><b>${day}</b><small>${DOW[dd.getDay()]}</small></span>
+      <span class="calp-ag-list">
+        ${bds.map(m => `<span class="calp-ag-item" style="--k:${getGroup(m.groupId).color}">🎂 ${en ? 'Birthday' : 'วันเกิด'} ${escapeHtml(nickName(m))}</span>`).join('')}
+        ${evs.map(ev => `<span class="calp-ag-item" style="--k:${colourOf(ev)}">${renderEventIcon(ev, 'ev-icon')}${mark(ev, iso)}${escapeHtml(ev.title)}${ev.time && !ev.period ? ` <small>${escapeHtml(ev.time)}</small>` : ''}</span>`).join('')}
+      </span></button>`);
+  }
+  const monthName = en ? `${EN_MONTHS[month-1]} ${year}` : `${MONTH_NAMES[month-1]} ${year + 543}`;
+
+  return `
+  <section class="calp">
+    <header class="feed-head">
+      <p class="feed-today">48thDB</p>
+      <h1 class="feed-title">ปฏิทิน</h1>
+      ${state.oshi.length ? `
+      <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
+        <button class="scope-btn${state.oshiOnly?'':' is-on'}" data-action="set-oshi-only" data-id="0">ทั้งหมด</button>
+        <button class="scope-btn${state.oshiOnly?' is-on':''}" data-action="set-oshi-only" data-id="1">เฉพาะโอชิของฉัน</button>
+      </div>` : ''}
+    </header>
+    <div class="calp-bar">
+      <button class="cal-nav" data-action="cal-move" data-id="-1" aria-label="เดือนก่อนหน้า">‹</button>
+      <h2 class="calp-month">${monthName}</h2>
+      <button class="cal-nav" data-action="cal-move" data-id="1" aria-label="เดือนถัดไป">›</button>
+      ${key !== today.slice(0,7) ? `<button class="chip chip-link calp-today" data-action="cal-today">${en ? 'Today' : 'วันนี้'}</button>` : ''}
+    </div>
+    <div class="calp-board">
+      <div class="calp-dow">${DOW.map((d, i) => `<span${i===0||i===6 ? ' class="is-weekend"' : ''}>${d}</span>`).join('')}</div>
+      <div class="calp-grid">${cells.join('')}</div>
+    </div>
+    <p class="calp-legend"><span><i class="is-bday"></i>${en ? 'Birthday' : 'วันเกิด'}</span><span><i class="is-period"></i>${en ? 'Opens or closes' : 'วันเปิด–ปิดของช่วงงาน'}</span><span>${en ? 'Tap a day for everything on it' : 'แตะวันที่เพื่อดูทุกอย่างในวันนั้น'}</span></p>
+    <h3 class="section-label">${en ? 'This month' : 'ในเดือนนี้'}</h3>
+    ${agenda.length ? `<div class="calp-agenda">${agenda.join('')}</div>` : `<p class="muted-note">${en ? 'Nothing this month.' : 'ไม่มีงานในเดือนนี้'}</p>`}
+  </section>`;
+}
+
 // ============================= COMPARE =============================
 
 /** Whole months between two dates, so a gap reads as "1 ปี 4 เดือน". */
@@ -6329,7 +6496,7 @@ function loadLives(){
   _livesLoading = true;
   fetch('data/lives.json', { cache:'no-cache' })
     .then(r => r.ok ? r.json() : null)
-    .then(d => { LIVES = d || { members:{} }; if(state.selectedId) renderMain(); })
+    .then(d => { LIVES = d || { members:{} }; if(state.selectedId || state.view === 'stats') renderMain(); })
     .catch(() => { LIVES = { members:{} }; })
     .finally(() => { _livesLoading = false; });
 }
@@ -7138,6 +7305,7 @@ function renderDayModal(){
 
   const covering = SEED_SCHEDULE.filter(e => e.start <= iso && eventLastDay(e) >= iso)
     .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+  const bdays = activeMembers().filter(m => m.birthday && m.birthday.slice(5) === iso.slice(5));
   const outings = covering.filter(e => !e.period && !e.shop);
 
   // steps of every campaign timeline that land on this day
@@ -7185,7 +7353,11 @@ function renderDayModal(){
       <span class="day-main"><span class="day-tag">${s.what}${s.at ? ' ' + s.at : ''}</span> ${escapeHtml(s.name || s.e.title)}</span>
     </button>`;
   const block = (head, rows) => rows ? `<h3 class="evm-head">${head}</h3><div class="day-list">${rows}</div>` : '';
-  const nothing = !outings.length && !open.length && !steps.length && !sales.length;
+  const nothing = !outings.length && !open.length && !steps.length && !sales.length && !bdays.length;
+  const bdayRow = m => { const g = getGroup(m.groupId); const age = d.getFullYear() - +m.birthday.slice(0,4);
+    return `<button class="day-row" data-action="open-member" data-id="${m.id}" style="--k:${g.color}">
+      <span class="day-main">🎂 ${escapeHtml(nickName(m))}</span>
+      <span class="day-sub">${g.name}${age > 0 && age < 60 ? ` · ${en ? `turns ${age}` : `ครบ ${age} ปี`}` : ''}</span></button>`; };
 
   return `
   <div class="modal-backdrop" data-action="close-modal">
@@ -7196,6 +7368,7 @@ function renderDayModal(){
       <div class="modal-scroll">
         <p class="day-kicker">${en ? 'On this day' : 'ในวันนี้'}</p>
         <h2 class="evm-title">${title}</h2>
+        ${block(en ? 'Birthdays' : 'วันเกิด', bdays.map(bdayRow).join(''))}
         ${block(en ? 'Events' : 'งานและกิจกรรม', outings.map(evRow).join(''))}
         ${block(en ? 'Timeline' : 'ไทม์ไลน์ GE2026', steps.map(stepRow).join(''))}
         ${block(en ? 'Tickets and merchandise' : 'เปิด–ปิดขายบัตรและสินค้า', sales.map(saleRow).join(''))}
@@ -8176,12 +8349,126 @@ function renderStatsOverview(){
     </div>`;
   })()}
 
+  ${renderOverviewLives()}
+  ${renderOverviewViews()}
+  ${renderOverviewEvents()}
+  ${renderOverviewBirthdays()}
+
   <div class="group-card" style="--c:var(--gold)">
     <div class="group-head"><h2 style="font-size:21px;">ช่วงอายุ (ทุกวง)</h2></div>
     ${buckets.map(([lo,hi,label])=>renderBar(label, ages.filter(a=>a>=lo&&a<=hi).length, maxBucket, 'var(--gold)',
         {ageMin:lo||'', ageMax:hi>=99?'':hi})).join('')}
     <p class="stats-note">นับจาก ${ages.length} คนที่มีข้อมูลวันเกิด</p>
   </div>`;
+}
+
+/* Overview cards: a taste of each deeper tab, so the first page of stats has
+   something from everywhere. When a new stat lands in a tab, give it a line
+   here too if it says something at a glance. */
+function ovCard(title, tab, body, note){
+  return `<div class="group-card" style="--c:var(--gold)">
+    <div class="group-head"><h2 style="font-size:21px;">${title}</h2>
+      ${tab ? `<button class="link-inline" data-action="${tab === 'calendar' ? 'nav-calendar' : 'stats-tab'}" data-value="${tab}">ดูทั้งหมด →</button>` : ''}</div>
+    ${body}${note ? `<p class="stats-note">${note}</p>` : ''}</div>`;
+}
+function ovNick(id){ const m = getMember(id); return m ? nickName(m) : id; }
+function ovColour(id){ const m = getMember(id); return m ? getGroup(m.groupId).color : 'var(--ink-soft)'; }
+
+function renderOverviewLives(){
+  if(!LIVES){ loadLives(); return ''; }
+  const S = LIVES.stats;
+  if(!S) return '';
+  const en = isEN();
+  const DAYS = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  let peak = { d:0, hr:0, n:-1 };
+  S.heat.forEach((row, d) => row.forEach((n, hr) => { if(n > peak.n) peak = { d, hr, n }; }));
+  const top = S.top30.filter(([id, n]) => n && getMember(id)).slice(0, 5);
+  const pair = (S.sameDay || []).find(r => getMember(r[0]) && getMember(r[1]));
+  const streak = (S.streaks || []).find(([id]) => getMember(id));
+  return ovCard(en ? 'Lives' : 'ไลฟ์', 'lives', `
+    <div class="stat-grid" style="margin-bottom:4px;">
+      <button class="stat-cell" data-action="stats-tab" data-value="lives"><div class="label">${en ? 'All lives' : 'ไลฟ์ทั้งหมด'}</div><div class="value">${S.total.toLocaleString()}</div></button>
+      <div class="stat-cell"><div class="label">${en ? 'Last 30 days' : '30 วันล่าสุด'}</div><div class="value">${S.last30.toLocaleString()}</div></div>
+      <div class="stat-cell"><div class="label">${en ? 'Busiest hour' : 'ช่วงที่ไลฟ์บ่อยสุด'}</div><div class="value lv-peak">${DAYS[peak.d]} ${String(peak.hr).padStart(2,'0')}:00</div></div>
+      ${streak ? `<button class="stat-cell" data-action="open-member" data-id="${streak[0]}"><div class="label">${en ? 'Longest streak' : 'ไลฟ์ติดกันนานสุด'}</div><div class="value">${escapeHtml(ovNick(streak[0]))} · ${streak[1]} ${en ? 'days' : 'วัน'}</div></button>` : ''}
+    </div>
+    <h3 class="section-label" style="margin-top:6px;">${en ? 'Most lives, last 30 days' : 'ไลฟ์มากที่สุด 30 วันล่าสุด'}</h3>
+    ${top.map(([id, n]) => renderBarLink(ovNick(id), n, top[0][1], ovColour(id), 'open-member', { id })).join('')}
+    ${pair ? `<p class="ov-fact">${en ? 'Most often live on the same day' : 'คู่ที่ไลฟ์วันเดียวกันบ่อยสุด'}: <b>${escapeHtml(ovNick(pair[0]))} × ${escapeHtml(ovNick(pair[1]))}</b> · ${pair[2]} ${en ? 'days' : 'วัน'}</p>` : ''}`);
+}
+
+function renderOverviewViews(){
+  if(!YT_STATS){ loadYouTubeStats(); return ''; }
+  const V = YT_STATS.videos || {};
+  const en = isEN();
+  const seen = new Set(), rows = [];
+  let total = 0;
+  for(const [key, [vid]] of Object.entries(SEED_YOUTUBE)){
+    const st = V[vid];
+    if(!st || seen.has(vid)) continue;
+    seen.add(vid); total += st.views;
+    const [wid, i] = key.split('#');
+    const w = ALL_WORKS().find(x => x.id === wid) || (typeof SEED_SPECIALS !== 'undefined' ? SEED_SPECIALS.find(x => x.id === wid) : null);
+    const t = (SEED_SENBATSU[wid] || [])[+i];
+    if(w && t) rows.push({ w, name: t.track, views: st.views });
+  }
+  if(!rows.length) return '';
+  rows.sort((a, b) => b.views - a.views);
+  const top = rows.slice(0, 5);
+  const colourOfWork = w => { const g = getGroup(w.groupId || (w.id.startsWith('cgm') ? 'cgm48' : 'bnk48')); return g ? g.color : 'var(--gold)'; };
+  return ovCard(en ? 'YouTube views' : 'ยอดวิว YouTube', null, `<div class="ov-views">
+    <div class="stat-grid" style="margin-bottom:4px;">
+      <div class="stat-cell"><div class="label">${en ? 'All videos together' : 'ยอดวิวรวมทุกคลิป'}</div><div class="value">${shortViews(total)}</div></div>
+      <div class="stat-cell"><div class="label">${en ? 'Videos counted' : 'คลิปที่นับ'}</div><div class="value">${seen.size}</div></div>
+    </div>
+    <h3 class="section-label" style="margin-top:6px;">${en ? 'Most viewed' : 'เพลงที่ยอดวิวสูงสุด'}</h3>
+    ${top.map(r => renderBarLink(r.name, r.views, top[0].views, colourOfWork(r.w), 'open-single', { id: r.w.id })
+        .replace(`<span class="bar-val">${r.views}</span>`, `<span class="bar-val">${shortViews(r.views)}</span>`)).join('')}</div>`,
+    en ? 'Official videos only; one video per song.' : 'นับจากคลิปทางการ เพลงละหนึ่งคลิป');
+}
+
+function renderOverviewEvents(){
+  const en = isEN();
+  const today = toYmd(todayStart());
+  const year = today.slice(0,4), month = today.slice(0,7);
+  const outings = SEED_SCHEDULE.filter(e => !e.period && !e.shop);
+  const thisYear = outings.filter(e => e.start.startsWith(year));
+  const thisMonth = outings.filter(e => e.start.startsWith(month) || (e.start <= month + '-31' && eventLastDay(e) >= month + '-01'));
+  const ahead = outings.filter(e => e.start > today).sort((a, b) => a.start.localeCompare(b.start));
+  const counts = new Map();
+  thisYear.forEach(e => (e.members || []).forEach(id => counts.set(id, (counts.get(id) || 0) + 1)));
+  const top = [...counts.entries()].filter(([id]) => getMember(id)).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const next = ahead[0];
+  const d = next ? parseYmd(next.start) : null;
+  return ovCard(en ? 'Events' : 'งานและกิจกรรม', 'calendar', `
+    <div class="stat-grid" style="margin-bottom:4px;">
+      <button class="stat-cell" data-action="nav-calendar"><div class="label">${en ? 'This month' : 'เดือนนี้'}</div><div class="value">${thisMonth.length} ${en ? '' : 'งาน'}</div></button>
+      <div class="stat-cell"><div class="label">${en ? `In ${year}` : `ปี ${+year + 543}`}</div><div class="value">${thisYear.length} ${en ? '' : 'งาน'}</div></div>
+      <div class="stat-cell"><div class="label">${en ? 'Coming up' : 'ที่กำลังจะมา'}</div><div class="value">${ahead.length} ${en ? '' : 'งาน'}</div></div>
+      ${next ? `<button class="stat-cell" data-action="open-event" data-id="${next.id}"><div class="label">${en ? 'Next up' : 'งานถัดไป'} · ${d.getDate()} ${monthsShort()[d.getMonth()]}</div><div class="value ov-next">${escapeHtml(next.title)}</div></button>` : ''}
+    </div>
+    ${top.length ? `<h3 class="section-label" style="margin-top:6px;">${en ? `Most events in ${year}` : `ออกงานมากที่สุดในปี ${+year + 543}`}</h3>
+    ${top.map(([id, n]) => renderBarLink(ovNick(id), n, top[0][1], ovColour(id), 'open-member', { id })).join('')}` : ''}`,
+    en ? 'Counted from the events in this database.' : 'นับจากงานที่บันทึกไว้ในฐานข้อมูลนี้');
+}
+
+function renderOverviewBirthdays(){
+  const en = isEN();
+  const now = todayStart();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const list = activeMembers().filter(m => m.birthday && m.birthday.slice(5, 7) === mm)
+    .sort((a, b) => a.birthday.slice(8).localeCompare(b.birthday.slice(8)));
+  const perMonth = Array(12).fill(0);
+  activeMembers().forEach(m => { if(m.birthday) perMonth[+m.birthday.slice(5, 7) - 1]++; });
+  const busiest = perMonth.indexOf(Math.max(...perMonth));
+  const M = en ? EN_MONTHS : MONTH_NAMES;
+  return ovCard(en ? 'Birthdays' : 'วันเกิด', 'birthdays', `
+    <div class="stat-grid" style="margin-bottom:4px;">
+      <div class="stat-cell"><div class="label">${en ? `In ${M[now.getMonth()]}` : `เดือน${M[now.getMonth()]}`}</div><div class="value">${list.length} ${en ? '' : 'คน'}</div></div>
+      <div class="stat-cell"><div class="label">${en ? 'Busiest month' : 'เดือนที่เกิดเยอะสุด'}</div><div class="value">${M[busiest]} · ${perMonth[busiest]}</div></div>
+    </div>
+    ${list.length ? `<div class="ov-bdays">${list.map(m => `<button class="ov-bday" data-action="open-member" data-id="${m.id}" style="--c:${getGroup(m.groupId).color}">
+      <b>${+m.birthday.slice(8)}</b> ${escapeHtml(nickName(m))}</button>`).join('')}</div>` : ''}`);
 }
 
 function renderStatsSongs(){
@@ -8808,7 +9095,7 @@ function loadYouTubeStats(){
   _ytLoading = true;
   fetch('data/youtube.json', { cache:'no-cache' })
     .then(r => r.ok ? r.json() : null)
-    .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single') renderMain(); })
+    .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single' || state.view === 'stats') renderMain(); })
     .catch(() => { YT_STATS = { videos:{} }; })
     .finally(() => { _ytLoading = false; });
 }
@@ -9202,6 +9489,7 @@ function renderMain(){
     state.view==='feed' ? renderFeed() :
     state.view==='timeline' ? renderTimelinePage() :
     state.view==='shop' ? renderShopPage() :
+    state.view==='calendar' ? renderCalendarPage() :
     state.view==='browse' ? renderBrowse() :
     state.view==='groups' ? renderGroups() :
     state.view==='org' ? renderOrgChart() :
@@ -9443,7 +9731,7 @@ const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
 // stays put, which is what lets this work on static hosting with no rewrites.
-const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','timeline','shop'];
+const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','timeline','shop','calendar'];
 
 // Read at load time. The first history entry is written before the member list
 // has arrived, and writing it derives the address from a state that is still
@@ -9783,7 +10071,7 @@ function bindDelegatedEvents(){
       // Two sheets stacked on top of each other is not a place to be, so a
       // member opened from inside an event replaces it. Going back returns
       // to the event, since that is the entry underneath.
-      state.selectedId=id; state.editingId=null; state.selectedEvent=null;
+      state.selectedId=id; state.editingId=null; state.selectedEvent=null; state.dayOf=null;
       state.compareWith=null; state.comparePicking=false;
       renderMain(); pushHistory();
     }
@@ -9794,6 +10082,16 @@ function bindDelegatedEvents(){
     else if(action==='set-oshi-only'){
       state.oshiOnly = id === '1';
       state.calDay = null;   // the day that was open may not survive the filter
+      renderMain(); replaceHistory();
+    }
+    else if(action==='nav-calendar'){
+      state.view = 'calendar';
+      state.selectedEvent = null; state.selectedId = null; state.editingId = null;
+      state.query = ''; state.dayOf = null;
+      render(); pushHistory();
+    }
+    else if(action==='cal-today'){
+      state.calMonth = null; state.calDay = null;
       renderMain(); replaceHistory();
     }
     else if(action==='nav-shop'){
