@@ -5487,7 +5487,7 @@ const LOGO_SVG = `<svg class="logo-mark" viewBox="4.4 33.6 153 88.4" role="img" 
 
 const NAV_OPTIONS = [
   { value:'feed',        view:'feed', fav:false, icon:ICONS.home, iconActive:ICONS.homeFilled },
-  { value:'groups',      view:'groups', fav:false, icon:ICONS.groups, iconActive:ICONS.groupsFilled },
+  { value:'groups',      view:'browse', fav:false, icon:ICONS.groups, iconActive:ICONS.groupsFilled },
   { value:'discography', view:'discography', fav:false, icon:ICONS.works, iconActive:ICONS.worksFilled },
   { value:'stats',       view:'stats', fav:false, icon:ICONS.stats, iconActive:ICONS.statsFilled },
   { value:'profile',     view:'profile', fav:false, icon:ICONS.profile, iconActive:ICONS.profileFilled }
@@ -5622,7 +5622,7 @@ function filterAndSort(){
     );
   }
   const cmp = {
-    name: (a,b)=>nickName(a).localeCompare(nickName(b), isEN() ? 'en' : 'th'),
+    name: (a,b)=>a.name.localeCompare(b.name),
     group: (a,b)=>getGroup(a.groupId).name.localeCompare(getGroup(b.groupId).name),
     team: (a,b)=>shortTeamLabel(getTeam(a.teamId)).localeCompare(shortTeamLabel(getTeam(b.teamId))),
     gen: (a,b)=>(a.gen||99)-(b.gen||99),
