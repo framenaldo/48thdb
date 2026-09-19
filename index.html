@@ -7079,8 +7079,14 @@ function renderDayModal(){
     }
   }
 
-  // a stretch that opens or closes today is already told as a sale above
-  const open = covering.filter(e => (e.period || e.shop) && !sales.some(s => s.e === e));
+  // Each thing is told once. An outing or a sale is listed in its own right,
+  // so a campaign step pointing at it is dropped; a stretch that a remaining
+  // step already speaks for ("voting opens 12:00") is not listed again as open.
+  const shown = new Set([...outings.map(e => e.id), ...sales.map(s => s.e.id)]);
+  const kept = steps.filter(({ it }) => !it.ev || !shown.has(it.ev));
+  steps.length = 0; steps.push(...kept);
+  const byStep = new Set(steps.map(({ it }) => it.ev).filter(Boolean));
+  const open = covering.filter(e => (e.period || e.shop) && !shown.has(e.id) && !byStep.has(e.id));
 
   const evRow = e => `<button class="day-row" data-action="open-event" data-id="${e.id}"
       style="--k:${e.poster ? e.poster.accent : (getGroup((e.groups || [])[0]) || {}).color || 'var(--ink-soft)'}">
