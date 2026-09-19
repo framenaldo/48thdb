@@ -1737,6 +1737,23 @@
   .tl-venue, .tl-note{ display:block; margin-top:3px; font-size:12.5px; color:var(--ink-soft); line-height:1.45; }
   .tlp-card.is-on .tl-title{ color:var(--k); }
   .tl-jump{ margin:2px 0 6px; }
+  /* a date on the timeline opens its day */
+  button.tlp-when{ border:0; background:none; font:inherit; font-size:12px; font-weight:800; cursor:pointer; }
+  button.tlp-when:hover{ color:var(--pc, var(--ink)); text-decoration:underline; text-underline-offset:3px; }
+  .day-kicker{ margin:0; font-size:12px; font-weight:800; letter-spacing:.06em; color:var(--ink-soft); padding-right:70px; }
+  .day-list{ display:flex; flex-direction:column; gap:8px; }
+  .day-row{
+    display:flex; flex-direction:column; gap:2px; width:100%; padding:10px 13px; text-align:left;
+    font:inherit; color:inherit; border:1px solid var(--line); border-left:4px solid var(--k); border-radius:14px;
+    background:color-mix(in srgb, var(--k) 6%, transparent);
+  }
+  button.day-row{ cursor:pointer; }
+  button.day-row:hover{ background:color-mix(in srgb, var(--k) 13%, transparent); }
+  .day-main{ font-size:14.5px; font-weight:700; line-height:1.45; }
+  .day-main .ev-icon{ vertical-align:-4px; }
+  .day-sub{ font-size:12.5px; color:var(--ink-soft); line-height:1.45; }
+  .day-sub:empty{ display:none; }
+  .day-tag{ display:inline-block; margin-right:4px; padding:1px 8px; border-radius:999px; background:var(--k); color:#fff; font-size:11px; font-weight:800; }
   /* the badge that gives a sheet its face */
   .evm-icon{
     flex:none; width:38px; height:38px; border-radius:50%; display:inline-flex;
@@ -3494,7 +3511,7 @@ const TL_TRACKS = {
 const TL_KINDS = {
   start:   { th:'เริ่ม' },
   end:     { th:'สิ้นสุด' },
-  vote:    { th:'ช่วงโหวต' },
+  vote:    { th:'GE2026' },
   event:   { th:'งานอีเวนต์' },
   online:  { th:'ออนไลน์' },
   concert: { th:'คอนเสิร์ต' },
@@ -4208,7 +4225,7 @@ const ICONS = {
 let state = {
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
-  calMonth:null, calDay:null, posterOf:null, timelineId:null,
+  calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null,
   lang:'th',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
@@ -4600,6 +4617,7 @@ const EN = {
   'ไทม์ไลน์ทั้งงาน →': 'Full timeline →',
   'ไลฟ์': 'Lives',
   'ไทม์ไลน์ GE2026': 'GE2026 timeline',
+  'ดูทุกอย่างในวันนี้': 'Everything on this day',
   'ไม่พบไทม์ไลน์': 'No timeline found',
   'ร้านค้า': 'Shop',
   'สินค้าและพรีออเดอร์ที่เปิดอยู่ตอนนี้': 'Merchandise and pre-orders open right now',
@@ -6945,8 +6963,9 @@ function renderTimelinePage(){
       ${it.venue ? `<span class="tl-venue">${escapeHtml(it.venue)}</span>` : ''}
       ${it.note ? `<span class="tl-note">${escapeHtml(it.note)}</span>` : ''}`;
     const cls = `tlp-card${minor ? ' is-minor' : ''}${on ? ' is-on' : ''}`;
-    return `<span class="tlp-when${done ? ' is-done' : ''}" style="grid-row:${n + 1}">
-        ${day(it.d)}${it.to ? `<span class="tl-to">– ${day(it.to)}</span>` : ''}</span>
+    return `<button class="tlp-when${done ? ' is-done' : ''}" style="grid-row:${n + 1}"
+        data-action="open-day" data-id="${it.d}" title="${isEN() ? 'Everything on this day' : 'ดูทุกอย่างในวันนี้'}">
+        ${day(it.d)}${it.to ? `<span class="tl-to">– ${day(it.to)}</span>` : ''}</button>
       <span class="tlp-rail${done ? ' is-done' : ''}" style="grid-row:${n + 1}; --k:${tr.color}" aria-hidden="true"></span>
       ${it.ev ? `<button class="${cls} is-link${done ? ' is-done' : ''}" style="grid-row:${n + 1}; --k:${tr.color}"
           data-action="open-event" data-id="${it.ev}">${body}</button>`
@@ -7020,6 +7039,86 @@ function renderEventIcon(ev, cls){
   const img = art.startsWith('<img');
   return `<span class="${cls}${img ? ' is-img' : ''}" aria-hidden="true">${img ? art
     : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${art}</svg>`}</span>`;
+}
+
+/* One day, everything on it: what is on (a whole outing, or a stretch that is
+   open that day), the campaign steps that fall on it, and any tickets or
+   merchandise that go on sale or stop selling. Opened from a date on the
+   timeline page. */
+function renderDayModal(){
+  const iso = state.dayOf;
+  if(!iso) return '';
+  const en = isEN();
+  const d = parseYmd(iso);
+  const M = monthsShort();
+  const DAYS_LONG = en ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+    : ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
+  const title = en ? `${DAYS_LONG[d.getDay()]} ${d.getDate()} ${EN_MONTHS[d.getMonth()]} ${d.getFullYear()}`
+    : `${DAYS_LONG[d.getDay()]}ที่ ${d.getDate()} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear() + 543}`;
+  const hm = s => s && s.length > 10 ? s.slice(11, 16) + (en ? '' : ' น.') : '';
+
+  const covering = SEED_SCHEDULE.filter(e => e.start <= iso && eventLastDay(e) >= iso)
+    .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+  const outings = covering.filter(e => !e.period && !e.shop);
+
+  // steps of every campaign timeline that land on this day
+  const steps = [];
+  for(const [key, items] of Object.entries(TIMELINES))
+    for(const it of items) if(it.d <= iso && (it.to || it.d) >= iso) steps.push({ key, it });
+
+  // tickets and merchandise opening or closing on this day
+  const sales = [];
+  for(const e of SEED_SCHEDULE){
+    if(e.sales){
+      if(e.sales.from && e.sales.from.slice(0,10) === iso) sales.push({ e, what: en ? 'Tickets on sale' : 'เปิดขายบัตร', at: hm(e.sales.from), kind:'open' });
+      if(e.sales.to && e.sales.to.slice(0,10) === iso) sales.push({ e, what: en ? 'Ticket sales close' : 'ปิดขายบัตร', at: hm(e.sales.to), kind:'close' });
+    }
+    if(e.shop){
+      if(e.shop.from.slice(0,10) === iso) sales.push({ e, what: en ? 'On sale' : 'เปิดขาย', at: hm(e.shop.from), kind:'open', name: e.shop.name });
+      if(e.shop.to.slice(0,10) === iso) sales.push({ e, what: en ? 'Sale closes' : 'ปิดขาย', at: hm(e.shop.to), kind:'close', name: e.shop.name });
+    }
+  }
+
+  // a stretch that opens or closes today is already told as a sale above
+  const open = covering.filter(e => (e.period || e.shop) && !sales.some(s => s.e === e));
+
+  const evRow = e => `<button class="day-row" data-action="open-event" data-id="${e.id}"
+      style="--k:${e.poster ? e.poster.accent : (getGroup((e.groups || [])[0]) || {}).color || 'var(--ink-soft)'}">
+      <span class="day-main">${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}</span>
+      <span class="day-sub">${[e.time ? e.time + (en ? '' : ' น.') : '', e.part ? escapeHtml(e.part) : '',
+        e.venue ? escapeHtml(e.venue) : e.online ? escapeHtml(e.online) : ''].filter(Boolean).join(' · ')}</span>
+    </button>`;
+  const stepRow = ({ it }) => {
+    const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
+    const inner = `<span class="day-main">${escapeHtml(it.title)}</span>
+      <span class="day-sub">${[it.time ? it.time + (en ? '' : ' น.') : '', it.part ? escapeHtml(it.part) : '', it.venue ? escapeHtml(it.venue) : ''].filter(Boolean).join(' · ')}</span>`;
+    return it.ev
+      ? `<button class="day-row" data-action="open-event" data-id="${it.ev}" style="--k:${tr.color}">${inner}</button>`
+      : `<div class="day-row" style="--k:${tr.color}">${inner}</div>`;
+  };
+  const saleRow = s => `<button class="day-row" data-action="open-event" data-id="${s.e.id}" style="--k:${s.kind === 'open' ? '#1B8E52' : '#C8231A'}">
+      <span class="day-main"><span class="day-tag">${s.what}${s.at ? ' ' + s.at : ''}</span> ${escapeHtml(s.name || s.e.title)}</span>
+    </button>`;
+  const block = (head, rows) => rows ? `<h3 class="evm-head">${head}</h3><div class="day-list">${rows}</div>` : '';
+  const nothing = !outings.length && !open.length && !steps.length && !sales.length;
+
+  return `
+  <div class="modal-backdrop" data-action="close-modal">
+    <div class="modal-glass-card is-day-sheet" data-stop-close="1">
+      <button class="modal-close-btn" data-action="close-modal" title="${en ? 'Close' : 'ปิด'}" aria-label="${en ? 'Close' : 'ปิด'}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="modal-scroll">
+        <p class="day-kicker">${en ? 'On this day' : 'ในวันนี้'}</p>
+        <h2 class="evm-title">${title}</h2>
+        ${block(en ? 'Events' : 'งานและกิจกรรม', outings.map(evRow).join(''))}
+        ${block(en ? 'Timeline' : 'ไทม์ไลน์ GE2026', steps.map(stepRow).join(''))}
+        ${block(en ? 'Tickets and merchandise' : 'เปิด–ปิดขายบัตรและสินค้า', sales.map(saleRow).join(''))}
+        ${block(en ? 'Open that day' : 'ช่วงที่เปิดอยู่ในวันนี้', open.map(evRow).join(''))}
+        ${nothing ? `<p class="muted-note">${en ? 'Nothing is on this day.' : 'ไม่มีงานในวันนี้'}</p>` : ''}
+      </div>
+    </div>
+  </div>`;
 }
 
 function renderEventModal(){
@@ -8164,6 +8263,7 @@ function groupTag(g){
 function leaveOverlays(){
   state.selectedId = null; state.selectedEvent = null; state.editingId = null;
   state.compareWith = null; state.comparePicking = false; state.posterOf = null;
+  state.dayOf = null;
 }
 
 /* The events a member is booked for, split by where they sit in time. An event
@@ -8943,7 +9043,7 @@ function render(){
   renderMain();
 }
 function syncBodyScrollLock(){
-  const shouldLock = !!state.selectedId || !!state.selectedEvent;
+  const shouldLock = !!state.selectedId || !!state.selectedEvent || !!state.dayOf;
   const isLocked = document.body.classList.contains('modal-locked');
   if(shouldLock && !isLocked){
     state._savedScrollY = window.scrollY || window.pageYOffset || 0;
@@ -8985,6 +9085,7 @@ function renderMain(){
        : state.compareWith && state.selectedId ? renderCompareModal()
        : state.selectedId ? renderDetailModal() : '')
     + (state.selectedEvent ? renderEventModal() : '')
+    + (state.dayOf && !state.selectedEvent ? renderDayModal() : '')
     // Last, because it opens over a sheet. Sharing z-index 60 with the sheets
     // meant whichever was written later won, and that was the sheet.
     + (state.posterOf ? renderPosterViewer() : '');
@@ -9187,7 +9288,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','timelineId'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','timelineId','dayOf'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
@@ -9333,7 +9434,7 @@ function isSameScreen(a, b){
   return !!a && !!b && a.view===b.view && a.selectedId===b.selectedId
     && a.selectedEvent===b.selectedEvent
     && a.compareWith===b.compareWith && a.comparePicking===b.comparePicking
-    && a.posterOf===b.posterOf
+    && a.posterOf===b.posterOf && a.dayOf===b.dayOf
     && a.editingId===b.editingId && a.favoritesOnly===b.favoritesOnly && a.oshiOnly===b.oshiOnly
     && a.showGraduated===b.showGraduated && a.selectedSingle===b.selectedSingle;
 }
@@ -9604,7 +9705,7 @@ function bindDelegatedEvents(){
       const insideCard = e.target.closest('.modal-glass-card');
       const onCloseBtn = e.target.closest('.modal-close-btn');
       if(insideCard && !onCloseBtn) return;
-      goBack(()=>{ state.selectedId = null; state.selectedEvent = null; });
+      goBack(()=>{ state.selectedId = null; state.selectedEvent = null; state.dayOf = null; });
     }
     else if(action==='filter-to'){
       const m = getMember(id);
@@ -9779,6 +9880,11 @@ function bindDelegatedEvents(){
     }
     else if(action==='open-event'){
       state.selectedEvent = el.dataset.id;
+      state.dayOf = null;           // the day sheet steps aside; back returns to it
+      renderMain(); pushHistory();
+    }
+    else if(action==='open-day'){
+      state.dayOf = id;
       renderMain(); pushHistory();
     }
     else if(action==='sub-tab'){
