@@ -7179,12 +7179,27 @@ function slotNow(ev, iso){
    the day; an event can say `until:'HH:MM'`; one with only a start time is
    taken to run two hours; one with no time at all runs all day (null). */
 const DEFAULT_RUN_MS = 2 * 3600000;
+/* When the day's programme ends: an explicit until, or else the latest
+   "HH:MM–HH:MM" in the event's own schedule lines (a roadshow's list of
+   rounds), so an outing with a start time only is not closed too early. */
+function eventUntil(ev){
+  if(ev.until) return ev.until;
+  let last = null;
+  for(const line of [...(ev.detail || []), ...(ev.info || [])]){
+    for(const m of String(line).matchAll(/(\d{1,2})[:.](\d{2})\s*[–-]\s*(\d{1,2})[:.](\d{2})/g)){
+      const t = `${m[3].padStart(2, '0')}:${m[4]}`;
+      if(!last || t > last) last = t;
+    }
+  }
+  return last && ev.time && last > ev.time ? last : null;
+}
 function endsAtToday(ev, iso){
   if(ev.slots){
     const today = slotsOn(ev, iso);
     return today.length ? slotTime(iso, today[today.length - 1].until) : slotTime(iso, '00:00');
   }
-  if(ev.until) return slotTime(iso, ev.until);
+  const until = eventUntil(ev);
+  if(until) return slotTime(iso, until);
   if(ev.time) return slotTime(iso, ev.time) + DEFAULT_RUN_MS;
   return null;
 }
@@ -7206,7 +7221,7 @@ function startsAt(ev, todayIso){
 /** The same words whether the screen was just drawn or the clock just ticked. */
 function startsLabel(at){
   const left = at - Date.now();
-  return left > 0 ? startsInLabel(left) : 'เริ่มแล้ว';
+  return left > 0 ? startsInLabel(left) : 'กำลังจัดอยู่';
 }
 
 let _feedLiveKey = null;
@@ -7214,6 +7229,9 @@ function tickClock(){
   syncTicker();
   document.querySelectorAll('[data-starts-at]').forEach(el=>{
     el.textContent = startsLabel(Number(el.dataset.startsAt));
+    // the moment it starts, the pill starts blinking without a reload
+    const pill = el.closest('.today-hero-status');
+    if(pill) pill.classList.toggle('is-live', Number(el.dataset.startsAt) <= Date.now());
     localize(el.parentElement || el);
   });
 
@@ -7320,7 +7338,7 @@ function renderTodayHero(ev, todayIso){
     : rota && rota.today.length ? 'รอบวันนี้จบแล้ว'
     : (ev.time ? 'กำลังจัดอยู่' : 'วันนี้');
   // on right now: the booth is open, or the day's show has begun
-  const live = !!(rota && rota.current) || (!at && !(rota && rota.today.length) && !!ev.time);
+  const live = rota ? !!rota.current : (!!ev.time && (!at || at <= Date.now()));
   const hours = rota ? rota.today.map(s => `${s.time}–${s.until}`).join(', ') : (ev.time || '');
   const shown = people.slice(0, 8);
   const rest = people.length - shown.length;
