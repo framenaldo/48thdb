@@ -823,12 +823,13 @@
   @media (min-width:700px){ .share-sheet{ align-items:center; } .share-panel{ border-radius:26px; } }
   .share-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; font-size:17px; }
   .share-x{ width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; font-size:15px; }
-  .group-head{ position:relative; }
-  .box-share-btn{ margin-left:auto; flex:none; width:32px; height:32px; border-radius:50%; cursor:pointer;
+  .group-head{ position:relative; padding-right:44px; }
+  .box-share-btn{ position:absolute; top:-4px; right:0; flex:none; width:32px; height:32px; border-radius:50%; cursor:pointer;
     display:inline-flex; align-items:center; justify-content:center; padding:0;
     border:1px solid var(--line); background:var(--card); color:var(--ink-soft); }
   .box-share-btn svg{ width:15px; height:15px; }
   @media (hover:hover){ .box-share-btn:hover{ color:var(--ink); } }
+  .bday-scope{ margin:0 0 12px; }
   .share-cats{ display:flex; gap:6px; overflow-x:auto; margin:0 0 10px; padding-bottom:2px; scrollbar-width:none; }
   .share-cat{ flex:none; padding:6px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--ink);
     font:inherit; font-size:13px; font-weight:800; cursor:pointer; }
@@ -4469,7 +4470,7 @@ let state = {
   isOwner:false, pending:[],
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
-  calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview',
+  calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
   lang:'th',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
@@ -8765,11 +8766,11 @@ function renderStatsBirthdays(){
     return `<span class="age-step"><span class="from">${from}</span><span class="arrow">→</span><span class="to">${to}</span></span>`;
   };
 
-  // The headline figures count everyone, graduates included: the clustering
-  // only shows up across all 158, while the lists below stay on the current
-  // line-up because an upcoming birthday only means something for a member
-  // who is still in the group.
-  const everyone = state.members.filter(m=>m.birthday);
+  // Current members by default. Graduates are counted only on their own
+  // view, which shows the counts alone: an upcoming birthday means something
+  // only for someone still in the group.
+  const allTime = state.bdayScope === 'all';
+  const everyone = (allTime ? state.members : activeMembers()).filter(m=>m.birthday);
   const byMonth = MONTH_NAMES.map((name,i)=>({
     name, mm:String(i+1).padStart(2,'0'),
     n:everyone.filter(m=>+m.birthday.slice(5,7)===i+1).length }));
@@ -8786,10 +8787,14 @@ function renderStatsBirthdays(){
   const shared = [...byDate.entries()].filter(([,list])=>list.length>1)
     .sort((a,b)=> b[1].length-a[1].length || a[0].localeCompare(b[0]));
   const sharedPeople = shared.reduce((n,[,list])=>n+list.length, 0);
-  const topShared = shared.filter(([,list])=>list.length>=3);
+  const topShared = shared.filter(([,list])=>list.length >= (allTime ? 3 : 2));
   const dateLabel = d => `${+d.slice(3)} ${THAI_MONTHS[+d.slice(0,2)-1]}`;
 
+  const scope = `<div class="feed-scope bday-scope" role="group" aria-label="ขอบเขตที่นับ">
+    <button class="scope-btn${allTime?'':' is-on'}" data-action="bday-scope" data-id="current">สมาชิกปัจจุบัน</button>
+    <button class="scope-btn${allTime?' is-on':''}" data-action="bday-scope" data-id="all">รวมที่จบการศึกษาแล้ว</button></div>`;
   return `
+  ${scope}
   <div class="stat-grid">
     <button class="stat-cell" data-action="drill" data-month="${busiest?busiest.mm:''}">
       <div class="label">เดือนที่เกิดมากที่สุด</div>
@@ -8809,7 +8814,7 @@ function renderStatsBirthdays(){
 
   <div class="group-card" style="--c:var(--gold)">
     <div class="group-head"><h2 style="font-size:21px;">แยกตามเดือนเกิด</h2>
-      <span class="mono" style="font-size:12px;color:var(--ink-soft);">${everyone.length} คน ทุกวง รวมที่จบแล้ว</span></div>
+      <span class="mono" style="font-size:12px;color:var(--ink-soft);">${everyone.length} คน ทุกวง${allTime ? ' รวมที่จบแล้ว' : ' สมาชิกปัจจุบัน'}</span></div>
     ${byMonth.map(x=>renderBar(x.name, x.n, maxMonth, 'var(--gold)', {month:x.mm})).join('')}
   </div>
 
@@ -8825,11 +8830,11 @@ function renderStatsBirthdays(){
               ${escapeHtml(m.nameTh||m.name)}</button>`; }).join('')}
         </div>
       </div>`).join('')}
-    <p class="stats-note">24 กุมภาพันธ์ ตรงกับวันศิลปินแห่งชาติ ซึ่งกำหนดตามวันพระราชสมภพของรัชกาลที่ 2
-      — และวาเลนไทน์เกิดวันที่ 14 กุมภาพันธ์ ตรงกับชื่อตัวเองพอดี</p>
+    ${topShared.some(([d]) => d === '02-24') ? `<p class="stats-note">24 กุมภาพันธ์ ตรงกับวันศิลปินแห่งชาติ ซึ่งกำหนดตามวันพระราชสมภพของรัชกาลที่ 2
+      — และวาเลนไทน์เกิดวันที่ 14 กุมภาพันธ์ ตรงกับชื่อตัวเองพอดี</p>` : ''}
   </div>` : ''}
 
-  <h3 class="section-label" style="margin-top:4px;">วันเกิดที่ใกล้ถึง</h3>
+  ${allTime ? '' : `<h3 class="section-label" style="margin-top:4px;">วันเกิดที่ใกล้ถึง</h3>
   <div class="bday-next">
     ${upcoming.map(({m,d})=>{
       const g = getGroup(m.groupId);
@@ -8861,7 +8866,7 @@ function renderStatsBirthdays(){
         </button>`;
       }).join('')}
     </div>`;
-  }).join('')}`;
+  }).join('')}`}`;
 }
 
 /* Wherever a group, team, member, release or event is named, it can be
@@ -9948,7 +9953,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','timelineId','dayOf','geTab'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','timelineId','dayOf','geTab','bdayScope'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
@@ -11388,6 +11393,10 @@ function bindDelegatedEvents(){
       }
       await saveOshiData();
       updateOshiButtonsFor(id);
+    }
+    else if(action==='bday-scope'){
+      state.bdayScope = id === 'all' ? 'all' : 'current';
+      renderMain(); replaceHistory();
     }
     else if(action==='stats-tab'){
       state.statsTab = el.dataset.value;
