@@ -1,0 +1,717 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//48thDb//Calendar//TH
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:48thDb · วันเกิดเมมเบอร์
+X-WR-CALDESC:วันเกิดของเมมเบอร์ BNK48 
+ และ CGM48 ปัจจุบัน
+X-WR-TIMEZONE:Asia/Bangkok
+REFRESH-INTERVAL;VALUE=DURATION:PT3H
+X-PUBLISHED-TTL:PT3H
+BEGIN:VTIMEZONE
+TZID:Asia/Bangkok
+BEGIN:STANDARD
+DTSTART:19700101T000000
+TZOFFSETFROM:+0700
+TZOFFSETTO:+0700
+TZNAME:ICT
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:bday-bnk-fame@48thdb
+DTSTAMP:20041015T000000Z
+SUMMARY:🎂 Fame BNK48
+DTSTART;VALUE=DATE:20041015
+DTEND;VALUE=DATE:20041016
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เฟม (Fame)\nhttps://framenaldo.gith
+ ub.io/48thdb/?m=bnk-fame
+URL:https://framenaldo.github.io/48thdb/?m=bnk-fame
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-hoop@48thdb
+DTSTAMP:20020918T000000Z
+SUMMARY:🎂 Hoop BNK48
+DTSTART;VALUE=DATE:20020918
+DTEND;VALUE=DATE:20020919
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ฮูพ (Hoop)\nhttps://framenaldo.gith
+ ub.io/48thdb/?m=bnk-hoop
+URL:https://framenaldo.github.io/48thdb/?m=bnk-hoop
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-janry@48thdb
+DTSTAMP:20080103T000000Z
+SUMMARY:🎂 Janry BNK48
+DTSTART;VALUE=DATE:20080103
+DTEND;VALUE=DATE:20080104
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด แจนรี่ (Janry)\nhttps://frame
+ naldo.github.io/48thdb/?m=bnk-janry
+URL:https://framenaldo.github.io/48thdb/?m=bnk-janry
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-luksorn@48thdb
+DTSTAMP:20050627T000000Z
+SUMMARY:🎂 Luksorn BNK48
+DTSTART;VALUE=DATE:20050627
+DTEND;VALUE=DATE:20050628
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ลูกศร (Luksorn)\nhttps://framen
+ aldo.github.io/48thdb/?m=bnk-luksorn
+URL:https://framenaldo.github.io/48thdb/?m=bnk-luksorn
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-mail@48thdb
+DTSTAMP:20100717T000000Z
+SUMMARY:🎂 Mail BNK48
+DTSTART;VALUE=DATE:20100717
+DTEND;VALUE=DATE:20100718
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เมล (Mail)\nhttps://framenaldo.gith
+ ub.io/48thdb/?m=bnk-mail
+URL:https://framenaldo.github.io/48thdb/?m=bnk-mail
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-marine@48thdb
+DTSTAMP:20060429T000000Z
+SUMMARY:🎂 Marine BNK48
+DTSTART;VALUE=DATE:20060429
+DTEND;VALUE=DATE:20060430
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด มารีน (Marine)\nhttps://framena
+ ldo.github.io/48thdb/?m=bnk-marine
+URL:https://framenaldo.github.io/48thdb/?m=bnk-marine
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-micha@48thdb
+DTSTAMP:20070612T000000Z
+SUMMARY:🎂 Micha BNK48
+DTSTART;VALUE=DATE:20070612
+DTEND;VALUE=DATE:20070613
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด มิชา (Micha)\nhttps://framenaldo.
+ github.io/48thdb/?m=bnk-micha
+URL:https://framenaldo.github.io/48thdb/?m=bnk-micha
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-monet@48thdb
+DTSTAMP:20080804T000000Z
+SUMMARY:🎂 Monet BNK48
+DTSTART;VALUE=DATE:20080804
+DTEND;VALUE=DATE:20080805
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด โมเน่ต์ (Monet)\nhttps://fr
+ amenaldo.github.io/48thdb/?m=bnk-monet
+URL:https://framenaldo.github.io/48thdb/?m=bnk-monet
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-patt@48thdb
+DTSTAMP:20080617T000000Z
+SUMMARY:🎂 Patt BNK48
+DTSTART;VALUE=DATE:20080617
+DTEND;VALUE=DATE:20080618
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด แพท (Patt)\nhttps://framenaldo.gith
+ ub.io/48thdb/?m=bnk-patt
+URL:https://framenaldo.github.io/48thdb/?m=bnk-patt
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-praew@48thdb
+DTSTAMP:20080523T000000Z
+SUMMARY:🎂 Praew BNK48
+DTSTART;VALUE=DATE:20080523
+DTEND;VALUE=DATE:20080524
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด แพรว (Praew)\nhttps://framenaldo.
+ github.io/48thdb/?m=bnk-praew
+URL:https://framenaldo.github.io/48thdb/?m=bnk-praew
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-wawa@48thdb
+DTSTAMP:20090811T000000Z
+SUMMARY:🎂 Wawa BNK48
+DTSTART;VALUE=DATE:20090811
+DTEND;VALUE=DATE:20090812
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด วาว่า (Wawa)\nhttps://framenald
+ o.github.io/48thdb/?m=bnk-wawa
+URL:https://framenaldo.github.io/48thdb/?m=bnk-wawa
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-arlee@48thdb
+DTSTAMP:20040326T000000Z
+SUMMARY:🎂 Arlee BNK48
+DTSTART;VALUE=DATE:20040326
+DTEND;VALUE=DATE:20040327
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด อาหลี (Arlee)\nhttps://framenal
+ do.github.io/48thdb/?m=bnk-arlee
+URL:https://framenaldo.github.io/48thdb/?m=bnk-arlee
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-berry@48thdb
+DTSTAMP:20050723T000000Z
+SUMMARY:🎂 Berry BNK48
+DTSTART;VALUE=DATE:20050723
+DTEND;VALUE=DATE:20050724
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เบอร์รี่ (Berry)\nhttps:/
+ /framenaldo.github.io/48thdb/?m=bnk-berry
+URL:https://framenaldo.github.io/48thdb/?m=bnk-berry
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-emmy@48thdb
+DTSTAMP:20070913T000000Z
+SUMMARY:🎂 Emmy BNK48
+DTSTART;VALUE=DATE:20070913
+DTEND;VALUE=DATE:20070914
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เอ็มมี่ (Emmy)\nhttps://fra
+ menaldo.github.io/48thdb/?m=bnk-emmy
+URL:https://framenaldo.github.io/48thdb/?m=bnk-emmy
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-jew@48thdb
+DTSTAMP:20031128T000000Z
+SUMMARY:🎂 Jew BNK48
+DTSTART;VALUE=DATE:20031128
+DTEND;VALUE=DATE:20031129
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด จิว (Jew)\nhttps://framenaldo.githu
+ b.io/48thdb/?m=bnk-jew
+URL:https://framenaldo.github.io/48thdb/?m=bnk-jew
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-l@48thdb
+DTSTAMP:20030213T000000Z
+SUMMARY:🎂 L BNK48
+DTSTART;VALUE=DATE:20030213
+DTEND;VALUE=DATE:20030214
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด แอล (L)\nhttps://framenaldo.github.
+ io/48thdb/?m=bnk-l
+URL:https://framenaldo.github.io/48thdb/?m=bnk-l
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-palmmy@48thdb
+DTSTAMP:20031028T000000Z
+SUMMARY:🎂 Palmmy BNK48
+DTSTART;VALUE=DATE:20031028
+DTEND;VALUE=DATE:20031029
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ปาล์มมี่ (Palmmy)\nhttps:
+ //framenaldo.github.io/48thdb/?m=bnk-palmmy
+URL:https://framenaldo.github.io/48thdb/?m=bnk-palmmy
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-pancake@48thdb
+DTSTAMP:20070206T000000Z
+SUMMARY:🎂 Pancake BNK48
+DTSTART;VALUE=DATE:20070206
+DTEND;VALUE=DATE:20070207
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด แพนเค้ก (Pancake)\nhttps://
+ framenaldo.github.io/48thdb/?m=bnk-pancake
+URL:https://framenaldo.github.io/48thdb/?m=bnk-pancake
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-proud@48thdb
+DTSTAMP:20021114T000000Z
+SUMMARY:🎂 Proud BNK48
+DTSTART;VALUE=DATE:20021114
+DTEND;VALUE=DATE:20021115
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ภราว (Proud)\nhttps://framenaldo.
+ github.io/48thdb/?m=bnk-proud
+URL:https://framenaldo.github.io/48thdb/?m=bnk-proud
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-saonoi@48thdb
+DTSTAMP:20051109T000000Z
+SUMMARY:🎂 Saonoi BNK48
+DTSTART;VALUE=DATE:20051109
+DTEND;VALUE=DATE:20051110
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด สาวน้อย (Saonoi)\nhttps://f
+ ramenaldo.github.io/48thdb/?m=bnk-saonoi
+URL:https://framenaldo.github.io/48thdb/?m=bnk-saonoi
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-sindy@48thdb
+DTSTAMP:20090403T000000Z
+SUMMARY:🎂 Sindy BNK48
+DTSTART;VALUE=DATE:20090403
+DTEND;VALUE=DATE:20090404
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ซินดี้ (Sindy)\nhttps://frame
+ naldo.github.io/48thdb/?m=bnk-sindy
+URL:https://framenaldo.github.io/48thdb/?m=bnk-sindy
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-yoghurt@48thdb
+DTSTAMP:20041110T000000Z
+SUMMARY:🎂 Yoghurt BNK48
+DTSTART;VALUE=DATE:20041110
+DTEND;VALUE=DATE:20041111
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด โยเกิร์ต (Yoghurt)\nhttps
+ ://framenaldo.github.io/48thdb/?m=bnk-yoghurt
+URL:https://framenaldo.github.io/48thdb/?m=bnk-yoghurt
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-blythe@48thdb
+DTSTAMP:20100722T000000Z
+SUMMARY:🎂 Blythe BNK48
+DTSTART;VALUE=DATE:20100722
+DTEND;VALUE=DATE:20100723
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด บลายธ์ (Blythe)\nhttps://fram
+ enaldo.github.io/48thdb/?m=bnk-blythe
+URL:https://framenaldo.github.io/48thdb/?m=bnk-blythe
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-cartoon@48thdb
+DTSTAMP:20090826T000000Z
+SUMMARY:🎂 Cartoon BNK48
+DTSTART;VALUE=DATE:20090826
+DTEND;VALUE=DATE:20090827
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด การ์ตูน (Cartoon)\nhttps://
+ framenaldo.github.io/48thdb/?m=bnk-cartoon
+URL:https://framenaldo.github.io/48thdb/?m=bnk-cartoon
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-galeya@48thdb
+DTSTAMP:20081224T000000Z
+SUMMARY:🎂 Galeya BNK48
+DTSTART;VALUE=DATE:20081224
+DTEND;VALUE=DATE:20081225
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เกลญ่า (Galeya)\nhttps://fram
+ enaldo.github.io/48thdb/?m=bnk-galeya
+URL:https://framenaldo.github.io/48thdb/?m=bnk-galeya
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-grape@48thdb
+DTSTAMP:20110408T000000Z
+SUMMARY:🎂 Grape BNK48
+DTSTART;VALUE=DATE:20110408
+DTEND;VALUE=DATE:20110409
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เกรพ (Grape)\nhttps://framenaldo.
+ github.io/48thdb/?m=bnk-grape
+URL:https://framenaldo.github.io/48thdb/?m=bnk-grape
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-inkcha@48thdb
+DTSTAMP:20070731T000000Z
+SUMMARY:🎂 Inkcha BNK48
+DTSTART;VALUE=DATE:20070731
+DTEND;VALUE=DATE:20070801
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด อิ้งค์ชา (Inkcha)\nhttps:
+ //framenaldo.github.io/48thdb/?m=bnk-inkcha
+URL:https://framenaldo.github.io/48thdb/?m=bnk-inkcha
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-khaimook@48thdb
+DTSTAMP:20040105T000000Z
+SUMMARY:🎂 Khaimook BNK48
+DTSTART;VALUE=DATE:20040105
+DTEND;VALUE=DATE:20040106
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ไข่มุก (Khaimook)\nhttps://fr
+ amenaldo.github.io/48thdb/?m=bnk-khaimook
+URL:https://framenaldo.github.io/48thdb/?m=bnk-khaimook
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-khowjow@48thdb
+DTSTAMP:20070223T000000Z
+SUMMARY:🎂 Khowjow BNK48
+DTSTART;VALUE=DATE:20070223
+DTEND;VALUE=DATE:20070224
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ข้าวจ้าว (Khowjow)\nhttps
+ ://framenaldo.github.io/48thdb/?m=bnk-khowjow
+URL:https://framenaldo.github.io/48thdb/?m=bnk-khowjow
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-mayji@48thdb
+DTSTAMP:20050505T000000Z
+SUMMARY:🎂 Mayji BNK48
+DTSTART;VALUE=DATE:20050505
+DTEND;VALUE=DATE:20050506
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เมย์จิ (Mayji)\nhttps://frame
+ naldo.github.io/48thdb/?m=bnk-mayji
+URL:https://framenaldo.github.io/48thdb/?m=bnk-mayji
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-mint@48thdb
+DTSTAMP:20100204T000000Z
+SUMMARY:🎂 Mint BNK48
+DTSTART;VALUE=DATE:20100204
+DTEND;VALUE=DATE:20100205
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด มิ้นท์ (Mint)\nhttps://framen
+ aldo.github.io/48thdb/?m=bnk-mint
+URL:https://framenaldo.github.io/48thdb/?m=bnk-mint
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-mirin@48thdb
+DTSTAMP:20100528T000000Z
+SUMMARY:🎂 Mirin BNK48
+DTSTART;VALUE=DATE:20100528
+DTEND;VALUE=DATE:20100529
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด มิริน (Mirin)\nhttps://framenal
+ do.github.io/48thdb/?m=bnk-mirin
+URL:https://framenaldo.github.io/48thdb/?m=bnk-mirin
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-nall@48thdb
+DTSTAMP:20010825T000000Z
+SUMMARY:🎂 Nall BNK48
+DTSTART;VALUE=DATE:20010825
+DTEND;VALUE=DATE:20010826
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด แนล (Nall)\nhttps://framenaldo.gith
+ ub.io/48thdb/?m=bnk-nall
+URL:https://framenaldo.github.io/48thdb/?m=bnk-nall
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-nammonn@48thdb
+DTSTAMP:20030810T000000Z
+SUMMARY:🎂 Nammonn BNK48
+DTSTART;VALUE=DATE:20030810
+DTEND;VALUE=DATE:20030811
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด น้ำมนต์ (Nammonn)\nhttps://
+ framenaldo.github.io/48thdb/?m=bnk-nammonn
+URL:https://framenaldo.github.io/48thdb/?m=bnk-nammonn
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-neen@48thdb
+DTSTAMP:20020414T000000Z
+SUMMARY:🎂 Neen BNK48
+DTSTART;VALUE=DATE:20020414
+DTEND;VALUE=DATE:20020415
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด นีน (Neen)\nhttps://framenaldo.gith
+ ub.io/48thdb/?m=bnk-neen
+URL:https://framenaldo.github.io/48thdb/?m=bnk-neen
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-niya@48thdb
+DTSTAMP:20090214T000000Z
+SUMMARY:🎂 Niya BNK48
+DTSTART;VALUE=DATE:20090214
+DTEND;VALUE=DATE:20090215
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด นีญ่า (Niya)\nhttps://framenald
+ o.github.io/48thdb/?m=bnk-niya
+URL:https://framenaldo.github.io/48thdb/?m=bnk-niya
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-bnk-rose@48thdb
+DTSTAMP:20071101T000000Z
+SUMMARY:🎂 Rose BNK48
+DTSTART;VALUE=DATE:20071101
+DTEND;VALUE=DATE:20071102
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด โรส (Rose)\nhttps://framenaldo.gith
+ ub.io/48thdb/?m=bnk-rose
+URL:https://framenaldo.github.io/48thdb/?m=bnk-rose
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-lookked@48thdb
+DTSTAMP:20000706T000000Z
+SUMMARY:🎂 Lookked CGM48
+DTSTART;VALUE=DATE:20000706
+DTEND;VALUE=DATE:20000707
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ลูกเกด (Lookked)\nhttps://fra
+ menaldo.github.io/48thdb/?m=cgm-lookked
+URL:https://framenaldo.github.io/48thdb/?m=cgm-lookked
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-nana@48thdb
+DTSTAMP:20030227T000000Z
+SUMMARY:🎂 Nana CGM48
+DTSTART;VALUE=DATE:20030227
+DTEND;VALUE=DATE:20030228
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด นานา (Nana)\nhttps://framenaldo.g
+ ithub.io/48thdb/?m=cgm-nana
+URL:https://framenaldo.github.io/48thdb/?m=cgm-nana
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-jingjing@48thdb
+DTSTAMP:20020130T000000Z
+SUMMARY:🎂 Jingjing CGM48
+DTSTART;VALUE=DATE:20020130
+DTEND;VALUE=DATE:20020131
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด จิงจิง (Jingjing)\nhttps://fr
+ amenaldo.github.io/48thdb/?m=cgm-jingjing
+URL:https://framenaldo.github.io/48thdb/?m=cgm-jingjing
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-prae@48thdb
+DTSTAMP:20050103T000000Z
+SUMMARY:🎂 Prae CGM48
+DTSTART;VALUE=DATE:20050103
+DTEND;VALUE=DATE:20050104
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด แพร (Prae)\nhttps://framenaldo.gith
+ ub.io/48thdb/?m=cgm-prae
+URL:https://framenaldo.github.io/48thdb/?m=cgm-prae
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-lingling@48thdb
+DTSTAMP:20020720T000000Z
+SUMMARY:🎂 Lingling CGM48
+DTSTART;VALUE=DATE:20020720
+DTEND;VALUE=DATE:20020721
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด หลิงหลิง (Lingling)\nhttp
+ s://framenaldo.github.io/48thdb/?m=cgm-lingling
+URL:https://framenaldo.github.io/48thdb/?m=cgm-lingling
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-else@48thdb
+DTSTAMP:20030812T000000Z
+SUMMARY:🎂 Else CGM48
+DTSTART;VALUE=DATE:20030812
+DTEND;VALUE=DATE:20030813
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เอลฟ์ (Else)\nhttps://framenald
+ o.github.io/48thdb/?m=cgm-else
+URL:https://framenaldo.github.io/48thdb/?m=cgm-else
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-ginna@48thdb
+DTSTAMP:20061210T000000Z
+SUMMARY:🎂 Ginna CGM48
+DTSTART;VALUE=DATE:20061210
+DTEND;VALUE=DATE:20061211
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด จีนน่า (Ginna)\nhttps://frame
+ naldo.github.io/48thdb/?m=cgm-ginna
+URL:https://framenaldo.github.io/48thdb/?m=cgm-ginna
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-ploen@48thdb
+DTSTAMP:20080226T000000Z
+SUMMARY:🎂 Ploen CGM48
+DTSTART;VALUE=DATE:20080226
+DTEND;VALUE=DATE:20080227
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เพลิน (Ploen)\nhttps://framenal
+ do.github.io/48thdb/?m=cgm-ploen
+URL:https://framenaldo.github.io/48thdb/?m=cgm-ploen
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-kwan@48thdb
+DTSTAMP:20080304T000000Z
+SUMMARY:🎂 Kwan CGM48
+DTSTART;VALUE=DATE:20080304
+DTEND;VALUE=DATE:20080305
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ขวัญ (Kwan)\nhttps://framenaldo.g
+ ithub.io/48thdb/?m=cgm-kwan
+URL:https://framenaldo.github.io/48thdb/?m=cgm-kwan
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-nisha@48thdb
+DTSTAMP:20090904T000000Z
+SUMMARY:🎂 Nisha CGM48
+DTSTART;VALUE=DATE:20090904
+DTEND;VALUE=DATE:20090905
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด นิชา (Nisha)\nhttps://framenaldo.
+ github.io/48thdb/?m=cgm-nisha
+URL:https://framenaldo.github.io/48thdb/?m=cgm-nisha
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-valentine@48thdb
+DTSTAMP:20080214T000000Z
+SUMMARY:🎂 Valentine CGM48
+DTSTART;VALUE=DATE:20080214
+DTEND;VALUE=DATE:20080215
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด วาเลนไทน์ (Valentine)\n
+ https://framenaldo.github.io/48thdb/?m=cgm-valentine
+URL:https://framenaldo.github.io/48thdb/?m=cgm-valentine
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-satangpound@48thdb
+DTSTAMP:20071026T000000Z
+SUMMARY:🎂 Satangpound CGM48
+DTSTART;VALUE=DATE:20071026
+DTEND;VALUE=DATE:20071027
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด สตางค์ปอนด์ (Satang
+ pound)\nhttps://framenaldo.github.io/48thdb/?m=cgm-satangpound
+URL:https://framenaldo.github.io/48thdb/?m=cgm-satangpound
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-praifa@48thdb
+DTSTAMP:20120104T000000Z
+SUMMARY:🎂 Praifa CGM48
+DTSTART;VALUE=DATE:20120104
+DTEND;VALUE=DATE:20120105
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ปรายฟ้า (Praifa)\nhttps://f
+ ramenaldo.github.io/48thdb/?m=cgm-praifa
+URL:https://framenaldo.github.io/48thdb/?m=cgm-praifa
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-shenae@48thdb
+DTSTAMP:20061107T000000Z
+SUMMARY:🎂 Shenae CGM48
+DTSTART;VALUE=DATE:20061107
+DTEND;VALUE=DATE:20061108
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ชีเน่ (Shenae)\nhttps://framena
+ ldo.github.io/48thdb/?m=cgm-shenae
+URL:https://framenaldo.github.io/48thdb/?m=cgm-shenae
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-emma@48thdb
+DTSTAMP:20040212T000000Z
+SUMMARY:🎂 Emma CGM48
+DTSTART;VALUE=DATE:20040212
+DTEND;VALUE=DATE:20040213
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด เอมม่า (Emma)\nhttps://framen
+ aldo.github.io/48thdb/?m=cgm-emma
+URL:https://framenaldo.github.io/48thdb/?m=cgm-emma
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-hongyok@48thdb
+DTSTAMP:20040127T000000Z
+SUMMARY:🎂 Hongyok CGM48
+DTSTART;VALUE=DATE:20040127
+DTEND;VALUE=DATE:20040128
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด หงษ์หยก (Hongyok)\nhttps://
+ framenaldo.github.io/48thdb/?m=cgm-hongyok
+URL:https://framenaldo.github.io/48thdb/?m=cgm-hongyok
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-chifa@48thdb
+DTSTAMP:20081017T000000Z
+SUMMARY:🎂 Chifa CGM48
+DTSTART;VALUE=DATE:20081017
+DTEND;VALUE=DATE:20081018
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ชิฟา (Chifa)\nhttps://framenaldo.
+ github.io/48thdb/?m=cgm-chifa
+URL:https://framenaldo.github.io/48thdb/?m=cgm-chifa
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-tara@48thdb
+DTSTAMP:20130605T000000Z
+SUMMARY:🎂 Tara CGM48
+DTSTART;VALUE=DATE:20130605
+DTEND;VALUE=DATE:20130606
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ธารา (Tara)\nhttps://framenaldo.g
+ ithub.io/48thdb/?m=cgm-tara
+URL:https://framenaldo.github.io/48thdb/?m=cgm-tara
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-punpon@48thdb
+DTSTAMP:20090112T000000Z
+SUMMARY:🎂 Punpon CGM48
+DTSTART;VALUE=DATE:20090112
+DTEND;VALUE=DATE:20090113
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด ปันผล (Punpon)\nhttps://framena
+ ldo.github.io/48thdb/?m=cgm-punpon
+URL:https://framenaldo.github.io/48thdb/?m=cgm-punpon
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-lewlew@48thdb
+DTSTAMP:20061224T000000Z
+SUMMARY:🎂 Lewlew CGM48
+DTSTART;VALUE=DATE:20061224
+DTEND;VALUE=DATE:20061225
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด หลิวหลิว (Lewlew)\nhttps:
+ //framenaldo.github.io/48thdb/?m=cgm-lewlew
+URL:https://framenaldo.github.io/48thdb/?m=cgm-lewlew
+END:VEVENT
+BEGIN:VEVENT
+UID:bday-cgm-namphet@48thdb
+DTSTAMP:20080224T000000Z
+SUMMARY:🎂 Namphet CGM48
+DTSTART;VALUE=DATE:20080224
+DTEND;VALUE=DATE:20080225
+RRULE:FREQ=YEARLY
+TRANSP:TRANSPARENT
+DESCRIPTION:วันเกิด น้ำเพชร (Namphet)\nhttps://
+ framenaldo.github.io/48thdb/?m=cgm-namphet
+URL:https://framenaldo.github.io/48thdb/?m=cgm-namphet
+END:VEVENT
+END:VCALENDAR

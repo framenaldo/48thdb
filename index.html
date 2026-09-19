@@ -830,6 +830,19 @@
   .box-share-btn svg{ width:15px; height:15px; }
   @media (hover:hover){ .box-share-btn:hover{ color:var(--ink); } }
   .bday-scope{ margin:0 0 12px; }
+  .calp-subscribe{ display:inline-flex; align-items:center; gap:8px; margin:12px 0 0; padding:9px 16px; border-radius:999px; cursor:pointer;
+    border:1px solid var(--line); background:var(--card); color:var(--ink); font:inherit; font-size:13.5px; font-weight:800;
+    box-shadow:0 2px 8px rgba(0,0,0,.05); }
+  .calp-subscribe svg{ width:18px; height:18px; }
+  .calp-subscribe:active{ transform:scale(.97); }
+  .cal-sub-note{ margin:0 0 12px; font-size:13px; color:var(--ink-soft); line-height:1.5; }
+  .cal-feeds{ flex-wrap:wrap; }
+  .cal-sub-actions{ display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+  .cal-sub-btn{ display:flex; flex-direction:column; gap:2px; padding:12px 16px; border-radius:16px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink); font:inherit; font-size:15px; font-weight:800; text-align:left; text-decoration:none; cursor:pointer; }
+  .cal-sub-btn small{ font-size:12px; font-weight:600; color:var(--ink-soft); }
+  .cal-sub-btn.is-main{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .cal-sub-btn.is-main small{ color:inherit; opacity:.75; }
   .share-cats{ display:flex; gap:6px; overflow-x:auto; margin:0 0 10px; padding-bottom:2px; scrollbar-width:none; }
   .share-cat{ flex:none; padding:6px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--ink);
     font:inherit; font-size:13px; font-weight:800; cursor:pointer; }
@@ -6611,6 +6624,9 @@ function renderCalendarPage(){
         <button class="scope-btn${state.oshiOnly?' is-on':''}" data-action="set-oshi-only" data-id="1">เฉพาะโอชิของฉัน</button>
       </div>` : ''}
     </header>
+    <button class="calp-subscribe" data-action="cal-subscribe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>
+      <span>${en ? 'Add to your phone calendar' : 'เพิ่มลงปฏิทินในมือถือ'}</span></button>
     <div class="calp-bar">
       <button class="cal-nav" data-action="cal-move" data-id="-1" aria-label="เดือนก่อนหน้า">‹</button>
       <h2 class="calp-month">${monthName}</h2>
@@ -11203,6 +11219,51 @@ async function buildShareCard(sub){
   return new Promise(res => c.toBlob(res, 'image/png'));
 }
 
+/* Subscribing, not downloading: the phone keeps the feed and fetches it again
+   every few hours, so an event added or moved here reaches its calendar too. */
+const CAL_FEEDS = [
+  { file:'calendar.ics',       th:'ทุกงาน BNK48 & CGM48', en:'All BNK48 & CGM48 events' },
+  { file:'calendar-bnk48.ics', th:'เฉพาะ BNK48',           en:'BNK48 only' },
+  { file:'calendar-cgm48.ics', th:'เฉพาะ CGM48',           en:'CGM48 only' },
+  { file:'birthdays.ics',      th:'วันเกิดเมมเบอร์',        en:'Member birthdays' },
+];
+function openCalendarSheet(){
+  const en = isEN();
+  closeShareSheet();
+  const base = new URL('.', location.href).href;
+  const el = document.createElement('div');
+  el.className = 'share-sheet';
+  let pick = CAL_FEEDS[0].file;
+  const paint = () => {
+    const https = base + pick, webcal = https.replace(/^https?:/, 'webcal:');
+    el.querySelector('.cal-feeds').innerHTML = CAL_FEEDS.map(f => `<button class="share-cat${f.file === pick ? ' is-on' : ''}" data-cal="${f.file}">${en ? f.en : f.th}</button>`).join('');
+    el.querySelector('[data-go="apple"]').href = webcal;
+    el.querySelector('[data-go="google"]').href = 'https://calendar.google.com/calendar/render?cid=' + encodeURIComponent(webcal);
+    el.querySelector('[data-go="copy"]').dataset.url = https;
+  };
+  el.innerHTML = `<div class="share-back" data-share="close"></div>
+    <div class="share-panel" role="dialog" aria-label="${en ? 'Add to calendar' : 'เพิ่มลงปฏิทิน'}">
+      <div class="share-head"><b>${en ? 'Add to your phone calendar' : 'เพิ่มลงปฏิทินในมือถือ'}</b><button class="share-x" data-share="close" aria-label="${en ? 'Close' : 'ปิด'}">✕</button></div>
+      <p class="cal-sub-note">${en ? 'Subscribe once and new or changed events arrive by themselves — your phone checks for updates every few hours.'
+        : 'สมัครครั้งเดียว งานใหม่หรืองานที่เปลี่ยนจะเข้าไปในปฏิทินเอง มือถือจะเช็กอัปเดตทุกไม่กี่ชั่วโมง'}</p>
+      <div class="share-cats cal-feeds"></div>
+      <div class="cal-sub-actions">
+        <a class="cal-sub-btn is-main" data-go="apple" href="#">${en ? 'iPhone / iPad / Mac' : 'iPhone / iPad / Mac'}<small>${en ? 'Apple Calendar' : 'แอปปฏิทินของ Apple'}</small></a>
+        <a class="cal-sub-btn" data-go="google" href="#" target="_blank" rel="noopener noreferrer">Google Calendar<small>${en ? 'Android and the web' : 'Android และบนเว็บ'}</small></a>
+        <button class="cal-sub-btn" data-go="copy">${en ? 'Copy the link' : 'คัดลอกลิงก์'}<small>${en ? 'for other calendar apps' : 'สำหรับแอปปฏิทินอื่น'}</small></button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  paint();
+  requestAnimationFrame(() => el.classList.add('show'));
+  el.addEventListener('click', async e => {
+    const c = e.target.closest('[data-cal]'); if(c){ pick = c.dataset.cal; paint(); return; }
+    if(e.target.closest('[data-share="close"]')) return closeShareSheet();
+    const cp = e.target.closest('[data-go="copy"]');
+    if(cp){ try{ await navigator.clipboard.writeText(cp.dataset.url); toast(en ? 'Link copied' : 'คัดลอกลิงก์แล้ว'); }catch(err){ toast(cp.dataset.url); } }
+  });
+}
+
 let _shareUrl = null;
 async function openShareSheet(given){
   const en = isEN();
@@ -11513,6 +11574,9 @@ function bindDelegatedEvents(){
       state.selectedEvent = null; state.selectedId = null; state.editingId = null;
       state.query = ''; state.dayOf = null;
       render(); pushHistory();
+    }
+    else if(action==='cal-subscribe'){
+      openCalendarSheet();
     }
     else if(action==='cal-today'){
       state.calMonth = null; state.calDay = null;
