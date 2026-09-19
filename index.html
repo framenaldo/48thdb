@@ -812,6 +812,38 @@
     .pd-row.is-add{ grid-template-columns:1fr; }
     .pd-arrow{ display:none; }
   }
+  /* share sheet */
+  .share-sheet{ position:fixed; inset:0; z-index:90; display:flex; align-items:flex-end; justify-content:center; }
+  .share-back{ position:absolute; inset:0; background:rgba(12,6,20,.45); opacity:0; transition:opacity .2s ease; backdrop-filter:blur(4px); }
+  .share-panel{ position:relative; width:min(460px, 100%); max-height:94vh; overflow:auto; background:var(--paper); color:var(--ink);
+    border-radius:26px 26px 0 0; padding:14px 18px calc(18px + env(safe-area-inset-bottom)); transform:translateY(40px); opacity:0;
+    transition:transform .25s var(--ease-out), opacity .2s ease; box-shadow:0 -10px 40px rgba(0,0,0,.2); }
+  .share-sheet.show .share-back{ opacity:1; }
+  .share-sheet.show .share-panel{ transform:none; opacity:1; }
+  @media (min-width:700px){ .share-sheet{ align-items:center; } .share-panel{ border-radius:26px; } }
+  .share-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; font-size:17px; }
+  .share-x{ width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; font-size:15px; }
+  .share-preview{ aspect-ratio:4/5; width:min(100%, 52vh * .8); margin:0 auto; border-radius:18px; overflow:hidden;
+    background:var(--card); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
+  .share-preview img{ width:100%; height:100%; display:block; }
+  .share-preview span{ font-size:13px; color:var(--ink-soft); padding:20px; text-align:center; }
+  .share-preview.is-loading{ animation:sharePulse 1.2s ease-in-out infinite; }
+  @keyframes sharePulse{ 50%{ opacity:.55; } }
+  .share-actions{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:14px; }
+  .share-act{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 6px; border-radius:16px; cursor:pointer;
+    border:1px solid var(--line); background:var(--card); color:var(--ink); font:inherit; font-size:12.5px; font-weight:800; }
+  .share-act svg{ width:22px; height:22px; }
+  .share-act.is-main{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .share-act:disabled{ opacity:.45; cursor:default; }
+  .share-act:not(:disabled):active{ transform:scale(.96); }
+  .page-top-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .page-share-btn{ display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 14px; border-radius:999px; cursor:pointer;
+    border:1px solid var(--line); background:var(--card); color:var(--ink); font:inherit; font-size:13px; font-weight:800; }
+  .page-share-btn svg{ width:16px; height:16px; }
+  .feed-title-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .stats-bar{ align-items:center; }
+  .stats-bar .page-share-btn{ margin-left:auto; }
+  .ge-share-row{ display:flex; justify-content:flex-end; margin:-6px 0 10px; }
   .backup-card{
     background:var(--glass-card); border:1px solid var(--glass-edge);
     border-radius:16px; padding:16px;
@@ -4399,6 +4431,7 @@ const SEED_SPECIALS = [
 SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 const ICONS = {
   ticket:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5Z"/><path d="M14 6v2M14 11v2M14 16v2"/></svg>`,
+  share:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7.5 7.5 4.5-4.5 4.5 4.5"/><path d="M8 10.5H6.5A1.5 1.5 0 0 0 5 12v7.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V12a1.5 1.5 0 0 0-1.5-1.5H16"/></svg>`,
   link:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>`,
   home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>`,
   homeFilled:`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3 3 10.5V20h18v-9.5L12 3Z"/></svg>`,
@@ -4676,6 +4709,7 @@ const EN = {
   'กำลังมีงานวันนี้': 'On today',
   'ตารางงานที่จะถึง': 'Upcoming schedule',
   'ปฏิทิน': 'Calendar',
+  'แชร์': 'Share',
   'ยังไม่มีงานที่ประกาศไว้ล่วงหน้า': 'No events announced yet',
   'ยังไม่มีงานที่โอชิของคุณไป — กด “ทั้งหมด” เพื่อดูทุกงาน': 'No events with your oshi — tap “All” to see everything',
   'ดูรายละเอียด': 'See details',
@@ -6521,7 +6555,7 @@ function renderCompareModal(){
   return `
   <div class="modal-backdrop" data-action="close-compare">
     <div class="modal-glass-card" data-stop-close="1">
-      <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
+      <button class="modal-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}</button>
       <button class="modal-close-btn" data-action="close-compare" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
@@ -7436,7 +7470,9 @@ function renderGEPage(){
           <span><b>${escapeHtml(e.shop.name)}</b><small>${escapeHtml(e.shop.price)}</small></span></button>`).join('')}</div>` : ''}`;
   }
 
-  return `<section class="ge-page" style="--ge:${GE_PAGE.red}">${hero}${tabs}${body}</section>`;
+  return `<section class="ge-page" style="--ge:${GE_PAGE.red}">${hero}
+    <div class="ge-share-row"><button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></div>
+    ${tabs}${body}</section>`;
 }
 
 /* A face for each kind of outing, so a sheet is recognisable before it is read.
@@ -7591,7 +7627,7 @@ function renderEventModal(){
   return `
   <div class="modal-backdrop" data-action="close-modal">
     <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
-      <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
+      <button class="modal-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
@@ -7896,7 +7932,8 @@ function renderFeed(){
   <div class="feed-page">
     <header class="feed-head">
       <p class="feed-today">วัน${dayName}ที่ ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()+543}</p>
-      <h1 class="feed-title">วันนี้ที่ 48</h1>
+      <div class="feed-title-row"><h1 class="feed-title">วันนี้ที่ 48</h1>
+        <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></div>
       ${state.oshi.length ? `
       <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
         <button class="scope-btn${state.oshiOnly?'':' is-on'}" data-action="set-oshi-only" data-id="0">ทั้งหมด</button>
@@ -8060,7 +8097,7 @@ function renderDetailModal(){
   return `
   <div class="modal-backdrop" data-action="close-modal">
     <div class="modal-glass-card is-wide is-member-sheet" data-stop-close="1">
-      <button class="modal-share-btn" data-action="share" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${ICONS.link}</button>
+      <button class="modal-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
@@ -9061,11 +9098,12 @@ function renderStats(){
              : state.statsTab==='lives'     ? renderStatsLives()
              : renderStatsOverview();
   return `
-  <div class="filter-bar">
+  <div class="filter-bar stats-bar">
     <div class="subtab-bar">
       ${STATS_TABS.map(t=>`<button class="subtab ${state.statsTab===t.id?'active':''}"
         data-action="stats-tab" data-value="${t.id}">${t.label}</button>`).join('')}
     </div>
+    <button class="page-share-btn" data-action="share" title="แชร์สถิติ" aria-label="แชร์สถิติ">${ICONS.share}<span>แชร์</span></button>
   </div>
   ${body}`;
 }
@@ -9324,7 +9362,8 @@ function renderSingleDetail(){
 
   return `
   <div class="release-page">
-  <button class="back-btn" data-action="go-back">← กลับ</button>
+  <div class="page-top-row"><button class="back-btn" data-action="go-back">← กลับ</button>
+    <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></div>
   <div class="single-head" style="--c:${g.color}">
     <div class="timeline-year">${workGroups(s).map(id => linkGroup(getGroup(id))).join(' × ')} · ${workLabel(s)} · ${s.year}</div>
     <h2>${escapeHtml(s.title)}</h2>
@@ -10032,6 +10071,573 @@ async function shareCurrent(label){
   }
 }
 
+// ============================= SHARE CARDS =============================
+/* Sharing makes a picture: a card that sums up what is on screen — a member,
+   an event, a single, the election — drawn on a canvas at 1080×1350 (the 4:5
+   that Instagram, LINE and X all show whole). The sheet offers it to the
+   phone's share menu, saves it, or copies the plain link. */
+const SHARE_W = 1080, SHARE_H = 1350;
+const shareLoad = src => new Promise(res => { if(!src) return res(null);
+  const im = new Image(); im.decoding = 'async'; im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+function shareLogo(colour){
+  const svg = LOGO_SVG.replace('<svg ', `<svg xmlns="http://www.w3.org/2000/svg" style="color:${colour}" `).replaceAll('currentColor', colour);
+  return shareLoad('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+}
+/* Thai has no spaces between words, so lines break at word edges found by
+   the browser's own segmenter, falling back to single characters. */
+function shareWrap(g, text, maxW, maxLines){
+  const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? [...new Intl.Segmenter('th', { granularity:'word' }).segment(text)].map(s => s.segment) : [...text];
+  const lines = []; let cur = '';
+  for(const piece of seg){
+    const next = cur + piece;
+    if(g.measureText(next).width <= maxW || !cur){ cur = next; continue; }
+    lines.push(cur.trimEnd()); cur = piece.trimStart();
+    if(lines.length === maxLines) break;
+  }
+  if(lines.length < maxLines && cur) lines.push(cur);
+  else if(lines.length === maxLines && cur){
+    let last = lines[maxLines - 1];
+    while(last && g.measureText(last + '…').width > maxW) last = last.slice(0, -1);
+    lines[maxLines - 1] = last + '…';
+  }
+  return lines;
+}
+function shareRound(g, x, y, w, h, r){ g.beginPath(); g.roundRect(x, y, w, h, r); }
+function shareCover(g, im, x, y, w, h){
+  const s = Math.max(w / im.width, h / im.height), iw = im.width * s, ih = im.height * s;
+  g.drawImage(im, x + (w - iw) / 2, y + (h - ih) / 2, iw, ih);
+}
+function shareContain(g, im, x, y, w, h){
+  const s = Math.min(w / im.width, h / im.height), iw = im.width * s, ih = im.height * s;
+  g.drawImage(im, x + (w - iw) / 2, y + (h - ih) / 2, iw, ih);
+  return { x: x + (w - iw) / 2, y: y + (h - ih) / 2, w: iw, h: ih };
+}
+/* A face in a circle; without a photo, the whole nickname sized to fit. */
+function shareFace(g, m, im, x, y, size, colour){
+  const r = size / 2;
+  g.save(); g.beginPath(); g.arc(x + r, y + r, r, 0, Math.PI * 2); g.clip();
+  if(im) shareCover(g, im, x, y, size, size);
+  else {
+    g.fillStyle = colour; g.fillRect(x, y, size, size);
+    const name = nickName(m) || '?';
+    let fs = size * 0.42;
+    g.font = `800 ${fs}px "Noto Sans Thai", sans-serif`;
+    const w = g.measureText(name).width;
+    if(w > size * 0.8){ fs *= size * 0.8 / w; g.font = `800 ${fs}px "Noto Sans Thai", sans-serif`; }
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(name, x + r, y + r + fs * 0.06);
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+  }
+  g.restore();
+}
+function shareMix(hex, t, to = '#ffffff'){
+  const p = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+  const a = p(hex), b = p(to);
+  return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+}
+function sharePill(g, text, x, y, bg, fg, size = 30){
+  g.font = `800 ${size}px "Noto Sans Thai", sans-serif`;
+  const w = g.measureText(text).width + size * 1.1, h = size * 1.75;
+  g.fillStyle = bg; shareRound(g, x, y, w, h, h / 2); g.fill();
+  g.fillStyle = fg; g.textBaseline = 'middle'; g.fillText(text, x + size * 0.55, y + h / 2 + 1);
+  return w;
+}
+async function shareFooter(g, dark, url){
+  const ink = dark ? '#ffffff' : '#1C1329';
+  const logo = await shareLogo(ink);
+  if(logo) g.drawImage(logo, 64, SHARE_H - 128, 128, 74);
+  g.fillStyle = ink; g.globalAlpha = .75; g.textBaseline = 'middle'; g.textAlign = 'right';
+  g.font = '600 28px "Noto Sans Thai", sans-serif';
+  g.fillText(url.replace(/^https?:\/\//, '').replace(/\?.*$/, '').replace(/index\.html$/, ''), SHARE_W - 64, SHARE_H - 90);
+  g.globalAlpha = 1; g.textAlign = 'left';
+}
+
+async function drawMemberCard(g, m, url){
+  const en = isEN();
+  const grp = getGroup(m.groupId), team = getTeam(m.teamId);
+  const c = grp ? grp.color : '#E4457E';
+  const bg = g.createLinearGradient(0, 0, SHARE_W, SHARE_H);
+  bg.addColorStop(0, shareMix(c, .78)); bg.addColorStop(1, shareMix(c, .93, '#ffffff'));
+  g.fillStyle = bg; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  g.fillStyle = c; g.globalAlpha = .12; g.beginPath(); g.arc(SHARE_W - 80, 180, 360, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
+  // photo
+  const im = await shareLoad(m.photo);
+  const R = 210, cx = SHARE_W / 2, cy = 330;
+  g.beginPath(); g.arc(cx, cy, R + 12, 0, Math.PI * 2); g.fillStyle = '#fff'; g.fill();
+  shareFace(g, m, im, cx - R, cy - R, R * 2, c);
+  g.strokeStyle = c; g.lineWidth = 8; g.beginPath(); g.arc(cx, cy, R + 12, 0, Math.PI * 2); g.stroke();
+  // names
+  g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#1C1329';
+  g.font = '800 104px "Noto Sans Thai", sans-serif'; g.fillText(en ? m.name : (m.nameTh || m.name), cx, 690);
+  g.font = '700 40px "Noto Sans Thai", sans-serif'; g.fillStyle = c;
+  g.fillText(en ? (m.nameTh || '') : (m.name || ''), cx, 748);
+  const real = en ? (m.realName || m.realNameTh) : (m.realNameTh || m.realName);
+  if(real){ g.font = '500 34px "Noto Sans Thai", sans-serif'; g.fillStyle = '#5B5068'; g.fillText(real, cx, 800); }
+  // chips, centred
+  const chips = [grp && grp.name, team && team.name !== (grp && grp.name) ? team.name : null, m.gen ? (en ? `Gen ${m.gen}` : `รุ่น ${m.gen}`) : null,
+    m.graduated ? (en ? 'Graduated' : 'จบการศึกษา') : null].filter(Boolean);
+  g.font = '800 30px "Noto Sans Thai", sans-serif';
+  const widths = chips.map(t => g.measureText(t).width + 33), gap = 14;
+  let x = cx - (widths.reduce((s, w) => s + w, 0) + gap * (chips.length - 1)) / 2;
+  g.textAlign = 'left';
+  chips.forEach((t, i) => { x += sharePill(g, t, x, 836, i === 0 ? c : '#ffffff', i === 0 ? '#ffffff' : '#1C1329') + gap; });
+  // facts
+  const age = calcAge(m.birthday);
+  const facts = [
+    m.birthday ? [en ? 'Birthday' : 'วันเกิด', formatDate(m.birthday) + (age != null && !m.graduated ? (en ? ` · ${age}` : ` · ${age} ปี`) : '')] : null,
+    m.height ? [en ? 'Height' : 'ส่วนสูง', `${m.height} ${en ? 'cm' : 'ซม.'}`] : null,
+    m.hometown ? [en ? 'Hometown' : 'บ้านเกิด', m.hometown] : null,
+    m.blood ? [en ? 'Blood' : 'กรุ๊ปเลือด', m.blood] : null,
+  ].filter(Boolean).slice(0, 4);
+  const colW = (SHARE_W - 128 - 20) / 2;
+  facts.forEach(([k, v], i) => {
+    const fx = 64 + (i % 2) * (colW + 20), fy = 930 + Math.floor(i / 2) * 150;
+    g.fillStyle = 'rgba(255,255,255,.78)'; shareRound(g, fx, fy, colW, 130, 26); g.fill();
+    g.fillStyle = '#6B6078'; g.font = '700 26px "Noto Sans Thai", sans-serif'; g.textBaseline = 'alphabetic'; g.fillText(k, fx + 28, fy + 46);
+    g.fillStyle = '#1C1329'; g.font = '800 36px "Noto Sans Thai", sans-serif';
+    g.fillText(shareWrap(g, v, colW - 56, 1)[0] || '', fx + 28, fy + 100);
+  });
+  await shareFooter(g, false, url);
+}
+
+async function drawEventCard(g, ev, url){
+  const en = isEN();
+  const accent = ev.poster && ev.poster.accent || ((getGroup((ev.groups || [])[0]) || {}).color) || '#1C1329';
+  g.fillStyle = shareMix(accent, .55, '#000000'); g.fillRect(0, 0, SHARE_W, SHARE_H);
+  const im = ev.poster && ev.poster.img ? await shareLoad(ev.poster.img) : null;
+  // measure the words first
+  const year = +ev.start.slice(0, 4);
+  const when = `${eventDateLabel(ev)} ${en ? year : year + 543}${ev.time ? ` · ${ev.time}${en ? '' : ' น.'}` : ''}`;
+  g.font = '800 54px "Noto Sans Thai", sans-serif';
+  const lines = shareWrap(g, ev.title, SHARE_W - 192, 4);
+  const place = ev.venue || ev.online || '';
+  g.font = '600 32px "Noto Sans Thai", sans-serif';
+  const placeLines = place ? shareWrap(g, place, SHARE_W - 192, 2) : [];
+  const panelH = 70 + 52 + lines.length * 68 + (placeLines.length ? 24 + placeLines.length * 46 : 0) + 56;
+  const panelBottom = SHARE_H - 170, panelTop = im ? panelBottom - panelH : Math.max(220, (SHARE_H - 170 - panelH) / 2);
+  if(im){
+    g.save(); g.filter = 'blur(40px) brightness(.55)'; shareCover(g, im, -60, -60, SHARE_W + 120, panelTop + 120); g.restore();
+    const box = shareContain(g, im, 90, 60, SHARE_W - 180, panelTop - 60 - 40);
+    g.save(); g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 40; shareRound(g, box.x, box.y, box.w, box.h, 26); g.fillStyle = '#000'; g.fill(); g.restore();
+    g.save(); shareRound(g, box.x, box.y, box.w, box.h, 26); g.clip(); g.drawImage(im, box.x, box.y, box.w, box.h); g.restore();
+  }
+  g.fillStyle = '#ffffff'; shareRound(g, 48, panelTop, SHARE_W - 96, panelH, 34); g.fill();
+  let y = panelTop + 48;
+  sharePill(g, when, 96, y, accent, '#ffffff', 30);
+  y += 52 + 20;
+  g.textBaseline = 'alphabetic'; g.fillStyle = '#1C1329'; g.font = '800 54px "Noto Sans Thai", sans-serif';
+  lines.forEach(l => { y += 68; g.fillText(l, 96, y); });
+  if(placeLines.length){ y += 24; g.font = '600 32px "Noto Sans Thai", sans-serif'; g.fillStyle = '#5B5068';
+    placeLines.forEach(l => { y += 46; g.fillText(l, 96, y); }); }
+  await shareFooter(g, true, url);
+}
+
+async function drawSingleCard(g, s, url){
+  const en = isEN();
+  const grp = getGroup(s.groupId); const c = grp ? grp.color : '#E4457E';
+  const bg = g.createLinearGradient(0, 0, 0, SHARE_H);
+  bg.addColorStop(0, shareMix(c, .15, '#000000')); bg.addColorStop(1, shareMix(c, .7, '#000000'));
+  g.fillStyle = bg; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 2;
+  for(let r = 120; r < 900; r += 40){ g.beginPath(); g.arc(SHARE_W + 60, 260, r, 0, Math.PI * 2); g.stroke(); }
+  g.fillStyle = '#fff'; g.textBaseline = 'alphabetic';
+  g.font = '700 34px "Noto Sans Thai", sans-serif'; g.globalAlpha = .85;
+  g.fillText(`${workGroups(s).map(id => (getGroup(id) || {}).name).join(' × ')} · ${workLabel(s)} · ${s.year}`, 80, 150); g.globalAlpha = 1;
+  g.font = '800 92px "Noto Sans Thai", sans-serif';
+  let y = 150;
+  shareWrap(g, s.title, SHARE_W - 160, 3).forEach(l => { y += 110; g.fillText(l, 80, y); });
+  if(s.alt){ g.font = '600 40px "Noto Sans Thai", sans-serif'; g.globalAlpha = .8; y += 64; g.fillText(s.alt, 80, y); g.globalAlpha = 1; }
+  const tracks = SEED_SENBATSU[s.id] || [];
+  y += 60;
+  g.fillStyle = 'rgba(255,255,255,.1)'; shareRound(g, 60, y, SHARE_W - 120, Math.min(tracks.length, 7) * 92 + 40, 30); g.fill();
+  y += 20;
+  tracks.slice(0, 7).forEach((t, i) => {
+    y += 92;
+    g.fillStyle = i === 0 ? '#FFD98A' : '#ffffff';
+    g.font = `800 ${i === 0 ? 40 : 34}px "Noto Sans Thai", sans-serif`;
+    g.fillText(`${i + 1}. ` + (shareWrap(g, t.track, SHARE_W - 400, 1)[0] || ''), 100, y - 30);
+    g.font = '600 26px "Noto Sans Thai", sans-serif'; g.fillStyle = 'rgba(255,255,255,.7)';
+    const centres = t.centers.map(id => { const m = getMember(id); return m ? nickName(m) : ''; }).filter(Boolean).join(', ');
+    g.fillText(`${t.members.length} ${en ? 'members' : 'คน'}${centres ? ` · ${en ? 'centre' : 'เซ็นเตอร์'} ${centres}` : ''}`, 100, y + 6);
+  });
+  // faces of the title song's line-up, centres first, as many rows as fit
+  const lead = tracks[0];
+  if(lead){
+    const ids = [...lead.centers, ...lead.members.filter(id => !lead.centers.includes(id))].filter(getMember);
+    const top = y + 70, room = SHARE_H - 190 - top;
+    const perRow = 8, size = 104, gapX = (SHARE_W - 160 - perRow * size) / (perRow - 1), rowH = size + 46;
+    const rows = Math.max(0, Math.floor(room / rowH));
+    const shown = ids.slice(0, rows * perRow);
+    if(shown.length){
+      g.fillStyle = 'rgba(255,255,255,.75)'; g.font = '700 26px "Noto Sans Thai", sans-serif';
+      g.fillText(en ? 'Line-up' : 'เมมเบอร์ในเพลงหลัก', 80, top - 16);
+      const photos = await Promise.all(shown.map(id => shareLoad(getMember(id).photo)));
+      shown.forEach((id, i) => {
+        const m = getMember(id), col = i % perRow, row = Math.floor(i / perRow);
+        const x = 80 + col * (size + gapX), yy = top + 10 + row * rowH, r = size / 2;
+        shareFace(g, m, photos[i], x, yy, size, 'rgba(255,255,255,.22)');
+        if(lead.centers.includes(id)){ g.strokeStyle = '#FFD98A'; g.lineWidth = 5; g.beginPath(); g.arc(x + r, yy + r, r + 2, 0, Math.PI * 2); g.stroke(); }
+        if(photos[i]){ g.fillStyle = '#fff'; g.font = '700 22px "Noto Sans Thai", sans-serif'; g.textAlign = 'center';
+          g.fillText(shareWrap(g, nickName(m), size + gapX - 4, 1)[0] || '', x + r, yy + size + 32); g.textAlign = 'left'; }
+      });
+    }
+  }
+  await shareFooter(g, true, url);
+}
+
+async function drawGECard(g, url){
+  const en = isEN();
+  const bgIm = await shareLoad('posters/election-2026.jpg');
+  g.fillStyle = '#2A0508'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  if(bgIm) shareCover(g, bgIm, 0, 0, SHARE_W, SHARE_H);
+  const fade = g.createLinearGradient(0, 0, 0, SHARE_H);
+  fade.addColorStop(0, 'rgba(40,2,6,0)'); fade.addColorStop(.36, 'rgba(40,2,6,.25)'); fade.addColorStop(.56, 'rgba(30,0,4,.97)'); fade.addColorStop(1, 'rgba(24,0,3,1)');
+  g.fillStyle = fade; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  const logo = await shareLoad(GE_PAGE.logo);
+  if(logo){ g.save(); g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 30; shareContain(g, logo, 110, 640, SHARE_W - 220, 330); g.restore(); }
+  const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), res = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
+  const M = monthsShort(), dm = s => { const d = parseYmd(s); return `${d.getDate()} ${M[d.getMonth()]}`; };
+  g.textAlign = 'center'; g.fillStyle = '#fff'; g.textBaseline = 'alphabetic';
+  g.font = '800 44px "Noto Sans Thai", sans-serif';
+  if(vote) g.fillText(`${en ? 'Voting' : 'โหวต'} ${dm(vote.start)} – ${dm(eventLastDay(vote))}`, SHARE_W / 2, 1050);
+  if(res){ g.fillStyle = '#FFD98A'; g.fillText(`${en ? 'Final results' : 'ประกาศผล'} ${dm(res.start)}`, SHARE_W / 2, 1115); }
+  g.textAlign = 'left';
+  await shareFooter(g, true, url);
+}
+
+async function drawPageCard(g, title, url){
+  const bg = g.createLinearGradient(0, 0, SHARE_W, SHARE_H);
+  bg.addColorStop(0, '#FBD9E7'); bg.addColorStop(1, '#D3F1E6');
+  g.fillStyle = bg; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  const logo = await shareLogo('#1C1329');
+  if(logo) shareContain(g, logo, 240, 380, SHARE_W - 480, 360);
+  g.fillStyle = '#1C1329'; g.textAlign = 'center'; g.font = '800 64px "Noto Sans Thai", sans-serif';
+  shareWrap(g, title, SHARE_W - 200, 2).forEach((l, i) => g.fillText(l, SHARE_W / 2, 860 + i * 80));
+  g.textAlign = 'left';
+  await shareFooter(g, false, url);
+}
+
+/* Data files the cards read; a card shared from another page may need them
+   before the stats page has ever loaded them. */
+async function shareEnsureData(){
+  const get = async path => { try{ const r = await fetch(path, { cache:'no-cache' }); return r.ok ? await r.json() : null; }catch(e){ return null; } };
+  if(!LIVES) LIVES = (await get('data/lives.json')) || { members:{} };
+  if(!YT_STATS) YT_STATS = (await get('data/youtube.json')) || { videos:{} };
+}
+function shareGlow(g, x, y, r, colour, a){
+  const gr = g.createRadialGradient(x, y, 0, x, y, r);
+  gr.addColorStop(0, colour); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.globalAlpha = a; g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.globalAlpha = 1;
+}
+function shareThaiDate(d){
+  const en = isEN();
+  return en ? `${d.getDate()} ${EN_MONTHS[d.getMonth()]} ${d.getFullYear()}` : `${d.getDate()} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear() + 543}`;
+}
+function shareText(g, text, x, y, font, colour, align = 'left'){
+  g.font = font; g.fillStyle = colour; g.textAlign = align; g.textBaseline = 'alphabetic'; g.fillText(text, x, y); g.textAlign = 'left';
+}
+
+/* Everything the stats page knows, on one picture. */
+async function drawStatsCard(g, url){
+  const en = isEN();
+  await shareEnsureData();
+  const W = SHARE_W, P = 60;
+  g.fillStyle = '#150E22'; g.fillRect(0, 0, W, SHARE_H);
+  shareGlow(g, 120, 140, 520, '#FF6FA5', .45);
+  shareGlow(g, 980, 520, 560, '#3CC4A5', .30);
+  shareGlow(g, 300, 1250, 520, '#7A5CFF', .25);
+  const panel = (x, y, w, hh) => { g.fillStyle = 'rgba(255,255,255,.07)'; shareRound(g, x, y, w, hh, 28); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.12)'; g.lineWidth = 2; shareRound(g, x, y, w, hh, 28); g.stroke(); };
+
+  // head
+  shareText(g, en ? '48thDB · STATS' : '48thDB · สถิติ', P, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
+  shareText(g, en ? 'BNK48 & CGM48 in numbers' : 'BNK48 & CGM48 ในตัวเลข', P, 168, '800 66px "Noto Sans Thai", sans-serif', '#ffffff');
+  shareText(g, (en ? 'As of ' : 'ข้อมูล ณ ') + shareThaiDate(new Date()), P, 214, '600 28px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.65)');
+
+  // four headline numbers
+  const active = activeMembers(), grads = state.members.filter(m => m.graduated);
+  const ages = active.map(m => calcAge(m.birthday)).filter(a => a != null), hs = active.map(m => m.height).filter(Boolean);
+  const avg = a => a.length ? Math.round(a.reduce((s, n) => s + n, 0) / a.length) : '-';
+  const tiles = [[active.length, en ? 'members' : 'สมาชิกปัจจุบัน', '#FF6FA5'], [grads.length, en ? 'graduated' : 'จบการศึกษา', '#FFD98A'],
+    [avg(ages), en ? 'avg. age' : 'อายุเฉลี่ย (ปี)', '#8FE3CF'], [avg(hs), en ? 'avg. height, cm' : 'ส่วนสูงเฉลี่ย (ซม.)', '#B9A7FF']];
+  const tw = (W - P * 2 - 3 * 16) / 4;
+  tiles.forEach(([n, l, c], i) => { const x = P + i * (tw + 16); panel(x, 250, tw, 150);
+    shareText(g, String(n), x + 24, 336, '800 68px "Noto Sans Thai", sans-serif', c);
+    shareText(g, l, x + 24, 376, '600 22px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.72)'); });
+
+  // members per group, one bar
+  const per = GROUPS.map(gr => ({ gr, n: active.filter(m => m.groupId === gr.id).length }));
+  const total = per.reduce((s, x) => s + x.n, 0) || 1;
+  let bx = P; const by = 440, bw = W - P * 2, bh = 56;
+  g.save(); shareRound(g, bx, by, bw, bh, bh / 2); g.clip();
+  per.forEach(({ gr, n }) => { const w = bw * n / total; g.fillStyle = gr.color; g.fillRect(bx, by, w, bh);
+    shareText(g, `${gr.name} ${n}`, bx + 24, by + 38, '800 28px "Noto Sans Thai", sans-serif', '#fff'); bx += w; });
+  g.restore();
+
+  // two ranked lists
+  const colW = (W - P * 2 - 20) / 2, top = 530, listH = 520;
+  panel(P, top, colW, listH); panel(P + colW + 20, top, colW, listH);
+  const S = LIVES && LIVES.stats;
+  shareText(g, en ? 'Most lives · 30 days' : 'ไลฟ์มากสุด · 30 วัน', P + 26, top + 56, '800 30px "Noto Sans Thai", sans-serif', '#fff');
+  const lv = S ? S.top30.filter(([id, n]) => n && getMember(id)).slice(0, 5) : [];
+  const lvPhotos = await Promise.all(lv.map(([id]) => shareLoad(getMember(id).photo)));
+  lv.forEach(([id, n], i) => {
+    const m = getMember(id), y = top + 90 + i * 84, x = P + 26;
+    const c = (getGroup(m.groupId) || {}).color || '#FF6FA5';
+    shareFace(g, m, lvPhotos[i], x, y, 60, c);
+    shareText(g, nickName(m), x + 76, y + 26, '800 26px "Noto Sans Thai", sans-serif', '#fff');
+    const barW = colW - 26 - 76 - 90, frac = n / lv[0][1];
+    g.fillStyle = 'rgba(255,255,255,.12)'; shareRound(g, x + 76, y + 40, barW, 14, 7); g.fill();
+    g.fillStyle = c; shareRound(g, x + 76, y + 40, Math.max(14, barW * frac), 14, 7); g.fill();
+    shareText(g, String(n), P + colW - 26, y + 50, '800 32px "Noto Sans Thai", sans-serif', '#fff', 'right');
+  });
+  const cx0 = P + colW + 20;
+  shareText(g, en ? 'Most viewed on YouTube' : 'ยอดวิว YouTube สูงสุด', cx0 + 26, top + 56, '800 30px "Noto Sans Thai", sans-serif', '#fff');
+  const V = (YT_STATS && YT_STATS.videos) || {}, seen = new Set(), rows = []; let totalViews = 0;
+  for(const [key, [vid]] of Object.entries(SEED_YOUTUBE)){ const st = V[vid]; if(!st || seen.has(vid)) continue; seen.add(vid); totalViews += st.views;
+    const [wid, i] = key.split('#'); const w = findWork(wid), t = (SEED_SENBATSU[wid] || [])[+i]; if(w && t) rows.push({ w, name: t.track, views: st.views }); }
+  rows.sort((a, b) => b.views - a.views);
+  rows.slice(0, 5).forEach((r, i) => {
+    const y = top + 90 + i * 84, x = cx0 + 26;
+    const c = (getGroup(r.w.groupId) || {}).color || '#FF6FA5';
+    shareText(g, String(i + 1), x + 16, y + 44, '800 40px "Noto Sans Thai", sans-serif', i === 0 ? '#FFD98A' : 'rgba(255,255,255,.45)', 'center');
+    g.font = '800 25px "Noto Sans Thai", sans-serif';
+    shareText(g, shareWrap(g, r.name.replace(/\s*\(.*$/, ''), colW - 26 - 60 - 150, 1)[0] || '', x + 50, y + 26, '800 25px "Noto Sans Thai", sans-serif', '#fff');
+    const barW = colW - 26 - 50 - 176;
+    g.fillStyle = 'rgba(255,255,255,.12)'; shareRound(g, x + 50, y + 40, barW, 14, 7); g.fill();
+    g.fillStyle = c; shareRound(g, x + 50, y + 40, Math.max(14, barW * r.views / rows[0].views), 14, 7); g.fill();
+    shareText(g, shortViews(r.views), cx0 + colW - 26, y + 50, '800 26px "Noto Sans Thai", sans-serif', '#fff', 'right');
+  });
+
+  // bottom strip
+  const DAYS = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  let peak = null; if(S){ S.heat.forEach((row, d) => row.forEach((n, hr) => { if(!peak || n > peak.n) peak = { d, hr, n }; })); }
+  const mm = String(new Date().getMonth() + 1).padStart(2, '0');
+  const bdays = active.filter(m => m.birthday && m.birthday.slice(5, 7) === mm);
+  const strip = [
+    [S ? S.total.toLocaleString() : '-', en ? 'lives in total' : 'ไลฟ์ทั้งหมด'],
+    [peak ? `${DAYS[peak.d]} ${String(peak.hr).padStart(2, '0')}:00` : '-', en ? 'busiest hour' : 'ช่วงไลฟ์บ่อยสุด'],
+    [shortViews(totalViews), en ? 'YouTube views' : 'ยอดวิวรวม'],
+    [String(bdays.length), en ? 'birthdays this month' : 'วันเกิดเดือนนี้'],
+  ];
+  const sw = (W - P * 2 - 3 * 16) / 4, sy = top + listH + 24;
+  strip.forEach(([v, l], i) => { const x = P + i * (sw + 16); panel(x, sy, sw, 124);
+    g.font = '800 40px "Noto Sans Thai", sans-serif';
+    shareText(g, shareWrap(g, v, sw - 40, 1)[0], x + 22, sy + 62, '800 40px "Noto Sans Thai", sans-serif', '#fff');
+    shareText(g, l, x + 22, sy + 100, '600 21px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.65)'); });
+  await shareFooter(g, true, url);
+}
+
+/* Today at a glance: what is on, whose birthday, what is open to buy or vote. */
+async function drawTodayCard(g, url){
+  const en = isEN();
+  const W = SHARE_W, P = 60;
+  const iso = toYmd(todayStart()), now = new Date();
+  const bg = g.createLinearGradient(0, 0, W, SHARE_H);
+  bg.addColorStop(0, '#FF6FA5'); bg.addColorStop(.55, '#E45C9A'); bg.addColorStop(1, '#2FB59A');
+  g.fillStyle = bg; g.fillRect(0, 0, W, SHARE_H);
+  shareGlow(g, 900, 120, 420, '#FFFFFF', .25);
+  shareGlow(g, 100, 1200, 500, '#1C1329', .25);
+  const DAYS_LONG = en ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] : ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
+  shareText(g, `${DAYS_LONG[now.getDay()]}${en ? ' ' : 'ที่ '}${shareThaiDate(now)}`, P, 84, '700 32px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.9)');
+  shareText(g, en ? 'Today at 48' : 'วันนี้ที่ 48', P, 214, '800 104px "Noto Sans Thai", sans-serif', '#ffffff');
+
+  const todays = SEED_SCHEDULE.filter(e => !e.period && !e.shop && e.start <= iso && eventLastDay(e) >= iso)
+    .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+  const upcoming = SEED_SCHEDULE.filter(e => !e.period && !e.shop && e.start > iso).sort((a, b) => a.start.localeCompare(b.start));
+  const list = todays.length ? todays : upcoming;
+  const heading = todays.length ? (en ? `${todays.length} on today` : `งานวันนี้ ${todays.length} งาน`) : (en ? 'Nothing today — coming up' : 'วันนี้ไม่มีงาน · งานถัดไป');
+  shareText(g, heading, P, 282, '800 32px "Noto Sans Thai", sans-serif', '#fff');
+
+  const bdays = activeMembers().filter(m => m.birthday && m.birthday.slice(5) === iso.slice(5));
+  const open = SEED_SCHEDULE.filter(e => e.period && e.start <= iso && eventLastDay(e) >= iso);
+  const reserve = (bdays.length ? 170 : 0) + (open.length ? 60 + Math.min(open.length, 3) * 54 : 0);
+  const cardH = 196, gap = 16, y0 = 306;
+  const fit = Math.max(1, Math.floor((SHARE_H - 170 - y0 - reserve + gap) / (cardH + gap)));
+  const shown = list.slice(0, fit);
+  const posters = await Promise.all(shown.map(e => shareLoad(e.poster && e.poster.img)));
+  let y = y0;
+  shown.forEach((ev, i) => {
+    const accent = ev.poster && ev.poster.accent || ((getGroup((ev.groups || [])[0]) || {}).color) || '#1C1329';
+    g.save(); g.shadowColor = 'rgba(0,0,0,.18)'; g.shadowBlur = 24; g.fillStyle = '#fff'; shareRound(g, P, y, W - P * 2, cardH, 30); g.fill(); g.restore();
+    const th = cardH - 32;
+    if(posters[i]){ g.save(); shareRound(g, P + 16, y + 16, th, th, 22); g.clip(); shareCover(g, posters[i], P + 16, y + 16, th, th); g.restore(); }
+    else { g.fillStyle = shareMix(accent, .8); shareRound(g, P + 16, y + 16, th, th, 22); g.fill(); }
+    const tx = P + 16 + th + 26, tw = W - P - 30 - tx;
+    const slots = slotsOn(ev, iso);
+    const time = slots.length ? slots.map(s => `${s.time}–${s.until}`).join(', ') : (ev.time || '');
+    const dayLabel = todays.length ? (ev.end && ev.end !== ev.start ? `${en ? 'Day' : 'วันที่'} ${Math.round((parseYmd(iso) - parseYmd(ev.start)) / 864e5) + 1}/${Math.round((parseYmd(ev.end) - parseYmd(ev.start)) / 864e5) + 1}` : '')
+      : eventDateLabel(ev);
+    let px = tx;
+    if(dayLabel) px += sharePill(g, dayLabel, px, y + 22, accent, '#fff', 22) + 10;
+    if(time){ g.font = '700 24px "Noto Sans Thai", sans-serif'; g.fillStyle = '#5B5068'; g.textBaseline = 'middle';
+      g.fillText(shareWrap(g, time + (en ? '' : ' น.'), W - P - 30 - px, 1)[0], px, y + 42); }
+    g.font = '800 34px "Noto Sans Thai", sans-serif';
+    const tl = shareWrap(g, ev.title, tw, 2);
+    tl.forEach((l, k) => shareText(g, l, tx, y + 104 + k * 44, '800 34px "Noto Sans Thai", sans-serif', '#1C1329'));
+    const place = ev.venue || ev.online || '';
+    if(place){ g.font = '600 24px "Noto Sans Thai", sans-serif';
+      shareText(g, shareWrap(g, place, tw, 1)[0], tx, y + (tl.length > 1 ? 178 : 146), '600 24px "Noto Sans Thai", sans-serif', '#7A6E86'); }
+    y += cardH + gap;
+  });
+  if(list.length > shown.length) { shareText(g, en ? `+ ${list.length - shown.length} more` : `+ อีก ${list.length - shown.length} งาน`, W - P, y + 4, '800 28px "Noto Sans Thai", sans-serif', '#fff', 'right'); y += 30; }
+
+  if(bdays.length){
+    y += 14;
+    shareText(g, en ? '🎂 Birthday today' : '🎂 วันเกิดวันนี้', P, y + 30, '800 30px "Noto Sans Thai", sans-serif', '#fff');
+    const photos = await Promise.all(bdays.map(m => shareLoad(m.photo)));
+    bdays.slice(0, 6).forEach((m, i) => { const x = P + i * 160;
+      g.beginPath(); g.arc(x + 50, y + 100, 54, 0, Math.PI * 2); g.fillStyle = '#fff'; g.fill();
+      shareFace(g, m, photos[i], x, y + 50, 100, (getGroup(m.groupId) || {}).color || '#FF6FA5');
+      shareText(g, nickName(m), x + 132, y + 112, '800 30px "Noto Sans Thai", sans-serif', '#fff'); });
+    y += 170;
+  }
+  // the members out today, then what comes next, as far as the space goes
+  const floor = SHARE_H - 170 - (open.length ? 60 + Math.min(open.length, 3) * 54 + 10 : 0);
+  if(todays.length){
+    const ids = [...new Set(todays.flatMap(ev => { const s = slotsOn(ev, iso); return s.length ? s.flatMap(x => x.members) : (ev.members || []); }))].filter(getMember);
+    const size = 92, perRow = 8, gx = (W - P * 2 - perRow * size) / (perRow - 1), rowH = size + 44;
+    const rows = Math.min(2, Math.floor((floor - y - 60) / rowH));
+    const cap = Math.max(0, rows) * perRow;
+    const faces = ids.length > cap ? ids.slice(0, Math.max(0, cap - 1)) : ids;
+    if(faces.length){
+      y += 16;
+      shareText(g, en ? `Out today · ${ids.length}` : `เมมเบอร์ที่ออกงานวันนี้ · ${ids.length} คน`, P, y + 30, '800 30px "Noto Sans Thai", sans-serif', '#fff');
+      y += 54;
+      const photos = await Promise.all(faces.map(id => shareLoad(getMember(id).photo)));
+      faces.forEach((id, i) => { const m = getMember(id), x = P + (i % perRow) * (size + gx), yy = y + Math.floor(i / perRow) * rowH;
+        g.beginPath(); g.arc(x + size / 2, yy + size / 2, size / 2 + 4, 0, Math.PI * 2); g.fillStyle = 'rgba(255,255,255,.9)'; g.fill();
+        shareFace(g, m, photos[i], x, yy, size, (getGroup(m.groupId) || {}).color || '#FF6FA5');
+        if(photos[i]){ g.font = '800 21px "Noto Sans Thai", sans-serif';
+          shareText(g, shareWrap(g, nickName(m), size + gx - 4, 1)[0], x + size / 2, yy + size + 30, '800 21px "Noto Sans Thai", sans-serif', '#fff', 'center'); } });
+      if(ids.length > faces.length){ const i = faces.length, x = P + (i % perRow) * (size + gx), yy = y + Math.floor(i / perRow) * rowH;
+        g.beginPath(); g.arc(x + size / 2, yy + size / 2, size / 2 + 4, 0, Math.PI * 2); g.fillStyle = 'rgba(255,255,255,.9)'; g.fill();
+        shareText(g, `+${ids.length - faces.length}`, x + size / 2, yy + size / 2 + 13, '800 36px "Noto Sans Thai", sans-serif', '#C23E7A', 'center'); }
+      y += Math.ceil((faces.length + (ids.length > faces.length ? 1 : 0)) / perRow) * rowH;
+    }
+  }
+  const nextUp = todays.length ? upcoming : upcoming.slice(shown.length);
+  const nRows = Math.min(3, Math.floor((floor - y - 60) / 58));
+  if(nRows > 0 && nextUp.length){
+    y += 12;
+    shareText(g, en ? 'Coming up' : 'งานถัดไป', P, y + 30, '800 30px "Noto Sans Thai", sans-serif', '#fff');
+    y += 48;
+    nextUp.slice(0, nRows).forEach(ev => {
+      const c = ev.poster && ev.poster.accent || ((getGroup((ev.groups || [])[0]) || {}).color) || '#1C1329';
+      g.fillStyle = 'rgba(255,255,255,.92)'; shareRound(g, P, y, W - P * 2, 48, 24); g.fill();
+      const pw = sharePill(g, eventDateLabel(ev), P + 6, y + 6, c, '#fff', 20);
+      g.font = '800 24px "Noto Sans Thai", sans-serif';
+      shareText(g, shareWrap(g, ev.title, W - P * 2 - pw - 40, 1)[0], P + pw + 22, y + 33, '800 24px "Noto Sans Thai", sans-serif', '#1C1329');
+      y += 58;
+    });
+  }
+  if(open.length){
+    y = Math.max(y, floor) + 10;
+    shareText(g, en ? 'Open now' : 'เปิดอยู่ตอนนี้', P, y + 30, '800 30px "Noto Sans Thai", sans-serif', '#fff');
+    y += 50;
+    open.slice(0, 3).forEach(ev => {
+      const c = eventIconName(ev) === 'token' ? TL_TRACKS.vote.color : (ev.poster && ev.poster.accent) || '#1C1329';
+      const left = Math.round((parseYmd(eventLastDay(ev)) - parseYmd(iso)) / 864e5);
+      g.fillStyle = 'rgba(255,255,255,.92)'; shareRound(g, P, y, W - P * 2, 44, 22); g.fill();
+      g.fillStyle = c; shareRound(g, P, y, 16, 44, 8); g.fill();
+      g.font = '800 24px "Noto Sans Thai", sans-serif';
+      shareText(g, shareWrap(g, ev.bar || ev.title, W - P * 2 - 260, 1)[0], P + 30, y + 31, '800 24px "Noto Sans Thai", sans-serif', '#1C1329');
+      shareText(g, left === 0 ? (en ? 'last day' : 'วันสุดท้าย') : (en ? `${left} days left` : `เหลือ ${left} วัน`), W - P - 20, y + 31, '800 24px "Noto Sans Thai", sans-serif', c, 'right');
+      y += 54;
+    });
+  }
+  await shareFooter(g, true, url);
+}
+
+function shareSubject(){
+  const url = location.origin + urlForSnapshot(navSnapshot());
+  const m = state.selectedId ? getMember(state.selectedId) : null;
+  const ev = state.selectedEvent ? SEED_SCHEDULE.find(x => x.id === state.selectedEvent) : null;
+  if(m) return { kind:'member', m, url, title:`${nickName(m)} — 48thDB`, file:`48thdb-${m.name || m.id}` };
+  if(ev) return { kind:'event', ev, url, title:`${ev.title} — 48thDB`, file:`48thdb-${ev.id}` };
+  if(state.view === 'single' && state.selectedSingle){ const s = findWork(state.selectedSingle);
+    if(s) return { kind:'single', s, url, title:`${s.title} — 48thDB`, file:`48thdb-${s.id}` }; }
+  if(state.view === 'timeline') return { kind:'ge', url, title:'Senbatsu General Election 2026 — 48thDB', file:'48thdb-ge2026' };
+  if(state.view === 'stats') return { kind:'stats', url, title:'สถิติ BNK48 & CGM48 — 48thDB', file:'48thdb-stats' };
+  if(state.view === 'feed') return { kind:'today', url, title:'วันนี้ที่ 48 — 48thDB', file:`48thdb-today-${toYmd(todayStart())}` };
+  const names = { feed:'วันนี้ที่ 48', browse:'สมาชิกทั้งหมด', groups:'ประวัติวง', org:'ตำแหน่ง', discography:'ผลงานเพลง', stats:'สถิติ', shop:'ร้านค้า', calendar:'ปฏิทิน' };
+  return { kind:'page', url, title:`${names[state.view] || '48thDB'} — 48thDB`, file:`48thdb-${state.view}` };
+}
+
+async function buildShareCard(sub){
+  try{ await Promise.all(['500', '600', '700', '800'].map(w => document.fonts.load(`${w} 40px "Noto Sans Thai"`, 'กขABC'))); }catch(e){}
+  const c = document.createElement('canvas'); c.width = SHARE_W; c.height = SHARE_H;
+  const g = c.getContext('2d');
+  if(sub.kind === 'member') await drawMemberCard(g, sub.m, sub.url);
+  else if(sub.kind === 'event') await drawEventCard(g, sub.ev, sub.url);
+  else if(sub.kind === 'single') await drawSingleCard(g, sub.s, sub.url);
+  else if(sub.kind === 'ge') await drawGECard(g, sub.url);
+  else if(sub.kind === 'stats') await drawStatsCard(g, sub.url);
+  else if(sub.kind === 'today') await drawTodayCard(g, sub.url);
+  else await drawPageCard(g, sub.title.replace(/ — 48thDB$/, ''), sub.url);
+  return new Promise(res => c.toBlob(res, 'image/png'));
+}
+
+let _shareUrl = null;
+async function openShareSheet(){
+  const en = isEN();
+  const sub = shareSubject();
+  closeShareSheet();
+  const el = document.createElement('div');
+  el.className = 'share-sheet';
+  el.innerHTML = `<div class="share-back" data-share="close"></div>
+    <div class="share-panel" role="dialog" aria-label="${en ? 'Share' : 'แชร์'}">
+      <div class="share-head"><b>${en ? 'Share' : 'แชร์'}</b><button class="share-x" data-share="close" aria-label="${en ? 'Close' : 'ปิด'}">✕</button></div>
+      <div class="share-preview is-loading"><span>${en ? 'Making the card…' : 'กำลังสร้างการ์ด…'}</span></div>
+      <div class="share-actions">
+        <button class="share-act is-main" data-share="image" disabled>${ICONS.share}<span>${en ? 'Share image' : 'แชร์รูป'}</span></button>
+        <button class="share-act" data-share="save" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg><span>${en ? 'Save image' : 'บันทึกรูป'}</span></button>
+        <button class="share-act" data-share="link">${ICONS.link}<span>${en ? 'Share link' : 'แชร์ลิงก์'}</span></button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  let blob = null;
+  const file = () => new File([blob], sub.file.replace(/[^\w.-]+/g, '-') + '.png', { type:'image/png' });
+  el.addEventListener('click', async e => {
+    const b = e.target.closest('[data-share]'); if(!b) return;
+    const act = b.dataset.share;
+    if(act === 'close') return closeShareSheet();
+    if(act === 'link') return shareCurrent(sub.title);
+    if(!blob) return;
+    if(act === 'image'){
+      const f = file();
+      try{
+        if(navigator.canShare && navigator.canShare({ files:[f] })){ await navigator.share({ files:[f], title:sub.title, text:sub.url }); return; }
+      }catch(err){ if(err && err.name === 'AbortError') return; }
+      act === 'image' && saveShareBlob(blob, f.name);
+    }
+    if(act === 'save') saveShareBlob(blob, file().name);
+  });
+  try{
+    blob = await buildShareCard(sub);
+    if(!el.isConnected) return;
+    _shareUrl = URL.createObjectURL(blob);
+    const pv = el.querySelector('.share-preview');
+    pv.classList.remove('is-loading');
+    pv.innerHTML = `<img src="${_shareUrl}" alt="${escapeAttr(sub.title)}">`;
+    el.querySelectorAll('.share-act[disabled]').forEach(x => x.disabled = false);
+  }catch(err){
+    el.querySelector('.share-preview').innerHTML = `<span>${en ? 'Could not make the card — the link still works.' : 'สร้างการ์ดไม่สำเร็จ แชร์ลิงก์ได้ตามปกติ'}</span>`;
+  }
+}
+function saveShareBlob(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast(isEN() ? 'Image saved' : 'บันทึกรูปแล้ว');
+}
+function closeShareSheet(){
+  document.querySelectorAll('.share-sheet').forEach(x => x.remove());
+  if(_shareUrl){ URL.revokeObjectURL(_shareUrl); _shareUrl = null; }
+}
+
 function navSnapshot(){
   const snap = {};
   NAV_KEYS.forEach(k => snap[k] = state[k]);
@@ -10098,6 +10704,7 @@ function initHistory(){
   history.replaceState({ snap:navSnapshot(), depth:0, scrollY:0 }, '');
   _navReady = true;
   window.addEventListener('popstate', (e)=>{
+    closeShareSheet();
     const snap = e.state && e.state.snap;
     if(!snap) return;
     _navDepth = (e.state && e.state.depth) || 0;
@@ -10328,9 +10935,7 @@ function bindDelegatedEvents(){
     else if(action==='export-oshi'){ exportOshi(); }
     else if(action==='import-oshi'){ importOshi(); }
     else if(action==='share'){
-      const m = state.selectedId ? getMember(state.selectedId) : null;
-      const ev = state.selectedEvent ? SEED_SCHEDULE.find(x=>x.id===state.selectedEvent) : null;
-      shareCurrent(m ? `${m.nameTh} — 48thDB` : ev ? `${ev.title} — 48thDB` : '48thDB');
+      openShareSheet();
     }
     else if(action==='close-modal'){
       const insideCard = e.target.closest('.modal-glass-card');
