@@ -1637,7 +1637,7 @@
   /* The timeline page. Dates down the left, a rail of dots beside them, then
      one bar per stretch of the campaign that stays open for weeks, the way the
      official poster draws them, and the steps themselves on the right. */
-  .tlp{ --tlp-date:58px; --tlp-lane:9px; --tlp-dot:15px; max-width:1040px; margin-inline:auto; }
+  .tlp{ --tlp-date:58px; --tlp-lane:9px; --tlp-dot:15px; --tlp-gap:14px; max-width:1040px; margin-inline:auto; }
   .tlp-head{ display:flex; gap:16px; align-items:flex-start; margin:2px 0 18px; }
   .tlp-poster-btn{
     flex:0 0 108px; padding:0; border:1px solid var(--line); border-radius:12px;
@@ -1681,8 +1681,14 @@
   }
   .tlp-rail.is-done::after{ opacity:.45; }
 
+  .tlp-link{
+    align-self:start; height:3px; border-radius:2px; background:var(--bar);
+    margin:calc(var(--tlp-dot) - 1.5px) calc(-1 * var(--tlp-gap)) 0 calc(var(--tlp-lane) / 2);
+  }
+  .tlp-link.is-over{ opacity:.4; }
   .tlp-card{
-    grid-column:-2; display:block; width:100%; margin:0 0 10px 14px; padding:10px 13px;
+    position:relative; z-index:1;
+    grid-column:-2; display:block; width:calc(100% - var(--tlp-gap)); margin:0 0 10px var(--tlp-gap); padding:10px 13px;
     text-align:left; font:inherit; color:inherit;
     border:1px solid var(--line); border-left:4px solid var(--k); border-radius:14px;
     background:color-mix(in srgb, var(--k) 5%, transparent);
@@ -2396,7 +2402,8 @@
     /* room enough for wider dates and wider bars */
     .tlp{ --tlp-date:86px; --tlp-lane:13px; }
     .tlp-when{ font-size:13px; padding-right:12px; }
-    .tlp-card{ margin-left:20px; padding:11px 14px; }
+    .tlp{ --tlp-gap:20px; }
+    .tlp-card{ padding:11px 14px; }
     .tlp-poster-btn{ flex-basis:168px; }
     .tlp-head{ gap:24px; margin-bottom:24px; }
     .tlp-legend{ flex-direction:row; flex-wrap:wrap; gap:6px 20px; }
@@ -6890,14 +6897,20 @@ function renderTimelinePage(){
   const ahead = items.filter(it => endOf(it) >= iso);
   const nextD = ahead.length ? ahead[0].d : '';
 
-  const bars = page.bars.map(b => {
+  // Each bar is joined to the card it opens on and the card it closes on by a
+  // line in its own colour, so a stretch reads as one bracket from start to end.
+  const bars = page.bars.map((b, lane) => {
     const a = firstRow(b.from), z = lastRow(b.to);
     if(a < 0 || z < 0) return '';
     const over = b.to < iso;
     const open = b.from <= iso && b.to >= iso;
-    return `<span class="tlp-bar${over ? ' is-over' : ''}${open ? ' is-open' : ''}"
-      style="--bar:${b.color}; grid-row:${a + 1} / ${z + 1}"
-      title="${escapeAttr(b.th)} · ${day(b.from)} – ${day(b.to)}"></span>`;
+    const col = 3 + lane;
+    const cls = `${over ? ' is-over' : ''}${open ? ' is-open' : ''}`;
+    const tip = `${escapeAttr(b.th)} · ${day(b.from)} – ${day(b.to)}`;
+    const link = row => `<span class="tlp-link${cls}" aria-hidden="true"
+      style="--bar:${b.color}; grid-row:${row + 1}; grid-column:${col} / -2"></span>`;
+    return `<span class="tlp-bar${cls}" style="--bar:${b.color}; grid-row:${a + 1} / ${z + 1}; grid-column:${col}" title="${tip}"></span>
+      ${link(a)}${link(z)}`;
   }).join('');
 
   const rows = items.map((it, n) => {
