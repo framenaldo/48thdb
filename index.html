@@ -1655,12 +1655,18 @@
   .tlp-grid{ display:grid; align-items:start; column-gap:0; }
   /* a bar runs from the row its stretch opens on to the row it closes on: the
      grid rows put it there, the margins line it up with the dots */
+  /* A stretch is drawn as one line, like a route on a transit map: out of its
+     opening card, round a curve, down beside the dates, round again and into
+     its closing card. The bar and its two elbows share one thickness (--t) and
+     one left edge, so the joins disappear. */
+  .tlp{ --t:5px; --r:10px; }
   .tlp-bar{
-    align-self:stretch; justify-self:center; width:7px; border-radius:4px;
-    background:var(--bar); margin-top:var(--tlp-dot); margin-bottom:calc(-1 * var(--tlp-dot));
+    align-self:stretch; justify-self:start; width:var(--t); background:var(--bar);
+    margin-left:calc(var(--tlp-lane) / 2 - var(--t) / 2);
+    margin-top:calc(var(--tlp-dot) + var(--t) / 2 + var(--r));
+    margin-bottom:calc(-1 * (var(--tlp-dot) - var(--t) / 2 - var(--r)));
   }
-  .tlp-bar.is-over{ opacity:.4; }
-  .tlp-bar.is-open{ box-shadow:0 0 0 2px color-mix(in srgb, var(--bar) 28%, transparent); }
+  .tlp-bar.is-over, .tlp-link.is-over{ opacity:.4; }
   .tlp-when{
     grid-column:1; display:flex; flex-direction:column; align-items:flex-end;
     padding:7px 9px 0 0; text-align:right; font-size:12px; font-weight:800;
@@ -1682,10 +1688,20 @@
   .tlp-rail.is-done::after{ opacity:.45; }
 
   .tlp-link{
-    align-self:start; height:3px; border-radius:2px; background:var(--bar);
-    margin:calc(var(--tlp-dot) - 1.5px) calc(-1 * var(--tlp-gap)) 0 calc(var(--tlp-lane) / 2);
+    align-self:start; box-sizing:border-box; height:calc(var(--r) + var(--t));
+    border:0 solid var(--bar); border-left-width:var(--t);
+    margin-left:calc(var(--tlp-lane) / 2 - var(--t) / 2); margin-right:calc(-1 * var(--tlp-gap));
   }
-  .tlp-link.is-over{ opacity:.4; }
+  /* opening: along the top, curving down into the bar */
+  .tlp-link.is-start{
+    border-top-width:var(--t); border-top-left-radius:calc(var(--r) + var(--t));
+    margin-top:calc(var(--tlp-dot) - var(--t) / 2);
+  }
+  /* closing: out of the bar, curving along the bottom */
+  .tlp-link.is-end{
+    border-bottom-width:var(--t); border-bottom-left-radius:calc(var(--r) + var(--t));
+    margin-top:calc(var(--tlp-dot) + var(--t) / 2 - var(--r) - var(--t));
+  }
   .tlp-card{
     position:relative; z-index:1;
     grid-column:-2; display:block; width:calc(100% - var(--tlp-gap)); margin:0 0 10px var(--tlp-gap); padding:10px 13px;
@@ -6907,10 +6923,10 @@ function renderTimelinePage(){
     const col = 3 + lane;
     const cls = `${over ? ' is-over' : ''}${open ? ' is-open' : ''}`;
     const tip = `${escapeAttr(b.th)} · ${day(b.from)} – ${day(b.to)}`;
-    const link = row => `<span class="tlp-link${cls}" aria-hidden="true"
+    const link = (row, end) => `<span class="tlp-link ${end}${cls}" aria-hidden="true"
       style="--bar:${b.color}; grid-row:${row + 1}; grid-column:${col} / -2"></span>`;
     return `<span class="tlp-bar${cls}" style="--bar:${b.color}; grid-row:${a + 1} / ${z + 1}; grid-column:${col}" title="${tip}"></span>
-      ${link(a)}${link(z)}`;
+      ${link(a, 'is-start')}${link(z, 'is-end')}`;
   }).join('');
 
   const rows = items.map((it, n) => {
