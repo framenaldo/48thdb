@@ -666,7 +666,7 @@
   .calp-legend span{ display:inline-flex; align-items:center; gap:6px; }
   .calp-legend i{ width:14px; height:10px; border-radius:3px; display:inline-block; }
   .calp-legend i.is-bday{ background:color-mix(in srgb, var(--gold) 45%, transparent); }
-  .calp-legend i.is-period{ width:26px; height:8px; border-radius:999px; background:var(--gold); }
+  .calp-legend i.is-period{ width:22px; height:8px; border-radius:999px; }
   .calp-agenda{ display:flex; flex-direction:column; gap:8px; }
   .calp-ag-row{
     display:flex; gap:12px; align-items:flex-start; width:100%; padding:10px 12px; text-align:left;
@@ -3513,7 +3513,7 @@ const SEED_SCHEDULE = [
     lineupTba:true },
   /* The single and the photoset are what the GE6 Tokens come in, so they sit
      with the election rather than in the discography until they are released. */
-  { id:'ev-ge6-single', start:'2026-09-26', end:'2026-10-30', period:true,
+  { id:'ev-ge6-single', start:'2026-09-26', end:'2026-10-30', period:true, bar:'Pre-Order: Kimi to Doko ka e Ikitai',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" · Pre-Order',
     shop:{ name:'ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"', kind:'ซิงเกิลพิเศษ',
       price:'272 – 420 บาท', from:'2026-09-26T12:00', to:'2026-10-30T23:00',
@@ -3548,7 +3548,7 @@ const SEED_SCHEDULE = [
         'Mini Photobook Edition: Jacket, Mini Photobook, Music Card 8 เพลง, รูปสุ่ม 1 จาก 48 แบบ, บัตรกิจกรรมดิจิทัล และ GE6 Token 3 เหรียญ',
         'Music Code Edition: Music Code 8 เพลง และ GE6 Token 4 เหรียญ'] },
     ] },
-  { id:'ev-ge6-photoset', start:'2026-09-26', end:'2026-11-10', period:true,
+  { id:'ev-ge6-photoset', start:'2026-09-26', end:'2026-11-10', period:true, bar:'Pre-Order: Special Photoset GE2026',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Special Photoset',
     shop:{ name:'Special Photoset GE2026', kind:'รูปสะสม',
       price:'270 บาท', from:'2026-09-26T12:00', to:'2026-11-10T23:00',
@@ -6295,6 +6295,8 @@ function renderCalendarPage(){
   const spans = SEED_SCHEDULE.filter(ev => ev.period && ev.start <= monthLast && eventLastDay(ev) >= monthFirst)
     .filter(ev => !mine || hasMyOshi(ev))
     .sort((a, b) => a.start.localeCompare(b.start) || eventLastDay(b).localeCompare(eventLastDay(a)));
+  const spanLabel = ev => ev.bar || ev.title;
+  const spanColour = ev => eventIconName(ev) === 'token' ? TL_TRACKS.vote.color : colourOf(ev);
   const laneEnds = [];
   const laneOf = new Map();
   for(const ev of spans){
@@ -6316,9 +6318,9 @@ function renderCalendarPage(){
       lanes = Math.max(lanes, lane + 1);
       const starts = ev.start >= monthFirst && +ev.start.slice(8) === a;
       const ends = eventLastDay(ev) <= monthLast && +eventLastDay(ev).slice(8) === b;
-      const label = ev.shop ? ev.shop.name : ev.title;
+      const label = spanLabel(ev);
       bars.push(`<button class="calp-span${starts ? ' is-start' : ''}${ends ? ' is-end' : ''}${eventLastDay(ev) < today ? ' is-gone' : ''}"
-        style="grid-column:${(lead + a - 1) % 7 + 1} / ${(lead + b - 1) % 7 + 2}; grid-row:${lane + 2}; --k:${eventIconName(ev) === 'token' ? TL_TRACKS.vote.color : colourOf(ev)}"
+        style="grid-column:${(lead + a - 1) % 7 + 1} / ${(lead + b - 1) % 7 + 2}; grid-row:${lane + 2}; --k:${spanColour(ev)}"
         data-action="open-event" data-id="${ev.id}" title="${escapeAttr(label)}"><span>${escapeHtml(label)}</span></button>`);
     }
     weeks.push(`<div class="calp-week" style="--lanes:${lanes}; grid-template-rows:var(--num-h)${lanes ? ` repeat(${lanes}, var(--lane-h))` : ''} 1fr">
@@ -6362,7 +6364,7 @@ function renderCalendarPage(){
       <div class="calp-dow">${DOW.map((d, i) => `<span${i===0||i===6 ? ' class="is-weekend"' : ''}>${d}</span>`).join('')}</div>
       <div class="calp-weeks">${weeks.join('')}</div>
     </div>
-    <p class="calp-legend"><span><i class="is-bday"></i>${en ? 'Birthday' : 'วันเกิด'}</span><span><i class="is-period"></i>${en ? 'Open all day, every day (pre-orders, voting)' : 'แถบยาว = ช่วงที่ซื้อหรือโหวตได้ตลอด 24 ชั่วโมง'}</span><span>${en ? 'Tap a day for everything on it' : 'แตะวันที่เพื่อดูทุกอย่างในวันนั้น'}</span></p>
+    <p class="calp-legend"><span><i class="is-bday"></i>${en ? 'Birthday' : 'วันเกิด'}</span>${spans.map(ev => `<span><i class="is-period" style="background:${spanColour(ev)}"></i>${escapeHtml(spanLabel(ev))}</span>`).join('')}<span>${en ? 'Tap a day for everything on it' : 'แตะวันที่เพื่อดูทุกอย่างในวันนั้น'}</span></p>
     <h3 class="section-label">${en ? 'This month' : 'ในเดือนนี้'}</h3>
     ${agenda.length ? `<div class="calp-agenda">${agenda.join('')}</div>` : `<p class="muted-note">${en ? 'Nothing this month.' : 'ไม่มีงานในเดือนนี้'}</p>`}
   </section>`;
