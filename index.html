@@ -4482,7 +4482,7 @@ let state = {
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
-  lang:'th',
+  lang:'mix',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, langMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
@@ -5428,40 +5428,107 @@ function isEN(){ return state.lang === 'en'; }
    those three kinds of words. */
 function isMix(){ return state.lang === 'mix'; }
 const LANGS = [
+  { id:'mix', label:'EN/TH', name:'ชื่ออังกฤษ · เนื้อหาไทย (ค่าเริ่มต้น)' },
   { id:'th',  label:'TH',    name:'ภาษาไทย' },
-  { id:'mix', label:'EN/TH', name:'ชื่ออังกฤษ · เนื้อหาไทย' },
   { id:'en',  label:'EN',    name:'English' },
 ];
-/* Songs stored in Thai only, with the name streaming uses. Filled in by hand
-   as the names are confirmed; anything missing stays in Thai. */
-const SONG_EN = {};
+/* Song names as the official YouTube MV titles them: the language the video
+   leads with first, the other after it in brackets. Taken from the videos'
+   own titles on 19 Sep 2026, a dozen tidied by hand. A song with no video
+   falls back to its stored name, romaji first. */
+const SONG_MIX = {
+  "Oogoe Diamond (ก็ชอบให้รู้ว่าชอบ)": "Oogoe Diamond (ก็ชอบ ให้รู้ว่าชอบ)",
+  "365-Nichi no Kamihikouki – 365 วันกับเครื่องบินกระดาษ": "365-Nichi no Kamihikouki (365 วันกับเครื่องบินกระดาษ)",
+  "Koisuru Fortune Cookie – คุกกี้เสี่ยงทาย": "Koisuru Fortune Cookie (คุกกี้เสี่ยงทาย)",
+  "Shonichi – วันแรก": "Shonichi (วันแรก)",
+  "Tsugi no Season – ฤดูใหม่": "Tsugi no Season (ฤดูใหม่)",
+  "Kimi no Koto ga Suki Dakara – ก็เพราะว่าชอบเธอ": "Kimi no Koto ga Suki Dakara (ก็เพราะว่าชอบเธอ)",
+  "Let U Go (Ost. Where We Belong ที่ตรงนั้น มีฉันหรือเปล่า)": "LET U GO",
+  "77 no Suteki na Machi e – 77 ดินแดนแสนวิเศษ": "77 no Suteki na Machi e (77 ดินแดนแสนวิเศษ)",
+  "It's Life (Ost. BNK48: One Take) (ไทป์ A)": "IT'S LIFE (ไทป์ A)",
+  "It's Me (Ost. BNK48: One Take) (ไทป์ A)": "It's me (ไทป์ A)",
+  "สายซับ (Ost. ONE YEAR 365 วัน บ้านฉัน บ้านเธอ) (ไทป์ B)": "สายซับ (ไทป์ B)",
+  "มปร. (Ost. ONE YEAR 365 วัน บ้านฉัน บ้านเธอ) (ไทป์ B)": "มปร. (ไทป์ B)",
+  "โดดดิด่ง (Ost.ไทบ้าน x BNK48 จากใจผู้สาวคนนี้)": "โดดดิด่ง",
+  "จากใจผู้สาวคนนี้ (Ost.ไทบ้าน x BNK48 จากใจผู้สาวคนนี้)": "จากใจผู้สาวคนนี้",
+  "Hashire! Penguin – วิ่งไปสิ...เพนกวิน": "Hashire! Penguin (วิ่งไปสิ...เพนกวิน)",
+  "Wink wa Sankai": "Wink wa 3 Kai (วิ้งค์ 3 ครั้ง)",
+  "Sukida Sukida Sukida – ชอบเธอนะ": "Sukida Sukida Sukida (ชอบเธอนะ)",
+  "Only Today – Band Version (Type A)": "Only today (Band ver.) (Type A)",
+  "Only Today – Acapella Version (Type B)": "Only today (Acapella Version) (Type B)",
+  "ซาโยนาระครอวล์": "Sayonara Crawl (ซาโยนาระครอวล์)",
+  "ทุ่งแสงดาว": "Hoshizora wo Kimi ni (ทุ่งแสงดาว)",
+  "บีลีฟเวอส์": "Believers (บีลีฟเวอส์)",
+  "เมกนอยซ์": "Make noise (เมกนอยซ์)",
+  "Kinou Yori Motto Suki – ชอบเธอมากกว่าเมื่อวาน": "Kinou Yori Motto Suki (ชอบเธอมากกว่าเมื่อวาน)",
+  "อีวาเกะเมย์บี": "Iiwake Maybe (อีวาเกะเมย์บี)",
+  "Kibouteki Refrain – แค่นี้ก็พอใจแล้ว": "Kibouteki Refrain (แค่นี้ก็พอใจแล้ว)",
+  "ให้ฉันได้รู้": "Kiss Me! (ให้ฉันได้รู้)",
+  "กรีนแฟลช": "Green Flash (กรีนแฟลช)",
+  "ทวินเทล สุดยอดเลย!": "Saikyou Twintail (ทวินเทล สุดยอดเลย!)",
+  "Chouhatsu no Aozora – คำท้าทายที่ปลายฟ้า": "Chouhatsu no Aozora (คำท้าทายที่ปลายฟ้า)",
+  "กำไลข้อเท้าแห่งความทรงจำ": "11-Gatsu no Anklet (กำไลข้อเท้าแห่งความทรงจำ)",
+  "Masaka no Confession – คำสารภาพที่ไม่คาดฝัน": "Masaka no Confession (คำสารภาพที่ไม่คาดฝัน)",
+  "สุดยอดไปเลย": "Saikou ka yo (สุดยอดไปเลย)",
+  "Doushitemo Kimi ga Suki da – จะยังไงก็รักเธอ": "Doushitemo Kimi ga Suki da (จะยังไงก็รักเธอ)",
+  "เชียงใหม่ 106": "Chiang Mai 106 (เชียงใหม่ 106)",
+  "วาเลนไทน์โชคดี": "Onegai Valentine (วาเลนไทน์โชคดี)",
+  "เมลอนจูซ": "Melon Juice (เมลอนจูซ)",
+  "เส้นทางของผู้ใหญ่": "Otona e no Michi (เส้นทางของผู้ใหญ่)",
+  "เพื่อใครสักคน": "Dareka no Tame ni (เพื่อใครสักคน)",
+  "Chain of love": "Chain Of Love",
+  "บ้านแห่งหัวใจ": "บ้านแห่งหัวใจ (Anata ga Ite Kureta Kara)",
+  "MAESHIKA MUKANEE – สุดเส้นทาง": "MAESHIKA MUKANEE (สุดเส้นทาง)",
+  "รถไฟสายรุ้ง": "Niji no Ressha (รถไฟสายรุ้ง)",
+  "เพื่อน": "Tomodachi (เพื่อน)",
+  "เธอก็คือฉัน": "Kimi wa Boku da (เธอก็คือฉัน)",
+  "Sansei Kawaii! – เธออะ Kawaii!": "Sansei Kawaii! (เธออะ Kawaii!)",
+  "ซิ่งให้สุด... หยุดที่เธอ": "Hotei Sokudo to Yuuetsukan (ซิ่งให้สุด...หยุดที่เธอ)",
+  "Yume wa Nigenai – จะไม่หนีจากความฝัน": "Yume wa Nigenai (จะไม่หนีจากความฝัน)",
+  "LOVE TRIP": "Love Trip",
+  "หมุนไปนะตามโชคชะตา": "Chance no Junban (หมุนไปนะตามโชคชะตา)",
+  "Sakura, Minna de Tabeta – ซากุระแห่งความทรงจำ": "Sakura, Minna de Tabeta (ซากุระแห่งความทรงจำ)",
+  "Totsuzen Do Love Me! – โทษทีนะ…รักกันได้ไหม?": "Totsuzen Do Love Me! (โทษทีนะ...รักกันได้ไหม?)",
+  "ปริศนาห้องหัวใจ": "Heart no Dasshutsu Game (ปริศนาห้องหัวใจ)",
+  "ฝนราคะ": "Zankoku na Ame (ฝนราคะ)",
+  "Dai (Daai) Mai": "ได้(ด้าย)ไหม",
+  "Hetaretachi yo – สิ้นสุดทางแพ้": "Hetaretachi yo (สิ้นสุดทางแพ้)",
+  "Koi Tsunjatta": "Koi Tsunjatta – Let me know!",
+  "Kibou Ressha – รถไฟแห่งความหวัง": "Kibou Ressha (รถไฟแห่งความหวัง)",
+  "หัวเราะเซ่ (Warota People)": "Warota People (หัวเราะเซ่)",
+  "#SukiNanda": "#Sukinanda",
+  "Eien Pressure – ผูกพันนิรันดร์": "Eien Pressure (ผูกพันนิรันดร์)",
+  "Lip Gloss ที่คิดถึง": "Hisashiburi no Lip Gloss (Lip Gloss ที่คิดถึง)",
+  "Hokori no Oka – เนินเขาแห่งความฝัน": "Hokori no Oka (เนินเขาแห่งความฝัน)"
+  };
+
 const TH_RE = /[฀-๿]/, LATIN_RE = /[A-Za-z]/;
 function mixTitle(t){
-  if(!t || !TH_RE.test(t)) return t;
-  if(SONG_EN[t]) return `${SONG_EN[t]} (${t})`;
+  if(!t) return t;
+  if(SONG_MIX[t]) return SONG_MIX[t];
+  if(!TH_RE.test(t)) return t;
+  if(SONG_MIX[t]) return SONG_MIX[t];
   // "Romaji – Thai" becomes "Romaji (Thai)"
   const dash = t.match(/^(.*?[A-Za-z].*?)\s+[–-]\s+(.+)$/);
   if(dash && !TH_RE.test(dash[1]) && TH_RE.test(dash[2])) return `${dash[1]} (${dash[2]})`;
   return t;
-}
-function mixVenue(v){
-  if(!v || !TH_RE.test(v)) return v;
-  return v.replace(/ลานกิจกรรม/g, 'Event Space').replace(/ชั้น\s*([A-Za-z0-9]+)/g, 'Floor $1')
-    .replace(/ห้าง/g, '').replace(/\s{2,}/g, ' ').trim();
 }
 let MIX = null, MIX_SUBS = null;
 function buildMix(){
   MIX = {}; const subs = new Map();
   (state.members || []).forEach(m => { if(m.nameTh && m.name) MIX[m.nameTh] = m.name;
     if(m.realNameTh && m.realName) MIX[m.realNameTh] = m.realName; });
+  MIX['เซ็นเตอร์'] = 'Center'; MIX['· เซ็นเตอร์'] = '· Center';
   TEAMS.forEach(t => { if(t.nameEn) MIX[t.name] = t.nameEn; });
   const works = [...ALL_WORKS(), ...SEED_SPECIALS];
+  // a release named after its title song takes that song's name
   works.forEach(w => {
-    if(TH_RE.test(w.title) && w.alt && !TH_RE.test(w.alt)){ SONG_EN[w.title] = SONG_EN[w.title] || w.alt; }
+    const first = ((SEED_SENBATSU[w.id] || [])[0] || {}).track;
+    let x = mixTitle(w.title);
+    if(x === w.title && first){ const f = mixTitle(first); if(f !== first && f.includes(w.title)) x = f.replace(/\s*\((?:Type|ไทป์)\s*\w\)$/, ''); }
+    if(x !== w.title){ MIX[w.title] = x; if(w.title.length >= 6) subs.set(w.title, x); }
   });
-  works.forEach(w => { const x = mixTitle(w.title); if(x !== w.title){ MIX[w.title] = x; if(w.title.length >= 6) subs.set(w.title, x); } });
   Object.values(SEED_SENBATSU).flat().forEach(t => { const x = mixTitle(t.track); if(x !== t.track){ MIX[t.track] = x; if(t.track.length >= 6) subs.set(t.track, x); } });
-  SEED_SCHEDULE.forEach(e => [e.venue].filter(Boolean).forEach(v => { const x = mixVenue(v); if(x !== v) subs.set(v, x); }));
   // longest first, so a title is not half-replaced by a shorter one inside it
   MIX_SUBS = [...subs.entries()].sort((a, b) => b[0].length - a[0].length);
 }
@@ -8963,7 +9030,7 @@ function linkTeam(t, text){
 }
 function linkMember(m, text){
   if(!m) return escapeHtml(text || '');
-  return `<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(text ?? (m.nameTh || m.name))}</button>`;
+  return `<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(text ?? nickName(m))}</button>`;
 }
 function linkWork(w, text){
   if(!w) return escapeHtml(text || '');
@@ -9446,7 +9513,7 @@ function renderSingleDetail(){
         ${renderYouTube(s.id, i, t.track)}
       </div>
       <div class="track-sub">${t.members.length} คน${t.centers.length
-        ? ' · เซ็นเตอร์ ' + t.centers.map(id=>linkMember(getMember(id))).join(', ')
+        ? ` · ${isMix() ? 'Center' : 'เซ็นเตอร์'} ` + t.centers.map(id=>linkMember(getMember(id))).join(', ')
         : ''}</div>
       <div class="grid-mini">
         ${t.centers.map(id=>card(id, true)).join('')}
@@ -9501,10 +9568,10 @@ function renderWorkRow(w, kind){
   const who = kind==='album' ? 'เพลงประจำอัลบั้ม ' : kind==='digital' ? '' : 'เซ็มบัตสึ ';
   return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${w.id}">
     <div class="timeline-year">${w.year} · ${workGroupNames(w)} · ${workLabel(w)}</div>
-    <div class="timeline-title">${escapeHtml(w.title)}${w.alt?` <span class="title-alt">${escapeHtml(w.alt)}</span>`:''}</div>
+    <div class="timeline-title">${escapeHtml(w.title)}${w.alt && !(isMix() && mixTitle(w.title) !== w.title) ?` <span class="title-alt">${escapeHtml(w.alt)}</span>`:''}</div>
     <div class="single-meta">${lead
       ? `${who}${lead.members.length} คน`
-        + (lead.centers.length?' · เซ็นเตอร์ '+lead.centers.map(nick).join(', '):'')
+        + (lead.centers.length?` · ${isMix() ? 'Center' : 'เซ็นเตอร์'} `+lead.centers.map(id => { const m = getMember(id); return m ? escapeHtml(nickName(m)) : nick(id); }).join(', '):'')
         + (tracks.length>1 ? ` · อีก ${tracks.length-1} เพลง` : '')
       : isSpecialWork(w) ? 'ยังไม่ทราบรายชื่อผู้ร้อง' : 'ยังไม่มีข้อมูลเซ็มบัตสึ'}</div>
   </button>`;
@@ -11455,7 +11522,7 @@ function bindDelegatedEvents(){
       state.langMenuOpen = false;
       state.lang = action === 'set-lang' ? id : (isEN() ? 'th' : 'en');
       MIX = null;
-      try{ localStorage.setItem('48thdb-lang', state.lang); }catch(e){}
+      try{ localStorage.setItem('48thdb-lang2', state.lang); }catch(e){}
       applyDocumentLanguage();
       render();
     }
@@ -11830,7 +11897,12 @@ function registerServiceWorker(){
 
 // ============================= INIT =============================
 async function init(){
-  try{ const l = localStorage.getItem('48thdb-lang'); if(l) state.lang = l; }catch(e){}
+  // EN/TH became the default on 19 Sep 2026. A saved Thai was the old default
+  // rather than a choice, so it moves over once; a saved English stays.
+  try{
+    const l = localStorage.getItem('48thdb-lang2') || (localStorage.getItem('48thdb-lang') === 'en' ? 'en' : null);
+    if(l && LANGS.some(x => x.id === l)) state.lang = l;
+  }catch(e){}
   applyDocumentLanguage();
   registerServiceWorker();
   watchForUpdates();
