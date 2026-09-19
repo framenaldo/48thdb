@@ -5622,7 +5622,7 @@ function filterAndSort(){
     );
   }
   const cmp = {
-    name: (a,b)=>a.name.localeCompare(b.name),
+    name: (a,b)=>nickName(a).localeCompare(nickName(b), isEN() ? 'en' : 'th'),
     group: (a,b)=>getGroup(a.groupId).name.localeCompare(getGroup(b.groupId).name),
     team: (a,b)=>shortTeamLabel(getTeam(a.teamId)).localeCompare(shortTeamLabel(getTeam(b.teamId))),
     gen: (a,b)=>(a.gen||99)-(b.gen||99),
@@ -5642,6 +5642,11 @@ function filterAndSort(){
 
 /** The quieter line under a member's name: their real name, in the language
     being read. Falls back to the other language, then to nothing at all. */
+/* The nickname in the language the site is set to. */
+function nickName(m){
+  return (isEN() ? (m.name || m.nameTh) : (m.nameTh || m.name)) || '';
+}
+
 function secondName(m){
   return (isEN() ? (m.realName || m.realNameTh) : (m.realNameTh || m.realName)) || '';
 }
@@ -6509,7 +6514,7 @@ function renderRow(m){
     <div class="cell sticky-name">
       ${renderAvatar(m, 'avatar-sm', g.color)}
       <div class="name-block">
-        <div class="name-en">${m.name}${m.transfer?`<span class="grad-tag transfer-tag" title="ย้ายจาก ${getGroup(m.transfer.fromGroupId).name} เมื่อ ${formatDateShort(m.transfer.date)}">${ICONS.transfer}</span>`:''}${m.graduated?`<span class="grad-tag" title="จบการศึกษา ${formatDateShort(m.graduated)}">${ICONS.cap}</span>`:''}</div>
+        <div class="name-en">${escapeHtml(nickName(m))}${m.transfer?`<span class="grad-tag transfer-tag" title="ย้ายจาก ${getGroup(m.transfer.fromGroupId).name} เมื่อ ${formatDateShort(m.transfer.date)}">${ICONS.transfer}</span>`:''}${m.graduated?`<span class="grad-tag" title="จบการศึกษา ${formatDateShort(m.graduated)}">${ICONS.cap}</span>`:''}</div>
         <div class="name-th">${escapeHtml(secondName(m))}</div>
       </div>
     </div>
@@ -7692,7 +7697,7 @@ function renderDetailModal(){
 function renderMembersTabs(){
   const tab = (view, label) =>
     `<button class="sub-tab${state.view===view?' active':''}" data-action="sub-tab" data-view="${view}">${label}</button>`;
-  return `<div class="sub-tabs">${tab('groups','ประวัติวง')}${tab('org','ตำแหน่ง')}${tab('browse','สมาชิกทั้งหมด')}</div>`;
+  return `<div class="sub-tabs">${tab('browse','สมาชิกทั้งหมด')}${tab('org','ตำแหน่ง')}${tab('groups','ประวัติวง')}</div>`;
 }
 
 function renderGroups(){
