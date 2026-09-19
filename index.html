@@ -1803,10 +1803,24 @@
   }
   .shop-open{ pointer-events:none; }
   .shop-actions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  /* the buy button is the loudest thing on the card */
   .shop-buy{
-    background:var(--c); color:#fff; border-color:transparent; font-weight:800; text-decoration:none;
+    --bc:var(--c, var(--pink));
+    display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    min-height:46px; padding:0 22px; border-radius:999px; border:0;
+    background:var(--bc); color:#fff; text-decoration:none;
+    font-size:15.5px; font-weight:800; letter-spacing:.01em; white-space:nowrap;
+    box-shadow:0 6px 16px color-mix(in srgb, var(--bc) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.25);
+    transition:transform .15s var(--ease-out), box-shadow .15s ease, filter .15s ease;
   }
-  .shop-buy:hover{ filter:brightness(1.08); }
+  .shop-buy svg{ width:20px; height:20px; flex-shrink:0; }
+  .shop-buy-arrow{ font-size:14px; opacity:.85; }
+  .shop-buy:hover{ filter:brightness(1.08); transform:translateY(-1px);
+    box-shadow:0 9px 22px color-mix(in srgb, var(--bc) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.25); }
+  .shop-buy:active{ transform:translateY(1px) scale(.98); box-shadow:0 2px 6px color-mix(in srgb, var(--bc) 35%, transparent); }
+  .shop-actions .shop-buy{ flex:1 1 220px; max-width:320px; }
+  .shop-actions .shop-open{ background:none; border:0; box-shadow:none; padding:0 4px; }
+  .evm-related .shop-buy{ width:100%; max-width:360px; line-height:1; }
   .shop-thumb img{ display:block; width:100%; height:auto; }
   .shop-body{ min-width:0; }
   .shop-meta{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0; }
@@ -4629,6 +4643,7 @@ const EN = {
   'เปิดพรุ่งนี้': 'Opens tomorrow',
   'ทาง iAM Shop': 'From the iAM Shop',
   'ซื้อที่ iAM Shop ↗': 'Buy at the iAM Shop ↗',
+  'ซื้อที่ iAM Shop': 'Buy at the iAM Shop',
   '272 – 420 บาท': '272 – 420 THB',
   '270 บาท': '270 THB',
   'การโหวต': 'Voting',
@@ -6898,8 +6913,8 @@ function renderShopPage(){
           ${s.shopName ? `<li>ทาง ${escapeHtml(s.shopName)}</li>` : ''}
         </ul>
         <div class="shop-actions">
-          ${shopUrl(s) && state !== 'over' ? `<a class="chip shop-buy" href="${escapeAttr(shopUrl(s))}" target="_blank" rel="noopener noreferrer"
-            data-action="external">ซื้อที่ ${escapeHtml(s.shopName)} ↗</a>` : ''}
+          ${shopUrl(s) && state !== 'over' ? `<a class="shop-buy" href="${escapeAttr(shopUrl(s))}" target="_blank" rel="noopener noreferrer"
+            data-action="external"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>ซื้อที่ ${escapeHtml(s.shopName)} <span class="shop-buy-arrow">↗</span></a>` : ''}
           <span class="chip chip-link shop-open">ดูรายละเอียด →</span>
         </div>
       </div>
@@ -7204,7 +7219,7 @@ function renderEventModal(){
         ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
 
         ${ev.shop && shopUrl(ev.shop) && shopStatus(ev, Date.now()).state !== 'over' ? `<div class="evm-related">
-          <a class="chip shop-buy" href="${escapeAttr(shopUrl(ev.shop))}" target="_blank" rel="noopener noreferrer">ซื้อที่ ${escapeHtml(ev.shop.shopName)} ↗</a></div>` : ''}
+          <a class="shop-buy" style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}" href="${escapeAttr(shopUrl(ev.shop))}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>ซื้อที่ ${escapeHtml(ev.shop.shopName)} <span class="shop-buy-arrow">↗</span></a></div>` : ''}
         ${(ev.links || []).length ? `<div class="evm-related">${ev.links.map(l =>
           `<a class="chip chip-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)} ↗</a>`).join('')}</div>` : ''}
 
