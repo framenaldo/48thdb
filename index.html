@@ -823,13 +823,19 @@
   @media (min-width:700px){ .share-sheet{ align-items:center; } .share-panel{ border-radius:26px; } }
   .share-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; font-size:17px; }
   .share-x{ width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; font-size:15px; }
+  .group-head{ position:relative; }
+  .box-share-btn{ margin-left:auto; flex:none; width:32px; height:32px; border-radius:50%; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; padding:0;
+    border:1px solid var(--line); background:var(--card); color:var(--ink-soft); }
+  .box-share-btn svg{ width:15px; height:15px; }
+  @media (hover:hover){ .box-share-btn:hover{ color:var(--ink); } }
   .share-cats{ display:flex; gap:6px; overflow-x:auto; margin:0 0 10px; padding-bottom:2px; scrollbar-width:none; }
   .share-cat{ flex:none; padding:6px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--ink);
     font:inherit; font-size:13px; font-weight:800; cursor:pointer; }
   .share-cat.is-on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
   .share-preview{ aspect-ratio:4/5; width:min(100%, 52vh * .8); margin:0 auto; border-radius:18px; overflow:hidden;
     background:var(--card); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
-  .share-preview img{ width:100%; height:100%; display:block; }
+  .share-preview img{ width:100%; height:100%; display:block; object-fit:contain; }
   .share-preview span{ font-size:13px; color:var(--ink-soft); padding:20px; text-align:center; }
   .share-preview.is-loading{ animation:sharePulse 1.2s ease-in-out infinite; }
   @keyframes sharePulse{ 50%{ opacity:.55; } }
@@ -9733,6 +9739,7 @@ function renderMain(){
   syncTicker();
   localize(document.getElementById('app'));
   syncBodyScrollLock();
+  if(state.view === 'stats') addBoxShareButtons(main);
   attachMainEvents();
   startBirthdayFireworks();
   bindEdgeFades();
@@ -10730,6 +10737,54 @@ async function drawTodayCard(g, url){
   await shareFooter(g, true, url);
 }
 
+/* Any box on the stats page can be shared on its own: the box is photographed
+   as it looks on screen and set in the site's frame. */
+function addBoxShareButtons(root){
+  root.querySelectorAll('.group-card').forEach((card, i) => {
+    const head = card.querySelector('.group-head');
+    if(!head || head.querySelector('.box-share-btn')) return;
+    card.dataset.box = i;
+    const b = document.createElement('button');
+    b.className = 'box-share-btn'; b.dataset.action = 'share-box'; b.dataset.id = i;
+    b.title = isEN() ? 'Share this' : 'แชร์กล่องนี้'; b.setAttribute('aria-label', b.title);
+    b.innerHTML = ICONS.share;
+    head.appendChild(b);
+  });
+}
+let _shotLib = null;
+const shotLib = () => _shotLib || (_shotLib = import('https://cdn.jsdelivr.net/npm/modern-screenshot@4.7.0/+esm'));
+
+async function drawBoxCard(g, sub){
+  const en = isEN();
+  const node = sub.node;
+  const { domToCanvas } = await shotLib();
+  const dark = document.documentElement.dataset.theme === 'dark';
+  const shot = await domToCanvas(node, {
+    scale: 2,
+    backgroundColor: getComputedStyle(document.body).backgroundColor || (dark ? '#150E22' : '#ffffff'),
+    filter: el => !(el.matches && (el.matches('.box-share-btn') || el.matches('.group-head > .link-inline'))),
+  });
+  // frame: the shot at 960 wide, as tall as it needs (within reason)
+  const inner = SHARE_W - 120, s = Math.min(inner / shot.width, 1500 / shot.height);
+  const sw = shot.width * s, sh = shot.height * s;
+  const H = Math.max(SHARE_H, Math.round(sh + 230 + 170));
+  g.canvas.height = H;
+  g.fillStyle = '#150E22'; g.fillRect(0, 0, SHARE_W, H);
+  shareGlow(g, 120, 140, 520, '#FF6FA5', .45);
+  shareGlow(g, 980, H * .45, 560, '#3CC4A5', .30);
+  shareGlow(g, 300, H - 100, 520, '#7A5CFF', .25);
+  shareText(g, `48thDB · ${en ? 'STATS' : 'สถิติ'}`, 60, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
+  shareText(g, (en ? 'As of ' : 'ข้อมูล ณ ') + shareThaiDate(new Date()), 60, 140, '600 28px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.65)');
+  const top = 190 + Math.max(0, (H - 170 - 190 - sh) / 2);
+  g.save(); g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 40; g.fillStyle = '#fff';
+  shareRound(g, (SHARE_W - sw) / 2, top, sw, sh, 30); g.fill(); g.restore();
+  g.save(); shareRound(g, (SHARE_W - sw) / 2, top, sw, sh, 30); g.clip();
+  g.drawImage(shot, (SHARE_W - sw) / 2, top, sw, sh); g.restore();
+  const keep = SHARE_H;
+  // the footer sits at the bottom of this taller frame
+  g.save(); g.translate(0, H - keep); await shareFooter(g, true, sub.url); g.restore();
+}
+
 function shareSubject(){
   const url = location.origin + urlForSnapshot(navSnapshot());
   const m = state.selectedId ? getMember(state.selectedId) : null;
@@ -10749,7 +10804,8 @@ async function buildShareCard(sub){
   try{ await Promise.all(['500', '600', '700', '800'].map(w => document.fonts.load(`${w} 40px "Noto Sans Thai"`, 'กขABC'))); }catch(e){}
   const c = document.createElement('canvas'); c.width = SHARE_W; c.height = SHARE_H;
   const g = c.getContext('2d');
-  if(sub.kind === 'member') await drawMemberCard(g, sub.m, sub.url);
+  if(sub.kind === 'box') await drawBoxCard(g, sub);
+  else if(sub.kind === 'member') await drawMemberCard(g, sub.m, sub.url);
   else if(sub.kind === 'event') await drawEventCard(g, sub.ev, sub.url);
   else if(sub.kind === 'single') await drawSingleCard(g, sub.s, sub.url);
   else if(sub.kind === 'ge') await drawGECard(g, sub.url);
@@ -10761,9 +10817,9 @@ async function buildShareCard(sub){
 }
 
 let _shareUrl = null;
-async function openShareSheet(){
+async function openShareSheet(given){
   const en = isEN();
-  const sub = shareSubject();
+  const sub = given || shareSubject();
   closeShareSheet();
   const el = document.createElement('div');
   el.className = 'share-sheet';
@@ -11136,6 +11192,14 @@ function bindDelegatedEvents(){
     else if(action==='import-oshi'){ importOshi(); }
     else if(action==='share'){
       openShareSheet();
+    }
+    else if(action==='share-box'){
+      const node = document.querySelector(`.group-card[data-box="${id}"]`);
+      if(node){
+        const t = (node.querySelector('.group-head h2, .group-head .link-h2') || {}).textContent || '48thDB';
+        openShareSheet({ kind:'box', node, url: location.origin + urlForSnapshot(navSnapshot()),
+          title:`${t.trim()} — 48thDB`, file:`48thdb-${(state.statsTab || 'stats')}-${id}` });
+      }
     }
     else if(action==='close-modal'){
       const insideCard = e.target.closest('.modal-glass-card');
