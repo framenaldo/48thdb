@@ -618,7 +618,22 @@
   .calp-month{ margin:0; font-size:22px; font-weight:800; min-width:170px; text-align:center; }
   .calp-today{ margin-left:auto; }
   .calp-board{ background:var(--glass-card); border:1px solid var(--glass-edge); border-radius:20px; padding:10px; }
-  .calp-dow, .calp-grid{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:4px; }
+  .calp-dow{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:4px; }
+  .calp-weeks{ display:flex; flex-direction:column; gap:4px; --num-h:32px; --lane-h:22px; }
+  .calp-week{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); column-gap:4px; }
+  .calp-week > .calp-cell{ grid-row:1 / -1; }
+  .calp-week .calp-items{ margin-top:calc(var(--lanes) * var(--lane-h)); }
+  .calp-span{
+    position:relative; z-index:1; min-width:0; height:calc(var(--lane-h) - 4px); align-self:center;
+    margin:0 -2px; padding:0 8px; border:0; border-radius:0; cursor:pointer; text-align:left;
+    background:var(--k); color:#fff; font:inherit; font-size:11px; font-weight:800; line-height:1;
+    display:flex; align-items:center; overflow:hidden;
+  }
+  .calp-span span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .calp-span.is-start{ margin-left:6px; border-top-left-radius:999px; border-bottom-left-radius:999px; }
+  .calp-span.is-end{ margin-right:6px; border-top-right-radius:999px; border-bottom-right-radius:999px; }
+  .calp-span.is-gone{ opacity:.55; }
+  @media (hover:hover){ .calp-span:hover{ filter:brightness(1.1); } }
   .calp-dow span{ text-align:center; font-size:12px; font-weight:800; color:var(--ink-soft); padding:2px 0 6px; }
   .calp-dow span.is-weekend{ color:var(--bnk); }
   .calp-cell{
@@ -651,7 +666,7 @@
   .calp-legend span{ display:inline-flex; align-items:center; gap:6px; }
   .calp-legend i{ width:14px; height:10px; border-radius:3px; display:inline-block; }
   .calp-legend i.is-bday{ background:color-mix(in srgb, var(--gold) 45%, transparent); }
-  .calp-legend i.is-period{ border:1px dashed var(--ink-soft); }
+  .calp-legend i.is-period{ width:26px; height:8px; border-radius:999px; background:var(--gold); }
   .calp-agenda{ display:flex; flex-direction:column; gap:8px; }
   .calp-ag-row{
     display:flex; gap:12px; align-items:flex-start; width:100%; padding:10px 12px; text-align:left;
@@ -668,7 +683,11 @@
   .calp-ag-item .ev-icon{ vertical-align:-4px; margin-right:4px; }
   @media (max-width:700px){
     .calp-board{ padding:6px; border-radius:16px; }
-    .calp-dow, .calp-grid{ gap:3px; }
+    .calp-dow{ gap:3px; }
+    .calp-weeks{ gap:3px; --num-h:27px; --lane-h:17px; }
+    .calp-week{ column-gap:3px; }
+    .calp-span{ font-size:9.5px; padding:0 5px; }
+    .calp-span.is-start{ margin-left:3px; } .calp-span.is-end{ margin-right:3px; }
     .calp-cell{ min-height:74px; padding:4px 3px; border-radius:9px; }
     .calp-num{ width:21px; height:21px; font-size:12px; margin:0 auto; }
     .calp-item{ font-size:9.5px; padding:1px 3px; border-radius:4px; border-left-width:2px; }
@@ -678,6 +697,10 @@
   @media (max-width:420px){
     .calp-cell{ min-height:62px; }
     .calp-items{ display:none; }
+    .calp-weeks{ --lane-h:9px; }
+    .calp-span{ padding:0; }
+    .calp-span span{ display:none; }
+    .calp-week .calp-dots{ margin-top:calc(var(--lanes) * var(--lane-h) + 2px); }
     .calp-dots{ display:flex; justify-content:center; gap:3px; margin-top:auto; padding-bottom:3px; }
     .calp-dots i{ width:6px; height:6px; border-radius:50%; display:block; }
   }
@@ -6239,10 +6262,11 @@ function renderCalendarPage(){
   const mark = (ev, iso) => ev.period ? (iso === ev.start ? (en ? 'opens · ' : 'เปิด · ') : (en ? 'closes · ' : 'ปิด · ')) : '';
 
   const cells = [];
-  for(let i=0; i<lead; i++) cells.push('<div class="calp-cell is-empty"></div>');
+  for(let i=0; i<lead; i++) cells.push(`<div class="calp-cell is-empty" style="grid-column:${i + 1}"></div>`);
   for(let day=1; day<=daysInMonth; day++){
     const iso = `${key}-${String(day).padStart(2,'0')}`;
-    const evs = (events[iso] || []).slice().sort((a,b) => (a.period?1:0)-(b.period?1:0) || (a.time||'99').localeCompare(b.time||'99'));
+    // stretches you can buy or vote in all day long are drawn as bars instead
+    const evs = (events[iso] || []).filter(ev => !ev.period).sort((a,b) => (a.time||'99').localeCompare(b.time||'99'));
     const bds = births[iso.slice(5)] || [];
     const items = [
       ...bds.map(m => `<span class="calp-item is-bday" style="--k:${getGroup(m.groupId).color}">🎂 ${escapeHtml(nickName(m))}</span>`),
@@ -6255,14 +6279,51 @@ function renderCalendarPage(){
     if(iso < today) cls.push('is-gone');
     if(items.length) cls.push('has-any');
     const dow = (lead + day - 1) % 7;
-    cells.push(`<button class="${cls.join(' ')}" data-action="open-day" data-id="${iso}"${dow===0||dow===6 ? ' data-weekend="1"' : ''}>
+    cells.push(`<button class="${cls.join(' ')}" style="grid-column:${dow + 1}" data-action="open-day" data-id="${iso}"${dow===0||dow===6 ? ' data-weekend="1"' : ''}>
       <span class="calp-num">${day}</span>
       <span class="calp-items">${items.slice(0, MAX).join('')}${items.length > MAX ? `<span class="calp-more">+${items.length - MAX}</span>` : ''}</span>
       <span class="calp-dots">${dotColours.map(c => `<i style="background:${c}"></i>`).join('')}</span>
     </button>`);
   }
   const tail = (7 - (lead + daysInMonth) % 7) % 7;
-  for(let i=0; i<tail; i++) cells.push('<div class="calp-cell is-empty"></div>');
+  for(let i=0; i<tail; i++) cells.push(`<div class="calp-cell is-empty" style="grid-column:${7 - tail + i + 1}"></div>`);
+
+  // Bars for the stretches, the way a phone calendar draws a trip: one lane
+  // each, kept for the whole month, cut into a piece per week.
+  const mine = filteringByOshi();
+  const monthFirst = `${key}-01`, monthLast = `${key}-${String(daysInMonth).padStart(2,'0')}`;
+  const spans = SEED_SCHEDULE.filter(ev => ev.period && ev.start <= monthLast && eventLastDay(ev) >= monthFirst)
+    .filter(ev => !mine || hasMyOshi(ev))
+    .sort((a, b) => a.start.localeCompare(b.start) || eventLastDay(b).localeCompare(eventLastDay(a)));
+  const laneEnds = [];
+  const laneOf = new Map();
+  for(const ev of spans){
+    let lane = laneEnds.findIndex(end => end < ev.start);
+    if(lane < 0) lane = laneEnds.length;
+    laneEnds[lane] = eventLastDay(ev);
+    laneOf.set(ev.id, lane);
+  }
+  const dayNum = iso => iso < monthFirst ? 1 : iso > monthLast ? daysInMonth : +iso.slice(8);
+  const weeks = [];
+  for(let w = 0; w * 7 < cells.length; w++){
+    const firstDay = w * 7 - lead + 1, lastDay = firstDay + 6;       // may run outside the month
+    const bars = [];
+    let lanes = 0;
+    for(const ev of spans){
+      const a = Math.max(dayNum(ev.start), firstDay, 1), b = Math.min(dayNum(eventLastDay(ev)), lastDay, daysInMonth);
+      if(a > b) continue;
+      const lane = laneOf.get(ev.id);
+      lanes = Math.max(lanes, lane + 1);
+      const starts = ev.start >= monthFirst && +ev.start.slice(8) === a;
+      const ends = eventLastDay(ev) <= monthLast && +eventLastDay(ev).slice(8) === b;
+      const label = ev.shop ? ev.shop.name : ev.title;
+      bars.push(`<button class="calp-span${starts ? ' is-start' : ''}${ends ? ' is-end' : ''}${eventLastDay(ev) < today ? ' is-gone' : ''}"
+        style="grid-column:${(lead + a - 1) % 7 + 1} / ${(lead + b - 1) % 7 + 2}; grid-row:${lane + 2}; --k:${eventIconName(ev) === 'token' ? TL_TRACKS.vote.color : colourOf(ev)}"
+        data-action="open-event" data-id="${ev.id}" title="${escapeAttr(label)}"><span>${escapeHtml(label)}</span></button>`);
+    }
+    weeks.push(`<div class="calp-week" style="--lanes:${lanes}; grid-template-rows:var(--num-h)${lanes ? ` repeat(${lanes}, var(--lane-h))` : ''} 1fr">
+      ${cells.slice(w * 7, w * 7 + 7).join('')}${bars.join('')}</div>`);
+  }
 
   // the month as a list underneath, for reading on a phone
   const agenda = [];
@@ -6299,9 +6360,9 @@ function renderCalendarPage(){
     </div>
     <div class="calp-board">
       <div class="calp-dow">${DOW.map((d, i) => `<span${i===0||i===6 ? ' class="is-weekend"' : ''}>${d}</span>`).join('')}</div>
-      <div class="calp-grid">${cells.join('')}</div>
+      <div class="calp-weeks">${weeks.join('')}</div>
     </div>
-    <p class="calp-legend"><span><i class="is-bday"></i>${en ? 'Birthday' : 'วันเกิด'}</span><span><i class="is-period"></i>${en ? 'Opens or closes' : 'วันเปิด–ปิดของช่วงงาน'}</span><span>${en ? 'Tap a day for everything on it' : 'แตะวันที่เพื่อดูทุกอย่างในวันนั้น'}</span></p>
+    <p class="calp-legend"><span><i class="is-bday"></i>${en ? 'Birthday' : 'วันเกิด'}</span><span><i class="is-period"></i>${en ? 'Open all day, every day (pre-orders, voting)' : 'แถบยาว = ช่วงที่ซื้อหรือโหวตได้ตลอด 24 ชั่วโมง'}</span><span>${en ? 'Tap a day for everything on it' : 'แตะวันที่เพื่อดูทุกอย่างในวันนั้น'}</span></p>
     <h3 class="section-label">${en ? 'This month' : 'ในเดือนนี้'}</h3>
     ${agenda.length ? `<div class="calp-agenda">${agenda.join('')}</div>` : `<p class="muted-note">${en ? 'Nothing this month.' : 'ไม่มีงานในเดือนนี้'}</p>`}
   </section>`;
