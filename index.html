@@ -1806,21 +1806,21 @@
   /* the buy button is the loudest thing on the card */
   .shop-buy{
     --bc:var(--c, var(--pink));
-    display:inline-flex; align-items:center; justify-content:center; gap:9px;
-    min-height:46px; padding:0 22px; border-radius:999px; border:0;
+    display:inline-flex; align-items:center; justify-content:center; gap:7px;
+    min-height:40px; padding:0 18px; border-radius:999px; border:0;
     background:var(--bc); color:#fff; text-decoration:none;
-    font-size:15.5px; font-weight:800; letter-spacing:.01em; white-space:nowrap;
-    box-shadow:0 6px 16px color-mix(in srgb, var(--bc) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.25);
+    font-size:14px; font-weight:800; letter-spacing:.01em; white-space:nowrap;
+    box-shadow:0 4px 12px color-mix(in srgb, var(--bc) 32%, transparent), inset 0 1px 0 rgba(255,255,255,.25);
     transition:transform .15s var(--ease-out), box-shadow .15s ease, filter .15s ease;
   }
-  .shop-buy svg{ width:20px; height:20px; flex-shrink:0; }
-  .shop-buy-arrow{ font-size:14px; opacity:.85; }
+  .shop-buy svg{ width:17px; height:17px; flex-shrink:0; }
+  .shop-buy-arrow{ font-size:12.5px; opacity:.85; }
   .shop-buy:hover{ filter:brightness(1.08); transform:translateY(-1px);
     box-shadow:0 9px 22px color-mix(in srgb, var(--bc) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.25); }
   .shop-buy:active{ transform:translateY(1px) scale(.98); box-shadow:0 2px 6px color-mix(in srgb, var(--bc) 35%, transparent); }
-  .shop-actions .shop-buy{ flex:1 1 220px; max-width:320px; }
+  .shop-actions .shop-buy{ flex:none; }
   .shop-actions .shop-open{ background:none; border:0; box-shadow:none; padding:0 4px; }
-  .evm-related .shop-buy{ width:100%; max-width:360px; line-height:1; }
+  .evm-related .shop-buy{ line-height:1; }
   .shop-thumb img{ display:block; width:100%; height:auto; }
   .shop-body{ min-width:0; }
   .shop-meta{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0; }
