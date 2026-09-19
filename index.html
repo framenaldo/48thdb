@@ -10178,52 +10178,118 @@ async function shareFooter(g, dark, url){
   g.globalAlpha = 1; g.textAlign = 'left';
 }
 
+/* A member's card: who she is, then what the database knows she has done —
+   songs, centre spots and her lives on iAM48. */
 async function drawMemberCard(g, m, url){
-  const en = isEN();
+  const en = isEN(), P = 60, W = SHARE_W - P * 2;
+  await shareEnsureData();
   const grp = getGroup(m.groupId), team = getTeam(m.teamId);
   const c = grp ? grp.color : '#E4457E';
-  const bg = g.createLinearGradient(0, 0, SHARE_W, SHARE_H);
-  bg.addColorStop(0, shareMix(c, .78)); bg.addColorStop(1, shareMix(c, .93, '#ffffff'));
-  g.fillStyle = bg; g.fillRect(0, 0, SHARE_W, SHARE_H);
-  g.fillStyle = c; g.globalAlpha = .12; g.beginPath(); g.arc(SHARE_W - 80, 180, 360, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
-  // photo
+  g.fillStyle = '#150E22'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  shareGlow(g, 200, 180, 620, c, .55);
+  shareGlow(g, 1000, 760, 520, '#3CC4A5', .22);
+  shareGlow(g, 320, 1260, 520, '#7A5CFF', .22);
+
+  // who
   const im = await shareLoad(m.photo);
-  const R = 210, cx = SHARE_W / 2, cy = 330;
-  g.beginPath(); g.arc(cx, cy, R + 12, 0, Math.PI * 2); g.fillStyle = '#fff'; g.fill();
-  shareFace(g, m, im, cx - R, cy - R, R * 2, c);
-  g.strokeStyle = c; g.lineWidth = 8; g.beginPath(); g.arc(cx, cy, R + 12, 0, Math.PI * 2); g.stroke();
-  // names
-  g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#1C1329';
-  g.font = '800 104px "Noto Sans Thai", sans-serif'; g.fillText(en ? m.name : (m.nameTh || m.name), cx, 690);
-  g.font = '700 40px "Noto Sans Thai", sans-serif'; g.fillStyle = c;
-  g.fillText(en ? (m.nameTh || '') : (m.name || ''), cx, 748);
+  const R = 150;
+  g.beginPath(); g.arc(P + R, 80 + R, R + 8, 0, Math.PI * 2); g.fillStyle = c; g.fill();
+  shareFace(g, m, im, P, 80, R * 2, c);
+  const tx = P + R * 2 + 40, tw = SHARE_W - P - tx;
+  shareText(g, `48thDB · ${en ? 'PROFILE' : 'โปรไฟล์'}`, tx, 118, '800 26px "Noto Sans Thai", sans-serif', shareMix(c.startsWith('#') ? c : '#E4457E', .45));
+  let fs = 96; g.font = `800 ${fs}px "Noto Sans Thai", sans-serif`;
+  const big = en ? m.name : (m.nameTh || m.name);
+  while(g.measureText(big).width > tw && fs > 50){ fs -= 4; g.font = `800 ${fs}px "Noto Sans Thai", sans-serif`; }
+  shareText(g, big, tx, 216, `800 ${fs}px "Noto Sans Thai", sans-serif`, '#fff');
+  shareText(g, en ? (m.nameTh || '') : (m.name || ''), tx, 266, '700 36px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.8)');
   const real = en ? (m.realName || m.realNameTh) : (m.realNameTh || m.realName);
-  if(real){ g.font = '500 34px "Noto Sans Thai", sans-serif'; g.fillStyle = '#5B5068'; g.fillText(real, cx, 800); }
-  // chips, centred
+  if(real){ g.font = '600 26px "Noto Sans Thai", sans-serif'; shareText(g, shareWrap(g, real, tw, 1)[0], tx, 308, '600 26px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.6)'); }
+  const gBadge = getGroupCaptainBadge(m), tBadge = getTeamCaptainBadge(m);
   const chips = [grp && grp.name, team && team.name !== (grp && grp.name) ? team.name : null, m.gen ? (en ? `Gen ${m.gen}` : `รุ่น ${m.gen}`) : null,
+    gBadge ? (gBadge === 'C' ? (en ? 'Captain' : 'กัปตันวง') : (en ? 'Vice-captain' : 'รองกัปตันวง')) : tBadge ? (tBadge === 'C' ? (en ? 'Team captain' : 'กัปตันทีม') : (en ? 'Vice team captain' : 'รองกัปตันทีม')) : null,
     m.graduated ? (en ? 'Graduated' : 'จบการศึกษา') : null].filter(Boolean);
-  g.font = '800 30px "Noto Sans Thai", sans-serif';
-  const widths = chips.map(t => g.measureText(t).width + 33), gap = 14;
-  let x = cx - (widths.reduce((s, w) => s + w, 0) + gap * (chips.length - 1)) / 2;
-  g.textAlign = 'left';
-  chips.forEach((t, i) => { x += sharePill(g, t, x, 836, i === 0 ? c : '#ffffff', i === 0 ? '#ffffff' : '#1C1329') + gap; });
+  let x = tx, cy = 334;
+  chips.forEach((t, i) => { g.font = '800 24px "Noto Sans Thai", sans-serif'; const w = g.measureText(t).width + 26;
+    if(x + w > SHARE_W - P){ x = tx; cy += 52; }
+    x += sharePill(g, t, x, cy, i === 0 ? c : 'rgba(255,255,255,.14)', '#fff', 24) + 10; });
+
   // facts
+  let y = Math.max(420, cy + 66);
   const age = calcAge(m.birthday);
   const facts = [
-    m.birthday ? [en ? 'Birthday' : 'วันเกิด', formatDate(m.birthday) + (age != null && !m.graduated ? (en ? ` · ${age}` : ` · ${age} ปี`) : '')] : null,
-    m.height ? [en ? 'Height' : 'ส่วนสูง', `${m.height} ${en ? 'cm' : 'ซม.'}`] : null,
-    m.hometown ? [en ? 'Hometown' : 'บ้านเกิด', m.hometown] : null,
-    m.blood ? [en ? 'Blood' : 'กรุ๊ปเลือด', m.blood] : null,
-  ].filter(Boolean).slice(0, 4);
-  const colW = (SHARE_W - 128 - 20) / 2;
-  facts.forEach(([k, v], i) => {
-    const fx = 64 + (i % 2) * (colW + 20), fy = 930 + Math.floor(i / 2) * 150;
-    g.fillStyle = 'rgba(255,255,255,.78)'; shareRound(g, fx, fy, colW, 130, 26); g.fill();
-    g.fillStyle = '#6B6078'; g.font = '700 26px "Noto Sans Thai", sans-serif'; g.textBaseline = 'alphabetic'; g.fillText(k, fx + 28, fy + 46);
-    g.fillStyle = '#1C1329'; g.font = '800 36px "Noto Sans Thai", sans-serif';
-    g.fillText(shareWrap(g, v, colW - 56, 1)[0] || '', fx + 28, fy + 100);
-  });
-  await shareFooter(g, false, url);
+    [en ? 'Birthday' : 'วันเกิด', m.birthday ? formatDate(m.birthday) : '-', age != null && !m.graduated ? (en ? `${age} years old` : `อายุ ${age} ปี`) : ''],
+    [en ? 'Height' : 'ส่วนสูง', m.height ? `${m.height} ${en ? 'cm' : 'ซม.'}` : '-', ''],
+    [en ? 'Hometown' : 'บ้านเกิด', m.hometown || '-', ''],
+    [en ? 'Blood' : 'กรุ๊ปเลือด', m.blood || '-', ''],
+  ];
+  const tile = (x0, y0, w, hh, label, value, sub, col) => {
+    statsPanel(g, x0, y0, w, hh);
+    g.font = '600 22px "Noto Sans Thai", sans-serif';
+    shareText(g, shareWrap(g, label, w - 40, 1)[0], x0 + 22, y0 + 36, '600 22px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.65)');
+    let f = 38; g.font = `800 ${f}px "Noto Sans Thai", sans-serif`;
+    while(g.measureText(value).width > w - 40 && f > 22){ f -= 2; g.font = `800 ${f}px "Noto Sans Thai", sans-serif`; }
+    shareText(g, value, x0 + 22, y0 + 78, `800 ${f}px "Noto Sans Thai", sans-serif`, col || '#fff');
+    if(sub) shareText(g, sub, x0 + 22, y0 + hh - 14, '600 20px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.6)');
+  };
+  const fw = (W - 3 * 14) / 4;
+  facts.forEach(([l, v, s], i) => tile(P + i * (fw + 14), y, fw, 128, l, v, s));
+  y += 146;
+
+  // songs
+  const main = worksOf(m.id), special = worksOf(m.id, 'special');
+  const centres = [...main, ...special].filter(w => w.centre).length;
+  const latest = main[0];
+  const sec = (title, yy) => shareText(g, title, P, yy, '800 30px "Noto Sans Thai", sans-serif', '#fff');
+  sec(en ? 'Songs' : 'ผลงานเพลง', y + 28); y += 46;
+  const sw = (W - 2 * 14) / 3;
+  tile(P, y, sw, 128, en ? 'Songs' : 'เพลงที่ร่วมร้อง', String(main.length + special.length), special.length ? (en ? `${special.length} special` : `พิเศษ ${special.length} เพลง`) : '', '#FF6FA5');
+  tile(P + sw + 14, y, sw, 128, en ? 'Centre' : 'เป็นเซ็นเตอร์', `${centres}`, en ? 'songs' : 'เพลง', '#FFD98A');
+  tile(P + 2 * (sw + 14), y, sw, 128, en ? 'Latest' : 'ผลงานล่าสุด', latest ? latest.work.title : '-', latest ? `${workLabel(latest.work)} · ${latest.work.year}` : '', '#8FE3CF');
+  y += 146;
+
+  // lives
+  const L = LIVES && LIVES.members && LIVES.members[m.id];
+  if(L && L.total && !m.graduated){
+    const rank = Object.entries(LIVES.members).filter(([id, x]) => x && x.total && getMember(id) && !getMember(id).graduated)
+      .sort((a, b) => b[1].total - a[1].total).findIndex(([id]) => id === m.id) + 1;
+    const DAYS = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสฯ','วันศุกร์','วันเสาร์'];
+    const hr = L.hours ? L.hours.indexOf(Math.max(...L.hours)) : null, dd = L.days ? L.days.indexOf(Math.max(...L.days)) : null;
+    sec(en ? 'Lives on iAM48' : 'ไลฟ์ใน iAM48', y + 28); y += 46;
+    tile(P, y, sw, 128, en ? 'All lives' : 'ไลฟ์ทั้งหมด', L.total.toLocaleString(), rank ? (en ? `#${rank} of the group` : `อันดับ ${rank} ของวง`) : '', '#FF6FA5');
+    tile(P + sw + 14, y, sw, 128, en ? 'Last 30 days' : '30 วันล่าสุด', String(L.last30 || 0), en ? 'lives' : 'ไลฟ์', '#FFD98A');
+    tile(P + 2 * (sw + 14), y, sw, 128, en ? 'Usually' : 'มักไลฟ์', hr != null ? `${String(hr).padStart(2, '0')}:00` : '-', dd != null ? DAYS[dd] : '', '#8FE3CF');
+    y += 144;
+    // twelve months of lives
+    const now = new Date(), months = [];
+    for(let i = 11; i >= 0; i--){ const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({ n: (L.months || {})[`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`] || 0, label: monthsShort()[d.getMonth()] }); }
+    const room = SHARE_H - 170 - y - 10;
+    if(room > 150){
+      statsPanel(g, P, y, W, room);
+      const top = Math.max(1, ...months.map(x => x.n)), cw = (W - 52 - 11 * 10) / 12;
+      months.forEach((mo, i) => { const bx = P + 26 + i * (cw + 10), base = y + room - 42, bh = (room - 100) * mo.n / top;
+        g.fillStyle = i === 11 ? shareMix(c.startsWith('#') ? c : '#E4457E', .5) : c; shareRound(g, bx, base - bh, cw, Math.max(bh, 4), 6); g.fill();
+        shareText(g, String(mo.n), bx + cw / 2, base - bh - 8, '800 18px "Noto Sans Thai", sans-serif', '#fff', 'center');
+        shareText(g, mo.label, bx + cw / 2, base + 28, '600 16px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.65)', 'center'); });
+    }
+  } else {
+    // no lives to show: hobbies and likes, or when she graduated
+    const joined = joinedOn(m);
+    const lines = [
+      m.graduated ? [en ? 'Graduated' : 'จบการศึกษา', formatDate(m.graduated) + (joined ? ` · ${en ? 'with the group' : 'อยู่กับวง'} ${humanMonths(monthsBetween(joined, m.graduated))}` : '')] : null,
+      main.length ? [en ? 'Sang in' : 'ร่วมร้องใน', main.slice(0, 6).map(w => w.work.title).join(' · ')] : null,
+      m.hobby ? [en ? 'Hobbies' : 'งานอดิเรก', m.hobby] : null,
+      m.likes ? [en ? 'Likes' : 'สิ่งที่ชอบ', m.likes] : null,
+    ].filter(Boolean);
+    lines.forEach(([k, v]) => { if(y > SHARE_H - 300) return;
+      g.font = '800 30px "Noto Sans Thai", sans-serif';
+      const vl = shareWrap(g, v, W - 52, 2), hh = 76 + vl.length * 42;
+      statsPanel(g, P, y, W, hh);
+      shareText(g, k, P + 26, y + 42, '600 22px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.65)');
+      vl.forEach((l, i) => shareText(g, l, P + 26, y + 86 + i * 42, '800 30px "Noto Sans Thai", sans-serif', '#fff'));
+      y += hh + 16; });
+  }
+  await shareFooter(g, true, url);
 }
 
 async function drawEventCard(g, ev, url){
