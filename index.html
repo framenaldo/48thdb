@@ -1434,6 +1434,10 @@
     border:1px solid rgba(255,255,255,calc(.7*var(--glass-k)));
   }
   .theme-btn:active{ transform:scale(.9); }
+  /* the other round header buttons press the same way */
+  .shop-btn, .lang-btn, .tlp-btn{ transition:background .18s var(--ease-out), transform .35s var(--ease-spring); }
+  .shop-btn:active, .lang-btn:active, .tlp-btn:active{ transform:scale(.9); transition-duration:.09s; }
+  @media (hover:hover){ .shop-btn:hover, .lang-btn:hover, .theme-btn:hover{ background:rgba(255,255,255,calc(.75*var(--glass-k))); } }
   .mini-avatar-btn{ background:none; border:none; cursor:pointer; padding:0; display:block; }
   .mini-avatar{
     width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
