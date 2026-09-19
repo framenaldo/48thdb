@@ -8351,7 +8351,6 @@ function renderStatsOverview(){
 
   ${renderOverviewLives()}
   ${renderOverviewViews()}
-  ${renderOverviewEvents()}
   ${renderOverviewBirthdays()}
 
   <div class="group-card" style="--c:var(--gold)">
@@ -8425,31 +8424,6 @@ function renderOverviewViews(){
     ${top.map(r => renderBarLink(r.name, r.views, top[0].views, colourOfWork(r.w), 'open-single', { id: r.w.id })
         .replace(`<span class="bar-val">${r.views}</span>`, `<span class="bar-val">${shortViews(r.views)}</span>`)).join('')}</div>`,
     en ? 'Official videos only; one video per song.' : 'นับจากคลิปทางการ เพลงละหนึ่งคลิป');
-}
-
-function renderOverviewEvents(){
-  const en = isEN();
-  const today = toYmd(todayStart());
-  const year = today.slice(0,4), month = today.slice(0,7);
-  const outings = SEED_SCHEDULE.filter(e => !e.period && !e.shop);
-  const thisYear = outings.filter(e => e.start.startsWith(year));
-  const thisMonth = outings.filter(e => e.start.startsWith(month) || (e.start <= month + '-31' && eventLastDay(e) >= month + '-01'));
-  const ahead = outings.filter(e => e.start > today).sort((a, b) => a.start.localeCompare(b.start));
-  const counts = new Map();
-  thisYear.forEach(e => (e.members || []).forEach(id => counts.set(id, (counts.get(id) || 0) + 1)));
-  const top = [...counts.entries()].filter(([id]) => getMember(id)).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const next = ahead[0];
-  const d = next ? parseYmd(next.start) : null;
-  return ovCard(en ? 'Events' : 'งานและกิจกรรม', 'calendar', `
-    <div class="stat-grid" style="margin-bottom:4px;">
-      <button class="stat-cell" data-action="nav-calendar"><div class="label">${en ? 'This month' : 'เดือนนี้'}</div><div class="value">${thisMonth.length} ${en ? '' : 'งาน'}</div></button>
-      <div class="stat-cell"><div class="label">${en ? `In ${year}` : `ปี ${+year + 543}`}</div><div class="value">${thisYear.length} ${en ? '' : 'งาน'}</div></div>
-      <div class="stat-cell"><div class="label">${en ? 'Coming up' : 'ที่กำลังจะมา'}</div><div class="value">${ahead.length} ${en ? '' : 'งาน'}</div></div>
-      ${next ? `<button class="stat-cell" data-action="open-event" data-id="${next.id}"><div class="label">${en ? 'Next up' : 'งานถัดไป'} · ${d.getDate()} ${monthsShort()[d.getMonth()]}</div><div class="value ov-next">${escapeHtml(next.title)}</div></button>` : ''}
-    </div>
-    ${top.length ? `<h3 class="section-label" style="margin-top:6px;">${en ? `Most events in ${year}` : `ออกงานมากที่สุดในปี ${+year + 543}`}</h3>
-    ${top.map(([id, n]) => renderBarLink(ovNick(id), n, top[0][1], ovColour(id), 'open-member', { id })).join('')}` : ''}`,
-    en ? 'Counted from the events in this database.' : 'นับจากงานที่บันทึกไว้ในฐานข้อมูลนี้');
 }
 
 function renderOverviewBirthdays(){
