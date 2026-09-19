@@ -2642,22 +2642,19 @@
     position:relative; border-radius:999px;
     transition:color .25s var(--ease-out), transform .34s var(--ease-spring);
   }
-  .glass-nav button::before{
-    content:''; position:absolute; inset:1px 5px; z-index:0;
-    border-radius:999px; background:rgba(255,255,255,calc(.8*var(--glass-k)));
-    box-shadow:0 2px 8px rgba(var(--shadow-rgb),.14);
-    opacity:0; transform:scale(.55);
-    transition:opacity .28s var(--ease-out), transform .4s var(--ease-spring);
+  .glass-nav{ position:fixed; }
+  .gnav-blob{
+    position:absolute; left:0; top:50%; height:44px; margin-top:-22px; z-index:0; pointer-events:none;
+    border-radius:999px; background:rgba(255,255,255,calc(.82*var(--glass-k)));
+    box-shadow:0 2px 10px rgba(var(--shadow-rgb),.14); opacity:0;
+    transition:transform .45s cubic-bezier(.3,1.25,.4,1), width .45s cubic-bezier(.3,1.25,.4,1), opacity .25s ease;
   }
-  .glass-nav button.active::before{ opacity:1; transform:scale(1); }
-  .glass-nav button .gnav-icon{ position:relative; z-index:1; }
-  .glass-nav button:active{ transform:scale(.85); transition-duration:.09s; }
-  .glass-nav button.active .gnav-icon{ animation:navPop .5s var(--ease-spring); }
-  @keyframes navPop{
-    0%{ transform:scale(.65); }
-    55%{ transform:scale(1.2); }
-    100%{ transform:scale(1); }
-  }
+  .glass-nav button .gnav-icon{ position:relative; z-index:1; transition:transform .35s cubic-bezier(.3,1.25,.4,1); }
+  .glass-nav button:active{ transform:scale(.9); transition-duration:.09s; }
+  .glass-nav button.active{ color:var(--pink); }
+  .glass-nav button.active .gnav-icon{ transform:translateY(-1px) scale(1.08); }
+  .glass-nav button .gnav-icon svg *{ transition:stroke-width .3s ease; }
+  .glass-nav button.active .gnav-icon svg *{ stroke-width:2.3; }
 
   /* --- modal: softer spring in --- */
   .modal-glass-card{ animation:modalPopIn .38s var(--ease-spring); }
@@ -5934,12 +5931,24 @@ function currentNavValue(){
 }
 function renderNav(){
   const current = currentNavValue();
-  return `<nav class="glass-nav">${NAV_OPTIONS.map(o=>{
+  return `<nav class="glass-nav"><span class="gnav-blob" aria-hidden="true"></span>${NAV_OPTIONS.map(o=>{
     const isActive = o.value===current;
     return `<button data-action="nav-select" data-value="${o.value}" class="${isActive?'active':''}">
-      <span class="gnav-icon">${isActive?o.iconActive:o.icon}</span>
+      <span class="gnav-icon">${o.icon}</span>
     </button>`;
   }).join('')}</nav>`;
+}
+/* One highlight behind the tabs that glides to whichever is active. */
+function placeNavBlob(nav, animate){
+  const blob = nav && nav.querySelector('.gnav-blob');
+  const btn = nav && nav.querySelector('button.active');
+  if(!blob) return;
+  if(!btn){ blob.style.opacity = '0'; return; }
+  if(!animate) blob.style.transition = 'none';
+  blob.style.width = (btn.offsetWidth + 8) + 'px';
+  blob.style.transform = `translateX(${btn.offsetLeft - 4}px)`;
+  blob.style.opacity = '1';
+  if(!animate){ blob.offsetWidth; blob.style.transition = ''; }
 }
 
 /* Updates the nav in place so the active pill can animate between tabs
@@ -5951,18 +5960,18 @@ function syncNav(navContainer){
   }
   if(!navContainer.querySelector('.glass-nav')){
     navContainer.innerHTML = renderNav();
+    requestAnimationFrame(() => placeNavBlob(navContainer.querySelector('.glass-nav'), false));
     return;
   }
   const current = currentNavValue();
   navContainer.querySelectorAll('.glass-nav button').forEach(btn=>{
     const isActive = btn.dataset.value === current;
     if(btn.classList.contains('active') === isActive) return;
-    const opt = NAV_OPTIONS.find(o=>o.value === btn.dataset.value);
     btn.classList.toggle('active', isActive);
-    const ico = btn.querySelector('.gnav-icon');
-    if(ico && opt) ico.innerHTML = isActive ? opt.iconActive : opt.icon;
   });
+  placeNavBlob(navContainer.querySelector('.glass-nav'), true);
 }
+window.addEventListener('resize', () => placeNavBlob(document.querySelector('.glass-nav'), false));
 
 function renderGroupPills(){
   const ids = ['all', ...GROUPS.map(g=>g.id)];
