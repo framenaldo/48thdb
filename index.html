@@ -10150,6 +10150,7 @@ function attachMainEvents(){
       state.members.push(saved);
     }
     await fbDb.collection('members').doc(saved.id).set(plain(saved));
+    learnNames();
     state.view = 'browse';
     state.selectedId = data.id;
     state.editingId = null;
@@ -10329,6 +10330,14 @@ function shareWrap(g, text, maxW, maxLines){
     lines[maxLines - 1] = last + '…';
   }
   return lines;
+}
+/* roundRect arrived in Safari 16; older iPhones get the same shape by hand. */
+if(typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r){
+    r = Math.max(0, Math.min(Array.isArray(r) ? r[0] : (r || 0), w / 2, h / 2));
+    this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath();
+  };
 }
 function shareRound(g, x, y, w, h, r){ g.beginPath(); g.roundRect(x, y, w, h, r); }
 function shareCover(g, im, x, y, w, h){
@@ -11779,6 +11788,7 @@ function bindDelegatedEvents(){
       if(m && state.isOwner && confirm(`ยืนยันการลบ ${m.nameTh}?`)){
         state.members = state.members.filter(x=>x.id!==id);
         await deleteMemberDoc(id);
+        learnNames();
         state.view='browse'; state.selectedId=null;
         render(); replaceHistory();
       }

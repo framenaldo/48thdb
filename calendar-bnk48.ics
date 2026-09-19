@@ -283,6 +283,40 @@ DTEND;VALUE=DATE:20261113
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-concert-2026@48thdb
+DTSTAMP:20261114T000000Z
+SUMMARY:BNK48 & CGM48 Concert 2026 · รอบกลางวัน
+DESCRIPTION:รอประกาศรายชื่อ\nรายละ
+ เอียดและเวลายังไม่ประกาศ\n
+ • จัดรอบกลางวัน วันเดียวกั
+ บการประกาศผลการเลือกตั้ง
+ ซึ่งจัดรอบค่ำ\n• รายละเอีย
+ ดสถานที่และเวลารอประกาศ\n\nh
+ ttps://framenaldo.github.io/48thdb/?e=ev-concert-2026
+URL:https://framenaldo.github.io/48thdb/?e=ev-concert-2026
+DTSTART;VALUE=DATE:20261114
+DTEND;VALUE=DATE:20261115
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-election-results@48thdb
+DTSTAMP:20261114T000000Z
+SUMMARY:BNK48 & CGM48 Senbatsu General Election 2026 · Final Results · 
+ รอบค่ำ
+DESCRIPTION:รายละเอียดและเวลายังไ
+ ม่ประกาศ\n• ประกาศผลการเลื
+ อกตั้งอันดับสุดท้าย\n• จัด
+ รอบค่ำ วันเดียวกับ BNK48 & CGM48 Concert
+  2026 ที่จัดรอบกลางวัน\n• Top 12 เซ
+ ็มบัตสึได้ไปถ่าย MV ที่ญี่ป
+ ุ่น\n• Kami7 Special Project — เพลงร่วมกับ
+  AKB48\n• รายละเอียดสถานที่และ
+ เวลารอประกาศ\n• #BNK48CGM48_GE2026\n\nhttps://fr
+ amenaldo.github.io/48thdb/?e=ev-election-results
+URL:https://framenaldo.github.io/48thdb/?e=ev-election-results
+DTSTART;VALUE=DATE:20261114
+DTEND;VALUE=DATE:20261115
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-election-fanfest@48thdb
 DTSTAMP:20261003T000000Z
 SUMMARY:BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival
@@ -374,5 +408,19 @@ DESCRIPTION:รอประกาศรายชื่อ\n• แลกบ
 URL:https://framenaldo.github.io/48thdb/?e=ev-ge6-myo2
 DTSTART;VALUE=DATE:20261126
 DTEND;VALUE=DATE:20261130
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-ge6-heart@48thdb
+DTSTAMP:20261115T000000Z
+SUMMARY:BNK48 & CGM48 Senbatsu General Election 2026 : Heart to Heart
+DESCRIPTION:รอประกาศรายชื่อ\nรายละ
+ เอียดและเวลายังไม่ประกาศ\n
+ • งานต่อเนื่องหลังประกาศผ
+ ลการเลือกตั้ง\n• รายละเอีย
+ ดสถานที่และเวลารอประกาศ\n\nh
+ ttps://framenaldo.github.io/48thdb/?e=ev-ge6-heart
+URL:https://framenaldo.github.io/48thdb/?e=ev-ge6-heart
+DTSTART;VALUE=DATE:20261115
+DTEND;VALUE=DATE:20261116
 END:VEVENT
 END:VCALENDAR

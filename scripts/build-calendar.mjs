@@ -63,6 +63,7 @@ function describe(ev, extra){
   if(extra) lines.push(extra);
   if(ev.members && ev.members.length && !ev.lineupTba) lines.push('เมมเบอร์: ' + ev.members.map(nick).join(', '));
   if(ev.lineupTba) lines.push('รอประกาศรายชื่อ');
+  if(ev.tba) lines.push('รายละเอียดและเวลายังไม่ประกาศ');
   for(const l of [...(ev.detail || []), ...(ev.info || [])]) lines.push('• ' + l);
   lines.push('', SITE + '?e=' + ev.id);
   return lines.join('\n');
@@ -106,7 +107,9 @@ function calendar(name, desc, entries){
   return lines.map(fold).join('\r\n') + '\r\n';
 }
 
-const all = EVENTS.filter(ev => ev.start && ev.title && !ev.tba);
+// Only the placeholders ("To be announced") are left out. A dated event whose
+// details are still coming — the concert, the results — is in, as a whole day.
+const all = EVENTS.filter(ev => ev.start && ev.title && !/^to be announced$/i.test(ev.title.trim()));
 const feeds = {
   'calendar.ics': ['48thDb · BNK48 & CGM48', 'งานและกิจกรรมทั้งหมดของ BNK48 และ CGM48 จาก 48thDb', all],
   'calendar-bnk48.ics': ['48thDb · BNK48', 'งานและกิจกรรมของ BNK48 จาก 48thDb', all.filter(ev => groupsOf(ev).includes('bnk48'))],
