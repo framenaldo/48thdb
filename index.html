@@ -2000,6 +2000,30 @@
   .ev-icon.is-hero{ width:23px; height:23px; margin-right:7px; vertical-align:-4px; }
   .ev-icon.is-hero svg{ width:20px; height:20px; }
   .ev-icon.is-hero img{ width:23px; height:23px; }
+  /* a broadcast keeps YouTube's red wherever the event's own colour would go */
+  .ev-icon.is-yt, .evm-icon.is-yt, .tl-icon.is-yt{ color:#E02118; }
+  :root[data-theme="dark"] .ev-icon.is-yt,
+  :root[data-theme="dark"] .evm-icon.is-yt,
+  :root[data-theme="dark"] .tl-icon.is-yt{ color:#FF564B; }
+
+  /* LIVE: a quiet red badge before the stream, blinking while it is on air. */
+  .live-chip{
+    display:inline-flex; align-items:center; gap:5px; vertical-align:2px;
+    margin-left:7px; padding:2px 9px 2px 7px; border-radius:999px;
+    background:color-mix(in srgb, #E02118 14%, transparent); color:#C21C14;
+    font-family:'Noto Sans Thai',sans-serif; font-size:11px; font-weight:800; letter-spacing:.7px;
+  }
+  .live-chip::before{ content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+  /* in the sheet's meta row the flex gap already spaces it */
+  .live-chip.is-meta{ margin-left:0; padding:4px 11px 4px 9px; font-size:12px; }
+  :root[data-theme="dark"] .live-chip{ background:rgba(255,86,75,.18); color:#FF8078; }
+  .live-chip.is-on{ background:#E02118; color:#fff; animation:live-flash 1.2s ease-in-out infinite; }
+  :root[data-theme="dark"] .live-chip.is-on{ background:#FF3B30; color:#fff; }
+  @keyframes live-flash{
+    0%,100%{ opacity:1; box-shadow:0 0 0 0 transparent; }
+    50%{ opacity:.4; box-shadow:0 0 13px 2px rgba(224,33,24,.8); }
+  }
+  @media (prefers-reduced-motion: reduce){ .live-chip.is-on{ animation:none; } }
 
   /* The shop: one card per thing on sale, the poster beside what it costs. */
   .shop{ max-width:1040px; margin-inline:auto; }
@@ -3573,6 +3597,7 @@ const SEED_SCHEDULE = [
     members:['cgm-else','cgm-lewlew','cgm-ploen','cgm-praifa','cgm-ginna','cgm-tara'],
     related:['ev-hachicha-tsukimi'],
     poster:{ accent:'#1F6B58', surface:'#EFF7F1', ink:'#17423A', img:'posters/cgm48-popup-live-cnx.jpg', w:2048, h:2048 },
+    stream:{ label:'YouTube CGM48 OFFICIAL', url:'https://www.youtube.com/@CGM48OFFICIAL' },
     links:[{ label:'ถ่ายทอดสด', url:'https://www.youtube.com/@CGM48OFFICIAL' }],
     detail:[
       '16:00 สินค้า MERCHANDISE เริ่มจำหน่าย',
@@ -7314,6 +7339,11 @@ function tickClock(){
     if(pill) pill.classList.toggle('is-live', Number(el.dataset.startsAt) <= Date.now());
     localize(el.parentElement || el);
   });
+  // on air: the LIVE badge turns solid red and blinks, off air it goes quiet
+  document.querySelectorAll('[data-live-from]').forEach(el=>{
+    const ms = Date.now();
+    el.classList.toggle('is-on', ms >= Number(el.dataset.liveFrom) && ms <= Number(el.dataset.liveTo));
+  });
 
   const now = toYmd(new Date());
   if(state.view === 'feed' && !state.query && !state.selectedId && !state.selectedEvent && !state.posterOf) {
@@ -7379,7 +7409,7 @@ function renderEventCard(ev, todayIso){
     <div class="ev-body">
       ${(()=>{ const at = over ? null : startsAt(ev, todayIso);
         return at ? `<span class="ev-starts" data-starts-at="${at}">${startsLabel(at)}</span>` : ''; })()}
-      <h3 class="ev-title">${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}</h3>
+      <h3 class="ev-title">${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
         groupTag(g)).join('')}</div>` : ''}
@@ -7428,7 +7458,7 @@ function renderTodayHero(ev, todayIso){
     ${open ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="today-hero-body">
       <p class="today-hero-status${live ? ' is-live' : ''}"><span class="today-live" aria-hidden="true"></span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</p>
-      <h3 class="today-hero-title">${renderEventIcon(ev, 'ev-icon is-hero')}${escapeHtml(ev.title)}</h3>
+      <h3 class="today-hero-title">${renderEventIcon(ev, 'ev-icon is-hero')}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
       <p class="today-hero-meta">${hours ? `${hours} น.` : ''}${hours && ev.venue ? ' · ' : ''}${ev.venue ? escapeHtml(ev.venue) : ''}</p>
     </div>
     ${img ? `<div class="today-hero-art" style="--art:url('${escapeAttr(img)}')">
@@ -7785,12 +7815,37 @@ function eventIconName(ev){
   if(ev.tag === 'media') return 'tv';
   return '';
 }
+/* A broadcast has hours of its own: the badge is red all along and blinks
+   only between them. Multi-day events are read on whichever day is showing. */
+function streamWindow(ev){
+  if(!ev || !ev.stream || !ev.time) return null;
+  const today = toYmd(todayStart());
+  const day = (ev.start <= today && eventLastDay(ev) >= today) ? today : ev.start;
+  const at = t => {
+    const [hh, mm] = String(t).split(':').map(Number);
+    if(!Number.isFinite(hh)) return null;
+    const d = parseYmd(day); d.setHours(hh, mm || 0, 0, 0); return d.getTime();
+  };
+  const from = at(ev.time);
+  if(!from) return null;
+  const to = at(eventUntil(ev) || '');
+  return { from, to: to && to > from ? to : from + 2 * 3600000 };
+}
+function renderLiveChip(ev, cls){
+  const w = streamWindow(ev);
+  if(!w) return '';
+  const now = Date.now();
+  const on = now >= w.from && now <= w.to;
+  return `<span class="live-chip${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}"
+    data-live-from="${w.from}" data-live-to="${w.to}"
+    title="${escapeAttr(ev.stream.label || '')}">LIVE</span>`;
+}
 function renderEventIcon(ev, cls){
   const name = eventIconName(ev);
   if(!name) return '';
   const art = EV_ICONS[name];
   const img = art.startsWith('<img');
-  return `<span class="${cls}${img ? ' is-img' : ''}" aria-hidden="true">${img ? art
+  return `<span class="${cls}${img ? ' is-img' : ''}${name === 'live' ? ' is-yt' : ''}" aria-hidden="true">${img ? art
     : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${art}</svg>`}</span>`;
 }
 
@@ -7844,7 +7899,7 @@ function renderDayModal(){
 
   const evRow = e => `<button class="day-row" data-action="open-event" data-id="${e.id}"
       style="--k:${e.poster ? e.poster.accent : (getGroup((e.groups || [])[0]) || {}).color || 'var(--ink-soft)'}">
-      <span class="day-main">${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}</span>
+      <span class="day-main">${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}${renderLiveChip(e)}</span>
       <span class="day-sub">${[e.time ? e.time + (en ? '' : ' น.') : '', e.part ? escapeHtml(e.part) : '',
         e.venue ? escapeHtml(e.venue) : e.online ? escapeHtml(e.online) : ''].filter(Boolean).join(' · ')}</span>
     </button>`;
@@ -7918,6 +7973,7 @@ function renderEventModal(){
         <div class="evm-meta">
           ${renderEventIcon(ev, 'evm-icon')}
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}${ev.part?' · '+escapeHtml(ev.part):''}</p>
+          ${renderLiveChip(ev, 'is-meta')}
           ${(()=>{ const at = startsAt(ev, toYmd(todayStart()));
             return at ? `<span class="evm-starts" data-starts-at="${at}">${startsLabel(at)}</span>` : ''; })()}
           ${ev.bookClosed
