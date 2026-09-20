@@ -1439,6 +1439,14 @@
   .shop-btn:active, .lang-btn:active, .tlp-btn:active{ transform:scale(.9); transition-duration:.09s; }
   @media (hover:hover){ .shop-btn:hover, .lang-btn:hover, .theme-btn:hover{ background:rgba(255,255,255,calc(.75*var(--glass-k))); } }
   .mini-avatar-btn{ background:none; border:none; cursor:pointer; padding:0; display:block; }
+  .mini-avatar{ position:relative; overflow:hidden; flex-shrink:0; }
+  .mini-avatar img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
+  .acc-avatar-btn{ background:none; border:0; padding:0; cursor:pointer; border-radius:50%; flex-shrink:0; }
+  .avatar-edit{ display:flex; align-items:center; gap:18px; margin:0 0 20px; }
+  .avatar-edit-face .mini-avatar{ box-shadow:0 0 0 3px var(--card), 0 0 0 5px var(--gold); }
+  .avatar-edit-actions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .avatar-edit-actions .muted-note{ flex-basis:100%; }
+  .avatar-pick{ cursor:pointer; }
   .mini-avatar{
     width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     background:var(--gold); color:#241a06; font-family:'Noto Sans Thai',sans-serif; font-weight:700; font-size:14px;
@@ -5851,7 +5859,7 @@ async function loadOshiData(){
   try{
     const doc = await fbDb.collection('users').doc(fbAuth.currentUser.uid).get();
     const d = doc.exists ? doc.data() : {};
-    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null};
+    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null};
   }catch(e){ return {oshi:[], kamiOshi:null}; }
 }
 async function saveOshiData(){
@@ -5890,6 +5898,30 @@ function renderHeader(){
   </header>`;
 }
 
+function authErrorText(err){
+  const T = {
+    'auth/email-already-in-use':'อีเมลนี้มีบัญชีอยู่แล้ว ลองเข้าสู่ระบบแทน',
+    'auth/invalid-email':'รูปแบบอีเมลไม่ถูกต้อง',
+    'auth/weak-password':'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร',
+    'auth/wrong-password':'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
+    'auth/user-not-found':'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
+    'auth/invalid-credential':'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
+    'auth/invalid-login-credentials':'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
+    'auth/missing-password':'กรุณาใส่รหัสผ่าน',
+    'auth/too-many-requests':'ลองผิดหลายครั้งเกินไป รอสักครู่แล้วลองใหม่',
+    'auth/network-request-failed':'เชื่อมต่ออินเทอร์เน็ตไม่ได้',
+  };
+  return (err && T[err.code]) || (err && err.message) || 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง';
+}
+
+function accountAvatar(size){
+  const a = state.account || {};
+  const src = a.avatar || a.photo;
+  const initial = a.name ? a.name[0].toUpperCase() : '?';
+  return `<span class="mini-avatar${src ? ' has-img' : ''}"${size ? ` style="width:${size}px;height:${size}px;font-size:${Math.round(size * .4)}px"` : ''}>${
+    src ? `<img src="${escapeAttr(src)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}<span>${escapeHtml(initial)}</span></span>`;
+}
+
 function renderProfileSlot(){
   const slot = document.getElementById('profile-slot');
   if(!slot) return;
@@ -5901,7 +5933,7 @@ function renderProfileSlot(){
   const initial = state.account.name ? state.account.name[0].toUpperCase() : '?';
   slot.innerHTML = `
     <div class="profile-slot-wrap">
-      <button class="mini-avatar-btn" data-action="toggle-profile-menu"><span class="mini-avatar">${initial}</span>${state.isOwner && state.pending.length ? `<span class="pd-dot">${state.pending.length}</span>` : ''}</button>
+      <button class="mini-avatar-btn" data-action="toggle-profile-menu">${accountAvatar()}${state.isOwner && state.pending.length ? `<span class="pd-dot">${state.pending.length}</span>` : ''}</button>
       ${state.profileMenuOpen ? `
       <div class="profile-dropdown">
         <div class="dropdown-name">${escapeHtml(state.account.name)}</div>
@@ -8654,7 +8686,7 @@ function renderProfile(){
   const accountBlock = loggedIn ? `
     <div class="account-card">
       <div class="acc-info">
-        <div class="mini-avatar" style="width:52px;height:52px;font-size:20px;flex-shrink:0;">${state.account.name[0].toUpperCase()}</div>
+        <button class="acc-avatar-btn" data-action="nav" data-view="editprofile" title="เปลี่ยนรูปโปรไฟล์" aria-label="เปลี่ยนรูปโปรไฟล์">${accountAvatar(52)}</button>
         <div style="min-width:0;">
           <div class="account-name">${escapeHtml(state.account.name)}</div>
           <div class="account-email">${escapeHtml(state.account.email)}</div>
@@ -9348,7 +9380,8 @@ function renderAuth(){
     </div>
     <form id="auth-form" novalidate>
       <div class="form-field" style="margin-bottom:12px;"><label>อีเมล</label><input id="auth-email-input" name="email" type="email" autocomplete="email"></div>
-      <div class="form-field" style="margin-bottom:6px;"><label>รหัสผ่าน</label><input id="auth-password-input" name="password" type="password" autocomplete="${mode==='signup'?'new-password':'current-password'}"></div>
+      <div class="form-field" style="margin-bottom:${mode==='signup'?'12px':'6px'};"><label>รหัสผ่าน${mode==='signup'?' <small class="muted-note">(อย่างน้อย 6 ตัว)</small>':''}</label><input id="auth-password-input" name="password" type="password" autocomplete="${mode==='signup'?'new-password':'current-password'}"></div>
+      ${mode==='signup' ? `<div class="form-field" style="margin-bottom:6px;"><label>ยืนยันรหัสผ่าน</label><input id="auth-password2-input" name="password2" type="password" autocomplete="new-password"></div>` : ''}
       <p id="auth-status" class="auth-error" style="display:none;"></p>
       <button type="button" id="auth-submit-btn" class="btn-add" style="width:100%;justify-content:center;margin-top:12px;">${mode==='signup'?'สร้างบัญชี':'เข้าสู่ระบบ'}</button>
     </form>
@@ -9361,11 +9394,20 @@ function renderAuth(){
 }
 
 function renderEditProfile(){
+  delete state._newAvatar;            // a picture picked and then cancelled does not carry over
   const acc = state.account || {name:'', email:''};
   return `
   <button class="back-btn" data-action="go-back">\u2190 กลับ</button>
   <h2 class="display" style="margin:0 0 18px;font-size:22px;">แก้ไขข้อมูลส่วนตัว</h2>
   <form id="editprofile-form" novalidate style="max-width:420px;">
+    <div class="avatar-edit">
+      <div class="avatar-edit-face" id="avatar-edit-face">${accountAvatar(96)}</div>
+      <div class="avatar-edit-actions">
+        <label class="btn-secondary avatar-pick">เปลี่ยนรูปโปรไฟล์<input id="avatar-file" type="file" accept="image/*" hidden></label>
+        ${acc.avatar ? `<button type="button" class="btn-secondary" id="avatar-remove">ลบรูป</button>` : ''}
+        <p class="muted-note" style="margin:6px 0 0;font-size:12px;">รูปจะถูกครอปเป็นวงกลมและย่อขนาดให้อัตโนมัติ</p>
+      </div>
+    </div>
     <div class="form-field" style="margin-bottom:14px;"><label>ชื่อที่แสดง</label><input id="edit-name-input" name="name" value="${escapeAttr(acc.name)}"></div>
     <div class="form-field" style="margin-bottom:6px;"><label>อีเมล</label><input value="${escapeAttr(acc.email)}" disabled style="opacity:.6;"></div>
     <p id="edit-status" class="auth-error" style="display:none;"></p>
@@ -10008,6 +10050,11 @@ function attachMainEvents(){
       try{
         const email = (document.getElementById('auth-email-input')||{}).value?.trim() || '';
         const password = (document.getElementById('auth-password-input')||{}).value || '';
+        if(mode==='signup'){
+          const again = (document.getElementById('auth-password2-input')||{}).value || '';
+          if(password.length < 6) throw { message:'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร' };
+          if(password !== again) throw { message:'รหัสผ่านทั้งสองช่องไม่ตรงกัน' };
+        }
         const cred = firebase.auth.EmailAuthProvider.credential(email, password);
         if(mode==='signup' && fbAuth.currentUser && fbAuth.currentUser.isAnonymous){
           try{
@@ -10029,7 +10076,7 @@ function attachMainEvents(){
       }catch(err){
         authBtn.disabled = false; authBtn.textContent = mode==='signup' ? 'สร้างบัญชี' : 'เข้าสู่ระบบ';
         if(statusEl){
-          statusEl.textContent = 'เกิดข้อผิดพลาด: ' + (err && err.message ? err.message : String(err));
+          statusEl.textContent = authErrorText(err);
           statusEl.style.display = 'block';
         }
       }
@@ -10064,6 +10111,33 @@ function attachMainEvents(){
     });
   }
 
+  // a picked photo is cropped square, shrunk to 256px and kept until Save
+  const avFile = document.getElementById('avatar-file');
+  if(avFile){
+    avFile.addEventListener('change', async () => {
+      const f = avFile.files && avFile.files[0]; if(!f) return;
+      try{
+        const url = URL.createObjectURL(f);
+        const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+        const s = Math.min(im.naturalWidth, im.naturalHeight), c = document.createElement('canvas'); c.width = c.height = 256;
+        const g = c.getContext('2d'); g.imageSmoothingQuality = 'high';
+        g.drawImage(im, (im.naturalWidth - s) / 2, (im.naturalHeight - s) / 2, s, s, 0, 0, 256, 256);
+        URL.revokeObjectURL(url);
+        state._newAvatar = c.toDataURL('image/jpeg', .86);
+        const face = document.getElementById('avatar-edit-face');
+        if(face) face.innerHTML = `<span class="mini-avatar has-img" style="width:96px;height:96px"><img src="${state._newAvatar}" alt=""></span>`;
+      }catch(e){ toast('เปิดรูปนี้ไม่ได้ ลองรูปอื่น'); }
+    });
+  }
+  const avRemove = document.getElementById('avatar-remove');
+  if(avRemove){
+    avRemove.addEventListener('click', () => {
+      state._newAvatar = '';
+      const face = document.getElementById('avatar-edit-face');
+      if(face) face.innerHTML = `<span class="mini-avatar" style="width:96px;height:96px;font-size:38px"><span>${escapeHtml((state.account.name || '?')[0].toUpperCase())}</span></span>`;
+      avRemove.remove();
+    });
+  }
   const editBtn = document.getElementById('edit-save-btn');
   if(editBtn){
     editBtn.addEventListener('click', async ()=>{
@@ -10075,6 +10149,12 @@ function attachMainEvents(){
         const name = (nameInput ? nameInput.value : '').trim() || 'ผู้ใช้';
         await fbAuth.currentUser.updateProfile({ displayName: name });
         state.account = { ...state.account, name };
+        if(state._newAvatar !== undefined){
+          await fbDb.collection('users').doc(fbAuth.currentUser.uid).set({ avatar: state._newAvatar || null }, { merge:true });
+          state.account.avatar = state._newAvatar || null;
+          if(!state._newAvatar) state.account.photo = null;
+          delete state._newAvatar;
+        }
         state.view='profile';
         render();
       }catch(err){
@@ -12048,7 +12128,8 @@ async function init(){
       }
     }
     if(user && !user.isAnonymous){
-      state.account = { name: user.displayName || user.email || 'ผู้ใช้', email: user.email || '', loggedIn:true, uid:user.uid };
+      state.account = { name: user.displayName || user.email || 'ผู้ใช้', email: user.email || '', loggedIn:true, uid:user.uid,
+        photo: user.photoURL || null };
     } else {
       state.account = null;
     }
@@ -12062,6 +12143,7 @@ async function init(){
     const oshiData = await loadOshiData();
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;
+    if(state.account && oshiData.avatar) state.account.avatar = oshiData.avatar;
     if(!_urlApplied){ _urlApplied = true; applyUrlToState(); replaceHistory(); }
     render();
   });
