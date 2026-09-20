@@ -2434,6 +2434,22 @@
       color-mix(in srgb, var(--ink) 8%, transparent) 55%,
       transparent);
   }
+  /* The lettering is drawn by a mask, so it is always the colour of the text
+     it stands in for — no second file for dark mode, none for each accent. */
+  .song-logo{
+    display:block; width:min(330px, 88%); aspect-ratio:var(--ratio);
+    background:currentColor;
+    -webkit-mask:var(--logo) center/contain no-repeat; mask:var(--logo) center/contain no-repeat;
+  }
+  /* With the lettering there, the written-out title steps back to a caption. */
+  .evm-logo{ margin:10px 0 2px; color:var(--c); }
+  .evm-logo + .evm-title,
+  .is-event-sheet .evm-logo + .evm-title{ margin-top:9px; font-size:16.5px; line-height:1.35; }
+  .is-postered .evm-logo{ color:var(--sheet-ink, var(--c)); }
+  .shop-logo{ width:min(230px, 76%); margin:2px 0 6px; color:var(--c); }
+  .ge-shop-logo{ width:100%; max-width:185px; margin:1px 0 3px; color:var(--c); }
+  .ge-shop-card span:has(.ge-shop-logo){ flex:1 1 auto; }
+
   .evm-title{ margin:6px 0 0; font-size:21px; font-weight:800; line-height:1.3; letter-spacing:-.01em; padding-right:34px; }
   .evm-venue{ margin:8px 0 0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
   .evm-head{
@@ -3734,7 +3750,7 @@ const SEED_SCHEDULE = [
     lineupTba:true },
   /* The single and the photoset are what the GE6 Tokens come in, so they sit
      with the election rather than in the discography until they are released. */
-  { id:'ev-ge6-single', start:'2026-09-26', end:'2026-10-30', period:true, bar:'Pre-Order: Kimi to Doko ka e Ikitai',
+  { id:'ev-ge6-single', logo:'kimi', start:'2026-09-26', end:'2026-10-30', period:true, bar:'Pre-Order: Kimi to Doko ka e Ikitai',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" · Pre-Order',
     shop:{ name:'ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"', kind:'ซิงเกิลพิเศษ',
       price:'272 – 420 บาท', from:'2026-09-26T12:00', to:'2026-10-30T23:00',
@@ -3787,21 +3803,21 @@ const SEED_SCHEDULE = [
       'Rare (R) — 1 ท่าต่อสมาชิกหนึ่งคน',
       'Super Rare (SR) — 1 ท่า พร้อมข้อความ "Thank You" ลายมือสมาชิก แบบพิมพ์',
       'Super Super Rare (SSR) — 1 ท่า พร้อมลายเซ็นจริง มีเพียง 5 ใบต่อสมาชิกหนึ่งคน'] }] },
-  { id:'ev-ge6-handshake', start:'2026-10-31', end:'2026-11-01',
+  { id:'ev-ge6-handshake', logo:'kimi', start:'2026-10-31', end:'2026-11-01',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Handshake Event',
     venue:'MCC Hall, The Mall Lifestore Ngamwongwan', groups:['bnk48','cgm48'],
     timeline:'ge2026', related:['ev-ge6-single','ev-election-voting'],
     info:['ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Handshake Event',
       'รอบเวลารอประกาศอีกครั้ง'],
     lineupTba:true },
-  { id:'ev-ge6-myo1', start:'2026-11-05', end:'2026-11-08', online:'iAM48 Application',
+  { id:'ev-ge6-myo1', logo:'kimi', start:'2026-11-05', end:'2026-11-08', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 1]',
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo2'],
     info:['แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.ย. 2026 23:00 น.',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
       'รอบเวลารอประกาศอีกครั้ง'],
     lineupTba:true },
-  { id:'ev-ge6-myo2', start:'2026-11-26', end:'2026-11-29', online:'iAM48 Application',
+  { id:'ev-ge6-myo2', logo:'kimi', start:'2026-11-26', end:'2026-11-29', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 2]',
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo1'],
     info:['แลกบัตรได้ถึง 24 พ.ย. 2026 23:00 น.',
@@ -7673,7 +7689,8 @@ function renderShopPage(){
       <div class="shop-body">
         <p class="shop-meta"><span class="shop-kind">${escapeHtml(s.kind)}</span>
           <span class="shop-status">${status}</span></p>
-        <h3 class="shop-title">${escapeHtml(s.name)}</h3>
+        ${e.logo ? renderSongLogo(e.logo, 'shop-logo')
+          : `<h3 class="shop-title">${escapeHtml(s.name)}</h3>`}
         <p class="shop-price">${escapeHtml(s.price)}</p>
         <ul class="shop-facts">
           <li>${en ? 'On sale' : 'สั่งซื้อ'} ${when(s.from)} – ${when(s.to)}</li>
@@ -7788,6 +7805,21 @@ function renderTimelinePage(inHub){
 }
 /* The election's own page: the logo, where the campaign stands today, and
    three tabs — a summary, the full timeline, and every outing tied to it. */
+/* A song's own lettering, worn by everything that release touches. The art is
+   one white SVG used as a mask, so the same file takes the colour of whatever
+   it sits on — the accent on a card, white on a poster. The PNG beside it is
+   for the share canvas, which cannot mask. */
+const SONG_LOGOS = {
+  kimi: { src:'logos/kimi-to-doko-ka-e-ikitai.svg', png:'logos/kimi-to-doko-ka-e-ikitai.png',
+    ratio: 841.89 / 347.07, alt:'Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ' },
+};
+function renderSongLogo(key, cls){
+  const l = SONG_LOGOS[key];
+  if(!l) return '';
+  return `<span class="song-logo${cls ? ' ' + cls : ''}" style="--logo:url('${l.src}'); --ratio:${l.ratio}"
+    role="img" aria-label="${escapeAttr(l.alt)}"></span>`;
+}
+
 const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo.png', red:'#B3121E',
   vote:'ev-election-voting', results:'ev-election-results' };
 function renderGEPage(){
@@ -7855,7 +7887,8 @@ function renderGEPage(){
       ${shop.length ? `<h3 class="section-label">${en ? 'On sale' : 'สินค้าที่เปิดขาย'}</h3>
         <div class="ge-shop">${shop.map(e => `<button class="ge-shop-card" style="--c:${e.poster ? e.poster.accent : GE_PAGE.red}" data-action="open-event" data-id="${e.id}">
           ${e.poster && e.poster.img ? `<img src="${escapeAttr(e.poster.img)}" alt="" loading="lazy" decoding="async">` : ''}
-          <span><b>${escapeHtml(e.shop.name)}</b><small>${escapeHtml(e.shop.price)}</small></span></button>`).join('')}</div>` : ''}`;
+          <span>${e.logo ? renderSongLogo(e.logo, 'ge-shop-logo')
+            : `<b>${escapeHtml(e.shop.name)}</b>`}<small>${escapeHtml(e.shop.price)}</small></span></button>`).join('')}</div>` : ''}`;
   }
 
   return `<section class="ge-page" style="--ge:${GE_PAGE.red}">${hero}
@@ -8127,6 +8160,7 @@ function renderEventModal(){
             ? `<span class="evm-price">${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span></span>`
             : ''}
         </div>
+        ${ev.logo ? renderSongLogo(ev.logo, 'evm-logo') : ''}
         <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
         <hr class="evm-rule">
         ${ev.venue ? `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.venue)}"
@@ -10752,6 +10786,17 @@ function shareFace(g, m, im, x, y, size, colour){
   }
   g.restore();
 }
+/* The song logos ship white for the page's mask; on a white share panel they
+   would vanish, so the shape is refilled with the colour it should be. */
+function shareTint(img, colour, w, h){
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const x = c.getContext('2d');
+  x.drawImage(img, 0, 0, w, h);
+  x.globalCompositeOperation = 'source-in';
+  x.fillStyle = colour; x.fillRect(0, 0, w, h);
+  return c;
+}
 function shareMix(hex, t, to = '#ffffff'){
   const p = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
   const a = p(hex), b = p(to);
@@ -10893,15 +10938,20 @@ async function drawEventCard(g, ev, url){
   const accent = ev.poster && ev.poster.accent || ((getGroup((ev.groups || [])[0]) || {}).color) || '#1C1329';
   g.fillStyle = shareMix(accent, .55, '#000000'); g.fillRect(0, 0, SHARE_W, SHARE_H);
   const im = ev.poster && ev.poster.img ? await shareLoad(ev.poster.img) : null;
+  // A release's own lettering leads the panel, and the title follows it small.
+  const art = ev.logo && SONG_LOGOS[ev.logo] ? await shareLoad(SONG_LOGOS[ev.logo].png) : null;
+  const logoW = art ? 620 : 0, logoH = art ? Math.round(logoW / SONG_LOGOS[ev.logo].ratio) : 0;
   // measure the words first
   const year = +ev.start.slice(0, 4);
   const when = `${eventDateLabel(ev)} ${en ? year : year + 543}${ev.time ? ` · ${ev.time}${en ? '' : ' น.'}` : ''}`;
-  g.font = '800 54px "Noto Sans Thai", sans-serif';
-  const lines = shareWrap(g, ev.title, SHARE_W - 192, 4);
+  const titleSize = art ? 38 : 54, titleStep = art ? 52 : 68;
+  g.font = `800 ${titleSize}px "Noto Sans Thai", sans-serif`;
+  const lines = shareWrap(g, ev.title, SHARE_W - 192, art ? 3 : 4);
   const place = ev.venue || ev.online || '';
   g.font = '600 32px "Noto Sans Thai", sans-serif';
   const placeLines = place ? shareWrap(g, place, SHARE_W - 192, 2) : [];
-  const panelH = 70 + 52 + lines.length * 68 + (placeLines.length ? 24 + placeLines.length * 46 : 0) + 56;
+  const panelH = 70 + 52 + (art ? logoH + 26 : 0) + lines.length * titleStep
+    + (placeLines.length ? 24 + placeLines.length * 46 : 0) + 56;
   const panelBottom = SHARE_H - 170, panelTop = im ? panelBottom - panelH : Math.max(220, (SHARE_H - 170 - panelH) / 2);
   if(im){
     shareBlurCover(g, im, 0, 0, SHARE_W, SHARE_H, .6);
@@ -10913,8 +10963,10 @@ async function drawEventCard(g, ev, url){
   let y = panelTop + 48;
   sharePill(g, when, 96, y, accent, '#ffffff', 30);
   y += 52 + 20;
-  g.textBaseline = 'alphabetic'; g.fillStyle = '#1C1329'; g.font = '800 54px "Noto Sans Thai", sans-serif';
-  lines.forEach(l => { y += 68; g.fillText(l, 96, y); });
+  if(art){ g.drawImage(shareTint(art, accent, logoW, logoH), 96, y, logoW, logoH); y += logoH + 26; }
+  g.textBaseline = 'alphabetic'; g.fillStyle = art ? '#5B5068' : '#1C1329';
+  g.font = `800 ${titleSize}px "Noto Sans Thai", sans-serif`;
+  lines.forEach(l => { y += titleStep; g.fillText(l, 96, y); });
   if(placeLines.length){ y += 24; g.font = '600 32px "Noto Sans Thai", sans-serif'; g.fillStyle = '#5B5068';
     placeLines.forEach(l => { y += 46; g.fillText(l, 96, y); }); }
   await shareFooter(g, true, url);
