@@ -1984,6 +1984,11 @@
   }
   .evm-icon svg{ width:20px; height:20px; display:block; }
   .evm-icon.is-img{ background:none; border:0; }
+  /* the icon doubles as the link to the stream, so it presses like a button */
+  .ev-stream-link{ display:inline-flex; text-decoration:none; border-radius:50%; transition:transform .15s ease, box-shadow .15s ease; }
+  .ev-stream-link:hover{ transform:scale(1.06); }
+  .ev-stream-link:active{ transform:scale(.94); }
+  .ev-stream-link:focus-visible{ outline:2px solid #E02118; outline-offset:3px; }
   .evm-icon.is-img img{ width:38px; height:38px; border-radius:50%; display:block; object-fit:cover; }
   .tl-icon{
     display:inline-flex; align-items:center; justify-content:center; vertical-align:-5px;
@@ -3598,7 +3603,6 @@ const SEED_SCHEDULE = [
     related:['ev-hachicha-tsukimi'],
     poster:{ accent:'#1F6B58', surface:'#EFF7F1', ink:'#17423A', img:'posters/cgm48-popup-live-cnx.jpg', w:2048, h:2048 },
     stream:{ label:'YouTube CGM48 OFFICIAL', url:'https://www.youtube.com/@CGM48OFFICIAL' },
-    links:[{ label:'ถ่ายทอดสด', url:'https://www.youtube.com/@CGM48OFFICIAL' }],
     detail:[
       '16:00 สินค้า MERCHANDISE เริ่มจำหน่าย',
       '18:00–19:00 การแสดง — ถ่ายทอดสดทาง YouTube CGM48 OFFICIAL'],
@@ -7840,6 +7844,15 @@ function renderLiveChip(ev, cls){
     data-live-from="${w.from}" data-live-to="${w.to}"
     title="${escapeAttr(ev.stream.label || '')}">LIVE</span>`;
 }
+/* Where a stream has a home, its icon is the way there — no separate link
+   chip further down the sheet. */
+function renderStreamLink(ev, cls){
+  const icon = renderEventIcon(ev, cls);
+  if(!icon || !ev.stream || !ev.stream.url) return icon;
+  const label = `ดูถ่ายทอดสดทาง ${ev.stream.label || 'YouTube'}`;
+  return `<a class="ev-stream-link" href="${escapeAttr(ev.stream.url)}" target="_blank" rel="noopener noreferrer"
+    title="${escapeAttr(label)}" aria-label="${escapeAttr(label)}">${icon}</a>`;
+}
 function renderEventIcon(ev, cls){
   const name = eventIconName(ev);
   if(!name) return '';
@@ -7971,7 +7984,7 @@ function renderEventModal(){
         </div>
         <div class="evm-body">
         <div class="evm-meta">
-          ${renderEventIcon(ev, 'evm-icon')}
+          ${renderStreamLink(ev, 'evm-icon')}
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}${ev.part?' · '+escapeHtml(ev.part):''}</p>
           ${renderLiveChip(ev, 'is-meta')}
           ${(()=>{ const at = startsAt(ev, toYmd(todayStart()));
