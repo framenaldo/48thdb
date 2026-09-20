@@ -1,11 +1,17 @@
 # Refresh every member's iAM48 live stats and the song videos' view counts
-# once a day and publish them. The site reads data/lives.json and
-# data/youtube.json; nothing else is touched.
+# and publish them. The site reads data/lives.json and data/youtube.json;
+# nothing else is touched.
 name: Refresh live stats
 
 on:
   schedule:
-    - cron: '0 20 * * *'      # 03:00 in Thailand, after the night's lives
+    # Midnight in Thailand, so a day's lives are counted the moment it ends.
+    # GitHub's cron is best-effort and usually a few minutes late, which here
+    # only helps: the run wants to be just after midnight, never just before.
+    - cron: '0 17 * * *'      # 00:00 in Thailand
+    # And again at 03:00, to pick up anyone who went live after midnight
+    # rather than leaving those lives to wait a whole day.
+    - cron: '0 20 * * *'      # 03:00 in Thailand
   workflow_dispatch:          # and on demand from the Actions tab
 
 permissions:
