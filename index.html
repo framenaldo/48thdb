@@ -1505,8 +1505,11 @@
   }
   /* Live on iAM48: a face, the caption she wrote, and a pulsing dot. */
   .iaml-row{ display:flex; flex-wrap:wrap; gap:9px; }
+  /* A chip takes the room its caption needs, up to the width of the column:
+     short ones share a line, a talkative one fills its own and trails off. */
   .iaml-card{
     display:flex; align-items:center; gap:10px; min-width:0; max-width:100%;
+    flex:0 1 auto;
     padding:8px 14px 8px 8px; border-radius:999px; text-decoration:none; color:inherit;
     border:1px solid color-mix(in srgb, var(--c) 32%, var(--line));
     background:color-mix(in srgb, var(--c) 9%, var(--card));
@@ -1520,7 +1523,7 @@
   }
   .iaml-text{ display:flex; flex-direction:column; min-width:0; }
   .iaml-name{ font-weight:800; font-size:14px; line-height:1.25; }
-  .iaml-cap{ font-size:12.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:190px; }
+  .iaml-cap{ font-size:12.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   @media (prefers-reduced-motion: reduce){ .iaml-dot{ animation:none; } }
 
   /* A notice from the owner: red enough to catch the eye, quiet enough to
