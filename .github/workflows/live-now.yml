@@ -1,0 +1,50 @@
+# Ask YouTube whether the group is actually on air, so the site's LIVE badge
+# follows the stream rather than the printed start time. The script looks at
+# the schedule first and only spends quota during the hours an event with a
+# `stream` is expected — most runs stop without asking anything.
+#
+# GitHub's cron is best-effort and often late, so a confirmed live can take a
+# few minutes to reach the page; the badge still lights up on time from the
+# schedule alone in the meantime.
+name: Live now
+
+on:
+  schedule:
+    - cron: '*/15 3-16 * * *'   # every 15 min, 10:00–23:59 in Thailand
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live-now
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Ask YouTube
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: node scripts/check-live.mjs
+
+      - name: Publish if the answer changed
+        run: |
+          if git diff --quiet -- data/live-now.json; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git config user.name  "48thdb-bot"
+          git config user.email "48thdb-bot@users.noreply.github.com"
+          git add data/live-now.json
+          git commit -m "Live now: $(node -e "console.log((require('./data/live-now.json').live[0]||{}).title||'nothing on air')")"
+          git pull --rebase
+          git push

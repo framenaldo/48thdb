@@ -1503,6 +1503,38 @@
     -webkit-background-clip:text; background-clip:text;
     color:transparent; -webkit-text-fill-color:transparent;
   }
+  /* A notice from the owner: red enough to catch the eye, quiet enough to
+     sit above the day's events without shouting over them. */
+  .flash-card{
+    position:relative; margin:0 0 10px; padding:13px 15px 13px 18px;
+    border-radius:16px; border:1px solid color-mix(in srgb, #C8231A 26%, var(--line));
+    background:color-mix(in srgb, #C8231A 7%, var(--card)); overflow:hidden;
+  }
+  .flash-card::before{ content:''; position:absolute; inset:0 auto 0 0; width:5px; background:#C8231A; }
+  .flash-line{ display:flex; align-items:center; gap:9px; margin:0 0 5px; }
+  .flash-tag{
+    display:inline-flex; align-items:center; gap:5px; padding:2px 9px; border-radius:999px;
+    background:#C8231A; color:#fff; font-size:11px; font-weight:800; letter-spacing:.7px;
+  }
+  .flash-tag::before{ content:''; width:6px; height:6px; border-radius:50%; background:#fff; animation:today-pulse 1.6s ease-out infinite; }
+  .flash-when{ font-size:12px; color:var(--ink-soft); }
+  .flash-text{ margin:0; font-size:15.5px; line-height:1.45; font-weight:600; color:var(--ink); }
+  .flash-foot{ display:flex; flex-wrap:wrap; gap:7px; margin-top:9px; }
+  .flash-foot:empty{ display:none; }
+  .flash-del{ color:#C8231A; border-color:color-mix(in srgb, #C8231A 35%, var(--line)); }
+  .flash-box{ display:flex; flex-direction:column; gap:8px; margin:0 0 14px; }
+  .flash-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .flash-row .flash-input{ flex:1 1 180px; }
+  .flash-input{
+    width:100%; padding:10px 12px; border-radius:12px;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    font-family:'Noto Sans Thai',sans-serif; font-size:14px;
+  }
+  .flash-input:focus{ outline:2px solid color-mix(in srgb, #C8231A 55%, transparent); outline-offset:1px; }
+  textarea.flash-input{ resize:vertical; min-height:56px; }
+  .flash-list{ margin:0 0 18px; }
+  @media (prefers-reduced-motion: reduce){ .flash-tag::before{ animation:none; } }
+
   .feed-block{ margin:0 0 24px; }
   .feed-block .section-label{
     display:flex; align-items:center; gap:9px; margin:0 0 12px;
@@ -2023,6 +2055,9 @@
   .live-chip.is-meta{ margin-left:0; padding:4px 11px 4px 9px; font-size:12px; }
   :root[data-theme="dark"] .live-chip{ background:rgba(255,86,75,.18); color:#FF8078; }
   .live-chip.is-on{ background:#E02118; color:#fff; animation:live-flash 1.2s ease-in-out infinite; }
+  /* confirmed by YouTube: the badge is the way into the stream itself */
+  a.live-chip.is-air{ text-decoration:none; }
+  a.live-chip.is-air:active{ filter:brightness(1.2); }
   :root[data-theme="dark"] .live-chip.is-on{ background:#FF3B30; color:#fff; }
   @keyframes live-flash{
     0%,100%{ opacity:1; box-shadow:0 0 0 0 transparent; }
@@ -3602,7 +3637,7 @@ const SEED_SCHEDULE = [
     members:['cgm-else','cgm-lewlew','cgm-ploen','cgm-praifa','cgm-ginna','cgm-tara'],
     related:['ev-hachicha-tsukimi'],
     poster:{ accent:'#1F6B58', surface:'#EFF7F1', ink:'#17423A', img:'posters/cgm48-popup-live-cnx.jpg', w:2048, h:2048 },
-    stream:{ label:'YouTube CGM48 OFFICIAL', url:'https://www.youtube.com/@CGM48OFFICIAL' },
+    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL' },
     detail:[
       '16:00 สินค้า MERCHANDISE เริ่มจำหน่าย',
       '18:00–19:00 การแสดง — ถ่ายทอดสดทาง YouTube CGM48 OFFICIAL'],
@@ -4557,7 +4592,7 @@ const ICONS = {
 
 // ============================= STATE =============================
 let state = {
-  isOwner:false, pending:[],
+  isOwner:false, pending:[], flash:[],
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
@@ -5071,6 +5106,13 @@ const EN = {
   'รายละเอียดสถานที่และเวลารอประกาศ': 'Venue and time still to be announced',
   'ราคาเริ่มต้น 145 บาท': 'From 145 THB',
   'กำลังจัดอยู่': 'On now',
+  'กำลังไลฟ์อยู่': 'On air now',
+  'ด่วน': 'FLASH',
+  'ประกาศด่วน': 'Latest word',
+  'ขึ้นทันทีทุกเครื่องที่เปิดเว็บอยู่': 'Appears at once on every open page',
+  'ส่งประกาศ': 'Post',
+  'ลบประกาศ': 'Remove',
+  'ยังไม่มีประกาศที่แสดงอยู่': 'Nothing posted right now',
   'เพลงพิเศษ': 'Specials',
   'ซิงเกิลพิเศษ': 'Special single',
   'ซิงเกิลดิจิทัล': 'Digital single',
@@ -5893,6 +5935,47 @@ async function loadPending(){
   }catch(e){ state.pending = []; }
 }
 const plain = o => o ? JSON.parse(JSON.stringify(o)) : null;   // Firestore refuses undefined
+
+/* ===================== WORD FROM THE OWNER =====================
+   A line typed on the owner's phone — "the show is running late", "Khaimook
+   is on instead" — reaches every open page in about a second. Firestore
+   pushes the change, so nothing here is deployed, polled or reloaded.
+   Everyone may read these; only the owner may write one (rules do that). */
+let _flashUnsub = null;
+/* One that has passed its own use-by is simply not shown any more. */
+function flashLive(list){
+  const now = Date.now();
+  return (list || []).filter(f => (f.th || f.en) && (!f.until || Date.parse(f.until) > now));
+}
+function listenFlash(){
+  if(_flashUnsub) return;
+  try{
+    _flashUnsub = fbDb.collection('flash').orderBy('at', 'desc').limit(12).onSnapshot(snap => {
+      state.flash = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      // the first answer can beat the first paint; that paint will show it
+      if(!document.getElementById('main')) return;
+      syncTicker();
+      // a notice arriving must not yank the page out from under a reader
+      if(state.selectedId || state.selectedEvent || state.posterOf || state.editingId) return;
+      if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+      if(state.view === 'feed' || state.view === 'profile') renderMain();
+    }, () => {});
+  }catch(e){}
+}
+/* Written in Thai; English only where the owner bothered to add it. */
+const flashText = f => (isEN() && f.en ? f.en : f.th) || f.en || '';
+function flashWhen(f){
+  const ms = f.at && f.at.seconds ? f.at.seconds * 1000 : null;
+  if(!ms) return '';
+  const mins = Math.round((Date.now() - ms) / 60000);
+  const en = isEN();
+  if(mins < 1) return en ? 'just now' : 'เมื่อสักครู่';
+  if(mins < 60) return en ? `${mins} min ago` : `${mins} นาทีที่แล้ว`;
+  const hrs = Math.round(mins / 60);
+  if(hrs < 24) return en ? `${hrs} h ago` : `${hrs} ชั่วโมงที่แล้ว`;
+  const d = new Date(ms);
+  return `${d.getDate()} ${monthsShort()[d.getMonth()]} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
 
 async function saveMembers(members){
   const batch = fbDb.batch();
@@ -7819,6 +7902,45 @@ function eventIconName(ev){
   if(ev.tag === 'media') return 'tv';
   return '';
 }
+/* ================= ON AIR, CONFIRMED =================
+   The schedule says when a show should start; data/live-now.json says whether
+   YouTube is carrying one right now. A workflow asks every quarter of an hour
+   during the hours something is expected, so a show that starts late still
+   lights the badge — a few minutes after it really begins, not before.
+   The file is small and is re-read while the page is open. */
+let LIVE_NOW = { checked:null, live:[] };
+let _liveNowTimer = null;
+function loadLiveNow(again){
+  // never from the service worker's copy: the whole point is the latest answer
+  fetch(`data/live-now.json?t=${Date.now()}`, { cache:'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if(!d) return;
+      const was = JSON.stringify(LIVE_NOW.live || []);
+      LIVE_NOW = { checked:d.checked || null, live:Array.isArray(d.live) ? d.live : [] };
+      if(JSON.stringify(LIVE_NOW.live) === was) return;
+      if(!document.getElementById('main')) return;   // the first paint will show it
+      syncTicker();
+      if(state.selectedId || state.posterOf || state.editingId) return;
+      renderMain();
+    })
+    .catch(() => {});
+  if(again && !_liveNowTimer){
+    _liveNowTimer = setInterval(() => {
+      if(document.visibilityState === 'visible') loadLiveNow(false);
+    }, 120000);
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'visible') loadLiveNow(false);
+    });
+  }
+}
+/** The stream YouTube is carrying for this event, if there is one. */
+function liveOnAir(ev){
+  if(!ev || !ev.stream) return null;
+  const key = ev.stream.channel || (ev.groups || [])[0];
+  return (LIVE_NOW.live || []).find(l => l.eventId === ev.id || (key && l.group === key)) || null;
+}
+
 /* A broadcast has hours of its own: the badge is red all along and blinks
    only between them. Multi-day events are read on whichever day is showing. */
 function streamWindow(ev){
@@ -7840,6 +7962,11 @@ function renderLiveChip(ev, cls){
   if(!w) return '';
   const now = Date.now();
   const on = now >= w.from && now <= w.to;
+  const air = liveOnAir(ev);
+  // Confirmed on air: the badge says so and goes straight to that stream.
+  if(air) return `<a class="live-chip is-on is-air${cls ? ' ' + cls : ''}"
+    href="${escapeAttr(air.url)}" target="_blank" rel="noopener noreferrer"
+    title="${escapeAttr(air.title || '')}">กำลังไลฟ์อยู่</a>`;
   return `<span class="live-chip${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}"
     data-live-from="${w.from}" data-live-to="${w.to}"
     title="${escapeAttr(ev.stream.label || '')}">LIVE</span>`;
@@ -8248,6 +8375,20 @@ function renderSearch(){
   </div>`;
 }
 
+/* A notice on the feed: the words, when they were written, and a way through
+   to the event they are about. The owner sees a button to take it down. */
+function renderFlashCard(f){
+  const ev = f.eventId ? SEED_SCHEDULE.find(e => e.id === f.eventId) : null;
+  return `<article class="flash-card">
+    <p class="flash-line"><span class="flash-tag">ด่วน</span><span class="flash-when">${escapeHtml(flashWhen(f))}</span></p>
+    <p class="flash-text">${escapeHtml(flashText(f))}</p>
+    <div class="flash-foot">
+      ${ev ? `<button class="chip chip-link" data-action="open-event" data-id="${ev.id}">${escapeHtml(ev.title)} ↗</button>` : ''}
+      ${state.isOwner ? `<button class="chip flash-del" data-action="delete-flash" data-id="${f.id}">ลบประกาศ</button>` : ''}
+    </div>
+  </article>`;
+}
+
 function renderFeed(){
   const today = todayStart();
   const iso = toYmd(today);
@@ -8284,6 +8425,12 @@ function renderFeed(){
     </header>
 
     <div class="feed-cols"><div class="feed-main">
+    ${flashLive(state.flash).length ? `
+    <section class="feed-block is-flash">
+      <h2 class="section-label">ประกาศด่วน</h2>
+      ${flashLive(state.flash).map(renderFlashCard).join('')}
+    </section>` : ''}
+
     ${nowOn.length ? `
     <section class="feed-block today-hero-block">
       <h2 class="section-label">งานวันนี้</h2>
@@ -8742,6 +8889,39 @@ function pendingValue(k, v){
   if(Array.isArray(v)) return v.map(x => escapeHtml(String(x))).join('<br>');
   return escapeHtml(String(v));
 }
+/* The owner's own desk: type a line, pick how long it should stand, send.
+   It is on every open page before the button finishes its press. */
+function renderFlashComposer(){
+  if(!state.isOwner) return '';
+  const live = flashLive(state.flash);
+  const iso = toYmd(todayStart());
+  const soon = SEED_SCHEDULE.filter(e => !e.shop && eventLastDay(e) >= iso)
+    .sort((a, b) => a.start.localeCompare(b.start)).slice(0, 14);
+  return `<div class="pd-head"><h3 class="section-label">ประกาศด่วน</h3>
+      <span class="muted-note">ขึ้นทันทีทุกเครื่องที่เปิดเว็บอยู่</span></div>
+    <div class="flash-box">
+      <textarea class="flash-input" id="flash-th" rows="2" maxlength="180"
+        placeholder="เช่น งานเลื่อนเป็น 19:00 น. หรือ Khaimook แสดงแทน Niya"></textarea>
+      <input class="flash-input" id="flash-en" maxlength="180" placeholder="ภาษาอังกฤษ (ไม่ใส่ก็ได้)">
+      <div class="flash-row">
+        <select class="flash-input" id="flash-event">
+          <option value="">ไม่ผูกกับงาน</option>
+          ${soon.map(e => `<option value="${e.id}">${escapeHtml(e.title)} · ${eventDateLabel(e)}</option>`).join('')}
+        </select>
+        <select class="flash-input" id="flash-life">
+          <option value="3">แสดง 3 ชั่วโมง</option>
+          <option value="today" selected>ถึงสิ้นวันนี้</option>
+          <option value="24">แสดง 24 ชั่วโมง</option>
+          <option value="72">แสดง 3 วัน</option>
+          <option value="0">ไม่กำหนด (ลบเอง)</option>
+        </select>
+      </div>
+      <button class="btn-add" data-action="post-flash">ส่งประกาศ</button>
+    </div>
+    ${live.length ? `<div class="flash-list">${live.map(renderFlashCard).join('')}</div>`
+      : `<p class="muted-note">ยังไม่มีประกาศที่แสดงอยู่</p>`}`;
+}
+
 function renderPendingQueue(){
   if(!state.isOwner) return '';
   const items = state.pending;
@@ -8799,6 +8979,7 @@ function renderProfile(){
 
   return `
   ${accountBlock}
+  ${renderFlashComposer()}
   ${renderPendingQueue()}
   <h3 class="section-label">Kami Oshi ของคุณ</h3>
   ${kamiMember ? renderKamiOshiFeatured(kamiMember) : `<p class="muted-note">ยังไม่ได้เลือก Kami Oshi — เปิดโปรไฟล์สมาชิกแล้วกดปุ่มมงกุฎเพื่อเลือก (เลือกได้คนเดียว)</p>`}
@@ -9864,6 +10045,7 @@ const NAV_HIDDEN_VIEWS = ['auth','editprofile','form'];
    is about and opens it. Built on every draw, but only swapped in when its
    words change, so the scroll does not jump back to the start on a tap. */
 const TICKER_KINDS = {
+  flash:  { th:'ด่วน',      en:'FLASH',    color:'#C8231A' },
   live:   { th:'LIVE',     en:'LIVE',     color:'#1E9E57' },
   today:  { th:'วันนี้',     en:'TODAY',    color:'#138A8A' },
   news:   { th:'ประกาศ',    en:'NEWS',     color:'#3A66D6' },
@@ -9891,6 +10073,23 @@ function tickerItems(){
   const nick = m => m.nameTh && !en ? m.nameTh : m.name;
   const ev = (e) => ({ action:'open-event', id:e.id });
   const items = [];
+
+  // 0. word from the owner — ahead of everything, however the day looks
+  for(const f of flashLive(state.flash)){
+    const text = flashText(f);
+    if(!text) continue;
+    items.push({ kind:'flash', parts: [
+      f.eventId && SEED_SCHEDULE.some(e => e.id === f.eventId)
+        ? { text, action:'open-event', id:f.eventId } : text ] });
+  }
+
+  // 0b. YouTube says it is carrying a stream right now
+  for(const l of (LIVE_NOW.live || [])){
+    const e = SEED_SCHEDULE.find(x => x.id === l.eventId);
+    if(mine && e && !hasMyOshi(e)) continue;
+    items.push({ kind:'live', to: e ? ev(e) : null, parts:[
+      en ? 'On air now' : 'กำลังไลฟ์อยู่', l.title || (e && e.title) || l.channel ] });
+  }
 
   // 1. on now, or on later today
   for(const e of SEED_SCHEDULE.filter(e => !e.period && e.start <= iso && eventLastDay(e) >= iso)){
@@ -11730,6 +11929,9 @@ function bindDelegatedEvents(){
       return;
     }
     if(state.langMenuOpen && !['toggle-lang-menu','set-lang'].includes(el.dataset.action)){ state.langMenuOpen = false; render(); }
+    // a link sitting inside a card takes the tap: follow it, don't open the card
+    const anchor = e.target.closest('a[href]');
+    if(anchor && anchor !== el && el.contains(anchor)) return;
     const action = el.dataset.action;
     const id = el.dataset.id;
 
@@ -11997,6 +12199,38 @@ function bindDelegatedEvents(){
     else if(action==='refresh-pending'){
       await loadPending(); render();
     }
+    else if(action==='post-flash'){
+      const th = (document.getElementById('flash-th')?.value || '').trim();
+      if(!th){ alert('พิมพ์ข้อความประกาศก่อน'); return; }
+      const life = document.getElementById('flash-life')?.value || 'today';
+      let until = null;
+      if(life === 'today'){ const d = todayStart(); d.setHours(23, 59, 0, 0); until = d.toISOString(); }
+      else if(Number(life) > 0) until = new Date(Date.now() + Number(life) * 3600000).toISOString();
+      el.disabled = true;
+      try{
+        await fbDb.collection('flash').add({
+          th,
+          en: (document.getElementById('flash-en')?.value || '').trim() || null,
+          eventId: document.getElementById('flash-event')?.value || null,
+          until,
+          at: firebase.firestore.FieldValue.serverTimestamp(),
+          by: { uid: fbAuth.currentUser ? fbAuth.currentUser.uid : null,
+                name: (state.account && state.account.name) || '' },
+        });
+        toast('ส่งประกาศแล้ว');
+      }catch(err){ alert('ส่งประกาศไม่สำเร็จ ลองใหม่อีกครั้ง'); }
+      el.disabled = false;
+      render();     // the listener brings the new notice in on its own
+    }
+    else if(action==='delete-flash'){
+      el.disabled = true;
+      try{
+        await fbDb.collection('flash').doc(id).delete();
+        state.flash = state.flash.filter(f => f.id !== id);
+        toast('ลบประกาศแล้ว');
+      }catch(err){ alert('ลบไม่สำเร็จ ลองใหม่อีกครั้ง'); }
+      render();
+    }
     else if(action==='cancel-form'){
       goBack(()=>{
         state.view = 'browse';
@@ -12231,6 +12465,8 @@ async function init(){
     }
     state.isOwner = await checkOwner();
     await loadPending();
+    listenFlash();
+    loadLiveNow(true);
     if(!state.members || !state.members.length){
       try{ state.members = await loadMembers(); }
       catch(e){ state.members = SEED_ALL_MEMBERS.slice(); }
