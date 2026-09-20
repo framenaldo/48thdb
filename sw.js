@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v10';
+const VERSION = 'v11';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
@@ -101,7 +101,12 @@ self.addEventListener('fetch', (event) => {
 
   if (url.origin === self.location.origin) {
     if (url.pathname.endsWith('/sw.js')) return;   // never serve the worker from cache
-    // data/ is rebuilt daily; yesterday's copy is only for when there is no network
+    // Who is on air is asked for again every couple of minutes, each time with a
+    // fresh ?t= so the CDN cannot answer from its own copy. Kept, every one of
+    // those would be a new cache entry that nothing ever asks for again, so
+    // these go straight to the network and are never stored.
+    if (/\/data\/(live-now|iam-live)\.json$/.test(url.pathname)) return;
+    // the rest of data/ is rebuilt daily; yesterday's copy is only for when there is no network
     if (url.pathname.includes('/data/')) { event.respondWith(dataFirst(request)); return; }
     event.respondWith(assetFresh(request));
     return;

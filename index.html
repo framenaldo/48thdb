@@ -255,7 +255,8 @@
   .grad-note{
     display:flex; align-items:center; gap:7px;
     font-size:12.5px; color:var(--ink-soft);
-    background:#FBF4E6; border:1px solid #EBD9B4; border-radius:10px;
+    background:color-mix(in srgb, var(--gold) 11%, var(--card));
+    border:1px solid color-mix(in srgb, var(--gold) 34%, var(--line)); border-radius:10px;
     padding:8px 12px; margin:0 0 12px;
   }
   /* transferred between groups rather than graduated from the first one */
@@ -726,7 +727,8 @@
     font-family:'Noto Sans Thai',sans-serif; font-size:13.5px; font-weight:600; color:var(--ink);
   }
   .cal-item-tag{
-    flex:none; font-size:10.5px; font-weight:800; color:var(--c);
+    /* small type on a wash of its own colour: darkened a little so it reads */
+    flex:none; font-size:10.5px; font-weight:800; color:color-mix(in srgb, var(--c) 68%, #000);
     background:color-mix(in srgb, var(--c) 13%, transparent);
     padding:3px 7px; border-radius:999px;
   }
@@ -2005,6 +2007,8 @@
     display:inline-block; padding:2px 8px; border-radius:999px; background:var(--k);
     color:#fff; font-size:10.5px; font-weight:800;
   }
+  /* white on this gold reads at about 2.7:1 in either theme */
+  [style*="--k:#C8961E"] .tl-kind, .ticker-kind[style*="#C8961E"]{ color:#241A06; }
   .tl-time{ margin-left:6px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
   .tl-now, .tl-next{ margin-left:6px; padding:2px 7px; border-radius:999px; font-size:10.5px; font-weight:800; }
   .tl-now{ background:var(--k); color:#fff; }
@@ -2559,7 +2563,9 @@
   .oshi-btn:active, .kami-btn:active{ transform:scale(.96); transition-duration:.08s; }
   .oshi-btn span{ color:var(--gold); font-size:16px; }
   .oshi-btn.active{ background:var(--bnk-soft); border-color:var(--bnk); color:var(--ink); }
-  .kami-btn.active{ background:#FBF0DC; border-color:var(--gold); color:var(--ink); }
+  /* The cream fill is mixed from the gold rather than fixed, so the text — which
+     turns light in dark mode — never lands on a light patch. */
+  .kami-btn.active{ background:color-mix(in srgb, var(--gold) 16%, var(--card)); border-color:var(--gold); color:var(--ink); }
   .kami-badge{ background:var(--gold)!important; display:inline-flex!important; align-items:center; gap:5px; }
   .kami-badge .crown-ico{ color:#fff; width:12px; height:12px; }
 
@@ -2886,6 +2892,30 @@
   @media (min-width:1600px){
     .modal-glass-card{ max-width:720px; }
   }
+
+  /* ---- Dark mode contrast ------------------------------------------------
+     Dark mode lightens the gold, the greys and the two group colours so they
+     read on a dark page — and every white label that sat on one of those
+     fills was left white. These found by measuring each piece of text against
+     the colour actually behind it. On a lightened fill the label goes dark; an
+     accent picked for a light card is mixed toward white. */
+  :root[data-theme="dark"]{ --on-fill:#1B1326; --ge-text:#FF8790; }
+  :root[data-theme="dark"] :is(.badge-link, .kami-badge, .captain-badge, .work-centre,
+      .track-tag, .scope-btn.is-on, .calp-cell.is-today .calp-num){ color:var(--on-fill); }
+  :root[data-theme="dark"] .kami-badge .crown-ico{ color:var(--on-fill); }
+  :root[data-theme="dark"] .shop-price,
+  :root[data-theme="dark"] .ge-shop-card small{ color:color-mix(in srgb, var(--c) 45%, #fff); }
+  :root[data-theme="dark"] .ge-next-when small{ color:var(--ge-text); }
+  :root[data-theme="dark"] .cal-item-tag{ color:color-mix(in srgb, var(--c) 55%, #fff); }
+  /* event icons take the poster's own accent, which is dark by design; on a dark
+     card the drawing all but disappears. (The YouTube-red one is set apart.) */
+  :root[data-theme="dark"] :is(.ev-icon, .evm-icon):not(.is-yt):not(.is-img){ color:color-mix(in srgb, var(--c) 42%, #fff); }
+  :root[data-theme="dark"] .tl-icon:not(.is-yt):not(.is-img){ color:color-mix(in srgb, var(--k) 45%, #fff); }
+  /* light words on a white-ish pill vanished; the pill turns dark instead */
+  :root[data-theme="dark"] .evm-fest-name{ background:rgba(18,12,26,.66); }
+  /* the starts-in pill: a pale wash of the accent with dark words, since the
+     poster accents were all chosen for light cards */
+  :root[data-theme="dark"] :is(.evm-starts, .ev-when){ background:color-mix(in srgb, var(--c) 32%, #fff); color:var(--on-fill); }
 </style>
 <script>
   /* Runs before first paint: a stored choice wins, otherwise follow the OS. */
@@ -3623,7 +3653,7 @@ const SEED_SCHEDULE = [
   { id:'ev-hachicha-tsukimi', start:'2026-09-17', end:'2026-09-24',
     title:'Hachi Cha Booth with Special Guest',
     venue:'ลานกิจกรรม ชั้น G, Central Chiangmai Airport, Chiang Mai', groups:['cgm48'],
-    related:['ev-lanna-tsukimi'],
+    related:['ev-lanna-tsukimi','ev-cgm48-popup-live-cnx'],
     poster:{ accent:'#1E6B45', surface:'#EEF6EF', ink:'#173F2B', img:'posters/hachicha-tsukimi.jpg', w:1562, h:1562 },
     slots:[
       { date:'2026-09-17', time:'18:00', until:'19:00', members:['cgm-jingjing','cgm-emma','cgm-lewlew'] },
