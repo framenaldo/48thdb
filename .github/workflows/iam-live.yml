@@ -1,0 +1,51 @@
+# Who is on iAM48 right now. The app sends no CORS header, so a visitor's
+# browser cannot ask it; this job asks and leaves the answer in
+# data/iam-live.json, which the page re-reads while it is open.
+#
+# Each member costs one ~400-byte request, so a round takes about a second.
+# The hours below are where the lives are: of 8,696 on record, 98.9% start
+# between 10:00 and midnight, and the app does not allow them any later.
+#
+# GitHub's cron is best-effort, so a badge can be up to ten or fifteen
+# minutes behind the live itself.
+name: iAM48 live now
+
+on:
+  schedule:
+    - cron: '*/20 3-9 * * *'    # 10:00–16:59 in Thailand, the quiet hours
+    - cron: '*/10 10-16 * * *'  # 17:00–23:59, when most lives happen
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: iam-live
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ask iAM48
+        run: python3 scripts/check-iam-live.py
+
+      - name: Publish if the answer changed
+        run: |
+          if git diff --quiet -- data/iam-live.json; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git config user.name  "48thdb-bot"
+          git config user.email "48thdb-bot@users.noreply.github.com"
+          git add data/iam-live.json
+          git commit -m "iAM48 live now: $(python3 -c "import json;d=json.load(open('data/iam-live.json'));print(', '.join(x['id'] for x in d['live']) or 'nobody')")"
+          git pull --rebase
+          git push

@@ -6,12 +6,12 @@ name: Refresh live stats
 on:
   schedule:
     # Midnight in Thailand, so a day's lives are counted the moment it ends.
-    # GitHub's cron is best-effort and usually a few minutes late, which here
-    # only helps: the run wants to be just after midnight, never just before.
+    # The app does not let members go live past midnight — of 8,696 lives on
+    # record, 15 begin at 00:00 and almost none after — so one run a day,
+    # just after the day closes, catches everything. GitHub's cron is
+    # best-effort and usually a few minutes late, which here only helps: the
+    # run wants to be just after midnight, never just before.
     - cron: '0 17 * * *'      # 00:00 in Thailand
-    # And again at 03:00, to pick up anyone who went live after midnight
-    # rather than leaving those lives to wait a whole day.
-    - cron: '0 20 * * *'      # 03:00 in Thailand
   workflow_dispatch:          # and on demand from the Actions tab
 
 permissions:
