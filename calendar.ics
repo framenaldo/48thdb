@@ -377,6 +377,31 @@ DTSTART;TZID=Asia/Bangkok:20260920T120000
 DTEND;TZID=Asia/Bangkok:20260920T180000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-live-cnx-2026-09-22@48thdb
+DTSTAMP:20260922T000000Z
+SUMMARY:CGM48 POP UP LIVE ON TOUR
+LOCATION:MUAN MORE SPACE\, Chiang Mai
+DESCRIPTION:เมมเบอร์: Else\, Lewlew\, Ploen\, Praifa\, Ginn
+ a\, Tara\n• 16:00 สินค้า MERCHANDISE เริ่มจำ
+ หน่าย\n• 18:00 เริ่มการแสดง — ถ่
+ ายทอดสดทาง YouTube CGM48 OFFICIAL\n• ซื้อเ
+ ครื่องดื่ม 1 แก้ว พร้อมแสดง
+ ใบเสร็จ ต่อเจ้าหน้าที่หน้
+ าประตูทางเข้า เพื่อเข้าชม 
+ CGM48 POP UP LIVE ON TOUR\n• สามารถนำใบเสร็
+ จมารับเครื่องดื่มกับ Members ไ
+ ด้หลังจบกิจกรรม\n• เครื่อง
+ ดื่ม POP UP LIVE ON TOUR 80 บาท\n• สามารถช
+ ำระได้ที่จุดซื้อสินค้า ขอ
+ สงวนสิทธิ์ชำระผ่าน QR Code เท่
+ านั้น\n• ภาพสินค้าสำหรับกา
+ รโฆษณาเท่านั้น\n\nhttps://framenaldo.github.io
+ /48thdb/?e=ev-cgm48-popup-live-cnx
+URL:https://framenaldo.github.io/48thdb/?e=ev-cgm48-popup-live-cnx
+DTSTART;TZID=Asia/Bangkok:20260922T180000
+DTEND;TZID=Asia/Bangkok:20260922T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:CGM48 11th Single "Koi Tsunjatta — Let me know!" Roadshow
