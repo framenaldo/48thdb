@@ -8034,24 +8034,39 @@ function loadLiveNow(again){
    therefore be a little behind the live itself, never ahead of it. */
 let IAM_LIVE = { checked:null, live:[] };
 let _iamLiveTimer = null;
+/* Two ways to learn who is live, in order of freshness:
+   1. the Worker in worker/, which asks iAM48 the moment it is asked — fill its
+      address in below to use it;
+   2. data/iam-live.json, written by the GitHub job, whose cron is throttled
+      and often hours behind.
+   The file is always the fallback, so an unreachable Worker costs nothing. */
+const IAM_LIVE_API = '';            // e.g. 'https://48thdb-iam-live.<you>.workers.dev'
+const IAM_POLL_MS = IAM_LIVE_API ? 45000 : 120000;
+
 function loadIamLive(again){
-  fetch(`data/iam-live.json?t=${Date.now()}`, { cache:'no-store' })
-    .then(r => r.ok ? r.json() : null)
-    .then(d => {
-      if(!d) return;
-      const was = JSON.stringify(IAM_LIVE.live || []);
-      IAM_LIVE = { checked:d.checked || null, live:Array.isArray(d.live) ? d.live : [] };
-      if(JSON.stringify(IAM_LIVE.live) === was) return;
-      if(!document.getElementById('main')) return;
-      syncTicker();
-      if(state.posterOf || state.editingId) return;
-      renderMain();
-    })
-    .catch(() => {});
+  const take = d => {
+    if(!d || !Array.isArray(d.live)) return false;
+    const was = JSON.stringify(IAM_LIVE.live || []);
+    IAM_LIVE = { checked:d.checked || null, live:d.live, source:d.source || 'file' };
+    if(JSON.stringify(IAM_LIVE.live) === was) return true;
+    if(!document.getElementById('main')) return true;
+    syncTicker();
+    if(!state.posterOf && !state.editingId) renderMain();
+    return true;
+  };
+  const file = () => fetch(`data/iam-live.json?t=${Date.now()}`, { cache:'no-store' })
+    .then(r => r.ok ? r.json() : null).then(take).catch(() => {});
+  if(IAM_LIVE_API){
+    fetch(`${IAM_LIVE_API}?t=${Date.now()}`, { cache:'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if(!take(d)) return file(); })
+      .catch(file);
+  } else file();
+
   if(again && !_iamLiveTimer){
     _iamLiveTimer = setInterval(() => {
       if(document.visibilityState === 'visible') loadIamLive(false);
-    }, 120000);
+    }, IAM_POLL_MS);
     document.addEventListener('visibilitychange', () => {
       if(document.visibilityState === 'visible') loadIamLive(false);
     });

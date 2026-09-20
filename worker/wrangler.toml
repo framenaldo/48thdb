@@ -1,0 +1,9 @@
+name = "48thdb-iam-live"
+main = "iam-live-worker.js"
+compatibility_date = "2026-09-21"
+
+# Optional: keeps the slices turning when nobody has the site open, so the
+# first visitor of the evening gets a complete answer. Remove these two lines
+# to save the scheduled invocations — the Worker is correct without them.
+[triggers]
+crons = ["*/2 10-17 * * *"]   # every 2 min, 17:00–00:59 in Thailand (UTC+7)
