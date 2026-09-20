@@ -12,6 +12,11 @@ on:
   schedule:
     - cron: '*/15 3-16 * * *'   # every 15 min, 10:00–23:59 in Thailand
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Ask anyway (cgm48, bnk48 or all) even with nothing scheduled'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -34,6 +39,7 @@ jobs:
       - name: Ask YouTube
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          FORCE: ${{ inputs.force }}
         run: node scripts/check-live.mjs
 
       - name: Publish if the answer changed

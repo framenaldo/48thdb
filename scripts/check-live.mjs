@@ -98,7 +98,17 @@ async function liveOn(ch){
   };
 }
 
-const due = channelsDue();
+/* FORCE=cgm48|bnk48|all asks anyway, whatever the schedule says — the manual
+   run in the Actions tab uses it to answer "is anything on right now?". */
+function forced(){
+  const want = (process.env.FORCE || '').trim().toLowerCase();
+  if(!want) return [];
+  return Object.entries(CHANNELS)
+    .filter(([k]) => want === 'all' || want === k)
+    .map(([k, ch]) => ({ ...ch, group:k, eventId:null, eventTitle:null }));
+}
+
+const due = forced().length ? forced() : channelsDue();
 let live = [], checked = true;
 if(!due.length){
   console.log('Nothing scheduled to be on air — no call made.');
