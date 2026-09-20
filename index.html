@@ -2446,6 +2446,12 @@
   .evm-logo + .evm-title,
   .is-event-sheet .evm-logo + .evm-title{ margin-top:9px; font-size:16.5px; line-height:1.35; }
   .is-postered .evm-logo{ color:var(--sheet-ink, var(--c)); }
+  /* Dark mode: the accent (and a poster's ink, darker still) sinks into the
+     card, so the lettering is mixed toward white until it reads again. */
+  :root[data-theme="dark"] .evm-logo,
+  :root[data-theme="dark"] .is-postered .evm-logo{ color:color-mix(in srgb, var(--c) 30%, #fff); }
+  :root[data-theme="dark"] .shop-logo,
+  :root[data-theme="dark"] .ge-shop-logo{ color:color-mix(in srgb, var(--c) 42%, #fff); }
   .shop-logo{ width:min(230px, 76%); margin:2px 0 6px; color:var(--c); }
   .ge-shop-logo{ width:100%; max-width:185px; margin:1px 0 3px; color:var(--c); }
   .ge-shop-card span:has(.ge-shop-logo){ flex:1 1 auto; }
