@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir -p public
           git ls-files -z \
-            | grep -zvE '^(scripts/|worker/|\.github/|\.claude/|\.gitignore|\.firebaserc|firebase\.json|senbatsu-idol-database)' \
+            | grep -zvE '^(scripts/|worker/|\.github/|\.claude/|\.gitignore|\.firebaserc|firebase\.json|site\.wrangler\.toml|senbatsu-idol-database)' \
             | tar -cf - --null -T - | tar -xf - -C public
           echo "Publishing $(find public -type f | wc -l) files"
 
@@ -44,4 +44,6 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: deploy --config .github/site.wrangler.toml
+          # pinned: the runner's bundled wrangler is older than the config format
+          wranglerVersion: '4.135.0'
+          command: deploy --config site.wrangler.toml
