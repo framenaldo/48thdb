@@ -14,7 +14,7 @@
  * Deploy: see worker/README.md.
  */
 
-const SITE = 'https://framenaldo.github.io/48thdb';
+const SITE = 'https://48thdb.com';
 const APP = 'https://app.bnk48.com';
 
 /* A channel's /live page says plainly whether it is carrying a stream, which

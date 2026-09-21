@@ -1,0 +1,16 @@
+# The page itself must never be served from a stale copy: the service worker is
+# network-first for exactly this reason, and a CDN cache would undo that.
+/index.html
+  Cache-Control: no-cache
+/
+  Cache-Control: no-cache
+
+# Asked for again every minute or two; a cached copy would defeat the point.
+/data/live-now.json
+  Cache-Control: no-store
+/data/iam-live.json
+  Cache-Control: no-store
+
+# Subscribed calendars should notice an edit within the hour.
+/*.ics
+  Cache-Control: public, max-age=1800

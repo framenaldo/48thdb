@@ -1,0 +1,8 @@
+# The site itself: static files, served by Workers. The "Deploy site" workflow
+# gathers them into public/ first (see deploy.yml); locally you can do the same
+# and run `npx wrangler deploy --config .github/site.wrangler.toml`.
+name = "48thdb-site"
+compatibility_date = "2026-09-21"
+
+[assets]
+directory = "./public"

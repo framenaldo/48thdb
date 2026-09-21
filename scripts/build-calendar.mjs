@@ -5,7 +5,7 @@
 // whenever index.html changes).
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const SITE = 'https://framenaldo.github.io/48thdb/';
+const SITE = 'https://48thdb.com/';
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
 // Pull a top-level `const NAME = [ ... ];` literal out of the page and evaluate it.

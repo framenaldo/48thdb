@@ -1,0 +1,47 @@
+# Publish the site to Cloudflare, on every push that changes something the
+# site serves — including the bot's own commits (the nightly live stats and
+# the rebuilt calendar feeds), so what is on the web always matches the repo.
+#
+# Only the files people actually load are uploaded: the scripts, the Worker
+# source and the workflows stay in the repo but are not served.
+#
+# Needs one secret, CLOUDFLARE_API_TOKEN (Edit Cloudflare Workers template).
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'scripts/**'
+      - 'worker/**'
+      - '.github/**'
+      - '.claude/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-site
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect what the site serves
+        run: |
+          mkdir -p public
+          git ls-files -z \
+            | grep -zvE '^(scripts/|worker/|\.github/|\.claude/|\.gitignore|\.firebaserc|firebase\.json|senbatsu-idol-database)' \
+            | tar -cf - --null -T - | tar -xf - -C public
+          echo "Publishing $(find public -type f | wc -l) files"
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy --config .github/site.wrangler.toml

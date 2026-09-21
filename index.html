@@ -8,6 +8,20 @@
 <meta name="theme-color" content="#FFF3F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16111E" media="(prefers-color-scheme: dark)">
 <meta name="description" content="ฐานข้อมูลสมาชิก ตารางงาน และผลงานเพลงของ BNK48 และ CGM48">
+<link rel="canonical" href="https://48thdb.com/">
+<script>
+  /* The site moved to 48thdb.com. GitHub still serves the old address, and an
+     app installed from there, or an old bookmark, would quietly go on using a
+     second copy — with its own saved settings and its own service worker. Send
+     them over instead, keeping whatever the link was pointing at. */
+  (function(){
+    if(location.hostname !== 'framenaldo.github.io') return;
+    var to = 'https://48thdb.com/' + location.search + location.hash;
+    try{ if(navigator.serviceWorker) navigator.serviceWorker.getRegistrations()
+      .then(function(rs){ rs.forEach(function(r){ r.unregister(); }); }); }catch(e){}
+    location.replace(to);
+  })();
+</script>
 <link rel="icon" href="icon4-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon4.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -8040,7 +8054,7 @@ let _iamLiveTimer = null;
    2. data/iam-live.json, written by the GitHub job, whose cron is throttled
       and often hours behind.
    The file is always the fallback, so an unreachable Worker costs nothing. */
-const IAM_LIVE_API = 'https://48thdb-iam-live.48thdb.workers.dev';
+const IAM_LIVE_API = 'https://api.48thdb.com';
 const IAM_POLL_MS = IAM_LIVE_API ? 45000 : 120000;
 
 function loadIamLive(again){
