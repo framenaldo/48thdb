@@ -1,4 +1,4 @@
-# ป้าย "กำลังไลฟ์ใน iAM48" แบบสด
+# โครงสร้างบน Cloudflare
 
 โค้ดในโฟลเดอร์นี้คือตัวกลางที่ไปถาม iAM48 ว่าใครกำลังไลฟ์อยู่ แล้วตอบกลับให้เว็บอ่านได้ทันที
 
@@ -10,9 +10,19 @@
 
 **ไม่ได้บังคับ** ถ้าไม่ติดตั้ง เว็บก็ใช้ไฟล์จาก GitHub เหมือนเดิม และถ้าติดตั้งแล้ว Worker ล่ม เว็บจะถอยกลับไปใช้ไฟล์เองอัตโนมัติ
 
-## ติดตั้งแล้ว
+## ตอนนี้มีอะไรอยู่บน Cloudflare บ้าง
 
-ใช้งานอยู่ที่ https://48thdb-iam-live.48thdb.workers.dev (ติดตั้งเมื่อ 21 ก.ย. 2026)
+| อะไร | ที่อยู่ | Worker |
+|---|---|---|
+| ตัวเว็บ | https://48thdb.com และ www | `48thdb-site` (ไฟล์สแตติก) |
+| ตัวเช็กไลฟ์ | https://api.48thdb.com | `48thdb-iam-live` |
+
+ส่วนข้อมูลสมาชิกกับระบบล็อกอินยังอยู่ที่ Firebase เหมือนเดิม
+
+เว็บเดิมที่ framenaldo.github.io ยังเปิดอยู่ แต่ `index.html` จะพาคนที่เข้าทางนั้นมาที่ 48thdb.com ให้เอง
+
+**deploy อัตโนมัติ** ทุกครั้งที่ push จะมี workflow "Deploy site" อัปเว็บขึ้น Cloudflare ให้ ต้องมี secret ชื่อ `CLOUDFLARE_API_TOKEN` ใน GitHub (ดูวิธีสร้างท้ายไฟล์นี้)
+
 ขั้นตอนข้างล่างเก็บไว้เผื่อต้องติดตั้งใหม่หรือย้ายบัญชี
 
 ## ติดตั้ง (ครั้งเดียว ประมาณ 5 นาที)
@@ -84,3 +94,17 @@ curl 'https://48thdb-iam-live.<คุณ>.workers.dev/?debug=1'
 ## แก้ไขภายหลัง
 
 แก้ไฟล์ `iam-live-worker.js` แล้วรัน `npx wrangler deploy` ซ้ำ ถ้าจะเลิกใช้ ให้ลบ URL ออกจาก `IAM_LIVE_API` ในหน้าเว็บ (เว็บกลับไปใช้ไฟล์เดิม) แล้วรัน `npx wrangler delete` ถ้าต้องการลบ Worker ทิ้ง
+
+## สร้าง CLOUDFLARE_API_TOKEN (ทำครั้งเดียว)
+
+จำเป็นสำหรับ deploy อัตโนมัติเวลา push — รวมถึงตอนที่บอทอัปเดตสถิติไลฟ์รายคืนและสร้างไฟล์ปฏิทินใหม่
+
+1. ไปที่ https://dash.cloudflare.com/profile/api-tokens → **Create Token**
+2. เลือกเทมเพลต **Edit Cloudflare Workers** → Continue → Create Token
+3. คัดลอกค่าที่ได้ (แสดงครั้งเดียว)
+4. ไปที่ https://github.com/framenaldo/48thdb/settings/secrets/actions → **New repository secret**
+   - Name: `CLOUDFLARE_API_TOKEN`
+   - Secret: วางค่าที่คัดลอกมา
+5. เสร็จแล้วสั่งรันทดสอบได้ที่แท็บ Actions → Deploy site → Run workflow
+
+> โทเค็นนี้ไม่ต้องส่งให้ใคร วางใน GitHub โดยตรงได้เลย

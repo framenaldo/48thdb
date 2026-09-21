@@ -40,10 +40,15 @@ jobs:
             | tar -cf - --null -T - | tar -xf - -C public
           echo "Publishing $(find public -type f | wc -l) files"
 
+      - name: Check the token is there
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is not set. Add it under Settings → Secrets and variables → Actions (see worker/README.md)."
+            exit 1
+          fi
+
       - name: Deploy
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          # pinned: the runner's bundled wrangler is older than the config format
-          wranglerVersion: '4.135.0'
-          command: deploy --config site.wrangler.toml
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        # pinned: the runner's own wrangler is older than this config format
+        run: npx --yes wrangler@4.135.0 deploy --config site.wrangler.toml
