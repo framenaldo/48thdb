@@ -1102,12 +1102,6 @@
   /* ---- a member's lives: four figures, a year of months, the latest three ---- */
   .lv{ margin-top:6px; }
   .lv-head{ display:flex; align-items:center; gap:10px; }
-  .lv-now{
-    display:inline-flex; align-items:center; gap:6px; padding:2px 10px; border-radius:999px;
-    background:#E0243A; color:#fff; font-size:11px; font-weight:800; text-decoration:none;
-  }
-  .lv-now::before{ content:''; width:7px; height:7px; border-radius:50%; background:#fff; animation:lv-pulse 1.4s ease-in-out infinite; }
-  @keyframes lv-pulse{ 50%{ opacity:.35; } }
   .lv-stats{
     display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:1px;
     border:1px solid var(--line); border-radius:16px; overflow:hidden; background:var(--line);
@@ -1535,28 +1529,6 @@
     -webkit-background-clip:text; background-clip:text;
     color:transparent; -webkit-text-fill-color:transparent;
   }
-  /* Live on iAM48: a face, the caption she wrote, and a pulsing dot. */
-  .iaml-row{ display:flex; flex-wrap:wrap; gap:9px; }
-  /* A chip takes the room its caption needs, up to the width of the column:
-     short ones share a line, a talkative one fills its own and trails off. */
-  .iaml-card{
-    display:flex; align-items:center; gap:10px; min-width:0; max-width:100%;
-    flex:0 1 auto;
-    padding:8px 14px 8px 8px; border-radius:999px; text-decoration:none; color:inherit;
-    border:1px solid color-mix(in srgb, var(--c) 32%, var(--line));
-    background:color-mix(in srgb, var(--c) 9%, var(--card));
-    transition:transform .15s ease;
-  }
-  .iaml-card:active{ transform:scale(.97); }
-  .iaml-face{ position:relative; flex:none; }
-  .iaml-dot{
-    position:absolute; right:-1px; bottom:-1px; width:11px; height:11px; border-radius:50%;
-    background:#E02118; border:2px solid var(--card); animation:today-pulse 1.6s ease-out infinite;
-  }
-  .iaml-text{ display:flex; flex-direction:column; min-width:0; }
-  .iaml-name{ font-weight:800; font-size:14px; line-height:1.25; }
-  .iaml-cap{ font-size:12.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  @media (prefers-reduced-motion: reduce){ .iaml-dot{ animation:none; } }
 
   /* A notice from the owner: red enough to catch the eye, quiet enough to
      sit above the day's events without shouting over them. */
@@ -7165,10 +7137,7 @@ function renderMemberLives(m){
   const upd = LIVES.updated ? new Date(LIVES.updated) : null;
 
   return `<section class="lv" style="--c:${g ? g.color : 'var(--ink-soft)'}">
-    <h3 class="section-label lv-head">${en ? 'Lives on iAM48' : 'ไลฟ์ใน iAM48'}
-      ${(() => { const now = iamLiveNow(m.id);
-        return now ? `<a class="lv-now" href="${escapeAttr(now.url || iamUrl(m))}" target="_blank" rel="noopener noreferrer"
-          title="${escapeAttr(now.caption || '')}">${en ? 'Live now' : 'กำลังไลฟ์'}</a>` : ''; })()}</h3>
+    <h3 class="section-label lv-head">${en ? 'Lives on iAM48' : 'ไลฟ์ใน iAM48'}</h3>
     <div class="lv-stats">
       <div class="lv-stat"><span class="lv-k">${en ? 'All lives' : 'ไลฟ์ทั้งหมด'}</span><span class="lv-v">${L.total.toLocaleString()}</span><span class="lv-s">${en ? 'since' : 'ตั้งแต่'} ${since}</span></div>
       <div class="lv-stat"><span class="lv-k">${en ? 'Last 30 days' : '30 วันล่าสุด'}</span><span class="lv-v">${L.last30 ?? 0}</span><span class="lv-s">${en ? 'lives' : 'ไลฟ์'}</span></div>
@@ -8035,78 +8004,43 @@ function eventIconName(ev){
    The file is small and is re-read while the page is open. */
 let LIVE_NOW = { checked:null, live:[] };
 let _liveNowTimer = null;
+/* Two ways to learn whether a channel is on air, in order of freshness:
+   the Worker, which looks the moment it is asked, and data/live-now.json,
+   written by a job whose cron GitHub fires only a few percent of the time.
+   The file is the fallback, so an unreachable Worker costs nothing. */
+const LIVE_API = 'https://api.48thdb.com';
 function loadLiveNow(again){
-  // never from the service worker's copy: the whole point is the latest answer
-  fetch(`data/live-now.json?t=${Date.now()}`, { cache:'no-store' })
-    .then(r => r.ok ? r.json() : null)
-    .then(d => {
-      if(!d) return;
-      const was = JSON.stringify(LIVE_NOW.live || []);
-      LIVE_NOW = { checked:d.checked || null, live:Array.isArray(d.live) ? d.live : [] };
-      if(JSON.stringify(LIVE_NOW.live) === was) return;
-      if(!document.getElementById('main')) return;   // the first paint will show it
-      syncTicker();
-      if(state.selectedId || state.posterOf || state.editingId) return;
-      renderMain();
-    })
-    .catch(() => {});
-  if(again && !_liveNowTimer){
-    _liveNowTimer = setInterval(() => {
-      if(document.visibilityState === 'visible') loadLiveNow(false);
-    }, 120000);
-    document.addEventListener('visibilitychange', () => {
-      if(document.visibilityState === 'visible') loadLiveNow(false);
-    });
-  }
-}
-/* Who is on iAM48 this minute, from data/iam-live.json. The app sends no CORS
-   header, so the page cannot ask it directly — a job asks every ten minutes
-   through the evening and leaves the answer in that file. A badge can
-   therefore be a little behind the live itself, never ahead of it. */
-let IAM_LIVE = { checked:null, live:[] };
-let _iamLiveTimer = null;
-/* Two ways to learn who is live, in order of freshness:
-   1. the Worker in worker/, which asks iAM48 the moment it is asked — fill its
-      address in below to use it;
-   2. data/iam-live.json, written by the GitHub job, whose cron is throttled
-      and often hours behind.
-   The file is always the fallback, so an unreachable Worker costs nothing. */
-const IAM_LIVE_API = 'https://api.48thdb.com';
-const IAM_POLL_MS = IAM_LIVE_API ? 45000 : 120000;
-
-function loadIamLive(again){
   const take = d => {
-    if(!d || !Array.isArray(d.live)) return false;
-    const was = JSON.stringify(IAM_LIVE.live || []) + JSON.stringify(LIVE_NOW.live || []);
-    IAM_LIVE = { checked:d.checked || null, live:d.live, source:d.source || 'file' };
-    // The Worker answers for YouTube in the same breath, and fresher than the
-    // job that writes data/live-now.json; when it does, its answer wins.
-    if(Array.isArray(d.youtube)) LIVE_NOW = { checked:d.checked || null, live:d.youtube };
-    if(JSON.stringify(IAM_LIVE.live || []) + JSON.stringify(LIVE_NOW.live || []) === was) return true;
-    if(!document.getElementById('main')) return true;
+    // the Worker answers under `youtube`, the committed file under `live`
+    const list = d && (Array.isArray(d.youtube) ? d.youtube : (Array.isArray(d.live) ? d.live : null));
+    if(!list) return false;
+    const was = JSON.stringify(LIVE_NOW.live || []);
+    LIVE_NOW = { checked:(d && d.checked) || null, live:list };
+    if(JSON.stringify(LIVE_NOW.live) === was) return true;
+    if(!document.getElementById('main')) return true;   // the first paint will show it
     syncTicker();
-    if(!state.posterOf && !state.editingId) renderMain();
+    if(!state.selectedId && !state.posterOf && !state.editingId) renderMain();
     return true;
   };
-  const file = () => fetch(`data/iam-live.json?t=${Date.now()}`, { cache:'no-store' })
+  // never from the service worker's copy: the whole point is the latest answer
+  const file = () => fetch(`data/live-now.json?t=${Date.now()}`, { cache:'no-store' })
     .then(r => r.ok ? r.json() : null).then(take).catch(() => {});
-  if(IAM_LIVE_API){
-    fetch(`${IAM_LIVE_API}?t=${Date.now()}`, { cache:'no-store' })
+  if(LIVE_API){
+    fetch(`${LIVE_API}?t=${Date.now()}`, { cache:'no-store' })
       .then(r => r.ok ? r.json() : null)
       .then(d => { if(!take(d)) return file(); })
       .catch(file);
   } else file();
 
-  if(again && !_iamLiveTimer){
-    _iamLiveTimer = setInterval(() => {
-      if(document.visibilityState === 'visible') loadIamLive(false);
-    }, IAM_POLL_MS);
+  if(again && !_liveNowTimer){
+    _liveNowTimer = setInterval(() => {
+      if(document.visibilityState === 'visible') loadLiveNow(false);
+    }, 60000);
     document.addEventListener('visibilitychange', () => {
-      if(document.visibilityState === 'visible') loadIamLive(false);
+      if(document.visibilityState === 'visible') loadLiveNow(false);
     });
   }
 }
-const iamLiveNow = id => (IAM_LIVE.live || []).find(l => l.id === id) || null;
 
 /** The stream YouTube is carrying for this event, if there is one. */
 function liveOnAir(ev){
@@ -8561,29 +8495,6 @@ function renderSearch(){
   </div>`;
 }
 
-/* Who is live on iAM48, as a strip at the top of the feed. Each name goes to
-   the app; the caption is what the member wrote above the live. */
-function renderIamLiveStrip(){
-  const mine = filteringByOshi();
-  const on = (IAM_LIVE.live || []).map(l => ({ l, m: getMember(l.id) })).filter(x => x.m)
-    .filter(x => !mine || isMyOshi(x.m));
-  if(!on.length) return '';
-  const en = isEN();
-  return `<section class="feed-block is-iamlive">
-    <h2 class="section-label">${en ? 'Live on iAM48 now' : 'กำลังไลฟ์ใน iAM48'}</h2>
-    <div class="iaml-row">${on.map(({ l, m }) => {
-      const g = getGroup(m.groupId);
-      return `<a class="iaml-card" style="--c:${g.color}" href="${escapeAttr(l.url)}"
-        target="_blank" rel="noopener noreferrer">
-        <span class="iaml-face">${renderAvatar(m, 'avatar-sm', g.color)}<span class="iaml-dot" aria-hidden="true"></span></span>
-        <span class="iaml-text">
-          <span class="iaml-name">${escapeHtml(nickName(m))}</span>
-          <span class="iaml-cap">${escapeHtml(l.caption || (en ? 'is live' : 'กำลังไลฟ์อยู่'))}</span>
-        </span></a>`;
-    }).join('')}</div>
-  </section>`;
-}
-
 /* A notice on the feed: the words, when they were written, and a way through
    to the event they are about. The owner sees a button to take it down. */
 function renderFlashCard(f){
@@ -8634,8 +8545,6 @@ function renderFeed(){
     </header>
 
     <div class="feed-cols"><div class="feed-main">
-    ${renderIamLiveStrip()}
-
     ${flashLive(state.flash).length ? `
     <section class="feed-block is-flash">
       <h2 class="section-label">ประกาศด่วน</h2>
@@ -10292,15 +10201,6 @@ function tickerItems(){
     items.push({ kind:'flash', parts: [
       f.eventId && SEED_SCHEDULE.some(e => e.id === f.eventId)
         ? { text, action:'open-event', id:f.eventId } : text ] });
-  }
-
-  // 0a. members on iAM48 this minute
-  {
-    const on = (IAM_LIVE.live || []).map(l => ({ l, m: getMember(l.id) })).filter(x => x.m)
-      .filter(x => !mine || isMyOshi(x.m));
-    if(on.length) items.push({ kind:'live', parts: [
-      en ? 'Live on iAM48' : 'กำลังไลฟ์ใน iAM48',
-      ...on.map(x => ({ text: nick(x.m), action:'open-member', id:x.m.id })) ] });
   }
 
   // 0b. YouTube says it is carrying a stream right now
@@ -12720,7 +12620,6 @@ async function init(){
     await loadPending();
     listenFlash();
     loadLiveNow(true);
-    loadIamLive(true);
 
     // The shared copy is the one the owner edits, so it wins over the page's —
     // but only redraw when it genuinely differs, or when the reader's own Oshi

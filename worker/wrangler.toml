@@ -1,9 +1,14 @@
-name = "48thdb-iam-live"
-main = "iam-live-worker.js"
+name = "48thdb-live"
+main = "live-worker.js"
 compatibility_date = "2026-09-21"
 
-# Optional: keeps the slices turning when nobody has the site open, so the
-# first visitor of the evening gets a complete answer. Remove these two lines
-# to save the scheduled invocations — the Worker is correct without them.
+# The site asks this at api.48thdb.com; claiming it here keeps the name and
+# the address together, so a rename moves the address with it.
+routes = [
+  { pattern = "api.48thdb.com", custom_domain = true },
+]
+
+# Keeps an answer warm for the first visitor of the evening. The Worker is
+# correct without this; remove these lines to save the scheduled runs.
 [triggers]
-crons = ["*/2 10-17 * * *"]   # every 2 min, 17:00–00:59 in Thailand (UTC+7)
+crons = ["*/5 10-16 * * *"]   # every 5 min, 17:00–23:59 in Thailand (UTC+7)

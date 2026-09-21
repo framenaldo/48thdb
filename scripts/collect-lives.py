@@ -150,7 +150,6 @@ def main():
             'total': len(times),
             'first': times[0].isoformat() if times else None,
             'last': times[-1].isoformat() if times else None,
-            'liveNow': any(v['videoContent'].get('isLive') for v in lives),
             'last30': sum(1 for t in times if (now - t).days < 30),
             'months': months, 'hours': hours, 'days': days,
             'recent': [{'id': v['videoContent']['id'],
