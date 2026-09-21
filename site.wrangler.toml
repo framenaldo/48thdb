@@ -1,12 +1,9 @@
-# The site: static files, plus a few lines that keep www and the bare domain
-# from becoming two separate origins. The "Deploy site" workflow gathers the
-# files into public/ first (see .github/workflows/deploy.yml); to do it by hand,
-# stage them the same way and run
+# The site: static files, served straight from the assets store with no code in
+# the way. The "Deploy site" workflow gathers them into public/ first (see
+# .github/workflows/deploy.yml); to do it by hand, stage them the same way and
 #   npx wrangler deploy --config site.wrangler.toml
 name = "48thdb-site"
-main = "site-worker.js"
 compatibility_date = "2026-09-21"
 
 [assets]
 directory = "./public"
-binding = "ASSETS"

@@ -1,0 +1,8 @@
+name = "48thdb-www"
+main = "www-redirect.js"
+compatibility_date = "2026-09-21"
+
+# www belongs to this Worker, not to the site: claiming it here moves it.
+routes = [
+  { pattern = "www.48thdb.com", custom_domain = true },
+]
