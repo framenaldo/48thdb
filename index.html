@@ -29,6 +29,12 @@
 <meta name="apple-mobile-web-app-title" content="48thDb">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- The page draws before Firebase answers, but the sooner it answers the
+     sooner a signed-in reader sees their own Oshi: open the connections now
+     rather than paying for DNS and TLS when the first call is made. -->
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
 <!-- ===== FIREBASE SETUP =====
   1) Go to console.firebase.google.com -> create a project.
@@ -12678,6 +12684,18 @@ async function init(){
   initHistory();
   bindScrollPressGuard();
   lockPinchZoom();
+  /* Draw at once, from the copy of every member the page already carries.
+     Nothing on the first screen comes from the network: waiting for an
+     anonymous sign-in and then a Firestore read used to leave the reader
+     looking at "กำลังโหลด..." for about two and a half seconds. Firebase
+     still runs — it just catches up behind a page that is already there. */
+  state.members = SEED_ALL_MEMBERS.slice();
+  learnNames();
+  _urlApplied = true;
+  applyUrlToState();
+  replaceHistory();
+  render();
+
   let checkedInitialAuth = false;
 
   fbAuth.onAuthStateChanged(async (user) => {
@@ -12702,16 +12720,33 @@ async function init(){
     listenFlash();
     loadLiveNow(true);
     loadIamLive(true);
-    if(!state.members || !state.members.length){
-      try{ state.members = await loadMembers(); }
-      catch(e){ state.members = SEED_ALL_MEMBERS.slice(); }
-      learnNames();
-    }
+
+    // The shared copy is the one the owner edits, so it wins over the page's —
+    // but only redraw when it genuinely differs, or when the reader's own Oshi
+    // arrive. A redraw for nothing is a flicker nobody asked for.
+    let changed = false;
+    try{
+      const shared = await loadMembers();
+      if(shared && shared.length && JSON.stringify(shared) !== JSON.stringify(state.members)){
+        state.members = shared;
+        learnNames();
+        changed = true;
+      }
+    }catch(e){}
+
     const oshiData = await loadOshiData();
+    if(JSON.stringify(oshiData.oshi) !== JSON.stringify(state.oshi)
+      || oshiData.kamiOshi !== state.kamiOshi) changed = true;
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;
     if(state.account && oshiData.avatar) state.account.avatar = oshiData.avatar;
-    if(!_urlApplied){ _urlApplied = true; applyUrlToState(); replaceHistory(); }
+
+    // Who is signed in shows in the header, which is cheap to redraw on its own.
+    renderProfileSlot();
+    if(!changed) return;
+    // Never pull the page out from under someone reading or typing.
+    if(state.posterOf || state.editingId) return;
+    if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
     render();
   });
 }
