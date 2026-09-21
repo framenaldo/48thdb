@@ -10,6 +10,11 @@
 
 **ไม่ได้บังคับ** ถ้าไม่ติดตั้ง เว็บก็ใช้ไฟล์จาก GitHub เหมือนเดิม และถ้าติดตั้งแล้ว Worker ล่ม เว็บจะถอยกลับไปใช้ไฟล์เองอัตโนมัติ
 
+## ติดตั้งแล้ว
+
+ใช้งานอยู่ที่ https://48thdb-iam-live.48thdb.workers.dev (ติดตั้งเมื่อ 21 ก.ย. 2026)
+ขั้นตอนข้างล่างเก็บไว้เผื่อต้องติดตั้งใหม่หรือย้ายบัญชี
+
 ## ติดตั้ง (ครั้งเดียว ประมาณ 5 นาที)
 
 1. สมัคร Cloudflare ฟรีที่ https://dash.cloudflare.com/sign-up (ไม่ต้องมีโดเมน ไม่ต้องผูกบัตร)
@@ -18,15 +23,28 @@
 
    ```bash
    cd worker
-   npx wrangler login      # เปิดเบราว์เซอร์ให้กดอนุญาต
-   npx wrangler deploy
+   npm_config_cache="$HOME/.npm-wrangler" npx wrangler login    # เปิดเบราว์เซอร์ให้กดอนุญาต
+   npm_config_cache="$HOME/.npm-wrangler" npx wrangler deploy
    ```
+
+   (ใส่ `npm_config_cache` เพราะโฟลเดอร์ `~/.npm` ของเครื่องนี้มีไฟล์ของ root ค้างอยู่
+   npm จึงเขียนแคชปกติไม่ได้ ถ้าแก้ด้วย `sudo chown -R 501:20 "$HOME/.npm"` แล้ว
+   จะตัดส่วนนี้ออกก็ได้)
 
 3. บรรทัดสุดท้ายจะบอก URL เช่น
 
    ```
    https://48thdb-iam-live.<ชื่อบัญชีคุณ>.workers.dev
    ```
+
+   > **ระวัง** ถ้าเป็นการ deploy ครั้งแรกของบัญชี มันจะถามให้ตั้งชื่อ subdomain ก่อน
+   > แล้ว wrangler อาจพิมพ์ URL ที่ใช้ชื่อที่คุณ**พิมพ์** ไม่ใช่ชื่อที่ Cloudflare **จดให้จริง**
+   > (เกิดขึ้นจริงตอนติดตั้งครั้งแรก: พิมพ์ `48thdb-fn` แต่ระบบจด `48thdb`)
+   > ถ้ายิง URL แล้วไม่ตอบ ให้เช็กชื่อจริงด้วยคำสั่งนี้
+   >
+   > ```bash
+   > npm_config_cache="$HOME/.npm-wrangler" npx wrangler subdomain
+   > ```
 
 4. เอา URL นั้นไปใส่ใน `index.html` ตรงบรรทัด
 

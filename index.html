@@ -8040,7 +8040,7 @@ let _iamLiveTimer = null;
    2. data/iam-live.json, written by the GitHub job, whose cron is throttled
       and often hours behind.
    The file is always the fallback, so an unreachable Worker costs nothing. */
-const IAM_LIVE_API = '';            // e.g. 'https://48thdb-iam-live.<you>.workers.dev'
+const IAM_LIVE_API = 'https://48thdb-iam-live.48thdb.workers.dev';
 const IAM_POLL_MS = IAM_LIVE_API ? 45000 : 120000;
 
 function loadIamLive(again){
