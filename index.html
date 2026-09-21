@@ -8046,9 +8046,12 @@ const IAM_POLL_MS = IAM_LIVE_API ? 45000 : 120000;
 function loadIamLive(again){
   const take = d => {
     if(!d || !Array.isArray(d.live)) return false;
-    const was = JSON.stringify(IAM_LIVE.live || []);
+    const was = JSON.stringify(IAM_LIVE.live || []) + JSON.stringify(LIVE_NOW.live || []);
     IAM_LIVE = { checked:d.checked || null, live:d.live, source:d.source || 'file' };
-    if(JSON.stringify(IAM_LIVE.live) === was) return true;
+    // The Worker answers for YouTube in the same breath, and fresher than the
+    // job that writes data/live-now.json; when it does, its answer wins.
+    if(Array.isArray(d.youtube)) LIVE_NOW = { checked:d.checked || null, live:d.youtube };
+    if(JSON.stringify(IAM_LIVE.live || []) + JSON.stringify(LIVE_NOW.live || []) === was) return true;
     if(!document.getElementById('main')) return true;
     syncTicker();
     if(!state.posterOf && !state.editingId) renderMain();
@@ -8078,7 +8081,18 @@ const iamLiveNow = id => (IAM_LIVE.live || []).find(l => l.id === id) || null;
 function liveOnAir(ev){
   if(!ev || !ev.stream) return null;
   const key = ev.stream.channel || (ev.groups || [])[0];
-  return (LIVE_NOW.live || []).find(l => l.eventId === ev.id || (key && l.group === key)) || null;
+  const hit = (LIVE_NOW.live || []).find(l => l.eventId === ev.id || (key && l.group === key));
+  if(!hit) return null;
+  if(hit.eventId === ev.id) return hit;
+  /* Matched only by channel: a group streams things that are not this event, so
+     the badge lights up only while this one could plausibly be the stream —
+     from an hour before its start until three hours after it should have ended. */
+  const w = streamWindow(ev);
+  const now = Date.now();
+  if(!w || now < w.from - 3600000 || now > w.to + 3 * 3600000) return null;
+  const today = toYmd(todayStart());
+  if(ev.start > today || eventLastDay(ev) < today) return null;
+  return hit;
 }
 
 /* A broadcast has hours of its own: the badge is red all along and blinks

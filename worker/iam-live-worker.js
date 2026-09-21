@@ -1,20 +1,33 @@
-/* Who is live on iAM48, answered in real time.
+/* Who is live right now — on iAM48, and on the groups' YouTube channels.
  *
- * The site cannot ask app.bnk48.com itself: that host sends no CORS header, so
- * a visitor's browser is turned away. The GitHub job (scripts/check-iam-live.py)
- * works around it by writing data/iam-live.json, but GitHub's cron is
- * best-effort and in practice fires a fraction of the time — a live that lasts
- * twenty minutes can be over before a badge appears.
+ * The site cannot ask either host itself: app.bnk48.com sends no CORS header,
+ * so a visitor's browser is turned away, and youtube.com the same. The GitHub
+ * jobs work around it by committing data/iam-live.json and data/live-now.json,
+ * but GitHub's cron is best-effort and in practice fires a few percent of the
+ * time it is asked to — a live that lasts twenty minutes is over long before a
+ * badge appears.
  *
- * This Worker sits in the middle instead: it asks iAM48, adds the CORS header
- * and answers in a second or two. The page polls it directly and falls back to
- * the committed file whenever this is unreachable.
+ * This Worker sits in the middle instead: it asks, adds the CORS header, and
+ * answers in a second or two. The page polls it directly and falls back to the
+ * committed files whenever it cannot be reached.
  *
  * Deploy: see worker/README.md.
  */
 
 const SITE = 'https://framenaldo.github.io/48thdb';
 const APP = 'https://app.bnk48.com';
+
+/* A channel's /live page says plainly whether it is carrying a stream, which
+ * costs no API quota at all — unlike search.list, at 100 of the 10,000 daily
+ * units a call. (The GitHub job has to use the API: YouTube turns away plain
+ * page requests from GitHub's runners. Cloudflare's are not GitHub's, and if
+ * YouTube ever refuses these too the page still has the committed file.) */
+const YT_CHANNELS = {
+  cgm48: { handle: 'CGM48OFFICIAL', name: 'CGM48 OFFICIAL' },
+  bnk48: { handle: 'bnk48official', name: 'BNK48 Official' },
+};
+const YT_KEY = 'https://iam-live.state/youtube-v1';
+const YT_TTL_MS = 60000;              // one look per channel per minute, shared by everyone
 
 /* The free plan allows 50 subrequests per invocation and there are 58 members,
  * so a single pass cannot reach everyone. Each invocation checks one slice and
@@ -96,6 +109,50 @@ function entryOf(member, row, now) {
   };
 }
 
+/* Is this channel carrying a stream right now? The live page only names a
+   video and says "isLiveNow" while one is actually on air. */
+async function youtubeLive(key) {
+  const ch = YT_CHANNELS[key];
+  const res = await fetch(`https://www.youtube.com/@${ch.handle}/live`, {
+    headers: {
+      'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/126 Safari/537.36',
+      'accept-language': 'en',
+    },
+    redirect: 'follow',
+    cf: { cacheTtl: 0 },
+  });
+  if (!res.ok) throw new Error(`YouTube said ${res.status}`);
+  const html = await res.text();
+  if (!/"isLiveNow":true/.test(html) && !/"isLive":true/.test(html)) return null;
+  const id = (html.match(/"videoId":"([\w-]{11})"/) || [])[1] || null;
+  let title = (html.match(/<meta name="title" content="([^"]+)"/) || [])[1] || null;
+  if (title) title = title.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  return {
+    group: key, channel: ch.name, title: title || ch.name,
+    videoId: id,
+    url: id ? `https://www.youtube.com/watch?v=${id}` : `https://www.youtube.com/@${ch.handle}/live`,
+  };
+}
+
+/* Both channels, at most once a minute between them however many people ask. */
+async function youtubeNow(now, force) {
+  const cached = (await readCache(YT_KEY)) || { at: 0, live: [] };
+  if (!force && now - cached.at < YT_TTL_MS) return { live: cached.live, fresh: false };
+  const found = [];
+  for (const key of Object.keys(YT_CHANNELS)) {
+    try {
+      const l = await youtubeLive(key);
+      if (l) found.push(l);
+    } catch (e) {
+      // keep whatever was last known for that channel rather than denying it
+      const before = cached.live.find((x) => x.group === key);
+      if (before && now - cached.at < 5 * 60 * 1000) found.push(before);
+    }
+  }
+  await writeCache(YT_KEY, { at: now, live: found }, 300);
+  return { live: found, fresh: true };
+}
+
 async function check(request) {
   const url = new URL(request.url);
   const now = Date.now();
@@ -132,16 +189,19 @@ async function check(request) {
     }))
     .sort((a, b) => String(a.at).localeCompare(String(b.at)));
 
+  const yt = await youtubeNow(now, url.searchParams.get('force') === 'yt');
+
   const body = {
     checked: new Date(now).toISOString(),
     live,
+    youtube: yt.live,
     source: 'worker',
     // how much of the roster the answer actually rests on
     known: Object.values(state).filter((m) => now - m.at < CLAIM_TTL_MS).length,
     members: list.length,
   };
   if (url.searchParams.get('debug')) {
-    body.debug = { slice, slices, asked, failed, sliceIds: mine.map((m) => m.id) };
+    body.debug = { slice, slices, asked, failed, ytFresh: yt.fresh, sliceIds: mine.map((m) => m.id) };
   }
   return body;
 }
