@@ -12709,6 +12709,7 @@ async function init(){
         return;
       }
     }
+    const wasAccount = state.account && state.account.uid, wasOwner = state.isOwner;
     if(user && !user.isAnonymous){
       state.account = { name: user.displayName || user.email || 'ผู้ใช้', email: user.email || '', loggedIn:true, uid:user.uid,
         photo: user.photoURL || null };
@@ -12724,7 +12725,9 @@ async function init(){
     // The shared copy is the one the owner edits, so it wins over the page's —
     // but only redraw when it genuinely differs, or when the reader's own Oshi
     // arrive. A redraw for nothing is a flicker nobody asked for.
-    let changed = false;
+    // Signing in changes whole pages, not just the header: the profile page
+    // carries the account card, and the owner's review queue with it.
+    let changed = (state.account && state.account.uid) !== wasAccount || state.isOwner !== wasOwner;
     try{
       const shared = await loadMembers();
       if(shared && shared.length && JSON.stringify(shared) !== JSON.stringify(state.members)){
