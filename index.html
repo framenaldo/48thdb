@@ -292,7 +292,17 @@
   }
   .gen-filter-chip:active{ filter:brightness(1.3); }
 
-  main{ padding:20px 20px calc(104px + env(safe-area-inset-bottom)); max-width:1100px; margin:0 auto; min-height:60vh; }
+  main{ padding:20px 20px 12px; max-width:1100px; margin:0 auto; min-height:60vh; }
+  /* The footer sits under every page and keeps the last of it clear of the
+     floating nav, which main used to do on its own. */
+  .site-foot{
+    max-width:1100px; margin:0 auto;
+    padding:14px 20px calc(104px + env(safe-area-inset-bottom));
+  }
+  .site-foot p{
+    margin:0; text-align:center; font-size:12px; line-height:1.5;
+    color:var(--ink-soft); opacity:.85;
+  }
 
   /* ---- Wide screens ----
      A phone gets one column in the order the feed was written in. The feed's
@@ -5196,6 +5206,7 @@ const EN = {
   'ราคาเริ่มต้น 145 บาท': 'From 145 THB',
   'กำลังจัดอยู่': 'On now',
   'กำลังไลฟ์อยู่': 'On air now',
+  '48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ': '48thdb.com is an unofficial fan site',
   'ด่วน': 'FLASH',
   'ประกาศด่วน': 'Latest word',
   'ขึ้นทันทีทุกเครื่องที่เปิดเว็บอยู่': 'Appears at once on every open page',
@@ -10429,7 +10440,9 @@ function syncTicker(){
 
 function render(){
   const app = document.getElementById('app');
-  app.innerHTML = renderHeader() + '<div id="ticker-slot"></div><div id="nav-container"></div><main id="main"></main>';
+  app.innerHTML = renderHeader() + '<div id="ticker-slot"></div><div id="nav-container"></div><main id="main"></main>'
+    // Said once, under everything: this is a fan's database, not the groups'.
+    + '<footer class="site-foot"><p>48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ</p></footer>';
   renderProfileSlot();
   renderMain();
 }
