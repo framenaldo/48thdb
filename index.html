@@ -8697,15 +8697,24 @@ function applyEventLinks(){
     (ev.links || []).forEach((l, i) => { l.url = o.links[i]; });
     if(!x) return;
     if(x.stream){
-      const yt = /youtube\.com|youtu\.be/.test(x.stream);
+      // the label and the channel follow the platform the new link is on
+      const where = streamPlatform(x.stream);
       const g = (ev.groups || []).length === 1 ? ev.groups[0] : undefined;
-      ev.stream = ev.stream || { label: yt ? `YouTube ${g ? g.toUpperCase() : ''}`.trim() : 'ไลฟ์', ...(yt && g ? { channel:g } : {}) };
+      if(!ev.stream || streamPlatform(ev.stream.url) !== where)
+        ev.stream = { label: where === 'YouTube' && g ? `YouTube ${g.toUpperCase()}` : where,
+          ...(where === 'YouTube' && g ? { channel:g } : {}) };
       ev.stream.url = x.stream;
     }
     if(x.ticket) ev.ticketUrl = x.ticket;
     if(x.shop && ev.shop) ev.shop.url = x.shop;
     if(x.links) (ev.links || []).forEach((l, i) => { if(x.links[i]) l.url = x.links[i]; });
   });
+}
+function streamPlatform(u){
+  let h = '';
+  try{ h = new URL(u).hostname.replace(/^(www|m)\./, ''); }catch(e){ return ''; }
+  return /youtube\.com|youtu\.be/.test(h) ? 'YouTube' : /facebook\.com|fb\.watch/.test(h) ? 'Facebook'
+    : /tiktok\.com/.test(h) ? 'TikTok' : /instagram\.com/.test(h) ? 'Instagram' : /(^|\.)(x|twitter)\.com$/.test(h) ? 'X' : h;
 }
 function listenEventLinks(){
   if(_evLinksUnsub) return;
@@ -10957,7 +10966,8 @@ function renderMain(){
   const navContainer = document.getElementById('nav-container');
   if(navContainer) syncNav(navContainer);
   const main = document.getElementById('main');
-  main.innerHTML =
+  let html;
+  try{ html =
     (state.query.trim() ? renderSearch() :
     state.view==='feed' ? renderFeed() :
     state.view==='timeline' ? renderGEPage() :
@@ -10982,6 +10992,13 @@ function renderMain(){
     // Last, because it opens over a sheet. Sharing z-index 60 with the sheets
     // meant whichever was written later won, and that was the sheet.
     + (state.posterOf ? renderPosterViewer() : '');
+  }catch(err){
+    // one bad record must not blank the whole site
+    console.error(err);
+    html = `<div class="empty-state render-failed"><p>${isEN() ? 'This page could not be shown.' : 'หน้านี้แสดงไม่ได้ชั่วคราว'}</p>
+      <button class="chip chip-link" data-action="nav" data-view="feed">${isEN() ? 'Back to home' : 'กลับหน้าแรก'}</button></div>`;
+  }
+  main.innerHTML = html;
   if(state.view !== _lastRenderedView){
     main.classList.remove('view-fade-in');
     void main.offsetWidth;
