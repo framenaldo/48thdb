@@ -2508,6 +2508,9 @@
     color:var(--paper); background:var(--c);
   }
   .evm-meta{ display:flex; flex-wrap:wrap; gap:7px; align-items:center; padding-right:76px; }
+  /* the day's run is over: the pill stays, quietly */
+  :is(.evm-starts, .ev-starts, .cal-item-tag).is-over{ color:var(--ink-soft); background:var(--paper-dim); }
+  .live-chip[hidden]{ display:none; }
   /* The price is the thing people go looking for, so it sits next to the date
      rather than partway down a list of notices. */
   .evm-price{
@@ -7659,16 +7662,25 @@ function startsAt(ev, todayIso){
 }
 
 /** The same words whether the screen was just drawn or the clock just ticked. */
-function startsLabel(at){
-  const left = at - Date.now();
+function startsLabel(at, end){
+  const now = Date.now(), left = at - now;
+  if(end && now >= end) return 'จบแล้ว';
   return left > 0 ? startsInLabel(left) : 'กำลังจัดอยู่';
+}
+/* The countdown pill: counts down, says it is on, and once the day's run is
+   over says so, all without a redraw. */
+function startsPill(cls, ev, iso, at){
+  const end = endsAtToday(ev, iso);
+  return `<span class="${cls}${end && Date.now() >= end ? ' is-over' : ''}" data-starts-at="${at}"${end ? ` data-ends-at="${end}"` : ''}>${startsLabel(at, end)}</span>`;
 }
 
 let _feedLiveKey = null;
 function tickClock(){
   syncTicker();
   document.querySelectorAll('[data-starts-at]').forEach(el=>{
-    el.textContent = startsLabel(Number(el.dataset.startsAt));
+    const end = Number(el.dataset.endsAt) || 0;
+    el.textContent = startsLabel(Number(el.dataset.startsAt), end);
+    el.classList.toggle('is-over', !!end && Date.now() >= end);
     // the moment it starts, the pill starts blinking without a reload
     const pill = el.closest('.today-hero-status');
     if(pill) pill.classList.toggle('is-live', Number(el.dataset.startsAt) <= Date.now());
@@ -7678,6 +7690,7 @@ function tickClock(){
   document.querySelectorAll('[data-live-from]').forEach(el=>{
     const ms = Date.now();
     el.classList.toggle('is-on', ms >= Number(el.dataset.liveFrom) && ms <= Number(el.dataset.liveTo));
+    el.hidden = ms > Number(el.dataset.liveTo);
   });
 
   const now = toYmd(new Date());
@@ -7743,7 +7756,7 @@ function renderEventCard(ev, todayIso){
     </div>
     <div class="ev-body">
       ${(()=>{ const at = over ? null : startsAt(ev, todayIso);
-        return at ? `<span class="ev-starts" data-starts-at="${at}">${startsLabel(at)}</span>` : ''; })()}
+        return at ? startsPill('ev-starts', ev, todayIso, at) : ''; })()}
       <h3 class="ev-title">${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
@@ -8576,6 +8589,8 @@ function renderLiveChip(ev, cls){
   if(air) return `<a class="live-chip is-on is-air${cls ? ' ' + cls : ''}"
     href="${escapeAttr(direct)}" target="_blank" rel="noopener noreferrer"
     title="${escapeAttr(air.title || '')}">กำลังไลฟ์อยู่</a>`;
+  // after the show there is nothing to watch live; the icon still links the replay
+  if(now > w.to) return '';
   return `<span class="live-chip${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}"
     data-live-from="${w.from}" data-live-to="${w.to}"
     title="${escapeAttr(ev.stream.label || '')}">LIVE</span>`;
@@ -8843,8 +8858,8 @@ function renderEventModal(){
           ${renderStreamLink(ev, 'evm-icon')}
           <p class="evm-date">${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}${ev.part?' · '+escapeHtml(ev.part):''}</p>
           ${renderLiveChip(ev, 'is-meta')}
-          ${(()=>{ const at = startsAt(ev, toYmd(todayStart()));
-            return at ? `<span class="evm-starts" data-starts-at="${at}">${startsLabel(at)}</span>` : ''; })()}
+          ${(()=>{ const iso = toYmd(todayStart()), at = startsAt(ev, iso);
+            return at ? startsPill('evm-starts', ev, iso, at) : ''; })()}
           ${ev.bookClosed
             ? `<span class="evm-price is-closed">${ICONS.ticket}${ev.price
                  ? `<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>` : ''}<span class="evm-closed">BOOK CLOSED</span></span>`
@@ -10195,7 +10210,7 @@ function renderMemberEvents(m){
     const at = kind === 'today' ? startsAt(e, iso) : null;
     const personal = e.memberDays && e.memberDays[m.id];
     const tag = kind === 'today'
-      ? (at ? `<span class="cal-item-tag" data-starts-at="${at}">${startsLabel(at)}</span>`
+      ? (at ? startsPill('cal-item-tag', e, iso, at)
             : `<span class="cal-item-tag">${dayOfRun(e)}</span>`)
       : `<span class="cal-item-tag">${personal || eventDateLabel(e)}</span>`;
     return `<button class="cal-item${kind === 'past' ? ' is-past' : ''}${kind === 'today' ? ' is-today' : ''}"
