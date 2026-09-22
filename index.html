@@ -6558,9 +6558,23 @@ function worksOf(id, which = 'main'){
     .filter(t => t.members.includes(id))
     .filter(t => which === 'all' || (which === 'special') === isSpecialWork(t.work))
     .map(t => ({ work:t.work, track:t.track, centre:t.centers.includes(id) }))
-    .sort((a,b) => b.work.year-a.work.year || (b.work.num||0)-(a.work.num||0)
-      || String(b.work.date||'').localeCompare(String(a.work.date||'')));
+    .sort((a,b) => b.work.year-a.work.year || workSeq(b.work)-workSeq(a.work)
+      || String(b.work.date||'').localeCompare(String(a.work.date||''))
+      || isTitleTrack(b)-isTitleTrack(a));
 }
+/* Albums and singles are numbered separately, so an album's number says
+   nothing about where it falls among the singles. An album collects the
+   singles it lists, so it comes just after the last of them. */
+const _workSeq = new WeakMap();
+function workSeq(w){
+  if(!w.singles || !w.singles.length) return w.num || 0;
+  if(!_workSeq.has(w)){
+    const nums = w.singles.map(id => (ALL_WORKS().find(x => x.id === id) || {}).num || 0);
+    _workSeq.set(w, Math.max(...nums) + 0.5);
+  }
+  return _workSeq.get(w);
+}
+const isTitleTrack = e => (e.track === e.work.title || e.track.startsWith(e.work.title + ' – ')) ? 1 : 0;
 
 function renderBarLink(label, value, max, color, action, data){
   const pct = max>0 ? Math.round(value/max*100) : 0;
