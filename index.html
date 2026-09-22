@@ -2206,6 +2206,8 @@
   .ge-count-num{ font-size:44px; font-weight:800; line-height:1; color:#FFD98A; text-shadow:0 2px 12px rgba(0,0,0,.45); }
   .ge-count-unit{ font-size:14px; font-weight:700; opacity:.9; }
   .ge-tabs .sub-tab.active{ background:var(--ge); border-color:var(--ge); color:#fff; }
+  /* four tabs on a phone: keep each label on one line */
+  @media (max-width:560px){ .ge-tabs .sub-tab{ padding:9px 4px; font-size:12.5px; white-space:nowrap; } }
   .ge-page .section-label{ margin-top:18px; }
   .ge-next{ display:flex; flex-direction:column; gap:8px; }
   .ge-next-row{ display:flex; gap:12px; align-items:center; width:100%; padding:10px 13px; text-align:left;
@@ -2225,6 +2227,124 @@
   .ge-shop-card b{ font-size:13.5px; line-height:1.35; }
   .ge-shop-card small{ font-size:13px; font-weight:800; color:var(--c); }
   .tlp.is-in-hub .tlp-legend{ margin:0 0 14px; }
+  /* ===== live election results ===== */
+  .gel-strip{ position:relative; overflow:hidden; border-radius:20px; padding:14px 16px; color:#fff;
+    background:radial-gradient(circle at 85% 0%, rgba(179,18,30,.9), transparent 60%), #2A0508; }
+  .gel-strip-top{ display:flex; align-items:center; gap:8px; min-height:4px; }
+  .gel-strip-top small{ opacity:.8; font-size:12.5px; }
+  .gel-strip h2{ margin:6px 0 2px; font-size:19px; line-height:1.3; }
+  .gel-strip > small{ opacity:.82; font-size:13px; }
+  .gel-live{ display:inline-flex; align-items:center; gap:6px; background:#E0243A; color:#fff; font-weight:800; font-size:12px;
+    padding:3px 10px; border-radius:999px; letter-spacing:.05em; }
+  .gel-live i, .gel-dot{ width:8px; height:8px; border-radius:50%; background:#fff; animation:gel-blink 1s infinite; }
+  .gel-dot{ display:inline-block; background:#E0243A; margin-left:6px; vertical-align:middle; }
+  @keyframes gel-blink{ 50%{ opacity:.2; } }
+  .gel-prog{ margin-top:10px; height:8px; border-radius:99px; background:rgba(255,255,255,.18); overflow:hidden; }
+  .gel-prog b{ display:block; height:100%; background:linear-gradient(90deg, #FFD27A, #fff); transition:width .5s; }
+  .gel-prog-t{ display:flex; justify-content:space-between; font-size:12px; margin-top:5px; opacity:.85; }
+  .gel-now{ --t:var(--silver); position:relative; margin:16px 0 4px; display:flex; gap:12px; align-items:center; padding:12px;
+    border-radius:18px; background:var(--card); border:2px solid var(--t); box-shadow:0 5px 0 rgba(var(--shadow-rgb),.08); animation:gel-pop .5s; }
+  .gel-now-tag{ position:absolute; top:-11px; left:14px; background:#B3121E; color:#fff; font-size:11px; font-weight:800; padding:2px 10px; border-radius:99px; }
+  .gel-now-rank{ display:flex; flex-direction:column; align-items:center; min-width:40px; }
+  .gel-now-rank b{ font-size:30px; font-weight:800; color:var(--t); line-height:1; }
+  .gel-now-rank small{ font-size:11px; color:var(--ink-soft); }
+  .gel-now-face{ width:64px !important; height:64px !important; border-radius:14px !important; flex:none; font-size:15px; }
+  .gel-now-who{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .gel-now-who b{ font-size:18px; font-weight:800; }
+  .gel-now-who span{ font-weight:700; font-size:15px; }
+  .gel-now-who small{ font-weight:500; color:var(--ink-soft); }
+  .gel-dots i{ font-style:normal; animation:gel-blink 1.2s infinite; }
+  .gel-dots i:nth-child(2){ animation-delay:.2s; } .gel-dots i:nth-child(3){ animation-delay:.4s; }
+  .gel-before{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-size:12.5px; color:var(--ink-soft); margin:6px 4px 18px; }
+  .gel-before b{ color:var(--ink); }
+  .gel-before-face{ width:22px !important; height:22px !important; border-radius:6px !important; font-size:9px; }
+  .gel-rounds{ margin:14px 0 4px; }
+  .gel-rounds .sub-tab.active{ background:var(--ge); border-color:var(--ge); color:#fff; }
+  .gel-rounds .sub-tab.active .gel-dot, .ge-tabs .sub-tab.active .gel-dot{ background:#fff; }
+  .gel-owner{ margin:6px 0 0; }
+  .gel-bands{ display:grid; grid-template-columns:1fr; gap:14px; margin-top:12px; }
+  @media (min-width:900px){ .gel-bands{ grid-template-columns:repeat(3, 1fr); align-items:start; } }
+  .gel-band{ --t:var(--gold); }
+  .gel-band.is-gold, .gel-now.is-gold{ --t:#B8862E; --t2:#E0B55A; }
+  .gel-band.is-silver, .gel-now.is-silver{ --t:#76828E; --t2:#A9B4BE; }
+  .gel-band.is-bronze, .gel-now.is-bronze{ --t:#9A5733; --t2:#C98A5E; }
+  .gel-band-h{ display:flex; align-items:baseline; justify-content:space-between; padding:8px 12px; border-radius:12px;
+    color:#fff; font-weight:800; font-size:14px; background:linear-gradient(90deg, var(--t), var(--t2)); }
+  .gel-band-h small{ font-weight:600; font-size:12px; opacity:.92; }
+  .gel-seats{ display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; margin-top:6px; }
+  .gel-seats span{ aspect-ratio:1; max-height:52px; border-radius:12px; border:1.5px dashed var(--line); display:grid; place-items:center;
+    font-weight:800; font-size:15px; color:var(--t); background:color-mix(in srgb, var(--card) 50%, transparent); }
+  .gel-wait{ text-align:center; font-size:12px; color:var(--ink-soft); margin:6px 0 0; }
+  .gel-rows{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+  .gel-row{ position:relative; overflow:hidden; display:grid; grid-template-columns:30px 44px minmax(0,1fr) auto; align-items:center; gap:10px;
+    width:100%; padding:6px 10px 6px 6px; border-radius:14px; background:var(--card); border:1.5px solid var(--line);
+    box-shadow:0 3px 0 rgba(var(--shadow-rgb),.05); color:var(--ink); font:inherit; text-align:left; }
+  button.gel-row{ cursor:pointer; }
+  button.gel-row:active{ transform:translateY(2px); box-shadow:none; }
+  .gel-row.is-fresh{ border-color:var(--t); animation:gel-pop .6s; }
+  .gel-row.is-pending{ border-color:var(--t); border-style:dashed; }
+  @keyframes gel-pop{ 0%{ transform:scale(.96); opacity:.3; } 100%{ transform:none; opacity:1; } }
+  .gel-n{ font-weight:800; font-size:17px; text-align:center; color:var(--t); }
+  .gel-face{ width:44px !important; height:44px !important; border-radius:10px !important; font-size:11px; }
+  .gel-q{ width:44px; height:44px; border-radius:10px; display:grid; place-items:center; font-weight:800; font-size:18px; color:var(--ink-soft);
+    background:repeating-linear-gradient(45deg, var(--line), var(--line) 6px, transparent 6px, transparent 12px); }
+  .gel-now .gel-q{ font-size:26px; }
+  .gel-who{ min-width:0; }
+  .gel-who b{ display:block; font-size:15px; line-height:1.25; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gel-row.is-pending .gel-who b{ color:var(--ink-soft); }
+  .gel-who small{ font-size:11.5px; color:var(--ink-soft); }
+  .gel-g{ display:inline-block; font-size:10px; font-weight:800; padding:0 6px; border-radius:5px; color:#fff; margin-right:4px; }
+  .gel-g.is-bnk{ background:var(--bnk); } .gel-g.is-cgm{ background:var(--cgm); }
+  .gel-v{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+  .gel-v b{ font-size:14px; font-variant-numeric:tabular-nums; }
+  .gel-bar{ position:absolute; left:0; bottom:0; height:3px; background:var(--t); opacity:.45; }
+  .gel-mv{ font-size:11.5px; font-weight:800; border-radius:99px; padding:1px 7px; white-space:nowrap; }
+  .gel-mv.is-up{ color:#1E8E4E; background:#E3F6EA; } .gel-mv.is-dn{ color:#C62B2B; background:#FBE7E7; }
+  .gel-mv.is-eq{ color:var(--ink-soft); background:var(--paper-dim); } .gel-mv.is-new{ color:#7A4BC4; background:#EFE6FB; }
+  .gel-foot{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:12px; }
+  .ge-live-banner{ display:flex; align-items:center; gap:10px; width:100%; margin:0 0 12px; padding:10px 14px; border-radius:14px; cursor:pointer;
+    background:#2A0508; color:#fff; border:0; font:inherit; font-weight:700; text-align:left; }
+  .ge-live-banner span{ flex:1; }
+  .ge-live-banner small{ opacity:.8; font-weight:600; }
+  /* the owner's entry desk */
+  .gea{ max-width:560px; margin-inline:auto; }
+  .gea-head{ display:flex; align-items:center; gap:10px; }
+  .gea-head h2{ margin:0; font-size:20px; flex:1; }
+  .gea-lock{ font-size:11px; font-weight:800; color:#B3121E; background:#FBE6E8; padding:2px 9px; border-radius:99px; }
+  .gea-card{ margin-top:12px; padding:12px; border-radius:18px; background:var(--card); border:1.5px solid var(--line); box-shadow:0 4px 0 rgba(var(--shadow-rgb),.06); }
+  .gea-seg{ display:flex; gap:3px; padding:3px; border-radius:12px; background:var(--paper-dim); }
+  .gea-seg button{ flex:1; border:0; background:none; font:inherit; font-size:13px; font-weight:700; padding:8px 2px; border-radius:9px; color:var(--ink-soft); cursor:pointer; }
+  .gea-seg button.is-on{ background:var(--card); color:var(--ink); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.08); }
+  .gea-switch{ display:flex; align-items:center; justify-content:space-between; width:100%; margin-top:12px; border:0; background:none;
+    font:inherit; font-weight:700; font-size:14px; color:var(--ink); cursor:pointer; padding:0; text-align:left; }
+  .gea-switch small{ color:var(--ink-soft); font-weight:500; }
+  .gea-switch i{ flex:none; width:48px; height:28px; border-radius:99px; background:var(--line); position:relative; transition:background .2s; }
+  .gea-switch i::after{ content:''; position:absolute; left:3px; top:3px; width:22px; height:22px; border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+  .gea-switch.is-on i{ background:#E0243A; } .gea-switch.is-on i::after{ left:23px; }
+  .gea-hint{ font-size:12px; color:var(--ink-soft); line-height:1.55; margin:10px 4px; }
+  .gea-band{ margin-top:12px; padding:10px; border-radius:18px; background:var(--card); border:1.5px solid var(--line); }
+  .gea-band.is-gold{ --t:#B8862E; } .gea-band.is-silver{ --t:#76828E; } .gea-band.is-bronze{ --t:#9A5733; }
+  .gea-band-h{ font-size:12px; font-weight:800; color:var(--t); letter-spacing:.04em; margin:0 2px 8px; }
+  .gea-row{ display:grid; grid-template-columns:28px 104px minmax(0,1fr) 30px; gap:6px; align-items:center; margin-bottom:6px; border-radius:12px; }
+  .gea-row.is-ok{ animation:gea-ok 1.2s; }
+  @keyframes gea-ok{ 0%{ background:#DDF5E6; } 100%{ background:transparent; } }
+  .gea-n{ font-weight:800; text-align:center; color:var(--t); }
+  .gea-v, .gea-q{ width:100%; min-width:0; height:42px; border:1.5px solid var(--line); border-radius:10px; padding:0 10px; font:inherit; font-size:16px;
+    background:var(--card); color:var(--ink); }
+  .gea-v{ text-align:right; font-weight:700; font-variant-numeric:tabular-nums; }
+  .gea-v:focus, .gea-q:focus{ outline:none; border-color:var(--bnk); box-shadow:0 0 0 3px rgba(228,69,126,.18); }
+  .gea-name{ position:relative; display:flex; align-items:center; min-width:0; }
+  .gea-face{ position:absolute !important; left:7px; width:26px !important; height:26px !important; border-radius:7px !important; font-size:8px; pointer-events:none; z-index:1; }
+  .gea-face + .gea-q{ padding-left:40px; }
+  .gea-x{ width:30px; height:30px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink-soft); font-size:16px; cursor:pointer; }
+  .gea-sug{ position:absolute; top:calc(100% + 4px); left:-110px; right:-36px; z-index:20; border:1.5px solid var(--line); border-radius:12px;
+    background:var(--card); box-shadow:0 10px 24px rgba(var(--shadow-rgb),.16); overflow:hidden; }
+  .gea-sug button{ display:flex; align-items:center; gap:8px; width:100%; padding:8px 10px; border:0; background:none; font:inherit; font-size:14px;
+    color:var(--ink); cursor:pointer; text-align:left; }
+  .gea-sug button + button{ border-top:1px solid var(--line); }
+  .gea-sug button.is-hi{ background:color-mix(in srgb, var(--bnk) 10%, var(--card)); }
+  .gea-sug small{ margin-left:auto; color:var(--ink-soft); font-size:11.5px; }
+  .gea-sug-face{ width:28px !important; height:28px !important; border-radius:7px !important; font-size:8px; flex:none; }
   @media (max-width:560px){
     .ge-btn{ padding:0 10px 0 7px; }
     .ge-btn img{ height:19px; }
@@ -4685,7 +4805,7 @@ const ICONS = {
 
 // ============================= STATE =============================
 let state = {
-  isOwner:false, pending:[], flash:[],
+  isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
@@ -7936,11 +8056,19 @@ function renderGEPage(){
     </div>
   </div>`;
 
-  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['timeline', en ? 'Timeline' : 'ไทม์ไลน์'], ['events', en ? 'All events' : 'งานทั้งหมด']]
-    .map(([v, l]) => `<button class="sub-tab${tab === v ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}</button>`).join('')}</div>`;
+  // the results tab appears once there is something in it (always for the owner)
+  const hasResults = state.isOwner || GE_ROUNDS.some(r => geHasData(r.id) || ((state.geRounds || {})[r.id] || {}).live);
+  const liveRound = geLiveRound();
+  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
+    ['timeline', en ? 'Timeline' : 'ไทม์ไลน์'], ['events', en ? 'All events' : 'งานทั้งหมด']]
+    .map(([v, l]) => `<button class="sub-tab${tab === v ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
+  const liveBanner = liveRound && tab !== 'results' ? `<button class="ge-live-banner" data-action="ge-tab" data-value="results">
+    <span class="gel-live"><i></i>LIVE</span><span>${en ? 'Announcing' : 'กำลังประกาศ'} ${geRoundLabel(liveRound)}
+    <small>· ${en ? `${geAnnounced(liveRound.id)} / ${GE_SEATS} so far` : `ประกาศแล้ว ${geAnnounced(liveRound.id)} / ${GE_SEATS}`}</small></span>→</button>` : '';
 
   let body = '';
-  if(tab === 'timeline') body = renderTimelinePage(true);
+  if(tab === 'results') body = renderGEResults();
+  else if(tab === 'timeline') body = renderTimelinePage(true);
   else if(tab === 'events'){
     const ahead = events.filter(e => eventLastDay(e) >= iso), past = events.filter(e => eventLastDay(e) < iso);
     body = `${ahead.map(e => renderEventCard(e, iso)).join('')}
@@ -7970,7 +8098,316 @@ function renderGEPage(){
 
   return `<section class="ge-page" style="--ge:${GE_PAGE.red}">${hero}
     <div class="ge-share-row"><button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></div>
-    ${tabs}${body}</section>`;
+    ${liveBanner}${tabs}${body}</section>`;
+}
+
+/* ===== Election results, reported live =====
+   Each round is one Firestore doc under ge/, written only by the owner while
+   the result is read out: `slots` maps a rank to what is known of it so far —
+   the votes (announced first) and then who. Every open page listens, so a
+   number typed at the venue is on screen about a second later. */
+const GE_ROUNDS = [
+  { id:'ge2026-q1',    th:'ผลด่วน 1',   en:'Preliminary 1' },
+  { id:'ge2026-q2',    th:'ผลด่วน 2',   en:'Preliminary 2' },
+  { id:'ge2026-final', th:'ผลสุดท้าย', en:'Final results' },
+];
+const GE_BANDS = [
+  { name:'Senbatsu',    from:1,  to:12, tone:'gold' },
+  { name:'Under Girls', from:13, to:24, tone:'silver' },
+  { name:'Next Girls',  from:25, to:36, tone:'bronze' },
+];
+const GE_SEATS = 36;
+let _geUnsub = null;
+function listenGE(){
+  if(_geUnsub) return;
+  try{
+    _geUnsub = fbDb.collection('ge').onSnapshot(snap => {
+      const next = {};
+      snap.docs.forEach(d => { next[d.id] = d.data(); });
+      state.geRounds = next;
+      if(!document.getElementById('main')) return;
+      if(state.selectedId || state.selectedEvent || state.posterOf || state.editingId) return;
+      // the owner mid-entry keeps their cursor; the page catches up after
+      if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+      if(state.view === 'timeline' || state.view === 'gelive') renderMain();
+    }, () => {});
+  }catch(e){}
+}
+const geRoundLabel = r => isEN() ? r.en : r.th;
+const geSlots = id => ((state.geRounds || {})[id] || {}).slots || {};
+const geHasData = id => Object.keys(geSlots(id)).length > 0;
+const geLiveRound = () => GE_ROUNDS.find(r => ((state.geRounds || {})[r.id] || {}).live);
+function geDefaultRound(){
+  const live = geLiveRound();
+  if(live) return live.id;
+  const done = GE_ROUNDS.filter(r => geHasData(r.id));
+  return (done.length ? done[done.length - 1] : GE_ROUNDS[0]).id;
+}
+function geAnnounced(id){
+  const s = geSlots(id);
+  return Object.keys(s).filter(k => s[k] && s[k].id).length;
+}
+/* Where each member stood last round, for the arrows. Nothing to compare
+   against — the first round, or one not entered — means no arrows at all. */
+function gePrevRanks(id){
+  const i = GE_ROUNDS.findIndex(r => r.id === id);
+  if(i < 1) return null;
+  const s = geSlots(GE_ROUNDS[i - 1].id);
+  const out = {};
+  Object.keys(s).forEach(k => { if(s[k] && s[k].id) out[s[k].id] = +k; });
+  return Object.keys(out).length ? out : null;
+}
+function geMove(prev, mid, rank){
+  if(!prev || !mid) return '';
+  const en = isEN();
+  const was = prev[mid];
+  if(!was) return `<span class="gel-mv is-new">${en ? 'New' : 'ใหม่'}</span>`;
+  if(was === rank) return `<span class="gel-mv is-eq">${en ? 'Same' : 'คงที่'}</span>`;
+  return was > rank ? `<span class="gel-mv is-up">▲ ${en ? 'from' : 'จาก'} ${was}</span>`
+    : `<span class="gel-mv is-dn">▼ ${en ? 'from' : 'จาก'} ${was}</span>`;
+}
+const geVotes = v => (typeof v === 'number' && isFinite(v)) ? v.toLocaleString('en-US') : '';
+function geFace(m, cls){
+  const g = getGroup(m.groupId) || {};
+  return renderAvatar(m, 'avatar-sm ' + cls, g.color || 'var(--ink-soft)');
+}
+function geTeamTag(m){
+  const g = m.groupId === 'cgm48' ? 'CGM' : 'BNK';
+  const t = getTeam(m.teamId);
+  const team = t ? (/Trainee/.test(t.name) ? 'Trainee' : t.name) : '';
+  return `<span class="gel-g is-${g.toLowerCase()}">${g}</span>${escapeHtml(team)}`;
+}
+// Rows that changed since the last draw get a moment of emphasis.
+let _geSeen = null;
+function geFresh(round, rank, slot){
+  const key = round + ':' + rank, sig = (slot.id || '') + '|' + (slot.v == null ? '' : slot.v);
+  const was = _geSeen && _geSeen[key];
+  return _geSeen !== null && was !== sig;
+}
+function geRemember(round){
+  const s = geSlots(round);
+  const seen = _geSeen && _geSeen.__round === round ? _geSeen : { __round:round };
+  for(let n = 1; n <= GE_SEATS; n++){ const x = s[n] || {}; seen[round + ':' + n] = (x.id || '') + '|' + (x.v == null ? '' : x.v); }
+  _geSeen = seen;
+}
+
+function renderGEResults(){
+  const en = isEN();
+  const rounds = state.geRounds || {};
+  const round = GE_ROUNDS.find(r => r.id === state.geRound) || GE_ROUNDS.find(r => r.id === geDefaultRound());
+  const doc = rounds[round.id] || {};
+  const slots = doc.slots || {};
+  const live = !!doc.live;
+  const prev = gePrevRanks(round.id);
+  const told = geAnnounced(round.id);
+  const top = Math.max(1, ...Object.values(slots).map(s => (s && s.v) || 0));
+  if(!_geSeen || _geSeen.__round !== round.id) _geSeen = null;
+
+  const picks = `<div class="sub-tabs gel-rounds">${GE_ROUNDS.map(r => {
+    const on = r.id === round.id, isLive = !!(rounds[r.id] || {}).live;
+    return `<button class="sub-tab${on ? ' active' : ''}" data-action="ge-round" data-value="${r.id}">${geRoundLabel(r)}${isLive ? '<i class="gel-dot"></i>' : ''}</button>`;
+  }).join('')}</div>`;
+
+  const at = doc.at && doc.at.seconds ? new Date(doc.at.seconds * 1000) : null;
+  const hhmm = at ? `${String(at.getHours()).padStart(2, '0')}:${String(at.getMinutes()).padStart(2, '0')}` : '';
+  const strip = `<div class="gel-strip">
+    <div class="gel-strip-top">${live ? '<span class="gel-live"><i></i>LIVE</span>' : ''}${hhmm ? `<small>${en ? 'Updated' : 'อัปเดต'} ${hhmm}${en ? '' : ' น.'}</small>` : ''}</div>
+    <h2>${en ? 'GE2026 results' : 'ผลเลือกตั้ง GE2026'} · ${geRoundLabel(round)}</h2>
+    <small>${live ? (en ? 'Read out from 36 upward · this page updates itself' : 'ประกาศจากอันดับ 36 ขึ้นไป · หน้านี้อัปเดตเองทันที')
+      : told >= GE_SEATS ? (en ? 'All 36 ranks announced' : 'ประกาศครบ 36 อันดับแล้ว')
+      : told ? (en ? 'Partial results' : 'ผลบางส่วน') : (en ? 'Not announced yet' : 'ยังไม่ประกาศ')}</small>
+    <div class="gel-prog"><b style="width:${told / GE_SEATS * 100}%"></b></div>
+    <div class="gel-prog-t"><span>${en ? `Announced ${told} / ${GE_SEATS}` : `ประกาศแล้ว ${told} / ${GE_SEATS}`}</span>${told < GE_SEATS ? `<span>${en ? `${GE_SEATS - told} to go` : `ยังเหลืออีก ${GE_SEATS - told}`}</span>` : ''}</div>
+  </div>`;
+
+  // what is being read out right now, and the one before it
+  let now = '';
+  const last = +doc.last;
+  if(live && last && slots[last]){
+    const s = slots[last], m = s.id && getMember(s.id);
+    const band = GE_BANDS.find(b => last >= b.from && last <= b.to);
+    const face = m ? geFace(m, 'gel-now-face') : '<span class="gel-q gel-now-face">?</span>';
+    now = `<div class="gel-now is-${band.tone}"><span class="gel-now-tag">LIVE</span>
+      <div class="gel-now-rank"><b>${last}</b><small>${band.name.replace(' Girls', '')}</small></div>${face}
+      <div class="gel-now-who">${m ? `<b>${escapeHtml(m.name)}</b>` : `<b class="gel-dots">${en ? 'Announcing' : 'กำลังประกาศ'}<i>.</i><i>.</i><i>.</i></b>`}
+        ${s.v != null ? `<span>${geVotes(s.v)} <small>${en ? 'votes' : 'คะแนน'}</small></span>` : ''}</div>
+      ${m ? geMove(prev, m.id, last) : ''}</div>`;
+    let p = null;
+    for(let n = last + 1; n <= GE_SEATS; n++){ if(slots[n] && slots[n].id){ p = n; break; } }
+    const pm = p && getMember(slots[p].id);
+    if(pm) now += `<div class="gel-before">${en ? 'Before' : 'ก่อนหน้า'} · <b>${p}</b> ${geFace(pm, 'gel-before-face')} ${escapeHtml(pm.name)} ${geVotes(slots[p].v)} ${geMove(prev, pm.id, p)}</div>`;
+  }
+
+  const bands = GE_BANDS.map(b => {
+    const ranks = []; for(let n = b.from; n <= b.to; n++) ranks.push(n);
+    const known = ranks.filter(n => slots[n] && (slots[n].id || slots[n].v != null));
+    const waiting = ranks.filter(n => !known.includes(n));
+    const rows = known.map(n => {
+      const s = slots[n], m = s.id && getMember(s.id);
+      const fresh = geFresh(round.id, n, s) ? ' is-fresh' : '';
+      const bar = s.v ? `<span class="gel-bar" style="width:${Math.min(100, s.v / top * 100)}%"></span>` : '';
+      if(!m) return `<div class="gel-row is-pending${fresh}"><span class="gel-n">${n}</span><span class="gel-q">?</span>
+        <span class="gel-who"><b>${live ? (en ? 'Announcing…' : 'กำลังประกาศ…') : '—'}</b></span>
+        <span class="gel-v"><b>${geVotes(s.v)}</b></span>${bar}</div>`;
+      return `<button class="gel-row${fresh}" data-action="open-member" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
+        <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small></span>
+        <span class="gel-v"><b>${geVotes(s.v)}</b>${geMove(prev, m.id, n)}</span>${bar}</button>`;
+    }).join('');
+    return `<section class="gel-band is-${b.tone}">
+      <div class="gel-band-h">${b.name}<small>${en ? `Ranks ${b.from}–${b.to}` : `อันดับ ${b.from}–${b.to}`}</small></div>
+      ${waiting.length ? `<div class="gel-seats">${waiting.map(n => `<span>${n}</span>`).join('')}</div>
+        ${!known.length ? `<p class="gel-wait">${en ? 'Not announced yet' : 'ยังไม่ประกาศ'}</p>` : ''}` : ''}
+      ${rows ? `<div class="gel-rows">${rows}</div>` : ''}
+    </section>`;
+  }).join('');
+
+  const owner = state.isOwner ? `<button class="chip chip-link gel-owner" data-action="nav" data-view="gelive">${en ? 'Enter results →' : 'กรอกผล →'}</button>` : '';
+  const out = `<div class="gel">${strip}${now}${picks}${owner}<div class="gel-bands">${bands}</div>
+    ${prev ? `<p class="gel-foot">${en ? 'Arrows compare with' : 'ลูกศรเทียบกับ'} ${geRoundLabel(GE_ROUNDS[GE_ROUNDS.findIndex(r => r.id === round.id) - 1])}</p>` : ''}</div>`;
+  geRemember(round.id);
+  return out;
+}
+
+/* The owner's desk: one row per rank, votes first because that is the order
+   the venue reads them out in, then the name. Enter sends each. */
+function renderGEAdmin(){
+  const en = isEN();
+  if(!state.isOwner) return `<section class="gea"><div class="empty-state">${en ? 'This page is for the site owner.' : 'หน้านี้สำหรับเจ้าของเว็บเท่านั้น'}</div></section>`;
+  const rounds = state.geRounds || {};
+  const round = GE_ROUNDS.find(r => r.id === state.geAdminRound) || GE_ROUNDS.find(r => r.id === geDefaultRound());
+  state.geAdminRound = round.id;
+  const doc = rounds[round.id] || {};
+  const slots = doc.slots || {};
+  const seg = `<div class="gea-seg">${GE_ROUNDS.map(r => `<button class="${r.id === round.id ? 'is-on' : ''}" data-action="ge-admin-round" data-value="${r.id}">${geRoundLabel(r)}</button>`).join('')}</div>`;
+  const toggle = `<button class="gea-switch${doc.live ? ' is-on' : ''}" data-action="ge-live" aria-pressed="${!!doc.live}">
+    <span>${en ? 'Live now' : 'ถ่ายทอดสดอยู่'} <small>${en ? '(LIVE badge on the site)' : '(ป้าย LIVE บนเว็บ)'}</small></span><i></i></button>`;
+  const bands = GE_BANDS.slice().reverse().map(b => {
+    const rows = [];
+    for(let n = b.to; n >= b.from; n--){
+      const s = slots[n] || {}, m = s.id && getMember(s.id);
+      rows.push(`<div class="gea-row" data-rank="${n}"><span class="gea-n">${n}</span>
+        <input class="gea-v" inputmode="numeric" autocomplete="off" data-rank="${n}" value="${geVotes(s.v)}" placeholder="${en ? 'Votes' : 'คะแนน'}">
+        <div class="gea-name">${m ? geFace(m, 'gea-face') : ''}<input class="gea-q" autocomplete="off" data-rank="${n}" value="${m ? escapeAttr(m.name) : ''}" placeholder="${en ? 'Name' : 'ชื่อ'}">
+          <div class="gea-sug" hidden></div></div>
+        ${s.id || s.v != null ? `<button class="gea-x" data-action="ge-clear" data-value="${n}" aria-label="${en ? 'Clear' : 'ล้าง'}">×</button>` : '<span></span>'}</div>`);
+    }
+    return `<div class="gea-band is-${b.tone}"><div class="gea-band-h">${b.name} · ${b.from}–${b.to}</div>${rows.join('')}</div>`;
+  }).join('');
+  return `<section class="gea">
+    <div class="gea-head"><button class="chip" data-action="ge-back">←</button><h2>${en ? 'Live results' : 'รายงานผลสด'}</h2><span class="gea-lock">${en ? 'Owner only' : 'เฉพาะเจ้าของเว็บ'}</span></div>
+    <div class="gea-card">${seg}${toggle}</div>
+    <p class="gea-hint">${en ? 'Type the votes and press Enter — they go up at once. Then the name when it is read out; pick from the list and Enter. Photo, team and arrows fill themselves. Anything can be typed over.'
+      : 'ใส่คะแนนแล้วกด Enter คะแนนขึ้นเว็บทันที แล้วค่อยพิมพ์ชื่อตอนเขาประกาศ เลือกจากรายการแล้วกด Enter · รูป ทีม และลูกศรขึ้น/ลงดึงให้เอง · กรอกผิดพิมพ์ทับได้ตลอด'}</p>
+    <div class="gea-bands">${bands}</div></section>`;
+}
+
+async function geWrite(round, patch, rank){
+  const doc = (state.geRounds[round] = state.geRounds[round] || {});
+  if(rank){
+    doc.slots = doc.slots || {};
+    doc.slots[rank] = Object.assign({}, doc.slots[rank], patch);
+    doc.last = rank;
+  } else Object.assign(doc, patch);
+  const body = rank ? { slots:{ [rank]:patch }, last:rank } : patch;
+  body.at = firebase.firestore.FieldValue.serverTimestamp();
+  try{ await fbDb.collection('ge').doc(round).set(body, { merge:true }); return true; }
+  catch(e){ toast(isEN() ? 'Could not save — check the connection' : 'บันทึกไม่ได้ ลองเช็กอินเทอร์เน็ต'); return false; }
+}
+function geMatches(q){
+  const ql = q.trim().toLowerCase();
+  if(!ql) return [];
+  const score = m => {
+    const names = [m.name, m.nameTh].filter(Boolean).map(s => s.toLowerCase());
+    if(names.some(s => s === ql)) return 0;
+    if(names.some(s => s.startsWith(ql))) return 1;
+    if(names.some(s => s.includes(ql))) return 2;
+    return 9;
+  };
+  return (state.members || []).filter(m => !m.graduated)
+    .map(m => [score(m), m]).filter(x => x[0] < 9)
+    .sort((a, b) => a[0] - b[0] || a[1].name.localeCompare(b[1].name)).slice(0, 6).map(x => x[1]);
+}
+function focusGE(rank, cls){
+  const el = document.querySelector(`.gea .${cls}[data-rank="${rank}"]`);
+  if(el){ el.focus(); el.select && el.select(); el.scrollIntoView({ block:'center', behavior:'smooth' }); }
+}
+function bindGEAdmin(){
+  const root = document.querySelector('.gea');
+  if(!root || root._bound) return;
+  root._bound = true;
+  const round = () => state.geAdminRound;
+  const markOk = (row) => { if(!row) return; row.classList.remove('is-ok'); void row.offsetWidth; row.classList.add('is-ok'); };
+  const saveVotes = async (inp) => {
+    const n = +inp.dataset.rank, raw = inp.value.replace(/[^\d]/g, '');
+    const cur = geSlots(round())[n] || {};
+    if(!raw){ return; }
+    const v = +raw;
+    inp.value = geVotes(v);
+    if(cur.v === v) return true;
+    if(await geWrite(round(), { v }, n)) markOk(inp.closest('.gea-row'));
+    return true;
+  };
+  const pick = async (inp, m) => {
+    const n = +inp.dataset.rank;
+    const box = inp.parentElement.querySelector('.gea-sug');
+    box.hidden = true; box.innerHTML = '';
+    inp.value = m.name;
+    const other = Object.entries(geSlots(round())).find(([k, s]) => s && s.id === m.id && +k !== n);
+    if(other) toast(isEN() ? `${m.name} is also at ${other[0]}` : `${m.name} อยู่ที่อันดับ ${other[0]} ด้วย`);
+    if(await geWrite(round(), { id:m.id }, n)){
+      const row = inp.closest('.gea-row');
+      const old = row.querySelector('.gea-face'); if(old) old.remove();
+      inp.insertAdjacentHTML('beforebegin', geFace(m, 'gea-face'));
+      markOk(row);
+    }
+    if(n > 1) focusGE(n - 1, 'gea-v');
+  };
+  const suggest = (inp) => {
+    const box = inp.parentElement.querySelector('.gea-sug');
+    const list = geMatches(inp.value);
+    inp._list = list; inp._hi = 0;
+    if(!list.length){ box.hidden = true; box.innerHTML = ''; return; }
+    box.innerHTML = list.map((m, i) => `<button type="button" class="${i === 0 ? 'is-hi' : ''}" data-i="${i}">${geFace(m, 'gea-sug-face')}<b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small></button>`).join('');
+    box.hidden = false;
+  };
+  root.addEventListener('input', e => {
+    if(e.target.classList.contains('gea-q')) suggest(e.target);
+  });
+  root.addEventListener('keydown', e => {
+    const t = e.target;
+    if(t.classList.contains('gea-v') && e.key === 'Enter'){
+      e.preventDefault();
+      saveVotes(t).then(() => focusGE(t.dataset.rank, 'gea-q'));
+    }
+    if(t.classList.contains('gea-q')){
+      const box = t.parentElement.querySelector('.gea-sug');
+      const list = t._list || [];
+      if((e.key === 'ArrowDown' || e.key === 'ArrowUp') && list.length){
+        e.preventDefault();
+        t._hi = (t._hi + (e.key === 'ArrowDown' ? 1 : list.length - 1)) % list.length;
+        box.querySelectorAll('button').forEach((b, i) => b.classList.toggle('is-hi', i === t._hi));
+      } else if(e.key === 'Enter'){
+        e.preventDefault();
+        if(list.length) pick(t, list[t._hi || 0]);
+      } else if(e.key === 'Escape'){ box.hidden = true; }
+    }
+  });
+  root.addEventListener('change', e => { if(e.target.classList.contains('gea-v')) saveVotes(e.target); });
+  // pointerdown, not click: the input's blur would close the list first
+  root.addEventListener('pointerdown', e => {
+    const b = e.target.closest('.gea-sug button');
+    if(!b) return;
+    e.preventDefault();
+    const inp = b.closest('.gea-name').querySelector('.gea-q');
+    const m = (inp._list || [])[+b.dataset.i];
+    if(m) pick(inp, m);
+  });
+  root.addEventListener('focusout', e => {
+    if(e.target.classList.contains('gea-q')){
+      const box = e.target.parentElement.querySelector('.gea-sug');
+      setTimeout(() => { box.hidden = true; }, 150);
+    }
+  });
 }
 
 /* A face for each kind of outing, so a sheet is recognisable before it is read.
@@ -10396,6 +10833,7 @@ function renderMain(){
     (state.query.trim() ? renderSearch() :
     state.view==='feed' ? renderFeed() :
     state.view==='timeline' ? renderGEPage() :
+    state.view==='gelive' ? renderGEAdmin() :
     state.view==='shop' ? renderShopPage() :
     state.view==='calendar' ? renderCalendarPage() :
     state.view==='browse' ? renderBrowse() :
@@ -10430,6 +10868,7 @@ function renderMain(){
   const hb = (sel, on) => { const b = document.querySelector(sel); if(b) b.classList.toggle('is-on', on); };
   hb('.cal-btn', state.view === 'calendar'); hb('.shop-btn:not(.cal-btn)', state.view === 'shop'); hb('.ge-btn', state.view === 'timeline');
   if(state.view === 'stats') addBoxShareButtons(main);
+  if(state.view === 'gelive') bindGEAdmin();
   attachMainEvents();
   startBirthdayFireworks();
   bindEdgeFades();
@@ -10697,6 +11136,8 @@ function urlForSnapshot(snap){
   else if(snap.selectedId){    p.set('m', snap.selectedId);
                                if(snap.compareWith) p.set('vs', snap.compareWith); }
   else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
+  else if(snap.view === 'timeline' && snap.geTab === 'results') p.set('v', 'results');
+  else if(snap.view === 'gelive') p.set('v', 'gelive');
   else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view))
     p.set('v', snap.view);
   const q = p.toString();
@@ -10722,6 +11163,8 @@ function applyUrlToState(){
   if(sng && findWork(sng)){
     state.view='single'; state.selectedSingle=sng; return;
   }
+  if(view === 'results'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results'; return; }
+  if(view === 'gelive'){ state.view = 'gelive'; return; }
   if(view && SHAREABLE_VIEWS.includes(view)){ state.view = view; if(view === 'timeline') state.timelineId = 'ge2026'; }
 }
 
@@ -12154,6 +12597,31 @@ function bindDelegatedEvents(){
       state.query = '';
       render(); pushHistory();
     }
+    else if(action==='ge-round'){
+      state.geRound = el.dataset.value; _geSeen = null;
+      renderMain();
+    }
+    else if(action==='ge-admin-round'){
+      state.geAdminRound = el.dataset.value;
+      renderMain();
+    }
+    else if(action==='ge-back'){
+      state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results'; state.geRound = state.geAdminRound;
+      render(); pushHistory();
+    }
+    else if(action==='ge-live'){
+      const r = state.geAdminRound, on = !((state.geRounds[r] || {}).live);
+      // one round is on air at a time
+      GE_ROUNDS.forEach(x => { if(x.id !== r && (state.geRounds[x.id] || {}).live) geWrite(x.id, { live:false }); });
+      geWrite(r, { live:on }).then(() => renderMain());
+      renderMain();
+    }
+    else if(action==='ge-clear'){
+      const r = state.geAdminRound, n = el.dataset.value;
+      if(state.geRounds[r] && state.geRounds[r].slots) delete state.geRounds[r].slots[n];
+      fbDb.collection('ge').doc(r).update({ ['slots.' + n]: firebase.firestore.FieldValue.delete() }).catch(() => {});
+      renderMain();
+    }
     else if(action==='ge-tab'){
       state.geTab = el.dataset.value;
       renderMain(); replaceHistory();
@@ -12635,6 +13103,7 @@ async function init(){
     state.isOwner = await checkOwner();
     await loadPending();
     listenFlash();
+    listenGE();
     loadLiveNow(true);
 
     // The shared copy is the one the owner edits, so it wins over the page's —
