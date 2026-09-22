@@ -11611,7 +11611,7 @@ async function drawMemberCard(g, m, url){
   const sec = (title, yy) => shareText(g, title, P, yy, '800 30px "Noto Sans Thai", sans-serif', '#fff');
   sec(en ? 'Songs' : 'ผลงานเพลง', y + 28); y += 46;
   const sw = (W - 2 * 14) / 3;
-  tile(P, y, sw, 128, en ? 'Songs' : 'เพลงที่ร่วมร้อง', String(main.length + special.length), special.length ? (en ? `${special.length} special` : `พิเศษ ${special.length} เพลง`) : '', '#FF6FA5');
+  tile(P, y, sw, 128, en ? 'Songs' : 'เพลงที่มีส่วนร่วม', String(main.length + special.length), special.length ? (en ? `${special.length} special` : `พิเศษ ${special.length} เพลง`) : '', '#FF6FA5');
   tile(P + sw + 14, y, sw, 128, en ? 'Centre' : 'เป็นเซ็นเตอร์', `${centres}`, en ? 'songs' : 'เพลง', '#FFD98A');
   tile(P + 2 * (sw + 14), y, sw, 128, en ? 'Latest' : 'ผลงานล่าสุด', latest ? trackShortName(latest.track) : '-', latest ? `${workLabel(latest.work)} · ${latest.work.year}` : '', '#8FE3CF');
   y += 146;
