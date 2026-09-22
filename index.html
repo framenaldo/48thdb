@@ -6547,6 +6547,12 @@ function allTracks(withSpecials){
 }
 
 /** A member's tracks: 'main' (the default), 'special', or 'all'. */
+/* "Romaji – Thai" titles are two names for one song; a tight space takes the
+   one that matches the reader's language. */
+function trackShortName(t){
+  const [ro, th] = String(t).split(' – ');
+  return th && !isEN() && !isMix() ? th : ro;
+}
 function worksOf(id, which = 'main'){
   return allTracks(which !== 'main')
     .filter(t => t.members.includes(id))
@@ -11561,6 +11567,21 @@ async function drawMemberCard(g, m, url){
     shareText(g, shareWrap(g, label, w - 40, 1)[0], x0 + 22, y0 + 36, '600 22px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.65)');
     let f = 38; g.font = `800 ${f}px "Noto Sans Thai", sans-serif`;
     while(g.measureText(value).width > w - 40 && f > 22){ f -= 2; g.font = `800 ${f}px "Noto Sans Thai", sans-serif`; }
+    // A song title can outrun even the smallest size: it takes two lines, and
+    // what sat under it moves up beside the label.
+    if(g.measureText(value).width > w - 40){
+      const ff = `800 26px "Noto Sans Thai", sans-serif`; g.font = ff;
+      shareWrap(g, value, w - 40, 2).forEach((ln, i) => shareText(g, ln, x0 + 22, y0 + 74 + i * 32, ff, col || '#fff'));
+      if(sub){
+        g.font = '600 22px "Noto Sans Thai", sans-serif';
+        const lw = g.measureText(label).width;
+        g.font = '600 18px "Noto Sans Thai", sans-serif';
+        const room = w - 52 - lw;
+        const side = g.measureText('· ' + sub).width <= room ? sub : sub.split(' · ')[0];
+        shareText(g, shareWrap(g, '· ' + side, room, 1)[0], x0 + 30 + lw, y0 + 36, '600 18px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.55)');
+      }
+      return;
+    }
     shareText(g, value, x0 + 22, y0 + 78, `800 ${f}px "Noto Sans Thai", sans-serif`, col || '#fff');
     if(sub) shareText(g, sub, x0 + 22, y0 + hh - 14, '600 20px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.6)');
   };
@@ -11577,7 +11598,7 @@ async function drawMemberCard(g, m, url){
   const sw = (W - 2 * 14) / 3;
   tile(P, y, sw, 128, en ? 'Songs' : 'เพลงที่ร่วมร้อง', String(main.length + special.length), special.length ? (en ? `${special.length} special` : `พิเศษ ${special.length} เพลง`) : '', '#FF6FA5');
   tile(P + sw + 14, y, sw, 128, en ? 'Centre' : 'เป็นเซ็นเตอร์', `${centres}`, en ? 'songs' : 'เพลง', '#FFD98A');
-  tile(P + 2 * (sw + 14), y, sw, 128, en ? 'Latest' : 'ผลงานล่าสุด', latest ? latest.work.title : '-', latest ? `${workLabel(latest.work)} · ${latest.work.year}` : '', '#8FE3CF');
+  tile(P + 2 * (sw + 14), y, sw, 128, en ? 'Latest' : 'ผลงานล่าสุด', latest ? trackShortName(latest.track) : '-', latest ? `${workLabel(latest.work)} · ${latest.work.year}` : '', '#8FE3CF');
   y += 146;
 
   // lives
