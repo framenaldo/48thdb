@@ -2227,6 +2227,20 @@
   .ge-shop-card b{ font-size:13.5px; line-height:1.35; }
   .ge-shop-card small{ font-size:13px; font-weight:800; color:var(--c); }
   .tlp.is-in-hub .tlp-legend{ margin:0 0 14px; }
+  /* the owner's link editor in an event sheet */
+  .evl-open{ margin-top:14px; }
+  .evl{ margin-top:14px; padding:12px; border-radius:16px; border:1.5px dashed var(--line); background:color-mix(in srgb, var(--card) 70%, transparent); }
+  .evl .evm-head{ margin-top:0; display:flex; align-items:center; gap:8px; }
+  .evl-lock{ font-size:11px; font-weight:800; color:#B3121E; background:#FBE6E8; padding:1px 8px; border-radius:99px; }
+  .evl-row{ display:flex; flex-direction:column; gap:4px; margin-top:10px; font-size:13px; font-weight:700; }
+  .evl-row input{ height:42px; border:1.5px solid var(--line); border-radius:10px; padding:0 10px; font:inherit; font-size:15px; font-weight:500;
+    background:var(--card); color:var(--ink); min-width:0; }
+  .evl-row input:focus{ outline:none; border-color:var(--bnk); box-shadow:0 0 0 3px rgba(228,69,126,.18); }
+  .evl-row small{ font-weight:500; color:var(--ink-soft); word-break:break-all; }
+  .evl-hint{ font-size:12px; color:var(--ink-soft); margin:10px 0 0; line-height:1.5; }
+  .evl-acts{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
+  .evl-reset{ margin-left:auto; }
+  .evl-acts .chip{ min-height:40px; padding:0 16px; font-size:14px; }
   /* ===== live election results ===== */
   .gel-strip{ position:relative; overflow:hidden; border-radius:20px; padding:14px 16px; color:#fff;
     background:radial-gradient(circle at 85% 0%, rgba(179,18,30,.9), transparent 60%), #2A0508; }
@@ -4805,7 +4819,7 @@ const ICONS = {
 
 // ============================= STATE =============================
 let state = {
-  isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null,
+  isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
@@ -8655,6 +8669,117 @@ function renderDayModal(){
   </div>`;
 }
 
+/* ===== Event links the owner can correct from the page =====
+   A stream, ticket or shop link that turns out wrong is fixed from the event's
+   own sheet. The fix lives in Firestore (eventlinks/{event id}) and is laid
+   over the event as it was written here, so every open page takes it within
+   a second, no deploy; clearing it brings the written link back. */
+const EV_LINK_ORIG = new Map();
+let _evLinks = {}, _evLinksUnsub = null;
+function evLinkOrig(ev){
+  if(!EV_LINK_ORIG.has(ev.id)) EV_LINK_ORIG.set(ev.id, {
+    stream: ev.stream ? { ...ev.stream } : null,
+    ticket: ev.ticketUrl,
+    shop: ev.shop ? ev.shop.url : undefined,
+    links: (ev.links || []).map(l => l.url),
+  });
+  return EV_LINK_ORIG.get(ev.id);
+}
+function applyEventLinks(){
+  SEED_SCHEDULE.forEach(ev => {
+    const x = _evLinks[ev.id];
+    if(!x && !EV_LINK_ORIG.has(ev.id)) return;
+    const o = evLinkOrig(ev);
+    // back to what was written, then the corrections on top
+    if(o.stream) ev.stream = { ...o.stream }; else delete ev.stream;
+    if(o.ticket === undefined) delete ev.ticketUrl; else ev.ticketUrl = o.ticket;
+    if(ev.shop){ if(o.shop === undefined) delete ev.shop.url; else ev.shop.url = o.shop; }
+    (ev.links || []).forEach((l, i) => { l.url = o.links[i]; });
+    if(!x) return;
+    if(x.stream){
+      const yt = /youtube\.com|youtu\.be/.test(x.stream);
+      const g = (ev.groups || []).length === 1 ? ev.groups[0] : undefined;
+      ev.stream = ev.stream || { label: yt ? `YouTube ${g ? g.toUpperCase() : ''}`.trim() : 'ไลฟ์', ...(yt && g ? { channel:g } : {}) };
+      ev.stream.url = x.stream;
+    }
+    if(x.ticket) ev.ticketUrl = x.ticket;
+    if(x.shop && ev.shop) ev.shop.url = x.shop;
+    if(x.links) (ev.links || []).forEach((l, i) => { if(x.links[i]) l.url = x.links[i]; });
+  });
+}
+function listenEventLinks(){
+  if(_evLinksUnsub) return;
+  try{
+    _evLinksUnsub = fbDb.collection('eventlinks').onSnapshot(snap => {
+      _evLinks = {};
+      snap.docs.forEach(d => { _evLinks[d.id] = d.data(); });
+      applyEventLinks();
+      if(!document.getElementById('main')) return;
+      if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+      // keep a reader's place in an open sheet
+      const sc = document.querySelector('.modal-scroll'), top = sc ? sc.scrollTop : 0;
+      renderMain();
+      const sc2 = document.querySelector('.modal-scroll'); if(sc2) sc2.scrollTop = top;
+    }, () => {});
+  }catch(e){}
+}
+/* Pasted links often carry share trackers; they are dropped, nothing else. */
+function cleanLink(raw){
+  let u = (raw || '').trim();
+  if(!u) return '';
+  if(!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  try{
+    const x = new URL(u);
+    if(!/\./.test(x.hostname)) return null;
+    ['si', 'feature', 'fbclid', 'igsh', 'igshid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(k => x.searchParams.delete(k));
+    return x.toString();
+  }catch(e){ return null; }
+}
+function renderEventLinkEditor(ev){
+  if(!state.isOwner) return '';
+  if(state.linkEditFor !== ev.id) return `<button class="chip evl-open" data-action="edit-evlinks" data-id="${ev.id}">✎ แก้ลิงก์</button>`;
+  const o = evLinkOrig(ev), x = _evLinks[ev.id] || {};
+  const row = (k, label, cur, orig) => `<label class="evl-row"><span>${label}</span>
+    <input type="url" inputmode="url" autocomplete="off" data-evl="${k}" value="${escapeAttr(cur || '')}" placeholder="https://…">
+    ${orig && orig !== cur ? `<small>เดิม: ${escapeHtml(orig)}</small>` : ''}</label>`;
+  const rows = [row('stream', 'ลิงก์ไลฟ์', ev.stream && ev.stream.url, o.stream && o.stream.url)];
+  if(ev.price) rows.push(row('ticket', 'ลิงก์ซื้อบัตร', ev.ticketUrl, o.ticket));
+  if(ev.shop) rows.push(row('shop', `ลิงก์ร้าน${ev.shop.shopName ? ' ' + escapeHtml(ev.shop.shopName) : ''}`, shopUrl(ev.shop), o.shop || SHOP_URLS[ev.shop.shopName]));
+  (ev.links || []).forEach((l, i) => rows.push(row('link' + i, escapeHtml(l.label), l.url, o.links[i])));
+  return `<div class="evl">
+    <h3 class="evm-head">แก้ลิงก์ <small class="evl-lock">เฉพาะเจ้าของเว็บ</small></h3>
+    ${rows.join('')}
+    <p class="evl-hint">กดบันทึกแล้วทุกคนที่เปิดเว็บอยู่เห็นลิงก์ใหม่ในไม่กี่วินาที · ตัวติดตามท้ายลิงก์ เช่น ?si= ตัดให้เอง</p>
+    <div class="evl-acts">
+      <button class="btn-add" data-action="save-evlinks" data-id="${ev.id}">บันทึก</button>
+      <button class="chip" data-action="cancel-evlinks">ยกเลิก</button>
+      ${Object.keys(x).length ? `<button class="chip evl-reset" data-action="reset-evlinks" data-id="${ev.id}">ใช้ลิงก์เดิมทั้งหมด</button>` : ''}
+    </div></div>`;
+}
+async function saveEventLinks(ev){
+  const o = evLinkOrig(ev);
+  const out = {}, links = {};
+  for(const inp of document.querySelectorAll('.evl [data-evl]')){
+    const k = inp.dataset.evl, v = cleanLink(inp.value);
+    if(v === null){ toast(`ลิงก์นี้ใช้ไม่ได้: ${inp.value}`); inp.focus(); return; }
+    const orig = k === 'stream' ? o.stream && o.stream.url : k === 'ticket' ? o.ticket
+      : k === 'shop' ? (o.shop || SHOP_URLS[ev.shop.shopName]) : o.links[+k.slice(4)];
+    if(!v || v === orig) continue;
+    if(k.startsWith('link')) links[k.slice(4)] = v; else out[k] = v;
+  }
+  if(Object.keys(links).length) out.links = links;
+  const ref = fbDb.collection('eventlinks').doc(ev.id);
+  try{
+    if(Object.keys(out).length) await ref.set({ ...out, at: firebase.firestore.FieldValue.serverTimestamp() });
+    else await ref.delete();
+  }catch(e){ toast('บันทึกไม่ได้ ลองเช็กอินเทอร์เน็ต'); return; }
+  if(Object.keys(out).length){ const { at, ...rest } = { ...out }; _evLinks[ev.id] = rest; } else delete _evLinks[ev.id];
+  applyEventLinks();
+  state.linkEditFor = null;
+  renderMain();
+  toast('บันทึกลิงก์แล้ว');
+}
+
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
   if(!ev) return '';
@@ -8737,6 +8862,7 @@ function renderEventModal(){
           <a class="shop-buy" style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}" href="${escapeAttr(shopUrl(ev.shop))}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>ซื้อที่ ${escapeHtml(ev.shop.shopName)} <span class="shop-buy-arrow">↗</span></a></div>` : ''}
         ${(ev.links || []).length ? `<div class="evm-related">${ev.links.map(l =>
           `<a class="chip chip-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)} ↗</a>`).join('')}</div>` : ''}
+        ${renderEventLinkEditor(ev)}
 
         ${(ev.related || []).map(id => SEED_SCHEDULE.find(e => e.id === id)).filter(Boolean).length ? `
         <h3 class="evm-head">งานที่เกี่ยวข้อง</h3>
@@ -12599,6 +12725,22 @@ function bindDelegatedEvents(){
       state.query = '';
       render(); pushHistory();
     }
+    else if(action==='edit-evlinks'){
+      state.linkEditFor = id; renderMain();
+      const f = document.querySelector('.evl input'); if(f){ f.scrollIntoView({ block:'center', behavior:'smooth' }); }
+    }
+    else if(action==='cancel-evlinks'){ state.linkEditFor = null; renderMain(); }
+    else if(action==='save-evlinks'){
+      const ev = SEED_SCHEDULE.find(e => e.id === id); if(ev) saveEventLinks(ev);
+    }
+    else if(action==='reset-evlinks'){
+      const ev = SEED_SCHEDULE.find(e => e.id === id);
+      if(ev && confirm('ใช้ลิงก์เดิมทั้งหมดของงานนี้?')){
+        fbDb.collection('eventlinks').doc(id).delete().then(() => {
+          delete _evLinks[id]; applyEventLinks(); state.linkEditFor = null; renderMain(); toast('กลับไปใช้ลิงก์เดิมแล้ว');
+        }).catch(() => toast('บันทึกไม่ได้ ลองเช็กอินเทอร์เน็ต'));
+      }
+    }
     else if(action==='ge-round'){
       state.geRound = el.dataset.value; _geSeen = null;
       renderMain();
@@ -13106,6 +13248,7 @@ async function init(){
     await loadPending();
     listenFlash();
     listenGE();
+    listenEventLinks();
     loadLiveNow(true);
 
     // The shared copy is the one the owner edits, so it wins over the page's —
