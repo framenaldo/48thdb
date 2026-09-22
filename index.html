@@ -2511,6 +2511,9 @@
   /* the day's run is over: the pill stays, quietly */
   :is(.evm-starts, .ev-starts, .cal-item-tag).is-over{ color:var(--ink-soft); background:var(--paper-dim); }
   .live-chip[hidden]{ display:none; }
+  .live-chip.is-replay{ background:var(--paper-dim); color:var(--ink); text-decoration:none; }
+  .live-chip.is-replay::before{ width:0; height:0; border-radius:0; background:none;
+    border-left:7px solid currentColor; border-top:4.5px solid transparent; border-bottom:4.5px solid transparent; }
   /* The price is the thing people go looking for, so it sits next to the date
      rather than partway down a list of notices. */
   .evm-price{
@@ -5213,6 +5216,7 @@ const EN = {
   'สีประจำวง': 'Official colour',
   'จบไปแล้ววันนี้': 'Over for today',
   'จบแล้ว': 'Over',
+  'ดูย้อนหลัง': 'Replay',
   'อยู่ที่บูธตอนนี้': 'At the booth now',
   'รอบวันนี้จบแล้ว': "Today's turn is over",
   'ตารางสมาชิกประจำบูธ': 'Who is at the booth',
@@ -7692,6 +7696,9 @@ function tickClock(){
     el.classList.toggle('is-on', ms >= Number(el.dataset.liveFrom) && ms <= Number(el.dataset.liveTo));
     el.hidden = ms > Number(el.dataset.liveTo);
   });
+  document.querySelectorAll('[data-replay-from]').forEach(el=>{
+    el.hidden = Date.now() <= Number(el.dataset.replayFrom);
+  });
 
   const now = toYmd(new Date());
   if(state.view === 'feed' && !state.query && !state.selectedId && !state.selectedEvent && !state.posterOf) {
@@ -8577,6 +8584,11 @@ function streamWindow(ev){
   const to = at(eventUntil(ev) || '');
   return { from, to: to && to > from ? to : from + 2 * 3600000 };
 }
+function isReplayLink(u){
+  u = u || '';
+  if(/youtube\.com|youtu\.be/.test(u)) return /youtube\.com\/(live\/|watch|shorts\/)|youtu\.be\//.test(u);
+  return /facebook\.com\/.+\/(videos|posts|live)|facebook\.com\/(share|watch|reel)|fb\.watch|tiktok\.com\/@[^/]+\/(video|live)|instagram\.com\/(p|reel|tv)\//.test(u);
+}
 function renderLiveChip(ev, cls){
   const w = streamWindow(ev);
   if(!w) return '';
@@ -8589,9 +8601,12 @@ function renderLiveChip(ev, cls){
   if(air) return `<a class="live-chip is-on is-air${cls ? ' ' + cls : ''}"
     href="${escapeAttr(direct)}" target="_blank" rel="noopener noreferrer"
     title="${escapeAttr(air.title || '')}">กำลังไลฟ์อยู่</a>`;
-  // after the show there is nothing to watch live; the icon still links the replay
-  if(now > w.to) return '';
-  return `<span class="live-chip${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}"
+  // Once the show is over the badge becomes a way to watch it again — when the
+  // link is the show's own video or post, not just a channel page.
+  const replay = isReplayLink(ev.stream.url) ? `<a class="live-chip is-replay${cls ? ' ' + cls : ''}" href="${escapeAttr(ev.stream.url)}"
+    target="_blank" rel="noopener noreferrer" data-replay-from="${w.to}"${now > w.to ? '' : ' hidden'}>ดูย้อนหลัง</a>` : '';
+  if(now > w.to) return replay;
+  return replay + `<span class="live-chip${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}"
     data-live-from="${w.from}" data-live-to="${w.to}"
     title="${escapeAttr(ev.stream.label || '')}">LIVE</span>`;
 }
