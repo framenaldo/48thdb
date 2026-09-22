@@ -3850,7 +3850,7 @@ const SEED_SCHEDULE = [
     members:['cgm-else','cgm-lewlew','cgm-ploen','cgm-praifa','cgm-ginna','cgm-tara'],
     related:['ev-hachicha-tsukimi'],
     poster:{ accent:'#1F6B58', surface:'#EFF7F1', ink:'#17423A', img:'posters/cgm48-popup-live-cnx.jpg', w:1200, h:1200 },
-    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL' },
+    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/live/-qpOhV_8TUI' },
     detail:[
       '16:00 สินค้า MERCHANDISE เริ่มจำหน่าย',
       '18:00–19:00 การแสดง — ถ่ายทอดสดทาง YouTube CGM48 OFFICIAL'],
@@ -8535,9 +8535,11 @@ function renderLiveChip(ev, cls){
   const now = Date.now();
   const on = now >= w.from && now <= w.to;
   const air = liveOnAir(ev);
-  // Confirmed on air: the badge says so and goes straight to that stream.
+  // Confirmed on air: the badge says so and goes straight to that stream —
+  // the event's own video when one was given, else what the channel is airing.
+  const direct = /youtube\.com\/(live\/|watch)|youtu\.be\//.test(ev.stream.url || '') ? ev.stream.url : air.url;
   if(air) return `<a class="live-chip is-on is-air${cls ? ' ' + cls : ''}"
-    href="${escapeAttr(air.url)}" target="_blank" rel="noopener noreferrer"
+    href="${escapeAttr(direct)}" target="_blank" rel="noopener noreferrer"
     title="${escapeAttr(air.title || '')}">กำลังไลฟ์อยู่</a>`;
   return `<span class="live-chip${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}"
     data-live-from="${w.from}" data-live-to="${w.to}"
