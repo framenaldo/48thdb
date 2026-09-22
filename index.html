@@ -8551,7 +8551,7 @@ function renderLiveChip(ev, cls){
   const air = liveOnAir(ev);
   // Confirmed on air: the badge says so and goes straight to that stream —
   // the event's own video when one was given, else what the channel is airing.
-  const direct = /youtube\.com\/(live\/|watch)|youtu\.be\//.test(ev.stream.url || '') ? ev.stream.url : air.url;
+  const direct = air && (/youtube\.com\/(live\/|watch)|youtu\.be\//.test(ev.stream.url || '') ? ev.stream.url : air.url);
   if(air) return `<a class="live-chip is-on is-air${cls ? ' ' + cls : ''}"
     href="${escapeAttr(direct)}" target="_blank" rel="noopener noreferrer"
     title="${escapeAttr(air.title || '')}">กำลังไลฟ์อยู่</a>`;
