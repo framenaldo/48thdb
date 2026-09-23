@@ -11905,6 +11905,8 @@ function urlForSnapshot(snap){
   else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
   else if(snap.view === 'timeline' && snap.geTab === 'results') p.set('v', 'results');
   else if(snap.view === 'gelive') p.set('v', 'gelive');
+  // not one to share, but a reload should land back on it rather than on Home
+  else if(snap.view === 'profile') p.set('v', 'profile');
   else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view))
     p.set('v', snap.view);
   const q = p.toString();
@@ -11932,6 +11934,7 @@ function applyUrlToState(){
   }
   if(view === 'results'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results'; return; }
   if(view === 'gelive'){ state.view = 'gelive'; return; }
+  if(view === 'profile'){ state.view = 'profile'; return; }
   if(view && SHAREABLE_VIEWS.includes(view)){ state.view = view; if(view === 'timeline') state.timelineId = 'ge2026'; }
 }
 
