@@ -1,0 +1,41 @@
+# One-off, on the working branch only: fetch the covers of the videos being
+# celebrated, so the share card can be previewed on the real artwork. Removed
+# again before the branch is merged; the hourly job does this from then on.
+name: Fetch milestone covers (one-off)
+
+on:
+  push:
+    branches: [claude/website-next-steps-dkq0f1]
+    paths: ['.github/workflows/fetch-covers-once.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch covers
+        run: |
+          python3 - <<'PY'
+          import importlib.util, json, datetime as dt
+          spec = importlib.util.spec_from_file_location('cy', 'scripts/collect-youtube.py')
+          cy = importlib.util.module_from_spec(spec); spec.loader.exec_module(cy)
+          doc = json.loads(open('data/youtube.json', encoding='utf-8').read())
+          print('saved:', cy.fetch_covers(doc['milestones'], dt.datetime.now(cy.TZ)))
+          print(doc['milestones'])
+          open('data/youtube.json', 'w', encoding='utf-8').write(json.dumps(doc, separators=(',', ':')))
+          PY
+      - name: Commit to the branch
+        run: |
+          [ -d covers ] || { echo "no covers fetched"; exit 1; }
+          git config user.name  "48thdb-bot"
+          git config user.email "48thdb-bot@users.noreply.github.com"
+          git add data/youtube.json covers/
+          git commit -m "Fetch the covers of this week's view milestones"
+          git push
