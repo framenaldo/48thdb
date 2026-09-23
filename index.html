@@ -1160,6 +1160,22 @@
   .yt-views{ padding-left:7px; border-left:1px solid var(--line); font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
   .yt-btn:hover{ border-color:#FF0000; }
   .yt-btn:active{ transform:scale(.95); }
+  /* a video that has just passed a round number of views */
+  .yt-btn.is-milestone{ border-color:#D4A017; background:linear-gradient(120deg, #FFF6D6, #FFE3EE 55%, #FFF6D6);
+    background-size:220% 100%; animation:cheer-shine 3.2s ease-in-out infinite; }
+  .yt-btn.is-milestone .yt-views{ color:#8A5A00; border-left-color:rgba(212,160,23,.4); }
+  @keyframes cheer-shine{ 0%,100%{ background-position:0 0; } 50%{ background-position:100% 0; } }
+  .yt-cheer{ display:inline-flex; align-items:center; gap:6px; flex:none; cursor:pointer;
+    padding:5px 12px 5px 10px; border-radius:999px; border:1px solid #D4A017;
+    background:linear-gradient(135deg, #FFD36E, #F2A93B); color:#3A2300; font:800 12px 'Noto Sans Thai',sans-serif;
+    box-shadow:0 2px 0 #B07A12; transition:transform .12s, box-shadow .12s; }
+  .yt-cheer svg{ width:14px; height:14px; }
+  .yt-cheer:active{ transform:translateY(2px); box-shadow:none; }
+  .cheer-rain{ position:fixed; inset:0; pointer-events:none; z-index:9999; overflow:hidden; }
+  .cheer-rain i{ position:absolute; top:-16px; width:8px; height:14px; border-radius:2px; opacity:.95;
+    animation:cheer-fall var(--d) cubic-bezier(.25,.6,.4,1) var(--w) forwards; }
+  @keyframes cheer-fall{ to{ transform:translate(var(--x), 110vh) rotate(var(--r)); } }
+  @media (prefers-reduced-motion:reduce){ .yt-btn.is-milestone{ animation:none; } }
   .social-row{ display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 2px; }
   .social-chip{
     display:inline-flex; align-items:center; justify-content:center;
@@ -11251,7 +11267,7 @@ function loadYouTubeStats(){
   _ytLoading = true;
   fetch('data/youtube.json', { cache:'no-cache' })
     .then(r => r.ok ? r.json() : null)
-    .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single' || state.view === 'stats') renderMain(); })
+    .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single' || state.view === 'stats') renderMain(); syncTicker(); })
     .catch(() => { YT_STATS = { videos:{} }; })
     .finally(() => { _ytLoading = false; });
 }
@@ -11260,6 +11276,40 @@ function shortViews(n){
   const f = (v, d) => (Math.round(v / d * 10) / 10).toLocaleString(undefined, { maximumFractionDigits:1 });
   if(isEN()) return n >= 1e9 ? f(n,1e9)+'B' : n >= 1e6 ? f(n,1e6)+'M' : n >= 1e3 ? f(n,1e3)+'K' : String(n);
   return n >= 1e6 ? f(n,1e6)+' ล้าน' : n >= 1e5 ? f(n,1e5)+' แสน' : n >= 1e4 ? f(n,1e4)+' หมื่น' : n >= 1e3 ? f(n,1e3)+' พัน' : String(n);
+}
+/* A video that has just passed a round number of views — every 100,000 to a
+   million, then every million — is celebrated for a week. The hourly job
+   notes when it passed (data/youtube.json → milestones). */
+const MILESTONE_DAYS = 7;
+const ytAt = s => Date.parse(String(s).replace(/T(\d\d:\d\d)([+-])/, 'T$1:00$2'));   // Safari wants the seconds
+function ytMilestone(vid){
+  const m = YT_STATS && YT_STATS.milestones && YT_STATS.milestones[vid];
+  return m && Date.now() - ytAt(m.at) < MILESTONE_DAYS * 86400000 ? m : null;
+}
+// every video being celebrated, with the song it belongs to (its date is Bangkok's, as written)
+function ytMilestones(){
+  const out = [];
+  for(const [key, [vid, kind]] of Object.entries(SEED_YOUTUBE)){
+    const m = ytMilestone(vid);
+    if(!m || out.some(x => x.vid === vid)) continue;
+    const [workId, i] = key.split('#'), work = findWork(workId);
+    if(!work) continue;
+    const t = (SEED_SENBATSU[workId] || [])[+i];
+    out.push({ vid, ytKind:kind, mark:m.mark, at:m.at, cover:!!m.cover, workId, i:+i, work, track: t ? t.track : work.title });
+  }
+  return out.sort((a, b) => ytAt(b.at) - ytAt(a.at));
+}
+const milestoneWords = mark => isEN() ? `${shortViews(mark)} views` : `${shortViews(mark)}วิว`;   // "4 แสนวิว"
+/* A little confetti the first time a celebrated song is opened on this device */
+function cheerConfetti(key){
+  try{ if(localStorage.getItem(key)) return; localStorage.setItem(key, '1'); }catch(e){}
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const rain = document.createElement('div');
+  rain.className = 'cheer-rain'; rain.setAttribute('aria-hidden', 'true');
+  const colours = ['#FFD36E', '#E4457E', '#2E8C82', '#FF6FA5', '#7EE0C3', '#FFFFFF'];
+  rain.innerHTML = Array.from({ length:90 }, (_, n) => `<i style="left:${Math.random() * 100}%;background:${colours[n % colours.length]};--x:${Math.round(Math.random() * 160 - 80)}px;--r:${Math.round(Math.random() * 720 - 360)}deg;--d:${(2.2 + Math.random() * 1.6).toFixed(2)}s;--w:${(Math.random() * .5).toFixed(2)}s"></i>`).join('');
+  document.body.appendChild(rain);
+  setTimeout(() => rain.remove(), 4600);
 }
 function renderYouTube(workId, i, trackName){
   const yt = SEED_YOUTUBE[`${workId}#${i}`];
@@ -11271,6 +11321,12 @@ function renderYouTube(workId, i, trackName){
   const views = st ? (isEN() ? `${shortViews(st.views)} views`
     : st.views >= 1e3 ? `${shortViews(st.views)}วิว` : `${st.views} วิว`) : '';   // "206.9 ล้านวิว"
   const exact = st ? ` · ${st.views.toLocaleString()} ${isEN() ? 'views' : 'วิว'}` : '';
+  const cheer = ytMilestone(vid);
+  if(cheer && state.view === 'single') setTimeout(() => cheerConfetti(`48thdb-cheer-${vid}-${cheer.mark}`), 450);
+  if(cheer) return `<a class="yt-btn is-milestone" href="https://www.youtube.com/watch?v=${escapeAttr(vid)}" target="_blank" rel="noopener noreferrer"
+    title="YouTube: ${escapeAttr(trackName)}${exact}" aria-label="YouTube ${escapeAttr(label)}: ${escapeAttr(trackName)}${exact}">${YT_ICON}<span>${label}</span><span class="yt-views">🎉 ${
+      isEN() ? `${milestoneWords(cheer.mark)}!` : `ครบ ${milestoneWords(cheer.mark)}`}</span></a>
+    <button class="yt-cheer" data-action="share-milestone" data-id="${escapeAttr(vid)}">${ICONS.share}<span>${isEN() ? 'Share the card' : 'แชร์การ์ดฉลอง'}</span></button>`;
   return `<a class="yt-btn" href="https://www.youtube.com/watch?v=${escapeAttr(vid)}" target="_blank" rel="noopener noreferrer"
     title="YouTube: ${escapeAttr(trackName)}${exact}" aria-label="YouTube ${escapeAttr(label)}: ${escapeAttr(trackName)}${exact}">${YT_ICON}<span>${label}</span>${
     views ? `<span class="yt-views">${views}</span>` : ''}</a>`;
@@ -11460,6 +11516,7 @@ const TICKER_KINDS = {
   ticket: { th:'บัตร',      en:'TICKETS',  color:'#C8961E' },
   vote:   { th:'โหวต',      en:'VOTE',     color:'#C8231A' },
   result: { th:'ผลโหวต',    en:'RESULTS',  color:'#C8231A' },
+  cheer:  { th:'ยินดีด้วย',   en:'CONGRATS', color:'#D4A017' },
 };
 const TICKER_MAX = 4;
 
@@ -11538,6 +11595,12 @@ function tickerItems(){
     en ? 'Happy birthday' : 'สุขสันต์วันเกิด',
     ...born.map(m => { const a = calcAge(m.birthday);
       return { text: `${nick(m)}${a != null ? (en ? ` (${a})` : ` อายุ ${a} ปี`) : ''}`, action:'open-member', id:m.id }; }) ] });
+
+  // 3b. a song video that has just passed a round number of views
+  if(!YT_STATS) loadYouTubeStats();
+  for(const m of ytMilestones())
+    items.push({ kind:'cheer', parts:[{ text:m.track, action:'open-single', id:m.workId },
+      en ? `passed ${m.mark.toLocaleString('en-US')} views 🎉` : `ครบ ${m.mark.toLocaleString('en-US')} วิวแล้ว 🎉`] });
 
   // 4. ticket sales opening today, or closing within three days
   for(const e of SEED_SCHEDULE.filter(e => e.sales && !e.bookClosed)){
@@ -13062,6 +13125,86 @@ function shareSubject(){
   return { kind:'page', url, title:`${names[state.view] || '48thDb'} — 48thDb`, file:`48thdb-${state.view}` };
 }
 
+function milestoneShare(vid){
+  const m = ytMilestones().find(x => x.vid === vid);
+  if(!m) return null;
+  const url = location.origin + location.pathname + '?s=' + encodeURIComponent(m.workId);
+  return { kind:'milestone', ...m, url,
+    title:`${m.track} ${isEN() ? `passed ${m.mark.toLocaleString('en-US')} views` : `ครบ ${m.mark.toLocaleString('en-US')} วิว`} — 48thDb`,
+    file:`48thdb-${m.workId}-${m.mark}` };
+}
+/* the cover: our own copy (saved by the job that noticed the milestone), else YouTube's */
+const shareLoadCors = src => new Promise(res => { const im = new Image(); im.crossOrigin = 'anonymous';
+  im.onload = () => res(im.naturalWidth > 200 ? im : null); im.onerror = () => res(null); im.src = src; });
+/* One firework: rays out from the centre, brightest at their tips, and a few sparks */
+function shareBurst(g, x, y, r, colour, seed){
+  let n = seed * 9301 + 49297; const rnd = () => (n = (n * 9301 + 49297) % 233280) / 233280;
+  g.save(); g.globalCompositeOperation = 'lighter'; g.lineCap = 'round';
+  const rays = 30;
+  for(let k = 0; k < rays; k++){
+    const a = k / rays * Math.PI * 2 + rnd() * .12, len = r * (.72 + rnd() * .28);
+    const x1 = x + Math.cos(a) * r * .18, y1 = y + Math.sin(a) * r * .18, x2 = x + Math.cos(a) * len, y2 = y + Math.sin(a) * len;
+    const gr = g.createLinearGradient(x1, y1, x2, y2);
+    gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, colour);
+    g.strokeStyle = gr; g.lineWidth = 3.2; g.shadowColor = colour; g.shadowBlur = 16;
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(x2, y2, 3.4, 0, Math.PI * 2); g.fill();
+    // a spark falling away below the tip
+    g.fillStyle = colour; g.beginPath(); g.arc(x2 + Math.cos(a) * 14, y2 + Math.sin(a) * 14 + 10, 2, 0, Math.PI * 2); g.fill();
+  }
+  g.restore();
+}
+function shareSparkle(g, x, y, s, colour){
+  g.save(); g.fillStyle = colour; g.shadowColor = colour; g.shadowBlur = 12; g.beginPath();
+  g.moveTo(x, y - s); g.quadraticCurveTo(x, y, x + s, y); g.quadraticCurveTo(x, y, x, y + s);
+  g.quadraticCurveTo(x, y, x - s, y); g.quadraticCurveTo(x, y, x, y - s); g.fill(); g.restore();
+}
+async function drawMilestoneCard(g, sub){
+  const en = isEN(), grp = getGroup(sub.work.groupId);
+  g.fillStyle = '#140A18'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  const cover = (sub.cover && await shareLoad(`covers/${sub.vid}.jpg`))
+    || await shareLoadCors(`https://i.ytimg.com/vi/${sub.vid}/maxresdefault.jpg`)
+    || await shareLoadCors(`https://i.ytimg.com/vi/${sub.vid}/hqdefault.jpg`);
+  if(cover) shareCover(g, cover, 0, 0, SHARE_W, SHARE_H);
+  else { shareGlow(g, 200, 300, 620, grp.color, .55); shareGlow(g, 900, 900, 620, '#7A5CFF', .35); }
+  // night above for the fireworks, and below for the words
+  let gr = g.createLinearGradient(0, 0, 0, SHARE_H);
+  gr.addColorStop(0, 'rgba(12,6,20,.72)'); gr.addColorStop(.36, 'rgba(12,6,20,.28)');
+  gr.addColorStop(.58, 'rgba(12,6,20,.55)'); gr.addColorStop(1, 'rgba(12,6,20,.95)');
+  g.fillStyle = gr; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  shareBurst(g, 210, 230, 175, '#FFD36E', 1);
+  shareBurst(g, 870, 200, 150, '#FF6FA5', 2);
+  shareBurst(g, 560, 110, 105, '#FFFFFF', 3);
+  shareBurst(g, 930, 520, 115, '#7EE0C3', 4);
+  shareBurst(g, 120, 560, 95, '#FFB3D1', 5);
+  [[400, 330, 14, '#FFD36E'], [700, 360, 11, '#fff'], [980, 330, 9, '#FFD36E'], [80, 360, 10, '#fff'], [640, 250, 8, '#FFB3D1']]
+    .forEach(([x, y, r, c]) => shareSparkle(g, x, y, r, c));
+  // the words
+  const x0 = 72, gold = g.createLinearGradient(0, 700, 0, 860);
+  gold.addColorStop(0, '#FFF1C1'); gold.addColorStop(.55, '#FFD36E'); gold.addColorStop(1, '#E7A93A');
+  g.textBaseline = 'alphabetic';
+  sharePill(g, en ? '🎉  CONGRATULATIONS' : '🎉  ยินดีด้วย!', x0, 640, '#FFD36E', '#2A1605', 34);
+  g.font = '900 176px "Noto Sans Thai", sans-serif'; g.fillStyle = gold;
+  g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 24;
+  const num = sub.mark.toLocaleString('en-US');
+  g.fillText(num, x0 - 6, 860);
+  const nw = g.measureText(num).width;
+  g.font = '800 58px "Noto Sans Thai", sans-serif'; g.fillStyle = '#FFF1C1';
+  g.fillText(en ? 'VIEWS' : 'วิว', x0 + nw + 18, 856);
+  g.shadowBlur = 0;
+  g.font = '800 64px "Noto Sans Thai", sans-serif'; g.fillStyle = '#fff';
+  const lines = shareWrap(g, isEN() ? sub.track : mixTitle(sub.track), SHARE_W - x0 * 2, 2);
+  lines.forEach((l, k) => g.fillText(l, x0, 988 + k * 78));
+  let y = 988 + (lines.length - 1) * 78 + 66;
+  const kind = (YT_KIND[sub.ytKind] || YT_KIND.video)[en ? 1 : 0];
+  const w1 = sharePill(g, grp.name, x0, y - 36, grp.color, '#fff', 28);
+  g.font = '600 30px "Noto Sans Thai", sans-serif'; g.fillStyle = 'rgba(255,255,255,.82)'; g.textBaseline = 'middle';
+  g.fillText(`${kind} · ${sub.work.title}`, x0 + w1 + 18, y - 36 + 25);
+  g.fillText(`${en ? 'on YouTube, reached' : 'บน YouTube · ครบเมื่อ'} ${shareThaiDate(new Date(...sub.at.slice(0, 10).split('-').map((v, k) => k === 1 ? v - 1 : +v)))}`, x0, y + 46);
+  g.textBaseline = 'alphabetic';
+  await shareFooter(g, true, sub.url);
+}
+
 async function buildShareCard(sub){
   try{ await Promise.all(['500', '600', '700', '800'].map(w => document.fonts.load(`${w} 40px "Noto Sans Thai"`, 'กขABC'))); }catch(e){}
   const c = document.createElement('canvas'); c.width = SHARE_W; c.height = SHARE_H;
@@ -13070,6 +13213,7 @@ async function buildShareCard(sub){
   else if(sub.kind === 'member') await drawMemberCard(g, sub.m, sub.url);
   else if(sub.kind === 'event') await drawEventCard(g, sub.ev, sub.url);
   else if(sub.kind === 'single') await drawSingleCard(g, sub.s, sub.url);
+  else if(sub.kind === 'milestone') await drawMilestoneCard(g, sub);
   else if(sub.kind === 'ge') await drawGECard(g, sub.url);
   else if(sub.kind === 'stats') await ({ lives: drawStatsLivesCard, songs: drawStatsSongsCard, birthdays: drawStatsBirthdaysCard,
       timeline: drawStatsTimelineCard }[sub.cat] || drawStatsCard)(g, sub.url);
@@ -13775,6 +13919,7 @@ function bindDelegatedEvents(){
         if(drift) window.scrollBy(0, drift);
       }
     }
+    else if(action==='share-milestone'){ const sub = milestoneShare(id); if(sub) openShareSheet(sub); }
     else if(action==='open-single'){
       state.selectedSingle = el.dataset.id;
       state.view = 'single';

@@ -1,0 +1,47 @@
+# Every hour, ask YouTube whether a song video has just passed a round number
+# of views, so the site can celebrate it within the hour rather than the next
+# night. Nothing is committed unless one has: the nightly "Refresh live stats"
+# run still brings every count up to date. Three API calls an hour.
+name: View milestones
+
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# the nightly job writes the same file; they take turns
+concurrency:
+  group: lives
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ask YouTube
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python3 scripts/collect-youtube.py --milestones-only
+
+      - name: Publish if a video passed a milestone
+        run: |
+          if [ -z "$(git status --porcelain -- data/youtube.json covers/)" ]; then
+            echo "Nothing to publish."
+            exit 0
+          fi
+          git config user.name  "48thdb-bot"
+          git config user.email "48thdb-bot@users.noreply.github.com"
+          git add data/youtube.json $([ -d covers ] && echo covers/)
+          git commit -m "Celebrate a view milestone"
+          git pull --rebase
+          git push

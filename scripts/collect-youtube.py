@@ -8,6 +8,14 @@ secret) the counts come from the YouTube Data API, 50 videos a call. Without
 one, each video's watch page is read instead, which works from a home
 connection but not from GitHub, whose servers YouTube turns away.
 Run by .github/workflows/lives.yml; safe to run by hand.
+
+Milestones: a video passing a round number of views (every 100,000 up to a
+million, then every million) is noted in the file with the moment it was
+seen, and its YouTube cover is saved to covers/<id>.jpg so the page can draw
+a share card on it without asking YouTube. With --milestones-only (the hourly
+job, .github/workflows/milestones.yml) the file is only written when a video
+has just passed one, so the hour's small changes in the counts do not each
+make a commit; the nightly run still brings every count up to date.
 """
 import datetime as dt
 import json
@@ -15,11 +23,14 @@ import os
 import pathlib
 import urllib.parse
 import re
+import sys
 import time
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'data' / 'youtube.json'
+COVERS = ROOT / 'covers'
+MILESTONE_DAYS = 7          # how long the page celebrates one; covers are fetched for these
 TZ = dt.timezone(dt.timedelta(hours=7))
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/126 Safari/537.36',
            'Accept-Language': 'en'}
@@ -71,8 +82,56 @@ def from_api(ids, key):
     return out
 
 
+def milestone(n):
+    """The last round number of views passed: every 100,000 to a million, then every million."""
+    if n < 100_000:
+        return 0
+    return n // 100_000 * 100_000 if n < 1_000_000 else n // 1_000_000 * 1_000_000
+
+
+def note_milestones(old, videos, now):
+    """Keeps the file's milestones, adding any passed since the last counts."""
+    kept = {vid: dict(m) for vid, m in (old.get('milestones') or {}).items()
+            if dt.datetime.fromisoformat(m['at']) > now - dt.timedelta(days=30)}
+    new = []
+    for vid, v in videos.items():
+        before = old['videos'].get(vid)
+        mark = milestone(v['views'])
+        if before and mark > milestone(before['views']):
+            kept[vid] = {'mark': mark, 'at': now.isoformat(timespec='minutes')}
+            new.append(f'{vid} passed {mark:,}')
+    return kept, new
+
+
+def fetch_covers(milestones, now):
+    """Saves the YouTube cover of each video still being celebrated, once, and
+    notes on the milestone that it is there, so the page only asks for covers
+    that exist."""
+    saved = []
+    for vid, m in milestones.items():
+        path = COVERS / f'{vid}.jpg'
+        if path.exists():
+            m['cover'] = True
+        if path.exists() or dt.datetime.fromisoformat(m['at']) < now - dt.timedelta(days=MILESTONE_DAYS):
+            continue
+        for size in ('maxresdefault', 'hqdefault'):
+            try:
+                img = urllib.request.urlopen(urllib.request.Request(
+                    f'https://i.ytimg.com/vi/{vid}/{size}.jpg', headers=HEADERS), timeout=30).read()
+            except Exception:
+                continue
+            if len(img) > 2000:                  # YouTube answers a missing size with a tiny grey picture
+                COVERS.mkdir(exist_ok=True)
+                path.write_bytes(img)
+                m['cover'] = True
+                saved.append(path.name)
+                break
+    return saved
+
+
 def main():
     old = json.loads(OUT.read_text(encoding='utf-8')) if OUT.exists() else {'videos': {}}
+    only_milestones = '--milestones-only' in sys.argv
     videos, failed = {}, []
     ids = video_ids()
     key = os.environ.get('YOUTUBE_API_KEY', '').strip()
@@ -82,7 +141,17 @@ def main():
         for vid in gone:                     # deleted or private since it was linked
             if vid in old['videos']:
                 videos[vid] = old['videos'][vid]
-        write(videos)
+        if only_milestones:
+            now = dt.datetime.now(TZ)
+            milestones, new = note_milestones(old, videos, now)
+            covers = fetch_covers(milestones, now)
+            if new or covers:
+                print(*new, *(f'cover saved: {c}' for c in covers), sep='\n')
+                write(videos, old)
+            else:
+                print('no milestone this hour')
+            return
+        write(videos, old)
         if gone:
             print('not returned by the API (kept old counts):', ', '.join(gone))
         return
@@ -99,16 +168,21 @@ def main():
                 print('YouTube is refusing this machine; keeping the previous counts')
                 return
         time.sleep(1.2)
-    write(videos)
+    write(videos, old)
     if failed:
         print('kept old count for:', *failed, sep='\n  ')
 
 
-def write(videos):
+def write(videos, old):
     if not videos:
         raise SystemExit('nothing read; leaving the old file alone')
     OUT.parent.mkdir(exist_ok=True)
-    doc = {'updated': dt.datetime.now(TZ).isoformat(timespec='minutes'), 'videos': videos}
+    now = dt.datetime.now(TZ)
+    milestones, new = note_milestones(old, videos, now)
+    for line in new:
+        print(line)
+    fetch_covers(milestones, now)
+    doc = {'updated': now.isoformat(timespec='minutes'), 'videos': videos, 'milestones': milestones}
     OUT.write_text(json.dumps(doc, separators=(',', ':')), encoding='utf-8')
     print(f'{len(videos)} videos, {sum(v["views"] for v in videos.values()):,} views')
 
