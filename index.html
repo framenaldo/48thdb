@@ -2725,17 +2725,32 @@
     min-width:44px; height:32px; padding:0 10px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
     background:var(--z); color:var(--zi); font-weight:900; font-size:15px; letter-spacing:.5px; white-space:nowrap;
   }
-  .sp-secs{ font-size:12px; color:#B9ABB3; letter-spacing:.5px; }
+  .sp-secs{ font-size:12px; color:#B9ABB3; letter-spacing:.5px; display:flex; flex-direction:column; align-items:flex-start; gap:3px; }
   .sp-price{ font-weight:800; font-size:15px; white-space:nowrap; }
   .sp.has-pick .sp-row:not(.is-on){ opacity:.45; }
   .sp-row.is-on{ background:color-mix(in srgb, var(--z) 22%, #1A1419); border-color:var(--z);
     box-shadow:0 3px 0 rgba(0,0,0,.45), 0 0 14px color-mix(in srgb, var(--z) 55%, transparent); }
   .sp-row:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+  /* a picked zone opens to show what its ticket brings */
+  .sp-row:has(.sp-perks){ border-radius:22px; }
+  .sp-tok{ display:inline-block; padding:1px 7px; border-radius:999px;
+    background:rgba(255,255,255,.12); color:#F4ECF1; font-size:11px; font-weight:800; letter-spacing:.3px; white-space:nowrap; }
+  .sp-perks{ grid-column:1 / -1; display:none; flex-wrap:wrap; gap:6px; margin:2px 0 4px 4px; }
+  .sp-row.is-on .sp-perks{ display:flex; animation:sp-open .25s ease-out; }
+  @keyframes sp-open{ from{ opacity:0; transform:translateY(-4px); } }
+  .sp-perk{ display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px;
+    background:rgba(255,255,255,.1); color:#F4ECF1; font-size:12.5px; font-weight:600; line-height:1.35; }
+  .sp-perk::before{ content:'✓'; font-weight:900; color:var(--z); }
+  .sp-perk.is-token{ background:color-mix(in srgb, var(--z) 28%, #1A1419); font-weight:800; }
+  .sp-perk.is-none{ background:none; color:#B9ABB3; font-weight:500; padding-left:2px; }
+  .sp-perk.is-none::before{ content:none; }
+  .sp-notes{ margin:10px 2px 0; padding:0; list-style:none; font-size:11.5px; line-height:1.55; color:#9C8E97; }
+  .sp-notes li + li{ margin-top:4px; }
   .sp-pick{ margin:10px 2px 0; font-size:13px; line-height:1.5; color:#D8CCD3; }
   .sp-pick b{ color:#fff; }
   .sp-in{ display:grid; gap:12px; }
   @container (min-width:560px){
-    .sp-in{ grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); align-items:center; gap:18px; }
+    .sp-in{ grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); align-items:start; gap:18px; }
   }
   @media (prefers-reduced-motion:reduce){
     .sp-sec, .sp-ring{ animation:none !important; }
@@ -3819,6 +3834,10 @@ const SEED_ALBUMS = [
    Past events are kept: they are what anniversary lookups will read.
    `members` are ids so an event links to profiles; `groups` covers the
    entries that name a whole group rather than a line-up. */
+/* The small print both 14 November charts carry under their ticket benefits */
+const SP_TICKET_NOTES = [
+  'GE6 Token ได้เฉพาะผู้ที่ซื้อบัตรก่อน 1 พ.ย. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อบัตร ถ้ากรอกเลขผิดอาจไม่ได้รับ',
+  'ทุกโซนได้ Wristband ถ้าทำหาย ผู้จัดไม่ออกให้ใหม่ในทุกกรณี'];
 const SEED_SCHEDULE = [
   { id:'ev-nipponhaku-2026', start:'2026-08-28', end:'2026-08-30',
     title:'NIPPON HAKU BANGKOK 2026',
@@ -4034,12 +4053,14 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#8E2352', surface:'#FBF0F3', ink:'#3E1428', img:'posters/journey-of-dreams.jpg', w:1366, h:2048 },
     price:'999 – 4,999', ticketUrl:'https://www.eventpop.me/',
     seatPlan:{ layout:'mcc-bangkapi', zones:[
-      { id:'A',  sections:['AL','AC','AR'], price:'4,999', color:'#E3262B' },
-      { id:'BC', sections:['BC'],           price:'3,999', color:'#FFE600' },
-      { id:'BLR', label:'BL, BR', sections:['BL','BR'], price:'1,999', color:'#F1D3AE' },
-      { id:'C',  sections:['CL','CR'],      price:'1,999', color:'#2EDC55' },
-      { id:'D',  sections:['DL','DR'],      price:'1,199', color:'#2436E6' },
-      { id:'E',  sections:['EL','ER'],      price:'999',   color:'#EE5FEE' }] },
+      // what each ticket brings, from the organiser's "Ticket Benefits" chart
+      { id:'A',  sections:['AL','AC','AR'], price:'4,999', color:'#E3262B', tokens:12, perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
+      { id:'BC', sections:['BC'],           price:'3,999', color:'#FFE600', tokens:7,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
+      { id:'BLR', label:'BL, BR', sections:['BL','BR'], price:'1,999', color:'#F1D3AE', tokens:6, perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
+      { id:'C',  sections:['CL','CR'],      price:'1,999', color:'#2EDC55', tokens:6,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
+      { id:'D',  sections:['DL','DR'],      price:'1,199', color:'#2436E6', tokens:1,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
+      { id:'E',  sections:['EL','ER'],      price:'999',   color:'#EE5FEE' }],
+      notes:SP_TICKET_NOTES },
     info:['ประตูเปิด 12:00 น. · เริ่มงาน 13:00 น.',
       'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpop.me',
       'จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ'],
@@ -4053,11 +4074,14 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-final-results.jpg', w:1366, h:2048 },
     price:'966 – 1,666', ticketUrl:'https://www.eventpop.me/',
     seatPlan:{ layout:'mcc-bangkapi', zones:[
-      { id:'A', sections:['AL','AC','AR'], price:'1,666', color:'#E3262B' },
-      { id:'B', sections:['BL','BC','BR'], price:'1,166', color:'#FFE600' },
-      { id:'C', sections:['CL','CR'],      price:'1,166', color:'#2EDC55' },
+      // what each ticket brings, from the organiser's "Ticket Benefits" chart
+      { id:'A', sections:['AL','AC','AR'], price:'1,666', color:'#E3262B', tokens:2,
+        perks:['Photo Act B (สุ่มจาก 58 แบบ)', 'Letter Set สำหรับงาน Heart to Heart'] },
+      { id:'B', sections:['BL','BC','BR'], price:'1,166', color:'#FFE600', tokens:1, perks:['Letter Set สำหรับงาน Heart to Heart'] },
+      { id:'C', sections:['CL','CR'],      price:'1,166', color:'#2EDC55', tokens:1, perks:['Letter Set สำหรับงาน Heart to Heart'] },
       { id:'D', sections:['DL','DR'],      price:'966',   color:'#2436E6' },
-      { id:'E', sections:['EL','ER'],      price:'966',   color:'#EE5FEE' }] },
+      { id:'E', sections:['EL','ER'],      price:'966',   color:'#EE5FEE' }],
+      notes:SP_TICKET_NOTES },
     links:[{ label:'คลิปประกาศ', url:'https://youtu.be/Xr381KDpZps' }],
     info:['ประกาศผลการเลือกตั้งอันดับสุดท้าย',
       '女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
@@ -5416,6 +5440,15 @@ const EN = {
   'อัฒจันทร์': 'Grand stand',
   'ลากหรือบิดสองนิ้วเพื่อหมุน · ถ่างนิ้วเพื่อซูม': 'Drag, or twist two fingers, to turn · pinch to zoom',
   'ถ่างนิ้วเพื่อซูม': 'Pinch to zoom',
+  'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหนและได้อะไรบ้าง': 'Tap a zone on the plan or in the list to see where it is and what it comes with',
+  'Photo Act A (สุ่มจาก 58 แบบ)': 'Photo Act A (one of 58, at random)',
+  'Photo Act B (สุ่มจาก 58 แบบ)': 'Photo Act B (one of 58, at random)',
+  'Postcard (สุ่มจาก 58 แบบ)': 'Postcard (one of 58, at random)',
+  'Letter Set สำหรับงาน Heart to Heart': 'Letter Set for Heart to Heart',
+  'บัตรโซนนี้ไม่มีของแถม': 'No extras come with this zone',
+  'GE6 Token ได้เฉพาะผู้ที่ซื้อบัตรก่อน 1 พ.ย. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อบัตร ถ้ากรอกเลขผิดอาจไม่ได้รับ':
+    'GE6 Tokens come only with tickets bought before 1 Nov 2026, with the Wallet Code from the iAM48 Application entered at purchase; a wrong code may lose them',
+  'ทุกโซนได้ Wristband ถ้าทำหาย ผู้จัดไม่ออกให้ใหม่ในทุกกรณี': 'Every zone gets a wristband; a lost one is never replaced',
   'ซูมเข้า': 'Zoom in',
   'ซูมออก': 'Zoom out',
   'คืนมุมมองเดิม': 'Reset the view',
@@ -5867,6 +5900,7 @@ const EN_PATTERNS = [
     m => `and ${m[1]} more — narrow the search to see them all`],
   [rx('บัตร ([\\d,]+) บาท'), m => `Ticket ${m[1]} THB`],
   [rx('([\\d,]+) – ([\\d,]+) บาท'), m => `${m[1]} – ${m[2]} THB`],
+  [rx('GE6 Token (\\d+) เหรียญ\\*'), m => `${m[1]} GE6 Token${m[1] === '1' ? '' : 's'}*`],
   [rx('([\\d,]+) บาท'), m => `${m[1]} THB`],
 
   /* people and history */
@@ -9134,11 +9168,15 @@ function renderSeatPlan(ev){
       <div class="sp-list">${plan.zones.map(z => `
         <button class="sp-row" data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" aria-pressed="false" style="--z:${z.color}; --zi:${spInk(z.color)}">
           <span class="sp-sw">${escapeHtml(z.label || z.id)}</span>
-          <span class="sp-secs">${z.sections.join(' · ')}</span>
+          <span class="sp-secs">${z.sections.join(' · ')}${z.tokens ? `<span class="sp-tok">GE6 × ${z.tokens}</span>` : ''}</span>
           <span class="sp-price">${escapeHtml(z.price)} บาท</span>
+          ${plan.notes ? `<span class="sp-perks">${z.tokens ? `<span class="sp-perk is-token">GE6 Token ${z.tokens} เหรียญ*</span>` : ''}${
+            (z.perks || []).map(p => `<span class="sp-perk">${escapeHtml(p)}</span>`).join('')}${
+            !z.tokens && !(z.perks || []).length ? `<span class="sp-perk is-none">บัตรโซนนี้ไม่มีของแถม</span>` : ''}</span>` : ''}
         </button>`).join('')}
       </div>
-      <p class="sp-pick" aria-live="polite">แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน</p>
+      <p class="sp-pick" aria-live="polite">${plan.notes ? 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหนและได้อะไรบ้าง' : 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน'}</p>
+      ${plan.notes ? `<ul class="sp-notes">${plan.notes.map((n, i) => `<li>${i ? '' : '<b>*</b> '}${escapeHtml(n)}</li>`).join('')}</ul>` : ''}
     </div>
   </div></div>`;
 }
@@ -9186,8 +9224,11 @@ function pickSeatZone(el){
   const fx = box.querySelector('.sp-fx'), read = box.querySelector('.sp-pick');
   fx.innerHTML = '';
   if(off){
-    read.textContent = isEN() ? 'Tap a zone on the plan or in the list to see where it is'
-      : 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน';
+    const perks = !!ev.seatPlan.notes;
+    read.textContent = isEN()
+      ? (perks ? 'Tap a zone on the plan or in the list to see where it is and what it comes with'
+               : 'Tap a zone on the plan or in the list to see where it is')
+      : (perks ? 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหนและได้อะไรบ้าง' : 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน');
     return;
   }
   // the zone rises out of the hall, a little past and back
