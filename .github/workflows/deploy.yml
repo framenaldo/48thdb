@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir -p public
           git ls-files -z \
-            | grep -zvE '^(scripts/|worker/|\.github/|\.claude/|\.gitignore|\.firebaserc|firebase\.json|site\.wrangler\.toml|senbatsu-idol-database)' \
+            | grep -zvE '^(scripts/|worker/|\.github/|\.claude/|\.gitignore|CLAUDE\.md|\.firebaserc|firebase\.json|site\.wrangler\.toml|senbatsu-idol-database)' \
             | tar -cf - --null -T - | tar -xf - -C public
           echo "Publishing $(find public -type f | wc -l) files"
 
