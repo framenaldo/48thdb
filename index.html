@@ -9328,7 +9328,8 @@ document.addEventListener('pointermove', e => {
       const at = spPointAt(g, p.x0, p.y0);
       st.anchor = { ...at, fx:(p.x - r.left) / r.width, fy:(p.y - r.top) / r.height };
     } else if(!flat){
-      st.yaw = s0.yaw + dx * .35;
+      // the side facing us follows the hand, as a turntable does: drag right, it turns right
+      st.yaw = s0.yaw - dx * .35;
       if(p.mouse) st.pitch = spClamp(s0.pitch - dy * .25, SP_TILT);
     } else return;
   }
