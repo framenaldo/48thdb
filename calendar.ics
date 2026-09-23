@@ -480,7 +480,7 @@ END:VEVENT
 BEGIN:VEVENT
 UID:ev-concert-2026-2026-11-14@48thdb
 DTSTAMP:20261114T000000Z
-SUMMARY:BNK48 & CGM48 Journey of Dreams
+SUMMARY:BNK48 & CGM48 Journey of Dreams 夢の旅
 LOCATION:MCC Hall\, The Mall Lifestore Bangkapi
 DESCRIPTION:รอประกาศรายชื่อ\n• ประต
  ูเปิด 12:00 น. · เริ่มงาน 13:00 น.\n• บ
@@ -504,11 +504,11 @@ DESCRIPTION:• ประกาศผลการเลือกตั้
  ตูเปิด 17:00 น. · เริ่มงาน 18:00 น.\n• 
  บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpo
  p.me\n• จัดรอบค่ำ วันเดียวกับ BN
- K48 & CGM48 Journey of Dreams ที่จัดรอบกลางว
- ัน\n• Top 12 เซ็มบัตสึได้ไปถ่าย 
- MV ที่ญี่ปุ่น\n• Kami7 Special Project — เพล
- งร่วมกับ AKB48\n• #BNK48CGM48_GE2026\n\nhttps://48thdb.c
- om/?e=ev-election-results
+ K48 & CGM48 Journey of Dreams 夢の旅 ที่จัดรอบกล
+ างวัน\n• Top 12 เซ็มบัตสึได้ไปถ
+ ่าย MV ที่ญี่ปุ่น\n• Kami7 Special Project —
+  เพลงร่วมกับ AKB48\n• #BNK48CGM48_GE2026\n\nhttps:
+ //48thdb.com/?e=ev-election-results
 URL:https://48thdb.com/?e=ev-election-results
 DTSTART;TZID=Asia/Bangkok:20261114T180000
 DTEND;TZID=Asia/Bangkok:20261114T200000
