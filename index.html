@@ -3834,10 +3834,12 @@ const SEED_ALBUMS = [
    Past events are kept: they are what anniversary lookups will read.
    `members` are ids so an event links to profiles; `groups` covers the
    entries that name a whole group rather than a line-up. */
-/* The small print both 14 November charts carry under their ticket benefits */
-const SP_TICKET_NOTES = [
+/* The small print ticket-benefit charts carry, by name. The schedule names it
+   (`notes:` on a seat plan) rather than holding it, so the schedule stays plain
+   data that scripts/build-calendar.mjs can read on its own. */
+const SEAT_NOTES = { 'ge2026-tickets':[
   'GE6 Token ได้เฉพาะผู้ที่ซื้อบัตรก่อน 1 พ.ย. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อบัตร ถ้ากรอกเลขผิดอาจไม่ได้รับ',
-  'ทุกโซนได้ Wristband ถ้าทำหาย ผู้จัดไม่ออกให้ใหม่ในทุกกรณี'];
+  'ทุกโซนได้ Wristband ถ้าทำหาย ผู้จัดไม่ออกให้ใหม่ในทุกกรณี'] };
 const SEED_SCHEDULE = [
   { id:'ev-nipponhaku-2026', start:'2026-08-28', end:'2026-08-30',
     title:'NIPPON HAKU BANGKOK 2026',
@@ -4060,11 +4062,11 @@ const SEED_SCHEDULE = [
       { id:'C',  sections:['CL','CR'],      price:'1,999', color:'#2EDC55', tokens:6,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
       { id:'D',  sections:['DL','DR'],      price:'1,199', color:'#2436E6', tokens:1,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
       { id:'E',  sections:['EL','ER'],      price:'999',   color:'#EE5FEE' }],
-      notes:SP_TICKET_NOTES },
+      notes:'ge2026-tickets' },
     info:['ประตูเปิด 12:00 น. · เริ่มงาน 13:00 น.',
       'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpop.me',
       'จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ'],
-    lineupTba:true },
+    allMembers:true },
   { id:'ev-election-results', start:'2026-11-14', time:'18:00',
     sales:{ from:'2026-10-15T12:00' },
     title:'BNK48 & CGM48 Senbatsu General Election 2026 · Final Results',
@@ -4081,7 +4083,7 @@ const SEED_SCHEDULE = [
       { id:'C', sections:['CL','CR'],      price:'1,166', color:'#2EDC55', tokens:1, perks:['Letter Set สำหรับงาน Heart to Heart'] },
       { id:'D', sections:['DL','DR'],      price:'966',   color:'#2436E6' },
       { id:'E', sections:['EL','ER'],      price:'966',   color:'#EE5FEE' }],
-      notes:SP_TICKET_NOTES },
+      notes:'ge2026-tickets' },
     links:[{ label:'คลิปประกาศ', url:'https://youtu.be/Xr381KDpZps' }],
     info:['ประกาศผลการเลือกตั้งอันดับสุดท้าย',
       '女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
@@ -4090,7 +4092,8 @@ const SEED_SCHEDULE = [
       'จัดรอบค่ำ วันเดียวกับ BNK48 & CGM48 Journey of Dreams 夢の旅 ที่จัดรอบกลางวัน',
       'Top 12 เซ็มบัตสึได้ไปถ่าย MV ที่ญี่ปุ่น',
       'Kami7 Special Project — เพลงร่วมกับ AKB48',
-      '#BNK48CGM48_GE2026'] },
+      '#BNK48CGM48_GE2026'],
+    allMembers:true },
   { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
@@ -4101,7 +4104,7 @@ const SEED_SCHEDULE = [
       '3 ต.ค. ประกาศผลโหวต 48 ชั่วโมงแรก',
       '3 ต.ค. เปิดตัวเพลง "Kimi to Doko ka e Ikitai" ครั้งแรก',
       'รายละเอียดอื่นรอประกาศ'],
-    lineupTba:true },
+    allMembers:true },
   /* The single and the photoset are what the GE6 Tokens come in, so they sit
      with the election rather than in the discography until they are released. */
   { id:'ev-ge6-single', logo:'kimi', start:'2026-09-26', end:'2026-10-30', period:true, bar:'Pre-Order: Kimi to Doko ka e Ikitai',
@@ -4163,31 +4166,33 @@ const SEED_SCHEDULE = [
     timeline:'ge2026', related:['ev-ge6-single','ev-election-voting'],
     info:['ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Handshake Event',
       'รอบเวลารอประกาศอีกครั้ง'],
-    lineupTba:true },
+    allMembers:true },
   { id:'ev-ge6-myo1', logo:'kimi', start:'2026-11-05', end:'2026-11-08', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 1]',
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo2'],
     info:['แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.ย. 2026 23:00 น.',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
       'รอบเวลารอประกาศอีกครั้ง'],
-    lineupTba:true },
+    allMembers:true },
   { id:'ev-ge6-myo2', logo:'kimi', start:'2026-11-26', end:'2026-11-29', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 2]',
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo1'],
     info:['แลกบัตรได้ถึง 24 พ.ย. 2026 23:00 น.',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
       'รอบเวลารอประกาศอีกครั้ง'],
-    lineupTba:true },
+    allMembers:true },
   { id:'ev-ge6-heart', start:'2026-11-15', tba:true,
     title:'BNK48 & CGM48 Senbatsu General Election 2026 : Heart to Heart',
     groups:['bnk48','cgm48'], timeline:'ge2026',
     related:['ev-election-results','ev-concert-2026'],
     info:['งานต่อเนื่องหลังประกาศผลการเลือกตั้ง',
       'รายละเอียดสถานที่และเวลารอประกาศ'],
-    lineupTba:true },
+    allMembers:true },
 ];
 SEED_SCHEDULE.forEach(e => {
   if(e.slots && !e.members) e.members = [...new Set(e.slots.flatMap(s => s.members))];
+  // every current member takes part: the list follows the roster rather than being copied out
+  if(e.allMembers) e.members = SEED_MEMBERS.map(m => m.id);
 });
 
 /* The election is not one day but two months of deadlines, so the events that
@@ -7910,8 +7915,10 @@ function renderEventCard(ev, todayIso){
   const isNow = runsToday && !over;
   // a rota on the day it ran: the people who were there, not the whole run
   const ids = over && ev.slots ? [...new Set(slotsOn(ev, todayIso).flatMap(s => s.members))] : (ev.members || []);
-  const people = ids.map(getMember).filter(Boolean);
-  const mine = people.filter(m => state.oshi.includes(m.id));
+  const all = ids.map(getMember).filter(Boolean);
+  const mine = all.filter(m => state.oshi.includes(m.id));
+  // a card shows only a few faces, so the viewer's oshi come first among them
+  const people = [...mine, ...all.filter(m => !state.oshi.includes(m.id))];
   const groupTags = (ev.groups || []).map(getGroup).filter(Boolean);
   const accent = ev.poster ? ev.poster.accent
     : groupTags.length === 1 ? groupTags[0].color
@@ -9176,7 +9183,7 @@ function renderSeatPlan(ev){
         </button>`).join('')}
       </div>
       <p class="sp-pick" aria-live="polite">${plan.notes ? 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหนและได้อะไรบ้าง' : 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน'}</p>
-      ${plan.notes ? `<ul class="sp-notes">${plan.notes.map((n, i) => `<li>${i ? '' : '<b>*</b> '}${escapeHtml(n)}</li>`).join('')}</ul>` : ''}
+      ${plan.notes ? `<ul class="sp-notes">${(SEAT_NOTES[plan.notes] || []).map((n, i) => `<li>${i ? '' : '<b>*</b> '}${escapeHtml(n)}</li>`).join('')}</ul>` : ''}
     </div>
   </div></div>`;
 }

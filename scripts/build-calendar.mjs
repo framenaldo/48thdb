@@ -61,7 +61,8 @@ function untilOf(ev){
 function describe(ev, extra){
   const lines = [];
   if(extra) lines.push(extra);
-  if(ev.members && ev.members.length && !ev.lineupTba) lines.push('เมมเบอร์: ' + ev.members.map(nick).join(', '));
+  if(ev.allMembers) lines.push('เมมเบอร์: สมาชิก BNK48 และ CGM48 ทุกคน');
+  else if(ev.members && ev.members.length && !ev.lineupTba) lines.push('เมมเบอร์: ' + ev.members.map(nick).join(', '));
   if(ev.lineupTba) lines.push('รอประกาศรายชื่อ');
   if(ev.tba) lines.push('รายละเอียดและเวลายังไม่ประกาศ');
   for(const l of [...(ev.detail || []), ...(ev.info || [])]) lines.push('• ' + l);
