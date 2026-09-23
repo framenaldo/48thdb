@@ -2651,6 +2651,69 @@
   .evm-head::before{
     content:''; flex:none; width:3px; height:14px; border-radius:999px; background:var(--c);
   }
+
+  /* Seat plan: the hall drawn on a dark stage, as the organiser prints it, so
+     the zone colours read the same on a light or a dark sheet. */
+  .sp{
+    container-type:inline-size;
+    padding:12px; border-radius:18px; background:#1A1419; color:#EFE7EC;
+    border:1px solid color-mix(in srgb, var(--pc, var(--c)) 40%, rgba(255,255,255,.1));
+    box-shadow:0 8px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .sp-map svg{ display:block; width:100%; height:auto; overflow:visible; font-family:'Noto Sans Thai',sans-serif; }
+  .sp .sp-dark{ fill:#050305; stroke:rgba(255,255,255,.1); stroke-width:1; }
+  .sp .sp-void{ fill:#050305; }
+  .sp .sp-dark-t{ fill:#D8CCD3; font-size:13px; font-weight:800; letter-spacing:2px; text-anchor:middle; }
+  .sp .sp-stage{ fill:#fff; font-size:26px; letter-spacing:3px; }
+  .sp .sp-rule{ stroke:rgba(255,255,255,.2); stroke-width:1; }
+  .sp .sp-cap{ fill:#B9ABB3; font-size:15px; font-weight:700; }
+  .sp-sec{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .sp-sec path{ fill:var(--z); stroke:#1A1419; stroke-width:1.5; transition:opacity .25s, filter .2s; }
+  .sp-sec text{ font-size:28px; font-weight:900; letter-spacing:1px; text-anchor:middle; pointer-events:none; transition:opacity .25s; }
+  .sp-sec text.is-small{ font-size:19px; }
+  @media (hover:hover){ .sp-sec:hover path{ filter:brightness(1.18); } }
+  .sp-sec:active path{ filter:brightness(.8); }
+  .sp.has-pick .sp-sec:not(.is-on) path, .sp.has-pick .sp-sec:not(.is-on) text{ opacity:.22; }
+  .sp-sec.is-on path{ stroke:#fff; stroke-width:4; filter:drop-shadow(0 0 10px var(--z)); animation:sp-pop .45s cubic-bezier(.3,1.6,.5,1); transform-box:fill-box; transform-origin:center; }
+  .sp-ring{ fill:none; stroke:#fff; stroke-width:4; transform-box:fill-box; transform-origin:center;
+    animation:sp-ring 1.1s ease-out 2; pointer-events:none; }
+  @keyframes sp-pop{ 0%{ transform:scale(.94); } 100%{ transform:scale(1); } }
+  @keyframes sp-ring{ 0%{ transform:scale(.3); opacity:1; } 100%{ transform:scale(2.4); opacity:0; } }
+  /* a first look says the blocks can be tapped: they light up once, in turn */
+  .sp:not(.has-pick) .sp-sec path{ animation:sp-hint 1.4s ease-in-out .6s 1; }
+  .sp:not(.has-pick) .sp-sec:nth-of-type(3n+2) path{ animation-delay:.75s; }
+  .sp:not(.has-pick) .sp-sec:nth-of-type(3n) path{ animation-delay:.9s; }
+  @keyframes sp-hint{ 0%,100%{ filter:none; } 45%{ filter:brightness(1.35) drop-shadow(0 0 6px var(--z)); } }
+  .sp-list{ display:grid; gap:7px; }
+  .sp-row{
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;
+    padding:6px 12px 6px 6px; border-radius:999px; cursor:pointer; text-align:left;
+    font-family:'Noto Sans Thai',sans-serif; color:#F4ECF1;
+    background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 3px 0 rgba(0,0,0,.45); transition:transform .12s, box-shadow .12s, background .2s, opacity .25s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .sp-row:active{ transform:translateY(3px); box-shadow:0 0 0 rgba(0,0,0,.45); }
+  .sp-sw{
+    min-width:44px; height:32px; padding:0 10px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
+    background:var(--z); color:var(--zi); font-weight:900; font-size:15px; letter-spacing:.5px; white-space:nowrap;
+  }
+  .sp-secs{ font-size:12px; color:#B9ABB3; letter-spacing:.5px; }
+  .sp-price{ font-weight:800; font-size:15px; white-space:nowrap; }
+  .sp.has-pick .sp-row:not(.is-on){ opacity:.45; }
+  .sp-row.is-on{ background:color-mix(in srgb, var(--z) 22%, #1A1419); border-color:var(--z);
+    box-shadow:0 3px 0 rgba(0,0,0,.45), 0 0 14px color-mix(in srgb, var(--z) 55%, transparent); }
+  .sp-row:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+  .sp-pick{ margin:10px 2px 0; font-size:13px; line-height:1.5; color:#D8CCD3; }
+  .sp-pick b{ color:#fff; }
+  .sp-in{ display:grid; gap:12px; }
+  @container (min-width:560px){
+    .sp-in{ grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); align-items:center; gap:18px; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .sp-sec path, .sp-sec.is-on path, .sp-ring{ animation:none !important; }
+    .sp-ring{ display:none; }
+  }
   @media (hover:hover){
     .ev-card.is-openable:hover{
       transform:translateY(-2px);
@@ -3942,7 +4005,14 @@ const SEED_SCHEDULE = [
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
     timeline:'ge2026', related:['ev-election-results','ev-ge6-heart'],
     poster:{ accent:'#8E2352', surface:'#FBF0F3', ink:'#3E1428', img:'posters/journey-of-dreams.jpg', w:1366, h:2048 },
-    links:[{ label:'ซื้อบัตร eventpop.me', url:'https://www.eventpop.me/' }],
+    price:'999 – 4,999', ticketUrl:'https://www.eventpop.me/',
+    seatPlan:{ layout:'mcc-bangkapi', zones:[
+      { id:'A',  sections:['AL','AC','AR'], price:'4,999', color:'#E3262B' },
+      { id:'BC', sections:['BC'],           price:'3,999', color:'#FFE600' },
+      { id:'BLR', label:'BL, BR', sections:['BL','BR'], price:'1,999', color:'#F1D3AE' },
+      { id:'C',  sections:['CL','CR'],      price:'1,999', color:'#2EDC55' },
+      { id:'D',  sections:['DL','DR'],      price:'1,199', color:'#2436E6' },
+      { id:'E',  sections:['EL','ER'],      price:'999',   color:'#EE5FEE' }] },
     info:['夢の旅 — ชื่องานภาษาญี่ปุ่น',
       'ประตูเปิด 12:00 น. · เริ่มงาน 13:00 น.',
       'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpop.me',
@@ -3955,8 +4025,14 @@ const SEED_SCHEDULE = [
     related:['ev-election-voting','ev-election-fanfest','ev-concert-2026','ev-ge6-heart'],
     timeline:'ge2026',
     poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-final-results.jpg', w:1366, h:2048 },
-    links:[{ label:'ซื้อบัตร eventpop.me', url:'https://www.eventpop.me/' },
-      { label:'คลิปประกาศ', url:'https://youtu.be/Xr381KDpZps' }],
+    price:'966 – 1,666', ticketUrl:'https://www.eventpop.me/',
+    seatPlan:{ layout:'mcc-bangkapi', zones:[
+      { id:'A', sections:['AL','AC','AR'], price:'1,666', color:'#E3262B' },
+      { id:'B', sections:['BL','BC','BR'], price:'1,166', color:'#FFE600' },
+      { id:'C', sections:['CL','CR'],      price:'1,166', color:'#2EDC55' },
+      { id:'D', sections:['DL','DR'],      price:'966',   color:'#2436E6' },
+      { id:'E', sections:['EL','ER'],      price:'966',   color:'#EE5FEE' }] },
+    links:[{ label:'คลิปประกาศ', url:'https://youtu.be/Xr381KDpZps' }],
     info:['ประกาศผลการเลือกตั้งอันดับสุดท้าย',
       '女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
       'ประตูเปิด 17:00 น. · เริ่มงาน 18:00 น.',
@@ -5307,7 +5383,12 @@ const EN = {
   'ประตูเปิด 12:00 น. · เริ่มงาน 13:00 น.': 'Doors open 12:00 · starts 13:00',
   'ประตูเปิด 17:00 น. · เริ่มงาน 18:00 น.': 'Doors open 17:00 · starts 18:00',
   'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpop.me': 'Tickets on sale 15 Oct 2026 12:00 at eventpop.me',
-  'ซื้อบัตร eventpop.me ↗': 'Buy tickets at eventpop.me ↗',
+  'ผังที่นั่งและราคาบัตร': 'Seat plan and prices',
+  'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน': 'Tap a zone on the plan or in the list to see where it is',
+  'พื้นล่าง': 'Floor',
+  'แพลตฟอร์ม 1 · สูง 0.40 ม.': 'Platform 1 · 0.40 m high',
+  'แพลตฟอร์ม 2 · สูง 0.60 ม.': 'Platform 2 · 0.60 m high',
+  'อัฒจันทร์': 'Grand stand',
   'เปิดขายบัตร Journey of Dreams และงานประกาศผล': 'Tickets on sale for Journey of Dreams and the results show',
   'ทาง eventpop.me': 'At eventpop.me',
   'จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ':
@@ -5755,6 +5836,7 @@ const EN_PATTERNS = [
   [rx('และอีก (\\d+) รายการ — พิมพ์ให้เจาะจงขึ้นเพื่อดูทั้งหมด'),
     m => `and ${m[1]} more — narrow the search to see them all`],
   [rx('บัตร ([\\d,]+) บาท'), m => `Ticket ${m[1]} THB`],
+  [rx('([\\d,]+) – ([\\d,]+) บาท'), m => `${m[1]} – ${m[2]} THB`],
   [rx('([\\d,]+) บาท'), m => `${m[1]} THB`],
 
   /* people and history */
@@ -8816,6 +8898,127 @@ function cleanLink(raw){
     return x.toString();
   }catch(e){ return null; }
 }
+/* A hall's seat plan, redrawn from the organiser's chart so each block can be
+   tapped. The drawing belongs to the hall; which blocks make up a zone, and
+   what a zone costs, belongs to the event (`seatPlan` on the event). */
+const SP_RECT = (x, y, w, h) => `M${x} ${y}h${w}v${h}h${-w}Z`;
+const SEAT_LAYOUTS = {
+  'mcc-bangkapi': {
+    w:452, h:626,
+    levels:{
+      floor:{ th:'พื้นล่าง', en:'Floor' },
+      p1:{ th:'แพลตฟอร์ม 1 · สูง 0.40 ม.', en:'Platform 1 · 0.40 m high' },
+      p2:{ th:'แพลตฟอร์ม 2 · สูง 0.60 ม.', en:'Platform 2 · 0.60 m high' },
+      stand:{ th:'อัฒจันทร์', en:'Grand stand' } },
+    captions:[['floor', 100], ['p1', 340], ['p2', 444], ['stand', 530]],
+    rules:[320, 424, 510, 622],
+    fixed:`<path class="sp-void" d="M245 40H319L145.5 213.5L108.5 176.5Z"/>
+      <path class="sp-void" d="M207 40H133L306.5 213.5L343.5 176.5Z"/>
+      <rect class="sp-void" x="7" y="0" width="438" height="72" rx="6"/>
+      <text class="sp-dark-t sp-stage" x="226" y="46">STAGE</text>
+      <path class="sp-dark" d="${SP_RECT(149, 454, 155, 46)}"/>
+      <text class="sp-dark-t" x="226" y="482">RESERVE</text>
+      <path class="sp-dark" d="${SP_RECT(149, 540, 155, 38)}"/>
+      <text class="sp-dark-t" x="226" y="564">F O H</text>`,
+    sections:{
+      AL:{ level:'floor', d:'M0 310V152L18 130H45L131 216V310Z', x:65, y:272 },
+      AC:{ level:'floor', d:'M149 310V222H196L226 194L256 222H304V310Z', x:226, y:280 },
+      AR:{ level:'floor', d:'M452 310V152L434 130H407L321 216V310Z', x:387, y:272 },
+      BL:{ level:'p1', d:SP_RECT(0, 350, 131, 64), x:65, y:392 },
+      BC:{ level:'p1', d:SP_RECT(149, 350, 155, 64), x:226, y:392 },
+      BR:{ level:'p1', d:SP_RECT(321, 350, 131, 64), x:387, y:392 },
+      CL:{ level:'p2', d:SP_RECT(0, 454, 131, 46), x:65, y:487 },
+      CR:{ level:'p2', d:SP_RECT(321, 454, 131, 46), x:387, y:487 },
+      DL:{ level:'stand', d:'M0 540H101V552H126V584H0Z', x:58, y:573 },
+      DR:{ level:'stand', d:'M452 540H351V552H326V584H452Z', x:394, y:573 },
+      EL:{ level:'stand', d:SP_RECT(0, 590, 126, 22), x:63, y:608, small:true },
+      ER:{ level:'stand', d:SP_RECT(326, 590, 126, 22), x:389, y:608, small:true } },
+  },
+};
+/* dark lettering on the pale zone colours, white on the deep ones */
+function spInk(hex){
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map(c => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4);
+  return .2126 * r + .7152 * g + .0722 * b > .3 ? '#141014' : '#fff';
+}
+function renderSeatPlan(ev){
+  const plan = ev.seatPlan, L = SEAT_LAYOUTS[plan.layout];
+  if(!L) return '';
+  const zoneOf = {};
+  plan.zones.forEach(z => z.sections.forEach(sec => { zoneOf[sec] = z; }));
+  const secs = Object.entries(L.sections).map(([name, sec]) => {
+    const z = zoneOf[name];
+    if(!z) return `<path class="sp-dark" d="${sec.d}"/>`;
+    return `<g class="sp-sec" data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" style="--z:${z.color}">
+      <path d="${sec.d}"/>
+      <text x="${sec.x}" y="${sec.y}" fill="${spInk(z.color)}"${sec.small ? ' class="is-small"' : ''}>${name}</text></g>`;
+  }).join('');
+  return `
+  <h3 class="evm-head">ผังที่นั่งและราคาบัตร</h3>
+  <div class="sp" data-ev="${ev.id}"><div class="sp-in">
+    <div class="sp-map">
+      <svg viewBox="0 0 ${L.w} ${L.h}" aria-hidden="true" focusable="false">
+        ${L.rules.map(y => `<line class="sp-rule" x1="0" x2="${L.w}" y1="${y}" y2="${y}"/>`).join('')}
+        ${L.captions.map(([lv, y]) => `<text class="sp-cap" x="0" y="${y}">${L.levels[lv].th}</text>`).join('')}
+        ${L.fixed}
+        ${secs}
+        <g class="sp-fx"></g>
+      </svg>
+    </div>
+    <div class="sp-side">
+      <div class="sp-list">${plan.zones.map(z => `
+        <button class="sp-row" data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" aria-pressed="false" style="--z:${z.color}; --zi:${spInk(z.color)}">
+          <span class="sp-sw">${escapeHtml(z.label || z.id)}</span>
+          <span class="sp-secs">${z.sections.join(' · ')}</span>
+          <span class="sp-price">${escapeHtml(z.price)} บาท</span>
+        </button>`).join('')}
+      </div>
+      <p class="sp-pick" aria-live="polite">แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน</p>
+    </div>
+  </div></div>`;
+}
+/* Picking a zone is a look, not a change of state: it lights the zone in
+   place, so nothing is redrawn and the sheet keeps its scroll. */
+function pickSeatZone(el){
+  const box = el.closest('.sp');
+  const ev = box && SEED_SCHEDULE.find(e => e.id === box.dataset.ev);
+  if(!ev) return;
+  const L = SEAT_LAYOUTS[ev.seatPlan.layout];
+  const zone = el.dataset.zone;
+  const off = box.dataset.pick === zone;
+  box.dataset.pick = off ? '' : zone;
+  box.classList.toggle('has-pick', !off);
+  box.querySelectorAll('[data-zone]').forEach(n => {
+    const on = !off && n.dataset.zone === zone;
+    n.classList.toggle('is-on', on);
+    if(n.tagName === 'BUTTON') n.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  const fx = box.querySelector('.sp-fx'), read = box.querySelector('.sp-pick');
+  fx.innerHTML = '';
+  if(off){
+    read.textContent = isEN() ? 'Tap a zone on the plan or in the list to see where it is'
+      : 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน';
+    return;
+  }
+  const z = ev.seatPlan.zones.find(x => x.id === zone);
+  // a ring on every block of the zone, so a zone split across the hall is found at once
+  fx.innerHTML = z.sections.map(name => {
+    const sec = L.sections[name];
+    return sec ? `<circle class="sp-ring" cx="${sec.x}" cy="${sec.y - 9}" r="26" style="--z:${z.color}"/>` : '';
+  }).join('');
+  const levels = [...new Set(z.sections.map(n => L.sections[n] && L.sections[n].level).filter(Boolean))]
+    .map(lv => L.levels[lv][isEN() ? 'en' : 'th']);
+  read.innerHTML = isEN()
+    ? `<b>Zone ${escapeHtml(z.label || z.id)}</b> · ${z.sections.join(', ')} · ${escapeHtml(levels.join(', '))} · <b>${escapeHtml(z.price)} THB</b>`
+    : `<b>โซน ${escapeHtml(z.label || z.id)}</b> · ${z.sections.join(', ')} · ${escapeHtml(levels.join(', '))} · <b>${escapeHtml(z.price)} บาท</b>`;
+  // picked from the list with the plan scrolled away: bring the plan back into sight
+  if(el.tagName === 'BUTTON'){
+    const map = box.querySelector('.sp-map'), r = map.getBoundingClientRect();
+    if(r.bottom < 60 || r.top > window.innerHeight - 60)
+      map.scrollIntoView({ block:'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+}
+
 function renderEventLinkEditor(ev){
   if(!state.isOwner) return '';
   if(state.linkEditFor !== ev.id) return `<button class="chip evl-open" data-action="edit-evlinks" data-id="${ev.id}">✎ แก้ลิงก์</button>`;
@@ -8933,6 +9136,8 @@ function renderEventModal(){
         ${(ev.sections || []).map(s => `
         <h3 class="evm-head">${escapeHtml(s.head)}</h3>
         <ul class="ev-detail">${s.lines.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>`).join('')}
+
+        ${ev.seatPlan ? renderSeatPlan(ev) : ''}
 
         ${ev.timeline ? `<button class="chip chip-link tl-jump" data-action="open-timeline" data-id="${ev.timeline}">
           ไทม์ไลน์ทั้งงาน →</button>` : ''}
@@ -12798,6 +13003,7 @@ function bindDelegatedEvents(){
       state.posterOf = id; renderMain(); pushHistory();
     }
     else if(action==='close-poster'){ closePoster(); }
+    else if(action==='seat-zone'){ pickSeatZone(el); }
     else if(action==='set-oshi-only'){
       state.oshiOnly = id === '1';
       state.calDay = null;   // the day that was open may not survive the filter
