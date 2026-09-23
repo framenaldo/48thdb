@@ -4098,7 +4098,8 @@ const SEED_SCHEDULE = [
       { id:'C',  sections:['CL','CR'],      price:'1,999', color:'#2EDC55', tokens:6,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
       { id:'D',  sections:['DL','DR'],      price:'1,199', color:'#2436E6', tokens:1,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
       { id:'E',  sections:['EL','ER'],      price:'999',   color:'#EE5FEE' }],
-      notes:'ge2026-tickets' },
+      notes:'ge2026-tickets', bundleIn:'ev-ge6-bundle',
+      bundleNote:{ th:'ในราคาเดียว เฉพาะโซน A, BC, BL/BR และ C', en:'at one price, for zones A, BC, BL/BR and C only' } },
     info:['ประตูเปิด 12:00 น. · เริ่มงาน 13:00 น.',
       'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpop.me',
       'จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ'],
@@ -4119,7 +4120,8 @@ const SEED_SCHEDULE = [
       { id:'C', sections:['CL','CR'],      price:'1,166', color:'#2EDC55', tokens:1, perks:['Letter Set สำหรับงาน Heart to Heart'] },
       { id:'D', sections:['DL','DR'],      price:'966',   color:'#2436E6' },
       { id:'E', sections:['EL','ER'],      price:'966',   color:'#EE5FEE' }],
-      notes:'ge2026-tickets', bundleIn:'ev-ge6-bundle' },
+      notes:'ge2026-tickets', bundleIn:'ev-ge6-bundle',
+      bundleNote:{ th:'ซื้อแล้วเลือกโซนงานนี้ได้อิสระ', en:'buy both and choose any zone here' } },
     links:[{ label:'คลิปประกาศ', url:'https://youtu.be/Xr381KDpZps' }],
     info:['ประกาศผลการเลือกตั้งอันดับสุดท้าย',
       '女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
@@ -9280,8 +9282,8 @@ function renderSeatPlan(ev){
       <p class="sp-pick" aria-live="polite">${spIdle(plan)}</p>
       ${plan.notes ? spNotes(plan.notes) : ''}
       ${host ? `<div class="sp-bundle-card">
-        <p>${isEN() ? `<b>Also sold as a bundle</b> with ${escapeHtml(pair ? pair.title : '')}: buy both and choose any zone here.`
-          : `<b>มีบันเดิล</b> ขายคู่กับบัตร ${escapeHtml(pair ? pair.title : '')} ซื้อแล้วเลือกโซนงานนี้ได้อิสระ`}</p>
+        <p>${isEN() ? `<b>Also sold as a bundle</b> with ${escapeHtml(pair ? pair.title : '')}${plan.bundleNote ? ': ' + escapeHtml(plan.bundleNote.en) : ''}.`
+          : `<b>มีบันเดิล</b> ขายคู่กับบัตร ${escapeHtml(pair ? pair.title : '')}${plan.bundleNote ? ' ' + escapeHtml(plan.bundleNote.th) : ''}`}</p>
         <button class="sp-bundle-go" data-action="open-event" data-id="${host.id}">ดูบันเดิล →</button>
       </div>` : ''}
     </div>
