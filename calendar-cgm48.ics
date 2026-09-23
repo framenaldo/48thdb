@@ -216,9 +216,22 @@ DTSTART;TZID=Asia/Bangkok:20260922T180000
 DTEND;TZID=Asia/Bangkok:20260922T190000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-live-0924-2026-09-24@48thdb
+DTSTAMP:20260924T000000Z
+SUMMARY:CGM48 11th Single "Koi Tsunjatta – Let me know!" Pop Up Live
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Hongyok\, Jingjing\, Lewlew\, Praifa\
+ n• ไลฟ์แบบปิด ไม่มีผู้ชมหน
+ ้างาน ดูได้ทาง YouTube CGM48 OFFICIAL\n\nhttps:/
+ /48thdb.com/?e=ev-cgm48-popup-live-0924
+URL:https://48thdb.com/?e=ev-cgm48-popup-live-0924
+DTSTART;TZID=Asia/Bangkok:20260924T180000
+DTEND;TZID=Asia/Bangkok:20260924T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
-SUMMARY:CGM48 11th Single "Koi Tsunjatta — Let me know!" Roadshow
+SUMMARY:CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow
 LOCATION:Grand Station ชั้น 2\, Fashion Island\, Bangkok
 DESCRIPTION:เมมเบอร์: Ginna\, Kwan\, Jingjing\, Nisha\, Plo
  en\, Hongyok\n• รอบเวลาเดียวกันทั้
@@ -235,7 +248,7 @@ END:VEVENT
 BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-27@48thdb
 DTSTAMP:20260926T000000Z
-SUMMARY:CGM48 11th Single "Koi Tsunjatta — Let me know!" Roadshow
+SUMMARY:CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow
 LOCATION:Grand Station ชั้น 2\, Fashion Island\, Bangkok
 DESCRIPTION:เมมเบอร์: Ginna\, Kwan\, Jingjing\, Nisha\, Plo
  en\, Hongyok\n• รอบเวลาเดียวกันทั้
