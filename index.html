@@ -13165,42 +13165,48 @@ async function drawMilestoneCard(g, sub){
   const cover = (sub.cover && await shareLoad(`covers/${sub.vid}.jpg`))
     || await shareLoadCors(`https://i.ytimg.com/vi/${sub.vid}/maxresdefault.jpg`)
     || await shareLoadCors(`https://i.ytimg.com/vi/${sub.vid}/hqdefault.jpg`);
-  if(cover) shareCover(g, cover, 0, 0, SHARE_W, SHARE_H);
+  // the cover twice: blurred as the night sky, and whole in a frame, so the
+  // fireworks can burst behind it and never across a face
+  if(cover) shareBlurCover(g, cover, 0, 0, SHARE_W, SHARE_H, .42);
   else { shareGlow(g, 200, 300, 620, grp.color, .55); shareGlow(g, 900, 900, 620, '#7A5CFF', .35); }
-  // night above for the fireworks, and below for the words
-  let gr = g.createLinearGradient(0, 0, 0, SHARE_H);
-  gr.addColorStop(0, 'rgba(12,6,20,.72)'); gr.addColorStop(.36, 'rgba(12,6,20,.28)');
-  gr.addColorStop(.58, 'rgba(12,6,20,.55)'); gr.addColorStop(1, 'rgba(12,6,20,.95)');
+  const gr = g.createLinearGradient(0, 0, 0, SHARE_H);
+  gr.addColorStop(0, 'rgba(12,6,20,.35)'); gr.addColorStop(.5, 'rgba(12,6,20,.2)'); gr.addColorStop(1, 'rgba(12,6,20,.88)');
   g.fillStyle = gr; g.fillRect(0, 0, SHARE_W, SHARE_H);
-  shareBurst(g, 210, 230, 175, '#FFD36E', 1);
-  shareBurst(g, 870, 200, 150, '#FF6FA5', 2);
-  shareBurst(g, 560, 110, 105, '#FFFFFF', 3);
-  shareBurst(g, 930, 520, 115, '#7EE0C3', 4);
-  shareBurst(g, 120, 560, 95, '#FFB3D1', 5);
-  [[400, 330, 14, '#FFD36E'], [700, 360, 11, '#fff'], [980, 330, 9, '#FFD36E'], [80, 360, 10, '#fff'], [640, 250, 8, '#FFB3D1']]
+  shareBurst(g, 150, 150, 170, '#FFD36E', 1);
+  shareBurst(g, 930, 130, 160, '#FF6FA5', 2);
+  shareBurst(g, 540, 70, 100, '#FFFFFF', 3);
+  shareBurst(g, 1010, 640, 120, '#7EE0C3', 4);
+  shareBurst(g, 70, 650, 110, '#FFB3D1', 5);
+  const fx = 60, fy = 150, fw = SHARE_W - 120, fh = Math.round(fw * 9 / 16);
+  if(cover){
+    g.save(); g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 40; g.shadowOffsetY = 14;
+    g.fillStyle = '#fff'; shareRound(g, fx - 6, fy - 6, fw + 12, fh + 12, 34); g.fill(); g.restore();
+    g.save(); shareRound(g, fx, fy, fw, fh, 28); g.clip(); shareCover(g, cover, fx, fy, fw, fh); g.restore();
+  }
+  [[320, 118, 13, '#FFD36E'], [760, 100, 10, '#fff'], [1040, 360, 9, '#FFD36E'], [36, 380, 10, '#fff'], [990, 760, 8, '#FFB3D1']]
     .forEach(([x, y, r, c]) => shareSparkle(g, x, y, r, c));
   // the words
-  const x0 = 72, gold = g.createLinearGradient(0, 700, 0, 860);
+  const x0 = 72, gold = g.createLinearGradient(0, 770, 0, 900);
   gold.addColorStop(0, '#FFF1C1'); gold.addColorStop(.55, '#FFD36E'); gold.addColorStop(1, '#E7A93A');
   g.textBaseline = 'alphabetic';
-  sharePill(g, en ? '🎉  CONGRATULATIONS' : '🎉  ยินดีด้วย!', x0, 640, '#FFD36E', '#2A1605', 34);
-  g.font = '900 176px "Noto Sans Thai", sans-serif'; g.fillStyle = gold;
+  sharePill(g, en ? '🎉  CONGRATULATIONS' : '🎉  ยินดีด้วย!', x0, fy + fh + 30, '#FFD36E', '#2A1605', 32);
+  g.font = '900 150px "Noto Sans Thai", sans-serif'; g.fillStyle = gold;
   g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 24;
   const num = sub.mark.toLocaleString('en-US');
-  g.fillText(num, x0 - 6, 860);
+  g.fillText(num, x0 - 6, 900);
   const nw = g.measureText(num).width;
-  g.font = '800 58px "Noto Sans Thai", sans-serif'; g.fillStyle = '#FFF1C1';
-  g.fillText(en ? 'VIEWS' : 'วิว', x0 + nw + 18, 856);
+  g.font = '800 54px "Noto Sans Thai", sans-serif'; g.fillStyle = '#FFF1C1';
+  g.fillText(en ? 'VIEWS' : 'วิว', x0 + nw + 18, 896);
   g.shadowBlur = 0;
-  g.font = '800 64px "Noto Sans Thai", sans-serif'; g.fillStyle = '#fff';
-  const lines = shareWrap(g, isEN() ? sub.track : mixTitle(sub.track), SHARE_W - x0 * 2, 2);
-  lines.forEach((l, k) => g.fillText(l, x0, 988 + k * 78));
-  let y = 988 + (lines.length - 1) * 78 + 66;
+  g.font = '800 58px "Noto Sans Thai", sans-serif'; g.fillStyle = '#fff';
+  const lines = shareWrap(g, mixTitle(sub.track), SHARE_W - x0 * 2, 2);
+  lines.forEach((l, k) => g.fillText(l, x0, 1000 + k * 70));
+  let y = 1000 + (lines.length - 1) * 70 + 62;
   const kind = (YT_KIND[sub.ytKind] || YT_KIND.video)[en ? 1 : 0];
-  const w1 = sharePill(g, grp.name, x0, y - 36, grp.color, '#fff', 28);
-  g.font = '600 30px "Noto Sans Thai", sans-serif'; g.fillStyle = 'rgba(255,255,255,.82)'; g.textBaseline = 'middle';
-  g.fillText(`${kind} · ${sub.work.title}`, x0 + w1 + 18, y - 36 + 25);
-  g.fillText(`${en ? 'on YouTube, reached' : 'บน YouTube · ครบเมื่อ'} ${shareThaiDate(new Date(...sub.at.slice(0, 10).split('-').map((v, k) => k === 1 ? v - 1 : +v)))}`, x0, y + 46);
+  const w1 = sharePill(g, grp.name, x0, y - 34, grp.color, '#fff', 26);
+  g.font = '600 29px "Noto Sans Thai", sans-serif'; g.fillStyle = 'rgba(255,255,255,.82)'; g.textBaseline = 'middle';
+  g.fillText(`${kind} · ${sub.work.title}`, x0 + w1 + 16, y - 34 + 23);
+  g.fillText(`${en ? 'on YouTube, reached' : 'บน YouTube · ครบเมื่อ'} ${shareThaiDate(new Date(...sub.at.slice(0, 10).split('-').map((v, k) => k === 1 ? v - 1 : +v)))}`, x0, y + 40);
   g.textBaseline = 'alphabetic';
   await shareFooter(g, true, sub.url);
 }
