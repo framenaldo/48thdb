@@ -2744,6 +2744,23 @@
   .sp-perk.is-token{ background:color-mix(in srgb, var(--z) 28%, #1A1419); font-weight:800; }
   .sp-perk.is-none{ background:none; color:#B9ABB3; font-weight:500; padding-left:2px; }
   .sp-perk.is-none::before{ content:none; }
+  /* ordinary tickets or the bundle: one list, one set of small print, at a time */
+  .sp .is-bundle{ display:none; }
+  .sp.is-bundle .sp-list.is-bundle{ display:grid; }
+  .sp.is-bundle .sp-notes.is-bundle, .sp.is-bundle .sp-bundle-intro{ display:block; }
+  .sp.is-bundle .is-single{ display:none; }
+  .sp-mode{ display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin:0 0 10px; }
+  .sp-mode .sp-seg button{ min-width:72px; }
+  .sp-mode-tag{ font-size:12px; font-weight:700; color:#F28B8B; }
+  .sp-bundle-intro{ margin:0 2px 10px; font-size:12.5px; line-height:1.55; color:#D8CCD3; }
+  .sp-bundle-intro b{ color:#fff; }
+  .sp-sec.is-out{ opacity:.16; cursor:default; animation:none !important; }
+  .sp-bundle-card{ margin-top:12px; padding:12px 12px 12px 14px; border-radius:16px; display:flex; flex-wrap:wrap; align-items:center;
+    justify-content:space-between; gap:10px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); }
+  .sp-bundle-card p{ margin:0; font-size:13px; line-height:1.5; color:#EFE7EC; flex:1 1 180px; }
+  .sp-bundle-go{ border:0; border-radius:999px; padding:9px 15px; cursor:pointer; white-space:nowrap;
+    background:#F4ECF1; color:#1A1419; font:800 13px 'Noto Sans Thai',sans-serif; box-shadow:0 3px 0 rgba(0,0,0,.45); transition:transform .12s, box-shadow .12s; }
+  .sp-bundle-go:active{ transform:translateY(3px); box-shadow:none; }
   .sp-notes{ margin:10px 2px 0; padding:0; list-style:none; font-size:11.5px; line-height:1.55; color:#9C8E97; }
   .sp-notes li + li{ margin-top:4px; }
   .sp-pick{ margin:10px 2px 0; font-size:13px; line-height:1.5; color:#D8CCD3; }
@@ -3837,7 +3854,12 @@ const SEED_ALBUMS = [
 /* The small print ticket-benefit charts carry, by name. The schedule names it
    (`notes:` on a seat plan) rather than holding it, so the schedule stays plain
    data that scripts/build-calendar.mjs can read on its own. */
-const SEAT_NOTES = { 'ge2026-tickets':[
+const SEAT_NOTES = {
+  'ge2026-bundle':[
+    'GE6 Token ได้เฉพาะผู้ที่ซื้อบันเดิลก่อน 10 ต.ค. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อ ใช้รับบัตร Hi-Touch ด้วย ถ้ากรอกเลขผิดอาจไม่ได้รับ',
+    'ผู้ซื้อบันเดิลได้ของตามตารางบันเดิลนี้ ไม่ใช่ของบัตรปกติสองใบรวมกัน',
+    'เลือกที่นั่ง 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกที่นั่งในโซนที่ซื้อไว้ให้เอง'],
+  'ge2026-tickets':[
   'GE6 Token ได้เฉพาะผู้ที่ซื้อบัตรก่อน 1 พ.ย. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อบัตร ถ้ากรอกเลขผิดอาจไม่ได้รับ',
   'ทุกโซนได้ Wristband ถ้าทำหาย ผู้จัดไม่ออกให้ใหม่ในทุกกรณี'] };
 const SEED_SCHEDULE = [
@@ -4062,7 +4084,13 @@ const SEED_SCHEDULE = [
       { id:'C',  sections:['CL','CR'],      price:'1,999', color:'#2EDC55', tokens:6,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
       { id:'D',  sections:['DL','DR'],      price:'1,199', color:'#2436E6', tokens:1,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Concert PVC Card'] },
       { id:'E',  sections:['EL','ER'],      price:'999',   color:'#EE5FEE' }],
-      notes:'ge2026-tickets' },
+      notes:'ge2026-tickets',
+      // Journey of Dreams and the results show sold together: a zone here, any zone there
+      bundle:{ id:'ev-ge6-bundle', with:'ev-election-results', to:'2026-10-10T21:00', notes:'ge2026-bundle', zones:[
+        { id:'A',   price:'5,899', tokens:13, perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Photo Act B (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Letter Set สำหรับงาน Heart to Heart', 'Concert PVC Card', 'บัตร Digital Group Hi-Touch งาน [GE2026] Single Roadshow 1 ใบ'] },
+        { id:'BC',  price:'4,899', tokens:8,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Photo Act B (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Letter Set สำหรับงาน Heart to Heart', 'Concert PVC Card', 'บัตร Digital Group Hi-Touch งาน [GE2026] Single Roadshow 1 ใบ'] },
+        { id:'BLR', price:'2,899', tokens:7,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Photo Act B (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Letter Set สำหรับงาน Heart to Heart', 'Concert PVC Card'] },
+        { id:'C',   price:'2,899', tokens:7,  perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Photo Act B (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Letter Set สำหรับงาน Heart to Heart', 'Concert PVC Card'] }] } },
     info:['ประตูเปิด 12:00 น. · เริ่มงาน 13:00 น.',
       'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpop.me',
       'จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ'],
@@ -4083,7 +4111,7 @@ const SEED_SCHEDULE = [
       { id:'C', sections:['CL','CR'],      price:'1,166', color:'#2EDC55', tokens:1, perks:['Letter Set สำหรับงาน Heart to Heart'] },
       { id:'D', sections:['DL','DR'],      price:'966',   color:'#2436E6' },
       { id:'E', sections:['EL','ER'],      price:'966',   color:'#EE5FEE' }],
-      notes:'ge2026-tickets' },
+      notes:'ge2026-tickets', bundleIn:'ev-concert-2026' },
     links:[{ label:'คลิปประกาศ', url:'https://youtu.be/Xr381KDpZps' }],
     info:['ประกาศผลการเลือกตั้งอันดับสุดท้าย',
       '女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
@@ -4160,6 +4188,16 @@ const SEED_SCHEDULE = [
       'Rare (R) — 1 ท่าต่อสมาชิกหนึ่งคน',
       'Super Rare (SR) — 1 ท่า พร้อมข้อความ "Thank You" ลายมือสมาชิก แบบพิมพ์',
       'Super Super Rare (SSR) — 1 ท่า พร้อมลายเซ็นจริง มีเพียง 5 ใบต่อสมาชิกหนึ่งคน'] }] },
+  { id:'ev-ge6-bundle', start:'2026-09-26', end:'2026-10-10', period:true, bar:'Ticket Bundle: Journey of Dreams + Final Results',
+    sales:{ from:'2026-09-26T12:00', to:'2026-10-10T21:00' },
+    title:'Journey of Dreams 夢の旅 + Final Results · Ticket Bundle', groups:['bnk48','cgm48'],
+    timeline:'ge2026', related:['ev-concert-2026','ev-election-results'], bundleOf:'ev-concert-2026',
+    poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/ge2026-ticket-bundle.jpg', w:1200, h:1200 },
+    price:'2,899 – 5,899', ticketUrl:'https://www.eventpop.me/',
+    info:['บัตร BNK48 & CGM48 Journey of Dreams 夢の旅 กับบัตรงานประกาศผล ซื้อพร้อมกันในราคาเดียว',
+      'งานประกาศผลเลือกโซนได้อิสระ ส่วน Journey of Dreams เลือกได้ 4 โซน: A, BC, BL/BR และ C',
+      'ขาย 26 ก.ย. 12:00 – 10 ต.ค. 2026 21:00 ทาง eventpop.me',
+      'เลือกที่นั่ง 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้'] },
   { id:'ev-ge6-handshake', logo:'kimi', start:'2026-10-31', end:'2026-11-01',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Handshake Event',
     venue:'MCC Hall, The Mall Lifestore Ngamwongwan', groups:['bnk48','cgm48'],
@@ -4206,11 +4244,16 @@ const TIMELINES = {
     { d:'2026-09-26', time:'12:00', kind:'start', track:'single',
       title:'เปิดพรีออเดอร์ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"',
       note:'Physical Edition, Digital Edition และ Special Photoset', ev:'ev-ge6-single' },
+    { d:'2026-09-26', time:'12:00', kind:'start', track:'event', title:'เปิดขายบันเดิล Journey of Dreams 夢の旅 + Final Results',
+      note:'ทาง eventpop.me', ev:'ev-ge6-bundle' },
     { d:'2026-10-01', time:'12:00', kind:'vote', track:'vote', title:'เปิดโหวต', ev:'ev-election-voting' },
     { d:'2026-10-03', to:'2026-10-04', kind:'event', track:'event', title:'BNK48 & CGM48 Fan Festival 2026',
       venue:'MCC Hall, The Mall Lifestore Bangkapi', ev:'ev-election-fanfest',
       note:'3 ต.ค. ประกาศผลโหวต 48 ชั่วโมงแรก และเปิดตัวเพลง "Kimi to Doko ka e Ikitai" ครั้งแรก' },
     { d:'2026-10-07', time:'12:00', kind:'start', track:'myo', title:'เปิดให้แลกบัตร Meeting You Online' },
+    { d:'2026-10-10', time:'21:00', kind:'end', track:'event', title:'ปิดขายบันเดิล', ev:'ev-ge6-bundle' },
+    { d:'2026-10-13', to:'2026-10-14', time:'10:00', kind:'start', track:'event', title:'เลือกที่นั่งบันเดิล',
+      note:'ถึง 14 ต.ค. 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้', ev:'ev-ge6-bundle' },
     { d:'2026-10-15', time:'12:00', kind:'start', track:'event', title:'เปิดขายบัตร Journey of Dreams 夢の旅 และงานประกาศผล',
       note:'ทาง eventpop.me', ev:'ev-concert-2026' },
     { d:'2026-10-30', time:'23:00', kind:'end', track:'single', title:'ปิดพรีออเดอร์ซิงเกิลพิเศษ Physical Edition', ev:'ev-ge6-single' },
@@ -4240,6 +4283,7 @@ const TIMELINE_PAGES = {
     poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-2026.jpg', w:959, h:1200 },
     bars:[
       { th:'ช่วงโหวต', from:'2026-10-01', to:'2026-11-12', color:'#C2A868' },
+      { th:'ขายบันเดิล Journey of Dreams + Final Results', from:'2026-09-26', to:'2026-10-10', color:'#E0457B' },
       { th:'พรีออเดอร์ซิงเกิลพิเศษ Physical Edition', from:'2026-09-26', to:'2026-10-30', color:'#4A9BD8' },
       { th:'พรีออเดอร์ Digital Edition และ Special Photoset', from:'2026-09-26', to:'2026-11-10', color:'#D8C93F' },
       { th:'ช่วงแลกบัตร Meeting You Online', from:'2026-10-07', to:'2026-11-24', color:'#7FB750' },
@@ -5445,6 +5489,29 @@ const EN = {
   'อัฒจันทร์': 'Grand stand',
   'ลากหรือบิดสองนิ้วเพื่อหมุน · ถ่างนิ้วเพื่อซูม': 'Drag, or twist two fingers, to turn · pinch to zoom',
   'ถ่างนิ้วเพื่อซูม': 'Pinch to zoom',
+  'บัตรปกติ': 'Regular',
+  'บันเดิล': 'Bundle',
+  'ปิดขายบันเดิลแล้ว': 'Bundle sales have closed',
+  'ดูราคาบันเดิล →': 'See the bundle prices →',
+  'ดูผังที่นั่ง ราคา และของที่ได้ →': 'Seat plan, prices and what comes with it →',
+  'บัตร Digital Group Hi-Touch งาน [GE2026] Single Roadshow 1 ใบ': 'One Digital Group Hi-Touch ticket for the [GE2026] Single Roadshow',
+  'GE6 Token ได้เฉพาะผู้ที่ซื้อบันเดิลก่อน 10 ต.ค. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อ ใช้รับบัตร Hi-Touch ด้วย ถ้ากรอกเลขผิดอาจไม่ได้รับ':
+    'GE6 Tokens come only with bundles bought before 10 Oct 2026, with the Wallet Code from the iAM48 Application entered at purchase — it also brings the Hi-Touch ticket; a wrong code may lose them',
+  'ผู้ซื้อบันเดิลได้ของตามตารางบันเดิลนี้ ไม่ใช่ของบัตรปกติสองใบรวมกัน': 'A bundle brings what this table lists, not the two regular tickets\' benefits added together',
+  'เลือกที่นั่ง 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกที่นั่งในโซนที่ซื้อไว้ให้เอง':
+    'Choose seats 13 Oct 10:00 – 14 Oct 2026 23:59; seats not chosen by then are assigned within the zone bought',
+  'บัตร BNK48 & CGM48 Journey of Dreams 夢の旅 กับบัตรงานประกาศผล ซื้อพร้อมกันในราคาเดียว':
+    'A ticket to BNK48 & CGM48 Journey of Dreams 夢の旅 and one to the results show, bought together at one price',
+  'งานประกาศผลเลือกโซนได้อิสระ ส่วน Journey of Dreams เลือกได้ 4 โซน: A, BC, BL/BR และ C':
+    'Any zone at the results show; at Journey of Dreams, one of four: A, BC, BL/BR or C',
+  'ขาย 26 ก.ย. 12:00 – 10 ต.ค. 2026 21:00 ทาง eventpop.me': 'On sale 26 Sep 12:00 – 10 Oct 2026 21:00 at eventpop.me',
+  'เลือกที่นั่ง 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้':
+    'Choose seats 13 Oct 10:00 – 14 Oct 2026 23:59; seats not chosen are assigned within the zone bought',
+  'เปิดขายบันเดิล Journey of Dreams 夢の旅 + Final Results': 'Bundle sales open: Journey of Dreams 夢の旅 + Final Results',
+  'ปิดขายบันเดิล': 'Bundle sales close',
+  'เลือกที่นั่งบันเดิล': 'Bundle seat selection',
+  'ถึง 14 ต.ค. 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้': 'Until 14 Oct 23:59; seats not chosen are assigned within the zone bought',
+  'ขายบันเดิล Journey of Dreams + Final Results': 'Bundle on sale: Journey of Dreams + Final Results',
   'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหนและได้อะไรบ้าง': 'Tap a zone on the plan or in the list to see where it is and what it comes with',
   'Photo Act A (สุ่มจาก 58 แบบ)': 'Photo Act A (one of 58, at random)',
   'Photo Act B (สุ่มจาก 58 แบบ)': 'Photo Act B (one of 58, at random)',
@@ -9040,6 +9107,7 @@ function spScene(ev, st){
   const poly = pts => pts.map(q => f1(q[0]) + ',' + f1(q[1])).join(' ');
   const zoneOf = {};
   plan.zones.forEach(z => z.sections.forEach(n => { zoneOf[n] = z; }));
+  const sold = st.bundle && plan.bundle ? new Set(plan.bundle.zones.map(z => z.id)) : null;
 
   function prism(pts, h, top, side){
     let area = 0;
@@ -9071,7 +9139,9 @@ function spScene(ev, st){
     const z = zoneOf[name];
     if(!z){ items.push({ d:depthOf(sec.pts), svg:`<g class="sp-block">${prism(sec.pts, spHeight(L, sec), '#060406', '#3a3139')}</g>` }); continue; }
     const h = spHeight(L, sec) + (st.pick === z.id ? SP_LIFT * st.lift : 0);
-    items.push({ d:depthOf(sec.pts), svg:`<g class="sp-sec${st.pick === z.id ? ' is-on' : ''}" data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" style="--z:${z.color}">${
+    const out = sold && !sold.has(z.id);
+    items.push({ d:depthOf(sec.pts), svg:`<g class="sp-sec${st.pick === z.id ? ' is-on' : ''}${out ? ' is-out' : ''}"${out ? '' :
+      ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}"`} style="--z:${z.color}">${
       prism(sec.pts, h, z.color, z.color)}${label(sec.at, h, name, sec.small ? 'is-small' : '', spInk(z.color))}</g>` });
   }
   items.sort((a, b) => a.d - b.d);
@@ -9121,7 +9191,7 @@ const spVbAttr = v => [v.vx, v.vy, v.vw, v.vh].map(n => Math.round(n * 10) / 10)
    the floor seats get a sheet's thickness so they still read as blocks */
 const spHeight = (L, sec) => Math.max(2, (sec.m != null ? sec.m : L.levels[sec.level].m) * SP_PER_M);
 function spState(box){
-  if(!box._sp) box._sp = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0, anchor:null };
+  if(!box._sp) box._sp = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0, anchor:null, bundle:!!box.dataset.bundle };
   return box._sp;
 }
 function spDraw(box){
@@ -9151,14 +9221,37 @@ function spTween(box, key, to, ms, ease = t => 1 - (1 - t) ** 3){
   };
   requestAnimationFrame(step);
 }
+/* The price list: one row per zone, opening to what its ticket brings */
+function spRows(ev, zones, notes, cls){
+  return `<div class="sp-list ${cls}">${zones.map(z => `
+        <button class="sp-row" data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" aria-pressed="false" style="--z:${z.color}; --zi:${spInk(z.color)}">
+          <span class="sp-sw">${escapeHtml(z.label || z.id)}</span>
+          <span class="sp-secs">${z.sections.join(' · ')}${z.tokens ? `<span class="sp-tok">GE6 × ${z.tokens}</span>` : ''}</span>
+          <span class="sp-price">${escapeHtml(z.price)} บาท</span>
+          ${notes ? `<span class="sp-perks">${z.tokens ? `<span class="sp-perk is-token">GE6 Token ${z.tokens} เหรียญ*</span>` : ''}${
+            (z.perks || []).map(p => `<span class="sp-perk">${escapeHtml(p)}</span>`).join('')}${
+            !z.tokens && !(z.perks || []).length ? `<span class="sp-perk is-none">บัตรโซนนี้ไม่มีของแถม</span>` : ''}</span>` : ''}
+        </button>`).join('')}
+      </div>`;
+}
+const spNotes = (key, cls) => `<ul class="sp-notes ${cls}">${(SEAT_NOTES[key] || []).map((n, i) =>
+  `<li>${i ? '' : '<b>*</b> '}${escapeHtml(n)}</li>`).join('')}</ul>`;
+const spIdle = plan => plan.notes ? 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหนและได้อะไรบ้าง' : 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน';
+// set by a link that means the bundle ("ดูราคาบันเดิล"), read once by the plan it opens
+let spStartBundle = false;
 function renderSeatPlan(ev){
   const plan = ev.seatPlan;
   if(!SEAT_LAYOUTS[plan.layout]) return '';
-  const st0 = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0 };
+  const bundle = plan.bundle, startBundle = !!(bundle && spStartBundle);
+  spStartBundle = false;
+  const pair = bundle && SEED_SCHEDULE.find(e => e.id === bundle.with);
+  const host = plan.bundleIn && SEED_SCHEDULE.find(e => e.id === plan.bundleIn);
+  const bundleClosed = bundle && Date.now() > new Date(bundle.to + ':00+07:00').getTime();
+  const st0 = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0, bundle:startBundle };
   const { svg } = spScene(ev, st0), v = spViewBox(SEAT_LAYOUTS[plan.layout], st0, false);
   return `
   <h3 class="evm-head">ผังที่นั่งและราคาบัตร</h3>
-  <div class="sp" data-ev="${ev.id}"><div class="sp-in">
+  <div class="sp${startBundle ? ' is-bundle' : ''}" data-ev="${ev.id}"${startBundle ? ' data-bundle="1"' : ''}><div class="sp-in">
     <div class="sp-map">
       <div class="sp-tools">
         <span class="sp-seg"><button data-action="seat-view" data-id="3d" aria-pressed="true" class="is-on">3D</button><button data-action="seat-view" data-id="2d" aria-pressed="false">2D</button></span>
@@ -9172,18 +9265,23 @@ function renderSeatPlan(ev){
       <p class="sp-hint"><span class="is-3d">ลากหรือบิดสองนิ้วเพื่อหมุน · ถ่างนิ้วเพื่อซูม</span><span class="is-2d">ถ่างนิ้วเพื่อซูม</span></p>
     </div>
     <div class="sp-side">
-      <div class="sp-list">${plan.zones.map(z => `
-        <button class="sp-row" data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" aria-pressed="false" style="--z:${z.color}; --zi:${spInk(z.color)}">
-          <span class="sp-sw">${escapeHtml(z.label || z.id)}</span>
-          <span class="sp-secs">${z.sections.join(' · ')}${z.tokens ? `<span class="sp-tok">GE6 × ${z.tokens}</span>` : ''}</span>
-          <span class="sp-price">${escapeHtml(z.price)} บาท</span>
-          ${plan.notes ? `<span class="sp-perks">${z.tokens ? `<span class="sp-perk is-token">GE6 Token ${z.tokens} เหรียญ*</span>` : ''}${
-            (z.perks || []).map(p => `<span class="sp-perk">${escapeHtml(p)}</span>`).join('')}${
-            !z.tokens && !(z.perks || []).length ? `<span class="sp-perk is-none">บัตรโซนนี้ไม่มีของแถม</span>` : ''}</span>` : ''}
-        </button>`).join('')}
+      ${bundle ? `<div class="sp-mode">
+        <span class="sp-seg"><button data-action="seat-mode" data-id="single" aria-pressed="${!startBundle}"${startBundle ? '' : ' class="is-on"'}>บัตรปกติ</button><button data-action="seat-mode" data-id="bundle" aria-pressed="${startBundle}"${startBundle ? ' class="is-on"' : ''}>บันเดิล</button></span>
+        ${bundleClosed ? `<span class="sp-mode-tag">ปิดขายบันเดิลแล้ว</span>` : ''}
       </div>
-      <p class="sp-pick" aria-live="polite">${plan.notes ? 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหนและได้อะไรบ้าง' : 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน'}</p>
-      ${plan.notes ? `<ul class="sp-notes">${(SEAT_NOTES[plan.notes] || []).map((n, i) => `<li>${i ? '' : '<b>*</b> '}${escapeHtml(n)}</li>`).join('')}</ul>` : ''}
+      <p class="sp-bundle-intro is-bundle">${isEN()
+        ? `A bundle is this show's ticket and one for <b>${escapeHtml(pair ? pair.title : '')}</b>, bought together; there, any zone is yours to choose.`
+        : `บันเดิล = บัตรงานนี้ + บัตร <b>${escapeHtml(pair ? pair.title : '')}</b> ซื้อพร้อมกัน งานนั้นเลือกโซนได้อิสระ`}</p>` : ''}
+      ${spRows(ev, plan.zones, plan.notes, 'is-single')}
+      ${bundle ? spRows(ev, bundle.zones.map(b => ({ ...plan.zones.find(z => z.id === b.id), ...b })), bundle.notes, 'is-bundle') : ''}
+      <p class="sp-pick" aria-live="polite">${spIdle(plan)}</p>
+      ${plan.notes ? spNotes(plan.notes, 'is-single') : ''}
+      ${bundle ? spNotes(bundle.notes, 'is-bundle') : ''}
+      ${host ? `<div class="sp-bundle-card">
+        <p>${isEN() ? `<b>Also in a bundle</b> with ${escapeHtml(host.title)}: buy both and choose any zone here.`
+          : `<b>มีบันเดิล</b> ซื้อพร้อม ${escapeHtml(host.title)} แล้วเลือกโซนงานนี้ได้อิสระ`}</p>
+        <button class="sp-bundle-go" data-action="open-bundle" data-id="${host.id}">ดูราคาบันเดิล →</button>
+      </div>` : ''}
     </div>
   </div></div>`;
 }
@@ -9193,10 +9291,30 @@ function setSeatView(el){
   if(!box) return;
   const flat = el.dataset.id === '2d';
   box.classList.toggle('is-flat', flat);
-  box.querySelectorAll('.sp-seg button').forEach(b => {
-    const on = b === el; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  spSegPick(el);
   box.querySelector('.sp-fx').innerHTML = '';
   spHome(box, flat);
+}
+function spSegPick(el){
+  el.closest('.sp-seg').querySelectorAll('button').forEach(b => {
+    const on = b === el; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+}
+/* Ordinary tickets or the bundle: the list, its small print and the zones on
+   sale change together, and whatever was picked is let go. */
+function setSeatMode(el){
+  const box = el.closest('.sp'), ev = box && SEED_SCHEDULE.find(e => e.id === box.dataset.ev);
+  if(!ev) return;
+  const st = spState(box), bundle = el.dataset.id === 'bundle';
+  if(st.bundle === bundle) return;
+  spSegPick(el);
+  st.bundle = bundle; st.pick = ''; st.lift = 0;
+  box.classList.toggle('is-bundle', bundle);
+  box.classList.remove('has-pick');
+  box.querySelectorAll('.sp-row').forEach(n => { n.classList.remove('is-on'); n.setAttribute('aria-pressed', 'false'); });
+  box.querySelector('.sp-fx').innerHTML = '';
+  const read = box.querySelector('.sp-pick');
+  read.textContent = spIdle(ev.seatPlan); localize(read);
+  spDraw(box);
 }
 /* back to where the view started: level, unturned, whole hall in sight */
 function spHome(box, flat){
@@ -9231,16 +9349,13 @@ function pickSeatZone(el){
   const fx = box.querySelector('.sp-fx'), read = box.querySelector('.sp-pick');
   fx.innerHTML = '';
   if(off){
-    const perks = !!ev.seatPlan.notes;
-    read.textContent = isEN()
-      ? (perks ? 'Tap a zone on the plan or in the list to see where it is and what it comes with'
-               : 'Tap a zone on the plan or in the list to see where it is')
-      : (perks ? 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหนและได้อะไรบ้าง' : 'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหน');
+    read.textContent = spIdle(ev.seatPlan); localize(read);
     return;
   }
   // the zone rises out of the hall, a little past and back
   spTween(box, 'lift', 1, 420, t => 1 + 2.2 * (t - 1) ** 3 + 1.2 * (t - 1) ** 2);
   const z = ev.seatPlan.zones.find(x => x.id === zone);
+  const price = (st.bundle && ev.seatPlan.bundle && ev.seatPlan.bundle.zones.find(x => x.id === zone) || z).price;
   // a ring on every block of the zone, where it will stand once risen
   const ph = st.pitch * Math.PI / 180, th = st.yaw * Math.PI / 180;
   fx.innerHTML = z.sections.map(name => {
@@ -9254,8 +9369,8 @@ function pickSeatZone(el){
   const levels = [...new Set(z.sections.map(n => L.sections[n] && L.sections[n].level).filter(Boolean))]
     .map(lv => L.levels[lv][isEN() ? 'en' : 'th']);
   read.innerHTML = isEN()
-    ? `<b>Zone ${escapeHtml(z.label || z.id)}</b> · ${z.sections.join(', ')} · ${escapeHtml(levels.join(', '))} · <b>${escapeHtml(z.price)} THB</b>`
-    : `<b>โซน ${escapeHtml(z.label || z.id)}</b> · ${z.sections.join(', ')} · ${escapeHtml(levels.join(', '))} · <b>${escapeHtml(z.price)} บาท</b>`;
+    ? `<b>Zone ${escapeHtml(z.label || z.id)}</b> · ${z.sections.join(', ')} · ${escapeHtml(levels.join(', '))} · <b>${st.bundle ? 'Bundle ' : ''}${escapeHtml(price)} THB</b>`
+    : `<b>โซน ${escapeHtml(z.label || z.id)}</b> · ${z.sections.join(', ')} · ${escapeHtml(levels.join(', '))} · <b>${st.bundle ? 'บันเดิล ' : ''}${escapeHtml(price)} บาท</b>`;
   // picked from the list with the plan scrolled away: bring the plan back into sight
   if(el.tagName === 'BUTTON'){
     const map = box.querySelector('.sp-map'), r = map.getBoundingClientRect();
@@ -9483,6 +9598,8 @@ function renderEventModal(){
         <ul class="ev-detail">${s.lines.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>`).join('')}
 
         ${ev.seatPlan ? renderSeatPlan(ev) : ''}
+        ${ev.bundleOf ? `<div class="evm-related"><button class="shop-buy" style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}"
+          data-action="open-bundle" data-id="${ev.bundleOf}">ดูผังที่นั่ง ราคา และของที่ได้ →</button></div>` : ''}
 
         ${ev.timeline ? `<button class="chip chip-link tl-jump" data-action="open-timeline" data-id="${ev.timeline}">
           ไทม์ไลน์ทั้งงาน →</button>` : ''}
@@ -13354,6 +13471,15 @@ function bindDelegatedEvents(){
     else if(action==='seat-zone'){ pickSeatZone(el); }
     else if(action==='seat-view'){ setSeatView(el); }
     else if(action==='seat-zoom'){ zoomSeatPlan(el); }
+    else if(action==='seat-mode'){ setSeatMode(el); }
+    else if(action==='open-bundle'){
+      // opens the event whose plan holds the bundle, with the bundle showing and in sight
+      spStartBundle = true;
+      state.selectedEvent = id; state.selectedId = null; state.dayOf = null;
+      renderMain(); pushHistory();
+      const sp = document.querySelector('.sp');
+      if(sp) sp.scrollIntoView({ block:'start', behavior: spCalm() ? 'auto' : 'smooth' });
+    }
     else if(action==='set-oshi-only'){
       state.oshiOnly = id === '1';
       state.calDay = null;   // the day that was open may not survive the filter

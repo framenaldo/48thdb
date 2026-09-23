@@ -361,6 +361,25 @@ DTEND;VALUE=DATE:20261111
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-ge6-bundle@48thdb
+DTSTAMP:20260926T000000Z
+SUMMARY:Ticket Bundle: Journey of Dreams + Final Results
+DESCRIPTION:• บัตร BNK48 & CGM48 Journey of Dreams 夢の旅 ก
+ ับบัตรงานประกาศผล ซื้อพร้
+ อมกันในราคาเดียว\n• งานประ
+ กาศผลเลือกโซนได้อิสระ ส่ว
+ น Journey of Dreams เลือกได้ 4 โซน: A\, BC\, BL/BR
+  และ C\n• ขาย 26 ก.ย. 12:00 – 10 ต.ค. 2026 21:00 
+ ทาง eventpop.me\n• เลือกที่นั่ง 13 ต.ค
+ . 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือ
+ ก ระบบจะเลือกให้ในโซนที่ซ
+ ื้อไว้\n\nhttps://48thdb.com/?e=ev-ge6-bundle
+URL:https://48thdb.com/?e=ev-ge6-bundle
+DTSTART;VALUE=DATE:20260926
+DTEND;VALUE=DATE:20261011
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-ge6-handshake@48thdb
 DTSTAMP:20261031T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Handshake E
