@@ -2660,10 +2660,12 @@
     border:1px solid color-mix(in srgb, var(--pc, var(--c)) 40%, rgba(255,255,255,.1));
     box-shadow:0 8px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06);
   }
-  .sp-map svg{ display:block; width:100%; height:auto; overflow:visible; font-family:'Noto Sans Thai',sans-serif;
+  .sp-map > svg{ display:block; width:100%; height:auto; overflow:hidden; border-radius:12px; font-family:'Noto Sans Thai',sans-serif;
     touch-action:pan-y; user-select:none; -webkit-user-select:none; }
-  .sp:not(.is-flat) .sp-map svg{ cursor:grab; }
-  .sp:not(.is-flat) .sp-map svg:active{ cursor:grabbing; }
+  /* zoomed in, one finger pans the hall instead of scrolling the page */
+  .sp.is-zoomed .sp-map > svg{ touch-action:none; }
+  .sp:not(.is-flat) .sp-map > svg, .sp.is-zoomed .sp-map > svg{ cursor:grab; }
+  .sp:not(.is-flat) .sp-map > svg:active, .sp.is-zoomed .sp-map > svg:active{ cursor:grabbing; }
   .sp .sp-floor{ fill:rgba(255,255,255,.035); stroke:rgba(255,255,255,.09); stroke-width:1; }
   .sp .sp-block .sp-top{ stroke:rgba(255,255,255,.12); stroke-width:1; }
   .sp .sp-dark-t{ fill:#D8CCD3; font-size:13px; font-weight:800; letter-spacing:2px; text-anchor:middle; pointer-events:none; }
@@ -2697,8 +2699,18 @@
   .sp-seg button.is-on{ background:#F4ECF1; color:#1A1419; box-shadow:0 2px 0 rgba(0,0,0,.45); }
   .sp-seg button:active{ transform:scale(.94); }
   .sp-seg button:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
-  .sp-drag{ font-size:12px; color:#9C8E97; }
-  .sp.is-flat .sp-drag{ visibility:hidden; }
+  .sp-zoom{ display:inline-flex; gap:6px; margin-left:auto; }
+  .sp-zoom button{
+    width:36px; height:36px; border-radius:999px; cursor:pointer; display:grid; place-items:center;
+    background:rgba(255,255,255,.07); color:#F4ECF1; border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 2px 0 rgba(0,0,0,.45); transition:transform .12s, box-shadow .12s;
+  }
+  .sp-zoom button svg{ width:16px; height:16px; }
+  .sp-zoom button:active{ transform:translateY(2px); box-shadow:none; }
+  .sp-zoom button:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+  .sp-hint{ margin:8px 2px 0; font-size:12px; color:#9C8E97; text-align:center; }
+  .sp .sp-hint .is-2d, .sp.is-flat .sp-hint .is-3d{ display:none; }
+  .sp.is-flat .sp-hint .is-2d{ display:inline; }
   .sp-list{ display:grid; gap:7px; }
   .sp-row{
     display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;
@@ -5404,7 +5416,11 @@ const EN = {
   'แพลตฟอร์ม 1 · สูง 0.40 ม.': 'Platform 1 · 0.40 m high',
   'แพลตฟอร์ม 2 · สูง 0.60 ม.': 'Platform 2 · 0.60 m high',
   'อัฒจันทร์': 'Grand stand',
-  'ลากซ้าย–ขวาเพื่อหมุน': 'Drag sideways to turn it',
+  'ลากหรือบิดสองนิ้วเพื่อหมุน · ถ่างนิ้วเพื่อซูม': 'Drag, or twist two fingers, to turn · pinch to zoom',
+  'ถ่างนิ้วเพื่อซูม': 'Pinch to zoom',
+  'ซูมเข้า': 'Zoom in',
+  'ซูมออก': 'Zoom out',
+  'คืนมุมมองเดิม': 'Reset the view',
   'เปิดขายบัตร Journey of Dreams และงานประกาศผล': 'Tickets on sale for Journey of Dreams and the results show',
   'ทาง eventpop.me': 'At eventpop.me',
   'จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ':
@@ -8952,7 +8968,7 @@ const SEAT_LAYOUTS = {
       ER:{ level:'stand', h:38, pts:SP_R(326, 590, 126, 22), at:[389,601], small:true } },
   },
 };
-const SP_PITCH = 46, SP_YAW = -12, SP_YAW_MAX = 26, SP_LIFT = 16;
+const SP_PITCH = 46, SP_YAW = -12, SP_YAW_MAX = 26, SP_LIFT = 16, SP_ZOOM = [.6, 4], SP_TILT = [12, 78];
 /* dark lettering on the pale zone colours, white on the deep ones */
 function spInk(hex){
   const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
@@ -9017,30 +9033,55 @@ function spScene(ev, st){
       L.captions.map(([lv, y]) => { const a = P(0, y, 0);
         return `<text class="sp-cap" x="${f1(a[0])}" y="${f1(a[1])}">${L.levels[lv][isEN() ? 'en' : 'th']}</text>`; }).join('')
     : `<polygon class="sp-floor" points="${poly(L.floor.map(p => P(p[0], p[1], 0)))}"/>`;
-  // one frame for every turn of the hall, so dragging never zooms the picture
+  return { svg: under + items.map(i => i.svg).join('') };
+}
+/* How much room the hall takes when tipped back by `pitch`, over the turns a
+   first look is likely to give it — so turning never zooms the picture. */
+function spBounds(L, pitch, flat){
+  const ph = pitch * Math.PI / 180, cp = Math.cos(ph), sp = Math.sin(ph);
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-  for(const yaw of flat ? [st.yaw] : [-SP_YAW_MAX, -SP_YAW_MAX / 2, 0, SP_YAW_MAX / 2, SP_YAW_MAX]){
+  const all = [...L.floor, ...L.blocks.flatMap(b => b.pts)];
+  for(const yaw of flat ? [0] : [-SP_YAW_MAX, -SP_YAW_MAX / 2, 0, SP_YAW_MAX / 2, SP_YAW_MAX]){
     const t = yaw * Math.PI / 180, ct = Math.cos(t), stn = Math.sin(t);
-    const all = [...L.floor, ...L.blocks.flatMap(b => b.pts)];
     for(const [x, y] of all) for(const z of [0, 44]){
       const dx = x - L.cx, dy = y - L.cy, X = dx * ct - dy * stn, Y = dx * stn + dy * ct, v = Y * cp - z * sp;
       x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0 = Math.min(y0, v); y1 = Math.max(y1, v);
     }
   }
-  return { vb:`${f1(x0 - 6)} ${f1(y0 - 6)} ${f1(x1 - x0 + 12)} ${f1(y1 - y0 + 12)}`,
-    svg: under + items.map(i => i.svg).join('') };
+  return { cx:(x0 + x1) / 2, cy:(y0 + y1) / 2, w:x1 - x0 + 12, h:y1 - y0 + 12 };
 }
+/* The window onto the scene. Its shape is fixed for the view (3D or 2D) so the
+   picture never jumps in height while it is turned or tilted; zoom narrows it
+   and pan moves it. An `anchor` pins a point of the scene under a finger. */
+function spViewBox(L, st, flat){
+  const frame = spBounds(L, flat ? 0 : SP_PITCH, flat), now = spBounds(L, st.pitch, flat);
+  const vw = frame.w / st.zoom, vh = frame.h / st.zoom;
+  if(st.anchor){
+    const a = st.anchor;
+    st.px = a.sx - a.fx * vw - (now.cx - vw / 2);
+    st.py = a.sy - a.fy * vh - (now.cy - vh / 2);
+    st.anchor = null;
+  }
+  st.px = Math.max(-frame.w / 2, Math.min(frame.w / 2, st.px));
+  st.py = Math.max(-frame.h / 2, Math.min(frame.h / 2, st.py));
+  return { vx:now.cx - vw / 2 + st.px, vy:now.cy - vh / 2 + st.py, vw, vh, frame };
+}
+const spVbAttr = v => [v.vx, v.vy, v.vw, v.vh].map(n => Math.round(n * 10) / 10).join(' ');
 function spState(box){
-  if(!box._sp) box._sp = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0 };
+  if(!box._sp) box._sp = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0, anchor:null };
   return box._sp;
 }
 function spDraw(box){
   const ev = SEED_SCHEDULE.find(e => e.id === box.dataset.ev);
-  const svg = box.querySelector('.sp-map svg');
+  const svg = box.querySelector('.sp-map > svg');
   if(!ev || !svg) return;
-  const { vb, svg:inner } = spScene(ev, spState(box));
-  svg.setAttribute('viewBox', vb);
-  svg.querySelector('.sp-scene').innerHTML = inner;
+  const st = spState(box), flat = box.classList.contains('is-flat');
+  const v = spViewBox(SEAT_LAYOUTS[ev.seatPlan.layout], st, flat);
+  st.view = v;
+  svg.setAttribute('viewBox', spVbAttr(v));
+  svg.style.aspectRatio = `${Math.round(v.frame.w)} / ${Math.round(v.frame.h)}`;
+  box.classList.toggle('is-zoomed', st.zoom > 1.02);
+  svg.querySelector('.sp-scene').innerHTML = spScene(ev, st).svg;
 }
 const spCalm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* ease one value of the view towards `to`, redrawing as it goes */
@@ -9060,16 +9101,22 @@ function spTween(box, key, to, ms, ease = t => 1 - (1 - t) ** 3){
 function renderSeatPlan(ev){
   const plan = ev.seatPlan;
   if(!SEAT_LAYOUTS[plan.layout]) return '';
-  const { vb, svg } = spScene(ev, { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0 });
+  const st0 = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0 };
+  const { svg } = spScene(ev, st0), v = spViewBox(SEAT_LAYOUTS[plan.layout], st0, false);
   return `
   <h3 class="evm-head">ผังที่นั่งและราคาบัตร</h3>
   <div class="sp" data-ev="${ev.id}"><div class="sp-in">
     <div class="sp-map">
       <div class="sp-tools">
         <span class="sp-seg"><button data-action="seat-view" data-id="3d" aria-pressed="true" class="is-on">3D</button><button data-action="seat-view" data-id="2d" aria-pressed="false">2D</button></span>
-        <span class="sp-drag">ลากซ้าย–ขวาเพื่อหมุน</span>
+        <span class="sp-zoom">
+          <button data-action="seat-zoom" data-id="out" title="ซูมออก" aria-label="ซูมออก"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 12h12"/></svg></button>
+          <button data-action="seat-zoom" data-id="in" title="ซูมเข้า" aria-label="ซูมเข้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 12h12M12 6v12"/></svg></button>
+          <button data-action="seat-zoom" data-id="reset" title="คืนมุมมองเดิม" aria-label="คืนมุมมองเดิม"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button>
+        </span>
       </div>
-      <svg viewBox="${vb}" aria-hidden="true" focusable="false"><g class="sp-scene">${svg}</g><g class="sp-fx"></g></svg>
+      <svg viewBox="${spVbAttr(v)}" style="aspect-ratio:${Math.round(v.frame.w)} / ${Math.round(v.frame.h)}" aria-hidden="true" focusable="false"><g class="sp-scene">${svg}</g><g class="sp-fx"></g></svg>
+      <p class="sp-hint"><span class="is-3d">ลากหรือบิดสองนิ้วเพื่อหมุน · ถ่างนิ้วเพื่อซูม</span><span class="is-2d">ถ่างนิ้วเพื่อซูม</span></p>
     </div>
     <div class="sp-side">
       <div class="sp-list">${plan.zones.map(z => `
@@ -9092,8 +9139,22 @@ function setSeatView(el){
   box.querySelectorAll('.sp-seg button').forEach(b => {
     const on = b === el; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
   box.querySelector('.sp-fx').innerHTML = '';
+  spHome(box, flat);
+}
+/* back to where the view started: level, unturned, whole hall in sight */
+function spHome(box, flat){
+  spTween(box, 'zoom', 1, 450); spTween(box, 'px', 0, 450); spTween(box, 'py', 0, 450);
   spTween(box, 'yaw', flat ? 0 : SP_YAW, 450);
   spTween(box, 'pitch', flat ? 0 : SP_PITCH, 550);
+}
+function zoomSeatPlan(el){
+  const box = el.closest('.sp');
+  if(!box) return;
+  box.querySelector('.sp-fx').innerHTML = '';
+  if(el.dataset.id === 'reset') return spHome(box, box.classList.contains('is-flat'));
+  const st = spState(box), k = el.dataset.id === 'in' ? 1.6 : 1 / 1.6;
+  // zooming leaves the pan alone, and the pan is the centre: the middle stays put
+  spTween(box, 'zoom', Math.max(SP_ZOOM[0], Math.min(SP_ZOOM[1], st.zoom * k)), 280);
 }
 /* Picking a zone is a look, not a change of state: it lights the zone in
    place, so nothing else is redrawn and the sheet keeps its scroll. */
@@ -9142,31 +9203,105 @@ function pickSeatZone(el){
       map.scrollIntoView({ block:'nearest', behavior: spCalm() ? 'auto' : 'smooth' });
   }
 }
-/* Dragging sideways turns the hall. A drag is not a tap: the click that ends
-   it is swallowed so it does not also pick the block under the finger. */
-let spDrag = null, spSwallowClick = false;
+/* The hall follows the fingers. One finger turns it (a mouse also tilts it),
+   or pans once zoomed in; two fingers twist to turn, pinch to zoom about the
+   spot between them, and slide up or down together to tilt, as a map does.
+   A gesture is not a tap: the click that ends it is swallowed so it does not
+   also pick the block under the finger. */
+let spG = null, spSwallowClick = false;
+const spClamp = (v, [a, b]) => Math.max(a, Math.min(b, v));
+function spBaseline(g){
+  const st = spState(g.box), pts = [...g.pts.values()];
+  g.rect = g.svg.getBoundingClientRect();
+  g.st0 = { yaw:st.yaw, pitch:st.pitch, zoom:st.zoom, view:st.view || spViewBox(SEAT_LAYOUTS[
+    SEED_SCHEDULE.find(e => e.id === g.box.dataset.ev).seatPlan.layout], st, g.box.classList.contains('is-flat')) };
+  pts.forEach(p => { p.x0 = p.x; p.y0 = p.y; });
+  if(pts.length >= 2){
+    const [a, b] = pts;
+    g.a0 = Math.atan2(b.y - a.y, b.x - a.x); g.d0 = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+    g.m0 = { x:(a.x + b.x) / 2, y:(a.y + b.y) / 2 };
+  }
+}
+// the point of the scene that sat under (x, y) when the gesture began
+function spPointAt(g, x, y){
+  const v = g.st0.view, r = g.rect;
+  return { sx:v.vx + (x - r.left) / r.width * v.vw, sy:v.vy + (y - r.top) / r.height * v.vh };
+}
 document.addEventListener('pointerdown', e => {
-  const svg = e.target.closest && e.target.closest('.sp-map svg');
+  const svg = e.target.closest && e.target.closest('.sp-map > svg');
   const box = svg && svg.closest('.sp');
-  if(!box || box.classList.contains('is-flat')) return;
-  if(box._spT) box._spT.yaw = (box._spT.yaw || 0) + 1;
-  spDrag = { box, x:e.clientX, yaw:spState(box).yaw, moved:false };
+  if(!box) return;
+  if(!spG || spG.box !== box) spG = { box, svg, pts:new Map(), moved:false };
+  spG.pts.set(e.pointerId, { x:e.clientX, y:e.clientY, mouse:e.pointerType === 'mouse' });
+  // a hand on the hall takes over from any easing still running
+  const runs = box._spT || (box._spT = {});
+  ['yaw', 'pitch', 'zoom', 'px', 'py'].forEach(k => { runs[k] = (runs[k] || 0) + 1; });
+  spBaseline(spG);
 });
 document.addEventListener('pointermove', e => {
-  if(!spDrag) return;
-  const dx = e.clientX - spDrag.x;
-  if(!spDrag.moved && Math.abs(dx) < 6) return;
-  if(!spDrag.moved){ spDrag.moved = true; spDrag.box.querySelector('.sp-fx').innerHTML = ''; }
-  const st = spState(spDrag.box);
-  st.yaw = Math.max(-SP_YAW_MAX, Math.min(SP_YAW_MAX, spDrag.yaw + dx * .35));
-  if(!spDrag.raf) spDrag.raf = requestAnimationFrame(() => { if(spDrag){ spDrag.raf = 0; spDraw(spDrag.box); } });
+  const g = spG, p = g && g.pts.get(e.pointerId);
+  if(!p) return;
+  p.x = e.clientX; p.y = e.clientY;
+  const st = spState(g.box), s0 = g.st0, flat = g.box.classList.contains('is-flat'), r = g.rect;
+  const pts = [...g.pts.values()];
+  if(pts.length >= 2){
+    const [a, b] = pts;
+    const d = Math.hypot(b.x - a.x, b.y - a.y) || 1, ang = Math.atan2(b.y - a.y, b.x - a.x);
+    const m = { x:(a.x + b.x) / 2, y:(a.y + b.y) / 2 };
+    let turn = ang - g.a0;
+    if(turn > Math.PI) turn -= 2 * Math.PI; else if(turn < -Math.PI) turn += 2 * Math.PI;
+    if(!g.moved && Math.abs(d - g.d0) < 6 && Math.abs(turn) < .05 && Math.hypot(m.x - g.m0.x, m.y - g.m0.y) < 6) return;
+    // both fingers moving up (or down) together is a tilt; apart or together is a pinch
+    const dy1 = a.y - a.y0, dy2 = b.y - b.y0;
+    const tilt = flat || Math.sign(dy1) !== Math.sign(dy2) ? 0 : Math.sign(dy1) * Math.min(Math.abs(dy1), Math.abs(dy2));
+    if(!flat){
+      st.yaw = s0.yaw + turn * 180 / Math.PI;
+      st.pitch = spClamp(s0.pitch - tilt * .3, SP_TILT);
+    }
+    st.zoom = spClamp(s0.zoom * d / g.d0, SP_ZOOM);
+    const at = spPointAt(g, g.m0.x, g.m0.y);
+    st.anchor = { ...at, fx:(m.x - r.left) / r.width, fy:(m.y - tilt - r.top) / r.height };
+  } else {
+    const dx = p.x - p.x0, dy = p.y - p.y0;
+    if(!g.moved && Math.hypot(dx, dy) < 6) return;
+    if(st.zoom > 1.02){
+      const at = spPointAt(g, p.x0, p.y0);
+      st.anchor = { ...at, fx:(p.x - r.left) / r.width, fy:(p.y - r.top) / r.height };
+    } else if(!flat){
+      st.yaw = s0.yaw + dx * .35;
+      if(p.mouse) st.pitch = spClamp(s0.pitch - dy * .25, SP_TILT);
+    } else return;
+  }
+  if(!g.moved){ g.moved = true; g.box.querySelector('.sp-fx').innerHTML = ''; }
+  if(!g.raf) g.raf = requestAnimationFrame(() => { g.raf = 0; spDraw(g.box); });
 });
-const spEnd = () => { if(spDrag && spDrag.moved) spSwallowClick = true; spDrag = null; setTimeout(() => { spSwallowClick = false; }, 0); };
-document.addEventListener('pointerup', spEnd);
-document.addEventListener('pointercancel', () => { spDrag = null; });
+function spLift(e){
+  const g = spG;
+  if(!g || !g.pts.has(e.pointerId)) return;
+  g.pts.delete(e.pointerId);
+  if(g.moved && e.type === 'pointerup'){ spSwallowClick = true; setTimeout(() => { spSwallowClick = false; }, 0); }
+  if(g.pts.size) spBaseline(g);                     // carry on with the finger still down
+  else spG = null;
+}
+document.addEventListener('pointerup', spLift);
+document.addEventListener('pointercancel', spLift);
 document.addEventListener('click', e => {
   if(spSwallowClick){ spSwallowClick = false; e.stopPropagation(); e.preventDefault(); }
 }, true);
+// a trackpad pinch (or Ctrl + wheel) zooms about the pointer
+document.addEventListener('wheel', e => {
+  const svg = e.ctrlKey && e.target.closest && e.target.closest('.sp-map > svg');
+  const box = svg && svg.closest('.sp');
+  if(!box) return;
+  e.preventDefault();
+  const st = spState(box);
+  if(!st.view) spDraw(box);
+  const g = { box, svg, rect:svg.getBoundingClientRect(), st0:{ view:st.view } };
+  const at = spPointAt(g, e.clientX, e.clientY);
+  st.zoom = spClamp(st.zoom * Math.exp(-e.deltaY * .01), SP_ZOOM);
+  st.anchor = { ...at, fx:(e.clientX - g.rect.left) / g.rect.width, fy:(e.clientY - g.rect.top) / g.rect.height };
+  spDraw(box);
+}, { passive:false });
 
 function renderEventLinkEditor(ev){
   if(!state.isOwner) return '';
@@ -13154,6 +13289,7 @@ function bindDelegatedEvents(){
     else if(action==='close-poster'){ closePoster(); }
     else if(action==='seat-zone'){ pickSeatZone(el); }
     else if(action==='seat-view'){ setSeatView(el); }
+    else if(action==='seat-zoom'){ zoomSeatPlan(el); }
     else if(action==='set-oshi-only'){
       state.oshiOnly = id === '1';
       state.calDay = null;   // the day that was open may not survive the filter
