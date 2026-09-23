@@ -268,38 +268,41 @@ DTEND;VALUE=DATE:20261113
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-concert-2026@48thdb
+UID:ev-concert-2026-2026-11-14@48thdb
 DTSTAMP:20261114T000000Z
-SUMMARY:BNK48 & CGM48 Concert 2026 · รอบกลางวัน
-DESCRIPTION:รอประกาศรายชื่อ\nรายละ
- เอียดและเวลายังไม่ประกาศ\n
- • จัดรอบกลางวัน วันเดียวกั
- บการประกาศผลการเลือกตั้ง
- ซึ่งจัดรอบค่ำ\n• รายละเอีย
- ดสถานที่และเวลารอประกาศ\n\nh
- ttps://48thdb.com/?e=ev-concert-2026
+SUMMARY:BNK48 & CGM48 Journey of Dreams
+LOCATION:MCC Hall\, The Mall Lifestore Bangkapi
+DESCRIPTION:รอประกาศรายชื่อ\n• 夢の旅 
+ — ชื่องานภาษาญี่ปุ่น\n• ประ
+ ตูเปิด 12:00 น. · เริ่มงาน 13:00 น.\n• 
+ บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpo
+ p.me\n• จัดรอบกลางวัน วันเดียว
+ กับการประกาศผลการเลือกตั
+ ้งซึ่งจัดรอบค่ำ\n\nhttps://48thdb.com/?e=ev-
+ concert-2026
 URL:https://48thdb.com/?e=ev-concert-2026
-DTSTART;VALUE=DATE:20261114
-DTEND;VALUE=DATE:20261115
+DTSTART;TZID=Asia/Bangkok:20261114T130000
+DTEND;TZID=Asia/Bangkok:20261114T150000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-election-results@48thdb
+UID:ev-election-results-2026-11-14@48thdb
 DTSTAMP:20261114T000000Z
-SUMMARY:BNK48 & CGM48 Senbatsu General Election 2026 · Final Results · 
- รอบค่ำ
-DESCRIPTION:รายละเอียดและเวลายังไ
- ม่ประกาศ\n• ประกาศผลการเลื
- อกตั้งอันดับสุดท้าย\n• จัด
- รอบค่ำ วันเดียวกับ BNK48 & CGM48 Concert
-  2026 ที่จัดรอบกลางวัน\n• Top 12 เซ
- ็มบัตสึได้ไปถ่าย MV ที่ญี่ป
- ุ่น\n• Kami7 Special Project — เพลงร่วมกับ
-  AKB48\n• รายละเอียดสถานที่และ
- เวลารอประกาศ\n• #BNK48CGM48_GE2026\n\nhttps://48
- thdb.com/?e=ev-election-results
+SUMMARY:BNK48 & CGM48 Senbatsu General Election 2026 · Final Results
+LOCATION:MCC Hall\, The Mall Lifestore Bangkapi
+DESCRIPTION:• ประกาศผลการเลือกตั้
+ งอันดับสุดท้าย\n• 女神たちよ、世界
+ へ響け！ — คำโปรยประจำงาน\n• ประ
+ ตูเปิด 17:00 น. · เริ่มงาน 18:00 น.\n• 
+ บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpo
+ p.me\n• จัดรอบค่ำ วันเดียวกับ BN
+ K48 & CGM48 Journey of Dreams ที่จัดรอบกลางว
+ ัน\n• Top 12 เซ็มบัตสึได้ไปถ่าย 
+ MV ที่ญี่ปุ่น\n• Kami7 Special Project — เพล
+ งร่วมกับ AKB48\n• #BNK48CGM48_GE2026\n\nhttps://48thdb.c
+ om/?e=ev-election-results
 URL:https://48thdb.com/?e=ev-election-results
-DTSTART;VALUE=DATE:20261114
-DTEND;VALUE=DATE:20261115
+DTSTART;TZID=Asia/Bangkok:20261114T180000
+DTEND;TZID=Asia/Bangkok:20261114T200000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-election-fanfest@48thdb
