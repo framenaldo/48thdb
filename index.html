@@ -2671,7 +2671,7 @@
   .sp .sp-dark-t{ fill:#D8CCD3; font-size:13px; font-weight:800; letter-spacing:2px; text-anchor:middle; pointer-events:none; }
   .sp .sp-stage{ fill:#fff; font-size:26px; letter-spacing:3px; }
   .sp .sp-rule{ stroke:rgba(255,255,255,.2); stroke-width:1; }
-  .sp .sp-cap{ fill:#B9ABB3; font-size:15px; font-weight:700; }
+  .sp .sp-cap{ fill:#B9ABB3; font-size:16px; font-weight:700; text-anchor:middle; }
   .sp-sec{ cursor:pointer; -webkit-tap-highlight-color:transparent; transition:opacity .25s, filter .2s; }
   .sp-sec polygon{ stroke:rgba(0,0,0,.35); stroke-width:.8; stroke-linejoin:round; }
   .sp-sec text{ font-size:28px; font-weight:900; letter-spacing:1px; text-anchor:middle; pointer-events:none; }
@@ -8936,35 +8936,44 @@ function cleanLink(raw){
    slant that can be turned by dragging, or laid flat as the printed plan. */
 const SP_R = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
 const SEAT_LAYOUTS = {
+  /* Traced from the organiser's chart (the Journey of Dreams / GE2026 seat
+     plan, 1500 px square): chart pixels less (176, 420), times 0.705. */
   'mcc-bangkapi': {
-    cx:226, cy:313, w:452,
+    cx:226, cy:281, w:452,
     levels:{
-      floor:{ th:'พื้นล่าง', en:'Floor', m:0 },
-      p1:{ th:'แพลตฟอร์ม 1 · สูง 0.40 ม.', en:'Platform 1 · 0.40 m high', m:.4 },
-      p2:{ th:'แพลตฟอร์ม 2 · สูง 0.60 ม.', en:'Platform 2 · 0.60 m high', m:.6 },
+      floor:{ th:'พื้นล่าง', en:'Floor', m:0, cap:{ th:['พื้นล่าง'], en:['Floor', 'level'] } },
+      p1:{ th:'แพลตฟอร์ม 1 · สูง 0.40 ม.', en:'Platform 1 · 0.40 m high', m:.4,
+        cap:{ th:['แพลตฟอร์ม', 'ชั้น 1', '(0.40 ม.)'], en:['Platform', 'Level 1', '(0.40 m)'] } },
+      p2:{ th:'แพลตฟอร์ม 2 · สูง 0.60 ม.', en:'Platform 2 · 0.60 m high', m:.6,
+        cap:{ th:['แพลตฟอร์ม', 'ชั้น 2', '(0.60 ม.)'], en:['Platform', 'Level 2', '(0.60 m)'] } },
       // the organiser gives no height for the stand; these are steps above platform 2
-      stand:{ th:'อัฒจันทร์', en:'Grand stand', m:.9 } },
-    captions:[['floor', 100], ['p1', 340], ['p2', 444], ['stand', 530]],
-    rules:[320, 424, 510, 622],
-    floor:[[-8, -8], [460, -8], [460, 626], [-8, 626]],
+      stand:{ th:'อัฒจันทร์', en:'Grand stand', m:.9, cap:{ th:['อัฒจันทร์'], en:['Grand', 'stand'] } } },
+    // the level names stand in a column left of the hall, as on the chart (flat view only)
+    captions:[['floor', -51.5, 254], ['p1', -51.5, 360], ['p2', -51.5, 437], ['stand', -51.5, 522]],
+    rules:[316.5, 407.5, 471.6, 573.9], ruleFrom:-96,
+    floor:[[-8, -8], [460, -8], [460, 570], [-8, 570]],
     blocks:[
-      { pts:[[7,0],[445,0],[445,72],[239,72],[343.5,176.5],[306.5,213.5],[226,133],[145.5,213.5],[108.5,176.5],[213,72],[7,72]],
-        h:32, text:'STAGE', at:[226,36], big:true },   // 0.8 m on the same scale as the seats
-      { pts:SP_R(149, 454, 155, 46), h:24, text:'RESERVE', at:[226,477] },
-      { pts:SP_R(149, 540, 155, 38), h:26, text:'F O H', at:[226,559] } ],
+      // the stage, and the runway under it: a neck that parts into two arms
+      // reaching out to either side, with a point between them at the centre
+      { pts:[[7.8,0],[445.6,0],[445.6,70.5],[302.4,70.5],[282.4,90.6],[350,158.3],[305.3,203],[237.6,135.4],
+          [226.7,146.3],[215.7,135.4],[148,203],[103.3,158.3],[171,90.6],[150.9,70.5],[7.8,70.5]],
+        h:32, text:'STAGE', at:[226.7,35.2], big:true },   // 0.8 m on the same scale as the seats
+      { pts:SP_R(148.8, 413.8, 155.8, 50.8), h:24, text:'RESERVE', at:[226.7,439.2] },
+      { pts:SP_R(148, 478, 156.6, 50), h:26, text:'F O H', at:[226.3,504.8] } ],
     sections:{
-      AL:{ level:'floor', pts:[[0,310],[0,152],[18,130],[45,130],[131,216],[131,310]], at:[65,262] },
-      AC:{ level:'floor', pts:[[149,310],[149,222],[196,222],[226,194],[256,222],[304,222],[304,310]], at:[226,270] },
-      AR:{ level:'floor', pts:[[452,310],[452,152],[434,130],[407,130],[321,216],[321,310]], at:[387,262] },
-      BL:{ level:'p1', pts:SP_R(0, 350, 131, 64), at:[65,382] },
-      BC:{ level:'p1', pts:SP_R(149, 350, 155, 64), at:[226,382] },
-      BR:{ level:'p1', pts:SP_R(321, 350, 131, 64), at:[387,382] },
-      CL:{ level:'p2', pts:SP_R(0, 454, 131, 46), at:[65,477] },
-      CR:{ level:'p2', pts:SP_R(321, 454, 131, 46), at:[387,477] },
-      DL:{ level:'stand', pts:[[0,540],[101,540],[101,552],[126,552],[126,584],[0,584]], at:[58,558] },
-      DR:{ level:'stand', pts:[[452,540],[351,540],[351,552],[326,552],[326,584],[452,584]], at:[394,558] },
-      EL:{ level:'stand', pts:SP_R(0, 590, 126, 22), at:[63,601], small:true, m:1.1 },
-      ER:{ level:'stand', pts:SP_R(326, 590, 126, 22), at:[389,601], small:true, m:1.1 } },
+      // AL and AR are notched on the inside, where the runway's arms reach them
+      AL:{ level:'floor', pts:[[0,308.1],[0,160.7],[23.3,129.7],[103.6,129.7],[71.9,159.3],[130.4,218.5],[130.4,308.1]], at:[66.3,259.4] },
+      AC:{ level:'floor', pts:[[149.5,308.1],[149.5,219.3],[181.9,219.3],[208,193.2],[245.3,193.2],[271.4,219.3],[303.9,219.3],[303.9,308.1]], at:[226,267.9] },
+      AR:{ level:'floor', pts:[[451.9,308.1],[451.9,160.7],[428.6,129.7],[348.3,129.7],[380,159.3],[321.5,218.5],[321.5,308.1]], at:[385.6,259.4] },
+      BL:{ level:'p1', pts:SP_R(0, 325, 130.4, 71.9), at:[65.2,361] },
+      BC:{ level:'p1', pts:SP_R(149.5, 325, 154.4, 71.9), at:[226.7,361] },
+      BR:{ level:'p1', pts:SP_R(321.5, 325, 130.4, 71.9), at:[386.7,361] },
+      CL:{ level:'p2', pts:SP_R(0, 413.8, 130.4, 50.8), at:[65.2,439.2] },
+      CR:{ level:'p2', pts:SP_R(321.5, 413.8, 130.4, 50.8), at:[386.7,439.2] },
+      DL:{ level:'stand', pts:[[0,478],[100.1,478],[100.1,494.2],[124.8,494.2],[124.8,528],[0,528]], at:[62.4,507.6] },
+      DR:{ level:'stand', pts:[[451.9,478],[351.8,478],[351.8,494.2],[327.1,494.2],[327.1,528],[451.9,528]], at:[389.5,507.6] },
+      EL:{ level:'stand', pts:SP_R(0, 536.5, 124.8, 25.4), at:[62.4,549.2], small:true, m:1.1 },
+      ER:{ level:'stand', pts:SP_R(327.1, 536.5, 124.8, 25.4), at:[389.5,549.2], small:true, m:1.1 } },
   },
 };
 const SP_PITCH = 46, SP_YAW = -12, SP_YAW_MAX = 26, SP_LIFT = 16, SP_PER_M = 40, SP_ZOOM = [.6, 4], SP_TILT = [12, 78];
@@ -9027,10 +9036,11 @@ function spScene(ev, st){
   items.sort((a, b) => a.d - b.d);
   const flat = st.pitch < 1;
   const under = flat
-    ? L.rules.map(y => { const a = P(0, y, 0), b = P(L.w, y, 0);
+    ? L.rules.map(y => { const a = P(L.ruleFrom || 0, y, 0), b = P(L.w, y, 0);
         return `<line class="sp-rule" x1="${f1(a[0])}" x2="${f1(b[0])}" y1="${f1(a[1])}" y2="${f1(b[1])}"/>`; }).join('') +
-      L.captions.map(([lv, y]) => { const a = P(0, y, 0);
-        return `<text class="sp-cap" x="${f1(a[0])}" y="${f1(a[1])}">${L.levels[lv][isEN() ? 'en' : 'th']}</text>`; }).join('')
+      L.captions.map(([lv, x, y]) => { const a = P(x, y, 0), lines = L.levels[lv].cap[isEN() ? 'en' : 'th'];
+        return `<text class="sp-cap" x="${f1(a[0])}" y="${f1(a[1] - (lines.length - 1) * 9 + 5)}">${
+          lines.map((t, i) => `<tspan x="${f1(a[0])}"${i ? ' dy="18"' : ''}>${t}</tspan>`).join('')}</text>`; }).join('')
     : `<polygon class="sp-floor" points="${poly(L.floor.map(p => P(p[0], p[1], 0)))}"/>`;
   return { svg: under + items.map(i => i.svg).join('') };
 }
@@ -9039,7 +9049,7 @@ function spScene(ev, st){
 function spBounds(L, pitch, flat){
   const ph = pitch * Math.PI / 180, cp = Math.cos(ph), sp = Math.sin(ph);
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-  const all = [...L.floor, ...L.blocks.flatMap(b => b.pts)];
+  const all = [...L.floor, ...L.blocks.flatMap(b => b.pts), ...(flat && L.ruleFrom ? [[L.ruleFrom, L.cy]] : [])];
   for(const yaw of flat ? [0] : [-SP_YAW_MAX, -SP_YAW_MAX / 2, 0, SP_YAW_MAX / 2, SP_YAW_MAX]){
     const t = yaw * Math.PI / 180, ct = Math.cos(t), stn = Math.sin(t);
     for(const [x, y] of all) for(const z of [0, 44]){
