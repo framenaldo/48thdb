@@ -2642,6 +2642,8 @@
   .ge-shop-card span:has(.ge-shop-logo){ flex:1 1 auto; }
 
   .evm-title{ margin:6px 0 0; font-size:21px; font-weight:800; line-height:1.3; letter-spacing:-.01em; padding-right:34px; }
+  /* an event's name in Japanese, set after its own name in the sheet only */
+  .evm-title-ja{ white-space:nowrap; }
   .evm-venue{ margin:8px 0 0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
   .evm-head{
     margin:20px 0 9px; font-family:'Noto Sans Thai',sans-serif;
@@ -4028,7 +4030,7 @@ const SEED_SCHEDULE = [
       'วันรับของรางวัลและรายละเอียดเพิ่มเติมรอประกาศอีกครั้ง'] }] },
   { id:'ev-concert-2026', start:'2026-11-14', time:'13:00',
     sales:{ from:'2026-10-15T12:00' },
-    title:'BNK48 & CGM48 Journey of Dreams',
+    title:'BNK48 & CGM48 Journey of Dreams', titleJa:'夢の旅',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
     timeline:'ge2026', related:['ev-election-results','ev-ge6-heart'],
     poster:{ accent:'#8E2352', surface:'#FBF0F3', ink:'#3E1428', img:'posters/journey-of-dreams.jpg', w:1366, h:2048 },
@@ -9397,7 +9399,8 @@ function renderEventModal(){
             : ''}
         </div>
         ${ev.logo ? renderSongLogo(ev.logo, 'evm-logo') : ''}
-        <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
+        <h2 class="evm-title">${escapeHtml(ev.title)}${ev.titleJa
+          ? ` <span class="evm-title-ja" lang="ja">${escapeHtml(ev.titleJa)}</span>` : ''}</h2>
         <hr class="evm-rule">
         ${ev.venue ? `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.venue)}"
             target="_blank" rel="noopener noreferrer" title="เปิดใน Google Maps">
