@@ -6266,7 +6266,7 @@ function renderHeader(){
     <div class="wordmark" data-action="nav-select" data-value="feed" style="cursor:pointer;">${LOGO_SVG}</div>
     <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก เพลง งาน..." value="${escapeAttr(state.query)}">
     <button class="ge-btn${state.view==='timeline' ? ' is-on' : ''}" data-action="open-ge" title="Senbatsu General Election 2026">
-      <img src="posters/ge2026-logo.png" width="640" height="242" alt="" decoding="async"><span>GE2026</span></button>
+      <img src="posters/ge2026-logo-v2.webp" width="960" height="349" alt="" decoding="async"><span>GE2026</span></button>
     <button class="shop-btn cal-btn${state.view==='calendar' ? ' is-on' : ''}" data-action="nav-calendar" title="ปฏิทิน" aria-label="ปฏิทิน">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
     </button>
@@ -8093,7 +8093,7 @@ function renderSongLogo(key, cls){
     role="img" aria-label="${escapeAttr(l.alt)}"></span>`;
 }
 
-const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo.png', red:'#B3121E',
+const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo-v2.webp', red:'#B3121E',
   vote:'ev-election-voting', results:'ev-election-results' };
 function renderGEPage(){
   const en = isEN();
@@ -8123,7 +8123,7 @@ function renderGEPage(){
   const hero = `<div class="ge-hero" style="--ge:${GE_PAGE.red}">
     <img class="ge-hero-bg" src="posters/election-2026.jpg" alt="" aria-hidden="true" decoding="async">
     <div class="ge-hero-in">
-      <img class="ge-logo" src="${GE_PAGE.logo}" width="640" height="242" alt="BNK48 & CGM48 Senbatsu General Election 2026">
+      <img class="ge-logo" src="${GE_PAGE.logo}" width="960" height="349" alt="BNK48 & CGM48 Senbatsu General Election 2026">
       <div class="ge-keys">
         ${vote ? `<button class="ge-key" data-action="open-event" data-id="${vote.id}"><small>${en ? 'Voting' : 'ช่วงโหวต'}</small>${dm(vote.start)} – ${dm(eventLastDay(vote))}</button>` : ''}
         ${results ? `<button class="ge-key" data-action="open-event" data-id="${results.id}"><small>${en ? 'Final results' : 'ประกาศผล'}</small>${dm(results.start)}</button>` : ''}
