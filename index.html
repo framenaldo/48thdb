@@ -3117,6 +3117,11 @@
   }
   .auth-error{ font-size:13px; color:var(--danger); background:var(--danger-soft); border-radius:8px; padding:10px 12px; margin:0 0 12px; line-height:1.5; }
   .auth-switch{ font-size:13px; color:var(--ink-soft); margin-top:16px; }
+  .auth-error.is-ok{ color:#1F6B53; background:#E3F4EC; }
+  :root[data-theme="dark"] .auth-error.is-ok{ color:#9FE0C6; background:rgba(46,140,130,.22); }
+  .auth-forgot{ text-align:right; margin:0 0 4px; }
+  .auth-forgot button{ background:none; border:none; padding:4px 0; color:var(--bnk); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+  .auth-forgot button:disabled{ color:var(--ink-soft); cursor:default; }
   .auth-switch button{ background:none; border:none; color:var(--bnk); font-weight:600; font-size:13px; cursor:pointer; padding:0; }
 
   /* ======================== INTERACTION MOTION ========================
@@ -5683,6 +5688,17 @@ const EN = {
   'เข้าสู่ระบบ / สมัครสมาชิก': 'Sign in / Sign up',
   'เข้าสู่ระบบเพื่อบันทึก Oshi ของคุณไว้ถาวร และเข้าจากอุปกรณ์ไหนก็ได้': 'Sign in to keep your oshi for good and reach them from any device',
   'เข้าสู่ระบบด้วย Google': 'Sign in with Google',
+  'ลืมรหัสผ่าน?': 'Forgot password?',
+  'อีเมลนี้มีบัญชีอยู่แล้ว ลองเข้าสู่ระบบแทน': 'This email already has an account — try signing in',
+  'รูปแบบอีเมลไม่ถูกต้อง': 'That email address does not look right',
+  'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร': 'The password needs at least 6 characters',
+  'อีเมลหรือรหัสผ่านไม่ถูกต้อง': 'Wrong email or password',
+  'กรุณาใส่รหัสผ่าน': 'Please enter your password',
+  'กรุณาใส่อีเมล': 'Please enter your email',
+  'ลองผิดหลายครั้งเกินไป รอสักครู่แล้วลองใหม่': 'Too many tries — wait a moment and try again',
+  'เชื่อมต่ออินเทอร์เน็ตไม่ได้': 'Cannot reach the internet',
+  'รหัสผ่านทั้งสองช่องไม่ตรงกัน': 'The two passwords do not match',
+  'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง': 'Something went wrong — try again',
   'หรือ': 'or',
   'อีเมล': 'Email',
   'มีบัญชีอยู่แล้ว?': 'Already have an account?',
@@ -6858,8 +6874,10 @@ function authErrorText(err){
     'auth/missing-password':'กรุณาใส่รหัสผ่าน',
     'auth/too-many-requests':'ลองผิดหลายครั้งเกินไป รอสักครู่แล้วลองใหม่',
     'auth/network-request-failed':'เชื่อมต่ออินเทอร์เน็ตไม่ได้',
+    'auth/missing-email':'กรุณาใส่อีเมล',
   };
-  return (err && T[err.code]) || (err && err.message) || 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง';
+  const th = (err && T[err.code]) || (err && err.message) || 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง';
+  return isEN() ? (toEn(th) ?? th) : th;
 }
 
 function accountAvatar(size){
@@ -11695,6 +11713,7 @@ function renderAuth(){
     <form id="auth-form" novalidate>
       <div class="form-field" style="margin-bottom:12px;"><label>อีเมล</label><input id="auth-email-input" name="email" type="email" autocomplete="email"></div>
       <div class="form-field" style="margin-bottom:${mode==='signup'?'12px':'6px'};"><label>รหัสผ่าน${mode==='signup'?' <small class="muted-note">(อย่างน้อย 6 ตัว)</small>':''}</label><input id="auth-password-input" name="password" type="password" autocomplete="${mode==='signup'?'new-password':'current-password'}"></div>
+      ${mode==='signin' ? `<div class="auth-forgot"><button type="button" id="auth-forgot-btn">ลืมรหัสผ่าน?</button></div>` : ''}
       ${mode==='signup' ? `<div class="form-field" style="margin-bottom:6px;"><label>ยืนยันรหัสผ่าน</label><input id="auth-password2-input" name="password2" type="password" autocomplete="new-password"></div>` : ''}
       <p id="auth-status" class="auth-error" style="display:none;"></p>
       <button type="button" id="auth-submit-btn" class="btn-add" style="width:100%;justify-content:center;margin-top:12px;">${mode==='signup'?'สร้างบัญชี':'เข้าสู่ระบบ'}</button>
@@ -12438,11 +12457,41 @@ function attachMainEvents(){
       theadTrack.style.transform = `translateX(${-bodyWrap.scrollLeft}px)`;
     }, {passive:true});
   }
+  /* Forgot password: Firebase mails a link to set a new one. It answers the
+     same whether or not the address has an account, so the message says "if". */
+  const forgotBtn = document.getElementById('auth-forgot-btn');
+  if(forgotBtn){
+    forgotBtn.addEventListener('click', async ()=>{
+      const en = isEN();
+      const statusEl = document.getElementById('auth-status');
+      const say = (text, ok) => { if(!statusEl) return;
+        statusEl.textContent = text; statusEl.classList.toggle('is-ok', !!ok); statusEl.style.display = 'block'; };
+      const email = (document.getElementById('auth-email-input')||{}).value?.trim() || '';
+      if(!email){
+        say(en ? 'Type your email above first, then tap “Forgot password?” again' : 'ใส่อีเมลด้านบนก่อน แล้วกด “ลืมรหัสผ่าน?” อีกครั้ง');
+        const box = document.getElementById('auth-email-input'); if(box) box.focus();
+        return;
+      }
+      forgotBtn.disabled = true; forgotBtn.textContent = en ? 'Sending…' : 'กำลังส่ง...';
+      try{
+        fbAuth.languageCode = en ? 'en' : 'th';
+        await fbAuth.sendPasswordResetEmail(email);
+        say(en ? `If ${email} has an account, a link to set a new password is on its way. Check your spam folder too.`
+          : `ถ้าอีเมล ${email} มีบัญชีอยู่ จะได้รับลิงก์ตั้งรหัสผ่านใหม่ในไม่กี่นาที ลองดูในโฟลเดอร์สแปมด้วย`, true);
+        // one mail at a time: the button rests for half a minute before it can send again
+        forgotBtn.textContent = en ? 'Sent' : 'ส่งแล้ว';
+        setTimeout(() => { forgotBtn.disabled = false; forgotBtn.textContent = en ? 'Send again' : 'ส่งอีกครั้ง'; }, 30000);
+      }catch(err){
+        forgotBtn.disabled = false; forgotBtn.textContent = en ? 'Forgot password?' : 'ลืมรหัสผ่าน?';
+        say(authErrorText(err));
+      }
+    });
+  }
   const authBtn = document.getElementById('auth-submit-btn');
   if(authBtn){
     authBtn.addEventListener('click', async ()=>{
       const statusEl = document.getElementById('auth-status');
-      if(statusEl){ statusEl.style.display='none'; statusEl.textContent=''; }
+      if(statusEl){ statusEl.style.display='none'; statusEl.textContent=''; statusEl.classList.remove('is-ok'); }
       const mode = state.authMode || 'signin';
       authBtn.disabled = true; authBtn.textContent = mode==='signup' ? 'กำลังสร้างบัญชี...' : 'กำลังเข้าสู่ระบบ...';
       try{
