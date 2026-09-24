@@ -2378,7 +2378,6 @@
   .ff-board .ff-when{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.14); border-left-color:var(--a); color:#B9ABB3; }
   .ff-board .ff-when b{ color:#F4ECF1; }
   .ff-board .ff-when.on{ background:color-mix(in srgb, var(--a) 30%, #1A1419); color:#F4ECF1; }
-  .ff-cap{ margin:14px 2px 7px; font-size:13px; font-weight:800; color:#F4ECF1; letter-spacing:.02em; }
   .ff-board .ff-times button{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.14); color:#F4ECF1;
     box-shadow:0 2px 0 rgba(0,0,0,.45); transition:transform .12s, box-shadow .12s; }
   .ff-board .ff-times button:active{ transform:translateY(2px); box-shadow:none; }
@@ -2392,6 +2391,18 @@
   .ff-board .ff-chip{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:#F4ECF1; }
   .ff-board .ff-chip b{ background:rgba(255,255,255,.14); color:#F4ECF1; }
   .ff-board .ff-note{ color:#9C8E97; text-align:center; }
+  /* the board catches the sheet on the way down, once — the next swipe moves on */
+  .modal-scroll:has(.ff-board){ scroll-snap-type:y proximity; overflow-anchor:none; }
+  .ff-board{ scroll-snap-align:start; scroll-snap-stop:always; scroll-margin-top:10px; transition:box-shadow .35s, border-color .35s; }
+  .ff-board .ff-times{ margin:0 0 10px; }
+  .ff-board .ff-hall[style*="height"]{ aspect-ratio:auto; }
+  .ff-grip{ display:block; width:42px; height:4px; margin:10px auto 0; border-radius:99px; background:rgba(255,255,255,.16);
+    transition:background .35s; }
+  .ff-board.is-locked{ border-color:rgba(240,108,155,.55);
+    box-shadow:0 0 0 1px rgba(240,108,155,.3), 0 0 26px rgba(240,108,155,.22), 0 10px 26px rgba(0,0,0,.3); }
+  .ff-board.is-locked .ff-grip{ background:#F06C9B; animation:ff-nudge 1.6s ease-in-out infinite; }
+  @keyframes ff-nudge{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(4px); } }
+  @media (prefers-reduced-motion:reduce){ .ff-board.is-locked .ff-grip{ animation:none; } }
   /* "my oshi only": her booths show her face with a pink edge, everyone else fades */
   .ff-scope{ margin:0 0 10px; background:var(--paper-dim); border-color:var(--line); }
   .ff-board .ff-b.is-oshi{ opacity:1; width:40px; height:40px; border-radius:9px; border:2.5px solid #F06C9B;
@@ -10000,6 +10011,7 @@ function renderBoothPlan(ev){
     </div>`;
   }
 
+  setTimeout(ffFit);   // once it is on the page, size the hall to the sheet
   return `<div class="ff${slot ? ' is-hour' : ''}${state.ffPick || state.ffWho ? ' has-pick' : ''}">
     <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
     ${scope}
@@ -10010,6 +10022,8 @@ function renderBoothPlan(ev){
       <span class="ff-count">${osh ? (en ? `${mine.size} oshi` : `โอชิ ${mine.size} คน`) : `${FF_BOOTHS.length} ${en ? 'booths' : 'บูธ'}`}</span>
       <span class="ff-spacer"></span>
     </div>
+    <div class="ff-times">${day.slots.map((s, i) => `<button class="${i === state.ffSlot ? 'on' : ''}${osh ? (oshiHour(s) ? ' has-oshi' : ' is-dim') : ''}"
+      data-action="ff-slot" data-value="${i}">${s.t}<small>${s.to}</small></button>`).join('')}</div>
     <div class="ff-hall">
       <div class="ff-stage${onStage.length ? ' lit' : ''}">
         <span class="ff-stage-lab">${en ? 'STAGE' : 'เวที'}</span>
@@ -10022,16 +10036,64 @@ function renderBoothPlan(ev){
       <span class="ff-door is-out" style="--y:50%"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>${en ? 'Exit' : 'ทางออก'}</span></span>
       ${booths}
     </div>
+    <span class="ff-grip" aria-hidden="true"></span>
     ${pickCard}
     ${noOshi}
-    <div class="ff-cap">${en ? 'Activity schedule' : 'ตารางกิจกรรม'}</div>
-    <div class="ff-times">${day.slots.map((s, i) => `<button class="${i === state.ffSlot ? 'on' : ''}${osh ? (oshiHour(s) ? ' has-oshi' : ' is-dim') : ''}"
-      data-action="ff-slot" data-value="${i}">${s.t}<small>${s.to}</small></button>`).join('')}</div>
     ${legend}
     <p class="ff-note">${en ? 'Pick an hour to see what the members are doing' : 'เลือกช่วงเวลาเพื่อแสดงกิจกรรมของเมมเบอร์'}</p>
     </div>
   </div>`;
 }
+
+/* The board is a resting point on the way down the sheet: scrolling past, it
+   catches once (scroll-snap, below) and holds the hours and the hall together
+   on one screen; the next swipe carries on. ffFit shortens the hall until the
+   whole board fits the sheet, never below a height the booths can stand. */
+function ffFit(){
+  const board = document.querySelector('.ff-board'), hall = board && board.querySelector('.ff-hall');
+  const sc = board && board.closest('.modal-scroll');
+  if(!hall || !sc) return;
+  const top = sc.scrollTop;
+  hall.style.height = '';
+  const natural = hall.offsetHeight;
+  const above = hall.getBoundingClientRect().top - board.getBoundingClientRect().top;
+  const avail = sc.clientHeight - 10 - above - 34;
+  if(avail < natural) hall.style.height = Math.max(430, avail) + 'px';
+  sc.scrollTop = top;
+  ffLocked();
+}
+/* lit while the board is the one resting on screen */
+function ffLocked(){
+  const board = document.querySelector('.ff-board'), sc = board && board.closest('.modal-scroll');
+  if(!sc) return;
+  const d = board.getBoundingClientRect().top - sc.getBoundingClientRect().top - 10;
+  board.classList.toggle('is-locked', Math.abs(d) < 6);
+}
+/* A fast swipe would fly straight past the board, so on the way down it is
+   caught once: the sheet stops with the board in place (stopping the
+   scroller for a moment is what ends a phone's momentum), and the next swipe
+   carries on. Going back up above it arms the catch again. */
+let ffLockRaf = 0, ffLast = 0, ffSheet = null, ffCaught = false;
+document.addEventListener('scroll', e => {
+  const sc = e.target;
+  if(!sc.classList || !sc.classList.contains('modal-scroll')) return;
+  const board = sc.querySelector('.ff-board');
+  if(!board) return;
+  if(ffSheet !== sc){ ffSheet = sc; ffLast = 0; ffCaught = false; }   // a sheet just opened starts from the top
+  const at = sc.scrollTop + board.getBoundingClientRect().top - sc.getBoundingClientRect().top - 10;
+  const now = sc.scrollTop, was = ffLast;
+  ffLast = now;
+  if(now < at - 160) ffCaught = false;
+  if(!ffCaught && was < at - 2 && now > at + 2){
+    ffCaught = true;
+    sc.style.overflowY = 'hidden';
+    sc.scrollTop = at; ffLast = at;
+    setTimeout(() => { sc.style.overflowY = ''; }, 420);
+  }
+  if(ffLockRaf) return;
+  ffLockRaf = requestAnimationFrame(() => { ffLockRaf = 0; ffLocked(); });
+}, true);
+window.addEventListener('resize', () => ffFit());
 
 /* The plan answers a tap by redrawing only itself — a full sheet redraw would
    throw the reader back to the top of a long event page. */
@@ -10042,8 +10104,13 @@ function ffPaint(){
   const box = document.createElement('div');
   box.innerHTML = renderBoothPlan(ev);
   const fresh = box.firstElementChild;
+  // hold the sheet still: swapping the plan out would otherwise let the
+  // browser re-anchor or re-snap it somewhere else
+  const sc = old.closest('.modal-scroll'), top = sc ? sc.scrollTop : 0;
   old.replaceWith(fresh);
   localize(fresh);
+  ffFit();
+  if(sc) sc.scrollTop = top;
 }
 
 function renderEventModal(){
