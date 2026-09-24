@@ -2422,6 +2422,10 @@
   .ff-tt th.ff-tt-t{ background:var(--ink); color:var(--paper); z-index:2; font-size:11.5px; }
   .ff-tt .ff-tt-t small{ display:block; font-size:10px; font-weight:600; color:var(--ink-soft); }
   .ff-tt td.is-none{ background:repeating-linear-gradient(45deg, var(--paper-dim) 0 6px, var(--card) 6px 12px); }
+  .ff-tt-p.is-faded{ opacity:.3; }
+  .ff-tt-p.is-oshi{ color:#D8336E; }
+  :root[data-theme="dark"] .ff-tt-p.is-oshi{ color:#F48BB0; }
+  .ff-tt-p.is-oshi .avatar-sm{ box-shadow:0 0 0 2px #F06C9B; }
   .ff-tt-p{ display:flex; align-items:center; gap:5px; margin:3px 0; font-weight:700; color:var(--ink); white-space:nowrap; line-height:1.2; }
   @media (min-width:640px){
     .ff-hall{ aspect-ratio:.95; --bw:34px; }
@@ -9914,13 +9918,13 @@ function renderBoothPlan(ev){
   if(acts){
     const cols = FF_MENU.map(k => FF_ACTS.find(a => a.k === k));
     const person = pid => { const pm = getMember(pid); if(!pm) return '';
-      return `<span class="ff-tt-p">${renderAvatar(pm, 'avatar-sm ff-chip-face', (getGroup(pm.groupId) || {}).color)}${escapeHtml(pm.name)}</span>`; };
-    const rows = day.slots.filter(sl => !osh || cols.some(a => (sl[a.k] || []).some(keep)));
-    const table = rows.length ? `<table class="ff-tt">
+      return `<span class="ff-tt-p${osh ? (mine.has(pid) ? ' is-oshi' : ' is-faded') : ''}">${renderAvatar(pm, 'avatar-sm ff-chip-face', (getGroup(pm.groupId) || {}).color)}${escapeHtml(pm.name)}</span>`; };
+    // with "my oshi only" on, everyone stays in the timetable but only she is in full colour
+    const table = `<table class="ff-tt">
       <tr><th class="ff-tt-t">${en ? 'Time' : 'เวลา'}</th>${cols.map(a => `<th style="--a:${a.c}">${en ? a.en : a.th}</th>`).join('')}</tr>
-      ${rows.map(sl => `<tr><td class="ff-tt-t">${sl.t}<small>${sl.to}</small></td>${cols.map(a => !(sl[a.k] || []).length
-        ? '<td class="is-none"></td>' : `<td style="--a:${a.c}">${sl[a.k].filter(keep).map(person).join('')}</td>`).join('')}</tr>`).join('')}
-    </table>` : '';
+      ${day.slots.map(sl => `<tr><td class="ff-tt-t">${sl.t}<small>${sl.to}</small></td>${cols.map(a => !(sl[a.k] || []).length
+        ? '<td class="is-none"></td>' : `<td style="--a:${a.c}">${sl[a.k].map(person).join('')}</td>`).join('')}</tr>`).join('')}
+    </table>`;
     return `<div class="ff">
       <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
       ${scope}
@@ -9929,8 +9933,8 @@ function renderBoothPlan(ev){
         <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
         <span class="ff-spacer"></span>
       </div>
-      ${noOshi || (table ? `<div class="ff-tt-wrap">${table}</div>`
-        : `<p class="ff-none">${en ? 'None of your oshi has anything on this day' : 'วันนี้โอชิของคุณไม่มีกิจกรรม'}</p>`)}
+      ${noOshi}
+      <div class="ff-tt-wrap">${table}</div>
       <p class="ff-note">${en ? 'Swipe sideways for the other activities' : 'ปัดซ้ายขวาเพื่อดูกิจกรรมอื่น'}</p>
     </div>`;
   }
