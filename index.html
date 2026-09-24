@@ -2392,6 +2392,24 @@
   .ff-board .ff-chip{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:#F4ECF1; }
   .ff-board .ff-chip b{ background:rgba(255,255,255,.14); color:#F4ECF1; }
   .ff-board .ff-note{ color:#9C8E97; text-align:center; }
+  /* "my oshi only": her booths show her face with a pink edge, everyone else fades */
+  .ff-scope{ margin:0 0 10px; background:var(--paper-dim); border-color:var(--line); }
+  .ff-board .ff-b.is-oshi{ opacity:1; width:40px; height:40px; border-radius:9px; border:2.5px solid #F06C9B;
+    background:#2A2126 var(--img) center/cover; box-shadow:0 0 10px rgba(240,108,155,.6); z-index:5; }
+  .ff-board .ff-b.is-oshi .ff-n{ position:absolute; left:-7px; top:-8px; min-width:17px; height:17px; padding:0 3px; border-radius:5px;
+    display:grid; place-items:center; font-size:9.5px; background:#F06C9B; color:#fff; border:1.5px solid #1A1419; }
+  .ff-board .ff-b.is-oshi .ff-nm{ display:block; top:calc(100% + 3px); padding:1px 5px; border-radius:5px;
+    background:rgba(26,20,25,.88); color:#F4ECF1; font-size:9.5px; font-weight:800; }
+  .ff.is-hour .ff-board .ff-b.is-oshi:not(.is-here){ opacity:.5; }
+  .ff.is-hour .ff-board .ff-b.is-oshi.is-here .ff-n{ background:#E2B55A; color:#2A1D08; }
+  .ff .ff-board .ff-b.is-mute, .ff.is-hour .ff-board .ff-b.is-mute{ opacity:.14; }
+  .ff-board .ff-times button{ position:relative; }
+  .ff-board .ff-times button.is-dim{ opacity:.38; }
+  .ff-board .ff-times button.has-oshi::after{ content:''; position:absolute; top:5px; right:6px; width:7px; height:7px; border-radius:50%;
+    background:#F06C9B; box-shadow:0 0 6px rgba(240,108,155,.8); }
+  .ff-none{ margin:10px 0 0; padding:10px; border-radius:14px; text-align:center; font-size:12.5px; color:var(--ink-soft);
+    background:var(--paper-dim); }
+  .ff-board .ff-none{ background:rgba(255,255,255,.06); color:#B9ABB3; }
   /* the activities tab: the organiser's timetable */
   .ff-tt-wrap{ overflow-x:auto; border:1.5px solid var(--line); border-radius:16px; background:var(--card);
     box-shadow:0 3px 0 rgba(var(--shadow-rgb),.05); }
@@ -5317,7 +5335,7 @@ const ICONS = {
 // ============================= STATE =============================
 let state = {
   isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
-  ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan',
+  ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOshi:false,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
@@ -9878,6 +9896,13 @@ function renderBoothPlan(ev){
   const dayLabel = d => { const x = parseYmd(d.date); return `${x.getDate()} ${monthsShort()[x.getMonth()]}`; };
   const picked = state.ffPick ? getMember(state.ffPick) : null;
   const acts = state.ffTab === 'acts';
+  // "my oshi only": everyone else steps back, on the plan and in the timetable
+  const osh = state.ffOshi, mine = new Set(state.oshi), keep = id => !osh || mine.has(id);
+  const scope = `<div class="feed-scope ff-scope" role="group" aria-label="${en ? 'Who to show' : 'ขอบเขตที่แสดง'}">
+    <button class="scope-btn${osh ? '' : ' is-on'}" data-action="ff-oshi" data-value="0">${en ? 'Everyone' : 'ทั้งหมด'}</button>
+    <button class="scope-btn${osh ? ' is-on' : ''}" data-action="ff-oshi" data-value="1">${en ? 'My oshi only' : 'เฉพาะโอชิของฉัน'}</button>
+  </div>`;
+  const noOshi = osh && !mine.size ? `<p class="ff-none">${en ? 'No oshi yet — tap the ☆ on a member to add one' : 'ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม'}</p>` : '';
 
   const tabs = `<div class="ff-tabs">
     <button class="${acts ? '' : 'on'}" data-action="ff-tab" data-value="plan">${en ? 'Booth plan' : 'ผังบูธ'}</button>
@@ -9890,19 +9915,22 @@ function renderBoothPlan(ev){
     const cols = FF_MENU.map(k => FF_ACTS.find(a => a.k === k));
     const person = pid => { const pm = getMember(pid); if(!pm) return '';
       return `<span class="ff-tt-p">${renderAvatar(pm, 'avatar-sm ff-chip-face', (getGroup(pm.groupId) || {}).color)}${escapeHtml(pm.name)}</span>`; };
-    const table = `<table class="ff-tt">
+    const rows = day.slots.filter(sl => !osh || cols.some(a => (sl[a.k] || []).some(keep)));
+    const table = rows.length ? `<table class="ff-tt">
       <tr><th class="ff-tt-t">${en ? 'Time' : 'เวลา'}</th>${cols.map(a => `<th style="--a:${a.c}">${en ? a.en : a.th}</th>`).join('')}</tr>
-      ${day.slots.map(sl => `<tr><td class="ff-tt-t">${sl.t}<small>${sl.to}</small></td>${cols.map(a => (sl[a.k] || []).length
-        ? `<td style="--a:${a.c}">${sl[a.k].map(person).join('')}</td>` : '<td class="is-none"></td>').join('')}</tr>`).join('')}
-    </table>`;
+      ${rows.map(sl => `<tr><td class="ff-tt-t">${sl.t}<small>${sl.to}</small></td>${cols.map(a => !(sl[a.k] || []).length
+        ? '<td class="is-none"></td>' : `<td style="--a:${a.c}">${sl[a.k].filter(keep).map(person).join('')}</td>`).join('')}</tr>`).join('')}
+    </table>` : '';
     return `<div class="ff">
       <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
+      ${scope}
       ${tabs}
       <div class="ff-top">
         <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
         <span class="ff-spacer"></span>
       </div>
-      <div class="ff-tt-wrap">${table}</div>
+      ${noOshi || (table ? `<div class="ff-tt-wrap">${table}</div>`
+        : `<p class="ff-none">${en ? 'None of your oshi has anything on this day' : 'วันนี้โอชิของคุณไม่มีกิจกรรม'}</p>`)}
       <p class="ff-note">${en ? 'Swipe sideways for the other activities' : 'ปัดซ้ายขวาเพื่อดูกิจกรรมอื่น'}</p>
     </div>`;
   }
@@ -9911,18 +9939,20 @@ function renderBoothPlan(ev){
   // a booth in play — visited this hour, or tapped — shows her face. Two in
   // play side by side would cover each other, so every second one of a run
   // steps out toward the middle of the hall.
-  const inPlay = id => !!id && ((slot && (slot.booth || []).includes(id)) || state.ffPick === id || state.ffWho === id);
+  const atBooth = id => !!slot && (slot.booth || []).includes(id) && keep(id);
+  const inPlay = id => !!id && (atBooth(id) || state.ffPick === id || state.ffWho === id || (osh && mine.has(id)));
   const lane = n => n >= FF_ROW[0] ? 'row' : FF_COLS.findIndex(([a, b]) => n >= a && n <= b);
   let run = 0;
   const booths = FF_BOOTHS.map((id, i) => {
     const n = i + 1, m = getMember(id);
     if(!m) return '';
     const [x, y] = FF_AT[n], g = getGroup(m.groupId) || {};
-    const here = slot && (slot.booth || []).includes(id);
-    const on = state.ffPick === id || state.ffWho === id, lit = here || on;
+    const here = atBooth(id), fan = osh && mine.has(id);
+    const on = state.ffPick === id || state.ffWho === id, lit = here || on || fan;
     run = lit && n > 1 && inPlay(FF_BOOTHS[i - 1]) && lane(n - 1) === lane(n) ? run + 1 : 0;
     const step = lit && run % 2 ? (lane(n) === 'row' ? '--dy:-50px;' : `--dx:${x < 50 ? 46 : -46}px;`) : '';
-    return `<button class="ff-b${n >= FF_ROW[0] ? ' is-row' : ''}${here ? ' is-here' : ''}${on ? ' is-pick' : ''}"
+    return `<button class="ff-b${n >= FF_ROW[0] ? ' is-row' : ''}${here ? ' is-here' : ''}${on ? ' is-pick' : ''}${
+      fan ? ' is-oshi' : osh ? ' is-mute' : ''}"
       style="left:${x}%;top:${y}%;--c:${g.color};${step}${lit && m.photo ? `--img:url('${escapeAttr(m.photo)}')` : ''}"
       data-action="ff-booth" data-id="${id}" title="${escapeAttr(m.name + ' · ' + (en ? 'booth ' : 'บูธ ') + n)}">
       <span class="ff-n">${n}</span>${on ? '<span class="ff-ring" aria-hidden="true"></span>' : ''}
@@ -9934,10 +9964,13 @@ function renderBoothPlan(ev){
     return `<button class="ff-chip" data-action="ff-who" data-id="${id}">${renderAvatar(m, 'avatar-sm ff-chip-face', (getGroup(m.groupId) || {}).color)}${escapeHtml(m.name)}
       <b>${ffBoothOf(id)}</b></button>`;
   }).join('');
+  const planRows = slot ? FF_ACTS.filter(a => a.plan && (slot[a.k] || []).some(keep)) : [];
 
-  const legend = slot ? `<div class="ff-now">${FF_ACTS.filter(a => a.plan && (slot[a.k] || []).length).map(a =>
-    `<div class="ff-row" style="--a:${a.c}"><span class="ff-lab">${(en ? a.en : a.th).split(' ').map(w => `<span>${w}</span>`).join(' ')}</span><span class="ff-people">${chips(slot[a.k])}</span></div>`).join('')}
-    </div>` : '';
+  const legend = !slot ? '' : planRows.length ? `<div class="ff-now">${planRows.map(a =>
+    `<div class="ff-row" style="--a:${a.c}"><span class="ff-lab">${(en ? a.en : a.th).split(' ').map(w => `<span>${w}</span>`).join(' ')}</span><span class="ff-people">${chips(slot[a.k].filter(keep))}</span></div>`).join('')}
+    </div>` : `<p class="ff-none">${en ? 'None of your oshi is at a booth or on stage this hour' : 'ช่วงนี้โอชิของคุณไม่ได้ลงบูธหรือขึ้นเวที'}</p>`;
+  const oshiHour = s => FF_ACTS.some(a => a.plan && (s[a.k] || []).some(id => mine.has(id)));
+  const onStage = slot ? (slot.stage || []).filter(keep) : [];
 
   // a member who was tapped answers with her own hours; a booth answers with whose it is
   let pickCard = '';
@@ -9965,17 +9998,18 @@ function renderBoothPlan(ev){
 
   return `<div class="ff${slot ? ' is-hour' : ''}${state.ffPick || state.ffWho ? ' has-pick' : ''}">
     <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
+    ${scope}
     ${tabs}
     <div class="ff-board">
     <div class="ff-top">
       <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
-      <span class="ff-count">${FF_BOOTHS.length} ${en ? 'booths' : 'บูธ'}</span>
+      <span class="ff-count">${osh ? (en ? `${mine.size} oshi` : `โอชิ ${mine.size} คน`) : `${FF_BOOTHS.length} ${en ? 'booths' : 'บูธ'}`}</span>
       <span class="ff-spacer"></span>
     </div>
     <div class="ff-hall">
-      <div class="ff-stage${slot && (slot.stage || []).length ? ' lit' : ''}">
+      <div class="ff-stage${onStage.length ? ' lit' : ''}">
         <span class="ff-stage-lab">${en ? 'STAGE' : 'เวที'}</span>
-        ${slot ? `<span class="ff-onstage">${(slot.stage || []).map(id => { const m = getMember(id); if(!m) return '';
+        ${slot ? `<span class="ff-onstage">${onStage.map(id => { const m = getMember(id); if(!m) return '';
           return `<button class="ff-up" data-action="ff-who" data-id="${id}" title="${escapeAttr(m.name)}"
             style="--c:${(getGroup(m.groupId) || {}).color}">${renderAvatar(m, 'avatar-sm ff-up-face', (getGroup(m.groupId) || {}).color)}
             <small>${escapeHtml(m.name)}</small></button>`; }).join('')}</span>` : ''}
@@ -9985,8 +10019,10 @@ function renderBoothPlan(ev){
       ${booths}
     </div>
     ${pickCard}
+    ${noOshi}
     <div class="ff-cap">${en ? 'Activity schedule' : 'ตารางกิจกรรม'}</div>
-    <div class="ff-times">${day.slots.map((s, i) => `<button class="${i === state.ffSlot ? 'on' : ''}" data-action="ff-slot" data-value="${i}">${s.t}<small>${s.to}</small></button>`).join('')}</div>
+    <div class="ff-times">${day.slots.map((s, i) => `<button class="${i === state.ffSlot ? 'on' : ''}${osh ? (oshiHour(s) ? ' has-oshi' : ' is-dim') : ''}"
+      data-action="ff-slot" data-value="${i}">${s.t}<small>${s.to}</small></button>`).join('')}</div>
     ${legend}
     <p class="ff-note">${en ? 'Pick an hour to see what the members are doing' : 'เลือกช่วงเวลาเพื่อแสดงกิจกรรมของเมมเบอร์'}</p>
     </div>
@@ -14133,6 +14169,9 @@ function bindDelegatedEvents(){
     else if(action==='ff-booth'){
       state.ffPick = state.ffPick === id ? null : id; state.ffWho = null;
       ffPaint();
+    }
+    else if(action==='ff-oshi'){
+      state.ffOshi = el.dataset.value === '1'; state.ffPick = null; state.ffWho = null; ffPaint();
     }
     else if(action==='ff-tab'){
       state.ffTab = el.dataset.value; ffPaint();
