@@ -2319,6 +2319,7 @@
   .ff-row{ display:flex; gap:8px; padding:8px 10px; background:var(--card); }
   .ff-row + .ff-row{ border-top:1px solid var(--line); }
   .ff-lab{ flex:none; width:82px; font-size:11.5px; font-weight:800; color:var(--a); line-height:1.5; }
+  .ff-lab span{ white-space:nowrap; }   /* "Group Hi-Touch" breaks at the space, never the hyphen */
   .ff-people{ display:flex; flex-wrap:wrap; gap:5px; }
   .ff-chip{ display:inline-flex; align-items:center; gap:5px; border:1.5px solid var(--line); border-radius:99px;
     background:var(--card); color:var(--ink); font:inherit; font-size:12px; font-weight:700; padding:2px 4px 2px 2px; cursor:pointer; }
@@ -4316,6 +4317,9 @@ const SEED_SCHEDULE = [
     info:['女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
       '3 ต.ค. ประกาศผลโหวต 48 ชั่วโมงแรก',
       '3 ต.ค. เปิดตัวเพลง "Kimi to Doko ka e Ikitai" ครั้งแรก',
+      'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
+      'Hachi Cha และ Merchandise เมมเบอร์อยู่เต็ม 1 ชั่วโมง ไม่สลับกลุ่ม',
+      'ตารางกิจกรรมอาจเปลี่ยนแปลงภายหลัง',
       'รายละเอียดอื่นรอประกาศ'],
     allMembers:true },
   /* The single and the photoset are what the GE6 Tokens come in, so they sit
@@ -5765,6 +5769,9 @@ const EN = {
   '3 ต.ค. ประกาศผลโหวต 48 ชั่วโมงแรก': 'On 3 Oct: the first 48 hours of voting are announced',
   '3 ต.ค. เปิดตัวเพลง "Kimi to Doko ka e Ikitai" ครั้งแรก': 'On 3 Oct: the first performance of "Kimi to Doko ka e Ikitai"',
   'รายละเอียดอื่นรอประกาศ': 'Everything else is still to be announced',
+  'Hachi Cha และ Merchandise เมมเบอร์อยู่เต็ม 1 ชั่วโมง ไม่สลับกลุ่ม':
+    'At Hachi Cha and Merchandise the members stay the whole hour; the groups do not rotate',
+  'ตารางกิจกรรมอาจเปลี่ยนแปลงภายหลัง': 'The activity schedule may still change',
   'พรีออเดอร์ 26 ก.ย. 12:00 – 30 ต.ค. 2026 23:00 น. ทาง iAM Shop': 'Pre-order 26 Sep 12:00 – 30 Oct 2026 23:00 at the iAM Shop',
   'พรีออเดอร์ 26 ก.ย. 12:00 – 10 พ.ย. 2026 23:00 น. ทาง iAM Shop': 'Pre-order 26 Sep 12:00 – 10 Nov 2026 23:00 at the iAM Shop',
   'ส่งสินค้า 30 พ.ย. 2026 เป็นต้นไป': 'Delivery from 30 Nov 2026',
@@ -9738,30 +9745,47 @@ const FF_ROW = [49,58,13,87,93];   // [first, last, x start%, x end%, y%]
 const FF_BOOTHS = ['bnk-nall', 'bnk-neen', 'bnk-arlee', 'bnk-l', 'bnk-grape', 'cgm-satangpound', 'cgm-lewlew', 'cgm-punpon', 'cgm-lingling', 'bnk-patt', 'bnk-micha', 'bnk-mint', 'bnk-mail', 'cgm-else', 'cgm-shenae', 'bnk-nammonn', 'bnk-pancake', 'bnk-monet', 'bnk-praew', 'bnk-luksorn', 'bnk-cartoon', 'cgm-emma', 'bnk-palmmy', 'cgm-chifa', 'cgm-lookked', 'cgm-ginna', 'cgm-jingjing', 'bnk-khaimook', 'bnk-marine', 'bnk-janry', 'bnk-berry', 'bnk-galeya', 'bnk-mayji', 'cgm-praifa', 'bnk-emmy', 'bnk-blythe', 'bnk-mirin', 'bnk-wawa', 'bnk-hoop', 'bnk-sindy', 'bnk-inkcha', 'cgm-nisha', 'bnk-jew', 'cgm-tara', 'cgm-nana', 'cgm-namphet', 'cgm-kwan', 'cgm-hongyok', 'bnk-saonoi', 'bnk-rose', 'bnk-niya', 'bnk-khowjow', 'bnk-proud', 'bnk-yoghurt', 'bnk-fame', 'cgm-ploen', 'cgm-prae', 'cgm-valentine'];
 const FF_DAYS = [
   { date:'2026-10-03', slots:[
-    { t:'11:00', to:'12:00', stage:['cgm-praifa', 'bnk-luksorn', 'bnk-blythe', 'bnk-rose'], booth:['bnk-mirin', 'cgm-nana', 'cgm-chifa', 'bnk-wawa'] },
-    { t:'12:00', to:'13:00', stage:['cgm-tara', 'cgm-ploen', 'bnk-mirin', 'bnk-cartoon'], booth:['cgm-lookked', 'cgm-shenae', 'bnk-blythe', 'bnk-marine'] },
-    { t:'13:00', to:'14:00', stage:['bnk-proud', 'cgm-lookked', 'bnk-mail', 'cgm-shenae'], booth:['cgm-ploen', 'cgm-tara', 'bnk-niya', 'bnk-l'] },
-    { t:'14:00', to:'15:00', stage:['bnk-marine', 'cgm-emma', 'bnk-wawa', 'bnk-yoghurt'], booth:['bnk-cartoon', 'bnk-luksorn', 'bnk-fame', 'bnk-mail'] },
-    { t:'15:00', to:'16:00', stage:['bnk-l', 'cgm-chifa', 'bnk-fame', 'bnk-niya'], booth:['bnk-rose', 'cgm-praifa', 'cgm-emma', 'bnk-proud'] },
+    { t:'11:00', to:'12:00', stage:['cgm-praifa', 'bnk-luksorn', 'bnk-blythe', 'bnk-rose'], booth:['bnk-mirin', 'cgm-nana', 'cgm-chifa', 'bnk-wawa'], hitouch:['bnk-fame', 'cgm-namphet', 'cgm-lewlew', 'cgm-satangpound', 'cgm-lookked', 'bnk-inkcha', 'bnk-grape'],
+      hachi:['cgm-emma', 'bnk-emmy', 'cgm-tara', 'cgm-punpon'], merch:['bnk-hoop', 'bnk-saonoi', 'cgm-shenae', 'bnk-mail'] },
+    { t:'12:00', to:'13:00', stage:['cgm-tara', 'cgm-ploen', 'bnk-mirin', 'bnk-cartoon'], booth:['cgm-lookked', 'cgm-shenae', 'bnk-blythe', 'bnk-marine'],
+      hachi:['cgm-jingjing', 'bnk-mayji', 'bnk-pancake', 'bnk-rose'], merch:['cgm-satangpound', 'bnk-nall', 'cgm-lingling', 'bnk-proud'] },
+    { t:'13:00', to:'14:00', stage:['bnk-proud', 'cgm-lookked', 'bnk-mail', 'cgm-shenae'], booth:['cgm-ploen', 'cgm-tara', 'bnk-niya', 'bnk-l'], hitouch:['bnk-yoghurt', 'bnk-blythe', 'bnk-nall', 'bnk-arlee', 'bnk-wawa', 'cgm-chifa', 'cgm-valentine'],
+      hachi:['cgm-praifa', 'cgm-nisha', 'cgm-hongyok', 'bnk-neen'], merch:['cgm-nana', 'bnk-luksorn', 'cgm-prae', 'bnk-khowjow'] },
+    { t:'14:00', to:'15:00', stage:['bnk-marine', 'cgm-emma', 'bnk-wawa', 'bnk-yoghurt'], booth:['bnk-cartoon', 'bnk-luksorn', 'bnk-fame', 'bnk-mail'],
+      hachi:['bnk-galeya', 'bnk-patt', 'bnk-sindy', 'cgm-prae', 'cgm-ploen'], merch:['bnk-emmy', 'bnk-niya', 'bnk-khaimook', 'bnk-jew', 'cgm-jingjing'] },
+    { t:'15:00', to:'16:00', stage:['bnk-l', 'cgm-chifa', 'bnk-fame', 'bnk-niya'], booth:['bnk-rose', 'cgm-praifa', 'cgm-emma', 'bnk-proud'], hitouch:['cgm-lingling', 'bnk-cartoon', 'bnk-nammonn', 'bnk-khaimook', 'bnk-palmmy', 'bnk-micha', 'bnk-pancake', 'bnk-mayji'],
+      hachi:['bnk-janry', 'cgm-ginna', 'bnk-luksorn', 'bnk-praew'], merch:['bnk-mint', 'bnk-yoghurt', 'bnk-marine', 'bnk-wawa'] },
   ] },
   { date:'2026-10-04', slots:[
-    { t:'11:00', to:'12:00', stage:['bnk-palmmy', 'bnk-nall', 'cgm-punpon', 'cgm-lewlew', 'bnk-inkcha'], booth:['cgm-nisha', 'bnk-hoop', 'bnk-galeya', 'bnk-grape', 'cgm-ginna'] },
-    { t:'12:00', to:'13:00', stage:['bnk-jew', 'cgm-nana', 'bnk-mint', 'cgm-valentine', 'cgm-else'], booth:['bnk-mayji', 'cgm-lewlew', 'bnk-nall', 'bnk-monet', 'bnk-neen'] },
-    { t:'13:00', to:'14:00', stage:['cgm-ginna', 'cgm-jingjing', 'bnk-neen', 'cgm-hongyok'], booth:['bnk-micha', 'bnk-pancake', 'bnk-berry', 'cgm-else'] },
-    { t:'14:00', to:'15:00', stage:['bnk-janry', 'bnk-nammonn', 'bnk-hoop', 'bnk-emmy'], booth:['cgm-namphet', 'bnk-mint', 'cgm-punpon', 'cgm-jingjing'] },
-    { t:'15:00', to:'16:00', stage:['cgm-lingling', 'bnk-micha', 'bnk-khaimook', 'bnk-sindy'], booth:['cgm-satangpound', 'bnk-palmmy', 'cgm-prae', 'bnk-nammonn'] },
-    { t:'16:00', to:'17:00', stage:['cgm-satangpound', 'bnk-khowjow', 'bnk-praew', 'bnk-berry'], booth:['cgm-valentine', 'bnk-patt', 'bnk-saonoi', 'cgm-hongyok'] },
-    { t:'17:00', to:'18:00', stage:['cgm-namphet', 'bnk-monet', 'cgm-nisha', 'bnk-mayji'], booth:['bnk-praew', 'bnk-sindy', 'bnk-arlee', 'bnk-jew'] },
-    { t:'18:00', to:'19:00', stage:['bnk-patt', 'bnk-galeya', 'cgm-kwan', 'bnk-pancake'], booth:['bnk-khowjow', 'bnk-emmy', 'bnk-janry', 'cgm-lingling'] },
-    { t:'19:00', to:'20:00', stage:['bnk-grape', 'cgm-prae', 'bnk-saonoi', 'bnk-arlee'], booth:['bnk-khaimook', 'bnk-inkcha', 'bnk-yoghurt', 'cgm-kwan'] },
+    { t:'11:00', to:'12:00', stage:['bnk-palmmy', 'bnk-nall', 'cgm-punpon', 'cgm-lewlew', 'bnk-inkcha'], booth:['cgm-nisha', 'bnk-hoop', 'bnk-galeya', 'bnk-grape', 'cgm-ginna'], hitouch:['bnk-marine', 'cgm-else', 'cgm-jingjing', 'cgm-tara', 'bnk-mail', 'bnk-niya', 'cgm-praifa'],
+      hachi:['bnk-micha', 'cgm-lingling', 'bnk-mirin', 'bnk-mint'], merch:['cgm-hongyok', 'bnk-fame', 'bnk-rose', 'bnk-neen'] },
+    { t:'12:00', to:'13:00', stage:['bnk-jew', 'cgm-nana', 'bnk-mint', 'cgm-valentine', 'cgm-else'], booth:['bnk-mayji', 'cgm-lewlew', 'bnk-nall', 'bnk-monet', 'bnk-neen'],
+      hachi:['bnk-khowjow', 'bnk-wawa', 'bnk-inkcha', 'bnk-grape'], merch:['cgm-praifa', 'bnk-micha', 'bnk-janry', 'cgm-nisha'] },
+    { t:'13:00', to:'14:00', stage:['cgm-ginna', 'cgm-jingjing', 'bnk-neen', 'cgm-hongyok'], booth:['bnk-micha', 'bnk-pancake', 'bnk-berry', 'cgm-else'], hitouch:['bnk-jew', 'cgm-shenae', 'cgm-nana', 'bnk-janry', 'cgm-emma', 'cgm-ploen', 'cgm-kwan'],
+      hachi:['bnk-khaimook', 'bnk-cartoon', 'cgm-lookked', 'bnk-proud'], merch:['cgm-valentine', 'bnk-monet', 'bnk-patt', 'bnk-inkcha'] },
+    { t:'14:00', to:'15:00', stage:['bnk-janry', 'bnk-nammonn', 'bnk-hoop', 'bnk-emmy'], booth:['cgm-namphet', 'bnk-mint', 'cgm-punpon', 'cgm-jingjing'],
+      hachi:['bnk-nall', 'cgm-nana', 'bnk-l', 'bnk-arlee', 'bnk-palmmy'], merch:['cgm-lewlew', 'cgm-ginna', 'cgm-lookked', 'cgm-kwan', 'bnk-mayji'] },
+    { t:'15:00', to:'16:00', stage:['cgm-lingling', 'bnk-micha', 'bnk-khaimook', 'bnk-sindy'], booth:['cgm-satangpound', 'bnk-palmmy', 'cgm-prae', 'bnk-nammonn'], hitouch:['bnk-neen', 'cgm-punpon', 'bnk-emmy', 'bnk-patt', 'bnk-monet', 'cgm-nisha', 'bnk-berry'],
+      hachi:['bnk-niya', 'cgm-else', 'bnk-jew', 'bnk-fame'], merch:['cgm-tara', 'cgm-chifa', 'bnk-praew', 'bnk-mirin'] },
+    { t:'16:00', to:'17:00', stage:['cgm-satangpound', 'bnk-khowjow', 'bnk-praew', 'bnk-berry'], booth:['cgm-valentine', 'bnk-patt', 'bnk-saonoi', 'cgm-hongyok'],
+      hachi:['bnk-blythe', 'bnk-monet', 'cgm-namphet', 'bnk-marine'], merch:['bnk-cartoon', 'cgm-else', 'cgm-punpon', 'bnk-sindy'] },
+    { t:'17:00', to:'18:00', stage:['cgm-namphet', 'bnk-monet', 'cgm-nisha', 'bnk-mayji'], booth:['bnk-praew', 'bnk-sindy', 'bnk-arlee', 'bnk-jew'], hitouch:['bnk-khowjow', 'bnk-luksorn', 'cgm-prae', 'bnk-saonoi', 'bnk-l', 'cgm-ginna', 'bnk-proud', 'bnk-galeya'],
+      hachi:['bnk-mail', 'cgm-satangpound', 'bnk-hoop', 'cgm-kwan'], merch:['cgm-ploen', 'cgm-emma', 'bnk-pancake', 'bnk-nammonn'] },
+    { t:'18:00', to:'19:00', stage:['bnk-patt', 'bnk-galeya', 'cgm-kwan', 'bnk-pancake'], booth:['bnk-khowjow', 'bnk-emmy', 'bnk-janry', 'cgm-lingling'],
+      hachi:['cgm-lewlew', 'cgm-valentine', 'bnk-yoghurt', 'bnk-saonoi'], merch:['bnk-grape', 'bnk-arlee', 'bnk-blythe', 'bnk-berry'] },
+    { t:'19:00', to:'20:00', stage:['bnk-grape', 'cgm-prae', 'bnk-saonoi', 'bnk-arlee'], booth:['bnk-khaimook', 'bnk-inkcha', 'bnk-yoghurt', 'cgm-kwan'], hitouch:['bnk-rose', 'cgm-hongyok', 'bnk-sindy', 'bnk-praew', 'bnk-hoop', 'bnk-mirin', 'bnk-mint'],
+      hachi:['cgm-chifa', 'cgm-shenae', 'bnk-nammonn', 'bnk-berry'], merch:['cgm-namphet', 'bnk-palmmy', 'bnk-galeya', 'bnk-l'] },
   ] },
 ];
-/* The two activities this plan is about. The rest of the festival's programme
-   — hi-touch, hachi cha, the merchandise counter — happens away from the booth
-   floor, so it is not drawn here. */
+/* The festival's programme, one key per column of the organiser's schedule.
+   Only the booth visits light up booths on the plan; the stage draws its own
+   members, and the rest happens away from the booth floor. */
 const FF_ACTS = [
-  { k:'booth', th:'ลงบูธ',   en:'Booth visits', c:'#C08A2E' },
-  { k:'stage', th:'ขึ้นเวที', en:'Main stage',   c:'#B3121E' },
+  { k:'booth',   th:'ลงบูธ',            en:'Booth visits',   c:'#C08A2E' },
+  { k:'stage',   th:'ขึ้นเวที',          en:'Main stage',     c:'#B3121E' },
+  { k:'hitouch', th:'Group Hi-Touch',   en:'Group Hi-Touch', c:'#7A4FC0' },
+  { k:'hachi',   th:'Hachi Cha',        en:'Hachi Cha',      c:'#2F7D4F' },
+  { k:'merch',   th:'Merchandise',      en:'Merchandise',    c:'#2D6CB0' },
 ];
 function ffPos(){
   const p = {};
@@ -9777,8 +9801,7 @@ const ffDay = () => FF_DAYS[state.ffDay] || FF_DAYS[0];
 function ffHours(id){
   const out = [];
   FF_DAYS.forEach((d, di) => d.slots.forEach((s, si) => {
-    const a = FF_ACTS.find(x => (s[x.k] || []).includes(id));
-    if(a) out.push({ di, si, s, a });
+    FF_ACTS.filter(x => (s[x.k] || []).includes(id)).forEach(a => out.push({ di, si, s, a }));
   }));
   return out;
 }
@@ -9844,7 +9867,7 @@ function renderBoothPlan(ev){
   }).join('');
 
   const legend = slot ? `<div class="ff-now">${FF_ACTS.filter(a => (slot[a.k] || []).length).map(a =>
-    `<div class="ff-row" style="--a:${a.c}"><span class="ff-lab">${en ? a.en : a.th}</span><span class="ff-people">${chips(slot[a.k])}</span></div>`).join('')}
+    `<div class="ff-row" style="--a:${a.c}"><span class="ff-lab">${(en ? a.en : a.th).split(' ').map(w => `<span>${w}</span>`).join(' ')}</span><span class="ff-people">${chips(slot[a.k])}</span></div>`).join('')}
     </div>` : '';
 
   // a member who was tapped answers with her own hours; a booth answers with whose it is
