@@ -2333,25 +2333,21 @@
   .ff-item-top{ width:100%; display:flex; align-items:center; gap:9px; padding:7px 10px; border:0; background:none;
     font:inherit; color:var(--ink); text-align:left; cursor:pointer; }
   .ff-item.is-open .ff-item-top{ background:color-mix(in srgb, var(--c) 9%, var(--card)); }
-  .ff-item-face{ width:34px !important; height:34px !important; border-radius:10px !important; font-size:10px; flex:none; }
   .ff-item-who{ min-width:0; }
   .ff-item-who b{ display:block; font-size:14px; line-height:1.25; }
   .ff-item-who small{ font-size:11px; color:var(--ink-soft); }
-  .ff-item-no{ margin-left:auto; font-size:10.5px; font-weight:800; color:#fff; background:var(--c);
-    padding:2px 8px; border-radius:99px; flex:none; }
-  .ff-caret{ flex:none; width:16px; height:16px; color:var(--ink-soft); transition:transform .18s; }
+  .ff-caret{ flex:none; margin-left:auto; width:16px; height:16px; color:var(--ink-soft); transition:transform .18s; }
   .ff-caret svg{ width:100%; height:100%; display:block; }
   .ff-item.is-open .ff-caret{ transform:rotate(180deg); }
-  .ff-item-body{ display:flex; flex-wrap:wrap; gap:6px; padding:0 10px 10px 53px; }
-  /* an hour opened: everyone on that round */
-  .ff-round{ flex-basis:100%; display:flex; flex-direction:column; gap:7px; padding:9px 10px; border-radius:12px;
-    background:color-mix(in srgb, var(--a) 8%, var(--card)); border:1.5px solid color-mix(in srgb, var(--a) 30%, var(--line)); }
-  .ff-round-lab{ font-size:11.5px; font-weight:800; color:var(--a); }
-  .ff-round .ff-chip{ cursor:default; }
-  .ff-round .ff-chip.is-me{ border-color:var(--a); box-shadow:0 0 0 1px var(--a); }
-  .ff-round-go{ align-self:flex-start; border:1.5px solid var(--line); border-radius:99px; background:var(--card); color:var(--ink);
-    font:inherit; font-size:11.5px; font-weight:700; padding:4px 11px; cursor:pointer; box-shadow:0 2px 0 rgba(var(--shadow-rgb),.1); }
-  .ff-round-go:active{ transform:translateY(2px); box-shadow:none; }
+  /* an activity opened: every round of it, day by day */
+  .ff-act-dot{ flex:none; width:12px; height:34px; border-radius:6px; background:var(--c); }
+  .ff-act .ff-item-who b{ color:var(--c); }
+  .ff-rounds{ padding:2px 10px 10px; }
+  .ff-rday{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin:8px 0 5px; }
+  .ff-rnd{ display:flex; gap:9px; align-items:flex-start; padding:7px 0; border-top:1px dashed var(--line); }
+  .ff-rnd-t{ flex:none; width:44px; font-size:12.5px; font-weight:800; color:var(--ink); line-height:1.2; }
+  .ff-rnd-t small{ display:block; font-size:10px; font-weight:600; color:var(--ink-soft); }
+  .ff-rounds .ff-chip{ cursor:default; }
   @media (min-width:640px){
     .ff-hall{ aspect-ratio:.95; --bw:34px; }
     .ff-nm{ display:block; }
@@ -5264,7 +5260,7 @@ const ICONS = {
 // ============================= STATE =============================
 let state = {
   isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
-  ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOpen:null, ffRound:null,
+  ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOpen:null,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
@@ -9816,6 +9812,8 @@ function ffHours(id){
   }));
   return out;
 }
+/* the activities tab lists them as the organiser's schedule does */
+const FF_MENU = ['stage', 'booth', 'hitouch', 'hachi', 'merch'];
 const FF_CARET = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
 
 function renderBoothPlan(ev){
@@ -9830,41 +9828,33 @@ function renderBoothPlan(ev){
     <button class="${acts ? 'on' : ''}" data-action="ff-tab" data-value="acts">${en ? 'Activities' : 'กิจกรรม'}</button>
   </div>`;
 
-  // ---- the activities tab: everyone, and what each of them is doing ----
+  // ---- the activities tab: one row per activity, in the poster's order; open
+  // one and every round of it is listed with the members on it ----
   if(acts){
-    const rows = FF_BOOTHS.map(id => ({ id, m: getMember(id) })).filter(x => x.m)
-      .sort((a, b) => a.m.name.localeCompare(b.m.name))
-      .map(({ id, m }) => {
-        const g = getGroup(m.groupId) || {}, open = state.ffOpen === id, hours = ffHours(id);
-        return `<div class="ff-item${open ? ' is-open' : ''}" style="--c:${g.color}">
-          <button class="ff-item-top" data-action="ff-open" data-id="${id}" aria-expanded="${open}">
-            ${renderAvatar(m, 'avatar-sm ff-item-face', g.color)}
-            <span class="ff-item-who"><b>${escapeHtml(m.name)}</b><small>${escapeHtml(m.nameTh || '')} · ${escapeHtml(g.name || '')}</small></span>
-            <span class="ff-item-no">${en ? 'Booth' : 'บูธ'} ${ffBoothOf(id)}</span>
-            <span class="ff-caret" aria-hidden="true">${FF_CARET}</span>
-          </button>
-          ${open ? `<div class="ff-item-body">${hours.length ? hours.map(h => {
-            // an hour opens the round below it: everyone doing that activity then
-            const key = `${h.di}.${h.si}.${h.a.k}`, on = state.ffRound === key;
-            const pill = `<button class="ff-when${on ? ' on' : ''}" style="--a:${h.a.c}" data-action="ff-round" data-value="${key}"
-              aria-expanded="${on}"><b>${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}</b>${en ? h.a.en : h.a.th}</button>`;
-            if(!on) return pill;
-            const people = (h.s[h.a.k] || []).map(pid => { const pm = getMember(pid); if(!pm) return '';
-              return `<span class="ff-chip${pid === id ? ' is-me' : ''}">${renderAvatar(pm, 'avatar-sm ff-chip-face', (getGroup(pm.groupId) || {}).color)}${escapeHtml(pm.name)}</span>`; }).join('');
-            return pill + `<div class="ff-round" style="--a:${h.a.c}">
-              <span class="ff-round-lab">${en ? `${h.a.en}, ${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}` : `${h.a.th} รอบ ${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}`}</span>
-              <span class="ff-people">${people}</span>
-              ${h.a.plan ? `<button class="ff-round-go" data-action="ff-when" data-value="${h.di}.${h.si}">${en ? 'See it on the plan →' : 'ดูบนผัง →'}</button>` : ''}
-            </div>`; }).join('')
-            : `<p class="ff-pick-none">${en ? 'Not on this plan' : 'ไม่มีกิจกรรมในผังนี้'}</p>`}</div>` : ''}
-        </div>`;
-      }).join('');
+    const rows = FF_MENU.map(k => FF_ACTS.find(a => a.k === k)).map(a => {
+      const open = state.ffOpen === a.k;
+      const rounds = FF_DAYS.map((d, di) => ({ d, di, slots: d.slots.filter(s => (s[a.k] || []).length) }))
+        .filter(x => x.slots.length);
+      const n = rounds.reduce((t, x) => t + x.slots.length, 0);
+      return `<div class="ff-item ff-act${open ? ' is-open' : ''}" style="--c:${a.c}">
+        <button class="ff-item-top" data-action="ff-open" data-id="${a.k}" aria-expanded="${open}">
+          <span class="ff-act-dot" aria-hidden="true"></span>
+          <span class="ff-item-who"><b>${en ? a.en : a.th}</b><small>${n} ${en ? (n === 1 ? 'round' : 'rounds') : 'รอบ'}</small></span>
+          <span class="ff-caret" aria-hidden="true">${FF_CARET}</span>
+        </button>
+        ${open ? `<div class="ff-rounds">${rounds.map(({ d, slots }) => `<div class="ff-rday">${dayLabel(d)}</div>
+          ${slots.map(sl => `<div class="ff-rnd"><span class="ff-rnd-t">${sl.t}<small>${sl.to}</small></span>
+            <span class="ff-people">${sl[a.k].map(pid => { const pm = getMember(pid); if(!pm) return '';
+              return `<span class="ff-chip">${renderAvatar(pm, 'avatar-sm ff-chip-face', (getGroup(pm.groupId) || {}).color)}${escapeHtml(pm.name)}</span>`; }).join('')}</span>
+          </div>`).join('')}`).join('')}</div>` : ''}
+      </div>`;
+    }).join('');
     return `<div class="ff">
       <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
       ${tabs}
       <div class="ff-list">${rows}</div>
-      <p class="ff-note">${en ? 'Tap a member to see her hours; tap an hour to see who else is on that round'
-        : 'แตะชื่อเพื่อดูกิจกรรมของเธอ แตะกิจกรรมเพื่อดูว่ารอบนั้นมีใครบ้าง'}</p>
+      <p class="ff-note">${en ? 'Tap an activity to see who is on each round'
+        : 'แตะกิจกรรมเพื่อดูว่าแต่ละรอบมีใครบ้าง'}</p>
     </div>`;
   }
 
@@ -14088,10 +14078,7 @@ function bindDelegatedEvents(){
       state.ffTab = el.dataset.value; ffPaint();
     }
     else if(action==='ff-open'){
-      state.ffOpen = state.ffOpen === id ? null : id; state.ffRound = null; ffPaint();
-    }
-    else if(action==='ff-round'){
-      state.ffRound = state.ffRound === el.dataset.value ? null : el.dataset.value; ffPaint();
+      state.ffOpen = state.ffOpen === id ? null : id; ffPaint();
     }
     else if(action==='ff-who'){
       state.ffWho = state.ffWho === id ? null : id; state.ffPick = null;
@@ -14101,7 +14088,6 @@ function bindDelegatedEvents(){
       const [d, i] = el.dataset.value.split('.').map(Number);
       const same = state.ffTab === 'plan' && state.ffDay === d && state.ffSlot === i;
       state.ffDay = d; state.ffSlot = same ? null : i;
-      if(state.ffTab !== 'plan'){ state.ffWho = state.ffOpen; state.ffPick = null; state.ffTab = 'plan'; }
       ffPaint();
     }
     else if(action==='edit-evlinks'){
