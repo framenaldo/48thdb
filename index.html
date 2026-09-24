@@ -4500,6 +4500,33 @@ const SEED_SCHEDULE = [
       'งานประกาศผลเลือกโซนได้อิสระ ส่วน Journey of Dreams เลือกได้ 4 โซน: A, BC, BL/BR และ C',
       'ขาย 26 ก.ย. 12:00 – 10 ต.ค. 2026 21:00 ทาง eventpop.me',
       'เลือกที่นั่ง 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้'] },
+  /* The single's roadshows, from the September–October schedule. Where the
+     line-up says "to be announced", lineupTba says so on the card. */
+  { id:'ev-kimi-roadshow-union', logo:'kimi', start:'2026-10-10', end:'2026-10-11',
+    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
+    venue:'Union Mall, Bangkok', groups:['bnk48','cgm48'],
+    timeline:'ge2026', related:['ev-ge6-single'],
+    members:['bnk-hoop','bnk-pancake','bnk-praew','cgm-chifa','cgm-lingling','cgm-prae'],
+    info:['รอบเวลารอประกาศอีกครั้ง'] },
+  { id:'ev-partner-1017', start:'2026-10-17', title:'To be announced',
+    venue:'Chiang Mai', tag:'partner', tba:true },
+  { id:'ev-kimi-roadshow-t21', logo:'kimi', start:'2026-10-17', end:'2026-10-18',
+    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
+    venue:'Terminal21 Rama 3, Bangkok', groups:['bnk48','cgm48'], lineupTba:true,
+    timeline:'ge2026', related:['ev-ge6-single'],
+    info:['รอบเวลารอประกาศอีกครั้ง'] },
+  { id:'ev-kimi-roadshow-cnx', logo:'kimi', start:'2026-10-17', end:'2026-10-18',
+    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
+    venue:'Central Chiangmai Airport, Chiang Mai', groups:['cgm48'],
+    timeline:'ge2026', related:['ev-ge6-single'],
+    members:['cgm-chifa','cgm-emma','cgm-ginna','cgm-jingjing','cgm-kwan','cgm-lewlew',
+      'cgm-lingling','cgm-lookked','cgm-nana','cgm-prae','cgm-satangpound','cgm-shenae'],
+    info:['รอบเวลารอประกาศอีกครั้ง'] },
+  { id:'ev-kimi-roadshow-mbk', logo:'kimi', start:'2026-10-24', end:'2026-10-25',
+    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
+    venue:'MBK Center, Bangkok', groups:['bnk48','cgm48'], lineupTba:true,
+    timeline:'ge2026', related:['ev-ge6-single'],
+    info:['รอบเวลารอประกาศอีกครั้ง'] },
   { id:'ev-ge6-handshake', logo:'kimi', start:'2026-10-31', end:'2026-11-01',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Handshake Event',
     venue:'MCC Hall, The Mall Lifestore Ngamwongwan', groups:['bnk48','cgm48'],
@@ -4553,11 +4580,19 @@ const TIMELINES = {
       venue:'MCC Hall, The Mall Lifestore Bangkapi', ev:'ev-election-fanfest',
       note:'3 ต.ค. ประกาศผลโหวต 48 ชั่วโมงแรก และเปิดตัวเพลง "Kimi to Doko ka e Ikitai" ครั้งแรก' },
     { d:'2026-10-07', time:'12:00', kind:'start', track:'myo', title:'เปิดให้แลกบัตร Meeting You Online' },
+    { d:'2026-10-10', to:'2026-10-11', kind:'event', track:'single', title:'Roadshow ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"',
+      venue:'Union Mall, Bangkok', ev:'ev-kimi-roadshow-union' },
     { d:'2026-10-10', time:'21:00', kind:'end', track:'event', title:'ปิดขายบันเดิล', ev:'ev-ge6-bundle' },
     { d:'2026-10-13', to:'2026-10-14', time:'10:00', kind:'start', track:'event', title:'เลือกที่นั่งบันเดิล',
       note:'ถึง 14 ต.ค. 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้', ev:'ev-ge6-bundle' },
     { d:'2026-10-15', time:'12:00', kind:'start', track:'event', title:'เปิดขายบัตร Journey of Dreams 夢の旅 และงานประกาศผล',
       note:'ทาง eventpop.me', ev:'ev-concert-2026' },
+    { d:'2026-10-17', to:'2026-10-18', kind:'event', track:'single', title:'Roadshow ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"',
+      venue:'Terminal21 Rama 3, Bangkok', note:'รอประกาศรายชื่อ', ev:'ev-kimi-roadshow-t21' },
+    { d:'2026-10-17', to:'2026-10-18', kind:'event', track:'single', title:'Roadshow ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"',
+      venue:'Central Chiangmai Airport, Chiang Mai', ev:'ev-kimi-roadshow-cnx' },
+    { d:'2026-10-24', to:'2026-10-25', kind:'event', track:'single', title:'Roadshow ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"',
+      venue:'MBK Center, Bangkok', note:'รอประกาศรายชื่อ', ev:'ev-kimi-roadshow-mbk' },
     { d:'2026-10-30', time:'23:00', kind:'end', track:'single', title:'ปิดพรีออเดอร์ซิงเกิลพิเศษ Physical Edition', ev:'ev-ge6-single' },
     { d:'2026-10-31', to:'2026-11-01', kind:'event', track:'single', title:'Handshake Event ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"',
       venue:'MCC Hall, The Mall Lifestore Ngamwongwan', ev:'ev-ge6-handshake' },
@@ -5810,6 +5845,7 @@ const EN = {
   'เปิดให้แลกบัตร Meeting You Online': 'Redeeming Meeting You Online tickets opens',
   'ปิดพรีออเดอร์ซิงเกิลพิเศษ Physical Edition': 'Pre-order closes for the special single, Physical Edition',
   'Handshake Event ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"': 'Handshake Event for the special single "Kimi to Doko ka e Ikitai"',
+  'Roadshow ซิงเกิลพิเศษ "Kimi to Doko ka e Ikitai"': 'Roadshow for the special single "Kimi to Doko ka e Ikitai"',
   'ปิดแลกบัตร Meeting You Online [Round 1]': 'Redeeming Meeting You Online tickets closes [Round 1]',
   'ปิดแลกบัตร Meeting You Online [Round 2]': 'Redeeming Meeting You Online tickets closes [Round 2]',
   'ปิดพรีออเดอร์ Digital Edition และ Special Photoset': 'Pre-order closes for the Digital Edition and Special Photoset',
@@ -8365,7 +8401,7 @@ function renderEventCard(ev, todayIso){
     <div class="ev-body">
       ${(()=>{ const at = over ? null : startsAt(ev, todayIso);
         return at ? startsPill('ev-starts', ev, todayIso, at) : ''; })()}
-      <h3 class="ev-title">${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':''}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
+      <h3 class="ev-title">${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':ev.tag==='partner'?'<span class="ev-tag">Partner</span>':''}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
         groupTag(g)).join('')}</div>` : ''}

@@ -596,6 +596,55 @@ DTEND;VALUE=DATE:20261011
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-kimi-roadshow-union@48thdb
+DTSTAMP:20261010T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Union Mall\, Bangkok
+DESCRIPTION:เมมเบอร์: Hoop\, Pancake\, Praew\, Chifa\, Ling
+ ling\, Prae\n• รอบเวลารอประกาศอีกค
+ รั้ง\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-union
+URL:https://48thdb.com/?e=ev-kimi-roadshow-union
+DTSTART;VALUE=DATE:20261010
+DTEND;VALUE=DATE:20261012
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-t21@48thdb
+DTSTAMP:20261017T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Terminal21 Rama 3\, Bangkok
+DESCRIPTION:รอประกาศรายชื่อ\n• รอบเ
+ วลารอประกาศอีกครั้ง\n\nhttps://48thd
+ b.com/?e=ev-kimi-roadshow-t21
+URL:https://48thdb.com/?e=ev-kimi-roadshow-t21
+DTSTART;VALUE=DATE:20261017
+DTEND;VALUE=DATE:20261019
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-cnx@48thdb
+DTSTAMP:20261017T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Central Chiangmai Airport\, Chiang Mai
+DESCRIPTION:เมมเบอร์: Chifa\, Emma\, Ginna\, Jingjing\, Kwa
+ n\, Lewlew\, Lingling\, Lookked\, Nana\, Prae\, Satangpound\, Shenae\n• 
+ รอบเวลารอประกาศอีกครั้ง\n\nh
+ ttps://48thdb.com/?e=ev-kimi-roadshow-cnx
+URL:https://48thdb.com/?e=ev-kimi-roadshow-cnx
+DTSTART;VALUE=DATE:20261017
+DTEND;VALUE=DATE:20261019
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-mbk@48thdb
+DTSTAMP:20261024T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:MBK Center\, Bangkok
+DESCRIPTION:รอประกาศรายชื่อ\n• รอบเ
+ วลารอประกาศอีกครั้ง\n\nhttps://48thd
+ b.com/?e=ev-kimi-roadshow-mbk
+URL:https://48thdb.com/?e=ev-kimi-roadshow-mbk
+DTSTART;VALUE=DATE:20261024
+DTEND;VALUE=DATE:20261026
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-ge6-handshake@48thdb
 DTSTAMP:20261031T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Handshake E
