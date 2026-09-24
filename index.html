@@ -2331,12 +2331,10 @@
   .ff-acts{ display:flex; gap:6px; overflow-x:auto; padding:2px 1px 5px; margin-bottom:8px; scrollbar-width:none; }
   .ff-acts::-webkit-scrollbar{ display:none; }
   .ff-act{ flex:none; border:1.5px solid var(--line); border-top:4px solid var(--c); border-radius:12px; background:var(--card);
-    color:var(--c); font:inherit; font-size:12.5px; font-weight:800; line-height:1.2; padding:7px 12px; cursor:pointer;
+    color:var(--c); font:inherit; font-size:13px; font-weight:800; line-height:1.2; padding:9px 13px; cursor:pointer;
     text-align:center; white-space:nowrap; box-shadow:0 2px 0 rgba(var(--shadow-rgb),.1); }
-  .ff-act small{ display:block; font-size:10px; font-weight:600; color:var(--ink-soft); }
   .ff-act:active{ transform:translateY(2px); box-shadow:none; }
   .ff-act.on{ background:var(--c); border-color:var(--c); color:#fff; }
-  .ff-act.on small{ color:#fff; opacity:.85; }
   .ff-rounds{ border:1.5px solid var(--line); border-top:4px solid var(--c); border-radius:16px; background:var(--card); padding:2px 10px 8px; }
   .ff-rday{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin:8px 0 5px; }
   .ff-rnd{ display:flex; gap:9px; align-items:flex-start; padding:7px 0; border-top:1px dashed var(--line); }
@@ -9826,11 +9824,9 @@ function renderBoothPlan(ev){
   // order; the one picked lists every round of it with the members on it ----
   if(acts){
     const cur = FF_ACTS.find(a => a.k === state.ffOpen) || FF_ACTS.find(a => a.k === FF_MENU[0]);
-    const menu = FF_MENU.map(k => FF_ACTS.find(a => a.k === k)).map(a => {
-      const n = FF_DAYS.reduce((t, d) => t + d.slots.filter(s => (s[a.k] || []).length).length, 0);
-      return `<button class="ff-act${a === cur ? ' on' : ''}" style="--c:${a.c}" data-action="ff-open" data-id="${a.k}"
-        aria-pressed="${a === cur}">${en ? a.en : a.th}<small>${n} ${en ? (n === 1 ? 'round' : 'rounds') : 'รอบ'}</small></button>`;
-    }).join('');
+    const menu = FF_MENU.map(k => FF_ACTS.find(a => a.k === k)).map(a =>
+      `<button class="ff-act${a === cur ? ' on' : ''}" style="--c:${a.c}" data-action="ff-open" data-id="${a.k}"
+        aria-pressed="${a === cur}">${en ? a.en : a.th}</button>`).join('');
     const rounds = FF_DAYS.map(d => ({ d, slots: d.slots.filter(s => (s[cur.k] || []).length) })).filter(x => x.slots.length)
       .map(({ d, slots }) => `<div class="ff-rday">${dayLabel(d)}</div>
         ${slots.map(sl => `<div class="ff-rnd"><span class="ff-rnd-t">${sl.t}<small>${sl.to}</small></span>
