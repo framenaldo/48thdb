@@ -2307,6 +2307,7 @@
     padding:4px 8px; cursor:pointer; }
   .ff-when b{ color:var(--ink); font-size:12px; }
   .ff-when.on{ background:color-mix(in srgb, var(--a) 12%, var(--card)); color:var(--ink); }
+  .ff-when.is-off{ cursor:default; background:var(--paper-dim); }   /* an hour away from the plan: listed, not tappable */
   /* the hours */
   .ff-times{ display:flex; gap:6px; overflow-x:auto; padding-bottom:3px; }
   .ff-times button{ flex:none; border:1.5px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink);
@@ -9778,11 +9779,12 @@ const FF_DAYS = [
   ] },
 ];
 /* The festival's programme, one key per column of the organiser's schedule.
-   Only the booth visits light up booths on the plan; the stage draws its own
-   members, and the rest happens away from the booth floor. */
+   The booth plan shows only the two marked `plan` — booth visits and the
+   stage; the rest happens away from the booth floor and is listed on the
+   activities tab. */
 const FF_ACTS = [
-  { k:'booth',   th:'ลงบูธ',            en:'Booth visits',   c:'#C08A2E' },
-  { k:'stage',   th:'ขึ้นเวที',          en:'Main stage',     c:'#B3121E' },
+  { k:'booth',   th:'ลงบูธ',            en:'Booth visits',   c:'#C08A2E', plan:true },
+  { k:'stage',   th:'ขึ้นเวที',          en:'Main stage',     c:'#B3121E', plan:true },
   { k:'hitouch', th:'Group Hi-Touch',   en:'Group Hi-Touch', c:'#7A4FC0' },
   { k:'hachi',   th:'Hachi Cha',        en:'Hachi Cha',      c:'#2F7D4F' },
   { k:'merch',   th:'Merchandise',      en:'Merchandise',    c:'#2D6CB0' },
@@ -9832,9 +9834,12 @@ function renderBoothPlan(ev){
             <span class="ff-item-no">${en ? 'Booth' : 'บูธ'} ${ffBoothOf(id)}</span>
             <span class="ff-caret" aria-hidden="true">${FF_CARET}</span>
           </button>
-          ${open ? `<div class="ff-item-body">${hours.length ? hours.map(h => `<button class="ff-when" style="--a:${h.a.c}"
-            data-action="ff-when" data-value="${h.di}.${h.si}"><b>${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}</b>${en ? h.a.en : h.a.th}${
-              h.a.k === 'booth' ? ` · ${en ? 'Booth' : 'บูธ'} ${ffBoothOf(id)}` : ''}</button>`).join('')
+          ${open ? `<div class="ff-item-body">${hours.length ? hours.map(h => {
+            // only booth and stage hours lead to the plan; the others are just listed
+            const tag = h.a.plan ? 'button' : 'span';
+            return `<${tag} class="ff-when${h.a.plan ? '' : ' is-off'}" style="--a:${h.a.c}"${h.a.plan
+              ? ` data-action="ff-when" data-value="${h.di}.${h.si}"` : ''}><b>${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}</b>${en ? h.a.en : h.a.th}${
+              h.a.k === 'booth' ? ` · ${en ? 'Booth' : 'บูธ'} ${ffBoothOf(id)}` : ''}</${tag}>`; }).join('')
             : `<p class="ff-pick-none">${en ? 'Not on this plan' : 'ไม่มีกิจกรรมในผังนี้'}</p>`}</div>` : ''}
         </div>`;
       }).join('');
@@ -9866,7 +9871,7 @@ function renderBoothPlan(ev){
       <b>${ffBoothOf(id)}</b></button>`;
   }).join('');
 
-  const legend = slot ? `<div class="ff-now">${FF_ACTS.filter(a => (slot[a.k] || []).length).map(a =>
+  const legend = slot ? `<div class="ff-now">${FF_ACTS.filter(a => a.plan && (slot[a.k] || []).length).map(a =>
     `<div class="ff-row" style="--a:${a.c}"><span class="ff-lab">${(en ? a.en : a.th).split(' ').map(w => `<span>${w}</span>`).join(' ')}</span><span class="ff-people">${chips(slot[a.k])}</span></div>`).join('')}
     </div>` : '';
 
@@ -9875,7 +9880,7 @@ function renderBoothPlan(ev){
     : 'แตะที่เมมเบอร์เพื่อดูกิจกรรมของเธอ หรือแตะที่บูธเพื่อดูว่าเป็นบ้านของใคร'}</p>`;
   const who = state.ffWho ? getMember(state.ffWho) : null;
   if(who){
-    const g = getGroup(who.groupId) || {}, hours = ffHours(who.id);
+    const g = getGroup(who.groupId) || {}, hours = ffHours(who.id).filter(h => h.a.plan);
     pickCard = `<div class="ff-pick is-who" style="--c:${g.color}">
       ${renderAvatar(who, 'avatar-sm ff-pick-face', g.color)}
       <span class="ff-pick-who"><b>${escapeHtml(who.name)}</b><small>${escapeHtml(g.name || '')}</small></span>
