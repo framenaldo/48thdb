@@ -2307,7 +2307,7 @@
     padding:4px 8px; cursor:pointer; }
   .ff-when b{ color:var(--ink); font-size:12px; }
   .ff-when.on{ background:color-mix(in srgb, var(--a) 12%, var(--card)); color:var(--ink); }
-  .ff-when.is-off{ cursor:default; background:var(--paper-dim); }   /* an hour away from the plan: listed, not tappable */
+  .ff-when:active{ transform:translateY(1px); }
   /* the hours */
   .ff-times{ display:flex; gap:6px; overflow-x:auto; padding-bottom:3px; }
   .ff-times button{ flex:none; border:1.5px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink);
@@ -2343,6 +2343,15 @@
   .ff-caret svg{ width:100%; height:100%; display:block; }
   .ff-item.is-open .ff-caret{ transform:rotate(180deg); }
   .ff-item-body{ display:flex; flex-wrap:wrap; gap:6px; padding:0 10px 10px 53px; }
+  /* an hour opened: everyone on that round */
+  .ff-round{ flex-basis:100%; display:flex; flex-direction:column; gap:7px; padding:9px 10px; border-radius:12px;
+    background:color-mix(in srgb, var(--a) 8%, var(--card)); border:1.5px solid color-mix(in srgb, var(--a) 30%, var(--line)); }
+  .ff-round-lab{ font-size:11.5px; font-weight:800; color:var(--a); }
+  .ff-round .ff-chip{ cursor:default; }
+  .ff-round .ff-chip.is-me{ border-color:var(--a); box-shadow:0 0 0 1px var(--a); }
+  .ff-round-go{ align-self:flex-start; border:1.5px solid var(--line); border-radius:99px; background:var(--card); color:var(--ink);
+    font:inherit; font-size:11.5px; font-weight:700; padding:4px 11px; cursor:pointer; box-shadow:0 2px 0 rgba(var(--shadow-rgb),.1); }
+  .ff-round-go:active{ transform:translateY(2px); box-shadow:none; }
   @media (min-width:640px){
     .ff-hall{ aspect-ratio:.95; --bw:34px; }
     .ff-nm{ display:block; }
@@ -5255,7 +5264,7 @@ const ICONS = {
 // ============================= STATE =============================
 let state = {
   isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
-  ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOpen:null,
+  ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOpen:null, ffRound:null,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
@@ -9835,11 +9844,18 @@ function renderBoothPlan(ev){
             <span class="ff-caret" aria-hidden="true">${FF_CARET}</span>
           </button>
           ${open ? `<div class="ff-item-body">${hours.length ? hours.map(h => {
-            // only booth and stage hours lead to the plan; the others are just listed
-            const tag = h.a.plan ? 'button' : 'span';
-            return `<${tag} class="ff-when${h.a.plan ? '' : ' is-off'}" style="--a:${h.a.c}"${h.a.plan
-              ? ` data-action="ff-when" data-value="${h.di}.${h.si}"` : ''}><b>${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}</b>${en ? h.a.en : h.a.th}${
-              h.a.k === 'booth' ? ` · ${en ? 'Booth' : 'บูธ'} ${ffBoothOf(id)}` : ''}</${tag}>`; }).join('')
+            // an hour opens the round below it: everyone doing that activity then
+            const key = `${h.di}.${h.si}.${h.a.k}`, on = state.ffRound === key;
+            const pill = `<button class="ff-when${on ? ' on' : ''}" style="--a:${h.a.c}" data-action="ff-round" data-value="${key}"
+              aria-expanded="${on}"><b>${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}</b>${en ? h.a.en : h.a.th}</button>`;
+            if(!on) return pill;
+            const people = (h.s[h.a.k] || []).map(pid => { const pm = getMember(pid); if(!pm) return '';
+              return `<span class="ff-chip${pid === id ? ' is-me' : ''}">${renderAvatar(pm, 'avatar-sm ff-chip-face', (getGroup(pm.groupId) || {}).color)}${escapeHtml(pm.name)}</span>`; }).join('');
+            return pill + `<div class="ff-round" style="--a:${h.a.c}">
+              <span class="ff-round-lab">${en ? `${h.a.en}, ${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}` : `${h.a.th} รอบ ${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}`}</span>
+              <span class="ff-people">${people}</span>
+              ${h.a.plan ? `<button class="ff-round-go" data-action="ff-when" data-value="${h.di}.${h.si}">${en ? 'See it on the plan →' : 'ดูบนผัง →'}</button>` : ''}
+            </div>`; }).join('')
             : `<p class="ff-pick-none">${en ? 'Not on this plan' : 'ไม่มีกิจกรรมในผังนี้'}</p>`}</div>` : ''}
         </div>`;
       }).join('');
@@ -9847,8 +9863,8 @@ function renderBoothPlan(ev){
       <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
       ${tabs}
       <div class="ff-list">${rows}</div>
-      <p class="ff-note">${en ? 'Tap a member to see her hours; tap an hour to find her on the plan'
-        : 'แตะชื่อเพื่อดูกิจกรรมของเธอ แตะเวลาเพื่อดูตำแหน่งบนผัง'}</p>
+      <p class="ff-note">${en ? 'Tap a member to see her hours; tap an hour to see who else is on that round'
+        : 'แตะชื่อเพื่อดูกิจกรรมของเธอ แตะกิจกรรมเพื่อดูว่ารอบนั้นมีใครบ้าง'}</p>
     </div>`;
   }
 
@@ -14072,7 +14088,10 @@ function bindDelegatedEvents(){
       state.ffTab = el.dataset.value; ffPaint();
     }
     else if(action==='ff-open'){
-      state.ffOpen = state.ffOpen === id ? null : id; ffPaint();
+      state.ffOpen = state.ffOpen === id ? null : id; state.ffRound = null; ffPaint();
+    }
+    else if(action==='ff-round'){
+      state.ffRound = state.ffRound === el.dataset.value ? null : el.dataset.value; ffPaint();
     }
     else if(action==='ff-who'){
       state.ffWho = state.ffWho === id ? null : id; state.ffPick = null;
