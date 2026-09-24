@@ -2271,12 +2271,14 @@
     box-shadow:0 0 0 2px #fff; }
   .ff-up small{ font-size:8.5px; font-weight:700; max-width:46px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   @keyframes ff-rise{ from{ transform:translateY(6px); opacity:0; } }
-  /* the hall's one door, used both ways: an opening in the wall and a tag beside it */
-  .ff-door{ position:absolute; left:0; top:46%; transform:translateY(-50%); display:flex; align-items:center; gap:5px; pointer-events:none; }
-  .ff-door::before{ content:''; width:4px; height:38px; border-radius:0 3px 3px 0; background:#3FB5A5;
-    box-shadow:0 0 10px rgba(63,181,165,.7); }
+  /* the doors, entrance above and exit below: an opening in the wall and a tag beside it */
+  .ff-door{ position:absolute; left:0; top:var(--y); transform:translateY(-50%); display:flex; align-items:center; gap:5px;
+    pointer-events:none; --d:63,181,165; --dt:#BFE9E2; }
+  .ff-door.is-out{ --d:240,138,93; --dt:#FAD2BF; }
+  .ff-door::before{ content:''; width:4px; height:30px; border-radius:0 3px 3px 0; background:rgb(var(--d));
+    box-shadow:0 0 10px rgba(var(--d),.7); }
   .ff-door span{ display:inline-flex; align-items:center; gap:4px; padding:3px 8px 3px 6px; border-radius:999px;
-    background:rgba(63,181,165,.14); border:1px solid rgba(63,181,165,.45); color:#BFE9E2;
+    background:rgba(var(--d),.14); border:1px solid rgba(var(--d),.45); color:var(--dt);
     font-size:9.5px; font-weight:800; white-space:nowrap; }
   .ff-door svg{ width:12px; height:12px; flex:none; }
   .ff-b{ position:absolute; transform:translate(-50%,-50%); width:var(--bw); height:var(--bw); padding:0; cursor:pointer;
@@ -9978,7 +9980,8 @@ function renderBoothPlan(ev){
             style="--c:${(getGroup(m.groupId) || {}).color}">${renderAvatar(m, 'avatar-sm ff-up-face', (getGroup(m.groupId) || {}).color)}
             <small>${escapeHtml(m.name)}</small></button>`; }).join('')}</span>` : ''}
       </div>
-      <span class="ff-door"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg>${en ? 'In &amp; out' : 'ทางเข้า-ออก'}</span></span>
+      <span class="ff-door" style="--y:39%"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>${en ? 'Entrance' : 'ทางเข้า'}</span></span>
+      <span class="ff-door is-out" style="--y:50%"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>${en ? 'Exit' : 'ทางออก'}</span></span>
       ${booths}
     </div>
     ${pickCard}
