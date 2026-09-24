@@ -2285,8 +2285,6 @@
   .ff-nm.is-below{ left:50%; top:calc(100% + 2px); transform:translateX(-50%); }
   :root[data-theme="dark"] .ff-nm{ color:#B8A583; }
   /* the booth that was tapped */
-  .ff-idle{ margin:10px 0 0; padding:9px; border:1.5px dashed var(--line); border-radius:14px; text-align:center;
-    font-size:12.5px; color:var(--ink-soft); }
   .ff-pick{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; margin-top:10px; padding:9px 10px;
     border:1.5px solid var(--line); border-radius:16px; background:var(--card); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.05); }
   .ff-pick.is-who{ border-color:var(--c); }
@@ -2367,7 +2365,6 @@
   @keyframes ff-ring{ 0%{ transform:scale(.3); opacity:1; } 100%{ transform:scale(2.2); opacity:0; } }
   @media (prefers-reduced-motion:reduce){ .ff-ring{ display:none; } }
   /* the card under the plan, and the hours */
-  .ff-board .ff-idle{ border-color:rgba(255,255,255,.18); color:#9C8E97; }
   .ff-board .ff-pick{ background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); box-shadow:0 3px 0 rgba(0,0,0,.45); color:#F4ECF1; }
   .ff-board .ff-pick.is-who{ border-color:var(--c); }
   .ff-board .ff-pick-who small, .ff-board .ff-pick-none{ color:#B9ABB3; }
@@ -9936,8 +9933,7 @@ function renderBoothPlan(ev){
     </div>` : '';
 
   // a member who was tapped answers with her own hours; a booth answers with whose it is
-  let pickCard = `<p class="ff-idle">${en ? 'Tap a member to see her hours, or a booth to see whose fan club it is'
-    : 'แตะที่เมมเบอร์เพื่อดูกิจกรรมของเธอ หรือแตะที่บูธเพื่อดูว่าเป็นบ้านของใคร'}</p>`;
+  let pickCard = '';
   const who = state.ffWho ? getMember(state.ffWho) : null;
   if(who){
     const g = getGroup(who.groupId) || {}, hours = ffHours(who.id).filter(h => h.a.plan);
@@ -9977,7 +9973,7 @@ function renderBoothPlan(ev){
             style="--c:${(getGroup(m.groupId) || {}).color}">${renderAvatar(m, 'avatar-sm ff-up-face', (getGroup(m.groupId) || {}).color)}
             <small>${escapeHtml(m.name)}</small></button>`; }).join('')}</span>` : ''}
       </div>
-      <span class="ff-entry">▶ ${en ? 'entrance' : 'ทางเข้า'}</span>
+      <span class="ff-entry">▶︎ ${en ? 'entrance' : 'ทางเข้า'}</span>
       ${booths}
     </div>
     ${pickCard}
