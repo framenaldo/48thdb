@@ -2243,6 +2243,87 @@
   .ge-shop-card b{ font-size:13.5px; line-height:1.35; }
   .ge-shop-card small{ font-size:13px; font-weight:800; color:var(--c); }
   .tlp.is-in-hub .tlp-legend{ margin:0 0 14px; }
+  /* ===== fan festival booth plan ===== */
+  .ff{ margin-top:6px; }
+  .ff-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .ff-days{ display:flex; gap:3px; padding:3px; border-radius:11px; background:var(--paper-dim); }
+  .ff-days button{ border:0; background:none; font:inherit; font-size:12px; font-weight:700; color:var(--ink-soft);
+    padding:5px 10px; border-radius:8px; cursor:pointer; }
+  .ff-days button.on{ background:var(--card); color:var(--ink); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.08); }
+  .ff-count{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .ff-spacer{ flex:1; min-width:74px; }   /* keeps clear of the sheet's share and close buttons */
+  /* the hall, seen from above: the floor, the stage, and a tile for every booth */
+  .ff-hall{ position:relative; width:100%; aspect-ratio:.54; border-radius:14px; overflow:hidden;
+    background:#F6E7CE; border:2px solid #E3CFAE; --bw:31px; }
+  :root[data-theme="dark"] .ff-hall{ background:#2E2618; border-color:#463A25; }
+  .ff-stage{ position:absolute; left:20%; width:60%; top:1.6%; min-height:5.4%; padding:3px 6px; border-radius:8px;
+    background:var(--ink); color:var(--paper); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    font-size:10.5px; font-weight:800; letter-spacing:.14em; }
+  .ff-stage.lit{ background:#B3121E; color:#fff; box-shadow:0 0 0 3px rgba(179,18,30,.25); }
+  .ff-onstage{ display:flex; gap:4px; justify-content:center; flex-wrap:wrap; }
+  .ff-up{ border:0; background:none; padding:0; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:1px;
+    color:#fff; font:inherit; letter-spacing:0; animation:ff-rise .3s ease-out; }
+  .ff-up-face{ width:30px !important; height:30px !important; border-radius:8px !important; font-size:9px;
+    box-shadow:0 0 0 2px #fff; }
+  .ff-up small{ font-size:8.5px; font-weight:700; max-width:46px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  @keyframes ff-rise{ from{ transform:translateY(6px); opacity:0; } }
+  .ff-entry{ position:absolute; left:2%; top:46%; font-size:9px; font-weight:800; color:#9A8468; letter-spacing:.05em; }
+  :root[data-theme="dark"] .ff-entry{ color:#9C8A6A; }
+  .ff-b{ position:absolute; transform:translate(-50%,-50%); width:var(--bw); height:var(--bw); padding:0; cursor:pointer;
+    border:2px solid var(--c); border-radius:7px; background:var(--card) var(--img) center/cover; color:inherit; font:inherit;
+    transition:transform .16s, opacity .16s, box-shadow .16s; }
+  .ff-b:active{ transform:translate(-50%,-50%) scale(.94); }
+  .ff-n{ position:absolute; left:-4px; top:-5px; min-width:15px; height:15px; padding:0 3px; border-radius:5px; background:var(--c);
+    color:#fff; font-size:9px; font-weight:800; display:grid; place-items:center; border:1.5px solid var(--card); }
+  .ff-nm{ position:absolute; font-size:9px; font-weight:700; color:#6B5B43; white-space:nowrap; display:none; }
+  .ff-nm.is-right{ left:calc(100% + 5px); top:50%; transform:translateY(-50%); }
+  .ff-nm.is-left{ right:calc(100% + 5px); top:50%; transform:translateY(-50%); }
+  .ff-nm.is-below{ left:50%; top:calc(100% + 2px); transform:translateX(-50%); }
+  :root[data-theme="dark"] .ff-nm{ color:#B8A583; }
+  /* an hour picked: the booths she visits come forward, the rest settle back */
+  .ff.is-hour .ff-b{ opacity:.4; filter:grayscale(.55); }
+  .ff.is-hour .ff-b.is-here{ opacity:1; filter:none; transform:translate(-50%,-50%) scale(1.14);
+    box-shadow:0 0 0 2px var(--card), 0 0 0 4px #C08A2E, 0 6px 14px rgba(var(--shadow-rgb),.35); z-index:3; }
+  .ff.is-hour .ff-b.is-here .ff-nm{ color:var(--ink); font-weight:800; }
+  .ff-b.is-pick{ box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--ink); z-index:4; opacity:1 !important; filter:none !important; }
+  /* the booth that was tapped */
+  .ff-idle{ margin:10px 0 0; padding:9px; border:1.5px dashed var(--line); border-radius:14px; text-align:center;
+    font-size:12.5px; color:var(--ink-soft); }
+  .ff-pick{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; margin-top:10px; padding:9px 10px;
+    border:1.5px solid var(--line); border-radius:16px; background:var(--card); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.05); }
+  .ff-pick-face{ width:44px !important; height:44px !important; border-radius:12px !important; font-size:11px; }
+  .ff-pick-who b{ display:block; font-size:15.5px; line-height:1.2; }
+  .ff-pick-who small{ font-size:11.5px; color:var(--ink-soft); }
+  .ff-pick-no{ font-size:11px; font-weight:800; color:#fff; background:var(--c); padding:3px 10px; border-radius:99px; }
+  .ff-pick-day{ grid-column:1/-1; display:flex; flex-wrap:wrap; gap:6px; }
+  .ff-when{ display:flex; align-items:center; gap:5px; border:1.5px solid var(--line); border-left:4px solid var(--a);
+    border-radius:10px; background:var(--card); font:inherit; font-size:11.5px; font-weight:600; color:var(--ink-soft);
+    padding:4px 8px; cursor:pointer; }
+  .ff-when b{ color:var(--ink); font-size:12px; }
+  .ff-when.on{ background:color-mix(in srgb, var(--a) 12%, var(--card)); color:var(--ink); }
+  /* the hours */
+  .ff-times{ display:flex; gap:6px; overflow-x:auto; padding-bottom:3px; }
+  .ff-times button{ flex:none; border:1.5px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink);
+    font:inherit; font-size:12.5px; font-weight:700; line-height:1.2; padding:7px 11px; cursor:pointer; text-align:center; }
+  .ff-times button small{ display:block; font-size:10px; font-weight:600; color:var(--ink-soft); }
+  .ff-times button.on{ background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .ff-times button.on small{ color:var(--paper); opacity:.75; }
+  /* who is doing what in the chosen hour */
+  .ff-now{ margin-top:10px; border:1.5px solid var(--line); border-radius:16px; overflow:hidden; }
+  .ff-row{ display:flex; gap:8px; padding:8px 10px; background:var(--card); }
+  .ff-row + .ff-row{ border-top:1px solid var(--line); }
+  .ff-lab{ flex:none; width:82px; font-size:11.5px; font-weight:800; color:var(--a); line-height:1.5; }
+  .ff-people{ display:flex; flex-wrap:wrap; gap:5px; }
+  .ff-chip{ display:inline-flex; align-items:center; gap:5px; border:1.5px solid var(--line); border-radius:99px;
+    background:var(--card); color:var(--ink); font:inherit; font-size:12px; font-weight:700; padding:2px 4px 2px 2px; cursor:pointer; }
+  .ff-chip b{ font-size:10px; font-weight:800; color:var(--ink-soft); background:var(--paper-dim); border-radius:99px; padding:1px 5px; }
+  .ff-chip-face{ width:20px !important; height:20px !important; font-size:8px; }
+  .ff-note{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; margin:9px 2px 0; }
+  @media (min-width:640px){
+    .ff-hall{ aspect-ratio:.95; --bw:34px; }
+    .ff-nm{ display:block; }
+    .ff-lab{ width:96px; }
+  }
   /* the owner's link editor in an event sheet */
   .evl-open{ margin-top:14px; }
   .evl{ margin-top:14px; padding:12px; border-radius:16px; border:1.5px dashed var(--line); background:color-mix(in srgb, var(--card) 70%, transparent); }
@@ -4204,7 +4285,7 @@ const SEED_SCHEDULE = [
       'Kami7 Special Project — เพลงร่วมกับ AKB48',
       '#BNK48CGM48_GE2026'],
     allMembers:true },
-  { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04',
+  { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04', boothPlan:'fanfest',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
     related:['ev-election-voting','ev-election-results','ev-ge6-single'],
@@ -5147,6 +5228,7 @@ const ICONS = {
 // ============================= STATE =============================
 let state = {
   isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
+  ffDay:0, ffSlot:null, ffPick:null,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
@@ -9623,6 +9705,137 @@ async function saveEventLinks(ev){
   toast('บันทึกลิงก์แล้ว');
 }
 
+/* The fan festival floor: one booth per member, numbered as on the
+   organiser's plan, and the hour-by-hour activity schedule. Booths run in
+   columns down the hall — [first, last, x%, y start%, y end%] — with the last
+   ten along the bottom. A member is away from their booth while an activity
+   runs, which is what the schedule below says and the plan shows. */
+const FF_COLS = [[1,5,11,14,32], [6,12,11,56,86], [13,21,39,43,81], [22,30,57,43,81], [31,48,87,14,86]];
+const FF_ROW = [49,58,13,87,93];   // [first, last, x start%, x end%, y%]
+/* booth 1 upward */
+const FF_BOOTHS = ['bnk-nall', 'bnk-neen', 'bnk-arlee', 'bnk-l', 'bnk-grape', 'cgm-satangpound', 'cgm-lewlew', 'cgm-punpon', 'cgm-lingling', 'bnk-patt', 'bnk-micha', 'bnk-mint', 'bnk-mail', 'cgm-else', 'cgm-shenae', 'bnk-nammonn', 'bnk-pancake', 'bnk-monet', 'bnk-praew', 'bnk-luksorn', 'bnk-cartoon', 'cgm-emma', 'bnk-palmmy', 'cgm-chifa', 'cgm-lookked', 'cgm-ginna', 'cgm-jingjing', 'bnk-khaimook', 'bnk-marine', 'bnk-janry', 'bnk-berry', 'bnk-galeya', 'bnk-mayji', 'cgm-praifa', 'bnk-emmy', 'bnk-blythe', 'bnk-mirin', 'bnk-wawa', 'bnk-hoop', 'bnk-sindy', 'bnk-inkcha', 'cgm-nisha', 'bnk-jew', 'cgm-tara', 'cgm-nana', 'cgm-namphet', 'cgm-kwan', 'cgm-hongyok', 'bnk-saonoi', 'bnk-rose', 'bnk-niya', 'bnk-khowjow', 'bnk-proud', 'bnk-yoghurt', 'bnk-fame', 'cgm-ploen', 'cgm-prae', 'cgm-valentine'];
+const FF_DAYS = [
+  { date:'2026-10-03', slots:[
+    { t:'11:00', to:'12:00', stage:['cgm-praifa', 'bnk-luksorn', 'bnk-blythe', 'bnk-rose'], booth:['bnk-mirin', 'cgm-nana', 'cgm-chifa', 'bnk-wawa'] },
+    { t:'12:00', to:'13:00', stage:['cgm-tara', 'cgm-ploen', 'bnk-mirin', 'bnk-cartoon'], booth:['cgm-lookked', 'cgm-shenae', 'bnk-blythe', 'bnk-marine'] },
+    { t:'13:00', to:'14:00', stage:['bnk-proud', 'cgm-lookked', 'bnk-mail', 'cgm-shenae'], booth:['cgm-ploen', 'cgm-tara', 'bnk-niya', 'bnk-l'] },
+    { t:'14:00', to:'15:00', stage:['bnk-marine', 'cgm-emma', 'bnk-wawa', 'bnk-yoghurt'], booth:['bnk-cartoon', 'bnk-luksorn', 'bnk-fame', 'bnk-mail'] },
+    { t:'15:00', to:'16:00', stage:['bnk-l', 'cgm-chifa', 'bnk-fame', 'bnk-niya'], booth:['bnk-rose', 'cgm-praifa', 'cgm-emma', 'bnk-proud'] },
+  ] },
+  { date:'2026-10-04', slots:[
+    { t:'11:00', to:'12:00', stage:['bnk-palmmy', 'bnk-nall', 'cgm-punpon', 'cgm-lewlew', 'bnk-inkcha'], booth:['cgm-nisha', 'bnk-hoop', 'bnk-galeya', 'bnk-grape', 'cgm-ginna'] },
+    { t:'12:00', to:'13:00', stage:['bnk-jew', 'cgm-nana', 'bnk-mint', 'cgm-valentine', 'cgm-else'], booth:['bnk-mayji', 'cgm-lewlew', 'bnk-nall', 'bnk-monet', 'bnk-neen'] },
+    { t:'13:00', to:'14:00', stage:['cgm-ginna', 'cgm-jingjing', 'bnk-neen', 'cgm-hongyok'], booth:['bnk-micha', 'bnk-pancake', 'bnk-berry', 'cgm-else'] },
+    { t:'14:00', to:'15:00', stage:['bnk-janry', 'bnk-nammonn', 'bnk-hoop', 'bnk-emmy'], booth:['cgm-namphet', 'bnk-mint', 'cgm-punpon', 'cgm-jingjing'] },
+    { t:'15:00', to:'16:00', stage:['cgm-lingling', 'bnk-micha', 'bnk-khaimook', 'bnk-sindy'], booth:['cgm-satangpound', 'bnk-palmmy', 'cgm-prae', 'bnk-nammonn'] },
+    { t:'16:00', to:'17:00', stage:['cgm-satangpound', 'bnk-khowjow', 'bnk-praew', 'bnk-berry'], booth:['cgm-valentine', 'bnk-patt', 'bnk-saonoi', 'cgm-hongyok'] },
+    { t:'17:00', to:'18:00', stage:['cgm-namphet', 'bnk-monet', 'cgm-nisha', 'bnk-mayji'], booth:['bnk-praew', 'bnk-sindy', 'bnk-arlee', 'bnk-jew'] },
+    { t:'18:00', to:'19:00', stage:['bnk-patt', 'bnk-galeya', 'cgm-kwan', 'bnk-pancake'], booth:['bnk-khowjow', 'bnk-emmy', 'bnk-janry', 'cgm-lingling'] },
+    { t:'19:00', to:'20:00', stage:['bnk-grape', 'cgm-prae', 'bnk-saonoi', 'bnk-arlee'], booth:['bnk-khaimook', 'bnk-inkcha', 'bnk-yoghurt', 'cgm-kwan'] },
+  ] },
+];
+/* The two activities this plan is about. The rest of the festival's programme
+   — hi-touch, hachi cha, the merchandise counter — happens away from the booth
+   floor, so it is not drawn here. */
+const FF_ACTS = [
+  { k:'booth', th:'ลงบูธ',   en:'Booth visits', c:'#C08A2E' },
+  { k:'stage', th:'ขึ้นเวที', en:'Main stage',   c:'#B3121E' },
+];
+function ffPos(){
+  const p = {};
+  const spread = (a, b, f) => { const n = b - a; for(let i = a; i <= b; i++) p[i] = f(n ? (i - a) / n : 0); };
+  FF_COLS.forEach(([a, b, x, y0, y1]) => spread(a, b, t => [x, y0 + (y1 - y0) * t]));
+  spread(FF_ROW[0], FF_ROW[1], t => [FF_ROW[2] + (FF_ROW[3] - FF_ROW[2]) * t, FF_ROW[4]]);
+  return p;
+}
+const FF_AT = ffPos();
+const ffMember = n => getMember(FF_BOOTHS[n - 1]);
+const ffBoothOf = id => FF_BOOTHS.indexOf(id) + 1;
+const ffDay = () => FF_DAYS[state.ffDay] || FF_DAYS[0];
+/* Which activity, if any, a member is doing in the chosen hour. */
+function ffDoing(slot, id){
+  if(!slot) return null;
+  return FF_ACTS.find(a => (slot[a.k] || []).includes(id)) || null;
+}
+function renderBoothPlan(ev){
+  const en = isEN();
+  const day = ffDay(), slot = day.slots[state.ffSlot];
+  const dayLabel = d => { const x = parseYmd(d.date); return `${x.getDate()} ${monthsShort()[x.getMonth()]}`; };
+  const picked = state.ffPick ? getMember(state.ffPick) : null;
+
+  const booths = FF_BOOTHS.map((id, i) => {
+    const n = i + 1, m = getMember(id);
+    if(!m) return '';
+    const [x, y] = FF_AT[n], g = getGroup(m.groupId) || {};
+    const here = slot && (slot.booth || []).includes(id);
+    return `<button class="ff-b${here ? ' is-here' : ''}${state.ffPick === id ? ' is-pick' : ''}"
+      style="left:${x}%;top:${y}%;--c:${g.color};${m.photo ? `--img:url('${escapeAttr(m.photo)}')` : ''}"
+      data-action="ff-booth" data-id="${id}" title="${escapeAttr(m.name + ' · ' + (en ? 'booth ' : 'บูธ ') + n)}">
+      <span class="ff-n">${n}</span>
+      <span class="ff-nm is-${n >= FF_ROW[0] ? 'below' : x > 60 ? 'left' : 'right'}">${escapeHtml(m.name)}</span></button>`;
+  }).join('');
+
+  const chips = list => (list || []).map(id => {
+    const m = getMember(id); if(!m) return '';
+    return `<button class="ff-chip" data-action="ff-booth" data-id="${id}">${renderAvatar(m, 'avatar-sm ff-chip-face', (getGroup(m.groupId) || {}).color)}${escapeHtml(m.name)}
+      <b>${ffBoothOf(id)}</b></button>`;
+  }).join('');
+
+  const legend = slot ? `<div class="ff-now">${FF_ACTS.filter(a => (slot[a.k] || []).length).map(a =>
+    `<div class="ff-row" style="--a:${a.c}"><span class="ff-lab">${en ? a.en : a.th}</span><span class="ff-people">${chips(slot[a.k])}</span></div>`).join('')}
+    </div>` : '';
+
+  // each booth is a fan club's, named for the member it supports
+  let pickCard = `<p class="ff-idle">${en ? 'Tap a booth to see whose fan club it is' : 'แตะที่บูธเพื่อดูว่าเป็นบ้านของใคร'}</p>`;
+  if(picked){
+    const g = getGroup(picked.groupId) || {};
+    pickCard = `<div class="ff-pick" style="--c:${g.color}">
+      ${renderAvatar(picked, 'avatar-sm ff-pick-face', g.color)}
+      <span class="ff-pick-who"><b>${escapeHtml(picked.name)}</b><small>${en ? 'fan club booth' : 'บูธบ้านแฟนคลับ'} · ${escapeHtml(g.name || '')}</small></span>
+      <span class="ff-pick-no">${en ? 'Booth' : 'บูธ'} ${ffBoothOf(picked.id)}</span>
+    </div>`;
+  }
+
+  return `<div class="ff${slot ? ' is-hour' : ''}">
+    <h3 class="evm-head">${en ? 'Fan club booths' : 'ผังบูธบ้านแฟนคลับ'}</h3>
+    <div class="ff-top">
+      <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
+      <span class="ff-count">${FF_BOOTHS.length} ${en ? 'booths' : 'บูธ'}</span>
+      <span class="ff-spacer"></span>
+    </div>
+    <div class="ff-hall">
+      <div class="ff-stage${slot && (slot.stage || []).length ? ' lit' : ''}">
+        <span class="ff-stage-lab">${en ? 'STAGE' : 'เวที'}</span>
+        ${slot ? `<span class="ff-onstage">${(slot.stage || []).map(id => { const m = getMember(id); if(!m) return '';
+          return `<button class="ff-up" data-action="ff-booth" data-id="${id}" title="${escapeAttr(m.name)}"
+            style="--c:${(getGroup(m.groupId) || {}).color}">${renderAvatar(m, 'avatar-sm ff-up-face', (getGroup(m.groupId) || {}).color)}
+            <small>${escapeHtml(m.name)}</small></button>`; }).join('')}</span>` : ''}
+      </div>
+      <span class="ff-entry">▶ ${en ? 'entrance' : 'ทางเข้า'}</span>
+      ${booths}
+    </div>
+    ${pickCard}
+    <h3 class="evm-head">${en ? 'Activity schedule' : 'ตารางกิจกรรม'}<small>${en ? ' · tap an hour' : ' · แตะเวลาเพื่อดูผังตอนนั้น'}</small></h3>
+    <div class="ff-times">${day.slots.map((s, i) => `<button class="${i === state.ffSlot ? 'on' : ''}" data-action="ff-slot" data-value="${i}">${s.t}<small>${s.to}</small></button>`).join('')}</div>
+    ${legend}
+    <p class="ff-note">${en ? 'Every booth is a fan club\'s, named for the member it supports. Pick an hour and the members standing on the stage appear on it, and the booths being visited light up.'
+      : 'ทุกบูธเป็นของบ้านแฟนคลับ ตั้งชื่อตามเมมเบอร์ที่เชียร์ · เลือกเวลาแล้วคนที่ขึ้นเวทีจะไปยืนอยู่บนเวที ส่วนบูธที่เมมเบอร์ลงไปเยี่ยมจะสว่างขึ้น'}</p>
+  </div>`;
+}
+
+/* The plan answers a tap by redrawing only itself — a full sheet redraw would
+   throw the reader back to the top of a long event page. */
+function ffPaint(){
+  const old = document.querySelector('.ff');
+  const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
+  if(!old || !ev) return;
+  const box = document.createElement('div');
+  box.innerHTML = renderBoothPlan(ev);
+  const fresh = box.firstElementChild;
+  old.replaceWith(fresh);
+  localize(fresh);
+}
+
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
   if(!ev) return '';
@@ -9707,6 +9920,7 @@ function renderEventModal(){
           <a class="shop-buy" style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}" href="${escapeAttr(shopUrl(ev.shop))}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>ซื้อที่ ${escapeHtml(ev.shop.shopName)} <span class="shop-buy-arrow">↗</span></a></div>` : ''}
         ${(ev.links || []).length ? `<div class="evm-related">${ev.links.map(l =>
           `<a class="chip chip-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)} ↗</a>`).join('')}</div>` : ''}
+        ${ev.boothPlan === 'fanfest' ? renderBoothPlan(ev) : ''}
         ${renderEventLinkEditor(ev)}
 
         ${(ev.related || []).map(id => SEED_SCHEDULE.find(e => e.id === id)).filter(Boolean).length ? `
@@ -13737,6 +13951,18 @@ function bindDelegatedEvents(){
       state.selectedEvent = null; state.selectedId = null; state.editingId = null;
       state.query = '';
       render(); pushHistory();
+    }
+    else if(action==='ff-day'){
+      state.ffDay = +el.dataset.value; state.ffSlot = null; ffPaint();
+    }
+    else if(action==='ff-slot'){
+      const i = +el.dataset.value;
+      state.ffSlot = state.ffSlot === i ? null : i;
+      ffPaint();
+    }
+    else if(action==='ff-booth'){
+      state.ffPick = state.ffPick === id ? null : id;
+      ffPaint();
     }
     else if(action==='edit-evlinks'){
       state.linkEditFor = id; renderMain();
