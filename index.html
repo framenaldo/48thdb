@@ -2284,12 +2284,6 @@
   .ff-nm.is-left{ right:calc(100% + 5px); top:50%; transform:translateY(-50%); }
   .ff-nm.is-below{ left:50%; top:calc(100% + 2px); transform:translateX(-50%); }
   :root[data-theme="dark"] .ff-nm{ color:#B8A583; }
-  /* an hour picked: the booths she visits come forward, the rest settle back */
-  .ff.is-hour .ff-b{ opacity:.4; filter:grayscale(.55); }
-  .ff.is-hour .ff-b.is-here{ opacity:1; filter:none; transform:translate(-50%,-50%) scale(1.14);
-    box-shadow:0 0 0 2px var(--card), 0 0 0 4px #C08A2E, 0 6px 14px rgba(var(--shadow-rgb),.35); z-index:3; }
-  .ff.is-hour .ff-b.is-here .ff-nm{ color:var(--ink); font-weight:800; }
-  .ff-b.is-pick{ box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--ink); z-index:4; opacity:1 !important; filter:none !important; }
   /* the booth that was tapped */
   .ff-idle{ margin:10px 0 0; padding:9px; border:1.5px dashed var(--line); border-radius:14px; text-align:center;
     font-size:12.5px; color:var(--ink-soft); }
@@ -2353,14 +2347,21 @@
   .ff-board .ff-nm{ color:#B9ABB3; }
   /* an hour picked: her booth lights up gold, the rest of the hall steps back */
   .ff.is-hour .ff-board .ff-b{ opacity:.3; filter:none; }
-  .ff.is-hour .ff-board .ff-b.is-here{ opacity:1; background:#E2B55A; border-color:#fff; transform:translate(-50%,-50%) scale(1.1);
-    box-shadow:0 0 12px rgba(226,181,90,.75); z-index:3; }
-  .ff.is-hour .ff-board .ff-b.is-here .ff-n{ color:#2A1D08; }
+  .ff-board .ff-b{ transform:translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))); }
+  .ff.is-hour .ff-board .ff-b.is-here{ opacity:1; width:40px; height:40px; border-radius:9px; border:2.5px solid #E2B55A;
+    background:#2A2126 var(--img) center/cover; box-shadow:0 0 12px rgba(226,181,90,.75); z-index:5; }
+  .ff-board .ff-b.is-here .ff-n, .ff-board .ff-b.is-pick .ff-n{ position:absolute; left:-7px; top:-8px; min-width:17px; height:17px;
+    padding:0 3px; border-radius:5px; display:grid; place-items:center; font-size:9.5px; background:#E2B55A; color:#2A1D08;
+    border:1.5px solid #1A1419; }
+  .ff-board .ff-b.is-here .ff-nm, .ff-board .ff-b.is-pick .ff-nm{ display:block; top:calc(100% + 3px); padding:1px 5px; border-radius:5px;
+    background:rgba(26,20,25,.88); color:#F4ECF1; font-size:9.5px; font-weight:800; }
   /* a booth tapped: cream, a white edge, a glow, and two rings going out */
   .ff.has-pick .ff-board .ff-b:not(.is-pick){ opacity:.24; }
-  .ff-board .ff-b.is-pick, .ff.is-hour .ff-board .ff-b.is-pick{ opacity:1 !important; background:#F3D9B1; border:2px solid #fff; transform:translate(-50%,-50%) scale(1.16);
-    box-shadow:0 0 14px rgba(243,217,177,.85); z-index:4; }
-  .ff-board .ff-b.is-pick .ff-n, .ff.is-hour .ff-board .ff-b.is-pick .ff-n{ color:#1A1419; }
+  .ff-board .ff-b.is-pick, .ff.is-hour .ff-board .ff-b.is-pick{ opacity:1 !important; width:46px; height:46px; border-radius:10px;
+    background:#F3D9B1 var(--img) center/cover; border:3px solid #fff; box-shadow:0 0 16px rgba(243,217,177,.9); z-index:6; }
+  .ff-board .ff-b.is-pick .ff-n, .ff.is-hour .ff-board .ff-b.is-pick .ff-n{ background:#F3D9B1; color:#1A1419; }
+  /* when a booth is tapped, the other booths in play this hour stay readable */
+  .ff.has-pick.is-hour .ff-board .ff-b.is-here:not(.is-pick){ opacity:.55; }
   .ff-ring{ position:absolute; left:50%; top:50%; width:44px; height:44px; margin:-22px 0 0 -22px; border-radius:50%;
     border:2.5px solid #fff; pointer-events:none; animation:ff-ring 1.1s ease-out 2; }
   @keyframes ff-ring{ 0%{ transform:scale(.3); opacity:1; } 100%{ transform:scale(2.2); opacity:0; } }
@@ -2387,20 +2388,19 @@
   .ff-board .ff-chip{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:#F4ECF1; }
   .ff-board .ff-chip b{ background:rgba(255,255,255,.14); color:#F4ECF1; }
   .ff-board .ff-note{ color:#9C8E97; text-align:center; }
-  /* the activities, side by side, and the rounds of the one picked */
-  .ff-acts{ display:flex; gap:6px; overflow-x:auto; padding:2px 1px 5px; margin-bottom:8px; scrollbar-width:none; }
-  .ff-acts::-webkit-scrollbar{ display:none; }
-  .ff-act{ flex:none; border:1.5px solid var(--line); border-top:4px solid var(--c); border-radius:12px; background:var(--card);
-    color:var(--c); font:inherit; font-size:13px; font-weight:800; line-height:1.2; padding:9px 13px; cursor:pointer;
-    text-align:center; white-space:nowrap; box-shadow:0 2px 0 rgba(var(--shadow-rgb),.1); }
-  .ff-act:active{ transform:translateY(2px); box-shadow:none; }
-  .ff-act.on{ background:var(--c); border-color:var(--c); color:#fff; }
-  .ff-rounds{ border:1.5px solid var(--line); border-top:4px solid var(--c); border-radius:16px; background:var(--card); padding:2px 10px 8px; }
-  .ff-rday{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin:8px 0 5px; }
-  .ff-rnd{ display:flex; gap:9px; align-items:flex-start; padding:7px 0; border-top:1px dashed var(--line); }
-  .ff-rnd-t{ flex:none; width:44px; font-size:12.5px; font-weight:800; color:var(--ink); line-height:1.2; }
-  .ff-rnd-t small{ display:block; font-size:10px; font-weight:600; color:var(--ink-soft); }
-  .ff-rounds .ff-chip{ cursor:default; }
+  /* the activities tab: the organiser's timetable */
+  .ff-tt-wrap{ overflow-x:auto; border:1.5px solid var(--line); border-radius:16px; background:var(--card);
+    box-shadow:0 3px 0 rgba(var(--shadow-rgb),.05); }
+  .ff-tt{ border-collapse:separate; border-spacing:0; font-size:11.5px; }
+  .ff-tt th{ background:var(--a); color:#fff; font-weight:800; padding:8px 9px; white-space:nowrap; text-align:center; }
+  .ff-tt td{ vertical-align:top; padding:6px 8px; border-top:1px solid var(--line); border-left:1px solid var(--line);
+    min-width:98px; background:color-mix(in srgb, var(--a) 7%, var(--card)); }
+  .ff-tt .ff-tt-t{ position:sticky; left:0; z-index:1; min-width:0; border-left:0; background:var(--card);
+    font-weight:800; font-size:12.5px; color:var(--ink); box-shadow:1.5px 0 0 var(--line); }
+  .ff-tt th.ff-tt-t{ background:var(--ink); color:var(--paper); z-index:2; font-size:11.5px; }
+  .ff-tt .ff-tt-t small{ display:block; font-size:10px; font-weight:600; color:var(--ink-soft); }
+  .ff-tt td.is-none{ background:repeating-linear-gradient(45deg, var(--paper-dim) 0 6px, var(--card) 6px 12px); }
+  .ff-tt-p{ display:flex; align-items:center; gap:5px; margin:3px 0; font-weight:700; color:var(--ink); white-space:nowrap; line-height:1.2; }
   @media (min-width:640px){
     .ff-hall{ aspect-ratio:.95; --bw:34px; }
     .ff-nm{ display:block; }
@@ -5313,7 +5313,7 @@ const ICONS = {
 // ============================= STATE =============================
 let state = {
   isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
-  ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOpen:null,
+  ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan',
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
@@ -9865,7 +9865,7 @@ function ffHours(id){
   }));
   return out;
 }
-/* the activities tab lists them as the organiser's schedule does */
+/* the activities tab lists them in the organiser's order */
 const FF_MENU = ['stage', 'booth', 'hitouch', 'hachi', 'merch'];
 
 function renderBoothPlan(ev){
@@ -9880,41 +9880,49 @@ function renderBoothPlan(ev){
     <button class="${acts ? 'on' : ''}" data-action="ff-tab" data-value="acts">${en ? 'Activities' : 'กิจกรรม'}</button>
   </div>`;
 
-  // ---- the activities tab: the activities side by side in the poster's
-  // order; the one picked lists every round of it with the members on it ----
+  // ---- the activities tab: the organiser's timetable, one day at a time —
+  // hours down the side, the activities across, the time column pinned ----
   if(acts){
-    const cur = FF_ACTS.find(a => a.k === state.ffOpen) || FF_ACTS.find(a => a.k === FF_MENU[0]);
-    const menu = FF_MENU.map(k => FF_ACTS.find(a => a.k === k)).map(a =>
-      `<button class="ff-act${a === cur ? ' on' : ''}" style="--c:${a.c}" data-action="ff-open" data-id="${a.k}"
-        aria-pressed="${a === cur}">${en ? a.en : a.th}</button>`).join('');
-    const rounds = FF_DAYS.map(d => ({ d, slots: d.slots.filter(s => (s[cur.k] || []).length) })).filter(x => x.slots.length)
-      .map(({ d, slots }) => `<div class="ff-rday">${dayLabel(d)}</div>
-        ${slots.map(sl => `<div class="ff-rnd"><span class="ff-rnd-t">${sl.t}<small>${sl.to}</small></span>
-          <span class="ff-people">${sl[cur.k].map(pid => { const pm = getMember(pid); if(!pm) return '';
-            return `<span class="ff-chip">${renderAvatar(pm, 'avatar-sm ff-chip-face', (getGroup(pm.groupId) || {}).color)}${escapeHtml(pm.name)}</span>`; }).join('')}</span>
-        </div>`).join('')}`).join('');
+    const cols = FF_MENU.map(k => FF_ACTS.find(a => a.k === k));
+    const person = pid => { const pm = getMember(pid); if(!pm) return '';
+      return `<span class="ff-tt-p">${renderAvatar(pm, 'avatar-sm ff-chip-face', (getGroup(pm.groupId) || {}).color)}${escapeHtml(pm.name)}</span>`; };
+    const table = `<table class="ff-tt">
+      <tr><th class="ff-tt-t">${en ? 'Time' : 'เวลา'}</th>${cols.map(a => `<th style="--a:${a.c}">${en ? a.en : a.th}</th>`).join('')}</tr>
+      ${day.slots.map(sl => `<tr><td class="ff-tt-t">${sl.t}<small>${sl.to}</small></td>${cols.map(a => (sl[a.k] || []).length
+        ? `<td style="--a:${a.c}">${sl[a.k].map(person).join('')}</td>` : '<td class="is-none"></td>').join('')}</tr>`).join('')}
+    </table>`;
     return `<div class="ff">
       <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
       ${tabs}
-      <div class="ff-acts">${menu}</div>
-      <div class="ff-rounds" style="--c:${cur.c}">${rounds}</div>
-      <p class="ff-note">${en ? 'Pick an activity to see who is on each round'
-        : 'เลือกกิจกรรมเพื่อดูว่าแต่ละรอบมีใครบ้าง'}</p>
+      <div class="ff-top">
+        <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
+        <span class="ff-spacer"></span>
+      </div>
+      <div class="ff-tt-wrap">${table}</div>
+      <p class="ff-note">${en ? 'Swipe sideways for the other activities' : 'ปัดซ้ายขวาเพื่อดูกิจกรรมอื่น'}</p>
     </div>`;
   }
 
   // ---- the booth plan ----
+  // a booth in play — visited this hour, or tapped — shows her face. Two in
+  // play side by side would cover each other, so every second one of a run
+  // steps out toward the middle of the hall.
+  const inPlay = id => !!id && ((slot && (slot.booth || []).includes(id)) || state.ffPick === id || state.ffWho === id);
+  const lane = n => n >= FF_ROW[0] ? 'row' : FF_COLS.findIndex(([a, b]) => n >= a && n <= b);
+  let run = 0;
   const booths = FF_BOOTHS.map((id, i) => {
     const n = i + 1, m = getMember(id);
     if(!m) return '';
     const [x, y] = FF_AT[n], g = getGroup(m.groupId) || {};
     const here = slot && (slot.booth || []).includes(id);
-    const on = state.ffPick === id || state.ffWho === id;
+    const on = state.ffPick === id || state.ffWho === id, lit = here || on;
+    run = lit && n > 1 && inPlay(FF_BOOTHS[i - 1]) && lane(n - 1) === lane(n) ? run + 1 : 0;
+    const step = lit && run % 2 ? (lane(n) === 'row' ? '--dy:-50px;' : `--dx:${x < 50 ? 46 : -46}px;`) : '';
     return `<button class="ff-b${n >= FF_ROW[0] ? ' is-row' : ''}${here ? ' is-here' : ''}${on ? ' is-pick' : ''}"
-      style="left:${x}%;top:${y}%;--c:${g.color}"
+      style="left:${x}%;top:${y}%;--c:${g.color};${step}${lit && m.photo ? `--img:url('${escapeAttr(m.photo)}')` : ''}"
       data-action="ff-booth" data-id="${id}" title="${escapeAttr(m.name + ' · ' + (en ? 'booth ' : 'บูธ ') + n)}">
       <span class="ff-n">${n}</span>${on ? '<span class="ff-ring" aria-hidden="true"></span>' : ''}
-      <span class="ff-nm is-${n >= FF_ROW[0] ? 'below' : x > 60 ? 'left' : 'right'}">${escapeHtml(m.name)}</span></button>`;
+      <span class="ff-nm is-${lit || n >= FF_ROW[0] ? 'below' : x > 60 ? 'left' : 'right'}">${escapeHtml(m.name)}</span></button>`;
   }).join('');
 
   const chips = list => (list || []).map(id => {
@@ -14124,12 +14132,6 @@ function bindDelegatedEvents(){
     }
     else if(action==='ff-tab'){
       state.ffTab = el.dataset.value; ffPaint();
-    }
-    else if(action==='ff-open'){
-      state.ffOpen = id; ffPaint();
-      // the redraw starts the row from the left again: bring the pick into view
-      const row = document.querySelector('.ff-acts'), on = row && row.querySelector('.ff-act.on');
-      if(on) row.scrollLeft = on.offsetLeft - row.offsetLeft - (row.clientWidth - on.offsetWidth) / 2;
     }
     else if(action==='ff-who'){
       state.ffWho = state.ffWho === id ? null : id; state.ffPick = null;
