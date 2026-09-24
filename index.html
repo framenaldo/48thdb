@@ -2245,6 +2245,10 @@
   .tlp.is-in-hub .tlp-legend{ margin:0 0 14px; }
   /* ===== fan festival booth plan ===== */
   .ff{ margin-top:6px; }
+  .ff-tabs{ display:flex; gap:4px; padding:4px; border-radius:14px; background:var(--paper-dim); margin-bottom:10px; }
+  .ff-tabs button{ flex:1; border:0; background:none; font:inherit; font-size:13.5px; font-weight:800; color:var(--ink-soft);
+    padding:8px 10px; border-radius:10px; cursor:pointer; }
+  .ff-tabs button.on{ background:var(--card); color:var(--ink); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.08); }
   .ff-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
   .ff-days{ display:flex; gap:3px; padding:3px; border-radius:11px; background:var(--paper-dim); }
   .ff-days button{ border:0; background:none; font:inherit; font-size:12px; font-weight:700; color:var(--ink-soft);
@@ -2252,29 +2256,41 @@
   .ff-days button.on{ background:var(--card); color:var(--ink); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.08); }
   .ff-count{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
   .ff-spacer{ flex:1; min-width:74px; }   /* keeps clear of the sheet's share and close buttons */
-  /* the hall, seen from above: the floor, the stage, and a tile for every booth */
-  .ff-hall{ position:relative; width:100%; aspect-ratio:.54; border-radius:14px; overflow:hidden;
-    background:#F6E7CE; border:2px solid #E3CFAE; --bw:31px; }
-  :root[data-theme="dark"] .ff-hall{ background:#2E2618; border-color:#463A25; }
-  .ff-stage{ position:absolute; left:20%; width:60%; top:1.6%; min-height:5.4%; padding:3px 6px; border-radius:8px;
-    background:var(--ink); color:var(--paper); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-    font-size:10.5px; font-weight:800; letter-spacing:.14em; }
-  .ff-stage.lit{ background:#B3121E; color:#fff; box-shadow:0 0 0 3px rgba(179,18,30,.25); }
-  .ff-onstage{ display:flex; gap:4px; justify-content:center; flex-wrap:wrap; }
+  /* The hall in one-point perspective, the same trick the concert stage uses:
+     the floor recedes toward the stage, but the booths standing on it are
+     drawn upright, so photos and numbers stay readable. */
+  .ff-hall{ position:relative; width:100%; aspect-ratio:.62; border-radius:14px; overflow:hidden;
+    background:linear-gradient(#F7EAD4 62%, #EFDFC2); border:2px solid #E3CFAE; --bw:27px;
+    --ff-near:#E9D2A8; --ff-far:#F6E9D2; --ff-edge:rgba(255,255,255,.9); --ff-line:#C7AC7F; }
+  :root[data-theme="dark"] .ff-hall{ background:linear-gradient(#2A2216 62%, #201A10); border-color:#463A25;
+    --ff-near:#3A2F1C; --ff-far:#2A2317; --ff-edge:rgba(255,255,255,.28); --ff-line:#6B5836; }
+  .ff-floor{ position:absolute; inset:0; width:100%; height:100%; }
+  /* the stage at the far end: its front face, with the members standing on top */
+  .ff-stage{ position:absolute; left:13%; right:13%; top:17.6%; height:8.6%; display:grid; place-items:center;
+    clip-path:polygon(7% 0, 93% 0, 100% 100%, 0 100%);
+    background:linear-gradient(var(--ink), color-mix(in srgb, var(--ink) 62%, #000)); }
+  .ff-stage.lit{ background:linear-gradient(#C8202C, #8A0F18); box-shadow:0 0 18px rgba(179,18,30,.45); }
+  .ff-stage-lab{ color:var(--paper); font-size:9.5px; font-weight:800; letter-spacing:.16em; }
+  .ff-onstage{ position:absolute; left:6%; right:6%; bottom:82.4%; display:flex; gap:4px; justify-content:center; flex-wrap:wrap; }
   .ff-up{ border:0; background:none; padding:0; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:1px;
-    color:#fff; font:inherit; letter-spacing:0; animation:ff-rise .3s ease-out; }
+    color:var(--ink); font:inherit; animation:ff-rise .3s ease-out; }
   .ff-up-face{ width:30px !important; height:30px !important; border-radius:8px !important; font-size:9px;
-    box-shadow:0 0 0 2px #fff; }
-  .ff-up small{ font-size:8.5px; font-weight:700; max-width:46px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    box-shadow:0 0 0 2px var(--card), 0 3px 8px rgba(var(--shadow-rgb),.35); }
+  .ff-up small{ font-size:8.5px; font-weight:800; max-width:50px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   @keyframes ff-rise{ from{ transform:translateY(6px); opacity:0; } }
-  .ff-entry{ position:absolute; left:2%; top:46%; font-size:9px; font-weight:800; color:#9A8468; letter-spacing:.05em; }
+  .ff-entry{ position:absolute; left:1%; top:50%; transform:translateY(-50%); writing-mode:vertical-rl;
+    font-size:9px; font-weight:800; color:#9A8468; letter-spacing:.05em; }
   :root[data-theme="dark"] .ff-entry{ color:#9C8A6A; }
-  .ff-b{ position:absolute; transform:translate(-50%,-50%); width:var(--bw); height:var(--bw); padding:0; cursor:pointer;
-    border:2px solid var(--c); border-radius:7px; background:var(--card) var(--img) center/cover; color:inherit; font:inherit;
+  /* a booth: a square that keeps its own depth in --s, upright on the floor */
+  .ff-b{ position:absolute; transform:translate(-50%,-50%); padding:0; cursor:pointer; z-index:var(--z);
+    width:calc(var(--bw) * var(--s)); height:calc(var(--bw) * var(--s));
+    border:2px solid var(--c); border-radius:calc(7px * var(--s)); background:var(--card) var(--img) center/cover;
+    color:inherit; font:inherit; filter:drop-shadow(0 calc(2px * var(--s)) calc(2px * var(--s)) rgba(var(--shadow-rgb),.28));
     transition:transform .16s, opacity .16s, box-shadow .16s; }
   .ff-b:active{ transform:translate(-50%,-50%) scale(.94); }
   .ff-n{ position:absolute; left:-4px; top:-5px; min-width:15px; height:15px; padding:0 3px; border-radius:5px; background:var(--c);
-    color:#fff; font-size:9px; font-weight:800; display:grid; place-items:center; border:1.5px solid var(--card); }
+    color:#fff; font-size:9px; font-weight:800; display:grid; place-items:center; border:1.5px solid var(--card);
+    transform:scale(calc(.62 + var(--s) * .38)); transform-origin:left top; }
   .ff-nm{ position:absolute; font-size:9px; font-weight:700; color:#6B5B43; white-space:nowrap; display:none; }
   .ff-nm.is-right{ left:calc(100% + 5px); top:50%; transform:translateY(-50%); }
   .ff-nm.is-left{ right:calc(100% + 5px); top:50%; transform:translateY(-50%); }
@@ -2282,20 +2298,23 @@
   :root[data-theme="dark"] .ff-nm{ color:#B8A583; }
   /* an hour picked: the booths she visits come forward, the rest settle back */
   .ff.is-hour .ff-b{ opacity:.4; filter:grayscale(.55); }
-  .ff.is-hour .ff-b.is-here{ opacity:1; filter:none; transform:translate(-50%,-50%) scale(1.14);
-    box-shadow:0 0 0 2px var(--card), 0 0 0 4px #C08A2E, 0 6px 14px rgba(var(--shadow-rgb),.35); z-index:3; }
+  .ff.is-hour .ff-b.is-here{ opacity:1; filter:none; transform:translate(-50%,-50%) scale(1.16);
+    box-shadow:0 0 0 2px var(--card), 0 0 0 4px #C08A2E, 0 6px 14px rgba(var(--shadow-rgb),.35); z-index:calc(var(--z) + 120); }
   .ff.is-hour .ff-b.is-here .ff-nm{ color:var(--ink); font-weight:800; }
-  .ff-b.is-pick{ box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--ink); z-index:4; opacity:1 !important; filter:none !important; }
+  .ff-b.is-pick{ box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--ink); z-index:calc(var(--z) + 240);
+    opacity:1 !important; filter:none !important; }
   /* the booth that was tapped */
   .ff-idle{ margin:10px 0 0; padding:9px; border:1.5px dashed var(--line); border-radius:14px; text-align:center;
     font-size:12.5px; color:var(--ink-soft); }
   .ff-pick{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; margin-top:10px; padding:9px 10px;
     border:1.5px solid var(--line); border-radius:16px; background:var(--card); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.05); }
+  .ff-pick.is-who{ border-color:var(--c); }
   .ff-pick-face{ width:44px !important; height:44px !important; border-radius:12px !important; font-size:11px; }
   .ff-pick-who b{ display:block; font-size:15.5px; line-height:1.2; }
   .ff-pick-who small{ font-size:11.5px; color:var(--ink-soft); }
   .ff-pick-no{ font-size:11px; font-weight:800; color:#fff; background:var(--c); padding:3px 10px; border-radius:99px; }
   .ff-pick-day{ grid-column:1/-1; display:flex; flex-wrap:wrap; gap:6px; }
+  .ff-pick-none{ grid-column:1/-1; font-size:12px; color:var(--ink-soft); }
   .ff-when{ display:flex; align-items:center; gap:5px; border:1.5px solid var(--line); border-left:4px solid var(--a);
     border-radius:10px; background:var(--card); font:inherit; font-size:11.5px; font-weight:600; color:var(--ink-soft);
     padding:4px 8px; cursor:pointer; }
@@ -2319,8 +2338,24 @@
   .ff-chip b{ font-size:10px; font-weight:800; color:var(--ink-soft); background:var(--paper-dim); border-radius:99px; padding:1px 5px; }
   .ff-chip-face{ width:20px !important; height:20px !important; font-size:8px; }
   .ff-note{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; margin:9px 2px 0; }
+  /* the activities tab: everyone, and what each of them is doing */
+  .ff-list{ border:1.5px solid var(--line); border-radius:16px; overflow:hidden; background:var(--card); }
+  .ff-item + .ff-item{ border-top:1px solid var(--line); }
+  .ff-item-top{ width:100%; display:flex; align-items:center; gap:9px; padding:7px 10px; border:0; background:none;
+    font:inherit; color:var(--ink); text-align:left; cursor:pointer; }
+  .ff-item.is-open .ff-item-top{ background:color-mix(in srgb, var(--c) 9%, var(--card)); }
+  .ff-item-face{ width:34px !important; height:34px !important; border-radius:10px !important; font-size:10px; flex:none; }
+  .ff-item-who{ min-width:0; }
+  .ff-item-who b{ display:block; font-size:14px; line-height:1.25; }
+  .ff-item-who small{ font-size:11px; color:var(--ink-soft); }
+  .ff-item-no{ margin-left:auto; font-size:10.5px; font-weight:800; color:#fff; background:var(--c);
+    padding:2px 8px; border-radius:99px; flex:none; }
+  .ff-caret{ flex:none; width:16px; height:16px; color:var(--ink-soft); transition:transform .18s; }
+  .ff-caret svg{ width:100%; height:100%; display:block; }
+  .ff-item.is-open .ff-caret{ transform:rotate(180deg); }
+  .ff-item-body{ display:flex; flex-wrap:wrap; gap:6px; padding:0 10px 10px 53px; }
   @media (min-width:640px){
-    .ff-hall{ aspect-ratio:.95; --bw:34px; }
+    .ff-hall{ aspect-ratio:.92; --bw:32px; }
     .ff-nm{ display:block; }
     .ff-lab{ width:96px; }
   }
@@ -5228,7 +5263,7 @@ const ICONS = {
 // ============================= STATE =============================
 let state = {
   isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
-  ffDay:0, ffSlot:null, ffPick:null,
+  ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOpen:null,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
@@ -9749,35 +9784,109 @@ function ffPos(){
   return p;
 }
 const FF_AT = ffPos();
-const ffMember = n => getMember(FF_BOOTHS[n - 1]);
 const ffBoothOf = id => FF_BOOTHS.indexOf(id) + 1;
 const ffDay = () => FF_DAYS[state.ffDay] || FF_DAYS[0];
-/* Which activity, if any, a member is doing in the chosen hour. */
-function ffDoing(slot, id){
-  if(!slot) return null;
-  return FF_ACTS.find(a => (slot[a.k] || []).includes(id)) || null;
+/* The hall is drawn in one-point perspective. A booth's depth d runs 0 at the
+   front of the floor to 1 at the stage; everything at that depth shrinks by s
+   and moves toward the middle, which is what makes the floor look like it is
+   receding. The booths themselves stay upright, as the concert stage's seats
+   do, so a face is still a face at the back of the room. */
+const FF_VIEW = { back:0.66, yFront:95, yBack:28, planFront:95, planBack:12 };
+function ffAt(d){
+  return { s: lerp(1, FF_VIEW.back, d), y: lerp(FF_VIEW.yFront, FF_VIEW.yBack, d) };
 }
+function ffProject(x, y){
+  const d = (FF_VIEW.planFront - y) / (FF_VIEW.planFront - FF_VIEW.planBack);
+  const a = ffAt(Math.max(0, Math.min(1, d)));
+  return { x: 50 + (x - 50) * a.s, y: a.y, s: a.s };
+}
+/* The floor: a trapezoid a little past the booths at either end, with the
+   dashed grid that gives the eye something to read the depth against. */
+function ffFloor(){
+  const edge = (s, k) => (50 + k * 49 * s).toFixed(2);
+  const near = ffAt(-0.05), far = ffAt(1.05);
+  const line = (x1, y1, x2, y2, o) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--ff-line)"
+    stroke-opacity="${o}" stroke-width="1" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>`;
+  const across = [0.18, 0.38, 0.58, 0.78].map(d => { const a = ffAt(d);
+    return line(edge(a.s, -1), a.y.toFixed(2), edge(a.s, 1), a.y.toFixed(2), .45); }).join('');
+  const along = [-0.62, -0.31, 0, 0.31, 0.62].map(k =>
+    line((50 + k * 49 * near.s).toFixed(2), near.y.toFixed(2), (50 + k * 49 * far.s).toFixed(2), far.y.toFixed(2), .34)).join('');
+  return `<svg class="ff-floor" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <polygon points="${edge(near.s,-1)},${near.y.toFixed(2)} ${edge(far.s,-1)},${far.y.toFixed(2)} ${edge(far.s,1)},${far.y.toFixed(2)} ${edge(near.s,1)},${near.y.toFixed(2)}"
+      fill="url(#ffFloor)" stroke="var(--ff-edge)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+    ${along}${across}
+    <defs><linearGradient id="ffFloor" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="var(--ff-near)"/><stop offset="1" stop-color="var(--ff-far)"/>
+    </linearGradient></defs>
+  </svg>`;
+}
+/* Everything a member does over the whole festival, in order. */
+function ffHours(id){
+  const out = [];
+  FF_DAYS.forEach((d, di) => d.slots.forEach((s, si) => {
+    const a = FF_ACTS.find(x => (s[x.k] || []).includes(id));
+    if(a) out.push({ di, si, s, a });
+  }));
+  return out;
+}
+const FF_CARET = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+
 function renderBoothPlan(ev){
   const en = isEN();
   const day = ffDay(), slot = day.slots[state.ffSlot];
   const dayLabel = d => { const x = parseYmd(d.date); return `${x.getDate()} ${monthsShort()[x.getMonth()]}`; };
   const picked = state.ffPick ? getMember(state.ffPick) : null;
+  const acts = state.ffTab === 'acts';
 
+  const tabs = `<div class="ff-tabs">
+    <button class="${acts ? '' : 'on'}" data-action="ff-tab" data-value="plan">${en ? 'Booth plan' : 'ผังบูธ'}</button>
+    <button class="${acts ? 'on' : ''}" data-action="ff-tab" data-value="acts">${en ? 'Activities' : 'กิจกรรม'}</button>
+  </div>`;
+
+  // ---- the activities tab: everyone, and what each of them is doing ----
+  if(acts){
+    const rows = FF_BOOTHS.map(id => ({ id, m: getMember(id) })).filter(x => x.m)
+      .sort((a, b) => a.m.name.localeCompare(b.m.name))
+      .map(({ id, m }) => {
+        const g = getGroup(m.groupId) || {}, open = state.ffOpen === id, hours = ffHours(id);
+        return `<div class="ff-item${open ? ' is-open' : ''}" style="--c:${g.color}">
+          <button class="ff-item-top" data-action="ff-open" data-id="${id}" aria-expanded="${open}">
+            ${renderAvatar(m, 'avatar-sm ff-item-face', g.color)}
+            <span class="ff-item-who"><b>${escapeHtml(m.name)}</b><small>${escapeHtml(m.nameTh || '')} · ${escapeHtml(g.name || '')}</small></span>
+            <span class="ff-item-no">${en ? 'Booth' : 'บูธ'} ${ffBoothOf(id)}</span>
+            <span class="ff-caret" aria-hidden="true">${FF_CARET}</span>
+          </button>
+          ${open ? `<div class="ff-item-body">${hours.length ? hours.map(h => `<button class="ff-when" style="--a:${h.a.c}"
+            data-action="ff-when" data-value="${h.di}.${h.si}"><b>${dayLabel(FF_DAYS[h.di])} ${h.s.t}–${h.s.to}</b>${en ? h.a.en : h.a.th}${
+              h.a.k === 'booth' ? ` · ${en ? 'Booth' : 'บูธ'} ${ffBoothOf(id)}` : ''}</button>`).join('')
+            : `<p class="ff-pick-none">${en ? 'Not on this plan' : 'ไม่มีกิจกรรมในผังนี้'}</p>`}</div>` : ''}
+        </div>`;
+      }).join('');
+    return `<div class="ff">
+      <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
+      ${tabs}
+      <div class="ff-list">${rows}</div>
+      <p class="ff-note">${en ? 'Tap a member to see her hours; tap an hour to find her on the plan'
+        : 'แตะชื่อเพื่อดูกิจกรรมของเธอ แตะเวลาเพื่อดูตำแหน่งบนผัง'}</p>
+    </div>`;
+  }
+
+  // ---- the booth plan ----
   const booths = FF_BOOTHS.map((id, i) => {
     const n = i + 1, m = getMember(id);
     if(!m) return '';
-    const [x, y] = FF_AT[n], g = getGroup(m.groupId) || {};
+    const [px, py] = FF_AT[n], v = ffProject(px, py), g = getGroup(m.groupId) || {};
     const here = slot && (slot.booth || []).includes(id);
-    return `<button class="ff-b${here ? ' is-here' : ''}${state.ffPick === id ? ' is-pick' : ''}"
-      style="left:${x}%;top:${y}%;--c:${g.color};${m.photo ? `--img:url('${escapeAttr(m.photo)}')` : ''}"
+    return `<button class="ff-b${here ? ' is-here' : ''}${state.ffPick === id || state.ffWho === id ? ' is-pick' : ''}"
+      style="left:${v.x.toFixed(2)}%;top:${v.y.toFixed(2)}%;--s:${v.s.toFixed(3)};--z:${Math.round(v.s * 100)};--c:${g.color};${m.photo ? `--img:url('${escapeAttr(m.photo)}')` : ''}"
       data-action="ff-booth" data-id="${id}" title="${escapeAttr(m.name + ' · ' + (en ? 'booth ' : 'บูธ ') + n)}">
       <span class="ff-n">${n}</span>
-      <span class="ff-nm is-${n >= FF_ROW[0] ? 'below' : x > 60 ? 'left' : 'right'}">${escapeHtml(m.name)}</span></button>`;
+      <span class="ff-nm is-${n >= FF_ROW[0] ? 'below' : px > 60 ? 'left' : 'right'}">${escapeHtml(m.name)}</span></button>`;
   }).join('');
 
   const chips = list => (list || []).map(id => {
     const m = getMember(id); if(!m) return '';
-    return `<button class="ff-chip" data-action="ff-booth" data-id="${id}">${renderAvatar(m, 'avatar-sm ff-chip-face', (getGroup(m.groupId) || {}).color)}${escapeHtml(m.name)}
+    return `<button class="ff-chip" data-action="ff-who" data-id="${id}">${renderAvatar(m, 'avatar-sm ff-chip-face', (getGroup(m.groupId) || {}).color)}${escapeHtml(m.name)}
       <b>${ffBoothOf(id)}</b></button>`;
   }).join('');
 
@@ -9785,41 +9894,54 @@ function renderBoothPlan(ev){
     `<div class="ff-row" style="--a:${a.c}"><span class="ff-lab">${en ? a.en : a.th}</span><span class="ff-people">${chips(slot[a.k])}</span></div>`).join('')}
     </div>` : '';
 
-  // each booth is a fan club's, named for the member it supports
-  let pickCard = `<p class="ff-idle">${en ? 'Tap a booth to see whose fan club it is' : 'แตะที่บูธเพื่อดูว่าเป็นบ้านของใคร'}</p>`;
-  if(picked){
+  // a member who was tapped answers with her own hours; a booth answers with whose it is
+  let pickCard = `<p class="ff-idle">${en ? 'Tap a member to see her hours, or a booth to see whose fan club it is'
+    : 'แตะที่เมมเบอร์เพื่อดูกิจกรรมของเธอ หรือแตะที่บูธเพื่อดูว่าเป็นบ้านของใคร'}</p>`;
+  const who = state.ffWho ? getMember(state.ffWho) : null;
+  if(who){
+    const g = getGroup(who.groupId) || {}, hours = ffHours(who.id);
+    pickCard = `<div class="ff-pick is-who" style="--c:${g.color}">
+      ${renderAvatar(who, 'avatar-sm ff-pick-face', g.color)}
+      <span class="ff-pick-who"><b>${escapeHtml(who.name)}</b><small>${escapeHtml(g.name || '')}</small></span>
+      <span class="ff-pick-no">${en ? 'Booth' : 'บูธ'} ${ffBoothOf(who.id)}</span>
+      ${hours.length ? `<div class="ff-pick-day">${hours.map(h => `<button class="ff-when${h.di === state.ffDay && h.si === state.ffSlot ? ' on' : ''}"
+        style="--a:${h.a.c}" data-action="ff-when" data-value="${h.di}.${h.si}"><b>${dayLabel(FF_DAYS[h.di])} ${h.s.t}</b>${en ? h.a.en : h.a.th}${
+          h.a.k === 'booth' ? ` · ${en ? 'Booth' : 'บูธ'} ${ffBoothOf(who.id)}` : ''}</button>`).join('')}</div>`
+        : `<p class="ff-pick-none">${en ? 'Not on this plan' : 'ไม่มีกิจกรรมในผังนี้'}</p>`}
+    </div>`;
+  }
+  else if(picked){
     const g = getGroup(picked.groupId) || {};
     pickCard = `<div class="ff-pick" style="--c:${g.color}">
       ${renderAvatar(picked, 'avatar-sm ff-pick-face', g.color)}
-      <span class="ff-pick-who"><b>${escapeHtml(picked.name)}</b><small>${en ? 'fan club booth' : 'บูธบ้านแฟนคลับ'} · ${escapeHtml(g.name || '')}</small></span>
+      <span class="ff-pick-who"><b>${escapeHtml(picked.name)}</b><small>${escapeHtml(g.name || '')}</small></span>
       <span class="ff-pick-no">${en ? 'Booth' : 'บูธ'} ${ffBoothOf(picked.id)}</span>
     </div>`;
   }
 
   return `<div class="ff${slot ? ' is-hour' : ''}">
-    <h3 class="evm-head">${en ? 'Fan club booths' : 'ผังบูธบ้านแฟนคลับ'}</h3>
+    <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
+    ${tabs}
     <div class="ff-top">
       <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
       <span class="ff-count">${FF_BOOTHS.length} ${en ? 'booths' : 'บูธ'}</span>
       <span class="ff-spacer"></span>
     </div>
     <div class="ff-hall">
-      <div class="ff-stage${slot && (slot.stage || []).length ? ' lit' : ''}">
-        <span class="ff-stage-lab">${en ? 'STAGE' : 'เวที'}</span>
-        ${slot ? `<span class="ff-onstage">${(slot.stage || []).map(id => { const m = getMember(id); if(!m) return '';
-          return `<button class="ff-up" data-action="ff-booth" data-id="${id}" title="${escapeAttr(m.name)}"
-            style="--c:${(getGroup(m.groupId) || {}).color}">${renderAvatar(m, 'avatar-sm ff-up-face', (getGroup(m.groupId) || {}).color)}
-            <small>${escapeHtml(m.name)}</small></button>`; }).join('')}</span>` : ''}
-      </div>
+      ${ffFloor()}
+      <div class="ff-stage${slot && (slot.stage || []).length ? ' lit' : ''}"><span class="ff-stage-lab">${en ? 'STAGE' : 'เวที'}</span></div>
+      ${slot ? `<span class="ff-onstage">${(slot.stage || []).map(id => { const m = getMember(id); if(!m) return '';
+        return `<button class="ff-up" data-action="ff-who" data-id="${id}" title="${escapeAttr(m.name)}"
+          style="--c:${(getGroup(m.groupId) || {}).color}">${renderAvatar(m, 'avatar-sm ff-up-face', (getGroup(m.groupId) || {}).color)}
+          <small>${escapeHtml(m.name)}</small></button>`; }).join('')}</span>` : ''}
       <span class="ff-entry">▶ ${en ? 'entrance' : 'ทางเข้า'}</span>
       ${booths}
     </div>
     ${pickCard}
-    <h3 class="evm-head">${en ? 'Activity schedule' : 'ตารางกิจกรรม'}<small>${en ? ' · tap an hour' : ' · แตะเวลาเพื่อดูผังตอนนั้น'}</small></h3>
+    <h3 class="evm-head">${en ? 'Activity schedule' : 'ตารางกิจกรรม'}</h3>
     <div class="ff-times">${day.slots.map((s, i) => `<button class="${i === state.ffSlot ? 'on' : ''}" data-action="ff-slot" data-value="${i}">${s.t}<small>${s.to}</small></button>`).join('')}</div>
     ${legend}
-    <p class="ff-note">${en ? 'Every booth is a fan club\'s, named for the member it supports. Pick an hour and the members standing on the stage appear on it, and the booths being visited light up.'
-      : 'ทุกบูธเป็นของบ้านแฟนคลับ ตั้งชื่อตามเมมเบอร์ที่เชียร์ · เลือกเวลาแล้วคนที่ขึ้นเวทีจะไปยืนอยู่บนเวที ส่วนบูธที่เมมเบอร์ลงไปเยี่ยมจะสว่างขึ้น'}</p>
+    <p class="ff-note">${en ? 'Pick an hour to see what the members are doing' : 'เลือกช่วงเวลาเพื่อแสดงกิจกรรมของเมมเบอร์'}</p>
   </div>`;
 }
 
@@ -13961,7 +14083,24 @@ function bindDelegatedEvents(){
       ffPaint();
     }
     else if(action==='ff-booth'){
-      state.ffPick = state.ffPick === id ? null : id;
+      state.ffPick = state.ffPick === id ? null : id; state.ffWho = null;
+      ffPaint();
+    }
+    else if(action==='ff-tab'){
+      state.ffTab = el.dataset.value; ffPaint();
+    }
+    else if(action==='ff-open'){
+      state.ffOpen = state.ffOpen === id ? null : id; ffPaint();
+    }
+    else if(action==='ff-who'){
+      state.ffWho = state.ffWho === id ? null : id; state.ffPick = null;
+      ffPaint();
+    }
+    else if(action==='ff-when'){
+      const [d, i] = el.dataset.value.split('.').map(Number);
+      const same = state.ffTab === 'plan' && state.ffDay === d && state.ffSlot === i;
+      state.ffDay = d; state.ffSlot = same ? null : i;
+      if(state.ffTab !== 'plan'){ state.ffWho = state.ffOpen; state.ffPick = null; state.ffTab = 'plan'; }
       ffPaint();
     }
     else if(action==='edit-evlinks'){
