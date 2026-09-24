@@ -2327,6 +2327,66 @@
   .ff-chip b{ font-size:10px; font-weight:800; color:var(--ink-soft); background:var(--paper-dim); border-radius:99px; padding:1px 5px; }
   .ff-chip-face{ width:20px !important; height:20px !important; font-size:8px; }
   .ff-note{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; margin:9px 2px 0; }
+  /* ---- the booth plan drawn like the seat plans: a dark board, flat numbered
+     booths, and a tapped booth lit cream with rings going out from it ---- */
+  .ff-board{ padding:12px; border-radius:18px; background:#1A1419; color:#EFE7EC;
+    border:1px solid rgba(255,255,255,.1); box-shadow:0 8px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06); }
+  .ff-board .ff-days{ padding:3px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); }
+  .ff-board .ff-days button{ border-radius:999px; color:#B9ABB3; font-weight:800; font-size:12.5px; padding:5px 12px; transition:transform .12s; }
+  .ff-board .ff-days button:active{ transform:scale(.94); }
+  .ff-board .ff-days button.on{ background:#F4ECF1; color:#1A1419; box-shadow:0 2px 0 rgba(0,0,0,.45); }
+  .ff-board .ff-count{ color:#9C8E97; }
+  .ff-board .ff-hall{ background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.09); border-radius:12px; }
+  .ff-board .ff-stage{ background:#060406; color:#fff; border:1px solid rgba(255,255,255,.12); border-radius:4px;
+    letter-spacing:.06em; font-size:12px; font-weight:900; }
+  .ff-board .ff-stage.lit{ background:#060406; box-shadow:0 0 0 2px #B3121E, 0 0 18px rgba(179,18,30,.55); }
+  .ff-board .ff-entry{ color:#9C8E97; }
+  .ff-board .ff-b{ background:color-mix(in srgb, var(--c) 42%, #1A1419); border:1px solid rgba(0,0,0,.35); border-radius:5px;
+    display:grid; place-items:center; -webkit-tap-highlight-color:transparent; transition:opacity .25s, filter .2s, transform .16s, box-shadow .2s;
+    height:calc(var(--bw) * .68); }
+  /* the bottom row stands the other way, or its booths would touch */
+  .ff-board .ff-b.is-row{ width:calc(var(--bw) * .72); height:var(--bw); }
+  .ff-board .ff-n{ position:static; min-width:0; height:auto; padding:0; border:0; background:none;
+    color:color-mix(in srgb, var(--c) 45%, #fff); font-size:12px; font-weight:900; letter-spacing:.02em; }
+  @media (hover:hover){ .ff-board .ff-b:hover{ filter:brightness(1.2); } }
+  .ff-board .ff-b:active{ filter:brightness(.82); }
+  .ff-board .ff-nm{ color:#B9ABB3; }
+  /* an hour picked: her booth lights up gold, the rest of the hall steps back */
+  .ff.is-hour .ff-board .ff-b{ opacity:.3; filter:none; }
+  .ff.is-hour .ff-board .ff-b.is-here{ opacity:1; background:#E2B55A; border-color:#fff; transform:translate(-50%,-50%) scale(1.1);
+    box-shadow:0 0 12px rgba(226,181,90,.75); z-index:3; }
+  .ff.is-hour .ff-board .ff-b.is-here .ff-n{ color:#2A1D08; }
+  /* a booth tapped: cream, a white edge, a glow, and two rings going out */
+  .ff.has-pick .ff-board .ff-b:not(.is-pick){ opacity:.24; }
+  .ff-board .ff-b.is-pick, .ff.is-hour .ff-board .ff-b.is-pick{ opacity:1 !important; background:#F3D9B1; border:2px solid #fff; transform:translate(-50%,-50%) scale(1.16);
+    box-shadow:0 0 14px rgba(243,217,177,.85); z-index:4; }
+  .ff-board .ff-b.is-pick .ff-n, .ff.is-hour .ff-board .ff-b.is-pick .ff-n{ color:#1A1419; }
+  .ff-ring{ position:absolute; left:50%; top:50%; width:44px; height:44px; margin:-22px 0 0 -22px; border-radius:50%;
+    border:2.5px solid #fff; pointer-events:none; animation:ff-ring 1.1s ease-out 2; }
+  @keyframes ff-ring{ 0%{ transform:scale(.3); opacity:1; } 100%{ transform:scale(2.2); opacity:0; } }
+  @media (prefers-reduced-motion:reduce){ .ff-ring{ display:none; } }
+  /* the card under the plan, and the hours */
+  .ff-board .ff-idle{ border-color:rgba(255,255,255,.18); color:#9C8E97; }
+  .ff-board .ff-pick{ background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); box-shadow:0 3px 0 rgba(0,0,0,.45); color:#F4ECF1; }
+  .ff-board .ff-pick.is-who{ border-color:var(--c); }
+  .ff-board .ff-pick-who small, .ff-board .ff-pick-none{ color:#B9ABB3; }
+  .ff-board .ff-when{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.14); border-left-color:var(--a); color:#B9ABB3; }
+  .ff-board .ff-when b{ color:#F4ECF1; }
+  .ff-board .ff-when.on{ background:color-mix(in srgb, var(--a) 30%, #1A1419); color:#F4ECF1; }
+  .ff-cap{ margin:14px 2px 7px; font-size:13px; font-weight:800; color:#F4ECF1; letter-spacing:.02em; }
+  .ff-board .ff-times button{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.14); color:#F4ECF1;
+    box-shadow:0 2px 0 rgba(0,0,0,.45); transition:transform .12s, box-shadow .12s; }
+  .ff-board .ff-times button:active{ transform:translateY(2px); box-shadow:none; }
+  .ff-board .ff-times button small{ color:#9C8E97; }
+  .ff-board .ff-times button.on{ background:#F4ECF1; border-color:#F4ECF1; color:#1A1419; }
+  .ff-board .ff-times button.on small{ color:#1A1419; }
+  .ff-board .ff-now{ border-color:rgba(255,255,255,.14); }
+  .ff-board .ff-row{ background:rgba(255,255,255,.05); }
+  .ff-board .ff-row + .ff-row{ border-top-color:rgba(255,255,255,.1); }
+  .ff-board .ff-lab{ color:color-mix(in srgb, var(--a) 55%, #fff); }
+  .ff-board .ff-chip{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:#F4ECF1; }
+  .ff-board .ff-chip b{ background:rgba(255,255,255,.14); color:#F4ECF1; }
+  .ff-board .ff-note{ color:#9C8E97; text-align:center; }
   /* the activities, side by side, and the rounds of the one picked */
   .ff-acts{ display:flex; gap:6px; overflow-x:auto; padding:2px 1px 5px; margin-bottom:8px; scrollbar-width:none; }
   .ff-acts::-webkit-scrollbar{ display:none; }
@@ -9849,10 +9909,11 @@ function renderBoothPlan(ev){
     if(!m) return '';
     const [x, y] = FF_AT[n], g = getGroup(m.groupId) || {};
     const here = slot && (slot.booth || []).includes(id);
-    return `<button class="ff-b${here ? ' is-here' : ''}${state.ffPick === id || state.ffWho === id ? ' is-pick' : ''}"
-      style="left:${x}%;top:${y}%;--c:${g.color};${m.photo ? `--img:url('${escapeAttr(m.photo)}')` : ''}"
+    const on = state.ffPick === id || state.ffWho === id;
+    return `<button class="ff-b${n >= FF_ROW[0] ? ' is-row' : ''}${here ? ' is-here' : ''}${on ? ' is-pick' : ''}"
+      style="left:${x}%;top:${y}%;--c:${g.color}"
       data-action="ff-booth" data-id="${id}" title="${escapeAttr(m.name + ' · ' + (en ? 'booth ' : 'บูธ ') + n)}">
-      <span class="ff-n">${n}</span>
+      <span class="ff-n">${n}</span>${on ? '<span class="ff-ring" aria-hidden="true"></span>' : ''}
       <span class="ff-nm is-${n >= FF_ROW[0] ? 'below' : x > 60 ? 'left' : 'right'}">${escapeHtml(m.name)}</span></button>`;
   }).join('');
 
@@ -9891,9 +9952,10 @@ function renderBoothPlan(ev){
     </div>`;
   }
 
-  return `<div class="ff${slot ? ' is-hour' : ''}">
+  return `<div class="ff${slot ? ' is-hour' : ''}${state.ffPick || state.ffWho ? ' has-pick' : ''}">
     <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
     ${tabs}
+    <div class="ff-board">
     <div class="ff-top">
       <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
       <span class="ff-count">${FF_BOOTHS.length} ${en ? 'booths' : 'บูธ'}</span>
@@ -9911,10 +9973,11 @@ function renderBoothPlan(ev){
       ${booths}
     </div>
     ${pickCard}
-    <h3 class="evm-head">${en ? 'Activity schedule' : 'ตารางกิจกรรม'}</h3>
+    <div class="ff-cap">${en ? 'Activity schedule' : 'ตารางกิจกรรม'}</div>
     <div class="ff-times">${day.slots.map((s, i) => `<button class="${i === state.ffSlot ? 'on' : ''}" data-action="ff-slot" data-value="${i}">${s.t}<small>${s.to}</small></button>`).join('')}</div>
     ${legend}
     <p class="ff-note">${en ? 'Pick an hour to see what the members are doing' : 'เลือกช่วงเวลาเพื่อแสดงกิจกรรมของเมมเบอร์'}</p>
+    </div>
   </div>`;
 }
 
