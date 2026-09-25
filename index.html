@@ -1946,11 +1946,27 @@
   .slot-now{ align-self:flex-start; margin-top:3px; padding:1px 8px; border-radius:999px; background:var(--c); color:#fff; font-size:11px; font-weight:700; }
   .slot-who{ display:flex; flex-wrap:wrap; gap:6px; min-width:0; }
   .slot-who .ev-person{ margin:0; }
-  .slot-table[hidden]{ display:none; }
-  .slot-table[data-slot-day]{ gap:6px; }
-  .slot-table[data-slot-day] .slot-row{ align-items:center; padding:6px 12px; }
-  .slot-table[data-slot-day] .slot-time{ font-weight:700; font-size:14px; color:var(--c); }
-  .slot-days{ margin:2px 0 6px; max-width:100%; overflow-x:auto; scrollbar-width:none; }
+  .rota{ margin:6px 0 4px; border:1px solid var(--line); border-radius:16px; overflow:hidden; background:var(--card);
+    box-shadow:0 2px 0 rgba(var(--shadow-rgb),.06); }
+  .rota[hidden]{ display:none; }
+  .rota-head, .rota-row{ display:grid; grid-template-columns:104px 1fr; align-items:center; column-gap:8px; }
+  .rota-head{ padding:8px 14px; background:var(--paper-dim); font-size:12px; font-weight:800; color:var(--ink-soft); }
+  .rota-row{ padding:5px 14px; min-height:46px; border-top:1px solid var(--line); }
+  .rota-row.is-done{ opacity:.45; }
+  .rota-row.is-on{ background:color-mix(in srgb, var(--bnk) 12%, transparent); }
+  .rota-t{ font-size:14.5px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .rota-t small{ font-size:12px; font-weight:600; color:var(--ink-soft); }
+  .rota-who{ display:flex; align-items:center; flex-wrap:wrap; gap:6px 8px; min-width:0; }
+  .rota-who .ev-person{ margin:0; background:var(--paper-dim); border-color:var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.08); }
+  .rota-who .ev-person:active{ transform:translateY(2px); box-shadow:none; }
+  .rota-who .slot-now{ margin:0; align-self:center; background:var(--bnk); }
+  .rota-break{ display:flex; justify-content:center; align-items:baseline; gap:8px; padding:4px 14px;
+    background:var(--ink); color:var(--card); font-size:11.5px; letter-spacing:.04em; }
+  .rota-break b{ font-weight:800; }
+  .rota-break span{ opacity:.75; font-variant-numeric:tabular-nums; }
+  .slot-days{ display:flex; margin:2px 0 8px; }
+  .slot-days .scope-btn{ flex:1; display:flex; flex-direction:column; align-items:center; gap:0; padding:5px 4px; line-height:1.25; }
+  .slot-days .scope-btn small{ font-size:10.5px; font-weight:600; opacity:.8; }
   .slot-days .scope-btn{ transition:transform .12s; }
   .slot-days .scope-btn:active{ transform:scale(.94); }
   /* The timeline page. Dates down the left, a rail of dots beside them, then
@@ -4551,7 +4567,6 @@ const SEED_SCHEDULE = [
     allMembers:true },
   { id:'ev-ge6-myo1', logo:'kimi', start:'2026-11-05', end:'2026-11-08', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 1]',
-    poster:{ accent:'#5F8F2F', surface:'#F2F7EA', ink:'#2E4417', img:'posters/myo-round1.jpg', w:1365, h:2048 },
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo2'],
     info:['แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
@@ -4574,7 +4589,6 @@ const SEED_SCHEDULE = [
     ]) },
   { id:'ev-ge6-myo2', logo:'kimi', start:'2026-11-26', end:'2026-11-29', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 2]',
-    poster:{ accent:'#5F8F2F', surface:'#F2F7EA', ink:'#2E4417', img:'posters/myo-round2.jpg', w:1365, h:2048 },
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo1'],
     info:['แลกบัตรได้ 7 ต.ค. 12:00 – 24 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
@@ -6007,6 +6021,7 @@ const EN = {
   'Yoghurt มี 2 รอบติดกันในวันที่ 27 พ.ย. แทนรอบที่ไม่ได้จัดใน Round 1':
     'Yoghurt has two slots in a row on 27 Nov, making up for Round 1',
   'กำลังคุยอยู่ตอนนี้': 'On a call now',
+  'พัก': 'Break',
   'ตารางรอบของสมาชิก': 'Member slots',
   'งานต่อเนื่องหลังประกาศผลการเลือกตั้ง': 'The day after the election results',
   'Top 12 เซ็มบัตสึได้ไปถ่าย MV ที่ญี่ปุ่น': 'The top 12 senbatsu shoot their music video in Japan',
@@ -8340,8 +8355,8 @@ const doneForToday = (ev, iso) => { const end = endsAtToday(ev, iso); return end
 
 function startsAt(ev, todayIso){
   if(ev.slots){
-    const { next } = slotNow(ev, todayIso);
-    return next ? slotTime(todayIso, next.time) : null;
+    const { current, next } = slotNow(ev, todayIso), s = current || next;
+    return s ? slotTime(todayIso, s.time) : null;
   }
   if(!ev.time || ev.start > todayIso || eventLastDay(ev) < todayIso) return null;
   const [hh, mm] = ev.time.split(':').map(Number);
@@ -8562,7 +8577,7 @@ function renderSlotTable(ev){
   const iso = toYmd(todayStart());
   const now = Date.now();
   const M = monthsShort();
-  const row = (s, bare) => {
+  const row = s => {
     const [, mo, d] = s.date.split('-').map(Number);
     const done = slotTime(s.date, s.until) <= now;
     const on = !done && slotTime(s.date, s.time) <= now;
@@ -8572,8 +8587,8 @@ function renderSlotTable(ev){
         data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span></button>`;
     }).join('');
     return `<div class="slot-row${s.date === iso ? ' is-today' : ''}${done ? ' is-done' : ''}${on ? ' is-on' : ''}">
-      <div class="slot-when">${bare ? '' : `<span class="slot-date">${d} ${M[mo-1]}</span>`}<span class="slot-time">${s.time}–${s.until}</span>
-        ${on ? '<span class="slot-now">ตอนนี้</span>' : s.date === iso && !done && !bare ? '<span class="slot-now">วันนี้</span>' : ''}</div>
+      <div class="slot-when"><span class="slot-date">${d} ${M[mo-1]}</span><span class="slot-time">${s.time}–${s.until}</span>
+        ${on ? '<span class="slot-now">ตอนนี้</span>' : s.date === iso && !done ? '<span class="slot-now">วันนี้</span>' : ''}</div>
       <div class="slot-who">${who}</div>
     </div>`;
   };
@@ -8581,12 +8596,34 @@ function renderSlotTable(ev){
   const head = `<h3 class="evm-head">${ev.online ? 'ตารางรอบของสมาชิก' : 'ตารางสมาชิกประจำบูธ'}</h3>`;
   const dates = [...new Set(sorted.map(s => s.date))];
   if(sorted.length <= 12 || dates.length < 2) return `${head}<div class="slot-table">${sorted.map(row).join('')}</div>`;
-  // a long rota goes a day at a time, opening on today or the next day with turns
+  // a long rota goes a day at a time as a table of its own, opening on today
+  // or the next day with turns; a gap longer than the usual changeover is a break
+  const en = isEN();
   const pick = dates.includes(state.slotDay) ? state.slotDay : dates.find(d => d >= iso) || dates[0];
-  const dayName = d => { const x = parseYmd(d); return `${x.getDate()} ${M[x.getMonth()]}`; };
+  const WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  const dayName = d => { const x = parseYmd(d); return `<small>${WD[x.getDay()]}</small>${x.getDate()} ${M[x.getMonth()]}`; };
+  const mins = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  const cell = s => {
+    const done = slotTime(s.date, s.until) <= now;
+    const on = !done && slotTime(s.date, s.time) <= now;
+    const who = s.members.map(getMember).filter(Boolean).map(m => {
+      const g = getGroup(m.groupId);
+      return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
+        data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span></button>`;
+    }).join('');
+    return `<div class="rota-row${done ? ' is-done' : ''}${on ? ' is-on' : ''}">
+      <span class="rota-t">${s.time}<small>–${s.until}</small></span>
+      <span class="rota-who">${who}${on ? '<span class="slot-now">ตอนนี้</span>' : ''}</span></div>`;
+  };
+  const table = d => { const list = sorted.filter(s => s.date === d);
+    return `<div class="rota" data-slot-day="${d}"${d === pick ? '' : ' hidden'}>
+      <div class="rota-head"><span>${en ? 'Time' : 'เวลา'}</span><span>${en ? 'Member' : 'สมาชิก'}</span></div>
+      ${list.map((s, i) => (i && mins(s.time) - mins(list[i - 1].until) > 5
+        ? `<div class="rota-break"><b>พัก</b><span>${list[i - 1].until}–${s.time}</span></div>` : '') + cell(s)).join('')}
+    </div>`; };
   return `${head}<div class="feed-scope slot-days" role="tablist">${dates.map(d =>
       `<button class="scope-btn${d === pick ? ' is-on' : ''}" role="tab" data-action="slot-day" data-value="${d}">${dayName(d)}</button>`).join('')}</div>
-    ${dates.map(d => `<div class="slot-table" data-slot-day="${d}"${d === pick ? '' : ' hidden'}>${sorted.filter(s => s.date === d).map(s => row(s, true)).join('')}</div>`).join('')}`;
+    ${dates.map(table).join('')}`;
 }
 
 /* A page of its own for a campaign that runs for months: the dates down the
