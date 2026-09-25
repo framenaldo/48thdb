@@ -2784,8 +2784,14 @@
     color:var(--paper);
   }
   .evm-price.is-link:active{ filter:brightness(1.15); }
-  /* where the button takes you, so a fan knows which site is about to open */
-  .evm-seller{ margin-left:2px; padding-left:7px; border-left:1px solid color-mix(in srgb, currentColor 45%, transparent); font-weight:700; }
+  /* the seller's own "buy tickets at" badge, on a card of its own line so its
+     black lettering reads in either mode */
+  .evm-break{ flex-basis:100%; height:0; }
+  .evm-buy{ display:inline-flex; margin:2px 0 10px; padding:6px 12px; border-radius:14px; background:#fff;
+    border:1px solid var(--line); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.12);
+    transition:transform .12s ease, box-shadow .12s ease; }
+  .evm-buy:active{ transform:translateY(2px); box-shadow:0 1px 0 rgba(var(--shadow-rgb),.12); }
+  .evm-buy img{ display:block; height:38px; width:auto; }
   /* Booking having closed is a dead end, so it keeps its own red rather than
      the sheet's accent and never links anywhere. It says the window shut, not
      that the tickets ran out — those are different things to a fan deciding
@@ -9365,6 +9371,14 @@ function renderLiveChip(ev, cls){
     title="${escapeAttr(ev.stream.label || '')}">LIVE</span>`;
 }
 function hostOf(url){ try { return new URL(url).hostname; } catch(e){ return ''; } }
+/* A ticket link to a seller whose badge we hold gets it beneath the price. */
+function renderSellerBadge(url){
+  if(!/(^|\.)eventpop\.me$/.test(hostOf(url))) return '';
+  const en = isEN();
+  const img = en ? '<img src="logos/eventpop-buy-en.webp" width="2000" height="518" alt="Buy tickets at eventpop.me" decoding="async">'
+    : '<img src="logos/eventpop-buy-th.png" width="1144" height="296" alt="ซื้อบัตรได้ที่ eventpop.me" decoding="async">';
+  return `<span class="evm-break"></span><a class="evm-buy" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${img}</a>`;
+}
 /* Where a stream has a home, its icon is the way there — no separate link
    chip further down the sheet. */
 function renderStreamLink(ev, cls){
@@ -10332,9 +10346,8 @@ function renderEventModal(){
                  ? `<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>` : ''}<span class="evm-closed">BOOK CLOSED</span></span>`
             : ev.price && ev.ticketUrl
             ? `<a class="evm-price is-link" href="${escapeAttr(ev.ticketUrl)}" target="_blank" rel="noopener noreferrer">
-                 ${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>${
-                 /(^|\.)eventpop\.me$/.test(hostOf(ev.ticketUrl)) ? '<span class="evm-seller">Eventpop</span>' : ''}
-               </a>`
+                 ${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>
+               </a>${renderSellerBadge(ev.ticketUrl)}`
             : ev.price
             ? `<span class="evm-price">${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span></span>`
             : ''}
