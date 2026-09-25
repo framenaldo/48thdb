@@ -1679,6 +1679,12 @@
     background:var(--paper-dim); color:var(--ink-soft);
   }
   .ev-venue{ margin:6px 0 0; font-size:11.5px; color:var(--ink-soft); line-height:1.45; opacity:.9; }
+  .ev-sale{ display:inline-flex; align-items:center; gap:5px; margin:7px 0 0; padding:3px 10px 3px 8px; border-radius:999px;
+    font-size:11.5px; font-weight:700; line-height:1.4; color:var(--c-text, var(--c));
+    background:color-mix(in srgb, var(--c) 11%, transparent); border:1px solid color-mix(in srgb, var(--c) 26%, transparent); }
+  .ev-sale svg{ width:13px; height:13px; flex:none; }
+  .ev-sale.is-done{ color:var(--ink-soft); background:var(--paper-dim); border-color:var(--line); }
+  :root[data-theme="dark"] .ev-sale:not(.is-done){ color:var(--c-text, color-mix(in srgb, var(--c) 45%, #fff)); }
   .ev-groups{ display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
   .ev-group{
     font-size:10px; font-weight:800; letter-spacing:.04em; padding:2px 8px;
@@ -8457,6 +8463,24 @@ function eventWhenLabel(ev, todayIso){
 }
 function parseYmd(s){ const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
 
+/* When the tickets sell, on the card itself, so nobody has to open the sheet
+   to find out whether and until when they can buy. */
+function renderSaleLine(ev){
+  if(!ev.sales || ev.bookClosed) return '';
+  const en = isEN(), M = monthsShort(), now = Date.now();
+  const at = s => s ? slotTime(s.slice(0, 10), s.slice(11, 16)) : null;
+  const when = s => { const [, mo, d] = s.slice(0, 10).split('-').map(Number); return `${d} ${M[mo - 1]} ${s.slice(11, 16)}`; };
+  const u = en ? '' : ' น.';
+  const { from, to } = ev.sales, a = at(from), z = at(to);
+  let text, done = false;
+  if(z && now >= z){ text = en ? 'Ticket sales closed' : 'ปิดขายบัตรแล้ว'; done = true; }
+  else if(a && now < a) text = to ? (en ? `Tickets on sale ${when(from)} – ${when(to)}` : `ขายบัตร ${when(from)} – ${when(to)}${u}`)
+    : (en ? `Tickets on sale ${when(from)}` : `เปิดขายบัตร ${when(from)}${u}`);
+  else if(z) text = en ? `On sale until ${when(to)}` : `ขายบัตรถึง ${when(to)}${u}`;
+  else text = en ? 'Tickets on sale now' : 'เปิดขายบัตรแล้ว';
+  return `<p class="ev-sale${done ? ' is-done' : ''}">${ICONS.ticket}<span>${text}</span></p>`;
+}
+
 function renderEventCard(ev, todayIso){
   const runsToday = ev.start <= todayIso && eventLastDay(ev) >= todayIso;
   const over = runsToday && !ev.period && doneForToday(ev, todayIso);
@@ -8489,6 +8513,7 @@ function renderEventCard(ev, todayIso){
         return at ? startsPill('ev-starts', ev, todayIso, at) : ''; })()}
       <h3 class="ev-title">${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':ev.tag==='partner'?'<span class="ev-tag">Partner</span>':''}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
+      ${renderSaleLine(ev)}
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
         groupTag(g)).join('')}</div>` : ''}
       ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
