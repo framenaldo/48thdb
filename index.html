@@ -575,6 +575,11 @@
      is picked to read on the band — the festival's cream reads on its dark red
      and vanishes on cream paper — so it is not safe to reuse down here. */
   .modal-glass-card.is-postered .evm-head::before{ background:var(--ink); }
+  /* Meeting You Online's poster is sky over a meadow; its sheet is too — the
+     sky stays at the top and the grass at the foot while the content scrolls */
+  .modal-glass-card.is-postered.is-scene-meadow{
+    background:linear-gradient(180deg, #86B5DA 0%, #B9D5EB 14%, #E6EFF5 32%, #F6F4EC 56%, #EFEBCB 76%, #D3DB9D 90%, #B3C07A 100%);
+  }
   /* The same palette on the cards in the feed, so an event looks like itself
      before it is opened. */
   .ev-card.is-themed{ border-color:color-mix(in srgb, var(--c) 32%, transparent); box-shadow:0 5px 20px color-mix(in srgb, var(--c) 14%, transparent); }
@@ -607,6 +612,9 @@
     box-shadow:0 20px 60px rgba(0,0,0,.55);
     --danger:#F28B8B;
     --danger-soft:color-mix(in srgb, #B84545 30%, var(--sheet-dark));
+  }
+  :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-meadow{
+    background:linear-gradient(180deg, #1F3B57 0%, #1A2939 26%, #171B24 55%, #1C2320 80%, #2A3820 100%);
   }
   :root[data-theme="dark"] .is-postered .evm-price.is-link,
   :root[data-theme="dark"] .is-postered .evm-closed{ color:#fff; }
@@ -4571,6 +4579,7 @@ const SEED_SCHEDULE = [
     allMembers:true },
   { id:'ev-ge6-myo1', logo:'kimi', start:'2026-11-05', end:'2026-11-08', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 1]',
+    poster:{ accent:'#3D7DB0', surface:'#EEF3F1', ink:'#22384A', scene:'meadow' },
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo2'],
     info:['แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
@@ -4593,6 +4602,7 @@ const SEED_SCHEDULE = [
     ]) },
   { id:'ev-ge6-myo2', logo:'kimi', start:'2026-11-26', end:'2026-11-29', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 2]',
+    poster:{ accent:'#3D7DB0', surface:'#EEF3F1', ink:'#22384A', scene:'meadow' },
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo1'],
     info:['แลกบัตรได้ 7 ต.ค. 12:00 – 24 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
@@ -10292,7 +10302,7 @@ function renderEventModal(){
   const mine = people.filter(m => state.oshi.includes(m.id));
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
+    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.scene?` is-scene-${ev.poster.scene}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
       <button class="modal-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
