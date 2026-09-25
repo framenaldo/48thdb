@@ -2784,6 +2784,8 @@
     color:var(--paper);
   }
   .evm-price.is-link:active{ filter:brightness(1.15); }
+  /* where the button takes you, so a fan knows which site is about to open */
+  .evm-seller{ margin-left:2px; padding-left:7px; border-left:1px solid color-mix(in srgb, currentColor 45%, transparent); font-weight:700; }
   /* Booking having closed is a dead end, so it keeps its own red rather than
      the sheet's accent and never links anywhere. It says the window shut, not
      that the tickets ran out — those are different things to a fan deciding
@@ -4530,7 +4532,7 @@ const SEED_SCHEDULE = [
     dateTag:'วันขายบันเดิล',
     timeline:'ge2026', related:['ev-concert-2026','ev-election-results'],
     poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/ge2026-ticket-bundle.jpg', w:1200, h:1200 },
-    price:'2,899 – 5,899', ticketUrl:'https://www.eventpop.me/',
+    price:'2,899 – 5,899', ticketUrl:'https://www.eventpop.me/e/173942/ge2026_bundle?aff=evp',
     seatPlan:{ layout:'mcc-bangkapi', head:'ผังที่นั่ง Journey of Dreams 夢の旅 และราคาบันเดิล', notes:'ge2026-bundle', zones:[
       // from the the organiser Bundle Price and Ticket Bundle Benefits charts; D and E are not sold as a bundle
       { id:'A', sections:['AL','AC','AR'], color:'#E3262B', price:'5,899', tokens:13, perks:['Photo Act A (สุ่มจาก 58 แบบ)', 'Photo Act B (สุ่มจาก 58 แบบ)', 'Postcard (สุ่มจาก 58 แบบ)', 'Letter Set สำหรับงาน Heart to Heart', 'Concert PVC Card', 'บัตร Digital Group Hi-Touch งาน [GE2026] Single Roadshow 1 ใบ'] },
@@ -9362,6 +9364,7 @@ function renderLiveChip(ev, cls){
     data-live-from="${w.from}" data-live-to="${w.to}"
     title="${escapeAttr(ev.stream.label || '')}">LIVE</span>`;
 }
+function hostOf(url){ try { return new URL(url).hostname; } catch(e){ return ''; } }
 /* Where a stream has a home, its icon is the way there — no separate link
    chip further down the sheet. */
 function renderStreamLink(ev, cls){
@@ -10329,7 +10332,8 @@ function renderEventModal(){
                  ? `<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>` : ''}<span class="evm-closed">BOOK CLOSED</span></span>`
             : ev.price && ev.ticketUrl
             ? `<a class="evm-price is-link" href="${escapeAttr(ev.ticketUrl)}" target="_blank" rel="noopener noreferrer">
-                 ${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>
+                 ${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span>${
+                 /(^|\.)eventpop\.me$/.test(hostOf(ev.ticketUrl)) ? '<span class="evm-seller">Eventpop</span>' : ''}
                </a>`
             : ev.price
             ? `<span class="evm-price">${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span></span>`
