@@ -7946,7 +7946,7 @@ function renderMemberLives(m){
       <div class="lv-stat"><span class="lv-k">${en ? 'All lives' : 'ไลฟ์ทั้งหมด'}</span><span class="lv-v">${L.total.toLocaleString()}</span><span class="lv-s">${en ? 'since' : 'ตั้งแต่'} ${since}</span></div>
       <div class="lv-stat"><span class="lv-k">${en ? 'Last 30 days' : '30 วันล่าสุด'}</span><span class="lv-v">${L.last30 ?? 0}</span><span class="lv-s">${en ? 'lives' : 'ไลฟ์'}</span></div>
       <div class="lv-stat"><span class="lv-k">${en ? 'Latest live' : 'ไลฟ์ล่าสุด'}</span><span class="lv-v is-text">${agoText}</span><span class="lv-s">${last.getDate()} ${M[last.getMonth()]}</span></div>
-      <div class="lv-stat"><span class="lv-k">${en ? 'Usually live' : 'ช่วงที่ไลฟ์บ่อย'}</span><span class="lv-v is-text">${peak}</span><span class="lv-s">${en ? 'Thai time' : 'เวลาไทย'}</span></div>
+      <div class="lv-stat"><span class="lv-k">${en ? 'Usually' : 'มักไลฟ์'}</span><span class="lv-v is-text">${peak}</span><span class="lv-s">${en ? 'Thai time' : 'เวลาไทย'}</span></div>
     </div>
     <p class="lv-chart-title">${en ? 'Lives per month, last 12 months' : 'จำนวนไลฟ์รายเดือน ย้อนหลัง 12 เดือน'}</p>
     <div class="lv-chart">${bars}</div>
