@@ -1946,6 +1946,13 @@
   .slot-now{ align-self:flex-start; margin-top:3px; padding:1px 8px; border-radius:999px; background:var(--c); color:#fff; font-size:11px; font-weight:700; }
   .slot-who{ display:flex; flex-wrap:wrap; gap:6px; min-width:0; }
   .slot-who .ev-person{ margin:0; }
+  .slot-table[hidden]{ display:none; }
+  .slot-table[data-slot-day]{ gap:6px; }
+  .slot-table[data-slot-day] .slot-row{ align-items:center; padding:6px 12px; }
+  .slot-table[data-slot-day] .slot-time{ font-weight:700; font-size:14px; color:var(--c); }
+  .slot-days{ margin:2px 0 6px; max-width:100%; overflow-x:auto; scrollbar-width:none; }
+  .slot-days .scope-btn{ transition:transform .12s; }
+  .slot-days .scope-btn:active{ transform:scale(.94); }
   /* The timeline page. Dates down the left, a rail of dots beside them, then
      one bar per stretch of the campaign that stays open for weeks, the way the
      official poster draws them, and the steps themselves on the right. */
@@ -4145,6 +4152,14 @@ const SEAT_NOTES = {
   'ge2026-tickets':[
   'GE6 Token ได้เฉพาะผู้ที่ซื้อบัตรก่อน 1 พ.ย. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อบัตร ถ้ากรอกเลขผิดอาจไม่ได้รับ',
   'ทุกโซนได้ Wristband ถ้าทำหาย ผู้จัดไม่ออกให้ใหม่ในทุกกรณี'] };
+/* Meeting You Online: 20-minute turns, one member each, read off the
+   organiser's grid row by row. Weekdays open at the evening block, row 20. */
+const MYO_TIMES = ['10:00','10:25','10:50','11:15','11:40', '12:15','12:40','13:05','13:30','13:55',
+  '14:30','14:55','15:20','15:45','16:10', '16:45','17:10','17:35','18:00','18:25', '19:00','19:25','19:50','20:15','20:40'];
+const myoSlots = days => days.flatMap(([date, ids, from = 0]) => ids.map((id, i) => {
+  const time = MYO_TIMES[from + i], [h, m] = time.split(':').map(Number), end = h * 60 + m + 20;
+  return { date, time, until:`${String(end / 60 | 0).padStart(2,'0')}:${String(end % 60).padStart(2,'0')}`, members:[id] };
+}));
 const SEED_SCHEDULE = [
   { id:'ev-nipponhaku-2026', start:'2026-08-28', end:'2026-08-30',
     title:'NIPPON HAKU BANGKOK 2026',
@@ -4536,18 +4551,50 @@ const SEED_SCHEDULE = [
     allMembers:true },
   { id:'ev-ge6-myo1', logo:'kimi', start:'2026-11-05', end:'2026-11-08', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 1]',
+    poster:{ accent:'#5F8F2F', surface:'#F2F7EA', ink:'#2E4417', img:'posters/myo-round1.jpg', w:1365, h:2048 },
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo2'],
-    info:['แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.ย. 2026 23:00 น.',
+    info:['แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
-      'รอบเวลารอประกาศอีกครั้ง'],
-    allMembers:true },
+      'บัตร 1 ใบ คุยกับเมมเบอร์ได้ประมาณ 10 วินาที และในแต่ละรอบต้องใช้บัตรทั้งหมดในครั้งเดียว แบ่งใช้ไม่ได้',
+      'เข้ารอใน Waiting Room ก่อนเวลารอบประมาณ 10 นาที',
+      'Yoghurt ไม่มีรอบใน Round 1 เนื่องจากภารกิจส่วนตัว และจะมีรอบทดแทนใน Round 2'],
+    slots:myoSlots([
+      ['2026-11-05', ['bnk-sindy','bnk-praew','bnk-inkcha'], 20],
+      ['2026-11-06', ['cgm-kwan','cgm-chifa','cgm-lingling','cgm-lookked'], 20],
+      ['2026-11-07', ['bnk-janry','bnk-pancake','bnk-berry','bnk-cartoon','bnk-hoop',
+        'cgm-shenae','cgm-nana','cgm-prae','cgm-hongyok','cgm-jingjing',
+        'bnk-palmmy','bnk-mail','bnk-luksorn','bnk-micha','bnk-nammonn',
+        'cgm-ginna','cgm-nisha','cgm-satangpound','cgm-else','cgm-punpon',
+        'bnk-l','bnk-emmy','bnk-galeya','bnk-khaimook','cgm-emma']],
+      ['2026-11-08', ['cgm-namphet','cgm-valentine','cgm-lewlew','cgm-praifa','cgm-tara',
+        'bnk-arlee','bnk-jew','bnk-mint','bnk-saonoi','bnk-fame',
+        'bnk-wawa','bnk-niya','bnk-blythe','bnk-patt','bnk-rose',
+        'bnk-proud','bnk-nall','bnk-mirin','bnk-mayji','bnk-neen',
+        'bnk-khowjow','bnk-monet','bnk-grape','bnk-marine','cgm-ploen']],
+    ]) },
   { id:'ev-ge6-myo2', logo:'kimi', start:'2026-11-26', end:'2026-11-29', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 2]',
+    poster:{ accent:'#5F8F2F', surface:'#F2F7EA', ink:'#2E4417', img:'posters/myo-round2.jpg', w:1365, h:2048 },
     groups:['bnk48','cgm48'], timeline:'ge2026', related:['ev-ge6-single','ev-ge6-myo1'],
-    info:['แลกบัตรได้ถึง 24 พ.ย. 2026 23:00 น.',
+    info:['แลกบัตรได้ 7 ต.ค. 12:00 – 24 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี',
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
-      'รอบเวลารอประกาศอีกครั้ง'],
-    allMembers:true },
+      'บัตร 1 ใบ คุยกับเมมเบอร์ได้ประมาณ 10 วินาที และในแต่ละรอบต้องใช้บัตรทั้งหมดในครั้งเดียว แบ่งใช้ไม่ได้',
+      'เข้ารอใน Waiting Room ก่อนเวลารอบประมาณ 10 นาที',
+      'Yoghurt มี 2 รอบติดกันในวันที่ 27 พ.ย. แทนรอบที่ไม่ได้จัดใน Round 1'],
+    slots:myoSlots([
+      ['2026-11-26', ['cgm-lingling','bnk-blythe','cgm-kwan','cgm-namphet'], 20],
+      ['2026-11-27', ['bnk-wawa','bnk-inkcha','bnk-rose','bnk-yoghurt','bnk-yoghurt'], 20],
+      ['2026-11-28', ['cgm-praifa','cgm-satangpound','cgm-shenae','cgm-valentine','cgm-lewlew',
+        'bnk-monet','bnk-cartoon','bnk-jew','bnk-berry','bnk-hoop',
+        'bnk-palmmy','bnk-mail','bnk-grape','bnk-micha','bnk-nammonn',
+        'bnk-proud','bnk-nall','bnk-mirin','bnk-mayji','bnk-neen',
+        'bnk-galeya','bnk-praew','bnk-niya','bnk-khaimook','cgm-lookked']],
+      ['2026-11-29', ['bnk-janry','bnk-pancake','bnk-marine','bnk-fame','bnk-arlee',
+        'cgm-tara','cgm-nana','cgm-prae','cgm-hongyok','cgm-jingjing',
+        'bnk-saonoi','bnk-emmy','bnk-sindy','bnk-patt','bnk-mint',
+        'cgm-ginna','cgm-nisha','cgm-ploen','cgm-else','cgm-punpon',
+        'bnk-l','bnk-khowjow','bnk-luksorn','cgm-chifa','cgm-emma']],
+    ]) },
   { id:'ev-ge6-heart', start:'2026-11-15', tba:true,
     title:'BNK48 & CGM48 Senbatsu General Election 2026 : Heart to Heart',
     groups:['bnk48','cgm48'], timeline:'ge2026',
@@ -5948,8 +5995,19 @@ const EN = {
   'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online':
     'Enter with the digital ticket from the Meeting You Online CD Edition or Mini Photobook Edition',
   'รอบเวลารอประกาศอีกครั้ง': 'Session times are still to be announced',
-  'แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.ย. 2026 23:00 น.': 'Tickets can be redeemed 7 Oct 12:00 – 3 Nov 2026 23:00',
-  'แลกบัตรได้ถึง 24 พ.ย. 2026 23:00 น.': 'Tickets can be redeemed until 24 Nov 2026 23:00',
+  'แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี':
+    'Redeem tickets 7 Oct 12:00 – 3 Nov 2026 23:00. Tickets not redeemed by then cannot be used',
+  'แลกบัตรได้ 7 ต.ค. 12:00 – 24 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี':
+    'Redeem tickets 7 Oct 12:00 – 24 Nov 2026 23:00. Tickets not redeemed by then cannot be used',
+  'บัตร 1 ใบ คุยกับเมมเบอร์ได้ประมาณ 10 วินาที และในแต่ละรอบต้องใช้บัตรทั้งหมดในครั้งเดียว แบ่งใช้ไม่ได้':
+    'One ticket is about 10 seconds with the member; in each round all your tickets are used in one go and cannot be split',
+  'เข้ารอใน Waiting Room ก่อนเวลารอบประมาณ 10 นาที': 'Stand by in the Waiting Room about 10 minutes before your slot',
+  'Yoghurt ไม่มีรอบใน Round 1 เนื่องจากภารกิจส่วนตัว และจะมีรอบทดแทนใน Round 2':
+    'Yoghurt has no slot in Round 1 due to personal commitments; she will make it up in Round 2',
+  'Yoghurt มี 2 รอบติดกันในวันที่ 27 พ.ย. แทนรอบที่ไม่ได้จัดใน Round 1':
+    'Yoghurt has two slots in a row on 27 Nov, making up for Round 1',
+  'กำลังคุยอยู่ตอนนี้': 'On a call now',
+  'ตารางรอบของสมาชิก': 'Member slots',
   'งานต่อเนื่องหลังประกาศผลการเลือกตั้ง': 'The day after the election results',
   'Top 12 เซ็มบัตสึได้ไปถ่าย MV ที่ญี่ปุ่น': 'The top 12 senbatsu shoot their music video in Japan',
   'Kami7 Special Project — เพลงร่วมกับ AKB48': 'Kami7 Special Project — a collaboration song with AKB48',
@@ -8428,13 +8486,16 @@ function renderTodayHero(ev, todayIso){
   const at = startsAt(ev, todayIso);
   const dayOf = ev.end ? Math.round((parseYmd(todayIso) - parseYmd(ev.start)) / 86400000) + 1 : 0;
   const days = ev.end ? Math.round((parseYmd(ev.end) - parseYmd(ev.start)) / 86400000) + 1 : 0;
-  const status = rota && rota.current ? 'อยู่ที่บูธตอนนี้'
+  const status = rota && rota.current ? (ev.online ? 'กำลังคุยอยู่ตอนนี้' : 'อยู่ที่บูธตอนนี้')
     : at ? `<span data-starts-at="${at}">${startsLabel(at)}</span>`
     : rota && rota.today.length ? 'รอบวันนี้จบแล้ว'
     : (ev.time ? 'กำลังจัดอยู่' : 'วันนี้');
   // on right now: the booth is open, or the day's show has begun
   const live = rota ? !!rota.current : (!!ev.time && (!at || at <= Date.now()));
-  const hours = rota ? rota.today.map(s => `${s.time}–${s.until}`).join(', ') : (ev.time || '');
+  const hours = !rota ? (ev.time || '')
+    : rota.today.length > 3 ? `${rota.today[0].time}–${rota.today[rota.today.length - 1].until}`
+    : rota.today.map(s => `${s.time}–${s.until}`).join(', ');
+  if(rota && rota.current) people.sort((a, b) => rota.current.members.includes(b.id) - rota.current.members.includes(a.id));
   const shown = people.slice(0, 8);
   const rest = people.length - shown.length;
   const open = eventHasMore(ev);
@@ -8501,7 +8562,7 @@ function renderSlotTable(ev){
   const iso = toYmd(todayStart());
   const now = Date.now();
   const M = monthsShort();
-  const rows = ev.slots.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(s => {
+  const row = (s, bare) => {
     const [, mo, d] = s.date.split('-').map(Number);
     const done = slotTime(s.date, s.until) <= now;
     const on = !done && slotTime(s.date, s.time) <= now;
@@ -8511,12 +8572,21 @@ function renderSlotTable(ev){
         data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span></button>`;
     }).join('');
     return `<div class="slot-row${s.date === iso ? ' is-today' : ''}${done ? ' is-done' : ''}${on ? ' is-on' : ''}">
-      <div class="slot-when"><span class="slot-date">${d} ${M[mo-1]}</span><span class="slot-time">${s.time}–${s.until}</span>
-        ${on ? '<span class="slot-now">ตอนนี้</span>' : s.date === iso && !done ? '<span class="slot-now">วันนี้</span>' : ''}</div>
+      <div class="slot-when">${bare ? '' : `<span class="slot-date">${d} ${M[mo-1]}</span>`}<span class="slot-time">${s.time}–${s.until}</span>
+        ${on ? '<span class="slot-now">ตอนนี้</span>' : s.date === iso && !done && !bare ? '<span class="slot-now">วันนี้</span>' : ''}</div>
       <div class="slot-who">${who}</div>
     </div>`;
-  }).join('');
-  return `<h3 class="evm-head">ตารางสมาชิกประจำบูธ</h3><div class="slot-table">${rows}</div>`;
+  };
+  const sorted = ev.slots.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const head = `<h3 class="evm-head">${ev.online ? 'ตารางรอบของสมาชิก' : 'ตารางสมาชิกประจำบูธ'}</h3>`;
+  const dates = [...new Set(sorted.map(s => s.date))];
+  if(sorted.length <= 12 || dates.length < 2) return `${head}<div class="slot-table">${sorted.map(row).join('')}</div>`;
+  // a long rota goes a day at a time, opening on today or the next day with turns
+  const pick = dates.includes(state.slotDay) ? state.slotDay : dates.find(d => d >= iso) || dates[0];
+  const dayName = d => { const x = parseYmd(d); return `${x.getDate()} ${M[x.getMonth()]}`; };
+  return `${head}<div class="feed-scope slot-days" role="tablist">${dates.map(d =>
+      `<button class="scope-btn${d === pick ? ' is-on' : ''}" role="tab" data-action="slot-day" data-value="${d}">${dayName(d)}</button>`).join('')}</div>
+    ${dates.map(d => `<div class="slot-table" data-slot-day="${d}"${d === pick ? '' : ' hidden'}>${sorted.filter(s => s.date === d).map(s => row(s, true)).join('')}</div>`).join('')}`;
 }
 
 /* A page of its own for a campaign that runs for months: the dates down the
@@ -14310,6 +14380,12 @@ function bindDelegatedEvents(){
       state.selectedEvent = null; state.selectedId = null; state.editingId = null;
       state.query = '';
       render(); pushHistory();
+    }
+    else if(action==='slot-day'){
+      state.slotDay = el.dataset.value;
+      const box = el.closest('.slot-days').parentElement;
+      box.querySelectorAll('.slot-days .scope-btn').forEach(b => b.classList.toggle('is-on', b === el));
+      box.querySelectorAll('[data-slot-day]').forEach(t => { t.hidden = t.dataset.slotDay !== state.slotDay; });
     }
     else if(action==='ff-day'){
       state.ffDay = +el.dataset.value; state.ffSlot = null; ffPaint();
