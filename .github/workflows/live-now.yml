@@ -20,6 +20,7 @@ on:
 
 permissions:
   contents: write
+  actions: write     # to start "Deploy site" after a push, below
 
 concurrency:
   group: live-now
@@ -43,6 +44,8 @@ jobs:
         run: node scripts/check-live.mjs
 
       - name: Publish if the answer changed
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if git diff --quiet -- data/live-now.json; then
             echo "Nothing changed."
@@ -54,3 +57,7 @@ jobs:
           git commit -m "Live now: $(node -e "console.log((require('./data/live-now.json').live[0]||{}).title||'nothing on air')")"
           git pull --rebase
           git push
+          # A push made with the workflow's own token starts no other workflow,
+          # so "Deploy site" is asked for by name; without this the site keeps
+          # serving the old data until someone else pushes.
+          gh workflow run deploy.yml --ref main

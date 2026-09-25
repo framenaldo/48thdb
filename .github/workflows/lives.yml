@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: write
+  actions: write     # to start "Deploy site" after a push, below
 
 concurrency:
   group: lives
@@ -43,6 +44,8 @@ jobs:
         run: python3 scripts/collect-youtube.py
 
       - name: Publish if anything changed
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # covers/ holds new files, which git diff does not see
           if [ -z "$(git status --porcelain -- data/ covers/)" ]; then
@@ -55,3 +58,7 @@ jobs:
           git commit -m "Refresh iAM48 live stats and YouTube views"
           git pull --rebase
           git push
+          # A push made with the workflow's own token starts no other workflow,
+          # so "Deploy site" is asked for by name; without this the site keeps
+          # serving the old data until someone else pushes.
+          gh workflow run deploy.yml --ref main

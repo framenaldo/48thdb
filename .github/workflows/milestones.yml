@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  actions: write     # to start "Deploy site" after a push, below
 
 # the nightly job writes the same file; they take turns
 concurrency:
@@ -34,6 +35,8 @@ jobs:
         run: python3 scripts/collect-youtube.py --milestones-only
 
       - name: Publish if a video passed a milestone
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ -z "$(git status --porcelain -- data/youtube.json covers/)" ]; then
             echo "Nothing to publish."
@@ -45,3 +48,7 @@ jobs:
           git commit -m "Celebrate a view milestone"
           git pull --rebase
           git push
+          # A push made with the workflow's own token starts no other workflow,
+          # so "Deploy site" is asked for by name; without this the site keeps
+          # serving the old data until someone else pushes.
+          gh workflow run deploy.yml --ref main

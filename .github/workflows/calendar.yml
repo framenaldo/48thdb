@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: write     # to start "Deploy site" after a push, below
 
 concurrency:
   group: calendar
@@ -27,6 +28,8 @@ jobs:
       - name: Build feeds
         run: node scripts/build-calendar.mjs
       - name: Publish if anything changed
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if git diff --quiet -- '*.ics'; then
             echo "Nothing changed."
@@ -38,3 +41,7 @@ jobs:
           git commit -m "Rebuild calendar feeds"
           git pull --rebase
           git push
+          # A push made with the workflow's own token starts no other workflow,
+          # so "Deploy site" is asked for by name; without this the site keeps
+          # serving the old data until someone else pushes.
+          gh workflow run deploy.yml --ref main

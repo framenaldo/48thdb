@@ -1,6 +1,7 @@
 # Publish the site to Cloudflare, on every push that changes something the
-# site serves — including the bot's own commits (the nightly live stats and
-# the rebuilt calendar feeds), so what is on the web always matches the repo.
+# site serves. The bot's own commits (live stats, live-now, view milestones,
+# calendar feeds) push with the workflow token, which starts no workflow, so
+# those workflows run this one by name when they have pushed.
 #
 # Only the files people actually load are uploaded: the scripts, the Worker
 # source and the workflows stay in the repo but are not served.
