@@ -5674,6 +5674,10 @@ const EN = {
   '← ยกเลิก': '← Cancel',
   'ภาพรวม': 'Overview',
   'ไทม์ไลน์': 'Timeline',
+  'ปีที่บันทึกไว้': 'Years on record',
+  'เหตุการณ์ปีนี้': 'Events this year',
+  'ปีที่มีเรื่องมากที่สุด': 'Busiest years',
+  'นับจากวันเดบิวต์ของวง ซิงเกิลที่ปล่อย และการจบการศึกษา': 'Counting group debuts, single releases and graduations.',
   'เดือนเกิด': 'Birth month',
   'อายุ (ปี)': 'Age (years)',
   'สมาชิกปัจจุบัน': 'Current members',
@@ -11198,6 +11202,7 @@ function renderStatsOverview(){
   ${renderOverviewLives()}
   ${renderOverviewViews()}
   ${renderOverviewBirthdays()}
+  ${renderOverviewTimeline()}
 
   <div class="group-card" style="--c:var(--gold)">
     <div class="group-head"><h2 style="font-size:21px;">ช่วงอายุ (ทุกวง)</h2></div>
@@ -11289,6 +11294,31 @@ function renderOverviewBirthdays(){
     </div>
     ${list.length ? `<div class="ov-bdays">${list.map(m => `<button class="ov-bday" data-action="open-member" data-id="${m.id}" style="--c:${getGroup(m.groupId).color}">
       <b>${+m.birthday.slice(8)}</b> ${escapeHtml(nickName(m))}</button>`).join('')}</div>` : ''}`);
+}
+
+/* The timeline tab was the one deep tab with no taste of it on the overview.
+   It counts what the database knows happened in a year — a group debuting, a
+   single landing, someone graduating — so the years it points at are the same
+   ones the tab itself lists. */
+function renderOverviewTimeline(){
+  const years = new Map();
+  const add = y => years.set(y, (years.get(y) || 0) + 1);
+  GROUPS.forEach(g => add(+g.debut.slice(0, 4)));
+  SEED_SINGLES.forEach(s => add(s.year));
+  state.members.forEach(m => { if(m.graduated) add(+m.graduated.slice(0, 4)); });
+  if(!years.size) return '';
+
+  const spanned = [...years.keys()].sort((a, b) => a - b);
+  const busiest = [...years.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0]).slice(0, 5);
+
+  return ovCard('ไทม์ไลน์', 'timeline', `
+    <div class="stat-grid" style="margin-bottom:4px;">
+      <div class="stat-cell"><div class="label">ปีที่บันทึกไว้</div><div class="value">${spanned[0]}–${spanned[spanned.length - 1]}</div></div>
+      <div class="stat-cell"><div class="label">เหตุการณ์ปีนี้</div><div class="value">${years.get(todayStart().getFullYear()) || 0}</div></div>
+    </div>
+    <h3 class="section-label" style="margin-top:6px;">ปีที่มีเรื่องมากที่สุด</h3>
+    ${busiest.map(([y, n]) => renderBarLink(String(y), n, busiest[0][1], 'var(--gold)', 'stats-tab', { value:'timeline' })).join('')}`,
+    'นับจากวันเดบิวต์ของวง ซิงเกิลที่ปล่อย และการจบการศึกษา');
 }
 
 function renderStatsSongs(){
