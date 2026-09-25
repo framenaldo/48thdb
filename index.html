@@ -4183,8 +4183,7 @@ const SEED_ALBUMS = [
 const SEAT_NOTES = {
   'ge2026-bundle':[
     'GE6 Token ได้เฉพาะผู้ที่ซื้อบันเดิลก่อน 10 ต.ค. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อ ใช้รับบัตร Hi-Touch ด้วย ถ้ากรอกเลขผิดอาจไม่ได้รับ',
-    'ผู้ซื้อบันเดิลได้ของตามตารางบันเดิลนี้ ไม่ใช่ของบัตรปกติสองใบรวมกัน',
-    'เลือกที่นั่ง 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกที่นั่งในโซนที่ซื้อไว้ให้เอง'],
+    'ผู้ซื้อบันเดิลได้ของตามตารางบันเดิลนี้ ไม่ใช่ของบัตรปกติสองใบรวมกัน'],
   'ge2026-tickets':[
   'GE6 Token ได้เฉพาะผู้ที่ซื้อบัตรก่อน 1 พ.ย. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อบัตร ถ้ากรอกเลขผิดอาจไม่ได้รับ',
   'ทุกโซนได้ Wristband ถ้าทำหาย ผู้จัดไม่ออกให้ใหม่ในทุกกรณี'] };
@@ -4549,8 +4548,8 @@ const SEED_SCHEDULE = [
       { id:'E', sections:['EL','ER'], color:'#EE5FEE', off:true }] },
     info:['บัตร BNK48 & CGM48 Journey of Dreams 夢の旅 กับบัตรงานประกาศผล ซื้อพร้อมกันในราคาเดียว',
       'งานประกาศผลเลือกโซนได้อิสระ ส่วน Journey of Dreams เลือกได้ 4 โซน: A, BC, BL/BR และ C',
-      'ขาย 26 ก.ย. 12:00 – 10 ต.ค. 2026 21:00 ทาง eventpop.me',
-      'เลือกที่นั่ง 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้'] },
+      'ขายแบบ 2 Concerts Ticket Bundle (เลือกโซน) 26 ก.ย. 12:00 – 10 ต.ค. 2026 21:00 ทาง eventpop.me',
+      'นำ Ticket Reference Code มาเลือกที่นั่งได้เฉพาะ 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้'] },
   /* The single's roadshows, from the September–October schedule. Where the
      line-up says "to be announced", lineupTba says so on the card. */
   { id:'ev-kimi-roadshow-union', logo:'kimi', start:'2026-10-10', end:'2026-10-11',
@@ -4665,7 +4664,7 @@ const TIMELINES = {
     { d:'2026-10-07', time:'12:00', kind:'start', track:'myo', title:'เปิดให้แลกบัตร Meeting You Online' },
     { d:'2026-10-10', time:'21:00', kind:'end', track:'event', title:'ปิดขายบันเดิล', ev:'ev-ge6-bundle' },
     { d:'2026-10-13', to:'2026-10-14', time:'10:00', kind:'start', track:'event', title:'เลือกที่นั่งบันเดิล',
-      note:'ถึง 14 ต.ค. 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้', ev:'ev-ge6-bundle' },
+      note:'ใช้ Ticket Reference Code ถึง 14 ต.ค. 23:59 เท่านั้น ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้', ev:'ev-ge6-bundle' },
     { d:'2026-10-15', time:'12:00', kind:'start', track:'event', title:'เปิดขายบัตร Journey of Dreams 夢の旅 และงานประกาศผล',
       note:'ทาง eventpop.me', ev:'ev-concert-2026' },
     { d:'2026-10-30', time:'23:00', kind:'end', track:'single', title:'ปิดพรีออเดอร์ซิงเกิลพิเศษ Physical Edition', ev:'ev-ge6-single' },
@@ -5957,22 +5956,21 @@ const EN = {
   'GE6 Token ได้เฉพาะผู้ที่ซื้อบันเดิลก่อน 10 ต.ค. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อ ใช้รับบัตร Hi-Touch ด้วย ถ้ากรอกเลขผิดอาจไม่ได้รับ':
     'GE6 Tokens come only with bundles bought before 10 Oct 2026, with the Wallet Code from the iAM48 Application entered at purchase — it also brings the Hi-Touch ticket; a wrong code may lose them',
   'ผู้ซื้อบันเดิลได้ของตามตารางบันเดิลนี้ ไม่ใช่ของบัตรปกติสองใบรวมกัน': 'A bundle brings what this table lists, not the two regular tickets\' benefits added together',
-  'เลือกที่นั่ง 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกที่นั่งในโซนที่ซื้อไว้ให้เอง':
-    'Choose seats 13 Oct 10:00 – 14 Oct 2026 23:59; seats not chosen by then are assigned within the zone bought',
   'บัตร BNK48 & CGM48 Journey of Dreams 夢の旅 กับบัตรงานประกาศผล ซื้อพร้อมกันในราคาเดียว':
     'A ticket to BNK48 & CGM48 Journey of Dreams 夢の旅 and one to the results show, bought together at one price',
   'งานประกาศผลเลือกโซนได้อิสระ ส่วน Journey of Dreams เลือกได้ 4 โซน: A, BC, BL/BR และ C':
     'Any zone at the results show; at Journey of Dreams, one of four: A, BC, BL/BR or C',
-  'ขาย 26 ก.ย. 12:00 – 10 ต.ค. 2026 21:00 ทาง eventpop.me': 'On sale 26 Sep 12:00 – 10 Oct 2026 21:00 at eventpop.me',
-  'เลือกที่นั่ง 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้':
-    'Choose seats 13 Oct 10:00 – 14 Oct 2026 23:59; seats not chosen are assigned within the zone bought',
+  'ขายแบบ 2 Concerts Ticket Bundle (เลือกโซน) 26 ก.ย. 12:00 – 10 ต.ค. 2026 21:00 ทาง eventpop.me':
+    'Sold as the 2 Concerts Ticket Bundle (choose a zone), 26 Sep 12:00 – 10 Oct 2026 21:00 at eventpop.me',
+  'นำ Ticket Reference Code มาเลือกที่นั่งได้เฉพาะ 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้':
+    'Choose seats with your Ticket Reference Code, 13 Oct 10:00 – 14 Oct 2026 23:59 only; seats not chosen are assigned within the zone bought',
   'เปิดขายบันเดิล Journey of Dreams 夢の旅 + Final Results': 'Bundle sales open: Journey of Dreams 夢の旅 + Final Results',
   'ปิดขายบันเดิล': 'Bundle sales close',
   'วันขายบันเดิล': 'Bundle on sale',
   'ดูบันเดิล →': 'See the bundle →',
   'ผังที่นั่ง Journey of Dreams 夢の旅 และราคาบันเดิล': 'Journey of Dreams 夢の旅 seat plan and bundle prices',
   'เลือกที่นั่งบันเดิล': 'Bundle seat selection',
-  'ถึง 14 ต.ค. 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้': 'Until 14 Oct 23:59; seats not chosen are assigned within the zone bought',
+  'ใช้ Ticket Reference Code ถึง 14 ต.ค. 23:59 เท่านั้น ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้': 'With your Ticket Reference Code, until 14 Oct 23:59 only; seats not chosen are assigned within the zone bought',
   'ขายบันเดิล Journey of Dreams + Final Results': 'Bundle on sale: Journey of Dreams + Final Results',
   'แตะโซนบนผังหรือในรายการ เพื่อดูว่าอยู่ตรงไหนและได้อะไรบ้าง': 'Tap a zone on the plan or in the list to see where it is and what it comes with',
   'Photo Act A (สุ่มจาก 58 แบบ)': 'Photo Act A (one of 58, at random)',
