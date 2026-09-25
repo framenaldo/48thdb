@@ -2121,6 +2121,10 @@
   .ev-icon.is-hero{ width:23px; height:23px; margin-right:7px; vertical-align:-4px; }
   .ev-icon.is-hero svg{ width:20px; height:20px; }
   .ev-icon.is-hero img{ width:23px; height:23px; }
+  :is(.evm-icon, .tl-icon, .ev-icon).is-myo img{ border-radius:0; filter:drop-shadow(0 1px 1px rgba(40,60,10,.25)); }
+  .evm-icon.is-myo img{ width:36px; height:36px; }
+  .tlp-leg .ev-icon{ margin:0 -3px 0 0; width:17px; height:17px; }
+  .tlp-leg .ev-icon img{ width:17px; height:17px; }
   /* a broadcast keeps YouTube's red wherever the event's own colour would go */
   .ev-icon.is-yt, .evm-icon.is-yt, .tl-icon.is-yt{ color:#E02118; }
   :root[data-theme="dark"] .ev-icon.is-yt,
@@ -4676,7 +4680,7 @@ const TIMELINE_PAGES = {
       { th:'ขายบันเดิล Journey of Dreams + Final Results', from:'2026-09-26', to:'2026-10-10', color:'#E0457B' },
       { th:'พรีออเดอร์ซิงเกิลพิเศษ Physical Edition', from:'2026-09-26', to:'2026-10-30', color:'#4A9BD8' },
       { th:'พรีออเดอร์ Digital Edition และ Special Photoset', from:'2026-09-26', to:'2026-11-10', color:'#D8C93F' },
-      { th:'ช่วงแลกบัตร Meeting You Online', from:'2026-10-07', to:'2026-11-24', color:'#7FB750' },
+      { th:'ช่วงแลกบัตร Meeting You Online', from:'2026-10-07', to:'2026-11-24', color:'#7FB750', icon:'myo' },
     ],
   },
 };
@@ -8743,7 +8747,7 @@ function renderTimelinePage(inHub){
     const done = endOf(it) < iso;
     const on = it.d <= iso && endOf(it) >= iso;
     const next = !on && !done && it.d === nextD;
-    const ico = minor ? '' : renderEventIcon(SEED_SCHEDULE.find(e => e.id === it.ev), 'tl-icon');
+    const ico = minor ? trackIcon(it, 'tl-icon') : renderEventIcon(SEED_SCHEDULE.find(e => e.id === it.ev), 'tl-icon');
     const body = `${ico}${minor ? '' : `<span class="tl-kind">${k.th}</span>`}
       ${it.time ? `<span class="tl-time">${it.time} น.</span>` : ''}
       ${it.part ? `<span class="tl-time">${escapeHtml(it.part)}</span>` : ''}
@@ -8766,7 +8770,7 @@ function renderTimelinePage(inHub){
   if(inHub) return `
   <section class="tlp is-in-hub" style="--pc:${page.poster.accent}">
     <div class="tlp-legend">${page.bars.map(b =>
-      `<span class="tlp-leg" style="--bar:${b.color}"><i></i>${escapeHtml(b.th)}</span>`).join('')}</div>
+      `<span class="tlp-leg" style="--bar:${b.color}"><i></i>${b.icon ? renderIcon(b.icon, 'ev-icon') : ''}${escapeHtml(b.th)}</span>`).join('')}</div>
     <div class="tlp-grid" style="grid-template-columns:var(--tlp-date) 18px repeat(${page.bars.length}, var(--tlp-lane)) minmax(0, 1fr)">
       ${bars}${rows}
     </div>
@@ -8784,7 +8788,7 @@ function renderTimelinePage(inHub){
         <h1 class="tlp-title">${escapeHtml(page.title)}</h1>
         <p class="tlp-span">${span}</p>
         <div class="tlp-legend">${page.bars.map(b =>
-          `<span class="tlp-leg" style="--bar:${b.color}"><i></i>${escapeHtml(b.th)}</span>`).join('')}</div>
+          `<span class="tlp-leg" style="--bar:${b.color}"><i></i>${b.icon ? renderIcon(b.icon, 'ev-icon') : ''}${escapeHtml(b.th)}</span>`).join('')}</div>
       </div>
     </div>
     <div class="tlp-grid" style="grid-template-columns:var(--tlp-date) 18px repeat(${page.bars.length}, var(--tlp-lane)) minmax(0, 1fr)">
@@ -8876,7 +8880,7 @@ function renderGEPage(){
         const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
         const n = daysTo(it.d);
         const inner = `<span class="ge-next-when"><b>${dm(it.d)}</b>${n >= 0 ? `<small>${inDays(n)}</small>` : `<small>${en ? 'running' : 'กำลังดำเนินอยู่'}</small>`}</span>
-          <span class="ge-next-what">${escapeHtml(it.title)}${it.time ? ` <small>${it.time}${en ? '' : ' น.'}</small>` : ''}</span>`;
+          <span class="ge-next-what">${trackIcon(it, 'ev-icon')}${escapeHtml(it.title)}${it.time ? ` <small>${it.time}${en ? '' : ' น.'}</small>` : ''}</span>`;
         return it.ev ? `<button class="ge-next-row" style="--k:${tr.color}" data-action="open-event" data-id="${it.ev}">${inner}</button>`
           : `<div class="ge-next-row" style="--k:${tr.color}">${inner}</div>`;
       }).join('')}</div>
@@ -9204,13 +9208,14 @@ function bindGEAdmin(){
 
 /* A face for each kind of outing, so a sheet is recognisable before it is read.
    Line art in the site's own weight, except the GE6 token, which is the real
-   coin off the official poster. */
+   coin off the official poster, and Meeting You Online, which wears the
+   official green MYO badge, redrawn from the poster. */
 const EV_ICONS = {
   token:     '<img src="posters/ge6-token.png" width="196" height="196" alt="" decoding="async">',
+  myo:       '<img src="logos/myo.svg" width="100" height="100" alt="" decoding="async">',
   trophy:    '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22"/><path d="M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
   mic:       '<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4M9 21h6"/>',
   handshake: '<path d="m11 17 1.6 1.6a1.4 1.4 0 0 0 2-2"/><path d="m13.6 14.4 2.4 2.4a1.4 1.4 0 0 0 2-2l-3.7-3.7a2.8 2.8 0 0 0-4 0l-.8.8a1.4 1.4 0 1 1-2-2L10.2 7a5.5 5.5 0 0 1 6.7-.8l.4.2a2 2 0 0 0 1.3.3L21 6.4"/><path d="M3 6.4 2.2 14l6 6a1.4 1.4 0 0 0 2-2"/><path d="M3 5.6h7"/>',
-  videocall: '<rect x="4" y="2" width="13" height="20" rx="2.6"/><rect x="7" y="6" width="7" height="6" rx="1.4"/><path d="m17 8.6 3-1.6v6l-3-1.6"/><path d="M9.5 18.5h2"/>',
   heart:     '<path d="M19.5 13.6c1.4-1.4 2.5-2.9 2.5-5A4.8 4.8 0 0 0 17.2 4C15.6 4 14.3 4.8 12 7 9.7 4.8 8.4 4 6.8 4A4.8 4.8 0 0 0 2 8.6c0 2.1 1.1 3.6 2.5 5L12 21Z"/>',
   sparkles:  '<path d="m12 3-1.7 5a2 2 0 0 1-1.3 1.3L4 11l5 1.7a2 2 0 0 1 1.3 1.3L12 19l1.7-5a2 2 0 0 1 1.3-1.3L20 11l-5-1.7A2 2 0 0 1 13.7 8Z"/><path d="M19 17.5 19.6 19l1.5.5-1.5.6L19 21.6 18.4 20l-1.5-.5 1.5-.6Z"/>',
   disc:      '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.6"/><path d="M12 3a9 9 0 0 1 8.5 6"/>',
@@ -9227,7 +9232,7 @@ const EV_ICONS = {
 const EVENT_ICON = {
   'ev-election-voting':'token', 'ev-election-results':'trophy', 'ev-election-fanfest':'sparkles',
   'ev-ge6-single':'disc', 'ev-ge6-photoset':'photos', 'ev-ge6-handshake':'handshake',
-  'ev-ge6-myo1':'videocall', 'ev-ge6-myo2':'videocall', 'ev-concert-2026':'mic', 'ev-ge6-heart':'heart',
+  'ev-ge6-myo1':'myo', 'ev-ge6-myo2':'myo', 'ev-concert-2026':'mic', 'ev-ge6-heart':'heart',
   'ev-roadshow-mbk':'mic', 'ev-roadshow-fashionisland':'mic', 'ev-roadshow-0905':'mic',
   'ev-nine-charity':'mic', 'ev-charity-football-2026':'ball', 'ev-fame-fanmeet':'heart',
   'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
@@ -9356,12 +9361,15 @@ function renderStreamLink(ev, cls){
   return `<a class="ev-stream-link" href="${escapeAttr(ev.stream.url)}" target="_blank" rel="noopener noreferrer"
     title="${escapeAttr(label)}" aria-label="${escapeAttr(label)}">${icon}</a>`;
 }
-function renderEventIcon(ev, cls){
-  const name = eventIconName(ev);
+function renderEventIcon(ev, cls){ return renderIcon(eventIconName(ev), cls); }
+/* Anything to do with Meeting You Online carries its badge, even a step on a
+   timeline that has no event of its own (the redeem window opening and closing). */
+function trackIcon(it, cls){ return it.track === 'myo' ? renderIcon('myo', cls) : ''; }
+function renderIcon(name, cls){
   if(!name) return '';
   const art = EV_ICONS[name];
   const img = art.startsWith('<img');
-  return `<span class="${cls}${img ? ' is-img' : ''}${name === 'live' ? ' is-yt' : ''}" aria-hidden="true">${img ? art
+  return `<span class="${cls}${img ? ' is-img' : ''}${name === 'live' ? ' is-yt' : ''}${name === 'myo' ? ' is-myo' : ''}" aria-hidden="true">${img ? art
     : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${art}</svg>`}</span>`;
 }
 
@@ -9421,7 +9429,7 @@ function renderDayModal(){
     </button>`;
   const stepRow = ({ it }) => {
     const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
-    const inner = `<span class="day-main">${escapeHtml(it.title)}</span>
+    const inner = `<span class="day-main">${trackIcon(it, 'ev-icon')}${escapeHtml(it.title)}</span>
       <span class="day-sub">${[it.time ? it.time + (en ? '' : ' น.') : '', it.part ? escapeHtml(it.part) : '', it.venue ? escapeHtml(it.venue) : ''].filter(Boolean).join(' · ')}</span>`;
     return it.ev
       ? `<button class="day-row" data-action="open-event" data-id="${it.ev}" style="--k:${tr.color}">${inner}</button>`
@@ -11664,7 +11672,7 @@ function renderMemberEvents(m){
       : `<span class="cal-item-tag">${personal || eventDateLabel(e)}</span>`;
     return `<button class="cal-item${kind === 'past' ? ' is-past' : ''}${kind === 'today' ? ' is-today' : ''}"
       style="--c:${colour(e)}" data-action="open-event" data-id="${e.id}">
-      ${tag}<span>${escapeHtml(e.title)}</span>
+      ${tag}<span>${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}</span>
     </button>`;
   };
 
