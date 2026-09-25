@@ -4194,7 +4194,9 @@ const SEAT_NOTES = {
   'GE6 Token ได้เฉพาะผู้ที่ซื้อบัตรก่อน 1 พ.ย. 2026 และกรอก Wallet Code จาก iAM48 Application ตอนซื้อบัตร ถ้ากรอกเลขผิดอาจไม่ได้รับ',
   'ทุกโซนได้ Wristband ถ้าทำหาย ผู้จัดไม่ออกให้ใหม่ในทุกกรณี'] };
 /* Meeting You Online: 20-minute turns, one member each, read off the
-   organiser's grid row by row. Weekdays open at the evening block, row 20. */
+   organiser's grid row by row. Weekdays open at the evening block, row 20.
+   An event lists them as `turns` — plain data, so the calendar and live-check
+   scripts can lift the schedule — and they become slots once the page loads. */
 const MYO_TIMES = ['10:00','10:25','10:50','11:15','11:40', '12:15','12:40','13:05','13:30','13:55',
   '14:30','14:55','15:20','15:45','16:10', '16:45','17:10','17:35','18:00','18:25', '19:00','19:25','19:50','20:15','20:40'];
 const myoSlots = days => days.flatMap(([date, ids, from = 0]) => ids.map((id, i) => {
@@ -4599,7 +4601,7 @@ const SEED_SCHEDULE = [
       'บัตร 1 ใบ คุยกับเมมเบอร์ได้ประมาณ 10 วินาที และในแต่ละรอบต้องใช้บัตรทั้งหมดในครั้งเดียว แบ่งใช้ไม่ได้',
       'เข้ารอใน Waiting Room ก่อนเวลารอบประมาณ 10 นาที',
       'Yoghurt ไม่มีรอบใน Round 1 เนื่องจากภารกิจส่วนตัว และจะมีรอบทดแทนใน Round 2'],
-    slots:myoSlots([
+    turns:[
       ['2026-11-05', ['bnk-sindy','bnk-praew','bnk-inkcha'], 20],
       ['2026-11-06', ['cgm-kwan','cgm-chifa','cgm-lingling','cgm-lookked'], 20],
       ['2026-11-07', ['bnk-janry','bnk-pancake','bnk-berry','bnk-cartoon','bnk-hoop',
@@ -4612,7 +4614,7 @@ const SEED_SCHEDULE = [
         'bnk-wawa','bnk-niya','bnk-blythe','bnk-patt','bnk-rose',
         'bnk-proud','bnk-nall','bnk-mirin','bnk-mayji','bnk-neen',
         'bnk-khowjow','bnk-monet','bnk-grape','bnk-marine','cgm-ploen']],
-    ]) },
+    ] },
   { id:'ev-ge6-myo2', logo:'kimi', start:'2026-11-26', end:'2026-11-29', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 2]',
     poster:{ accent:'#3D7DB0', surface:'#EEF3F1', ink:'#22384A', scene:'meadow' },
@@ -4622,7 +4624,7 @@ const SEED_SCHEDULE = [
       'บัตร 1 ใบ คุยกับเมมเบอร์ได้ประมาณ 10 วินาที และในแต่ละรอบต้องใช้บัตรทั้งหมดในครั้งเดียว แบ่งใช้ไม่ได้',
       'เข้ารอใน Waiting Room ก่อนเวลารอบประมาณ 10 นาที',
       'Yoghurt มี 2 รอบติดกันในวันที่ 27 พ.ย. แทนรอบที่ไม่ได้จัดใน Round 1'],
-    slots:myoSlots([
+    turns:[
       ['2026-11-26', ['cgm-lingling','bnk-blythe','cgm-kwan','cgm-namphet'], 20],
       ['2026-11-27', ['bnk-wawa','bnk-inkcha','bnk-rose','bnk-yoghurt','bnk-yoghurt'], 20],
       ['2026-11-28', ['cgm-praifa','cgm-satangpound','cgm-shenae','cgm-valentine','cgm-lewlew',
@@ -4635,7 +4637,7 @@ const SEED_SCHEDULE = [
         'bnk-saonoi','bnk-emmy','bnk-sindy','bnk-patt','bnk-mint',
         'cgm-ginna','cgm-nisha','cgm-ploen','cgm-else','cgm-punpon',
         'bnk-l','bnk-khowjow','bnk-luksorn','cgm-chifa','cgm-emma']],
-    ]) },
+    ] },
   { id:'ev-ge6-heart', start:'2026-11-15', tba:true,
     title:'BNK48 & CGM48 Senbatsu General Election 2026 : Heart to Heart',
     groups:['bnk48','cgm48'], timeline:'ge2026',
@@ -4645,6 +4647,7 @@ const SEED_SCHEDULE = [
     allMembers:true },
 ];
 SEED_SCHEDULE.forEach(e => {
+  if(e.turns) e.slots = myoSlots(e.turns);
   if(e.slots && !e.members) e.members = [...new Set(e.slots.flatMap(s => s.members))];
   // every current member takes part: the list follows the roster rather than being copied out
   if(e.allMembers) e.members = SEED_MEMBERS.map(m => m.id);

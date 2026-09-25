@@ -32,6 +32,9 @@ function literal(name){
   for(; i < html.length; i++){
     const ch = html[i];
     if(quote){ if(ch === '\\'){ i++; continue; } if(ch === quote) quote = null; continue; }
+    // comments are prose: an apostrophe in one must not read as the start of a string
+    if(ch === '/' && html[i + 1] === '/'){ i = html.indexOf('\n', i); continue; }
+    if(ch === '/' && html[i + 1] === '*'){ i = html.indexOf('*/', i) + 1; continue; }
     if(ch === "'" || ch === '"' || ch === '`'){ quote = ch; continue; }
     if(ch === '[' || ch === '{') depth++;
     if(ch === ']' || ch === '}'){ depth--; if(depth === 0) break; }
