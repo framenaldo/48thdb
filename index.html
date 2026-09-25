@@ -12352,7 +12352,6 @@ const TICKER_KINDS = {
   ticket: { th:'บัตร',      en:'TICKETS',  color:'#C8961E' },
   vote:   { th:'โหวต',      en:'VOTE',     color:'#C8231A' },
   result: { th:'ผลโหวต',    en:'RESULTS',  color:'#C8231A' },
-  cheer:  { th:'ยินดีด้วย',   en:'CONGRATS', color:'#D4A017' },
 };
 const TICKER_MAX = 4;
 
@@ -12431,12 +12430,6 @@ function tickerItems(){
     en ? 'Happy birthday' : 'สุขสันต์วันเกิด',
     ...born.map(m => { const a = calcAge(m.birthday);
       return { text: `${nick(m)}${a != null ? (en ? ` (${a})` : ` อายุ ${a} ปี`) : ''}`, action:'open-member', id:m.id }; }) ] });
-
-  // 3b. a song video that has just passed a round number of views
-  if(!YT_STATS) loadYouTubeStats();
-  for(const m of ytMilestones())
-    items.push({ kind:'cheer', parts:[{ text:m.track, action:'open-single', id:m.workId },
-      en ? `passed ${m.mark.toLocaleString('en-US')} views 🎉` : `ครบ ${m.mark.toLocaleString('en-US')} วิวแล้ว 🎉`] });
 
   // 4. ticket sales opening today, or closing within three days
   for(const e of SEED_SCHEDULE.filter(e => e.sales && !e.bookClosed)){
