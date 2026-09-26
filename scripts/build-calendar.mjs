@@ -63,6 +63,7 @@ function untilOf(ev){
 
 function describe(ev, extra){
   const lines = [];
+  if(ev.cancelled) lines.push(ev.cancelled);
   if(extra) lines.push(extra);
   if(ev.allMembers) lines.push('เมมเบอร์: สมาชิก BNK48 และ CGM48 ทุกคน');
   else if(ev.members && ev.members.length && !ev.lineupTba) lines.push('เมมเบอร์: ' + ev.members.map(nick).join(', '));
@@ -78,7 +79,8 @@ function vevents(ev){
   const where = ev.venue || ev.online || '';
   const base = (uid, extra) => [
     `UID:${uid}@48thdb`, `DTSTAMP:${ymd(ev.start)}T000000Z`,
-    `SUMMARY:${esc(ev.bar || (ev.part ? `${ev.title} · ${ev.part}` : ev.title))}`,   // the short name the site's calendar uses, when there is one
+    `SUMMARY:${esc((ev.cancelled ? 'ยกเลิก: ' : '') + (ev.bar || (ev.part ? `${ev.title} · ${ev.part}` : ev.title)))}`,   // the short name the site's calendar uses, when there is one
+    ev.cancelled ? 'STATUS:CANCELLED' : null,
     where ? `LOCATION:${esc(where)}` : null,
     `DESCRIPTION:${esc(describe(ev, extra))}`,
     `URL:${SITE}?e=${ev.id}`,

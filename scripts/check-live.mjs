@@ -73,7 +73,7 @@ function channelsDue(){
   const mins = nowBkk().getUTCHours() * 60 + nowBkk().getUTCMinutes();
   const due = new Map();
   for(const ev of literal('SEED_SCHEDULE')){
-    if(!ev.stream || !ev.time) continue;
+    if(!ev.stream || !ev.time || ev.cancelled) continue;
     if(ev.start > today || lastDay(ev) < today) continue;
     const from = hhmm(ev.time) - EARLY_MIN;
     const to = hhmm(untilOf(ev) || ev.time) + LATE_MIN;

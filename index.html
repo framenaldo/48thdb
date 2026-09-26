@@ -1678,6 +1678,13 @@
     padding:2px 7px; border-radius:999px; margin-right:6px; vertical-align:1px;
     background:var(--paper-dim); color:var(--ink-soft);
   }
+  .ev-cancel-tag{ display:inline-block; margin-right:6px; padding:1px 8px; border-radius:999px; vertical-align:2px;
+    background:#B84545; color:#fff; font-size:11px; font-weight:800; letter-spacing:.02em; }
+  .ev-card.is-cancelled .ev-title{ text-decoration:line-through; text-decoration-thickness:1.5px; text-decoration-color:color-mix(in srgb, currentColor 55%, transparent); }
+  .ev-card.is-cancelled .ev-title .ev-cancel-tag{ text-decoration:none; }
+  .ev-card.is-cancelled .ev-people, .ev-card.is-cancelled .ev-venue{ opacity:.55; }
+  .evm-cancel{ margin:0 0 12px; padding:10px 14px; border-radius:14px; background:#B84545; color:#fff;
+    font-size:13.5px; font-weight:700; line-height:1.5; box-shadow:0 3px 0 rgba(0,0,0,.14); }
   .ev-venue{ margin:6px 0 0; font-size:11.5px; color:var(--ink-soft); line-height:1.45; opacity:.9; }
   .ev-sale{ display:inline-flex; align-items:center; gap:5px; margin:7px 0 0; padding:3px 10px 3px 8px; border-radius:999px;
     font-size:11.5px; font-weight:700; line-height:1.4; color:var(--c-text, var(--c));
@@ -4363,6 +4370,7 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#8E1E2E', surface:'#F4EEEF', ink:'#2A1116', img:'posters/cgm48-popup-live-letmeknow.jpg', w:1600, h:1601 },
     stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL/live' } },
   { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27', time:'12:00',
+    cancelled:'ยกเลิกการจัดงาน เนื่องจากศูนย์การค้าแฟชั่นไอส์แลนด์ปิดให้บริการชั่วคราว (สถานการณ์น้ำท่วม)',
     title:'CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow',
     venue:'Grand Station ชั้น 2, Fashion Island, Bangkok', groups:['cgm48'],
     poster:{ accent:'#8E1E2E', surface:'#F8EEF0', ink:'#3A0F18', img:'posters/roadshow-fashionisland-main.jpg', w:1200, h:1200 },
@@ -6051,6 +6059,8 @@ const EN = {
     'Yoghurt has two slots in a row on 27 Nov, making up for Round 1',
   'กำลังคุยอยู่ตอนนี้': 'On a call now',
   'พัก': 'Break',
+  'ยกเลิกแล้ว': 'Cancelled',
+  'ยกเลิกการจัดงาน เนื่องจากศูนย์การค้าแฟชั่นไอส์แลนด์ปิดให้บริการชั่วคราว (สถานการณ์น้ำท่วม)': 'Cancelled: Fashion Island has closed for the time being because of flooding',
   'ตารางรอบของสมาชิก': 'Member slots',
   'งานต่อเนื่องหลังประกาศผลการเลือกตั้ง': 'The day after the election results',
   'Top 12 เซ็มบัตสึได้ไปถ่าย MV ที่ญี่ปุ่น': 'The top 12 senbatsu shoot their music video in Japan',
@@ -7768,7 +7778,7 @@ function renderCalendarPage(){
       <span class="calp-ag-date"><b>${day}</b><small>${DOW[dd.getDay()]}</small></span>
       <span class="calp-ag-list">
         ${bds.map(m => `<span class="calp-ag-item" style="--k:${getGroup(m.groupId).color}">🎂 ${en ? 'Birthday' : 'วันเกิด'} ${escapeHtml(nickName(m))}</span>`).join('')}
-        ${evs.map(ev => `<span class="calp-ag-item" style="--k:${colourOf(ev)}">${renderEventIcon(ev, 'ev-icon')}${mark(ev, iso)}${escapeHtml(ev.title)}${ev.time && !ev.period ? ` <small>${escapeHtml(ev.time)}</small>` : ''}</span>`).join('')}
+        ${evs.map(ev => `<span class="calp-ag-item" style="--k:${colourOf(ev)}">${cancelTag(ev)}${renderEventIcon(ev, 'ev-icon')}${mark(ev, iso)}${escapeHtml(ev.title)}${ev.time && !ev.period ? ` <small>${escapeHtml(ev.time)}</small>` : ''}</span>`).join('')}
       </span></button>`);
   }
   const monthName = en ? `${EN_MONTHS[month-1]} ${year}` : `${MONTH_NAMES[month-1]} ${year + 543}`;
@@ -8383,6 +8393,7 @@ function endsAtToday(ev, iso){
 const doneForToday = (ev, iso) => { const end = endsAtToday(ev, iso); return end != null && end <= Date.now(); };
 
 function startsAt(ev, todayIso){
+  if(ev.cancelled) return null;
   if(ev.slots){
     const { current, next } = slotNow(ev, todayIso), s = current || next;
     return s ? slotTime(todayIso, s.time) : null;
@@ -8433,7 +8444,7 @@ function tickClock(){
   const now = toYmd(new Date());
   if(state.view === 'feed' && !state.query && !state.selectedId && !state.selectedEvent && !state.posterOf) {
     const iso = toYmd(todayStart());
-    const live = SEED_SCHEDULE.filter(e => (!filteringByOshi() || hasMyOshi(e)) && !e.period
+    const live = SEED_SCHEDULE.filter(e => (!filteringByOshi() || hasMyOshi(e)) && !e.period && !e.cancelled
       && e.start <= iso && eventLastDay(e) >= iso && !doneForToday(e, iso)).sort((a,b) => a.start.localeCompare(b.start)).map(e => e.id).join(',');
     if(_feedLiveKey !== null && live !== _feedLiveKey){ renderMain(); return; }
   }
@@ -8468,8 +8479,11 @@ function parseYmd(s){ const [y,m,d] = s.split('-').map(Number); return new Date(
 
 /* When the tickets sell, on the card itself, so nobody has to open the sheet
    to find out whether and until when they can buy. */
+/* A called-off event keeps its place in the lists, marked, so nobody sets out for it. */
+const cancelTag = ev => ev.cancelled ? '<span class="ev-cancel-tag">ยกเลิกแล้ว</span>' : '';
+
 function renderSaleLine(ev){
-  if(!ev.sales || ev.bookClosed) return '';
+  if(!ev.sales || ev.bookClosed || ev.cancelled) return '';
   const en = isEN(), M = monthsShort(), now = Date.now();
   const at = s => s ? slotTime(s.slice(0, 10), s.slice(11, 16)) : null;
   const when = s => { const [, mo, d] = s.slice(0, 10).split('-').map(Number); return `${d} ${M[mo - 1]} ${s.slice(11, 16)}`; };
@@ -8485,9 +8499,9 @@ function renderSaleLine(ev){
 }
 
 function renderEventCard(ev, todayIso){
-  const runsToday = ev.start <= todayIso && eventLastDay(ev) >= todayIso;
+  const runsToday = !ev.cancelled && ev.start <= todayIso && eventLastDay(ev) >= todayIso;
   const over = runsToday && !ev.period && doneForToday(ev, todayIso);
-  const when = over ? 'จบแล้ว' : eventWhenLabel(ev, todayIso);
+  const when = ev.cancelled ? '' : over ? 'จบแล้ว' : eventWhenLabel(ev, todayIso);
   const isNow = runsToday && !over;
   // a rota on the day it ran: the people who were there, not the whole run
   const ids = over && ev.slots ? [...new Set(slotsOn(ev, todayIso).flatMap(s => s.members))] : (ev.members || []);
@@ -8504,7 +8518,7 @@ function renderEventCard(ev, todayIso){
   const shown = people.slice(0, 6);
   const rest = people.length - shown.length;
   return `
-  <article class="ev-card${isNow?' is-now':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}" style="--c:${accent}${theme}"
+  <article class="ev-card${isNow?' is-now':''}${ev.cancelled?' is-cancelled':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}" style="--c:${accent}${theme}"
     ${hasMore ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="ev-date">
       <span class="ev-d">${eventDateLabel(ev)}</span>
@@ -8514,7 +8528,7 @@ function renderEventCard(ev, todayIso){
     <div class="ev-body">
       ${(()=>{ const at = over ? null : startsAt(ev, todayIso);
         return at ? startsPill('ev-starts', ev, todayIso, at) : ''; })()}
-      <h3 class="ev-title">${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':ev.tag==='partner'?'<span class="ev-tag">Partner</span>':''}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
+      <h3 class="ev-title">${cancelTag(ev)}${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':ev.tag==='partner'?'<span class="ev-tag">Partner</span>':''}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
       ${renderSaleLine(ev)}
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
@@ -9376,6 +9390,7 @@ function isReplayLink(u){
   return /facebook\.com\/.+\/(videos|posts|live)|facebook\.com\/(share|watch|reel)|fb\.watch|tiktok\.com\/@[^/]+\/(video|live)|instagram\.com\/(p|reel|tv)\//.test(u);
 }
 function renderLiveChip(ev, cls){
+  if(ev.cancelled) return '';
   const w = streamWindow(ev);
   if(!w) return '';
   const now = Date.now();
@@ -9476,7 +9491,7 @@ function renderDayModal(){
 
   const evRow = e => `<button class="day-row" data-action="open-event" data-id="${e.id}"
       style="--k:${e.poster ? e.poster.accent : (getGroup((e.groups || [])[0]) || {}).color || 'var(--ink-soft)'}">
-      <span class="day-main">${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}${renderLiveChip(e)}</span>
+      <span class="day-main">${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}${renderLiveChip(e)}</span>
       <span class="day-sub">${[e.time ? e.time + (en ? '' : ' น.') : '', e.part ? escapeHtml(e.part) : '',
         e.venue ? escapeHtml(e.venue) : e.online ? escapeHtml(e.online) : ''].filter(Boolean).join(' · ')}</span>
     </button>`;
@@ -10361,6 +10376,7 @@ function renderEventModal(){
         </button>` : ''}
         </div>
         <div class="evm-body">
+        ${ev.cancelled ? `<p class="evm-cancel" role="status">${escapeHtml(ev.cancelled)}</p>` : ''}
         <div class="evm-meta">
           ${renderStreamLink(ev, 'evm-icon')}
           <p class="evm-date"><span>${ev.dateTag ? `<span class="evm-date-tag">${escapeHtml(ev.dateTag)}</span> · ` : ''}${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}${ev.part?' · '+escapeHtml(ev.part):''}</span></p>
@@ -10659,12 +10675,12 @@ function renderFeed(){
   // Things on sale have a shop of their own; the feed is for what happens.
   const events = SEED_SCHEDULE.filter(e => !e.shop && (!mine || hasMyOshi(e)))
     .slice().sort((a,b) => a.start.localeCompare(b.start));
-  const running = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
+  const running = events.filter(e => !e.cancelled && e.start <= iso && eventLastDay(e) >= iso);
   const nowOn = running.filter(e => !e.period && !doneForToday(e, iso));
   const overToday = running.filter(e => !e.period && doneForToday(e, iso));
   _feedLiveKey = nowOn.map(e => e.id).join(',');
   const periods = running.filter(e => e.period);
-  const soon = events.filter(e => e.start > iso);
+  const soon = events.filter(e => e.start > iso || (e.cancelled && eventLastDay(e) >= iso));
   const past = events.filter(e => eventLastDay(e) < iso).reverse();
 
   return `
@@ -11697,8 +11713,8 @@ function renderMemberEvents(m){
     });
   });
   if(!evs.length) return '';
-  const today = evs.filter(e => e.start <= iso && eventLastDay(e) >= iso);
-  const upcoming = evs.filter(e => e.start > iso).sort((a,b) => a.start.localeCompare(b.start));
+  const today = evs.filter(e => !e.cancelled && e.start <= iso && eventLastDay(e) >= iso);
+  const upcoming = evs.filter(e => e.start > iso || (e.cancelled && eventLastDay(e) >= iso)).sort((a,b) => a.start.localeCompare(b.start));
   // Only the most recent outing is worth keeping on a member's card, and only
   // while it is still recent; after a month it has nothing left to say.
   const PAST_DAYS = 30;
@@ -11725,7 +11741,7 @@ function renderMemberEvents(m){
       : `<span class="cal-item-tag">${personal || eventDateLabel(e)}</span>`;
     return `<button class="cal-item${kind === 'past' ? ' is-past' : ''}${kind === 'today' ? ' is-today' : ''}"
       style="--c:${colour(e)}" data-action="open-event" data-id="${e.id}">
-      ${tag}<span>${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}</span>
+      ${tag}<span>${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}</span>
     </button>`;
   };
 
@@ -12394,7 +12410,7 @@ function tickerItems(){
   }
 
   // 1. on now, or on later today
-  for(const e of SEED_SCHEDULE.filter(e => !e.period && e.start <= iso && eventLastDay(e) >= iso)){
+  for(const e of SEED_SCHEDULE.filter(e => !e.period && !e.cancelled && e.start <= iso && eventLastDay(e) >= iso)){
     if(e.slots){
       const { current, next } = slotNow(e, iso);
       const s = current || next;
@@ -13681,7 +13697,7 @@ async function drawTodayCard(g, url){
   shareText(g, `${DAYS_LONG[now.getDay()]}${en ? ' ' : 'ที่ '}${shareThaiDate(now)}`, P, 84, '700 32px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.9)');
   shareText(g, en ? 'Today at 48' : 'วันนี้ที่ 48', P, 214, '800 104px "Noto Sans Thai", sans-serif', '#ffffff');
 
-  const todays = SEED_SCHEDULE.filter(e => !e.period && !e.shop && e.start <= iso && eventLastDay(e) >= iso)
+  const todays = SEED_SCHEDULE.filter(e => !e.period && !e.shop && !e.cancelled && e.start <= iso && eventLastDay(e) >= iso)
     .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
   const upcoming = SEED_SCHEDULE.filter(e => !e.period && !e.shop && e.start > iso).sort((a, b) => a.start.localeCompare(b.start));
   const list = todays.length ? todays : upcoming;
