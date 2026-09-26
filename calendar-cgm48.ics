@@ -229,16 +229,22 @@ END:VEVENT
 BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
-SUMMARY:CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow
+SUMMARY:ยกเลิก: CGM48 11th Single "Koi Tsunjatta – Let me kno
+ w!" Roadshow
+STATUS:CANCELLED
 LOCATION:Grand Station ชั้น 2\, Fashion Island\, Bangkok
-DESCRIPTION:เมมเบอร์: Ginna\, Kwan\, Jingjing\, Nisha\, Plo
- en\, Hongyok\n• รอบเวลาเดียวกันทั้
- งสองวัน 26 และ 27 ก.ย.\n• 12:00–13:00 Mini Con
- cert\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 พบสมา
- ชิกที่จุด Merchandise และ Hachi Cha\n• 17:00–1
- 8:00 Group Hi-Touch\n• บัตรเข้าร่วม Group Hi-Tou
- ch ได้จากการซื้อเข็มกลัดภา
- ยในงาน\n\nhttps://48thdb.com/?e=ev-roadshow-fashionisland
+DESCRIPTION:ยกเลิกการจัดงาน เนื่อ
+ งจากศูนย์การค้าแฟชั่นไอส
+ ์แลนด์ปิดให้บริการชั่วคร
+ าว (สถานการณ์น้ำท่วม)\nเมมเบ
+ อร์: Ginna\, Kwan\, Jingjing\, Nisha\, Ploen\, Hongyok\n• รอ
+ บเวลาเดียวกันทั้งสองวัน 26 
+ และ 27 ก.ย.\n• 12:00–13:00 Mini Concert\n• 14:00–15:00 G
+ roup Hi-Touch\n• 15:30–16:30 พบสมาชิกที่จุ
+ ด Merchandise และ Hachi Cha\n• 17:00–18:00 Group Hi-Touch\n•
+  บัตรเข้าร่วม Group Hi-Touch ได้จากก
+ ารซื้อเข็มกลัดภายในงาน\n\nhttp
+ s://48thdb.com/?e=ev-roadshow-fashionisland
 URL:https://48thdb.com/?e=ev-roadshow-fashionisland
 DTSTART;TZID=Asia/Bangkok:20260926T120000
 DTEND;TZID=Asia/Bangkok:20260926T180000
@@ -246,16 +252,22 @@ END:VEVENT
 BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-27@48thdb
 DTSTAMP:20260926T000000Z
-SUMMARY:CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow
+SUMMARY:ยกเลิก: CGM48 11th Single "Koi Tsunjatta – Let me kno
+ w!" Roadshow
+STATUS:CANCELLED
 LOCATION:Grand Station ชั้น 2\, Fashion Island\, Bangkok
-DESCRIPTION:เมมเบอร์: Ginna\, Kwan\, Jingjing\, Nisha\, Plo
- en\, Hongyok\n• รอบเวลาเดียวกันทั้
- งสองวัน 26 และ 27 ก.ย.\n• 12:00–13:00 Mini Con
- cert\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 พบสมา
- ชิกที่จุด Merchandise และ Hachi Cha\n• 17:00–1
- 8:00 Group Hi-Touch\n• บัตรเข้าร่วม Group Hi-Tou
- ch ได้จากการซื้อเข็มกลัดภา
- ยในงาน\n\nhttps://48thdb.com/?e=ev-roadshow-fashionisland
+DESCRIPTION:ยกเลิกการจัดงาน เนื่อ
+ งจากศูนย์การค้าแฟชั่นไอส
+ ์แลนด์ปิดให้บริการชั่วคร
+ าว (สถานการณ์น้ำท่วม)\nเมมเบ
+ อร์: Ginna\, Kwan\, Jingjing\, Nisha\, Ploen\, Hongyok\n• รอ
+ บเวลาเดียวกันทั้งสองวัน 26 
+ และ 27 ก.ย.\n• 12:00–13:00 Mini Concert\n• 14:00–15:00 G
+ roup Hi-Touch\n• 15:30–16:30 พบสมาชิกที่จุ
+ ด Merchandise และ Hachi Cha\n• 17:00–18:00 Group Hi-Touch\n•
+  บัตรเข้าร่วม Group Hi-Touch ได้จากก
+ ารซื้อเข็มกลัดภายในงาน\n\nhttp
+ s://48thdb.com/?e=ev-roadshow-fashionisland
 URL:https://48thdb.com/?e=ev-roadshow-fashionisland
 DTSTART;TZID=Asia/Bangkok:20260927T120000
 DTEND;TZID=Asia/Bangkok:20260927T180000
