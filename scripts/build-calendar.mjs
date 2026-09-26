@@ -79,7 +79,7 @@ function vevents(ev){
   const where = ev.venue || ev.online || '';
   const base = (uid, extra) => [
     `UID:${uid}@48thdb`, `DTSTAMP:${ymd(ev.start)}T000000Z`,
-    `SUMMARY:${esc((ev.cancelled ? 'ยกเลิก: ' : '') + (ev.bar || (ev.part ? `${ev.title} · ${ev.part}` : ev.title)))}`,   // the short name the site's calendar uses, when there is one
+    `SUMMARY:${esc((ev.cancelled ? (ev.postponed ? 'เลื่อน: ' : 'ยกเลิก: ') : '') + (ev.bar || (ev.part ? `${ev.title} · ${ev.part}` : ev.title)))}`,   // the short name the site's calendar uses, when there is one
     ev.cancelled ? 'STATUS:CANCELLED' : null,
     where ? `LOCATION:${esc(where)}` : null,
     `DESCRIPTION:${esc(describe(ev, extra))}`,

@@ -4384,6 +4384,7 @@ const SEED_SCHEDULE = [
     info:[
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน'] },
   { id:'ev-fame-fanmeet', start:'2026-09-27',
+    cancelled:'เลื่อนการแสดงออกไปก่อน เนื่องจากสถานการณ์ฝนตกและน้ำท่วมกรุงเทพในหลายพื้นที่ วันจัดใหม่และการคืนเงินจะแจ้งอีกครั้งทาง BNK48 Official SNS', postponed:true,
     sales:{ to:'2026-09-25T12:00' },
     title:"Fame's Airline Fanmeet",
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
@@ -6060,6 +6061,9 @@ const EN = {
   'กำลังคุยอยู่ตอนนี้': 'On a call now',
   'พัก': 'Break',
   'ยกเลิกแล้ว': 'Cancelled',
+  'เลื่อนแล้ว': 'Postponed',
+  'เลื่อนการแสดงออกไปก่อน เนื่องจากสถานการณ์ฝนตกและน้ำท่วมกรุงเทพในหลายพื้นที่ วันจัดใหม่และการคืนเงินจะแจ้งอีกครั้งทาง BNK48 Official SNS':
+    'Postponed because of heavy rain and flooding across Bangkok; the new date and refunds will be announced on BNK48 Official SNS',
   'ยกเลิกการจัดงาน เนื่องจากศูนย์การค้าแฟชั่นไอส์แลนด์ปิดให้บริการชั่วคราว (สถานการณ์น้ำท่วม)': 'Cancelled: Fashion Island has closed for the time being because of flooding',
   'ตารางรอบของสมาชิก': 'Member slots',
   'งานต่อเนื่องหลังประกาศผลการเลือกตั้ง': 'The day after the election results',
@@ -8479,8 +8483,9 @@ function parseYmd(s){ const [y,m,d] = s.split('-').map(Number); return new Date(
 
 /* When the tickets sell, on the card itself, so nobody has to open the sheet
    to find out whether and until when they can buy. */
-/* A called-off event keeps its place in the lists, marked, so nobody sets out for it. */
-const cancelTag = ev => ev.cancelled ? '<span class="ev-cancel-tag">ยกเลิกแล้ว</span>' : '';
+/* A called-off event keeps its place in the lists, marked, so nobody sets out for it.
+   `cancelled` holds why it is off on its date; `postponed` says a new date is to come. */
+const cancelTag = ev => ev.cancelled ? `<span class="ev-cancel-tag">${ev.postponed ? 'เลื่อนแล้ว' : 'ยกเลิกแล้ว'}</span>` : '';
 
 function renderSaleLine(ev){
   if(!ev.sales || ev.bookClosed || ev.cancelled) return '';
