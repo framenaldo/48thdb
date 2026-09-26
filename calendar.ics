@@ -452,9 +452,15 @@ END:VEVENT
 BEGIN:VEVENT
 UID:ev-fame-fanmeet@48thdb
 DTSTAMP:20260927T000000Z
-SUMMARY:Fame's Airline Fanmeet
+SUMMARY:เลื่อน: Fame's Airline Fanmeet
+STATUS:CANCELLED
 LOCATION:The Theater Hall ชั้น C\, The Bazaar Hotel Bangkok
-DESCRIPTION:เมมเบอร์: Fame\n• แฟนมีตเดี
+DESCRIPTION:เลื่อนการแสดงออกไปก่อ
+ น เนื่องจากสถานการณ์ฝนตกแ
+ ละน้ำท่วมกรุงเทพในหลายพื
+ ้นที่ วันจัดใหม่และการคืน
+ เงินจะแจ้งอีกครั้งทาง BNK48 Offi
+ cial SNS\nเมมเบอร์: Fame\n• แฟนมีตเดี
  ่ยวครั้งแรกของเฟม\n• ของที
  ่ได้ในบัตร: เซลฟีกับเฟม\, Boardi
  ng Pass\, Inhaler\, Postcard\n• บัตรเปิดขายแล
