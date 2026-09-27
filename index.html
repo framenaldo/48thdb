@@ -2333,20 +2333,21 @@
   .gev-btn:active{ transform:translateY(2px); box-shadow:none; }
   /* The candidate's poster as a real sheet of paper: it turns in 3D, the light
      slides across it as it does, it throws a shadow and a faint reflection on
-     the floor, and its back is plain white paper. The numbers that move it
-     (--rx --ry --gx --gy --glare --sheen --cos) are written by bindPoster3D. */
+     the floor, and its back is plain white paper.
+     Smoothness: while it turns nothing is painted again. Every moving part is
+     drawn once on its own layer and bindPoster3D only moves those layers
+     (transform and opacity, set straight on each), which a phone's graphics
+     chip does for free; the page itself is never restyled or laid out. */
   .gp3{ position:relative; flex:1; min-height:0; width:100%; perspective:1500px; touch-action:none; cursor:grab;
     user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
-    --w:250px; --h:354px; --top:0px; --rx:0deg; --ry:0deg; --z:1; --tx:0px; --ty:0px; --fy:177px;
-    --gx:50%; --gy:28%; --glare:.3; --sheen:50%; --cos:1; }
+    --w:250px; --h:354px; --top:0px; }
   .gp3.is-grab{ cursor:grabbing; }
   .gp3-card, .gp3-refl{ position:absolute; left:50%; top:var(--top); width:var(--w); height:var(--h); margin-left:calc(var(--w) / -2); }
   /* It spins about its own middle, leaning as it is tipped. The floor sits
      wherever its lowest point is at that moment (--fy below its middle), and
      the reflection is the same sheet mirrored in that floor, so the two always
      meet, as on a glossy floor. */
-  .gp3-card{ transform-style:preserve-3d; will-change:transform;
-    transform:translate(var(--tx), var(--ty)) scale(var(--z)) rotateX(var(--rx)) rotateY(var(--ry)); }
+  .gp3-card{ transform-style:preserve-3d; will-change:transform; }
   .gp3-face{ position:absolute; inset:0; border-radius:0; overflow:hidden;   /* square corners, like a printed poster */
     backface-visibility:hidden; -webkit-backface-visibility:hidden; }
   .gp3-front{ background:#fff; }
@@ -2361,24 +2362,29 @@
   .gp3-thru{ position:absolute; inset:0; pointer-events:none; background:var(--img) center/cover no-repeat;
     transform:scaleX(-1); opacity:.07; filter:blur(3px) saturate(.7); }
   /* the light: a soft glare that follows the angle, a bright band that sweeps
-     across as it turns, and the side turned away from the light going darker */
-  .gp3-glare, .gp3-sheen, .gp3-shade{ position:absolute; inset:0; pointer-events:none; }
-  .gp3-glare{ opacity:var(--glare);
-    background:radial-gradient(circle at var(--gx) var(--gy), rgba(255,255,255,.34) 0%, rgba(255,255,255,.2) 22%, rgba(255,255,255,.07) 42%, rgba(255,255,255,0) 64%); }
-  .gp3-sheen{ opacity:min(1, calc(var(--glare) * 1.25)); background-size:280% 100%; background-position:var(--sheen) 0; background-repeat:no-repeat;
-    background-image:linear-gradient(112deg, rgba(255,255,255,0) 38%, rgba(255,255,255,.2) 45%, rgba(255,255,255,.66) 50%, rgba(255,255,255,.2) 55%, rgba(255,255,255,0) 62%); }
-  .gp3-shade{ opacity:calc((1 - var(--cos)) * .9);
+     across as it turns, and the side turned away from the light going darker.
+     The glare is a small soft disc scaled up, so its layer stays tiny. */
+  .gp3-glare, .gp3-sheen, .gp3-shade{ position:absolute; pointer-events:none; }
+  .gp3-glare{ left:30%; top:calc(50% - var(--w) * .2); width:40%; aspect-ratio:1; opacity:.14; will-change:transform, opacity;
+    background:radial-gradient(circle closest-side, rgba(255,255,255,.34) 0%, rgba(255,255,255,.2) 35%, rgba(255,255,255,.07) 65%, rgba(255,255,255,0) 100%); }
+  .gp3-sheen{ left:0; top:0; width:120%; height:100%; opacity:0; will-change:transform, opacity;
+    background:linear-gradient(112deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.2) 42%, rgba(255,255,255,.66) 50%, rgba(255,255,255,.2) 58%, rgba(255,255,255,0) 70%); }
+  .gp3-shade{ inset:0; opacity:0; will-change:opacity;
     background:linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,0) 55%, rgba(0,0,0,.35)); }
-  .gp3-back .gp3-glare, .gp3-back .gp3-sheen{ opacity:calc(var(--glare) * .55); }
   /* on the floor: a shadow where it stands, and the poster again, faint, upside down */
-  .gp3-shadow{ position:absolute; left:50%; top:calc(var(--top) + var(--h) / 2 + var(--fy) * var(--z)); height:26px; border-radius:50%; pointer-events:none;
-    width:calc(var(--w) * (.25 + .75 * var(--cos)) + 24px); transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--z));
+  .gp3-shadow{ position:absolute; left:50%; top:calc(var(--top) + var(--h) / 2); width:calc(var(--w) + 24px); height:26px;
+    margin:-13px 0 0 calc((var(--w) + 24px) / -2); border-radius:50%; pointer-events:none; will-change:transform;
     background:radial-gradient(closest-side, rgba(0,0,0,.7), rgba(0,0,0,0)); filter:blur(5px); }
-  .gp3-refl{ border-radius:0; opacity:.24; pointer-events:none; background:#fff var(--img) center/cover no-repeat;
-    transform:translate(var(--tx), var(--ty)) scale(var(--z)) translateY(calc(var(--fy) * 2)) scaleY(-1) rotateX(var(--rx)) rotateY(var(--ry));
-    -webkit-mask-image:linear-gradient(to top, #000 0%, rgba(0,0,0,.4) 18%, transparent 42%);
-    mask-image:linear-gradient(to top, #000 0%, rgba(0,0,0,.4) 18%, transparent 42%); }
+  .gp3-refl{ border-radius:0; opacity:.24; pointer-events:none; background:#fff; will-change:transform;
+    overflow:hidden; }
+  /* the reflection fades into the floor: a fade in the backdrop's own colour laid over it, drawn once
+     with it (a mask would be redrawn on every frame of a turn) */
+  .gp3-refl::after{ content:''; position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(8,6,12,0) 0%, rgba(8,6,12,.6) 18%, #08060C 42%); }
+  /* an image, not a background: a background image here was drawn again on every frame of a turn */
+  .gp3-refl img{ display:block; width:100%; height:100%; object-fit:cover; }
   .gp3.is-back .gp3-refl{ background:#FAFAF8; }
+  .gp3.is-back .gp3-refl img{ visibility:hidden; }
   .gp3-hint{ position:absolute; left:50%; bottom:4px; transform:translateX(-50%); white-space:nowrap; pointer-events:none;
     font-size:12px; font-weight:700; color:rgba(255,255,255,.72); padding:5px 12px; border-radius:99px;
     background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); transition:opacity .4s; }
@@ -7617,25 +7623,43 @@ function bindPoster3D(view, stage){
   let ry = reduce ? 0 : -34, rx = reduce ? 0 : 8, vy = 0, target = null;
   let z = 1, tx = 0, ty = 0, hx = 0, hy = 0;
   const pts = new Map();
-  let last = null, moved = 0, pinch = null, raf = 0, tapAt = 0;
-  const set = (k, v) => stage.style.setProperty(k, v);
+  let last = null, moved = 0, pinch = null, raf = 0, tapAt = 0, drawRaf = 0, wasBack = null;
+  const card = stage.querySelector('.gp3-card'), refl = stage.querySelector('.gp3-refl'), shadow = stage.querySelector('.gp3-shadow');
+  const shade = stage.querySelector('.gp3-shade');
+  const front = stage.querySelector('.gp3-front'), back = stage.querySelector('.gp3-back');
+  const lit = [[front.querySelector('.gp3-glare'), front.querySelector('.gp3-sheen'), 1], [back.querySelector('.gp3-glare'), back.querySelector('.gp3-sheen'), .55]];
 
   const draw = () => {
-    const a = ry + hy, b = rx + hx;
-    const sa = Math.sin(a * Math.PI / 180), ca = Math.cos(a * Math.PI / 180), sb = Math.sin(b * Math.PI / 180);
-    set('--ry', a.toFixed(2) + 'deg'); set('--rx', b.toFixed(2) + 'deg');
-    set('--gx', (50 - sa * 58).toFixed(1) + '%'); set('--gy', (30 - sb * 130).toFixed(1) + '%');
-    const tip = Math.min(1, Math.abs(sa) * 1.6 + Math.abs(sb) * 1.8);
-    set('--glare', (.14 + tip * .86).toFixed(3));
-    const off = Math.min(90, Math.abs(((a % 180) + 270) % 180 - 90));   // degrees away from square on, front or back
-    const band = 1.25 - off / 45 * 1.5;                                   // 1.25 is past the right edge, -.25 past the left
-    set('--sheen', ((1.4 - band) / 1.8 * 100).toFixed(1) + '%');
-    set('--cos', Math.abs(ca).toFixed(3));
-    set('--z', z.toFixed(3)); set('--tx', tx.toFixed(1) + 'px'); set('--ty', ty.toFixed(1) + 'px');
+    const a = ry + hy, b = rx + hx, R = Math.PI / 180;
+    const sa = Math.sin(a * R), ca = Math.cos(a * R), sb = Math.sin(b * R);
     const d = stage._gp3 || { h:354, w:250 };
-    set('--fy', (d.h / 2 * Math.abs(Math.cos(b * Math.PI / 180)) + d.w / 2 * Math.abs(sa * sb)).toFixed(2) + 'px');
-    stage.classList.toggle('is-back', ca < 0);
+    const rot = `rotateX(${b.toFixed(2)}deg) rotateY(${a.toFixed(2)}deg)`;
+    const at = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${z.toFixed(3)})`;
+    // the floor is wherever its lowest corner is: a corner (x, y) ends up y·cos(rx) + x·sin(ry)·sin(rx) below the middle
+    const fy = d.h / 2 * Math.abs(Math.cos(b * R)) + d.w / 2 * Math.abs(sa * sb);
+    card.style.transform = `${at} ${rot}`;
+    refl.style.transform = `${at} translateY(${(fy * 2).toFixed(2)}px) scaleY(-1) ${rot}`;
+    const spread = (d.w * (.25 + .75 * Math.abs(ca)) + 24) / (d.w + 24);
+    shadow.style.transform = `translate(${tx.toFixed(1)}px, ${(ty + fy * z).toFixed(1)}px) scale(${(spread * z).toFixed(3)}, ${z.toFixed(3)})`;
+    // the light
+    const tip = Math.min(1, Math.abs(sa) * 1.6 + Math.abs(sb) * 1.8);
+    const glare = .14 + tip * .86;
+    const gx = (-sa * .58) * d.w, gy = (-.2 - sb * 1.3) * d.h;            // where the glare lands, from the middle
+    const off = Math.min(90, Math.abs(((a % 180) + 270) % 180 - 90));      // degrees away from square on, front or back
+    const band = 1.55 - off / 45 * 2.1;                                     // 1.55 is past the right edge, -.55 past the left
+    const sheenX = ((band - .6) / 1.2 * 100).toFixed(1);
+    for(const [g, sh, k] of lit){
+      g.style.transform = `translate(${gx.toFixed(1)}px, ${gy.toFixed(1)}px) scale(4)`;
+      g.style.opacity = (glare * k).toFixed(3);
+      sh.style.transform = `translateX(${sheenX}%)`;
+      sh.style.opacity = Math.min(1, glare * 1.25 * k).toFixed(3);
+    }
+    shade.style.opacity = ((1 - Math.abs(ca)) * .9).toFixed(3);
+    const isBack = ca < 0;
+    if(isBack !== wasBack){ stage.classList.toggle('is-back', isBack); wasBack = isBack; }
   };
+  // pointer events can come faster than the screen draws; draw once a frame
+  const req = () => { if(!drawRaf) drawRaf = requestAnimationFrame(() => { drawRaf = 0; draw(); }); };
   const face = () => Math.round(ry / 180) * 180;           // the nearest side, front or back
   // stepped by the clock, not the frame count, so a busy phone settles it just as fast
   let lastTick = 0;
@@ -7678,17 +7702,17 @@ function bindPoster3D(view, stage){
       const [a, b] = [...pts.values()];
       z = Math.min(3, Math.max(1, pinch.z * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d));
       if(z <= 1.01){ z = 1; tx = ty = 0; }
-      moved += 20; draw(); return;
+      moved += 20; req(); return;
     }
     const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
     moved += Math.abs(dx) + Math.abs(dy);
-    if(z > 1.02){ tx += dx; ty += dy; draw(); return; }        // brought close: a drag moves it
+    if(z > 1.02){ tx += dx; ty += dy; req(); return; }         // brought close: a drag moves it
     ry += dx * .5;
     rx = Math.max(-24, Math.min(24, rx - dy * .28));
     const now = performance.now(), dt = Math.max(8, now - last.t);
     vy = vy * .35 + dx * .5 * (16 / dt) * .65;
     last = { t:now };
-    draw();
+    req();
   });
   const up = e => {
     if(!pts.has(e.pointerId)) return;
@@ -9205,7 +9229,7 @@ function renderGEPosterViewer(id){
         title="${escapeAttr('Appeal comment · ' + m.name)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
     : `<div class="gp3" style="--img:url('${escapeAttr(gePoster(m.id))}')" role="img"
         aria-label="${escapeAttr((en ? 'Election poster: ' : 'โปสเตอร์เลือกตั้ง ') + m.name)}">
-        <span class="gp3-refl" aria-hidden="true"></span>
+        <span class="gp3-refl" aria-hidden="true"><img src="${gePoster(m.id)}" alt="" draggable="false" decoding="async"></span>
         <span class="gp3-shadow" aria-hidden="true"></span>
         <div class="gp3-card">
           <div class="gp3-face gp3-front">
