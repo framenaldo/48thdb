@@ -2283,6 +2283,67 @@
   .ge-next-what{ font-size:14px; font-weight:700; line-height:1.4; }
   .ge-next-what small{ color:var(--ink-soft); font-weight:600; }
   .ge-more{ margin-top:10px; }
+  /* ===== the candidates and their posters ===== */
+  .gec-sum{ margin:2px 2px 12px; font-size:13px; font-weight:700; color:var(--ink-soft); }
+  .gec-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(104px, 1fr)); gap:10px; }
+  .gec-card{ position:relative; display:flex; flex-direction:column; padding:0; border:1.5px solid var(--line); border-radius:14px;
+    overflow:hidden; background:var(--card); color:var(--ink); font:inherit; text-align:left; cursor:pointer;
+    box-shadow:0 3px 0 rgba(var(--shadow-rgb),.07); transition:transform .12s, box-shadow .12s; -webkit-tap-highlight-color:transparent; }
+  .gec-card:active{ transform:translateY(2px); box-shadow:0 1px 0 rgba(var(--shadow-rgb),.07); }
+  .gec-card img{ display:block; width:100%; height:auto; aspect-ratio:1448/2048; object-fit:cover; background:var(--paper-dim); }
+  .gec-star{ position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:50%; display:grid; place-items:center;
+    background:#F06C9B; color:#fff; font-size:12px; box-shadow:0 2px 6px rgba(0,0,0,.25); }
+  .gec-strip{ display:flex; gap:10px; overflow-x:auto; padding:2px 2px 6px; margin:0 -2px; scroll-snap-type:x proximity; }
+  .gec-strip .gec-card{ flex:none; width:96px; scroll-snap-align:start; }
+  /* on a member's profile: she is standing, and here is her poster */
+  .ge-cand{ display:flex; align-items:center; gap:10px; width:100%; margin:12px 0 0; padding:9px 10px 9px 9px; box-sizing:border-box;
+    border:1.5px solid var(--line); border-left:5px solid #B3121E; border-radius:16px; background:var(--card); color:var(--ink);
+    box-shadow:0 3px 0 rgba(var(--shadow-rgb),.07); }
+  .ge-cand-main{ flex:1; min-width:0; display:flex; align-items:center; gap:12px; padding:0; border:0; background:none; color:inherit;
+    font:inherit; text-align:left; cursor:pointer; }
+  .ge-cand-acts{ display:flex; flex-direction:column; gap:6px; flex:none; }
+  .ge-cand-go{ border:0; cursor:pointer; font-family:inherit; transition:transform .12s, box-shadow .12s; }
+  .ge-cand-go:active{ transform:translateY(2px); box-shadow:none; }
+  .ge-cand-go.is-clip{ background:var(--card); color:#B3121E; box-shadow:inset 0 0 0 1.5px #B3121E, 0 2px 0 rgba(0,0,0,.12); }
+  :root[data-theme="dark"] .ge-cand-go.is-clip{ color:#F07A84; box-shadow:inset 0 0 0 1.5px #F07A84, 0 2px 0 rgba(0,0,0,.3); }
+  .ge-cand img{ width:52px; height:auto; aspect-ratio:1448/2048; object-fit:cover; border-radius:7px; flex:none; background:var(--paper-dim); }
+  .ge-cand-t{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .ge-cand-t small{ font-size:11px; font-weight:800; color:#B3121E; letter-spacing:.02em; }
+  :root[data-theme="dark"] .ge-cand-t small{ color:#F07A84; }
+  .ge-cand-t b{ font-size:14px; line-height:1.3; }
+  .ge-cand-go{ flex:none; font-size:12px; font-weight:800; color:#fff; background:#B3121E; padding:6px 11px; border-radius:99px;
+    box-shadow:0 2px 0 rgba(0,0,0,.2); }
+  /* the poster viewer, when it holds a candidate: step to the next one, and say whose it is */
+  .poster-viewer.is-ge{ flex-direction:column; gap:12px; padding:60px 12px 14px; background:#08060C; }
+  .poster-viewer.is-ge .poster-full{ max-height:calc(100% - 76px); }
+  .gev-nav{ position:absolute; top:calc(50% - 38px); width:42px; height:42px; border-radius:50%; z-index:1; cursor:pointer;
+    background:rgba(20,16,24,.55); border:1px solid rgba(255,255,255,.28); color:#fff; display:grid; place-items:center;
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  .gev-nav svg{ width:20px; height:20px; }
+  .gev-nav.is-prev{ left:10px; } .gev-nav.is-next{ right:10px; }
+  .gev-bar{ width:100%; max-width:520px; display:flex; align-items:center; gap:10px; padding:8px 8px 8px 9px; border-radius:18px;
+    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); color:#fff; cursor:default; box-sizing:border-box; }
+  .gev-face{ width:38px !important; height:38px !important; border-radius:10px !important; flex:none; }
+  .gev-who{ flex:1; min-width:0; }
+  .gev-who b{ display:block; font-size:15px; line-height:1.2; }
+  .gev-who small{ display:block; font-size:11.5px; opacity:.72; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .gev-count{ font-size:11.5px; font-weight:700; opacity:.65; white-space:nowrap; }
+  .gev-btn{ flex:none; border:0; border-radius:99px; background:#fff; color:#1A1419; font:inherit; font-size:12.5px; font-weight:800;
+    padding:8px 13px; cursor:pointer; box-shadow:0 2px 0 rgba(0,0,0,.45); transition:transform .12s, box-shadow .12s; }
+  .gev-btn:active{ transform:translateY(2px); box-shadow:none; }
+  /* poster or clip, switched at the top of the viewer */
+  .gev-mode{ position:absolute; top:16px; left:50%; transform:translateX(-50%); z-index:1; display:flex; gap:3px; padding:3px;
+    border-radius:99px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22); cursor:default; }
+  .gev-mode button{ border:0; background:none; color:rgba(255,255,255,.78); font:inherit; font-size:12.5px; font-weight:800;
+    padding:6px 13px; border-radius:99px; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; }
+  .gev-mode button.on{ background:#fff; color:#1A1419; box-shadow:0 2px 0 rgba(0,0,0,.45); }
+  .gev-play{ font-size:10px; }
+  .gev-clip{ width:100%; max-width:min(960px, calc((100vh - 200px) * 16 / 9)); aspect-ratio:16/9; border-radius:12px; overflow:hidden;
+    background:#000; box-shadow:0 10px 30px rgba(0,0,0,.5); }
+  .gev-clip iframe{ width:100%; height:100%; border:0; display:block; }
+  .poster-viewer.is-clip{ justify-content:center; }
+  .gev-yt{ font-size:12px; font-weight:700; color:rgba(255,255,255,.75); text-decoration:none; padding:2px 8px; }
+  .gev-yt:hover{ color:#fff; text-decoration:underline; }
   .ge-shop{ display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:10px; }
   .ge-shop-card{ display:flex; gap:10px; align-items:center; padding:8px; border:1px solid var(--line); border-radius:14px;
     background:var(--glass-card); color:inherit; font:inherit; text-align:left; cursor:pointer; }
@@ -5501,7 +5562,7 @@ let state = {
   ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOshi:false,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
-  calMonth:null, calDay:null, posterOf:null, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
+  calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
   lang:'mix',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
@@ -7527,6 +7588,18 @@ function bindPosterZoom(){
     }
   }, { passive:false });
 
+  // a candidate's poster: a sideways swipe at normal size steps to the next one
+  let swipeFrom = null;
+  if(view.classList.contains('is-ge')){
+    img.addEventListener('touchstart', e => { swipeFrom = e.touches.length === 1 && scale <= 1.01 ? { x:e.touches[0].clientX, y:e.touches[0].clientY } : null; }, { passive:true });
+    img.addEventListener('touchend', e => {
+      if(!swipeFrom || e.touches.length || scale > 1.01) return;
+      const dx = e.changedTouches[0].clientX - swipeFrom.x, dy = e.changedTouches[0].clientY - swipeFrom.y;
+      swipeFrom = null;
+      if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) view.querySelector(dx < 0 ? '.gev-nav.is-next' : '.gev-nav.is-prev').click();
+    }, { passive:true });
+  }
+
   img.addEventListener('touchend', (e)=>{
     // Lifting one finger of a pinch leaves the other on the glass; it should
     // carry straight on as a drag instead of doing nothing until lifted too.
@@ -7573,6 +7646,7 @@ function closePoster(){ goBack(()=>{ state.posterOf = null; }); }
 /* Opening a poster full screen. The larger copy is a second file fetched only
    here, so the sheet is not made to carry it just in case someone taps. */
 function renderPosterViewer(){
+  if(String(state.posterOf).startsWith('ge:')) return renderGEPosterViewer(state.posterOf.slice(3));
   const ev = SEED_SCHEDULE.find(e => e.id === state.posterOf);
   if(!ev || !ev.poster || !ev.poster.img) return '';
   // One file for both: the poster as it was published, at its own size.
@@ -8890,6 +8964,95 @@ function renderSongLogo(key, cls){
     role="img" aria-label="${escapeAttr(l.alt)}"></span>`;
 }
 
+/* The 58 standing in the 2026 election, each with the poster the organiser
+   published for her. Opened full screen, a poster is the original file as it
+   came, untouched; the grid and the profile card show a small copy
+   (<id>-s.webp, 360 wide), which at their size is just as sharp and keeps
+   a phone from loading 17MB to show the grid. */
+const GE_CANDIDATES = [
+  'bnk-arlee', 'bnk-berry', 'bnk-blythe', 'bnk-cartoon', 'cgm-chifa', 'cgm-else', 'cgm-emma', 'bnk-emmy',
+  'bnk-fame', 'bnk-galeya', 'cgm-ginna', 'bnk-grape', 'cgm-hongyok', 'bnk-hoop', 'bnk-inkcha', 'bnk-janry',
+  'bnk-jew', 'cgm-jingjing', 'bnk-khaimook', 'bnk-khowjow', 'cgm-kwan', 'bnk-l', 'cgm-lewlew', 'cgm-lingling',
+  'cgm-lookked', 'bnk-luksorn', 'bnk-mail', 'bnk-marine', 'bnk-mayji', 'bnk-micha', 'bnk-mint', 'bnk-mirin',
+  'bnk-monet', 'bnk-nall', 'bnk-nammonn', 'cgm-namphet', 'cgm-nana', 'bnk-neen', 'cgm-nisha', 'bnk-niya',
+  'bnk-palmmy', 'bnk-pancake', 'bnk-patt', 'cgm-ploen', 'cgm-prae', 'bnk-praew', 'cgm-praifa', 'bnk-proud',
+  'cgm-punpon', 'bnk-rose', 'bnk-saonoi', 'cgm-satangpound', 'cgm-shenae', 'bnk-sindy', 'cgm-tara', 'cgm-valentine',
+  'bnk-wawa', 'bnk-yoghurt',
+];
+const gePoster = (id, small) => `posters/ge2026/${id}${small ? '-s.webp' : '.png'}`;
+/* Each candidate's appeal comment video, from the official playlist
+   "58 Candidates' Appeal Comment Videos" (list=PLM3I3RVGqr74), matched to her
+   by the name, group and real name in the video's title. */
+const GE_VIDEOS = {
+  'bnk-arlee':'SSq54iCgG5I', 'bnk-berry':'CI2hqHBdKV4', 'bnk-blythe':'nz0kbLOfE8E', 'bnk-cartoon':'_W_pfEWfSwo',
+  'bnk-emmy':'cCMXaK9JoRA', 'bnk-fame':'oCG5LofLYeI', 'bnk-galeya':'YYW6cbj0WyE', 'bnk-grape':'IxftaIjPV7M',
+  'bnk-hoop':'7Siu_YaCXlE', 'bnk-inkcha':'uguauISPX9o', 'bnk-janry':'JfO4Q2a6QxM', 'bnk-jew':'cy9FUEFvJjw',
+  'bnk-khaimook':'gHlO1Ad5OWw', 'bnk-khowjow':'axeBtiLPHjQ', 'bnk-l':'av4I-grbk_w', 'bnk-luksorn':'MwBcAg6Sftc',
+  'bnk-mail':'dZP6dfLF0a4', 'bnk-marine':'bvWi52QlD6s', 'bnk-mayji':'Kj9Sm2m9-yA', 'bnk-micha':'N8bWzrMNbVc',
+  'bnk-mint':'5gKL0CPgvs4', 'bnk-mirin':'JK9kuSy2UlY', 'bnk-monet':'paKUyp5DGyk', 'bnk-nall':'k3FC-ZFUOJY',
+  'bnk-nammonn':'wZGCliAlqdw', 'bnk-neen':'uoEdPh1UaWY', 'bnk-niya':'-cy2HuZVKWI', 'bnk-palmmy':'qL8gnxYA8Mw',
+  'bnk-pancake':'9Dzk8-MCsIE', 'bnk-patt':'KUCbF5LOK-E', 'bnk-praew':'sQCTIxoHdTg', 'bnk-proud':'8Q69t2xr8_Q',
+  'bnk-rose':'zrA1ZbkkA30', 'bnk-saonoi':'QgBLEkjNyfs', 'bnk-sindy':'dK6iqYiLdMA', 'bnk-wawa':'Kj_0Qt7f2Iw',
+  'bnk-yoghurt':'ZincbdPEhvc', 'cgm-chifa':'iFn4r8JmInI', 'cgm-else':'UQviYEePsc4', 'cgm-emma':'QLYoKePgKIQ',
+  'cgm-ginna':'dHDl-w7Pxr8', 'cgm-hongyok':'9G3v3mSMi8s', 'cgm-jingjing':'UgETel4E_p8', 'cgm-kwan':'XzmFnq-EFuo',
+  'cgm-lewlew':'vNWoQ3Rea78', 'cgm-lingling':'hlb6__zuBho', 'cgm-lookked':'Aka8MvOfJ1U', 'cgm-namphet':'nYbERswsr5E',
+  'cgm-nana':'j4VMNGn0HsU', 'cgm-nisha':'DLwJq8YswNY', 'cgm-ploen':'hSqw2jgNwgk', 'cgm-prae':'rlQacKi-nj4',
+  'cgm-praifa':'I9W-0sXwmhs', 'cgm-punpon':'lSLroKwU28c', 'cgm-satangpound':'PtryhfO4iVs', 'cgm-shenae':'o4ntCDZTQZM',
+  'cgm-tara':'6CTCy-sZKfQ', 'cgm-valentine':'n8_YBxy93Rg',
+};
+const GE_PLAYLIST = 'https://www.youtube.com/playlist?list=PLM3I3RVGqr74';
+const isGECandidate = id => GE_CANDIDATES.includes(id);
+const geCandidates = () => GE_CANDIDATES.map(getMember).filter(Boolean);
+function geCandCard(m){
+  const g = getGroup(m.groupId) || {};
+  return `<button class="gec-card" style="--c:${g.color}" data-action="open-poster" data-id="ge:${m.id}" title="${escapeAttr(m.name)}" aria-label="${escapeAttr(m.name)}">
+    <img src="${gePoster(m.id, true)}" width="360" height="509" alt="" loading="lazy" decoding="async">
+    ${state.oshi.includes(m.id) ? '<span class="gec-star" aria-hidden="true">★</span>' : ''}</button>`;
+}
+function renderGECandidates(){
+  const en = isEN(), all = geCandidates();
+  const mine = all.filter(m => state.oshi.includes(m.id));
+  const n = gid => all.filter(m => m.groupId === gid).length;
+  return `<p class="gec-sum">${en ? `${all.length} candidates · BNK48 ${n('bnk48')} · CGM48 ${n('cgm48')}`
+      : `ผู้สมัคร ${all.length} คน · BNK48 ${n('bnk48')} · CGM48 ${n('cgm48')}`}</p>
+    ${mine.length ? `<h3 class="section-label">${en ? 'Your oshi' : 'โอชิของคุณ'}</h3><div class="gec-grid">${mine.map(geCandCard).join('')}</div>
+      <h3 class="section-label">${en ? 'Everyone' : 'ทั้งหมด'}</h3>` : ''}
+    <div class="gec-grid">${all.map(geCandCard).join('')}</div>`;
+}
+/* A candidate's poster, full screen, with the ones either side of her a swipe away. */
+function renderGEPosterViewer(id){
+  const en = isEN(), list = geCandidates(), i = list.findIndex(m => m.id === id);
+  if(i < 0) return '';
+  const m = list[i], g = getGroup(m.groupId) || {}, t = getTeam(m.teamId);
+  const prev = list[(i - 1 + list.length) % list.length], next = list[(i + 1) % list.length];
+  const arrow = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+  const vid = GE_VIDEOS[m.id], clip = !!(state.geClip && vid);
+  // the player is only put on the page once someone asks for the clip
+  const stage = clip
+    ? `<div class="gev-clip"><iframe src="https://www.youtube-nocookie.com/embed/${escapeAttr(vid)}?autoplay=1&playsinline=1&rel=0&modestbranding=1"
+        title="${escapeAttr('Appeal comment · ' + m.name)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
+    : `<img class="poster-full" src="${gePoster(m.id)}" alt="${escapeAttr((en ? 'Election poster: ' : 'โปสเตอร์เลือกตั้ง ') + m.name)}" decoding="async">`;
+  return `
+  <div class="poster-viewer is-ge${clip ? ' is-clip' : ''}">
+    ${vid ? `<div class="gev-mode" role="group" aria-label="${en ? 'Show' : 'แสดง'}">
+      <button class="${clip ? '' : 'on'}" data-action="ge-clip" data-value="0">${en ? 'Poster' : 'โปสเตอร์'}</button>
+      <button class="${clip ? 'on' : ''}" data-action="ge-clip" data-value="1"><span class="gev-play" aria-hidden="true">▶</span>${en ? 'Appeal clip' : 'คลิปแนะนำตัว'}</button>
+    </div>` : ''}
+    <button class="poster-close" data-action="close-poster" title="ปิด" aria-label="ปิด">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <button class="gev-nav is-prev" data-action="ge-poster-step" data-id="${prev.id}" aria-label="${en ? 'Previous' : 'ก่อนหน้า'}">${arrow('M15 6l-6 6 6 6')}</button>
+    <button class="gev-nav is-next" data-action="ge-poster-step" data-id="${next.id}" aria-label="${en ? 'Next' : 'ถัดไป'}">${arrow('M9 6l6 6-6 6')}</button>
+    ${stage}
+    ${clip ? `<a class="gev-yt" href="https://www.youtube.com/watch?v=${escapeAttr(vid)}&list=PLM3I3RVGqr74" target="_blank" rel="noopener noreferrer">${en ? 'Open in YouTube' : 'เปิดใน YouTube'} ↗</a>` : ''}
+    <div class="gev-bar">
+      ${renderAvatar(m, 'avatar-sm gev-face', g.color)}
+      <span class="gev-who"><b>${escapeHtml(m.name)}</b><small>${escapeHtml(m.nameTh || '')} · ${escapeHtml(g.name || '')}${t ? ' ' + escapeHtml(t.name) : ''}</small></span>
+      <span class="gev-count">${i + 1} / ${list.length}</span>
+      <button class="gev-btn" data-action="ge-poster-profile" data-id="${m.id}">${en ? 'Profile' : 'โปรไฟล์'}</button>
+    </div>
+  </div>`;
+}
 const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo-v2.webp', red:'#B3121E',
   vote:'ev-election-voting', results:'ev-election-results' };
 function renderGEPage(){
@@ -8932,7 +9095,7 @@ function renderGEPage(){
   // the results tab appears once there is something in it (always for the owner)
   const hasResults = state.isOwner || GE_ROUNDS.some(r => geHasData(r.id) || ((state.geRounds || {})[r.id] || {}).live);
   const liveRound = geLiveRound();
-  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
+  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
     ['timeline', en ? 'Timeline' : 'ไทม์ไลน์'], ['events', en ? 'All events' : 'งานทั้งหมด']]
     .map(([v, l]) => `<button class="sub-tab${tab === v ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
   const liveBanner = liveRound && tab !== 'results' ? `<button class="ge-live-banner" data-action="ge-tab" data-value="results">
@@ -8941,6 +9104,7 @@ function renderGEPage(){
 
   let body = '';
   if(tab === 'results') body = renderGEResults();
+  else if(tab === 'candidates') body = renderGECandidates();
   else if(tab === 'timeline') body = renderTimelinePage(true);
   else if(tab === 'events'){
     const ahead = events.filter(e => eventLastDay(e) >= iso), past = events.filter(e => eventLastDay(e) < iso);
@@ -8950,7 +9114,11 @@ function renderGEPage(){
     const next = items.filter(it => (it.to || it.d) >= iso).slice(0, 4);
     const shop = events.filter(e => e.shop && shopStatus(e, Date.now()).state !== 'over');
     const nowOn = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
+    const cands = geCandidates(), oshiFirst = [...cands.filter(m => state.oshi.includes(m.id)), ...cands.filter(m => !state.oshi.includes(m.id))];
     body = `
+      <h3 class="section-label">${en ? `Candidates · ${cands.length}` : `ผู้สมัคร ${cands.length} คน`}</h3>
+      <div class="gec-strip">${oshiFirst.map(geCandCard).join('')}</div>
+      <button class="chip chip-link ge-more" data-action="ge-tab" data-value="candidates">${en ? 'All candidates →' : 'ดูผู้สมัครทั้งหมด →'}</button>
       ${nowOn.length ? `<h3 class="section-label">${en ? 'On now' : 'เปิดอยู่ตอนนี้'}</h3>${nowOn.map(e => renderEventCard(e, iso)).join('')}` : ''}
       <h3 class="section-label">${en ? 'Coming up' : 'ขั้นต่อไป'}</h3>
       <div class="ge-next">${next.map(it => {
@@ -10906,6 +11074,15 @@ function renderDetailModal(){
                no button: the owner does not want visitors to see members compared. -->
         </div>
         ${renderSocial(m)}
+        ${isGECandidate(m.id) ? `<div class="ge-cand">
+          <button class="ge-cand-main" data-action="open-poster" data-id="ge:${m.id}">
+            <img src="${gePoster(m.id, true)}" width="360" height="509" alt="" loading="lazy" decoding="async">
+            <span class="ge-cand-t"><small>${isEN() ? 'CANDIDATE' : 'ผู้สมัคร'}</small><b>Senbatsu General Election 2026</b></span>
+          </button>
+          <span class="ge-cand-acts">
+            <button class="ge-cand-go" data-action="open-poster" data-id="ge:${m.id}">${isEN() ? 'Poster' : 'โปสเตอร์'}</button>
+            ${GE_VIDEOS[m.id] ? `<button class="ge-cand-go is-clip" data-action="open-ge-clip" data-id="${m.id}">▶ ${isEN() ? 'Clip' : 'คลิป'}</button>` : ''}
+          </span></div>` : ''}
         </div>
         <div class="sheet-body">
         <div class="sheet-col sheet-col-a">
@@ -12920,7 +13097,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','timelineId','dayOf','geTab','bdayScope'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','geClip','timelineId','dayOf','geTab','bdayScope'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
@@ -14470,9 +14647,16 @@ function bindDelegatedEvents(){
       renderMain(); pushHistory();
     }
     else if(action==='open-poster'){
-      state.posterOf = id; renderMain(); pushHistory();
+      state.geClip = false; state.posterOf = id; renderMain(); pushHistory();
     }
     else if(action==='close-poster'){ closePoster(); }
+    else if(action==='ge-poster-step'){ state.posterOf = 'ge:' + id; renderMain(); replaceHistory(); }   // a clip stays a clip as you step
+    else if(action==='ge-clip'){ state.geClip = el.dataset.value === '1'; renderMain(); replaceHistory(); }
+    else if(action==='open-ge-clip'){ state.geClip = true; state.posterOf = 'ge:' + id; renderMain(); pushHistory(); }
+    else if(action==='ge-poster-profile'){
+      state.posterOf = null; state.selectedId = id; state.editingId = null; state.selectedEvent = null; state.dayOf = null;
+      renderMain(); replaceHistory();
+    }
     else if(action==='seat-zone'){ pickSeatZone(el); }
     else if(action==='seat-view'){ setSeatView(el); }
     else if(action==='seat-zoom'){ zoomSeatPlan(el); }
