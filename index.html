@@ -2305,19 +2305,25 @@
   .ff-count{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
   .ff-spacer{ flex:1; min-width:74px; }   /* keeps clear of the sheet's share and close buttons */
   /* the hall, seen from above: the floor, the stage, and a tile for every booth */
-  .ff-hall{ position:relative; width:100%; aspect-ratio:.54; border-radius:14px; overflow:hidden;
+  .ff-hall{ position:relative; width:100%; aspect-ratio:.54; border-radius:14px; overflow:hidden; container-type:inline-size;
     background:#F6E7CE; border:2px solid #E3CFAE; --bw:31px; }
   :root[data-theme="dark"] .ff-hall{ background:#2E2618; border-color:#463A25; }
-  .ff-stage{ position:absolute; left:20%; width:60%; top:1.6%; min-height:5.4%; padding:3px 6px; border-radius:8px;
+  .ff-stage{ position:absolute; left:20%; width:60%; top:1.6%; min-height:5.4%; padding:3px 3px; border-radius:8px;
     background:var(--ink); color:var(--paper); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
     font-size:10.5px; font-weight:800; letter-spacing:.14em; }
   .ff-stage.lit{ background:#B3121E; color:#fff; box-shadow:0 0 0 3px rgba(179,18,30,.25); }
-  .ff-onstage{ display:flex; gap:4px; justify-content:center; flex-wrap:wrap; }
+  /* One row, always: five on stage used to wrap onto a second row on a phone,
+     and the taller stage then covered the very booth being visited that hour
+     (Galeya's 32 at 11:00 on 4 Oct, Neen's 2 at 12:00). Five now squeeze their
+     faces a little and shorten a long name instead. */
+  .ff-onstage{ display:flex; gap:2px; justify-content:center; flex-wrap:nowrap; width:100%; }
   .ff-up{ border:0; background:none; padding:0; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:1px;
     color:#fff; font:inherit; letter-spacing:0; animation:ff-rise .3s ease-out; }
   .ff-up-face{ width:30px !important; height:30px !important; border-radius:8px !important; font-size:9px;
     box-shadow:0 0 0 2px #fff; }
-  .ff-up small{ font-size:8.5px; font-weight:700; max-width:46px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ff-up small{ font-size:8px; font-weight:700; max-width:min(46px, 100%); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ff-onstage .ff-up{ flex:1 1 0; min-width:0; max-width:46px; }   /* equal slots, so every face is the same size */
+  .ff-onstage .ff-up-face{ width:min(30px, 100%) !important; height:auto !important; aspect-ratio:1; }
   @keyframes ff-rise{ from{ transform:translateY(6px); opacity:0; } }
   /* the doors, entrance above and exit below: an opening in the wall and a tag beside it */
   .ff-door{ position:absolute; left:0; top:var(--y); transform:translateY(-50%); display:flex; align-items:center; gap:5px;
@@ -2488,8 +2494,16 @@
   .ff-tt-p{ display:flex; align-items:center; gap:5px; margin:3px 0; font-weight:700; color:var(--ink); white-space:nowrap; line-height:1.2; }
   @media (min-width:640px){
     .ff-hall{ aspect-ratio:.95; --bw:34px; }
-    .ff-nm{ display:block; }
     .ff-lab{ width:96px; }
+  }
+  /* Every booth's name fits beside it only in a hall wide enough for it. The
+     sheet stays about 460px wide until a large desktop, so a screen-width rule
+     switched the names on in a 396px hall, where they ran into the next column
+     and under the stage. This asks the hall itself, and pulls the stage in off
+     the first and last columns' names. */
+  @container (min-width:540px){
+    .ff-nm{ display:block; }
+    .ff-stage{ left:25%; width:50%; }
   }
   /* the owner's link editor in an event sheet */
   .evl-open{ margin-top:14px; }
