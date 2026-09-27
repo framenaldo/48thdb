@@ -2337,17 +2337,16 @@
      (--rx --ry --gx --gy --glare --sheen --cos) are written by bindPoster3D. */
   .gp3{ position:relative; flex:1; min-height:0; width:100%; perspective:1500px; touch-action:none; cursor:grab;
     user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
-    --w:250px; --h:354px; --top:0px; --rx:0deg; --ry:0deg; --z:1; --tx:0px; --ty:0px;
+    --w:250px; --h:354px; --top:0px; --rx:0deg; --ry:0deg; --z:1; --tx:0px; --ty:0px; --fy:177px;
     --gx:50%; --gy:28%; --glare:.3; --sheen:50%; --cos:1; }
   .gp3.is-grab{ cursor:grabbing; }
   .gp3-card, .gp3-refl{ position:absolute; left:50%; top:var(--top); width:var(--w); height:var(--h); margin-left:calc(var(--w) / -2); }
-  /* It stands on the floor: tipped forward or back, it pivots on its bottom
-     edge, which never leaves the floor; turned, it pivots on its middle. The
-     reflection is the same sheet mirrored in the floor, so the two always meet
-     along that bottom edge, as in a real glossy floor. */
-  .gp3{ --pivot:rotateY(var(--ry)) translateY(calc(var(--h) / 2)) rotateX(var(--rx)) translateY(calc(var(--h) / -2)); }
+  /* It spins about its own middle, leaning as it is tipped. The floor sits
+     wherever its lowest point is at that moment (--fy below its middle), and
+     the reflection is the same sheet mirrored in that floor, so the two always
+     meet, as on a glossy floor. */
   .gp3-card{ transform-style:preserve-3d; will-change:transform;
-    transform:translate(var(--tx), var(--ty)) scale(var(--z)) var(--pivot); }
+    transform:translate(var(--tx), var(--ty)) scale(var(--z)) rotateX(var(--rx)) rotateY(var(--ry)); }
   .gp3-face{ position:absolute; inset:0; border-radius:0; overflow:hidden;   /* square corners, like a printed poster */
     backface-visibility:hidden; -webkit-backface-visibility:hidden; }
   .gp3-front{ background:#fff; }
@@ -2372,11 +2371,11 @@
     background:linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,0) 55%, rgba(0,0,0,.35)); }
   .gp3-back .gp3-glare, .gp3-back .gp3-sheen{ opacity:calc(var(--glare) * .55); }
   /* on the floor: a shadow where it stands, and the poster again, faint, upside down */
-  .gp3-shadow{ position:absolute; left:50%; top:calc(var(--top) + var(--h)); height:26px; border-radius:50%; pointer-events:none;
+  .gp3-shadow{ position:absolute; left:50%; top:calc(var(--top) + var(--h) / 2 + var(--fy) * var(--z)); height:26px; border-radius:50%; pointer-events:none;
     width:calc(var(--w) * (.25 + .75 * var(--cos)) + 24px); transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--z));
     background:radial-gradient(closest-side, rgba(0,0,0,.7), rgba(0,0,0,0)); filter:blur(5px); }
   .gp3-refl{ border-radius:0; opacity:.24; pointer-events:none; background:#fff var(--img) center/cover no-repeat;
-    transform:translate(var(--tx), var(--ty)) scale(var(--z)) translateY(var(--h)) scaleY(-1) var(--pivot);
+    transform:translate(var(--tx), var(--ty)) scale(var(--z)) translateY(calc(var(--fy) * 2)) scaleY(-1) rotateX(var(--rx)) rotateY(var(--ry));
     -webkit-mask-image:linear-gradient(to top, #000 0%, rgba(0,0,0,.4) 18%, transparent 42%);
     mask-image:linear-gradient(to top, #000 0%, rgba(0,0,0,.4) 18%, transparent 42%); }
   .gp3.is-back .gp3-refl{ background:#FAFAF8; }
@@ -7609,6 +7608,7 @@ function gp3Size(stage){
   const h = Math.max(140, Math.min(H / 1.2, (W - 16) / 0.7071));   // room below for the reflection
   stage.style.setProperty('--h', h + 'px');
   stage.style.setProperty('--w', h * 0.7071 + 'px');
+  stage._gp3 = { h, w:h * 0.7071 };
   stage.style.setProperty('--top', Math.max(0, (H - h * 1.2) / 2) + 'px');
 }
 function bindPoster3D(view, stage){
@@ -7632,6 +7632,8 @@ function bindPoster3D(view, stage){
     set('--sheen', ((1.4 - band) / 1.8 * 100).toFixed(1) + '%');
     set('--cos', Math.abs(ca).toFixed(3));
     set('--z', z.toFixed(3)); set('--tx', tx.toFixed(1) + 'px'); set('--ty', ty.toFixed(1) + 'px');
+    const d = stage._gp3 || { h:354, w:250 };
+    set('--fy', (d.h / 2 * Math.abs(Math.cos(b * Math.PI / 180)) + d.w / 2 * Math.abs(sa * sb)).toFixed(2) + 'px');
     stage.classList.toggle('is-back', ca < 0);
   };
   const face = () => Math.round(ry / 180) * 180;           // the nearest side, front or back
