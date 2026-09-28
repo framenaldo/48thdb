@@ -6735,9 +6735,24 @@ function mixTitle(t){
   return t;
 }
 let MIX = null, MIX_SUBS = null;
+/* Thai nicknames that two members with different English names share —
+   จีจี้ is both Jeje and Gygee, ไข่มุก both Khaimook and Kaimook, มีน both Mean
+   and Meen. Turning such text into English would have to guess, and the
+   guess changed with the order the members loaded in, so these are never
+   looked up: a member's name is printed from her own record (nickName). */
+function sharedThaiNicks(){
+  const seen = new Map(), shared = new Set();
+  (state.members || []).forEach(m => {
+    if(!m.nameTh || !m.name) return;
+    const before = seen.get(m.nameTh);
+    if(before != null && before !== m.name) shared.add(m.nameTh); else seen.set(m.nameTh, m.name);
+  });
+  return shared;
+}
 function buildMix(){
   MIX = {}; const subs = new Map();
-  (state.members || []).forEach(m => { if(m.nameTh && m.name) MIX[m.nameTh] = m.name;
+  const shared = sharedThaiNicks();
+  (state.members || []).forEach(m => { if(m.nameTh && m.name && !shared.has(m.nameTh)) MIX[m.nameTh] = m.name;
     if(m.realNameTh && m.realName) MIX[m.realNameTh] = m.realName; });
   MIX['เซ็นเตอร์'] = 'Center'; MIX['· เซ็นเตอร์'] = '· Center';
   TEAMS.forEach(t => { if(t.nameEn) MIX[t.name] = t.nameEn; });
@@ -6804,7 +6819,8 @@ function toEn(s){
    to list 158 nicknames. Built once, after the data has loaded. */
 function learnNames(){
   MIX = null;
-  (state.members || []).forEach(m => { if(m.nameTh && m.name) EN[m.nameTh] = m.name; });
+  const shared = sharedThaiNicks();
+  (state.members || []).forEach(m => { if(m.nameTh && m.name && !shared.has(m.nameTh)) EN[m.nameTh] = m.name; });
   TEAMS.forEach(t => { if(t.nameEn) EN[t.name] = t.nameEn; });
 }
 
@@ -8496,7 +8512,7 @@ function renderStage(work, trackIndex, track){
         data-action="open-member" data-id="${id}" title="${escapeAttr(m.name+' · '+m.nameTh)}">
         <span class="seat-badge">
           <span class="seat-face">${renderAvatar(m, 'seat-avatar', g.color)}</span>
-          <span class="seat-name">${escapeHtml(m.nameTh || m.name)}</span>
+          <span class="seat-name">${escapeHtml(nickName(m))}</span>
         </span>
       </button>`;
     }).join('');
@@ -8896,7 +8912,7 @@ function renderEventCard(ev, todayIso){
         const g = getGroup(m.groupId);
         return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
           data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name)}">
-          ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span>
+          ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span>
         </button>`; }).join('')}${rest>0?`<span class="ev-more-people">+${rest}</span>`:''}</div>` : ''}
       ${mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
       ${hasMore ? `<p class="ev-open">ดูรายละเอียด</p>` : ''}
@@ -8951,7 +8967,7 @@ function renderTodayHero(ev, todayIso){
         const g = getGroup(m.groupId);
         return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
           data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name)}">
-          ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span>
+          ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span>
         </button>`; }).join('')}${rest > 0 ? `<span class="ev-more-people">+${rest}</span>` : ''}</div>` : ''}
       ${open ? `<p class="today-hero-open">ดูรายละเอียด</p>` : ''}
     </div>
@@ -8986,7 +9002,7 @@ function renderBirthdayBanner(ev){
       const g = getGroup(m.groupId);
       return `<button class="evm-fest-face" style="--c:${g.color}" data-action="open-member" data-id="${m.id}"
         title="${escapeAttr(m.name)}">${renderAvatar(m,'evm-face-img',g.color)}
-        <span class="evm-fest-name">${escapeHtml(m.nameTh||m.name)}</span></button>`;
+        <span class="evm-fest-name">${escapeHtml(nickName(m))}</span></button>`;
     }).join('')}</span>
   </div>`;
 }
@@ -9004,7 +9020,7 @@ function renderSlotTable(ev){
     const who = s.members.map(getMember).filter(Boolean).map(m => {
       const g = getGroup(m.groupId);
       return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
-        data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span></button>`;
+        data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span></button>`;
     }).join('');
     return `<div class="slot-row${s.date === iso ? ' is-today' : ''}${done ? ' is-done' : ''}${on ? ' is-on' : ''}">
       <div class="slot-when"><span class="slot-date">${d} ${M[mo-1]}</span><span class="slot-time">${s.time}–${s.until}</span>
@@ -9029,7 +9045,7 @@ function renderSlotTable(ev){
     const who = s.members.map(getMember).filter(Boolean).map(m => {
       const g = getGroup(m.groupId);
       return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
-        data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span></button>`;
+        data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span></button>`;
     }).join('');
     return `<div class="rota-row${done ? ' is-done' : ''}${on ? ' is-on' : ''}">
       <span class="rota-t">${s.time}<small>–${s.until}</small></span>
@@ -10914,7 +10930,7 @@ function renderEventModal(){
           const day = ev.memberDays && ev.memberDays[m.id];
           return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
             data-action="open-member" data-id="${m.id}">
-            ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(m.nameTh||m.name)}</span>
+            ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span>
             ${day ? `<span class="ev-person-day">${escapeHtml(day)}</span>` : ''}
           </button>`; }).join('')}</div>` : ''}
         </div>
@@ -11220,7 +11236,7 @@ function renderFeed(){
           const age = calcAge(m.birthday);
           return `<button class="bday-today" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
             ${renderAvatar(m,'bday-today-face',g.color)}
-            <span class="bday-today-name">${escapeHtml(m.nameTh||m.name)}</span>
+            <span class="bday-today-name">${escapeHtml(nickName(m))}</span>
             <span class="bday-today-sub">${escapeHtml(m.name)}</span>
             ${age!=null ? `<span class="bday-today-age">อายุ ${age} ปี</span>` : ''}
             <span class="bday-today-group" style="--c:${g.color}">${g.name}</span>
@@ -11238,7 +11254,7 @@ function renderFeed(){
           return `<button class="bday-chip" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
             ${renderAvatar(m,'avatar-sm',g.color)}
             <span><span class="when">${d===1?'พรุ่งนี้':'อีก '+d+' วัน'}${a!=null?` · <span class="age-step"><span class="from">${a}</span><span class="arrow">→</span><span class="to">${a+1}</span></span>`:''}</span>
-            <span class="who" style="display:block;">${escapeHtml(m.nameTh||m.name)}</span></span>
+            <span class="who" style="display:block;">${escapeHtml(nickName(m))}</span></span>
           </button>`;
         }).join('')}
       </div>
@@ -11331,7 +11347,7 @@ function renderDetailModal(){
         <div class="detail-head">
           ${renderAvatar(m, 'detail-avatar', g.color)}
           <div style="flex:1;min-width:200px;">
-            <div class="detail-name-th">${m.nameTh}</div>
+            <div class="detail-name-th">${escapeHtml(nickName(m))}</div>
             <div class="detail-name-en">${isEN()
               ? (secondName(m) || m.name)
               : m.name + (m.realNameTh?' · '+m.realNameTh:'') + (m.realName?' ('+m.realName+')':'')}</div>
@@ -11448,7 +11464,7 @@ function renderOrgChart(){
     ? `<button class="org-node rank-${rank}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
         ${renderAvatar(m, 'org-avatar', g.color)}
         <span class="org-role">${role}</span>
-        <span class="org-name">${escapeHtml(m.nameTh || m.name)}</span>
+        <span class="org-name">${escapeHtml(nickName(m))}</span>
         ${term ? `<span class="org-term">${term}</span>` : ''}
       </button>`
     : `<div class="org-node rank-${rank} is-empty" style="--c:${g.color}">
@@ -11459,7 +11475,7 @@ function renderOrgChart(){
     ? `<div class="org-tier${cls ? ' ' + cls : ''}">${slots.map(s => `<div class="org-slot">${s}</div>`).join('')}</div>`
     : '';
   const chips = (list, g) => list.map(m => `<button class="ev-person" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
-      ${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(m.nameTh || m.name)}</span></button>`).join('');
+      ${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(nickName(m))}</span></button>`).join('');
 
   const tree = g => {
     const held = SHIHAININ.filter(r => r.groupId === g.id);
@@ -12086,7 +12102,7 @@ function renderStatsBirthdays(){
         <div class="shared-who">
           ${list.map(m=>{ const g=getGroup(m.groupId);
             return `<button class="chip-link" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
-              ${escapeHtml(m.nameTh||m.name)}</button>`; }).join('')}
+              ${escapeHtml(nickName(m))}</button>`; }).join('')}
         </div>
       </div>`).join('')}
     ${topShared.some(([d]) => d === '02-24') ? `<p class="stats-note">24 กุมภาพันธ์ ตรงกับวันศิลปินแห่งชาติ ซึ่งกำหนดตามวันพระราชสมภพของรัชกาลที่ 2
@@ -12099,7 +12115,7 @@ function renderStatsBirthdays(){
       const g = getGroup(m.groupId);
       return `<button class="bday-chip ${d===0?'today':''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
         ${renderAvatar(m,'avatar-sm',g.color)}
-        <span><span class="when">${whenLabel(d)} · ${ageStep(m, d)}</span><span class="who" style="display:block;">${escapeHtml(m.nameTh||m.name)}</span></span>
+        <span><span class="when">${whenLabel(d)} · ${ageStep(m, d)}</span><span class="who" style="display:block;">${escapeHtml(nickName(m))}</span></span>
       </button>`;
     }).join('')}
   </div>
@@ -12120,7 +12136,7 @@ function renderStatsBirthdays(){
         return `<button class="bday-row ${d===0?'is-today':''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
           <span class="day">${+m.birthday.slice(8)}</span>
           ${renderAvatar(m,'avatar-sm',g.color)}
-          <span>${escapeHtml(m.nameTh||m.name)}</span>
+          <span>${escapeHtml(nickName(m))}</span>
           <span class="age">${ageStep(m, d)}</span>
         </button>`;
       }).join('')}
@@ -12255,7 +12271,7 @@ function renderStatsTimeline(){
           if(!gs.length) return '';
           return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
             <span>${gs.length} คนจบการศึกษาจาก ${linkGroup(g)}
-            <span class="ev-names">${gs.map(m=>`<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(m.nameTh||m.name)}</button>`).join(' · ')}</span></span></div>`;
+            <span class="ev-names">${gs.map(m=>`<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(nickName(m))}</button>`).join(' · ')}</span></span></div>`;
         }).join('')}
       </div>`;
     }).join('')}
@@ -12279,7 +12295,7 @@ function renderStatsLives(){
   const DAYS = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   const DAYS_LONG = en ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
     : ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
-  const nick = id => { const m = getMember(id); return m ? (en ? m.name : (m.nameTh || m.name)) : id; };
+  const nick = id => { const m = getMember(id); return m ? nickName(m) : id; };
   const colour = id => { const m = getMember(id); return m ? getGroup(m.groupId).color : 'var(--ink-soft)'; };
   const pairColour = (a, b) => { const x = getMember(a), y = getMember(b);
     return x && y && x.groupId === y.groupId ? getGroup(x.groupId).color : 'var(--gold)'; };
@@ -12737,7 +12753,7 @@ function renderWorkRow(w, kind){
   const g = getGroup(w.groupId);
   const tracks = SEED_SENBATSU[w.id];
   const lead = tracks && tracks[0];
-  const nick = id => { const m = getMember(id); return escapeHtml(m ? (m.nameTh||m.name) : ''); };
+  const nick = id => { const m = getMember(id); return escapeHtml(m ? nickName(m) : ''); };
   // Only a numbered single or a special single has a senbatsu; a digital
   // single just has the people who sang it.
   const who = kind==='album' ? 'เพลงประจำอัลบั้ม ' : kind==='digital' ? '' : 'เซ็มบัตสึ ';
@@ -12869,7 +12885,7 @@ function tickerItems(){
   const day = s => { const [, m, d] = s.slice(0,10).split('-').map(Number); return `${d} ${monthsShort()[m-1]}`; };
   const daysTo = s => Math.round((parseYmd(s.slice(0,10)) - parseYmd(iso)) / 86400000);
   const hm = s => s.slice(11, 16);
-  const nick = m => m.nameTh && !en ? m.nameTh : m.name;
+  const nick = m => nickName(m);
   const ev = (e) => ({ action:'open-event', id:e.id });
   const items = [];
 
