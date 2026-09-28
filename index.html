@@ -339,7 +339,7 @@
   .sec-stats{ order:1; } .sec-history{ order:2; } .sec-events{ order:3; } .sec-lives{ order:3; } .sec-works{ order:4; } .sec-facts{ order:5; } .sec-actions{ order:6; }
   .feed-main, .feed-side{ display:contents; }
   .today-hero-block{ order:1; } .is-over-today{ order:1; } .is-periods{ order:2; } .is-bday-today{ order:3; }
-  .is-bday-next{ order:4; } .is-schedule{ order:5; } .is-calendar{ order:6; } .is-past{ order:7; }
+  .is-bday-next{ order:4; } .is-schedule{ order:5; } .is-otd{ order:6; } .is-calendar{ order:6; } .is-past{ order:7; }
 
 
   /* Room to scroll past the end. Collapsing a stage plot makes the page
@@ -1383,6 +1383,23 @@
   .bday-chip .when{ font-size:11px; color:var(--ink-soft); }
   .bday-chip .who{ font-size:14px; font-weight:600; margin-top:1px; }
   .bday-chip.today{ border-color:var(--gold); background:var(--bnk-soft); }
+  /* วันนี้ในอดีต: framed rows with the group's colour down the left edge */
+  .otd-list{ display:flex; flex-direction:column; gap:8px; }
+  .otd-row{ display:flex; flex-direction:column; gap:3px; width:100%; box-sizing:border-box; text-align:left;
+    border:1px solid var(--line); border-left-color:transparent; border-radius:12px; padding:10px 13px 11px 14px;
+    background:linear-gradient(to right, var(--c,var(--ink)) 0 4px, var(--card) 4px); color:var(--ink);
+    font-family:'Noto Sans Thai',sans-serif; box-shadow:0 2px 0 rgba(var(--shadow-rgb),.07); }
+  button.otd-row{ cursor:pointer; transition:transform .12s, box-shadow .12s; }
+  button.otd-row:active{ transform:translateY(2px); box-shadow:0 0 0 rgba(var(--shadow-rgb),.07); }
+  .otd-row.has-face{ flex-direction:row; align-items:center; gap:11px; }
+  .otd-body{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .otd-when{ font-size:11.5px; font-weight:700; color:var(--c); }
+  .otd-date{ font-weight:500; color:var(--ink-soft); }
+  .otd-text{ font-size:14px; font-weight:600; line-height:1.4; }
+  .otd-song{ font-weight:800; }
+  .otd-faces{ display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
+  .otd-face{ padding:0; border:0; background:none; cursor:pointer; border-radius:50%; transition:transform .12s; }
+  .otd-face:active{ transform:scale(.92); }
   .month-block{ margin-bottom:16px; }
   .month-head{
     display:flex; align-items:baseline; gap:8px; margin:0 0 7px;
@@ -5658,6 +5675,8 @@ function getMember(id){ return state.members.find(m=>m.id===id); }
 const EN = {
   'ฐานข้อมูลสมาชิก ตารางงาน และผลงานเพลงของ BNK48 และ CGM48': 'Members, schedule and discography of BNK48 and CGM48',
   'กำลังโหลด...': 'Loading…',
+  'วันนี้ในอดีต': 'On this day',
+  'ครบรอบที่ใกล้ถึง': 'Coming anniversaries',
   'ค้นหาสมาชิก เพลง งาน...': 'Search members, songs, events…',
   'สลับธีมสว่าง/มืด': 'Switch light/dark theme',
   'เปลี่ยนภาษา': 'Change language',
@@ -11141,6 +11160,96 @@ function renderFlashCard(f){
   </article>`;
 }
 
+/* วันนี้ในอดีต — what happened on this date in earlier years, from dates the
+   database already holds: the groups' debuts, members starting as trainees,
+   promotions and moves between teams, graduations, Shihainin appointments and
+   the day each song's MV went up on YouTube (a release day itself is only
+   known to the year, so the MV stands in for it and says so). Birthdays have
+   their own block and are left out. People who share a day, a kind and a
+   team are one row: 22 CGM48 graduations on 3 Sep 2025 are one line. */
+function pastEvents(){
+  const out = [], rows = new Map();
+  const add = (date, kind, x) => {
+    if(!/^\d{4}-\d\d-\d\d$/.test(date || '')) return;
+    const key = [date, kind, x.team || '', x.groupId || '', x.workId ? x.workId + x.track : ''].join('|');
+    const had = rows.get(key);
+    if(had){ if(x.ids) x.ids.forEach(id => { if(!had.ids.includes(id)) had.ids.push(id); }); return; }
+    const row = { date, md: date.slice(5), year: +date.slice(0, 4), kind, ids: [], ...x };
+    rows.set(key, row); out.push(row);
+  };
+  GROUPS.forEach(g => add(g.debut, 'debut', { groupId: g.id }));
+  (state.members || []).forEach(m => { if(m.graduated) add(m.graduated, 'grad', { ids: [m.id], groupId: m.groupId }); });
+  Object.entries(SEED_TEAM_HISTORY).forEach(([id, spans]) => spans.forEach((sp, i) => {
+    const t = getTeam(sp.team), prev = spans[i - 1] && getTeam(spans[i - 1].team);
+    if(!t) return;
+    const kind = !prev ? 'join' : prev.groupId !== t.groupId ? 'transfer'
+      : /^trainee/.test(prev.id) && !/^trainee/.test(t.id) ? 'promote' : 'move';
+    add(sp.from, kind, { ids: [id], team: t.id, groupId: t.groupId, from: prev ? prev.groupId : null });
+  }));
+  SHIHAININ.forEach(r => add(r.from, 'shihainin', { ids: [r.memberId], groupId: r.groupId }));
+  if(YT_STATS && YT_STATS.videos){
+    for(const [key, [vid, kind]] of Object.entries(SEED_YOUTUBE)){
+      const st = YT_STATS.videos[vid];
+      if(kind !== 'mv' || !st || !st.published) continue;
+      const [workId, i] = key.split('#'), w = findWork(workId);
+      if(!w) continue;
+      const t = (SEED_SENBATSU[workId] || [])[+i];
+      add(st.published.slice(0, 10), 'mv', { workId, track: t ? t.track : w.title, groupId: w.groupId });
+    }
+  } else loadYouTubeStats();
+  return out;
+}
+/* Today's rows, or when today has none, the next ones within a month, so the
+   block is never a dead end. Only earlier years count. With "my oshi" on, only rows
+   that name one of them. */
+function onThisDay(today, mine){
+  const all = pastEvents().filter(r => r.year < today.getFullYear())
+    .filter(r => !mine || r.ids.some(id => state.oshi.includes(id)));
+  const md = d => toYmd(d).slice(5);
+  const todays = all.filter(r => r.md === md(today)).sort((a, b) => b.year - a.year);
+  if(todays.length) return { ahead: false, rows: todays.map(r => ({ r, d: 0 })) };
+  // a week ahead leaves 30 days of the year with nothing to show; a month leaves none
+  const rows = [];
+  for(let d = 1; d <= 30 && rows.length < 4; d++){
+    const day = new Date(today); day.setDate(day.getDate() + d);
+    all.filter(r => r.md === md(day)).sort((a, b) => b.year - a.year).forEach(r => rows.push({ r, d }));
+  }
+  return { ahead: true, rows: rows.slice(0, 4) };
+}
+function renderPastRow({ r, d }, today){
+  const en = isEN(), g = getGroup(r.groupId) || {}, t = r.team ? getTeam(r.team) : null;
+  const people = r.ids.map(getMember).filter(Boolean);
+  const names = people.length > 3
+    ? (en ? `${people.length} members` : `สมาชิก ${people.length} คน`)
+    : people.map(m => nickName(m)).join(en ? ', ' : ' ');
+  const ago = today.getFullYear() - r.year;
+  const when = d === 0 ? (en ? `${ago} ${ago === 1 ? 'year' : 'years'} ago` : `${ago} ปีก่อน`)
+    : `${d === 1 ? (en ? 'Tomorrow' : 'พรุ่งนี้') : (en ? `In ${d} days` : `อีก ${d} วัน`)} · ${en ? `${ago} ${ago === 1 ? 'year' : 'years'}` : `ครบ ${ago} ปี`}`;
+  const teamName = t ? (en && t.nameEn ? t.nameEn : t.name) : '';
+  const text = {
+    debut:     en ? `${g.name} debuted` : `${g.name} เดบิวต์`,
+    grad:      en ? `${names} graduated from ${g.name}` : `${names} จบการศึกษาจาก ${g.name}`,
+    join:      t && /^trainee/.test(t.id) ? (en ? `${names} became ${g.name} trainees` : `${names} เริ่มเป็นเด็กฝึก ${g.name}`)
+                 : (en ? `${names} joined ${g.name} in ${teamName}` : `${names} เข้าวง ${g.name} ใน ${teamName}`),
+    promote:   en ? `${names} promoted to ${teamName}` : `${names} ได้เลื่อนขึ้น ${teamName}`,
+    move:      en ? `${names} moved to ${teamName}` : `${names} ย้ายไป ${teamName}`,
+    transfer:  en ? `${names} moved from ${(getGroup(r.from) || {}).name} to ${g.name}` : `${names} ย้ายจาก ${(getGroup(r.from) || {}).name} มา ${g.name}`,
+    shihainin: en ? `${names} became ${g.name}'s Shihainin` : `${names} รับตำแหน่งชิไฮนิน ${g.name}`,
+    mv:        en ? 'MV released' : 'ปล่อย MV',
+  }[r.kind];
+  const date = formatDate(r.date);
+  const head = `<span class="otd-when">${when}<span class="otd-date"> · ${date}</span></span>`;
+  if(r.kind === 'mv') return `<button class="otd-row" style="--c:${g.color || 'var(--gold)'}" data-action="open-single" data-id="${r.workId}">
+      ${head}<span class="otd-text">${text} <span class="otd-song">${escapeHtml(r.track)}</span></span></button>`;
+  if(r.kind === 'debut') return `<button class="otd-row" style="--c:${g.color}" data-action="filter-team-direct" data-group="${g.id}" data-team="all">
+      ${head}<span class="otd-text">${escapeHtml(text)}</span></button>`;
+  if(people.length === 1) return `<button class="otd-row has-face" style="--c:${g.color}" data-action="open-member" data-id="${people[0].id}">
+      ${renderAvatar(people[0], 'avatar-sm', g.color)}<span class="otd-body">${head}<span class="otd-text">${escapeHtml(text)}</span></span></button>`;
+  return `<div class="otd-row" style="--c:${g.color}">
+      ${head}<span class="otd-text">${escapeHtml(text)}</span>
+      <span class="otd-faces">${people.map(m => `<button class="otd-face" data-action="open-member" data-id="${m.id}" title="${escapeAttr(nickName(m))}" aria-label="${escapeAttr(nickName(m))}">${renderAvatar(m, 'avatar-sm', g.color)}</button>`).join('')}</span></div>`;
+}
+
 function renderFeed(){
   const today = todayStart();
   const iso = toYmd(today);
@@ -11162,6 +11271,7 @@ function renderFeed(){
   const periods = running.filter(e => e.period);
   const soon = events.filter(e => e.start > iso || (e.cancelled && eventLastDay(e) >= iso));
   const past = events.filter(e => eventLastDay(e) < iso).reverse();
+  const otd = onThisDay(today, mine);
 
   return `
   <div class="feed-page">
@@ -11259,6 +11369,11 @@ function renderFeed(){
         }).join('')}
       </div>
     </section>
+    ${otd.rows.length ? `
+    <section class="feed-block is-otd">
+      <h2 class="section-label">${otd.ahead ? 'ครบรอบที่ใกล้ถึง' : 'วันนี้ในอดีต'}</h2>
+      <div class="otd-list">${otd.rows.map(x => renderPastRow(x, today)).join('')}</div>
+    </section>` : ''}
     <section class="feed-block is-calendar">
       <h2 class="section-label">ปฏิทิน</h2>
       ${renderCalendar()}
@@ -12619,7 +12734,7 @@ function loadYouTubeStats(){
   _ytLoading = true;
   fetch('data/youtube.json', { cache:'no-cache' })
     .then(r => r.ok ? r.json() : null)
-    .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single' || state.view === 'stats') renderMain(); syncTicker(); })
+    .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single' || state.view === 'stats' || state.view === 'feed') renderMain(); syncTicker(); })
     .catch(() => { YT_STATS = { videos:{} }; })
     .finally(() => { _ytLoading = false; });
 }
