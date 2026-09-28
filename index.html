@@ -8283,16 +8283,72 @@ const iamUrl = m => m && !m.graduated && m.groupId && m.name
 /* A member's lives in the iAM48 app, from data/lives.json, which a daily
    job rebuilds from the app's public catch-up list. Only start times and
    captions are published, so this is how often and when, never how long or
-   how many watched. The file is fetched the first time a sheet asks for it. */
-let LIVES = null, _livesLoading = false;
+   how many watched. The file is fetched the first time a sheet asks for it.
+   Between nightly runs api.48thdb.com/iam looks at every member's list each
+   quarter of an hour; the lives it has seen that the file has not yet are
+   added on top, so a live shows up here about 15 minutes after it ends. The
+   figures built from pairs and days (same day, together, streaks and so on)
+   wait for the night's run. */
+let LIVES = null, _livesLoading = false, _livesTimer = 0;
+const IAM_API = 'https://api.48thdb.com/iam';
 function loadLives(){
   if(LIVES || _livesLoading) return;
   _livesLoading = true;
   fetch('data/lives.json', { cache:'no-cache' })
     .then(r => r.ok ? r.json() : null)
-    .then(d => { LIVES = d || { members:{} }; if(state.selectedId || state.view === 'stats') renderMain(); })
+    .then(d => { LIVES = d || { members:{} }; if(state.selectedId || state.view === 'stats') renderMain(); refreshRecentLives(true); })
     .catch(() => { LIVES = { members:{} }; })
     .finally(() => { _livesLoading = false; });
+}
+function refreshRecentLives(first){
+  if(!_livesTimer) _livesTimer = setInterval(() => { if(!document.hidden) refreshRecentLives(); }, 5 * 60000);
+  return fetch(`${IAM_API}?t=${Math.floor(Date.now() / 60000)}`, { cache:'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => { const n = mergeRecentLives(d); if((n || first) && (state.selectedId || state.view === 'stats')) renderMain(); return n; })
+    .catch(() => 0);
+}
+/* Adds the lives the Worker has seen and lives.json has not, counted the way
+   the nightly job counts them (Thai time for months, hours and weekdays). */
+function mergeRecentLives(d){
+  if(!LIVES || !LIVES.members || !d || !d.members) return 0;
+  const S = LIVES.stats, TH = 7 * 3600000, pad = n => String(n).padStart(2, '0');
+  const thisYear = new Date(Date.now() + TH).getUTCFullYear();
+  let added = 0;
+  for(const [id, list] of Object.entries(d.members)){
+    const L = LIVES.members[id];
+    if(!L || !Array.isArray(list)) continue;          // someone new is brought in by the nightly run
+    const seen = new Set((L.recent || []).map(r => r.id));
+    const last = L.last ? new Date(L.last).getTime() : 0;
+    const fresh = list.filter(r => r && r.at && !seen.has(r.id) && new Date(r.at).getTime() > last)
+      .sort((a, b) => new Date(a.at) - new Date(b.at));
+    for(const r of fresh){
+      const th = new Date(new Date(r.at).getTime() + TH);
+      const key = `${th.getUTCFullYear()}-${pad(th.getUTCMonth() + 1)}`, hr = th.getUTCHours(), wd = th.getUTCDay();
+      L.total = (L.total || 0) + 1;
+      L.last30 = (L.last30 || 0) + 1;
+      L.last = r.at;
+      if(!L.first) L.first = r.at;
+      L.months = L.months || {}; L.months[key] = (L.months[key] || 0) + 1;
+      if(L.hours) L.hours[hr]++;
+      if(L.days) L.days[wd]++;
+      L.recent = [{ id:r.id, at:r.at, text:r.text || '' }, ...(L.recent || [])].slice(0, 5);
+      if(S){
+        S.total++; S.last30++;
+        if(th.getUTCFullYear() === thisYear) S.year++;
+        S.months[key] = (S.months[key] || 0) + 1;
+        if(S.heat && S.heat[wd]) S.heat[wd][hr]++;
+      }
+      added++;
+    }
+  }
+  if(S && added){
+    const rank = f => Object.entries(LIVES.members).map(([id, L]) => [id, f(L) || 0]).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    S.topAll = rank(L => L.total);
+    S.top30 = rank(L => L.last30);
+  }
+  // the time every member had been looked at by, which is what "updated" means
+  if(d.checked && (!LIVES.updated || new Date(d.checked) > new Date(LIVES.updated))) LIVES.updated = d.checked;
+  return added;
 }
 
 function renderMemberLives(m){
@@ -13813,7 +13869,7 @@ async function drawPageCard(g, title, url){
    before the stats page has ever loaded them. */
 async function shareEnsureData(){
   const get = async path => { try{ const r = await fetch(path, { cache:'no-cache' }); return r.ok ? await r.json() : null; }catch(e){ return null; } };
-  if(!LIVES) LIVES = (await get('data/lives.json')) || { members:{} };
+  if(!LIVES){ LIVES = (await get('data/lives.json')) || { members:{} }; await refreshRecentLives(); }
   if(!YT_STATS) YT_STATS = (await get('data/youtube.json')) || { videos:{} };
 }
 function shareGlow(g, x, y, r, colour, a){

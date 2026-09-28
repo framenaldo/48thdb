@@ -8,7 +8,13 @@ routes = [
   { pattern = "api.48thdb.com", custom_domain = true },
 ]
 
-# Keeps an answer warm for the first visitor of the evening. The Worker is
-# correct without this; remove these lines to save the scheduled runs.
+# Every 5 minutes: a third of the members' iAM48 catch-up lists (so each is
+# looked at every 15 minutes), and in the evening, 17:00–23:59 in Thailand,
+# a YouTube answer kept warm for the first visitor.
 [triggers]
-crons = ["*/5 10-16 * * *"]   # every 5 min, 17:00–23:59 in Thailand (UTC+7)
+crons = ["*/5 * * * *"]
+
+# The iAM48 lives each member published in the last three days.
+[[kv_namespaces]]
+binding = "IAM"
+id = "6fa61537e8444dbba588454ec4323753"

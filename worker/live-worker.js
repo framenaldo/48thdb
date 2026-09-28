@@ -96,8 +96,92 @@ async function check(force) {
   return { live: found, at: now, fresh: true, failed };
 }
 
+/* iAM48 lives that ended since last night.
+ *
+ * data/lives.json is rebuilt once a night from every member's catch-up list.
+ * Between those runs this keeps watching the same lists: a cron comes every
+ * five minutes and looks at a third of the members each time, so everyone is
+ * looked at every quarter of an hour (a third keeps each run well under the
+ * free plan's 50 requests). Whatever each of them published in the last three
+ * days is kept in KV, and the page adds the lives newer than its own copy of
+ * lives.json. The list of members and their iAM ids comes from lives.json
+ * itself, so the two never disagree about who is counted. */
+const IAM_SLICES = 3;
+const IAM_KEEP_MS = 3 * 86400000;
+const IAM_KEY = 'https://live.state/iam-v1';
+const IDS_FROM = ['https://48thdb.com/data/lives.json',
+  'https://raw.githubusercontent.com/framenaldo/48thdb/main/data/lives.json'];
+
+async function iamIds(env) {
+  const got = await env.IAM.get('ids', 'json');
+  if (got && Date.now() - got.at < 12 * 3600000) return got.ids;
+  for (const url of IDS_FROM) {
+    try {
+      const res = await fetch(url, { cf: { cacheTtl: 0 } });
+      if (!res.ok) continue;
+      const d = await res.json();
+      const ids = {};
+      for (const [id, v] of Object.entries(d.members || {})) if (v && v.iam) ids[id] = v.iam;
+      if (!Object.keys(ids).length) continue;
+      await env.IAM.put('ids', JSON.stringify({ at: Date.now(), ids }));
+      return ids;
+    } catch (e) { /* try the next copy */ }
+  }
+  if (got) return got.ids;
+  throw new Error('no member list');
+}
+
+async function iamLook(env, slice) {
+  const ids = await iamIds(env);
+  const mine = Object.keys(ids).sort().filter((_, i) => i % IAM_SLICES === slice);
+  const before = (await env.IAM.get(`slice:${slice}`, 'json')) || { members: {} };
+  const since = Date.now() - IAM_KEEP_MS;
+  const members = {};
+  let failed = 0;
+  await Promise.all(mine.map(async (id) => {
+    try {
+      const res = await fetch(`https://app.bnk48.com/member/${ids[id]}/videocontent?skip=0&take=10`, {
+        headers: { 'user-agent': 'Mozilla/5.0 (48thDb live stats; 48thdb.com)', accept: 'application/json' },
+        cf: { cacheTtl: 0 },
+      });
+      if (!res.ok) throw new Error(`iAM48 said ${res.status}`);
+      const list = await res.json();
+      const recent = [];
+      for (const x of list) {
+        const v = x && x.videoContent;
+        const at = v && new Date(v.publishedAt);
+        if (!at || isNaN(at) || at.getTime() < since) continue;
+        recent.push({ id: v.id, at: at.toISOString(), text: String(v.content || '').trim().slice(0, 120) });
+      }
+      if (recent.length) members[id] = recent;
+    } catch (e) {
+      // one bad answer should not make her lives vanish until the next look
+      failed++;
+      if (before.members[id]) members[id] = before.members[id];
+    }
+  }));
+  await env.IAM.put(`slice:${slice}`, JSON.stringify({ at: Date.now(), members, failed }));
+  return { looked: mine.length, failed };
+}
+
+async function iamRecent(env) {
+  const hit = await readCache(IAM_KEY);
+  if (hit) return hit;
+  const slices = await Promise.all([...Array(IAM_SLICES).keys()].map((i) => env.IAM.get(`slice:${i}`, 'json')));
+  const members = {};
+  let checked = null;
+  for (const s of slices) {
+    if (!s) { checked = null; break; }
+    Object.assign(members, s.members);
+    if (!checked || s.at < checked) checked = s.at;      // everyone has been looked at since then
+  }
+  const body = { checked: checked ? new Date(checked).toISOString() : null, members, source: 'worker' };
+  await writeCache(IAM_KEY, body, 60);
+  return body;
+}
+
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: { ...JSON_HEADERS, 'access-control-max-age': '86400' } });
     }
@@ -105,6 +189,14 @@ export default {
       return new Response('Method not allowed', { status: 405, headers: JSON_HEADERS });
     }
     const url = new URL(request.url);
+    if (url.pathname === '/iam') {
+      try {
+        return new Response(JSON.stringify(await iamRecent(env)), { headers: { ...JSON_HEADERS, 'cache-control': 'public, max-age=60' } });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: String((err && err.message) || err), members: {} }),
+          { status: 502, headers: JSON_HEADERS });
+      }
+    }
     try {
       const yt = await check(url.searchParams.get('force') === 'yt');
       const body = {
@@ -121,8 +213,12 @@ export default {
     }
   },
 
-  /* A cron keeps an answer warm for the first visitor of the evening. */
+  /* Every five minutes: a third of the members' iAM48 lists, and in the
+     evening (Thailand) a YouTube answer kept warm for the first visitor. */
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(check(true).catch(() => {}));
+    const at = new Date(event.scheduledTime);
+    const h = at.getUTCHours();
+    if (h >= 10 && h <= 16) ctx.waitUntil(check(true).catch(() => {}));
+    ctx.waitUntil(iamLook(env, Math.floor(event.scheduledTime / 300000) % IAM_SLICES).catch(() => {}));
   },
 };
