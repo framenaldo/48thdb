@@ -5621,7 +5621,7 @@ let state = {
   ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOshi:false,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
-  calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current',
+  calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current', livesScope:'current',
   lang:'mix',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
@@ -5911,6 +5911,7 @@ const EN = {
   'เดือนเกิด': 'Birth month',
   'อายุ (ปี)': 'Age (years)',
   'สมาชิกปัจจุบัน': 'Current members',
+  'รวมที่จบการศึกษาแล้ว': 'Including graduates',
   'อายุเฉลี่ย': 'Average age',
   'ส่วนสูงเฉลี่ย': 'Average height',
   'แยกตามทีม': 'By team',
@@ -8332,19 +8333,22 @@ function mergeRecentLives(d){
       if(L.hours) L.hours[hr]++;
       if(L.days) L.days[wd]++;
       L.recent = [{ id:r.id, at:r.at, text:r.text || '' }, ...(L.recent || [])].slice(0, 5);
-      if(S){
-        S.total++; S.last30++;
-        if(th.getUTCFullYear() === thisYear) S.year++;
-        S.months[key] = (S.months[key] || 0) + 1;
-        if(S.heat && S.heat[wd]) S.heat[wd][hr]++;
+      for(const X of [S, LIVES.statsAll]){
+        if(!X) continue;
+        X.total++; X.last30++;
+        if(th.getUTCFullYear() === thisYear) X.year++;
+        X.months[key] = (X.months[key] || 0) + 1;
+        if(X.heat && X.heat[wd]) X.heat[wd][hr]++;
       }
       added++;
     }
   }
-  if(S && added){
-    const rank = f => Object.entries(LIVES.members).map(([id, L]) => [id, f(L) || 0]).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    S.topAll = rank(L => L.total);
-    S.top30 = rank(L => L.last30);
+  if(added){
+    const rank = (f, grads) => Object.entries(LIVES.members).filter(([, L]) => grads || !L.grad)
+      .map(([id, L]) => [id, f(L) || 0]).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    if(S){ S.topAll = rank(L => L.total); S.top30 = rank(L => L.last30); }
+    const A = LIVES.statsAll;
+    if(A){ A.topAll = rank(L => L.total, true); A.top30 = rank(L => L.last30, true); }
   }
   // the time every member had been looked at by, which is what "updated" means
   if(d.checked && (!LIVES.updated || new Date(d.checked) > new Date(LIVES.updated))) LIVES.updated = d.checked;
@@ -8352,11 +8356,12 @@ function mergeRecentLives(d){
 }
 
 function renderMemberLives(m){
-  if(!m || m.graduated) return '';
+  if(!m) return '';
   if(!LIVES){ loadLives(); return ''; }
   const L = LIVES.members && LIVES.members[m.id];
   if(!L || !L.total) return '';
   const en = isEN();
+  const grad = !!(m.graduated || L.grad);   // her whole time in the app: years, not the last month
   const M = monthsShort();
   const g = getGroup(m.groupId);
   const now = new Date();
@@ -8372,16 +8377,21 @@ function renderMemberLives(m){
   const first = new Date(L.first);
   const since = `${M[first.getMonth()]} ${first.getFullYear()}`;
 
-  // the last twelve months, this one included, oldest first
+  // the last twelve months, this one included, oldest first; for a graduate, every year she was live
   const months = [];
-  for(let i = 11; i >= 0; i--){
+  if(grad){
+    const byYear = {};
+    Object.entries(L.months || {}).forEach(([k, n]) => { byYear[k.slice(0, 4)] = (byYear[k.slice(0, 4)] || 0) + n; });
+    for(let y = first.getFullYear(); y <= last.getFullYear(); y++) months.push({ key:String(y), n: byYear[y] || 0, label:String(y), year:y, current:false });
+  }
+  else for(let i = 11; i >= 0; i--){
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}`;
     months.push({ key, n: L.months[key] || 0, label: M[d.getMonth()], year: d.getFullYear(), current: i === 0 });
   }
   const top = Math.max(1, ...months.map(x => x.n));
   const bars = months.map(x => {
-    const tip = `${x.label} ${x.year} · ${x.n} ${en ? (x.n === 1 ? 'live' : 'lives') : 'ไลฟ์'}${x.current ? (en ? ' so far' : ' (เดือนนี้)') : ''}`;
+    const tip = `${grad ? x.label : `${x.label} ${x.year}`} · ${x.n} ${en ? (x.n === 1 ? 'live' : 'lives') : 'ไลฟ์'}${x.current ? (en ? ' so far' : ' (เดือนนี้)') : ''}`;
     return `<div class="lv-col${x.current ? ' is-current' : ''}${x.n ? '' : ' is-zero'}" title="${escapeAttr(tip)}" aria-label="${escapeAttr(tip)}" role="img">
       <span class="lv-val">${x.n}</span>
       <span class="lv-bar" style="height:${x.n ? Math.max(4, Math.round(x.n / top * 100)) : 0}%"></span>
@@ -8402,13 +8412,16 @@ function renderMemberLives(m){
     <h3 class="section-label lv-head">${en ? 'Lives on iAM48' : 'ไลฟ์ใน iAM48'}</h3>
     <div class="lv-stats">
       <div class="lv-stat"><span class="lv-k">${en ? 'All lives' : 'ไลฟ์ทั้งหมด'}</span><span class="lv-v">${L.total.toLocaleString()}</span><span class="lv-s">${en ? 'since' : 'ตั้งแต่'} ${since}</span></div>
-      <div class="lv-stat"><span class="lv-k">${en ? 'Last 30 days' : '30 วันล่าสุด'}</span><span class="lv-v">${L.last30 ?? 0}</span><span class="lv-s">${en ? 'lives' : 'ไลฟ์'}</span></div>
-      <div class="lv-stat"><span class="lv-k">${en ? 'Latest live' : 'ไลฟ์ล่าสุด'}</span><span class="lv-v is-text">${agoText}</span><span class="lv-s">${last.getDate()} ${M[last.getMonth()]}</span></div>
+      ${grad
+        ? `<div class="lv-stat"><span class="lv-k">${en ? 'Years live' : 'ช่วงที่ไลฟ์'}</span><span class="lv-v is-text">${first.getFullYear() === last.getFullYear() ? first.getFullYear() : `${first.getFullYear()}–${last.getFullYear()}`}</span><span class="lv-s">${en ? 'in the app' : 'ในแอป'}</span></div>
+      <div class="lv-stat"><span class="lv-k">${en ? 'Last live' : 'ไลฟ์สุดท้าย'}</span><span class="lv-v is-text">${M[last.getMonth()]} ${last.getFullYear()}</span><span class="lv-s">${en ? '' : 'วันที่ '}${last.getDate()} ${M[last.getMonth()]}</span></div>`
+        : `<div class="lv-stat"><span class="lv-k">${en ? 'Last 30 days' : '30 วันล่าสุด'}</span><span class="lv-v">${L.last30 ?? 0}</span><span class="lv-s">${en ? 'lives' : 'ไลฟ์'}</span></div>
+      <div class="lv-stat"><span class="lv-k">${en ? 'Latest live' : 'ไลฟ์ล่าสุด'}</span><span class="lv-v is-text">${agoText}</span><span class="lv-s">${last.getDate()} ${M[last.getMonth()]}</span></div>`}
       <div class="lv-stat"><span class="lv-k">${en ? 'Usually' : 'มักไลฟ์'}</span><span class="lv-v is-text">${peak}</span><span class="lv-s">${peakDay}</span></div>
     </div>
-    <p class="lv-chart-title">${en ? 'Lives per month, last 12 months' : 'จำนวนไลฟ์รายเดือน ย้อนหลัง 12 เดือน'}</p>
-    <div class="lv-chart">${bars}</div>
-    ${recent ? `<p class="lv-chart-title">${en ? 'Catch up on the latest' : 'ดูย้อนหลังล่าสุด'}</p><div class="lv-list">${recent}</div>` : ''}
+    <p class="lv-chart-title">${grad ? (en ? 'Lives per year' : 'จำนวนไลฟ์รายปี') : (en ? 'Lives per month, last 12 months' : 'จำนวนไลฟ์รายเดือน ย้อนหลัง 12 เดือน')}</p>
+    <div class="lv-chart"${grad ? ` style="grid-template-columns:repeat(${months.length}, minmax(0, 1fr))"` : ''}>${bars}</div>
+    ${recent ? `<p class="lv-chart-title">${grad ? (en ? 'Her last lives' : 'ไลฟ์ท้าย ๆ ในแอป') : (en ? 'Catch up on the latest' : 'ดูย้อนหลังล่าสุด')}</p><div class="lv-list">${recent}</div>` : ''}
     <p class="lv-foot">${en ? 'From the iAM48 catch-up list' : 'ข้อมูลจากหน้า Catch-up ของ iAM48'}${upd ? ` · ${en ? 'updated' : 'อัปเดต'} ${upd.getDate()} ${M[upd.getMonth()]} ${String(upd.getHours()).padStart(2,'0')}:${String(upd.getMinutes()).padStart(2,'0')}${en ? '' : ' น.'}` : ''}</p>
   </section>`;
 }
@@ -12254,9 +12267,14 @@ function renderStatsTimeline(){
    figure here is about when and how often. */
 function renderStatsLives(){
   if(!LIVES){ loadLives(); return `<p class="muted-note">${isEN() ? 'Loading…' : 'กำลังโหลด...'}</p>`; }
-  const S = LIVES.stats;
+  // the current members, or everyone who ever had a catch-up list, graduates included
+  const all = state.livesScope === 'all' && !!LIVES.statsAll;
+  const S = all ? LIVES.statsAll : LIVES.stats;
   if(!S) return `<p class="muted-note">${isEN() ? 'No live data yet.' : 'ยังไม่มีข้อมูลไลฟ์'}</p>`;
   const en = isEN();
+  const scope = LIVES.statsAll ? `<div class="feed-scope bday-scope" role="group" aria-label="${en ? 'Who is counted' : 'ขอบเขตที่นับ'}">
+    <button class="scope-btn${all ? '' : ' is-on'}" data-action="lives-scope" data-id="current">สมาชิกปัจจุบัน</button>
+    <button class="scope-btn${all ? ' is-on' : ''}" data-action="lives-scope" data-id="all">รวมที่จบการศึกษาแล้ว</button></div>` : '';
   const M = monthsShort();
   const DAYS = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   const DAYS_LONG = en ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
@@ -12300,6 +12318,7 @@ function renderStatsLives(){
   const upd = LIVES.updated ? new Date(LIVES.updated) : null;
 
   return `<div class="lv-stats-page">
+  ${scope}
   <div class="stat-grid">
     <div class="stat-cell"><div class="label">${en ? 'All lives' : 'ไลฟ์ทั้งหมด'}</div><div class="value">${S.total.toLocaleString()}</div></div>
     <div class="stat-cell"><div class="label">${en ? `In ${now.getFullYear()}` : `ในปี ${now.getFullYear()}`}</div><div class="value">${S.year.toLocaleString()}</div></div>
@@ -12348,7 +12367,9 @@ function renderStatsLives(){
   ${card(en ? 'Live on her own birthday' : 'ไลฟ์ในวันเกิดตัวเองบ่อยที่สุด', memberBars(S.birthday, 'ปี', 'year', 'years'),
     en ? 'Birthdays on which she went live.' : 'นับปีที่ไลฟ์ในวันเกิดของตัวเอง')}
 
-  <p class="stats-note">${en ? 'From the iAM48 catch-up lists of the current members' : 'ข้อมูลจากหน้า Catch-up ของ iAM48 เฉพาะสมาชิกปัจจุบัน'}${upd ? ` · ${en ? 'updated' : 'อัปเดต'} ${upd.getDate()} ${M[upd.getMonth()]} ${String(upd.getHours()).padStart(2,'0')}:${String(upd.getMinutes()).padStart(2,'0')}${en ? '' : ' น.'}` : ''}</p>
+  <p class="stats-note">${all
+    ? (en ? 'From the iAM48 catch-up lists of every member, graduates included; the lists begin in November 2018' : 'ข้อมูลจากหน้า Catch-up ของ iAM48 รวมสมาชิกที่จบการศึกษาแล้ว รายการในแอปเริ่มตั้งแต่ พ.ย. 2018')
+    : (en ? 'From the iAM48 catch-up lists of the current members' : 'ข้อมูลจากหน้า Catch-up ของ iAM48 เฉพาะสมาชิกปัจจุบัน')}${upd ? ` · ${en ? 'updated' : 'อัปเดต'} ${upd.getDate()} ${M[upd.getMonth()]} ${String(upd.getHours()).padStart(2,'0')}:${String(upd.getMinutes()).padStart(2,'0')}${en ? '' : ' น.'}` : ''}</p>
   </div>`;
 }
 
@@ -13361,7 +13382,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','geClip','timelineId','dayOf','geTab','bdayScope'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','geClip','timelineId','dayOf','geTab','bdayScope','livesScope'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
@@ -15146,6 +15167,10 @@ function bindDelegatedEvents(){
       }
       await saveOshiData();
       updateOshiButtonsFor(id);
+    }
+    else if(action==='lives-scope'){
+      state.livesScope = id === 'all' ? 'all' : 'current';
+      renderMain(); replaceHistory();
     }
     else if(action==='bday-scope'){
       state.bdayScope = id === 'all' ? 'all' : 'current';

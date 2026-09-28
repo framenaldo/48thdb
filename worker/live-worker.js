@@ -121,7 +121,8 @@ async function iamIds(env) {
       if (!res.ok) continue;
       const d = await res.json();
       const ids = {};
-      for (const [id, v] of Object.entries(d.members || {})) if (v && v.iam) ids[id] = v.iam;
+      // graduates are in the file for their history; they no longer go live
+      for (const [id, v] of Object.entries(d.members || {})) if (v && v.iam && !v.grad) ids[id] = v.iam;
       if (!Object.keys(ids).length) continue;
       await env.IAM.put('ids', JSON.stringify({ at: Date.now(), ids }));
       return ids;

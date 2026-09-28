@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Collect every current member's iAM48 live history into data/lives.json.
+"""Collect every member's iAM48 live history into data/lives.json.
 
 The iAM48 member page (app.bnk48.com/members/<group>/<nickname>) names the
 member's numeric id, and /member/<id>/videocontent lists her catch-up lives:
 when each started and its caption. Views and length are not published, so
 the stats are built from start times alone.
+
+Graduated members keep their catch-up lists too (1st generation back to
+November 2018, when the list begins), so they are collected as well and
+marked `grad`. `stats` counts the current members only, as the site always
+has; `statsAll` counts everyone.
 
 Run by .github/workflows/lives.yml once a day; safe to run by hand.
 """
@@ -14,6 +19,7 @@ import pathlib
 import re
 import sys
 import time
+import unicodedata
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -36,21 +42,36 @@ def get(url):
 
 
 BIRTHDAYS = {}
+GRAD = {}
+
+# Where the app's address for a member is not her name as the site spells it.
+IAM_PATH = {'cgm-meilli': 'cgm48/meilii'}
+# Graduated members whose page is gone but whose catch-up list is still there
+# (checked by the hashtag on her lives: #PIMBNK48).
+IAM_ID = {'bnk-pim': 93}
+# The catch-up lists begin in November 2018; nobody who left before then has one.
+LISTS_BEGIN = '2018-11-01'
 
 
 def members():
-    """Current members, read from the site's own seed so the two never disagree."""
+    """Every member, current and graduated, read from the site's own seed so
+    the two never disagree."""
     html = (ROOT / 'index.html').read_text(encoding='utf-8')
-    start = html.index('const SEED_MEMBERS')
-    block = html[start:html.index('];', start)]
-    for m in re.finditer(r"\{ id:'([a-z0-9-]+)', name:'([^']+)'.*?groupId:'([a-z0-9]+)'(.*?)photo:", block, re.S):
-        if 'graduated' in m.group(4):
-            continue
-        b = re.search(r"birthday:'(\d{4}-\d{2}-\d{2})'", m.group(0))
-        if b:
-            BIRTHDAYS[m.group(1)] = b.group(1)[5:]
-        slug = re.sub(r'[^a-z0-9]', '', m.group(2).lower())
-        yield m.group(1), f'{m.group(3)}/{slug}'
+    for name in ('const SEED_MEMBERS', 'const SEED_GRADUATED'):
+        start = html.index(name)
+        block = html[start:html.index('\n];', start)]
+        # one member to a line; not every record has a photo, so read to the end of the line
+        for m in re.finditer(r"\{ id:'([a-z0-9-]+)', name:'([^']+)'[^\n]*?groupId:'([a-z0-9]+)'[^\n]*", block):
+            g = re.search(r"graduated:'(\d{4}-\d{2}-\d{2})'", m.group(0))
+            if g:
+                if g.group(1) < LISTS_BEGIN:
+                    continue
+                GRAD[m.group(1)] = g.group(1)
+            b = re.search(r"birthday:'(\d{4}-\d{2}-\d{2})'", m.group(0))
+            if b:
+                BIRTHDAYS[m.group(1)] = b.group(1)[5:]
+            slug = re.sub(r'[^a-z0-9]', '', unicodedata.normalize('NFD', m.group(2)).encode('ascii', 'ignore').decode().lower())
+            yield m.group(1), IAM_PATH.get(m.group(1), f'{m.group(3)}/{slug}')
 
 
 def group_stats(starts, now):
@@ -127,8 +148,10 @@ def main():
     starts = {}
     for mid, path in members():
         try:
-            page = get(f'https://app.bnk48.com/members/{path}')
-            iam = int(re.search(r'/member/(\d+)/videocontent', page).group(1))
+            iam = IAM_ID.get(mid) or (old.get('members', {}).get(mid) or {}).get('iam')
+            if not iam:
+                page = get(f'https://app.bnk48.com/members/{path}')
+                iam = int(re.search(r'/member/(\d+)/videocontent', page).group(1))
             lives = json.loads(get(f'https://app.bnk48.com/member/{iam}/videocontent?skip=0&take=5000'))
         except Exception as e:
             # keep yesterday's numbers rather than blanking a member for one bad request
@@ -147,6 +170,7 @@ def main():
         recent = sorted(lives, key=lambda v: v['videoContent']['publishedAt'], reverse=True)[:5]
         out[mid] = {
             'iam': iam,
+            **({'grad': GRAD[mid]} if mid in GRAD else {}),
             'total': len(times),
             'first': times[0].isoformat() if times else None,
             'last': times[-1].isoformat() if times else None,
@@ -161,11 +185,14 @@ def main():
 
     if not out:
         sys.exit('nothing collected; leaving the old file alone')
-    stats = group_stats(starts, now) if len(starts) == len(out) else old.get('stats')
-    if out == old.get('members') and stats == old.get('stats'):
+    whole = len(starts) == len(out)
+    current = {m: ts for m, ts in starts.items() if m not in GRAD}
+    stats = group_stats(current, now) if whole else old.get('stats')
+    stats_all = group_stats(starts, now) if whole else old.get('statsAll')
+    if out == old.get('members') and stats == old.get('stats') and stats_all == old.get('statsAll'):
         print('no new lives; file left as it was')
         return
-    doc = {'updated': dt.datetime.now(TZ).isoformat(timespec='minutes'), 'members': out, 'stats': stats}
+    doc = {'updated': dt.datetime.now(TZ).isoformat(timespec='minutes'), 'members': out, 'stats': stats, 'statsAll': stats_all}
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(json.dumps(doc, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'{len(out)} members, {sum(m["total"] for m in out.values())} lives')
