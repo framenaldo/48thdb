@@ -2371,6 +2371,9 @@
   .gev-btn{ flex:none; border:0; border-radius:99px; background:#fff; color:#1A1419; font:inherit; font-size:12.5px; font-weight:800;
     padding:8px 13px; cursor:pointer; box-shadow:0 2px 0 rgba(0,0,0,.45); transition:transform .12s, box-shadow .12s; }
   .gev-btn:active{ transform:translateY(2px); box-shadow:none; }
+  .gev-btn.is-share{ display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,.14); color:#fff; box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5), 0 2px 0 rgba(0,0,0,.45); }
+  .gev-btn.is-share svg{ width:15px; height:15px; }
+  @media (max-width:380px){ .gev-btn.is-share span{ display:none; } }
   /* The candidate's poster as a real sheet of paper: it turns in 3D, the light
      slides across it as it does, it throws a shadow and a faint reflection on
      the floor, and its back is plain white paper.
@@ -7700,6 +7703,7 @@ function bindPoster3D(view, stage){
     const a = ry + hy, b = rx + hx, R = Math.PI / 180;
     const sa = Math.sin(a * R), ca = Math.cos(a * R), sb = Math.sin(b * R);
     const d = stage._gp3 || { h:354, w:250 };
+    stage._ang = { a, b };
     const rot = `rotateX(${b.toFixed(2)}deg) rotateY(${a.toFixed(2)}deg)`;
     const at = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${z.toFixed(3)})`;
     // the floor is wherever its lowest corner is: a corner (x, y) ends up y·cos(rx) + x·sin(ry)·sin(rx) below the middle
@@ -9392,6 +9396,7 @@ function renderGEPosterViewer(id){
       ${renderAvatar(m, 'avatar-sm gev-face', g.color)}
       <span class="gev-who"><b>${escapeHtml(m.name)}</b><small>${escapeHtml(m.nameTh || '')} · ${escapeHtml(g.name || '')}${t ? ' ' + escapeHtml(t.name) : ''}</small></span>
       <span class="gev-count">${i + 1} / ${list.length}</span>
+      <button class="gev-btn is-share" data-action="share" aria-label="${en ? 'Share' : 'แชร์'}">${ICONS.share}<span>${en ? 'Share' : 'แชร์'}</span></button>
       <button class="gev-btn" data-action="ge-poster-profile" data-id="${m.id}">${en ? 'Profile' : 'โปรไฟล์'}</button>
     </div>
   </div>`;
@@ -13631,7 +13636,8 @@ const BOOT_QUERY = location.search;
 
 function urlForSnapshot(snap){
   const p = new URLSearchParams();
-  if(snap.selectedEvent)       p.set('e', snap.selectedEvent);
+  if(String(snap.posterOf || '').startsWith('ge:')) p.set('p', snap.posterOf.slice(3));
+  else if(snap.selectedEvent)  p.set('e', snap.selectedEvent);
   else if(snap.selectedId){    p.set('m', snap.selectedId);
                                if(snap.compareWith) p.set('vs', snap.compareWith); }
   else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
@@ -13649,7 +13655,12 @@ function urlForSnapshot(snap){
 // that matches nothing is ignored rather than left to render a blank screen.
 function applyUrlToState(){
   const p = new URLSearchParams(BOOT_QUERY);
-  const ev = p.get('e'), mem = p.get('m'), sng = p.get('s'), view = p.get('v');
+  const ev = p.get('e'), mem = p.get('m'), sng = p.get('s'), view = p.get('v'), pst = p.get('p');
+
+  if(pst && isGECandidate(pst)){
+    state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'candidates';
+    state.posterOf = 'ge:' + pst; state.geClip = false; return;
+  }
 
   if(ev && SEED_SCHEDULE.some(x => x.id === ev)){ state.view='feed'; state.selectedEvent=ev; return; }
   if(mem && (state.members||[]).some(x => x.id === mem)){
@@ -13738,8 +13749,8 @@ function toast(msg){
 // Copies the link to whatever is on screen. navigator.share is offered first on
 // the phones that have it, since it reaches the apps people actually send links
 // through; the clipboard is the fallback everywhere else.
-async function shareCurrent(label){
-  const url = location.origin + urlForSnapshot(navSnapshot());
+async function shareCurrent(label, link){
+  const url = link || location.origin + urlForSnapshot(navSnapshot());
   try{
     if(navigator.share){ await navigator.share({ title:label || document.title, url }); return; }
   }catch(err){ if(err && err.name === 'AbortError') return; }
@@ -14087,6 +14098,121 @@ async function drawSingleCard(g, s, url){
     }
   }
   await shareFooter(g, true, url);
+}
+
+/* ---- The 3D poster, painted ----
+   The sheet the viewer turns, drawn onto a canvas for the pictures and clips
+   people share: turned and seen in the viewer's perspective, lit by the same
+   sweep of light, white paper behind, with its shadow and a faint reflection
+   on the floor. The poster is laid onto the turned sheet a tile at a time,
+   two triangles to a tile, each an ordinary 2D transform. */
+function gp3Textures(img, maxH){
+  const k = Math.min(1, maxH / img.naturalHeight);
+  const w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+  const front = document.createElement('canvas'); front.width = w; front.height = h;
+  front.getContext('2d').drawImage(img, 0, 0, w, h);
+  const back = document.createElement('canvas'); back.width = w; back.height = h;
+  const b = back.getContext('2d');
+  const paper = b.createRadialGradient(w * .28, h * .18, 0, w * .28, h * .18, Math.hypot(w, h));
+  paper.addColorStop(0, '#FFFFFF'); paper.addColorStop(.55, '#FDFDFC'); paper.addColorStop(1, '#F2F1EE');
+  b.fillStyle = paper; b.fillRect(0, 0, w, h);
+  // the front showing faintly through thick paper (seen from behind, so it reads mirrored)
+  const thru = document.createElement('canvas'); thru.width = w; thru.height = h;
+  // the viewer blurs by 3px on a poster 354px tall; keep that in proportion
+  const tg = thru.getContext('2d'); tg.filter = `blur(${(3 * h / 354).toFixed(1)}px) saturate(.7)`; tg.drawImage(img, 0, 0, w, h);
+  b.globalAlpha = .07; b.drawImage(thru, 0, 0); b.globalAlpha = 1;
+  return { front, back, ratio: img.naturalWidth / img.naturalHeight };
+}
+function gp3Geom(t, o){
+  const R = Math.PI / 180, a = o.a * R, b = o.b * R;
+  const sa = Math.sin(a), ca = Math.cos(a), sb = Math.sin(b), cb = Math.cos(b);
+  const h = o.h, w = h * t.ratio, P = h * 4.24;   // the viewer's 1500px perspective on a 354px poster
+  const proj = (x, y) => { const x1 = x * ca, z1 = -x * sa, y2 = y * cb - z1 * sb, z2 = y * sb + z1 * cb, k = P / (P - z2);
+    return [o.cx + x1 * k, o.cy + y2 * k]; };
+  const at = (u, v) => proj((u - .5) * w, (v - .5) * h);
+  const q = [at(0, 0), at(1, 0), at(1, 1), at(0, 1)];
+  const facing = (q[1][0] - q[0][0]) * (q[3][1] - q[0][1]) - (q[1][1] - q[0][1]) * (q[3][0] - q[0][0]);
+  return { sa, ca, sb, w, h, at, q, back: facing < 0, floor: Math.max(...q.map(p => p[1])), deg: o.a };
+}
+function gp3Sheet(g, t, G){
+  const tex = G.back ? t.back : t.front, TW = tex.width, TH = tex.height, NU = 10, NV = 14;
+  const pts = [];
+  for(let j = 0; j <= NV; j++) for(let i = 0; i <= NU; i++) pts.push(G.at(i / NU, j / NV));
+  const P = (i, j) => pts[j * (NU + 1) + i];
+  const tri = (s0, s1, s2, d0, d1, d2) => {
+    const den = s0[0] * (s1[1] - s2[1]) + s1[0] * (s2[1] - s0[1]) + s2[0] * (s0[1] - s1[1]);
+    if(!den) return;
+    const m = k => [
+      (d0[k] * (s1[1] - s2[1]) + d1[k] * (s2[1] - s0[1]) + d2[k] * (s0[1] - s1[1])) / den,
+      (d0[k] * (s2[0] - s1[0]) + d1[k] * (s0[0] - s2[0]) + d2[k] * (s1[0] - s0[0])) / den,
+      (d0[k] * (s1[0] * s2[1] - s2[0] * s1[1]) + d1[k] * (s2[0] * s0[1] - s0[0] * s2[1]) + d2[k] * (s0[0] * s1[1] - s1[0] * s0[1])) / den];
+    const [xa, xc, xe] = m(0), [yb, yd, yf] = m(1);
+    // each tile is grown a hair past its edges so no seam shows between them
+    const cx = (d0[0] + d1[0] + d2[0]) / 3, cy = (d0[1] + d1[1] + d2[1]) / 3;
+    const grow = p => { const dx = p[0] - cx, dy = p[1] - cy, l = Math.hypot(dx, dy) || 1; return [p[0] + dx / l * .9, p[1] + dy / l * .9]; };
+    g.save(); g.beginPath(); g.moveTo(...grow(d0)); g.lineTo(...grow(d1)); g.lineTo(...grow(d2)); g.closePath(); g.clip();
+    g.transform(xa, yb, xc, yd, xe, yf); g.drawImage(tex, 0, 0); g.restore();
+  };
+  for(let j = 0; j < NV; j++) for(let i = 0; i < NU; i++){
+    const u0 = i / NU * TW, u1 = (i + 1) / NU * TW, v0 = j / NV * TH, v1 = (j + 1) / NV * TH;
+    tri([u0, v0], [u1, v0], [u1, v1], P(i, j), P(i + 1, j), P(i + 1, j + 1));
+    tri([u0, v0], [u1, v1], [u0, v1], P(i, j), P(i + 1, j + 1), P(i, j + 1));
+  }
+  // the light, kept to the sheet
+  g.save(); g.beginPath(); G.q.forEach((p, k) => k ? g.lineTo(...p) : g.moveTo(...p)); g.closePath(); g.clip();
+  const k = G.back ? .55 : 1;
+  const tip = Math.min(1, Math.abs(G.sa) * 1.6 + Math.abs(G.sb) * 1.8), glare = .14 + tip * .86;
+  g.fillStyle = `rgba(0,0,0,${((1 - Math.abs(G.ca)) * .42).toFixed(3)})`;     // the side turned from the light
+  g.fillRect(-1e4, -1e4, 2e4, 2e4);
+  const off = Math.min(90, Math.abs(((G.deg % 180) + 270) % 180 - 90)), band = 1.55 - off / 45 * 2.1;
+  if(band > -.3 && band < 1.3){                                               // the band sweeping across as it turns
+    const A = G.at(band - .2, .5), B = G.at(band + .2, .5), sg = g.createLinearGradient(A[0], A[1], B[0], B[1]);
+    const peak = Math.min(1, glare * 1.25 * k);
+    [[0, 0], [.3, .2], [.5, .66], [.7, .2], [1, 0]].forEach(([x, al]) => sg.addColorStop(x, `rgba(255,255,255,${(al * peak).toFixed(3)})`));
+    g.fillStyle = sg; g.fillRect(-1e4, -1e4, 2e4, 2e4);
+  }
+  const c = G.at(.5 - G.sa * .58, .5 - .2 - G.sb * 1.3), r = Math.hypot(...[0, 1].map(i => G.at(1.3, .5)[i] - G.at(.5, .5)[i]));
+  const gl = g.createRadialGradient(c[0], c[1], 0, c[0], c[1], r), ga = glare * k;
+  [[0, .34], [.35, .2], [.65, .07], [1, 0]].forEach(([x, al]) => gl.addColorStop(x, `rgba(255,255,255,${(al * ga).toFixed(3)})`));
+  g.fillStyle = gl; g.fillRect(-1e4, -1e4, 2e4, 2e4);
+  g.restore();
+}
+/* o: { W, H, a, b (degrees, as the viewer turns it), h (poster height), cx, cy, keepBg, layer (a canvas to reuse) } */
+function gp3Scene(g, t, o){
+  const G = gp3Geom(t, o), s = o.h / 354;
+  if(!o.keepBg){ g.fillStyle = '#08060C'; g.fillRect(0, 0, o.W, o.H); }
+  // painted once on a layer of its own, so the faint reflection shows no seams between tiles
+  const layer = o.layer || document.createElement('canvas');
+  if(layer.width !== o.W || layer.height !== o.H){ layer.width = o.W; layer.height = o.H; }
+  const lg = layer.getContext('2d'); lg.clearRect(0, 0, o.W, o.H); gp3Sheet(lg, t, G);
+  // the reflection: the sheet mirrored at the floor, faint, sinking into it
+  g.save(); g.translate(0, 2 * G.floor); g.scale(1, -1); g.globalAlpha = .24; g.drawImage(layer, 0, 0); g.restore();
+  const f = g.createLinearGradient(0, G.floor, 0, G.floor + o.h * .42);
+  f.addColorStop(0, 'rgba(8,6,12,0)'); f.addColorStop(.43, 'rgba(8,6,12,.6)'); f.addColorStop(1, 'rgba(8,6,12,1)');
+  g.fillStyle = f; g.fillRect(0, G.floor, o.W, o.H - G.floor);
+  // its shadow, narrowing as it turns edge-on
+  const sw = (G.w * (.25 + .75 * Math.abs(G.ca)) + 24 * s) / 2, sh = 13 * s;
+  g.save(); g.translate(o.cx, G.floor); g.scale(1, sh / sw);
+  const sg = g.createRadialGradient(0, 0, 0, 0, 0, sw);
+  sg.addColorStop(0, 'rgba(0,0,0,.7)'); sg.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = sg; g.beginPath(); g.arc(0, 0, sw, 0, Math.PI * 2); g.fill(); g.restore();
+  g.drawImage(layer, 0, 0);
+  return G;
+}
+/* The card shared from the poster viewer: her poster at the angle it was left at */
+async function drawPosterCard(g, sub){
+  const en = isEN(), m = sub.m, grp = getGroup(m.groupId) || {}, team = getTeam(m.teamId);
+  const im = await shareLoad(gePoster(m.id));
+  let a = sub.ang ? sub.ang.a : -26, b = sub.ang ? sub.ang.b : 6;
+  a = ((a % 360) + 540) % 360 - 180;
+  if(Math.abs(a) < 8 && Math.abs(b) < 4){ a = -24; b = 6; }   // square on, it would look flat
+  g.fillStyle = '#08060C'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  shareGlow(g, SHARE_W / 2, 420, 720, grp.color || '#E4457E', .2);
+  if(im) gp3Scene(g, gp3Textures(im, 1500), { W:SHARE_W, H:SHARE_H, a, b, h:760, cx:SHARE_W / 2, cy:470, keepBg:true });
+  shareText(g, en ? m.name : nickName(m), SHARE_W / 2, 1030, '800 64px "Noto Sans Thai", sans-serif', '#ffffff', 'center');
+  shareText(g, `${grp.name || ''}${team ? ' · ' + team.name : ''} · ${en ? 'GE2026 candidate' : 'ผู้สมัคร GE2026'}`, SHARE_W / 2, 1086,
+    '600 30px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.72)', 'center');
+  await shareFooter(g, true, sub.url);
 }
 
 async function drawGECard(g, url){
@@ -14706,6 +14832,14 @@ async function drawBoxCard(g, sub){
 
 function shareSubject(){
   const url = location.origin + urlForSnapshot(navSnapshot());
+  if(String(state.posterOf || '').startsWith('ge:')){
+    const id = state.posterOf.slice(3), m = getMember(id);
+    const st = document.querySelector('.poster-viewer.is-ge .gp3');
+    // /p/<id> is a small page of its own, so a chat shows her poster in the preview
+    const link = location.origin + '/p/' + id;
+    if(m) return { kind:'poster', m, ang: st && st._ang ? { ...st._ang } : null, url: link, link,
+      title:`${nickName(m)} · Senbatsu General Election 2026 — 48thDb`, file:`48thdb-ge2026-${m.name || m.id}` };
+  }
   const m = state.selectedId ? getMember(state.selectedId) : null;
   const ev = state.selectedEvent ? SEED_SCHEDULE.find(x => x.id === state.selectedEvent) : null;
   if(m) return { kind:'member', m, url, title:`${nickName(m)} — 48thDb`, file:`48thdb-${m.name || m.id}` };
@@ -14815,6 +14949,7 @@ async function buildShareCard(sub){
   else if(sub.kind === 'single') await drawSingleCard(g, sub.s, sub.url);
   else if(sub.kind === 'milestone') await drawMilestoneCard(g, sub);
   else if(sub.kind === 'ge') await drawGECard(g, sub.url);
+  else if(sub.kind === 'poster') await drawPosterCard(g, sub);
   else if(sub.kind === 'stats') await ({ lives: drawStatsLivesCard, songs: drawStatsSongsCard, birthdays: drawStatsBirthdaysCard,
       timeline: drawStatsTimelineCard }[sub.cat] || drawStatsCard)(g, sub.url);
   else if(sub.kind === 'today') await drawTodayCard(g, sub.url);
@@ -14893,7 +15028,7 @@ async function openShareSheet(given){
     const b = e.target.closest('[data-share]'); if(!b) return;
     const act = b.dataset.share;
     if(act === 'close') return closeShareSheet();
-    if(act === 'link') return shareCurrent(sub.title);
+    if(act === 'link') return shareCurrent(sub.title, sub.link);
     if(act === 'cat'){
       if(b.dataset.cat === sub.cat) return;
       sub.cat = b.dataset.cat; sub.file = `48thdb-stats-${sub.cat}`;
