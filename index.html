@@ -2205,8 +2205,8 @@
   :root[data-theme="dark"] .live-chip{ background:rgba(255,86,75,.18); color:#FF8078; }
   .live-chip.is-on{ background:#E02118; color:#fff; animation:live-flash 1.2s ease-in-out infinite; }
   /* confirmed by YouTube: the badge is the way into the stream itself */
-  a.live-chip.is-air{ text-decoration:none; }
-  a.live-chip.is-air:active{ filter:brightness(1.2); }
+  a.live-chip.is-air, a.live-chip.is-link{ text-decoration:none; }
+  a.live-chip.is-air:active, a.live-chip.is-link:active{ filter:brightness(1.2); transform:translateY(1px); }
   :root[data-theme="dark"] .live-chip.is-on{ background:#FF3B30; color:#fff; }
   @keyframes live-flash{
     0%,100%{ opacity:1; box-shadow:0 0 0 0 transparent; }
@@ -4549,7 +4549,7 @@ const SEED_SCHEDULE = [
     members:['cgm-valentine','cgm-lookked','cgm-nana','cgm-else'],
     related:['ev-cgm48-popup-live-0924'],
     poster:{ accent:'#8E1E2E', surface:'#F4EEEF', ink:'#2A1116', img:'posters/cgm48-popup-live-0929.webp', w:2000, h:1125 },
-    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/watch?v=lQ28FDWneQs' } },
+    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://youtu.be/lQ28FDWneQs' } },
   { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27', time:'12:00',
     cancelled:'ยกเลิกการจัดงาน เนื่องจากศูนย์การค้าแฟชั่นไอส์แลนด์ปิดให้บริการชั่วคราว (สถานการณ์น้ำท่วม)',
     title:'CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow',
@@ -6071,6 +6071,7 @@ const EN = {
   'จบไปแล้ววันนี้': 'Over for today',
   'จบแล้ว': 'Over',
   'ดูย้อนหลัง': 'Replay',
+  'LIVE · ดูไลฟ์': 'LIVE · Watch',
   'อยู่ที่บูธตอนนี้': 'At the booth now',
   'รอบวันนี้จบแล้ว': "Today's turn is over",
   'ตารางสมาชิกประจำบูธ': 'Who is at the booth',
@@ -9936,6 +9937,11 @@ function renderLiveChip(ev, cls){
   const replay = isReplayLink(ev.stream.url) ? `<a class="live-chip is-replay${cls ? ' ' + cls : ''}" href="${escapeAttr(ev.stream.url)}"
     target="_blank" rel="noopener noreferrer" data-replay-from="${w.to}"${now > w.to ? '' : ' hidden'}>ดูย้อนหลัง</a>` : '';
   if(now > w.to) return replay;
+  // The show's own video was given: the badge opens it, before and during the
+  // show, whether or not the channel check has seen it go on air yet.
+  if(replay) return replay + `<a class="live-chip is-link${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}" href="${escapeAttr(ev.stream.url)}"
+    target="_blank" rel="noopener noreferrer" data-live-from="${w.from}" data-live-to="${w.to}"
+    title="${escapeAttr(`ดูถ่ายทอดสดทาง ${ev.stream.label || 'YouTube'}`)}">LIVE · ดูไลฟ์</a>`;
   return replay + `<span class="live-chip${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}"
     data-live-from="${w.from}" data-live-to="${w.to}"
     title="${escapeAttr(ev.stream.label || '')}">LIVE</span>`;
