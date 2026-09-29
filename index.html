@@ -914,6 +914,10 @@
     border:1px solid var(--line); background:var(--card); color:var(--ink); font:inherit; font-size:12.5px; font-weight:800; }
   .share-act svg{ width:22px; height:22px; }
   .share-act.is-main{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  /* the poster's spinning clip, across the whole row above the rest */
+  .share-act.is-clip{ grid-column:1 / -1; flex-direction:row; justify-content:center; gap:9px; padding:13px 12px;
+    background:linear-gradient(120deg, #E4457E, #2E8C82); color:#fff; border-color:transparent; box-shadow:0 3px 0 rgba(0,0,0,.18); }
+  .share-act.is-clip svg{ width:18px; height:18px; }
   .share-act:disabled{ opacity:.45; cursor:default; }
   .share-act:not(:disabled):active{ transform:scale(.96); }
   .page-top-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
@@ -14837,7 +14841,7 @@ function shareSubject(){
     const st = document.querySelector('.poster-viewer.is-ge .gp3');
     // /p/<id> is a small page of its own, so a chat shows her poster in the preview
     const link = location.origin + '/p/' + id;
-    if(m) return { kind:'poster', m, ang: st && st._ang ? { ...st._ang } : null, url: link, link,
+    if(m) return { kind:'poster', m, ang: st && st._ang ? { ...st._ang } : null, url: link, link, clip:`posters/ge2026/clips/${id}.mp4`,
       title:`${nickName(m)} · Senbatsu General Election 2026 — 48thDb`, file:`48thdb-ge2026-${m.name || m.id}` };
   }
   const m = state.selectedId ? getMember(state.selectedId) : null;
@@ -15015,6 +15019,7 @@ async function openShareSheet(given){
       ${sub.kind === 'stats' ? `<div class="share-cats">${STATS_TABS.map(t => `<button class="share-cat${t.id === sub.cat ? ' is-on' : ''}" data-share="cat" data-cat="${t.id}">${t.label}</button>`).join('')}</div>` : ''}
       <div class="share-preview is-loading"><span>${en ? 'Making the card…' : 'กำลังสร้างการ์ด…'}</span></div>
       <div class="share-actions">
+        ${sub.clip ? `<button class="share-act is-clip" data-share="clip" disabled><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg><span>${en ? 'Getting the clip…' : 'กำลังเตรียมคลิป…'}</span></button>` : ''}
         <button class="share-act is-main" data-share="image" disabled>${ICONS.share}<span>${en ? 'Share image' : 'แชร์รูป'}</span></button>
         <button class="share-act" data-share="save" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg><span>${en ? 'Save image' : 'บันทึกรูป'}</span></button>
         <button class="share-act" data-share="link">${ICONS.link}<span>${en ? 'Share link' : 'แชร์ลิงก์'}</span></button>
@@ -15022,13 +15027,29 @@ async function openShareSheet(given){
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
-  let blob = null;
+  let blob = null, clip = null;
   const file = () => new File([blob], sub.file.replace(/[^\w.-]+/g, '-') + '.png', { type:'image/png' });
+  /* The spinning poster clip is fetched as the sheet opens, so a tap can hand it
+     to the share menu at once: a phone lets the menu open only straight after a tap. */
+  if(sub.clip){
+    const cb = el.querySelector('[data-share="clip"]');
+    fetch(sub.clip).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(v => {
+      clip = new File([v], sub.file.replace(/[^\w.-]+/g, '-') + '.mp4', { type:'video/mp4' });
+      cb.disabled = false; cb.querySelector('span').textContent = en ? 'Share the spinning clip' : 'แชร์คลิปโปสเตอร์หมุน';
+    }).catch(() => { cb.querySelector('span').textContent = en ? 'Clip unavailable' : 'โหลดคลิปไม่สำเร็จ'; });
+  }
   el.addEventListener('click', async e => {
     const b = e.target.closest('[data-share]'); if(!b) return;
     const act = b.dataset.share;
     if(act === 'close') return closeShareSheet();
     if(act === 'link') return shareCurrent(sub.title, sub.link);
+    if(act === 'clip'){
+      if(!clip) return;
+      try{
+        if(navigator.canShare && navigator.canShare({ files:[clip] })){ await navigator.share({ files:[clip], title:sub.title, text:sub.link }); return; }
+      }catch(err){ if(err && err.name === 'AbortError') return; }
+      return saveShareBlob(clip, clip.name, en ? 'Clip saved' : 'บันทึกคลิปแล้ว');
+    }
     if(act === 'cat'){
       if(b.dataset.cat === sub.cat) return;
       sub.cat = b.dataset.cat; sub.file = `48thdb-stats-${sub.cat}`;
@@ -15068,12 +15089,12 @@ async function openShareSheet(given){
   };
   paint();
 }
-function saveShareBlob(blob, name){
+function saveShareBlob(blob, name, said){
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  toast(isEN() ? 'Image saved' : 'บันทึกรูปแล้ว');
+  toast(said || (isEN() ? 'Image saved' : 'บันทึกรูปแล้ว'));
 }
 function closeShareSheet(){
   document.querySelectorAll('.share-sheet').forEach(x => x.remove());

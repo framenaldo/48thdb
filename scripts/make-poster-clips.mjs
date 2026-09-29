@@ -6,6 +6,9 @@
  *
  * Needs the site served locally (port 8823), Chrome and ffmpeg (brew install ffmpeg).
  *   node scripts/make-poster-clips.mjs <out dir> [id ...]      (no ids: all 58)
+ * For the copies the site serves (posters/ge2026/clips/<id>.mp4, shared from the
+ * poster viewer) name them by id and squeeze them a little:
+ *   NAMES=id CRF=26 node scripts/make-poster-clips.mjs posters/ge2026/clips
  */
 import { spawn } from 'node:child_process';
 import { mkdtempSync, mkdirSync } from 'node:fs';
@@ -16,7 +19,7 @@ const OUT = process.argv[2];
 if(!OUT){ console.error('usage: make-poster-clips.mjs <out dir> [id ...]'); process.exit(1); }
 const SITE = process.env.SITE || 'http://localhost:8823/';
 const FFMPEG = process.env.FFMPEG || '/opt/homebrew/bin/ffmpeg';
-const FPS = 30, SECONDS = 7;
+const FPS = 30, SECONDS = 7, CRF = process.env.CRF || '18', BY_ID = process.env.NAMES === 'id';
 const PORT = 9566, sleep = ms => new Promise(r => setTimeout(r, ms));
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', '--disable-gpu',
   `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'cdp-'))}`, 'about:blank'], { stdio: 'ignore' });
@@ -69,9 +72,9 @@ const ids = process.argv.slice(3).length ? process.argv.slice(3) : await run('GE
 mkdirSync(OUT, { recursive: true });
 for(const id of ids){
   const label = await run(`_clip(${JSON.stringify(id)})`);
-  const file = join(OUT, `${label}.mp4`);
+  const file = join(OUT, `${BY_ID ? id : label}.mp4`);
   const ff = spawn(FFMPEG, ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'slow', '-movflags', '+faststart', file], { stdio: ['pipe', 'inherit', 'inherit'] });
+    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', CRF, '-preset', 'slow', '-movflags', '+faststart', file], { stdio: ['pipe', 'inherit', 'inherit'] });
   for(let f = 0; f < FPS * SECONDS; f++){
     const url = await run(`_frame(${f / FPS})`);
     if(!ff.stdin.write(Buffer.from(url.slice(url.indexOf(',') + 1), 'base64'))) await new Promise(r => ff.stdin.once('drain', r));

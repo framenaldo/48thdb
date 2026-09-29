@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v11';
+const VERSION = 'v12';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
@@ -106,6 +106,8 @@ self.addEventListener('fetch', (event) => {
     // those would be a new cache entry that nothing ever asks for again, so
     // these go straight to the network and are never stored.
     if (/\/data\/(live-now|iam-live)\.json$/.test(url.pathname)) return;
+    // the poster clips are fetched once, to be shared; a phone need not keep them
+    if (url.pathname.endsWith('.mp4')) return;
     // the rest of data/ is rebuilt daily; yesterday's copy is only for when there is no network
     if (url.pathname.includes('/data/')) { event.respondWith(dataFirst(request)); return; }
     event.respondWith(assetFresh(request));
