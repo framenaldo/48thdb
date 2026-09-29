@@ -227,6 +227,17 @@ DTSTART;TZID=Asia/Bangkok:20260924T180000
 DTEND;TZID=Asia/Bangkok:20260924T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-live-0929-2026-09-29@48thdb
+DTSTAMP:20260929T000000Z
+SUMMARY:CGM48 11th Single "Koi Tsunjatta – Let me know!" Pop Up Live
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Valentine\, Lookked\, Nana\, Else\n\n
+ https://48thdb.com/?e=ev-cgm48-popup-live-0929
+URL:https://48thdb.com/?e=ev-cgm48-popup-live-0929
+DTSTART;TZID=Asia/Bangkok:20260929T180000
+DTEND;TZID=Asia/Bangkok:20260929T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:ยกเลิก: CGM48 11th Single "Koi Tsunjatta – Let me kno
