@@ -1716,6 +1716,22 @@
     align-self:flex-start; white-space:nowrap;
   }
   .ev-body{ min-width:0; flex:1; }
+  /* The poster on the card, beside the text on the right, whole and in its own
+     shape; the members then run across the full width underneath. */
+  .ev-card.has-poster{ flex-wrap:wrap; }
+  .ev-card.has-poster .ev-poster{ order:2; flex:none; width:92px; align-self:flex-start; border-radius:10px; overflow:hidden;
+    box-shadow:0 3px 10px rgba(var(--shadow-rgb),.18); }
+  .ev-poster-bg{ display:none; }
+  .ev-poster-img{ display:block; width:100%; height:auto; }
+  .ev-card.has-poster .ev-body{ flex:1 1 0; }
+  .ev-foot{ order:3; flex:1 0 100%; min-width:0; padding-top:10px; border-top:1px solid color-mix(in srgb, var(--ink-soft) 16%, transparent); }
+  .ev-foot .ev-people{ margin-top:0; }
+  @media (min-width:640px){ .ev-card.has-poster .ev-poster{ width:120px; } }
+  /* the whole group at once */
+  .ev-all{ display:inline-flex; align-items:center; padding:4px 11px; border-radius:999px; font-size:11.5px; font-weight:800;
+    letter-spacing:.02em; color:#fff; background:var(--c); box-shadow:0 2px 0 rgba(0,0,0,.12); white-space:nowrap; }
+  .ev-all.is-everyone{ background:linear-gradient(110deg, #E4457E, #2E8C82); }
+  .ev-people.is-alls{ margin:0 0 8px; }
   .ev-title{ margin:0; font-size:16px; font-weight:800; line-height:1.32; letter-spacing:-.01em; }
   .ev-tag{
     display:inline-block; font-size:9.5px; font-weight:800; letter-spacing:.06em;
@@ -8947,11 +8963,17 @@ function renderEventCard(ev, todayIso){
     : (people.length ? getGroup(people[0].groupId).color : 'var(--ink-soft)');
   const theme = ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : '';
   const hasMore = eventHasMore(ev);
-  const shown = people.slice(0, 6);
-  const rest = people.length - shown.length;
+  // the poster itself, from a small copy (scripts/make-event-thumbs.sh); the original opens in the sheet
+  const img = ev.poster && ev.poster.img;
+  const poster = img ? `<div class="ev-poster" aria-hidden="true">
+      <img class="ev-poster-bg" src="${escapeAttr(evThumb(img))}" alt="" loading="lazy" decoding="async">
+      <img class="ev-poster-img" src="${escapeAttr(evThumb(img))}" alt="" loading="lazy" decoding="async"
+        width="${ev.poster.w || 1200}" height="${ev.poster.h || 1200}" onerror="this.onerror=null;this.src='${escapeAttr(img)}'">
+    </div>` : '';
   return `
-  <article class="ev-card${isNow?' is-now':''}${ev.cancelled?' is-cancelled':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}" style="--c:${accent}${theme}"
+  <article class="ev-card${isNow?' is-now':''}${ev.cancelled?' is-cancelled':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}${img?' has-poster':''}" style="--c:${accent}${theme}"
     ${hasMore ? `data-action="open-event" data-id="${ev.id}"` : ''}>
+    ${poster}
     <div class="ev-date">
       <span class="ev-d">${eventDateLabel(ev)}</span>
       ${ev.time ? `<span class="ev-time">${ev.time}</span>` : ''}
@@ -8966,16 +8988,47 @@ function renderEventCard(ev, todayIso){
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
         groupTag(g)).join('')}</div>` : ''}
       ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
-      ${shown.length ? `<div class="ev-people">${shown.map(m=>{
-        const g = getGroup(m.groupId);
-        return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
-          data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name)}">
-          ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span>
-        </button>`; }).join('')}${rest>0?`<span class="ev-more-people">+${rest}</span>`:''}</div>` : ''}
+      ${img ? '' : renderEventPeople(people, 6)}
+      ${!img && mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
+      ${(!img || !people.length) && hasMore ? `<p class="ev-open">ดูรายละเอียด</p>` : ''}
+    </div>
+    ${img && people.length ? `<div class="ev-foot">
+      ${renderEventPeople(people, 8)}
       ${mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
       ${hasMore ? `<p class="ev-open">ดูรายละเอียด</p>` : ''}
-    </div>
+    </div>` : ''}
   </article>`;
+}
+
+const evThumb = src => String(src).replace(/\.\w+$/, '-s.jpg');
+
+/* A line-up that is every current member, or every current member of one
+   group, is named as such (owner's rule) instead of 58 faces: "All Members",
+   "All BNK48 Members", "All CGM48 Members". Anyone else on the bill still
+   gets a chip. */
+function lineupGroups(ids){
+  const set = new Set(ids), act = activeMembers();
+  const whole = GROUPS.filter(g => { const gm = act.filter(m => m.groupId === g.id); return gm.length && gm.every(m => set.has(m.id)); });
+  if(!whole.length) return { whole: [], all: false, rest: ids };
+  const inWhole = new Set(act.filter(m => whole.some(g => g.id === m.groupId)).map(m => m.id));
+  return { whole, all: whole.length === GROUPS.length, rest: ids.filter(id => !inWhole.has(id)) };
+}
+function renderLineupPills(L){
+  if(L.all) return `<span class="ev-all is-everyone">All Members</span>`;
+  return L.whole.map(g => `<span class="ev-all" style="--c:${g.color}">All ${escapeHtml(g.name)} Members</span>`).join('');
+}
+/* The member row of a card: the whole-group pills, then chips, oshi first, up to max. */
+function renderEventPeople(people, max, cls){
+  if(!people.length) return '';
+  const L = lineupGroups(people.map(m => m.id));
+  const rest = people.filter(m => L.rest.includes(m.id));
+  const shown = rest.slice(0, max), more = rest.length - shown.length;
+  return `<div class="ev-people${cls ? ' ' + cls : ''}">${renderLineupPills(L)}${shown.map(m => {
+    const g = getGroup(m.groupId);
+    return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
+      data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name)}">
+      ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span>
+    </button>`; }).join('')}${more > 0 ? `<span class="ev-more-people">+${more}</span>` : ''}</div>`;
 }
 
 /* Today's events, as the first thing under the date: the whole poster where
@@ -9005,8 +9058,6 @@ function renderTodayHero(ev, todayIso){
     : rota.today.length > 3 ? `${rota.today[0].time}–${rota.today[rota.today.length - 1].until}`
     : rota.today.map(s => `${s.time}–${s.until}`).join(', ');
   if(rota && rota.current) people.sort((a, b) => rota.current.members.includes(b.id) - rota.current.members.includes(a.id));
-  const shown = people.slice(0, 8);
-  const rest = people.length - shown.length;
   const open = eventHasMore(ev);
   return `
   <article class="today-hero${open ? ' is-openable' : ''}${ev.poster ? ' is-themed' : ''}" style="--c:${accent}${ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : ''}"
@@ -9021,12 +9072,7 @@ function renderTodayHero(ev, todayIso){
     </div>` : (ev.theme === 'birthday' ? `<div class="today-hero-band">${renderBirthdayBanner(ev)}</div>` : '')}
     <div class="today-hero-body today-hero-foot">
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g => groupTag(g)).join('')}</div>` : ''}
-      ${shown.length ? `<div class="ev-people">${shown.map(m => {
-        const g = getGroup(m.groupId);
-        return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
-          data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name)}">
-          ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span>
-        </button>`; }).join('')}${rest > 0 ? `<span class="ev-more-people">+${rest}</span>` : ''}</div>` : ''}
+      ${renderEventPeople(people, 8)}
       ${open ? `<p class="today-hero-open">ดูรายละเอียด</p>` : ''}
     </div>
   </article>`;
@@ -10986,6 +11032,7 @@ function renderEventModal(){
 
         ${people.length ? `
         <h3 class="evm-head">สมาชิกที่ร่วมงาน · ${people.length} คน</h3>
+        ${(() => { const L = lineupGroups(people.map(m => m.id)); return L.whole.length ? `<div class="ev-people is-alls">${renderLineupPills(L)}</div>` : ''; })()}
         ${mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
         <div class="ev-people">${people.map(m=>{
           const g = getGroup(m.groupId);
