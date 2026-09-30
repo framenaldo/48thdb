@@ -24,6 +24,10 @@ the Firebase CLI from the owner's machine.
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.
+- An event poster (`poster.img`) shows on its card from a small copy,
+  `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one.
+  A line-up of every current member (or a whole group) prints as "All Members"
+  / "All BNK48 Members" / "All CGM48 Members" by itself — still list the ids.
 - Three languages: `EN/TH` (mix, the default), TH and EN. New Thai UI strings
   need an entry in the `EN` table.
 - Member photos: files under `photos/<member id>.jpg`, about 400×400. Older
@@ -87,6 +91,7 @@ clear browser data.
 ## Before you say it works
 
 Serve the folder (`.claude/launch.json` starts a static server on port 8823) and
-open `/?sw=off`. Walk every view in all three languages, plus a member sheet and
+open `/?sw=off`. `node .claude/check-site.mjs` walks every view in three languages,
+the sheets and the 3D poster headlessly and reports page errors. Walk every view in all three languages, plus a member sheet and
 an event sheet, and check the console is clean. Take a screenshot for anything
 visual — the owner reviews on a phone, so check it at phone width.
