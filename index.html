@@ -10849,10 +10849,13 @@ function renderBoothPlan(ev, opts = {}){
   // On the day the board follows the clock — today, this hour — until someone
   // picks another day or hour. A freshly drawn board starts following again.
   const now = ffNow();
-  if(!document.querySelector(bare ? '.ff[data-ff-bare]' : '.modal-scroll .ff')){ state.ffFollow = !state.ffHold; state.ffHold = false; }
-  if(!bare && state.ffScroll){ state.ffScroll = false;    // arrived by a shared link: straight to the board
+  // (a shared plan holds its day and hour until someone picks another, or the sheet closes)
+  if(!document.querySelector(bare ? '.ff[data-ff-bare]' : '.modal-scroll .ff')) state.ffFollow = !state.ffHold;
+  // arrived by a shared link: straight to the board — again after any redraw
+  // in the first seconds (Firebase catching up redraws the sheet from the top)
+  if(!bare && state.ffScrollUntil && Date.now() < state.ffScrollUntil)
     setTimeout(() => { const b = document.querySelector('.modal-scroll .ff-board'), sc = b && b.closest('.modal-scroll');
-      if(b && sc) sc.scrollTop += b.getBoundingClientRect().top - sc.getBoundingClientRect().top - 10; }, 120); }
+      if(b && sc) sc.scrollTop += b.getBoundingClientRect().top - sc.getBoundingClientRect().top - 10; }, 120);
   if(now && state.ffFollow){ state.ffDay = now.di; state.ffSlot = now.si >= 0 ? now.si : null; }
   _ffLiveKey = now ? `${now.di}.${now.si}.${now.before}.${now.after}` : '';
   const today = now && now.di === state.ffDay ? now : null;
@@ -13854,7 +13857,8 @@ function applyUrlToState(){
     // a shared booth plan: that day and hour, held there rather than following the clock
     const ff = /^(\d)(?:\.(\d+))?$/.exec(p.get('ff') || '');
     if(ff && FF_DAYS[+ff[1]]){ state.ffTab = 'plan'; state.ffDay = +ff[1];
-      state.ffSlot = ff[2] != null && FF_DAYS[+ff[1]].slots[+ff[2]] ? +ff[2] : null; state.ffHold = true; state.ffScroll = true; }
+      state.ffSlot = ff[2] != null && FF_DAYS[+ff[1]].slots[+ff[2]] ? +ff[2] : null;
+      state.ffHold = true; state.ffScrollUntil = Date.now() + 6000; }
     return;
   }
   if(mem && (state.members||[]).some(x => x.id === mem)){
@@ -15658,11 +15662,11 @@ function bindDelegatedEvents(){
       box.querySelectorAll('[data-slot-day]').forEach(t => { t.hidden = t.dataset.slotDay !== state.slotDay; });
     }
     else if(action==='ff-day'){
-      state.ffDay = +el.dataset.value; state.ffSlot = null; state.ffFollow = false; ffPaint();
+      state.ffDay = +el.dataset.value; state.ffSlot = null; state.ffFollow = false; state.ffHold = false; state.ffScrollUntil = 0; ffPaint();
     }
     else if(action==='ff-slot'){
       const i = +el.dataset.value;
-      state.ffSlot = state.ffSlot === i ? null : i; state.ffFollow = false;
+      state.ffSlot = state.ffSlot === i ? null : i; state.ffFollow = false; state.ffHold = false; state.ffScrollUntil = 0;
       ffPaint();
     }
     else if(action==='ff-booth'){
@@ -15672,7 +15676,7 @@ function bindDelegatedEvents(){
     else if(action==='ff-oshi'){
       state.ffOshi = el.dataset.value === '1'; state.ffPick = null; state.ffWho = null; ffPaint();
     }
-    else if(action==='ff-live'){ state.ffFollow = true; ffPaint(); }
+    else if(action==='ff-live'){ state.ffFollow = true; state.ffHold = false; ffPaint(); }
     else if(action==='ff-tab'){
       state.ffTab = el.dataset.value; ffPaint();
     }
@@ -15796,6 +15800,7 @@ function bindDelegatedEvents(){
       const insideCard = e.target.closest('.modal-glass-card');
       const onCloseBtn = e.target.closest('.modal-close-btn');
       if(insideCard && !onCloseBtn) return;
+      state.ffHold = false; state.ffScrollUntil = 0;
       goBack(()=>{ state.selectedId = null; state.selectedEvent = null; state.dayOf = null; });
     }
     else if(action==='filter-to'){
