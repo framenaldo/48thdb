@@ -10849,7 +10849,10 @@ function renderBoothPlan(ev, opts = {}){
   // On the day the board follows the clock — today, this hour — until someone
   // picks another day or hour. A freshly drawn board starts following again.
   const now = ffNow();
-  if(!document.querySelector(bare ? '.ff[data-ff-bare]' : '.modal-scroll .ff')) state.ffFollow = true;
+  if(!document.querySelector(bare ? '.ff[data-ff-bare]' : '.modal-scroll .ff')){ state.ffFollow = !state.ffHold; state.ffHold = false; }
+  if(!bare && state.ffScroll){ state.ffScroll = false;    // arrived by a shared link: straight to the board
+    setTimeout(() => { const b = document.querySelector('.modal-scroll .ff-board'), sc = b && b.closest('.modal-scroll');
+      if(b && sc) sc.scrollTop += b.getBoundingClientRect().top - sc.getBoundingClientRect().top - 10; }, 120); }
   if(now && state.ffFollow){ state.ffDay = now.di; state.ffSlot = now.si >= 0 ? now.si : null; }
   _ffLiveKey = now ? `${now.di}.${now.si}.${now.before}.${now.after}` : '';
   const today = now && now.di === state.ffDay ? now : null;
@@ -13846,7 +13849,14 @@ function applyUrlToState(){
     state.posterOf = 'ge:' + pst; state.geClip = false; return;
   }
 
-  if(ev && SEED_SCHEDULE.some(x => x.id === ev)){ state.view='feed'; state.selectedEvent=ev; return; }
+  if(ev && SEED_SCHEDULE.some(x => x.id === ev)){
+    state.view='feed'; state.selectedEvent=ev;
+    // a shared booth plan: that day and hour, held there rather than following the clock
+    const ff = /^(\d)(?:\.(\d+))?$/.exec(p.get('ff') || '');
+    if(ff && FF_DAYS[+ff[1]]){ state.ffTab = 'plan'; state.ffDay = +ff[1];
+      state.ffSlot = ff[2] != null && FF_DAYS[+ff[1]].slots[+ff[2]] ? +ff[2] : null; state.ffHold = true; state.ffScroll = true; }
+    return;
+  }
   if(mem && (state.members||[]).some(x => x.id === mem)){
     const m = getMember(mem);
     state.view = 'browse';
@@ -14383,6 +14393,92 @@ function gp3Scene(g, t, o){
   g.drawImage(layer, 0, 0);
   return G;
 }
+/* The booth plan as a picture: the hall for the day and hour on screen, the
+   stage and the booths being visited lit with faces, and beside it everyone's
+   whereabouts that hour. With no hour picked it is the plan and the booth list. */
+async function drawFFPlanCard(g, sub){
+  const en = isEN(), day = FF_DAYS[sub.day], slot = sub.slot != null ? day.slots[sub.slot] : null;
+  const W = SHARE_W, H = SHARE_H, D = parseYmd(day.date), M = monthsShort();
+  const dayWords = en ? `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][D.getDay()]} ${D.getDate()} ${M[D.getMonth()]}`
+    : `วัน${['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'][D.getDay()]} ${D.getDate()} ${M[D.getMonth()]}`;
+  g.fillStyle = '#17121A'; g.fillRect(0, 0, W, H);
+  shareGlow(g, 240, 160, 520, '#B3121E', .28);
+  shareText(g, 'BNK48 & CGM48 FAN FESTIVAL 2026', 60, 88, '800 26px "Noto Sans Thai", sans-serif', '#FF8A93');
+  shareText(g, `${en ? 'Booth plan' : 'ผังบูธ'} · ${dayWords}${slot ? ` · ${slot.t}–${slot.to}` : ''}`, 60, 140, '800 44px "Noto Sans Thai", sans-serif', '#ffffff');
+
+  // the hall, in the proportions of the one on the page
+  const hx = 60, hy = 180, hh = 990, hw = Math.round(hh * .54);
+  g.fillStyle = '#231B22'; shareRound(g, hx, hy, hw, hh, 22); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,.1)'; g.lineWidth = 2; g.stroke();
+  const at = n => [hx + FF_AT[n][0] / 100 * hw, hy + FF_AT[n][1] / 100 * hh];
+  const lit = new Set(slot ? slot.booth || [] : []);
+  const faces = {};
+  await Promise.all([...(slot ? [...(slot.stage || []), ...(slot.booth || [])] : [])].map(async id => {
+    const m = getMember(id); if(m) faces[id] = await shareLoad(m.photo); }));
+  // doors on the left wall
+  [['39', en ? 'In' : 'ทางเข้า', '#3CC4A5'], ['50', en ? 'Out' : 'ทางออก', '#F08A4B']].forEach(([y, t, c]) => {
+    const yy = hy + +y / 100 * hh; g.fillStyle = c; g.fillRect(hx - 3, yy - 20, 6, 40);
+    shareText(g, t, hx + 14, yy + 7, '700 17px "Noto Sans Thai", sans-serif', c); });
+  // every booth: a quiet numbered tile; the ones visited this hour, her face
+  const tile = 34;
+  FF_BOOTHS.forEach((id, i) => { const n = i + 1, m = getMember(id); if(!m || lit.has(id)) return;
+    const [x, y] = at(n), c = (getGroup(m.groupId) || {}).color || '#888';
+    g.fillStyle = shareMix(c, .78, '#231B22'); shareRound(g, x - tile / 2, y - tile / 2, tile, tile, 7); g.fill();
+    g.fillStyle = shareMix(c, .35, '#231B22'); g.font = '800 15px "Noto Sans Thai", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(String(n), x, y + 1); g.textAlign = 'left'; g.textBaseline = 'alphabetic'; });
+  FF_BOOTHS.forEach((id, i) => { if(!lit.has(id)) return; const n = i + 1, m = getMember(id); if(!m) return;
+    const [x, y] = at(n), c = (getGroup(m.groupId) || {}).color || '#888', big = 70;
+    g.save(); g.shadowColor = 'rgba(255,196,80,.55)'; g.shadowBlur = 18; g.fillStyle = '#F2B84B';
+    shareRound(g, x - big / 2 - 4, y - big / 2 - 4, big + 8, big + 8, 12); g.fill(); g.restore();
+    g.save(); shareRound(g, x - big / 2, y - big / 2, big, big, 9); g.clip();
+    if(faces[id]) shareCover(g, faces[id], x - big / 2, y - big / 2, big, big); else { g.fillStyle = c; g.fillRect(x - big / 2, y - big / 2, big, big); }
+    g.restore();
+    g.fillStyle = '#F2B84B'; shareRound(g, x - big / 2 - 10, y - big / 2 - 12, 34, 26, 7); g.fill();
+    shareText(g, String(n), x - big / 2 + 7, y - big / 2 + 7, '800 17px "Noto Sans Thai", sans-serif', '#2A1E08', 'center');
+    g.font = '800 17px "Noto Sans Thai", sans-serif'; const nw = g.measureText(m.name).width + 16;
+    g.fillStyle = 'rgba(20,14,18,.92)'; shareRound(g, x - nw / 2, y + big / 2 + 6, nw, 28, 8); g.fill();
+    shareText(g, m.name, x, y + big / 2 + 26, '800 17px "Noto Sans Thai", sans-serif', '#fff', 'center'); });
+  // the stage across the top, with whoever is on it
+  const sx = hx + hw * .2, sw = hw * .6, sy = hy + hh * .016, onStage = slot ? (slot.stage || []) : [];
+  const sh = onStage.length ? 118 : 54;
+  g.fillStyle = '#0B080B'; shareRound(g, sx, sy, sw, sh, 12); g.fill();
+  g.strokeStyle = onStage.length ? '#D8243A' : 'rgba(255,255,255,.15)'; g.lineWidth = 3; g.stroke();
+  shareText(g, en ? 'STAGE' : 'เวที', sx + sw / 2, sy + 30, '800 20px "Noto Sans Thai", sans-serif', '#fff', 'center');
+  if(onStage.length){ const f = Math.min(56, (sw - 16) / onStage.length - 8), gap = (sw - f * onStage.length) / (onStage.length + 1);
+    onStage.forEach((id, k) => { const m = getMember(id); if(!m) return; const x = sx + gap + k * (f + gap), y = sy + 40;
+      g.save(); shareRound(g, x, y, f, f, 8); g.clip(); if(faces[id]) shareCover(g, faces[id], x, y, f, f);
+      else { g.fillStyle = (getGroup(m.groupId) || {}).color || '#888'; g.fillRect(x, y, f, f); } g.restore();
+      g.font = '700 13px "Noto Sans Thai", sans-serif'; let nm = m.name; while(g.measureText(nm).width > f + gap - 4 && nm.length > 3) nm = nm.slice(0, -1);
+      shareText(g, nm === m.name ? nm : nm + '…', x + f / 2, y + f + 16, '700 13px "Noto Sans Thai", sans-serif', '#fff', 'center'); }); }
+
+  // beside the hall: who is where this hour, or with no hour, whose booth is which
+  const cx = hx + hw + 34, cw = W - 60 - cx;
+  let y = hy + 10;
+  if(slot){
+    const acts = FF_MENU.map(k => FF_ACTS.find(a => a.k === k)).filter(a => (slot[a.k] || []).length);
+    const names = acts.reduce((n, a) => n + slot[a.k].length, 0);
+    const rh = Math.min(32, (hh - 20 - acts.length * 66) / Math.max(1, names)), fs = Math.min(22, rh - 6);
+    acts.forEach(a => {
+      g.fillStyle = a.c; shareRound(g, cx, y, cw, 38, 10); g.fill();
+      shareText(g, en ? a.en : a.th, cx + 14, y + 27, '800 21px "Noto Sans Thai", sans-serif', '#fff');
+      y += 52;
+      slot[a.k].forEach(id => { const m = getMember(id); if(!m) return;
+        shareText(g, m.name, cx + 8, y + fs - 4, `700 ${fs}px "Noto Sans Thai", sans-serif`, 'rgba(255,255,255,.92)');
+        if(a.k === 'booth') shareText(g, `${en ? 'booth' : 'บูธ'} ${ffBoothOf(id)}`, cx + cw - 6, y + fs - 4, `700 ${fs - 3}px "Noto Sans Thai", sans-serif`, '#F2B84B', 'right');
+        y += rh; });
+      y += 14; });
+  } else {
+    shareText(g, en ? 'Whose booth is which' : 'บูธของใคร', cx, y + 26, '800 24px "Noto Sans Thai", sans-serif', '#fff');
+    y += 50;
+    const rows = Math.ceil(FF_BOOTHS.length / 2), colW = cw / 2, rowH = Math.min(30, (hy + hh - y) / rows);
+    FF_BOOTHS.forEach((id, i) => { const m = getMember(id); if(!m) return; const col = Math.floor(i / rows), r = i % rows;
+      const x = cx + col * colW, yy = y + r * rowH + 18;
+      shareText(g, String(i + 1), x + 26, yy, '800 16px "Noto Sans Thai", sans-serif', '#F2B84B', 'right');
+      shareText(g, m.name, x + 34, yy, '600 16px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.88)'); });
+  }
+  await shareFooter(g, true, sub.url);
+}
+
 /* The card shared from the poster viewer: her poster at the angle it was left at */
 async function drawPosterCard(g, sub){
   const en = isEN(), m = sub.m, grp = getGroup(m.groupId) || {}, team = getTeam(m.teamId);
@@ -15027,6 +15123,13 @@ function shareSubject(){
   const m = state.selectedId ? getMember(state.selectedId) : null;
   const ev = state.selectedEvent ? SEED_SCHEDULE.find(x => x.id === state.selectedEvent) : null;
   if(m) return { kind:'member', m, url, title:`${nickName(m)} — 48thDb`, file:`48thdb-${m.name || m.id}` };
+  // the festival sheet on its booth plan shares the plan itself, for the day and hour on screen
+  if(ev && ev.boothPlan === 'fanfest' && state.ffTab !== 'acts' && document.querySelector('.modal-scroll .ff-board')){
+    const d = FF_DAYS[state.ffDay] ? state.ffDay : 0, sl = FF_DAYS[d].slots[state.ffSlot] ? state.ffSlot : null;
+    const link = `${location.origin}/?e=${ev.id}&ff=${d}${sl != null ? '.' + sl : ''}`;
+    return { kind:'ffplan', ev, day:d, slot:sl, url:link, link, title:`ผังบูธ Fan Festival — 48thDb`,
+      file:`48thdb-fanfest-${FF_DAYS[d].date}${sl != null ? '-' + FF_DAYS[d].slots[sl].t.replace(':', '') : ''}` };
+  }
   if(ev) return { kind:'event', ev, url, title:`${ev.title} — 48thDb`, file:`48thdb-${ev.id}` };
   if(state.view === 'single' && state.selectedSingle){ const s = findWork(state.selectedSingle);
     if(s) return { kind:'single', s, url, title:`${s.title} — 48thDb`, file:`48thdb-${s.id}` }; }
@@ -15134,6 +15237,7 @@ async function buildShareCard(sub){
   else if(sub.kind === 'milestone') await drawMilestoneCard(g, sub);
   else if(sub.kind === 'ge') await drawGECard(g, sub.url);
   else if(sub.kind === 'poster') await drawPosterCard(g, sub);
+  else if(sub.kind === 'ffplan') await drawFFPlanCard(g, sub);
   else if(sub.kind === 'stats') await ({ lives: drawStatsLivesCard, songs: drawStatsSongsCard, birthdays: drawStatsBirthdaysCard,
       timeline: drawStatsTimelineCard }[sub.cat] || drawStatsCard)(g, sub.url);
   else if(sub.kind === 'today') await drawTodayCard(g, sub.url);
