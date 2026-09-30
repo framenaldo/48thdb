@@ -338,7 +338,7 @@
   .sheet-body{ display:flex; flex-direction:column; }
   .sec-stats{ order:1; } .sec-history{ order:2; } .sec-events{ order:3; } .sec-lives{ order:3; } .sec-works{ order:4; } .sec-facts{ order:5; } .sec-actions{ order:6; }
   .feed-main, .feed-side{ display:contents; }
-  .today-hero-block{ order:1; } .is-over-today{ order:1; } .is-periods{ order:2; } .is-bday-today{ order:3; }
+  .today-hero-block{ order:1; } .is-fflive{ order:1; } .is-over-today{ order:1; } .is-periods{ order:2; } .is-bday-today{ order:3; }
   .is-bday-next{ order:4; } .is-schedule{ order:5; } .is-otd{ order:6; } .is-calendar{ order:6; } .is-past{ order:7; }
 
 
@@ -2659,6 +2659,36 @@
     background:var(--paper-dim); }
   .ff-board .ff-none{ background:rgba(255,255,255,.06); color:#B9ABB3; }
   /* the activities tab: the organiser's timetable */
+  /* on the day: the box that says what is happening this hour */
+  .ff-live{ margin:0 0 12px; padding:11px 12px 12px; border-radius:16px; background:var(--card); border:1.5px solid var(--line);
+    box-shadow:0 3px 0 rgba(var(--shadow-rgb),.07); }
+  .ff-live.is-on{ border-color:color-mix(in srgb, #E02118 45%, var(--line)); }
+  .ff-live-head{ display:flex; align-items:center; flex-wrap:wrap; gap:4px 9px; font-size:14px; }
+  .ff-live-head b{ font-weight:800; }
+  .ff-live-head > span:not(.ff-live-dot){ font-size:12px; color:var(--ink-soft); font-weight:700; }
+  .ff-live-dot{ width:9px; height:9px; border-radius:50%; background:var(--ink-soft); flex:none; }
+  .ff-live.is-on .ff-live-dot{ background:#E02118; animation:live-flash 1.2s ease-in-out infinite; }
+  .ff-live-back{ margin-left:auto; border:0; border-radius:99px; padding:5px 11px; font:inherit; font-size:11.5px; font-weight:800; cursor:pointer;
+    background:#E02118; color:#fff; box-shadow:0 2px 0 rgba(0,0,0,.18); }
+  .ff-live-back:active{ transform:translateY(2px); box-shadow:none; }
+  .ff-live-rows{ display:flex; flex-direction:column; gap:7px; margin-top:10px; }
+  .ff-live-row{ display:flex; gap:9px; align-items:flex-start; }
+  .ff-live-lab{ flex:none; width:92px; padding:3px 8px; border-radius:8px; background:var(--a); color:#fff; font-size:11px; font-weight:800; text-align:center; line-height:1.35; }
+  .ff-live-ppl{ display:flex; flex-wrap:wrap; gap:4px 10px; min-width:0; }
+  .ff-live-p{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; white-space:nowrap; }
+  .ff-live-next{ margin:10px 0 0; padding-top:8px; border-top:1px dashed var(--line); font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .is-fflive .ff-live{ margin-bottom:10px; }
+  .ff-top .ff-live-back{ margin-left:8px; }
+  .ff-feed-btn{ display:block; width:100%; border:0; border-radius:99px; padding:12px 16px; background:#B3121E; color:#fff;
+    font:inherit; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 0 rgba(0,0,0,.2); transition:transform .12s, box-shadow .12s; }
+  .ff-feed-btn:active{ transform:translateY(2px); box-shadow:none; }
+  .ff-tt tr.is-now td{ background:color-mix(in srgb, #E02118 9%, var(--card)); }
+  .ff-tt tr.is-now td.ff-tt-t{ box-shadow:inset 4px 0 0 #E02118; }
+  .ff-tt tr.is-past td:not(.ff-tt-t){ opacity:.42; }
+  .ff-tt-now{ display:block; width:max-content; margin:0 0 3px; padding:1px 6px; border-radius:99px; background:#E02118; color:#fff;
+    font-size:9.5px; font-weight:800; letter-spacing:.03em; }
+  .ff-days button.is-today::after, .ff-times button.is-now::after{ content:''; display:inline-block; width:6px; height:6px; margin-left:5px;
+    border-radius:50%; background:#E02118; vertical-align:2px; }
   .ff-tt-wrap{ overflow-x:auto; border:1.5px solid var(--line); border-radius:16px; background:var(--card);
     box-shadow:0 3px 0 rgba(var(--shadow-rgb),.05); }
   .ff-tt{ border-collapse:separate; border-spacing:0; font-size:11.5px; }
@@ -6095,6 +6125,8 @@ const EN = {
   'จบแล้ว': 'Over',
   'ดูย้อนหลัง': 'Replay',
   'LIVE · ดูไลฟ์': 'LIVE · Watch',
+  'ตอนนี้ที่ Fan Festival': 'At the Fan Festival now',
+  'ดูผังบูธ': 'See the booth plan',
   'อยู่ที่บูธตอนนี้': 'At the booth now',
   'รอบวันนี้จบแล้ว': "Today's turn is over",
   'ตารางสมาชิกประจำบูธ': 'Who is at the booth',
@@ -8869,6 +8901,7 @@ function startsPill(cls, ev, iso, at){
 let _feedLiveKey = null;
 function tickClock(){
   syncTicker();
+  ffLiveTick();
   document.querySelectorAll('[data-starts-at]').forEach(el=>{
     const end = Number(el.dataset.endsAt) || 0;
     el.textContent = startsLabel(Number(el.dataset.startsAt), end);
@@ -10729,14 +10762,106 @@ function ffHours(id){
 /* the activities tab lists them in the organiser's order */
 const FF_MENU = ['stage', 'booth', 'hitouch', 'hachi', 'merch'];
 
-function renderBoothPlan(ev){
-  const en = isEN();
+/* Where the festival is right now, in Thai time: which of FF_DAYS, and which
+   hour of it (si), or before the first / after the last. (__ffNow lets a test
+   pretend it is the day.) */
+const ffClock = () => window.__ffNow ? new Date(window.__ffNow) : new Date();
+function ffNow(){
+  const th = new Date(ffClock().getTime() + 7 * 3600000).toISOString();
+  const iso = th.slice(0, 10), hm = th.slice(11, 16);
+  const di = FF_DAYS.findIndex(d => d.date === iso);
+  if(di < 0) return null;
+  const slots = FF_DAYS[di].slots;
+  return { di, hm, si: slots.findIndex(x => hm >= x.t && hm < x.to), next: slots.findIndex(x => x.t > hm),
+    before: hm < slots[0].t, after: hm >= slots[slots.length - 1].to };
+}
+const ffMins = (from, to) => { const m = s => +s.slice(0, 2) * 60 + +s.slice(3, 5); return m(to) - m(from); };
+let _ffLiveKey = '';
+/* On the day: what is happening this hour, activity by activity, and who is on stage next */
+function ffLivePanel(now, keep, en, away, onFeed){
+  if(!now) return '';
+  const slots = FF_DAYS[now.di].slots, lab = a => en ? a.en : a.th;
+  const people = ids => (ids || []).filter(keep).map(id => { const m = getMember(id); if(!m) return '';
+    return `<span class="ff-live-p">${renderAvatar(m, 'avatar-sm ff-chip-face', (getGroup(m.groupId) || {}).color)}${escapeHtml(m.name)}</span>`; }).join('');
+  // on the booth plan the board already shows the stage and the booths, so the box keeps to the rest
+  const rows = sl => FF_MENU.map(k => FF_ACTS.find(a => a.k === k)).filter(a => (!away || !a.plan) && (sl[a.k] || []).some(keep))
+    .map(a => `<div class="ff-live-row" style="--a:${a.c}"><span class="ff-live-lab">${lab(a)}</span><span class="ff-live-ppl">${people(sl[a.k])}</span></div>`).join('');
+  const none = `<p class="ff-none">${en ? 'None of your oshi is on this hour' : 'ช่วงนี้โอชิของคุณไม่มีกิจกรรม'}</p>`;
+  const inWords = n => n >= 60 ? (en ? `in ${Math.floor(n / 60)} h ${n % 60 ? (n % 60) + ' min' : ''}` : `อีก ${Math.floor(n / 60)} ชม.${n % 60 ? ` ${n % 60} นาที` : ''}`)
+    : (en ? `in ${n} min` : `อีก ${n} นาที`);
+  const stageNames = sl => (sl.stage || []).filter(keep).map(id => (getMember(id) || {}).name).filter(Boolean).join(', ');
+  let head, body = '', foot = '', on = false;
+  if(now.after){
+    head = `<b>${en ? "That's all for today" : 'กิจกรรมของวันนี้จบแล้ว'}</b>`;
+    const tmr = FF_DAYS[now.di + 1];
+    if(tmr) foot = `${en ? 'Tomorrow from' : 'พรุ่งนี้เริ่ม'} ${tmr.slots[0].t}${en ? '' : ' น.'}`;
+  } else if(now.si < 0){
+    const sl = slots[now.next];
+    head = `<b>${now.before ? (en ? 'Starts at' : 'เริ่ม') : (en ? 'Next at' : 'ช่วงถัดไป')} ${sl.t}${en ? '' : ' น.'}</b><span>${inWords(ffMins(now.hm, sl.t))}</span>`;
+    body = rows(sl) || none;
+  } else {
+    const sl = slots[now.si], nx = slots[now.si + 1];
+    on = true;
+    head = `<b>${en ? 'Now' : 'ตอนนี้'} <span class="ff-live-clock">${now.hm}</span>${en ? '' : ' น.'}</b><span>${en ? 'hour' : 'ช่วง'} ${sl.t}–${sl.to}</span>`;
+    body = rows(sl) || none;
+    const nxStage = nx && stageNames(nx);
+    if(nx) foot = `${en ? 'Next' : 'ถัดไป'} ${nx.t}${en ? '' : ' น.'}${nxStage ? ` · ${en ? 'on stage' : 'ขึ้นเวที'} ${escapeHtml(nxStage)}` : ''}`;
+  }
+  const back = onFeed || state.ffFollow ? '' : `<button class="ff-live-back" data-action="ff-live">${en ? 'Back to now' : 'กลับไปตอนนี้'}</button>`;
+  return `<div class="ff-live${on ? ' is-on' : ''}">
+    <div class="ff-live-head"><span class="ff-live-dot" aria-hidden="true"></span>${head}${back}</div>
+    ${body ? `<div class="ff-live-rows">${body}</div>` : ''}
+    ${foot ? `<p class="ff-live-next">${foot}</p>` : ''}
+  </div>`;
+}
+/* every 20 seconds: the clock in the box, and a repaint when the hour turns —
+   of the sheet when it is open, of the home feed's box when that is showing */
+function ffLiveTick(){
+  const n = ffNow();
+  document.querySelectorAll('.ff-live-clock').forEach(e => { if(n) e.textContent = n.hm; });
+  const key = n ? `${n.di}.${n.si}.${n.before}.${n.after}` : '';
+  if(key === _ffLiveKey) return;
+  // the feed redraws whole (its box sits outside the boards); an open sheet repaints only the boards
+  if(document.querySelector('.is-fflive') && !state.selectedEvent && !state.selectedId && !state.posterOf) renderMain();
+  else if(document.querySelector('.ff')) ffPaint();
+}
+/* On a festival day the home feed carries the same box, and one tap takes
+   you straight to the booth plan (laid out in full on the feed, the plan
+   pushed everything else three screens down — the owner chose the button). */
+function renderFeedFanFest(mine){
+  const now = ffNow();
+  const ev = now && SEED_SCHEDULE.find(e => e.boothPlan === 'fanfest');
+  if(!ev) return '';
+  _ffLiveKey = `${now.di}.${now.si}.${now.before}.${now.after}`;
+  const en = isEN(), keep = id => !mine || state.oshi.includes(id);
+  return `<section class="feed-block is-fflive">
+    <h2 class="section-label">${en ? 'At the Fan Festival now' : 'ตอนนี้ที่ Fan Festival'}</h2>
+    ${ffLivePanel(now, keep, en, false, true)}
+    <button class="ff-feed-btn" data-action="open-ff" data-id="${ev.id}">${en ? 'See the booth plan' : 'ดูผังบูธ'}</button>
+  </section>`;
+}
+
+/* opts.mode forces the tab ('acts' | 'plan'); opts.bare drops the heading,
+   the scope, the tabs and the box, for the home feed, which shows the box
+   itself and lays the timetable and the plan one after the other. */
+function renderBoothPlan(ev, opts = {}){
+  const en = isEN(), bare = !!opts.bare;
+  // On the day the board follows the clock — today, this hour — until someone
+  // picks another day or hour. A freshly drawn board starts following again.
+  const now = ffNow();
+  if(!document.querySelector(bare ? '.ff[data-ff-bare]' : '.modal-scroll .ff')) state.ffFollow = true;
+  if(now && state.ffFollow){ state.ffDay = now.di; state.ffSlot = now.si >= 0 ? now.si : null; }
+  _ffLiveKey = now ? `${now.di}.${now.si}.${now.before}.${now.after}` : '';
+  const today = now && now.di === state.ffDay ? now : null;
   const day = ffDay(), slot = day.slots[state.ffSlot];
   const dayLabel = d => { const x = parseYmd(d.date); return `${x.getDate()} ${monthsShort()[x.getMonth()]}`; };
   const picked = state.ffPick ? getMember(state.ffPick) : null;
-  const acts = state.ffTab === 'acts';
+  const acts = opts.mode ? opts.mode === 'acts' : state.ffTab === 'acts';
+  const attrs = `data-ff-mode="${opts.mode || ''}"${bare ? ' data-ff-bare="1"' : ''}`;
   // "my oshi only": everyone else steps back, on the plan and in the timetable
-  const osh = state.ffOshi, mine = new Set(state.oshi), keep = id => !osh || mine.has(id);
+  // (on the feed, the feed's own "my oshi" switch decides)
+  const osh = bare ? filteringByOshi() : state.ffOshi, mine = new Set(state.oshi), keep = id => !osh || mine.has(id);
+  const backNow = bare && now && !state.ffFollow ? `<button class="ff-live-back" data-action="ff-live">${en ? 'Back to now' : 'กลับไปตอนนี้'}</button>` : '';
   const scope = `<div class="feed-scope ff-scope" role="group" aria-label="${en ? 'Who to show' : 'ขอบเขตที่แสดง'}">
     <button class="scope-btn${osh ? '' : ' is-on'}" data-action="ff-oshi" data-value="0">${en ? 'Everyone' : 'ทั้งหมด'}</button>
     <button class="scope-btn${osh ? ' is-on' : ''}" data-action="ff-oshi" data-value="1">${en ? 'My oshi only' : 'เฉพาะโอชิของฉัน'}</button>
@@ -10757,18 +10882,20 @@ function renderBoothPlan(ev){
     // with "my oshi only" on, everyone stays in the timetable but only she is in full colour
     const table = `<table class="ff-tt">
       <tr><th class="ff-tt-t">${en ? 'Time' : 'เวลา'}</th>${cols.map(a => `<th style="--a:${a.c}">${en ? a.en : a.th}</th>`).join('')}</tr>
-      ${day.slots.map(sl => `<tr><td class="ff-tt-t">${sl.t}<small>${sl.to}</small></td>${cols.map(a => !(sl[a.k] || []).length
+      ${day.slots.map((sl, i) => `<tr class="${today && (today.after || (today.si >= 0 ? i < today.si : i < today.next)) ? 'is-past' : ''}${today && i === today.si ? 'is-now' : ''}"><td class="ff-tt-t">${
+        today && i === today.si ? `<span class="ff-tt-now">${en ? 'NOW' : 'ตอนนี้'}</span>` : ''}${sl.t}<small>${sl.to}</small></td>${cols.map(a => !(sl[a.k] || []).length
         ? '<td class="is-none"></td>' : `<td style="--a:${a.c}">${sl[a.k].map(person).join('')}</td>`).join('')}</tr>`).join('')}
     </table>`;
-    return `<div class="ff">
-      <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
+    return `<div class="ff" ${attrs}>
+      ${bare ? '' : `<h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
       ${scope}
-      ${tabs}
+      ${tabs}`}
       <div class="ff-top">
-        <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
-        <span class="ff-spacer"></span>
+        <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}${now && now.di === i ? ' is-today' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
+        <span class="ff-spacer"></span>${backNow}
       </div>
       ${noOshi}
+      ${bare ? '' : ffLivePanel(now, keep, en)}
       <div class="ff-tt-wrap">${table}</div>
       <p class="ff-note">${en ? 'Swipe sideways for the other activities' : 'ปัดซ้ายขวาเพื่อดูกิจกรรมอื่น'}</p>
     </div>`;
@@ -10836,17 +10963,18 @@ function renderBoothPlan(ev){
   }
 
   setTimeout(ffFit);   // once it is on the page, size the hall to the sheet
-  return `<div class="ff${slot ? ' is-hour' : ''}${state.ffPick || state.ffWho ? ' has-pick' : ''}">
-    <h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
+  return `<div class="ff${slot ? ' is-hour' : ''}${state.ffPick || state.ffWho ? ' has-pick' : ''}" ${attrs}>
+    ${bare ? '' : `<h3 class="evm-head">${en ? "Booths and activities" : "ผังบูธและกิจกรรม"}</h3>
     ${scope}
     ${tabs}
+    ${ffLivePanel(now, keep, en, true)}`}
     <div class="ff-board">
     <div class="ff-top">
-      <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
+      <div class="ff-days">${FF_DAYS.map((d, i) => `<button class="${i === state.ffDay ? 'on' : ''}${now && now.di === i ? ' is-today' : ''}" data-action="ff-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
       <span class="ff-count">${osh ? (en ? `${mine.size} oshi` : `โอชิ ${mine.size} คน`) : `${FF_BOOTHS.length} ${en ? 'booths' : 'บูธ'}`}</span>
-      <span class="ff-spacer"></span>
+      <span class="ff-spacer"></span>${backNow}
     </div>
-    <div class="ff-times">${day.slots.map((s, i) => `<button class="${i === state.ffSlot ? 'on' : ''}${osh ? (oshiHour(s) ? ' has-oshi' : ' is-dim') : ''}"
+    <div class="ff-times">${day.slots.map((s, i) => `<button class="${i === state.ffSlot ? 'on' : ''}${today && i === today.si ? ' is-now' : ''}${osh ? (oshiHour(s) ? ' has-oshi' : ' is-dim') : ''}"
       data-action="ff-slot" data-value="${i}">${s.t}<small>${s.to}</small></button>`).join('')}</div>
     <div class="ff-hall">
       <div class="ff-stage${onStage.length ? ' lit' : ''}">
@@ -10874,7 +11002,7 @@ function renderBoothPlan(ev){
    on one screen; the next swipe carries on. ffFit shortens the hall until the
    whole board fits the sheet, never below a height the booths can stand. */
 function ffFit(){
-  const board = document.querySelector('.ff-board'), hall = board && board.querySelector('.ff-hall');
+  const board = document.querySelector('.modal-scroll .ff-board'), hall = board && board.querySelector('.ff-hall');
   const sc = board && board.closest('.modal-scroll');
   if(!hall || !sc) return;
   const top = sc.scrollTop;
@@ -10888,7 +11016,7 @@ function ffFit(){
 }
 /* lit while the board is the one resting on screen */
 function ffLocked(){
-  const board = document.querySelector('.ff-board'), sc = board && board.closest('.modal-scroll');
+  const board = document.querySelector('.modal-scroll .ff-board'), sc = board && board.closest('.modal-scroll');
   if(!sc) return;
   const d = board.getBoundingClientRect().top - sc.getBoundingClientRect().top - 10;
   board.classList.toggle('is-locked', Math.abs(d) < 6);
@@ -10922,19 +11050,23 @@ window.addEventListener('resize', () => ffFit());
 /* The plan answers a tap by redrawing only itself — a full sheet redraw would
    throw the reader back to the top of a long event page. */
 function ffPaint(){
-  const old = document.querySelector('.ff');
-  const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
-  if(!old || !ev) return;
-  const box = document.createElement('div');
-  box.innerHTML = renderBoothPlan(ev);
-  const fresh = box.firstElementChild;
-  // hold the sheet still: swapping the plan out would otherwise let the
-  // browser re-anchor or re-snap it somewhere else
-  const sc = old.closest('.modal-scroll'), top = sc ? sc.scrollTop : 0;
-  old.replaceWith(fresh);
-  localize(fresh);
+  const ev = SEED_SCHEDULE.find(e => e.boothPlan === 'fanfest');
+  const olds = [...document.querySelectorAll('.ff')];
+  if(!ev || !olds.length) return;
+  // every board on the page — the sheet's, and the two on the home feed — as it was drawn
+  const fresh = olds.map(old => { const box = document.createElement('div');
+    box.innerHTML = renderBoothPlan(ev, { mode: old.dataset.ffMode || undefined, bare: !!old.dataset.ffBare }); return box.firstElementChild; });
+  olds.forEach((old, i) => {
+    // hold the sheet still (swapping the plan out would let the browser
+    // re-anchor it), and the timetable where it was scrolled sideways
+    const sc = old.closest('.modal-scroll'), top = sc ? sc.scrollTop : 0;
+    const wrap = old.querySelector('.ff-tt-wrap'), left = wrap ? wrap.scrollLeft : 0;
+    old.replaceWith(fresh[i]);
+    localize(fresh[i]);
+    const w2 = fresh[i].querySelector('.ff-tt-wrap'); if(w2) w2.scrollLeft = left;
+    if(sc) sc.scrollTop = top;
+  });
   ffFit();
-  if(sc) sc.scrollTop = top;
 }
 
 function renderEventModal(){
@@ -11390,6 +11522,7 @@ function renderFeed(){
       <h2 class="section-label">งานวันนี้</h2>
       ${nowOn.map(e => renderTodayHero(e, iso)).join('')}
     </section>` : ''}
+    ${renderFeedFanFest(mine)}
 
     ${overToday.length ? `
     <section class="feed-block is-over-today">
@@ -15421,11 +15554,11 @@ function bindDelegatedEvents(){
       box.querySelectorAll('[data-slot-day]').forEach(t => { t.hidden = t.dataset.slotDay !== state.slotDay; });
     }
     else if(action==='ff-day'){
-      state.ffDay = +el.dataset.value; state.ffSlot = null; ffPaint();
+      state.ffDay = +el.dataset.value; state.ffSlot = null; state.ffFollow = false; ffPaint();
     }
     else if(action==='ff-slot'){
       const i = +el.dataset.value;
-      state.ffSlot = state.ffSlot === i ? null : i;
+      state.ffSlot = state.ffSlot === i ? null : i; state.ffFollow = false;
       ffPaint();
     }
     else if(action==='ff-booth'){
@@ -15435,6 +15568,7 @@ function bindDelegatedEvents(){
     else if(action==='ff-oshi'){
       state.ffOshi = el.dataset.value === '1'; state.ffPick = null; state.ffWho = null; ffPaint();
     }
+    else if(action==='ff-live'){ state.ffFollow = true; ffPaint(); }
     else if(action==='ff-tab'){
       state.ffTab = el.dataset.value; ffPaint();
     }
@@ -15808,6 +15942,13 @@ function bindDelegatedEvents(){
         leaveOverlays();
         render(); pushHistory();
       }
+    }
+    else if(action==='open-ff'){
+      state.ffTab = 'plan'; state.selectedEvent = el.dataset.id; state.dayOf = null;
+      renderMain(); pushHistory();
+      // straight to the plan, not the top of the sheet
+      requestAnimationFrame(() => { const b = document.querySelector('.modal-scroll .ff-board'), sc = b && b.closest('.modal-scroll');
+        if(b && sc) sc.scrollTop += b.getBoundingClientRect().top - sc.getBoundingClientRect().top - 10; });
     }
     else if(action==='open-event'){
       state.selectedEvent = el.dataset.id;
