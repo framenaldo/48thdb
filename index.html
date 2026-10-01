@@ -2996,6 +2996,10 @@
   .gec-mbar{ flex:0 0 100%; height:10px; border-radius:99px; background:color-mix(in srgb, var(--ink-soft) 14%, transparent); overflow:hidden; }
   .gec-mbar i{ display:block; height:100%; border-radius:99px; background:var(--bnk); }
   .gec-mbar.is-early i{ background:var(--cgm); }
+  /* an event that is over: faded back, full colour again under a finger or a pointer */
+  .ev-card.is-done{ opacity:.55; filter:saturate(.55); transition:opacity .2s, filter .2s; }
+  .ev-card.is-done:active, .ev-card.is-done:focus-within{ opacity:.85; filter:none; }
+  @media (hover:hover){ .ev-card.is-done:hover{ opacity:.85; filter:none; } }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -9185,6 +9189,8 @@ function renderEventCard(ev, todayIso){
   const over = runsToday && !ev.period && doneForToday(ev, todayIso);
   const when = ev.cancelled ? '' : over ? 'จบแล้ว' : eventWhenLabel(ev, todayIso);
   const isNow = runsToday && !over;
+  // over for today, or over altogether: drawn faded, so what is still ahead stands out
+  const done = over || (!ev.cancelled && eventLastDay(ev) < todayIso);
   // a rota on the day it ran: the people who were there, not the whole run
   const ids = over && ev.slots ? [...new Set(slotsOn(ev, todayIso).flatMap(s => s.members))] : (ev.members || []);
   const all = ids.map(getMember).filter(Boolean);
@@ -9205,7 +9211,7 @@ function renderEventCard(ev, todayIso){
         width="${ev.poster.w || 1200}" height="${ev.poster.h || 1200}" onerror="this.onerror=null;this.src='${escapeAttr(img)}'">
     </div>` : '';
   return `
-  <article class="ev-card${isNow?' is-now':''}${ev.cancelled?' is-cancelled':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}${img?' has-poster':''}" style="--c:${accent}${theme}"
+  <article class="ev-card${isNow?' is-now':''}${done?' is-done':''}${ev.cancelled?' is-cancelled':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}${img?' has-poster':''}" style="--c:${accent}${theme}"
     ${hasMore ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     ${poster}
     <div class="ev-date">
