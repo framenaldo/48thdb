@@ -33,10 +33,14 @@ the Firebase CLI from the owner's machine.
 - Member photos: files under `photos/<member id>.jpg`, about 400×400. Older
   members still carry a base64 `photo:` — either form works.
 
-## The GE vote on the chain (owner only)
+## The GE vote on the chain
 
-`?v=gechain`, reached from the owner's chips on the GE results page and the
-results desk. It reads the iAM48 vote straight off TokenX in the browser
+Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`?v=vote`) and a
+teaser on its overview. `?v=gechain` is the owner's copy (price box, refresh).
+A cold start reads `data/chain-ge2025.json` (final) and `data/chain-ge2026.json`
+(left nightly by `scripts/collect-chain.mjs`, which runs the page's own
+GEC-CORE block), then follows the chain: near the tip, one read of GE6
+transfers a look updates both the votes and the token tally. It reads the iAM48 vote straight off TokenX in the browser
 (`GEC_POLLS`, POST `eth_getLogs` to scan.tokenx.finance — its paged GET lists
 are cached by its CDN and repeat page 1) and keeps running sums in
 localStorage. Each vote carries a salted hash, so there are no per-member

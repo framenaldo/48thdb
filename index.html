@@ -2964,6 +2964,19 @@
   .gec-hl small{ display:block; font-size:10.5px; font-weight:700; line-height:1.1; }
   .gec-hr b{ display:flex; flex-direction:column; align-items:flex-end; line-height:1.2; }
   .gec-hr b small{ font-size:10.5px; font-weight:600; color:var(--ink-soft); }
+  .gec-teaser{ display:flex; flex-direction:column; gap:4px; width:100%; box-sizing:border-box; margin:4px 0 14px; padding:16px 18px; text-align:left; cursor:pointer;
+    font-family:'Noto Sans Thai',sans-serif; color:#fff; border:0; border-radius:20px;
+    background:radial-gradient(120% 140% at 0% 0%, #B3121E 0%, #5A0A12 55%, #24060B 100%);
+    box-shadow:0 4px 0 rgba(90,10,18,.45), 0 10px 26px rgba(179,18,30,.25); transition:transform .12s, box-shadow .12s; }
+  .gec-teaser:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(90,10,18,.45); }
+  .gec-t-k{ font-size:12.5px; font-weight:800; letter-spacing:.02em; color:#F3C969; }
+  .gec-t-k .gec-live{ background:#FF5A6B; }
+  .gec-t-v{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; font-size:34px; font-weight:800; line-height:1.15; color:#F3C969; font-variant-numeric:tabular-nums; }
+  .gec-t-v small{ font-size:13px; font-weight:700; color:rgba(255,255,255,.75); }
+  .gec-t-row{ font-size:13px; font-weight:600; color:rgba(255,255,255,.85); }
+  .gec-t-row b{ color:#fff; } .gec-t-row .gec-t-x{ color:#F3C969; }
+  .gec-t-go{ margin-top:6px; font-size:13px; font-weight:800; color:#fff; }
+  .ge-page .gec{ max-width:none; }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -9713,15 +9726,16 @@ function renderGEPage(){
   // the results tab appears once there is something in it (always for the owner)
   const hasResults = state.isOwner || GE_ROUNDS.some(r => geHasData(r.id) || ((state.geRounds || {})[r.id] || {}).live);
   const liveRound = geLiveRound();
-  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
+  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ['chain', en ? 'Live vote' : 'ยอดโหวตสด'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
     ['timeline', en ? 'Timeline' : 'ไทม์ไลน์'], ['events', en ? 'All events' : 'งานทั้งหมด']]
-    .map(([v, l]) => `<button class="sub-tab${tab === v ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
+    .map(([v, l]) => `<button class="sub-tab${tab === v ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
   const liveBanner = liveRound && tab !== 'results' ? `<button class="ge-live-banner" data-action="ge-tab" data-value="results">
     <span class="gel-live"><i></i>LIVE</span><span>${en ? 'Announcing' : 'กำลังประกาศ'} ${geRoundLabel(liveRound)}
     <small>· ${en ? `${geAnnounced(liveRound.id)} / ${GE_SEATS} so far` : `ประกาศแล้ว ${geAnnounced(liveRound.id)} / ${GE_SEATS}`}</small></span>→</button>` : '';
 
   let body = '';
   if(tab === 'results') body = renderGEResults();
+  else if(tab === 'chain') body = renderGEChain(true);
   else if(tab === 'candidates') body = renderGECandidates();
   else if(tab === 'timeline') body = renderTimelinePage(true);
   else if(tab === 'events'){
@@ -9734,6 +9748,7 @@ function renderGEPage(){
     const nowOn = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
     const cands = geCandidates(), oshiFirst = [...cands.filter(m => state.oshi.includes(m.id)), ...cands.filter(m => !state.oshi.includes(m.id))];
     body = `
+      ${vote && iso >= vote.start ? gecTeaser(en) : ''}
       <h3 class="section-label">${en ? `Candidates · ${cands.length}` : `ผู้สมัคร ${cands.length} คน`}</h3>
       <div class="gec-strip">${oshiFirst.map(geCandCard).join('')}</div>
       <button class="chip chip-link ge-more" data-action="ge-tab" data-value="candidates">${en ? 'All candidates →' : 'ดูผู้สมัครทั้งหมด →'}</button>
@@ -9935,6 +9950,7 @@ function renderGEResults(){
    eth_getLogs, which its CDN does not cache, unlike its paged GET lists — and
    kept in this browser as running sums, so a revisit fetches only new blocks.
    Owner only, linked from the owner's pages alone. */
+/* GEC-CORE START — scripts/collect-chain.mjs runs this part as it stands */
 const GEC_API = 'https://scan.tokenx.finance';
 const GEC_VOTED = '0xf851f974bf070e5929a90c01a09d3c8a0bcbc807f1b3abafbd5bf9d4855547c4';
 const GEC_POLLS = {
@@ -9942,15 +9958,15 @@ const GEC_POLLS = {
   ge2025: { addr:'0x674Ab311C94780207a1357De9bcdd357d23f459E', start:32283011, end:33563711, t0:1739250000 },
 };
 const GEC_BLOCK = 3;   // seconds a block; steady on TokenX, so a block number is a time
-const GEC_KEEP = 'gec2:';
-try{ ['ge2026', 'ge2025'].forEach(id => localStorage.removeItem('gec1:' + id)); }catch(e){}
+const GEC_KEEP = 'gec3:';
+try{ ['gec1:ge2026', 'gec1:ge2025', 'gec2:ge2026', 'gec2:ge2025', 'gec2:tok'].forEach(k => localStorage.removeItem(k)); }catch(e){}
 const gecData = {};
 // the GE6 token itself: one mint, at this block, into the organiser's vault
 const GEC_TOKEN = { addr:'0x2f5c60bde7a5ebd2b116bb03cb5232fa1ea55f1c', start:48783515, end:Infinity };
 const GEC_TRANSFER = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 const GEC_ZERO = '0x0000000000000000000000000000000000000000', GEC_DEAD = '0x000000000000000000000000000000000000dead';
 const GEC_BIG = 1000;   // a vote this size or more is called out
-let gecBusy = null, gecErr = null, gecProg = null, gecAt = 0, gecTimer = null;
+let gecBusy = null, gecErr = null, gecProg = null, gecAt = 0, gecTimer = null, gecSeeded = false;
 const gecHour = (p, b) => Math.floor((b - p.start) * GEC_BLOCK / 3600);
 const gecMs = (p, b) => (p.t0 + (b - p.start) * GEC_BLOCK) * 1000;
 function gecLoad(id){
@@ -9987,19 +10003,21 @@ async function gecLogs(p, from, last, topics, each, step = 5000){
 const gecAmt = l => Number(BigInt('0x' + l.data.slice(2, 66))) / 1e18;
 // Right up to the tip, but each pass reads the last 40 blocks (two minutes)
 // again, in case the explorer had not finished indexing them, and skips any
-// log it has already counted.
-async function gecTail(id, d, p, head, topics, take){
+// log it has already counted. A vote is keyed by its transaction, so the same
+// vote met as a Voted log or as its token transfer counts once.
+const gecKeyLog = l => l.transactionHash + ':' + l.logIndex, gecKeyTx = l => l.transactionHash;
+async function gecTail(id, d, p, head, topics, take, key = gecKeyLog){
   if(d.to >= p.end) return;
   const last = Math.min(head, p.end);
   const seen = new Set(d.recent.map(r => r[0])), from = Math.max(p.start, d.to + 1 - 40);
-  const long = last - from > 2000;   // a first read, worth a progress bar; the 3-second looks are not
+  const long = last - from > 2000;   // a first read, worth a progress bar; the quick looks are not
   await gecLogs(p, from, last, topics, (logs, b) => {
     for(const l of logs){
-      const key = l.transactionHash + ':' + l.logIndex;
-      if(seen.has(key)) continue;
-      seen.add(key);
+      const k = key(l);
+      if(seen.has(k)) continue;
+      seen.add(k);
       const bn = parseInt(l.blockNumber, 16);
-      d.recent.push([key, bn]);
+      d.recent.push([k, bn]);
       take(l, bn);
     }
     d.to = Math.max(d.to, b);
@@ -10008,40 +10026,86 @@ async function gecTail(id, d, p, head, topics, take){
   d.recent = d.recent.filter(r => r[1] > d.to - 60);
   gecSave(id, d);
 }
-async function gecSync(id, head){
-  const p = GEC_POLLS[id];
-  const d = gecLoad(id) || (gecData[id] = { to:p.start - 1, n:0, sum:0, top:-1, hours:[], wallets:{}, recent:[], feed:[], big:[] });
-  await gecTail(id, d, p, head, [GEC_VOTED], (l, bn) => {
-      const w = '0x' + l.topics[1].slice(26), amt = gecAmt(l), h = gecHour(p, bn);
-      d.n++; d.sum += amt; d.top = Math.max(d.top, parseInt(l.topics[2], 16));
-      d.hours[h] = (d.hours[h] || 0) + amt;
-      const x = d.wallets[w] || (d.wallets[w] = [0, 0, h]); x[0] += amt; x[1]++;
-      const v = { b:bn, w, amt, tx:l.transactionHash };
-      d.feed.push(v); if(d.feed.length > 40) d.feed.shift();
-      if(amt >= GEC_BIG) d.big.push(v);
-      const ow = gecWallet && gecWallet.v && gecWallet.w === w && gecWallet.v[id];
-      if(ow && !ow.some(x => x.tx === l.transactionHash)) ow.push({ b:bn, amt, tx:l.transactionHash });
-  });
+const gecNewVotes = p => ({ to:p.start - 1, n:0, sum:0, hours:[], wallets:{}, recent:[], feed:[], big:[] });
+const gecNewTok = () => ({ to:GEC_TOKEN.start - 1, n:0, minted:0, burnt:0, bal:{}, vault:[], chan:{}, recent:[] });
+// one vote into the running sums
+function gecVote(d, p, id, w, amt, bn, tx){
+  const h = gecHour(p, bn);
+  d.n++; d.sum += amt;
+  d.hours[h] = (d.hours[h] || 0) + amt;
+  const x = d.wallets[w] || (d.wallets[w] = [0, 0, h]); x[0] += amt; x[1]++;
+  const v = { b:bn, w, amt, tx };
+  d.feed.push(v); if(d.feed.length > 40) d.feed.shift();
+  if(amt >= GEC_BIG) d.big.push(v);
+  const ow = typeof gecWallet !== 'undefined' && gecWallet && gecWallet.v && gecWallet.w === w && gecWallet.v[id];
+  if(ow && !ow.some(z => z.tx === tx)) ow.push({ b:bn, amt, tx });
 }
 /* Where every GE6 token is, from the token's own transfers. There is one mint,
    into the organiser's vault (the same wallet that created the poll); a wallet
    the vault sends to is a sales channel; anyone else holding GE6 got it from a
    channel or another holder. So each token is in one of: the vault, a channel,
    a buyer's wallet, the poll (voted), or burnt — counted, not estimated. */
-async function gecSyncToken(head){
-  const p = GEC_TOKEN, poll = GEC_POLLS.ge2026.addr.toLowerCase();
-  const t = gecLoad('tok') || (gecData.tok = { to:p.start - 1, n:0, minted:0, burnt:0, bal:{}, vault:[], chan:{}, recent:[] });
-  await gecTail('tok', t, p, head, [GEC_TRANSFER], l => {
-    const f = '0x' + l.topics[1].slice(26), to = '0x' + l.topics[2].slice(26), v = gecAmt(l);
-    t.n++;
-    if(f === GEC_ZERO){ t.minted += v; if(!t.vault.includes(to)) t.vault.push(to); }
-    else t.bal[f] = (t.bal[f] || 0) - v;
-    if(to === GEC_ZERO || to === GEC_DEAD){ t.burnt += v; return; }
-    t.bal[to] = (t.bal[to] || 0) + v;
-    if(t.vault.includes(f) && !t.vault.includes(to) && to !== poll){ const c = t.chan[to] || (t.chan[to] = [0, 0]); c[0] += v; }
-    if(t.chan[f] && !t.vault.includes(to)) t.chan[f][1] += v;
-  });
+function gecMove(t, f, to, v){
+  const poll = GEC_POLLS.ge2026.addr.toLowerCase();
+  t.n++;
+  if(f === GEC_ZERO){ t.minted += v; if(!t.vault.includes(to)) t.vault.push(to); }
+  else t.bal[f] = (t.bal[f] || 0) - v;
+  if(to === GEC_ZERO || to === GEC_DEAD){ t.burnt += v; return; }
+  t.bal[to] = (t.bal[to] || 0) + v;
+  if(t.vault.includes(f) && !t.vault.includes(to) && to !== poll){ const c = t.chan[to] || (t.chan[to] = [0, 0]); c[0] += v; }
+  if(t.chan[f] && !t.vault.includes(to)) t.chan[f][1] += v;
 }
+const gecEnds = l => ['0x' + l.topics[1].slice(26), '0x' + l.topics[2].slice(26)];
+async function gecSync(id, head){
+  const p = GEC_POLLS[id];
+  const d = gecLoad(id) || (gecData[id] = gecNewVotes(p));
+  await gecTail(id, d, p, head, [GEC_VOTED], (l, bn) => gecVote(d, p, id, '0x' + l.topics[1].slice(26), gecAmt(l), bn, l.transactionHash), gecKeyTx);
+}
+async function gecSyncToken(head){
+  const t = gecLoad('tok') || (gecData.tok = gecNewTok());
+  await gecTail('tok', t, GEC_TOKEN, head, [GEC_TRANSFER], l => { const [f, to] = gecEnds(l); gecMove(t, f, to, gecAmt(l)); });
+}
+/* Once both copies are near the tip, one read of the token's transfers keeps
+   both up to date: a vote is a transfer of GE6 into the poll, so the same log
+   moves the token tally and adds the vote. Two small requests a look. */
+async function gecSyncLive(head){
+  const p = GEC_POLLS.ge2026, d = gecLoad('ge2026'), t = gecLoad('tok');
+  if(!d || !t || d.to >= p.end) return false;
+  const lo = Math.min(d.to, t.to);
+  if(head - lo > 600) return false;
+  const hex = n => '0x' + n.toString(16), from = Math.max(GEC_TOKEN.start, lo + 1 - 40);
+  const logs = await gecRpc('eth_getLogs', [{ address:GEC_TOKEN.addr, fromBlock:hex(from), toBlock:hex(head), topics:[GEC_TRANSFER] }]);
+  if(logs.length >= 1000) return false;   // a burst; the long way takes it in pieces
+  const poll = p.addr.toLowerCase(), seenT = new Set(t.recent.map(r => r[0])), seenV = new Set(d.recent.map(r => r[0]));
+  for(const l of logs){
+    const bn = parseInt(l.blockNumber, 16), [f, to] = gecEnds(l), v = gecAmt(l);
+    const kt = gecKeyLog(l), kv = gecKeyTx(l);
+    if(!seenT.has(kt) && bn > t.to - 60){ seenT.add(kt); t.recent.push([kt, bn]); gecMove(t, f, to, v); }
+    if(to === poll && bn <= p.end && !seenV.has(kv) && bn > d.to - 60){ seenV.add(kv); d.recent.push([kv, bn]); gecVote(d, p, 'ge2026', f, v, bn, l.transactionHash); }
+  }
+  t.to = Math.max(t.to, head); d.to = Math.max(d.to, Math.min(head, p.end));
+  t.recent = t.recent.filter(r => r[1] > t.to - 60); d.recent = d.recent.filter(r => r[1] > d.to - 60);
+  gecSave('tok', t); gecSave('ge2026', d);
+  return true;
+}
+/* A cold start reads the copies the nightly job leaves in data/ (GE2025 is
+   final, GE2026 as of last midnight), then only what came since. */
+async function gecSeed(){
+  const want = [['ge2025', 'data/chain-ge2025.json'], ['ge2026', 'data/chain-ge2026.json']];
+  for(const [id, url] of want){
+    const have = gecLoad(id);
+    if(id === 'ge2025' && have && have.to >= GEC_POLLS.ge2025.end) continue;
+    try{
+      const r = await fetch(url, { cache:'no-cache' }); if(!r.ok) continue;
+      const j = await r.json(), parts = id === 'ge2025' ? { ge2025:j } : j;
+      for(const [k, v] of Object.entries(parts)){
+        const mine = gecLoad(k);
+        if(v && v.to != null && (!mine || v.to > mine.to)){ gecData[k] = v; gecSave(k, v); }
+      }
+    }catch(e){}
+  }
+}
+/* GEC-CORE END */
 
 /* Baht, at a price per token the owner types in (it moves); kept in this browser. */
 let gecPrice = 68;
@@ -10109,18 +10173,23 @@ function renderGECWallet(en, N, hm){
   }
   return `<div class="gea-card gec-wallet"${W && W.v ? ' data-gshare="wallet"' : ''}><h3 class="gec-h">${en ? 'Look up a wallet' : 'ดูกระเป๋า'}</h3>${form}${body}</div>`;
 }
+// the owner's desk, or the GE2026 page's vote tab and its overview
+const gecOnScreen = () => state.view === 'gechain' || (state.view === 'timeline' && ['chain', 'overview', undefined, null, ''].includes(state.geTab));
 function gecKick(force){
-  if(!state.isOwner || gecBusy) return;
+  if(gecBusy || !gecOnScreen()) return;
   if(!force && Date.now() - gecAt < 2500 && gecLoad('ge2026')) return;
   const mark = () => { const d = gecLoad('ge2026'), t = gecLoad('tok'); return (d ? d.n : -1) + ':' + (t ? t.n : -1); };
   const m0 = mark(), had25 = !!gecLoad('ge2025'), err0 = gecErr;
   gecErr = null;
   gecBusy = (async () => {
     try{
+      if(!gecSeeded){ gecSeeded = true; await gecSeed(); if(gecLoad('ge2026')) gecDraw(); }
       const head = parseInt(await gecRpc('eth_blockNumber', []), 16);
-      await gecSync('ge2026', head);
-      if(!had25) gecDraw();
-      await gecSyncToken(head);
+      if(!(await gecSyncLive(head))){
+        await gecSync('ge2026', head);
+        if(!had25) gecDraw();
+        await gecSyncToken(head);
+      }
       await gecSync('ge2025', head);
     }catch(e){ gecErr = String(e && e.message || e); }
     gecAt = Date.now();
@@ -10131,7 +10200,7 @@ function gecKick(force){
   })();
   // a block every 3 seconds, so a look every 3 seconds
   if(!gecTimer) gecTimer = setInterval(() => {
-    if(state.view !== 'gechain'){ clearInterval(gecTimer); gecTimer = null; return; }
+    if(!gecOnScreen()){ clearInterval(gecTimer); gecTimer = null; return; }
     if(!document.hidden) gecKick();
   }, 3000);
 }
@@ -10143,7 +10212,7 @@ function gecStamp(){
   el.textContent = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}:${String(t.getSeconds()).padStart(2, '0')}`;
 }
 function gecDraw(){
-  if(state.view !== 'gechain' || state.selectedId || state.selectedEvent || state.posterOf) return;
+  if(!gecOnScreen() || state.selectedId || state.selectedEvent || state.posterOf) return;
   // never under the owner's typing (the price, a wallet address); the next check catches up
   const f = document.activeElement;
   if(f && f.closest && f.closest('.gec') && /^(INPUT|TEXTAREA)$/.test(f.tagName)) return;
@@ -10391,6 +10460,19 @@ function gecHourRows(d, o, hNow){
   else for(let h = hi; h >= Math.max(0, hi - 23); h--) out.push([h, d.hours[h] || 0, null]);
   return out;
 }
+// The vote so far, small, at the top of the GE2026 overview; a tap opens the vote tab
+function gecTeaser(en){
+  gecKick();
+  const { d, o, hNow, wl } = gecCtx();
+  if(!d || !d.n) return `<button class="gec-teaser is-wait" data-action="ge-tab" data-value="chain"><span class="gec-t-k"><i class="gec-live"></i>${en ? 'The vote, live' : 'ยอดโหวตสด'}</span>
+    <span class="gec-t-row">${en ? 'Reading the votes…' : 'กำลังโหลดยอดโหวต…'}</span></button>`;
+  const same = o ? gecUpTo(o, hNow) : 0;
+  return `<button class="gec-teaser" data-action="ge-tab" data-value="chain">
+    <span class="gec-t-k"><i class="gec-live"></i>${en ? 'The vote, live · from the blockchain' : 'ยอดโหวตสด · จากบล็อกเชน'}</span>
+    <span class="gec-t-v">${gecTok(d.sum)}<small>${en ? 'tokens voted' : 'โทเคนที่โหวตแล้ว'}</small></span>
+    <span class="gec-t-row"><b>${gecN(d.n)}</b> ${en ? 'votes' : 'ครั้ง'} · <b>${gecN(wl.length)}</b> ${en ? 'wallets' : 'กระเป๋า'}${same > 0 ? ` · <b class="gec-t-x">×${(d.sum / same).toFixed(2)}</b> ${en ? 'on GE2025 at this point' : 'เทียบ GE2025 ณ เวลาเดียวกัน'}` : ''}</span>
+    <span class="gec-t-go">${en ? 'All the vote figures →' : 'ดูสถิติการโหวตทั้งหมด →'}</span></button>`;
+}
 // What the page is, in plain words, for whoever opens it; folds away once read
 let gecAbout = true, gecChanOpen = false, gecFeedSeen = null;
 function gecAboutCard(en){
@@ -10507,25 +10589,24 @@ function gecStretchCard(en, pc, o){
     <p class="gec-sub">${en ? `GE2025 ran ${Math.round(L / 24)} days (${dt(d0)} – ${dt(d1)} 2025); this year runs ${Math.round((GEC_POLLS.ge2026.end - GEC_POLLS.ge2026.start) * GEC_BLOCK / 86400)}. It only reached half its final total on day ${Math.floor(half / 24) + 1} of ${Math.round(L / 24)}. That late surge is what the “on last year’s curve” figure assumes will happen again.`
       : `GE2025 เปิดโหวต ${Math.round(L / 24)} วัน (${dt(d0)} – ${dt(d1)} 2025) ปีนี้ ${Math.round((GEC_POLLS.ge2026.end - GEC_POLLS.ge2026.start) * GEC_BLOCK / 86400)} วัน · กว่ายอดจะถึงครึ่งหนึ่งของยอดสุดท้ายต้องรอถึงวันที่ ${Math.floor(half / 24) + 1} จาก ${Math.round(L / 24)} วัน · ตัวเลข “ถ้าเดินตามเส้นปีที่แล้ว” คือสมมติว่าช่วงโค้งสุดท้ายแบบนี้จะเกิดขึ้นอีก`}</p></div>`;
 }
-function renderGEChain(){
+function renderGEChain(embed){
   const en = isEN();
-  if(!state.isOwner) return `<section class="gea"><div class="empty-state">${en ? 'This page is for the site owner.' : 'หน้านี้สำหรับเจ้าของเว็บเท่านั้น'}</div></section>`;
+  if(!embed && !state.isOwner) return `<section class="gea"><div class="empty-state">${en ? 'This page is for the site owner.' : 'หน้านี้สำหรับเจ้าของเว็บเท่านั้น'}</div></section>`;
   gecKick();
   const p = GEC_POLLS.ge2026, d = gecLoad('ge2026'), o = gecLoad('ge2025');
   const N = v => Math.round(v).toLocaleString('en-US');
   const pc = v => (v * 100).toFixed(v < .1 ? 1 : 0) + '%';
   const hms = ms => { const t = new Date(ms); return [t.getHours(), t.getMinutes(), t.getSeconds()].map(v => String(v).padStart(2, '0')).join(':'); };
   const hm = ms => { const t = new Date(Math.round(ms / 60000) * 60000); return `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`; };
-  const head = `<div class="gea-head"><button class="chip" data-action="ge-back">←</button><h2>${en ? 'The vote on the chain' : 'โหวตบนบล็อกเชน'}</h2><span class="gea-lock">${en ? 'Owner only' : 'เฉพาะเจ้าของเว็บ'}</span></div>
+  const head = `${embed ? '' : `<div class="gea-head"><button class="chip" data-action="ge-back">←</button><h2>${en ? 'The vote on the chain' : 'โหวตบนบล็อกเชน'}</h2><span class="gea-lock">${en ? 'Owner only' : 'เฉพาะเจ้าของเว็บ'}</span></div>`}
     <div class="gec-status"><span>${d ? `<i class="gec-live"></i>${en ? 'Live · up to ' : 'สด · ข้อมูลถึง '}<b class="gec-when">${hms(gecMs(p, d.to))}</b>${en ? '' : ' น.'} · ${en ? 'block' : 'บล็อก'} ${d.to.toLocaleString('en-US')}` : ''}</span>
-      <button class="chip" data-action="gec-refresh"${gecBusy ? ' disabled' : ''}>${en ? 'Refresh' : 'อัปเดต'}</button></div>
+      ${embed ? '' : `<button class="chip" data-action="gec-refresh"${gecBusy ? ' disabled' : ''}>${en ? 'Refresh' : 'อัปเดต'}</button>`}</div>
     <div class="gec-prog"${gecBusy && gecProg ? '' : ' hidden'}><span></span><b><i></i></b></div>
     ${gecErr ? `<p class="gec-err">${en ? 'Could not reach the explorer: ' : 'ดึงข้อมูลไม่สำเร็จ: '}${escapeHtml(gecErr)}</p>` : ''}`;
   if(!d || !d.n) return `<section class="gea gec">${head}${gecAboutCard(en)}<div class="gea-card"><p class="gea-hint">${gecBusy ? (en ? 'Reading the votes…' : 'กำลังอ่านโหวต…') : (en ? 'No votes yet.' : 'ยังไม่มีโหวต')}</p></div></section>`;
 
   const hNow = (d.to - p.start + 1) * GEC_BLOCK / 3600, hAll = (p.end - p.start) * GEC_BLOCK / 3600;
   const wl = Object.entries(d.wallets).sort((a, b) => b[1][0] - a[1][0]);
-  const gaps = d.top + 1 !== d.n;
   const elapsed = hNow < 48 ? (en ? `${Math.floor(hNow)} h ${Math.round(hNow % 1 * 60)} min` : `${Math.floor(hNow)} ชม. ${Math.round(hNow % 1 * 60)} นาที`)
     : (en ? `${Math.floor(hNow / 24)} days` : `${Math.floor(hNow / 24)} วัน`);
   const big = `<div class="gea-card gec-big" data-gshare="total">
@@ -10534,7 +10615,7 @@ function renderGEChain(){
     <div class="gec-trio"><span><b>${N(d.n)}</b>${en ? 'votes' : 'ครั้งที่โหวต'}</span><span><b>${N(wl.length)}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${gecTok(d.sum / wl.length)}</b>${en ? 'average a wallet' : 'เฉลี่ยต่อกระเป๋า'}</span></div>
     <div class="gec-run"><i style="width:${Math.min(100, hNow / hAll * 100).toFixed(1)}%"></i></div>
     <p class="gec-sub">${en ? `Open for ${elapsed} of ${Math.round(hAll / 24)} days · closes 12 Nov` : `เปิดโหวตมาแล้ว ${elapsed} จาก ${Math.round(hAll / 24)} วัน · ปิด 12 พ.ย.`}</p>
-    ${gaps ? `<p class="gec-err">${en ? 'Some votes are missing from this copy — press Refresh.' : 'ข้อมูลในเครื่องขาดบางโหวต กด "อัปเดต" ใหม่'}</p>` : ''}</div>`;
+</div>`;
 
   // the same in baht, at the price per token the owner keeps up to date
   const o2 = o && o.n && o.to >= GEC_POLLS.ge2025.end - 20 ? o : null;
@@ -10542,7 +10623,8 @@ function renderGEChain(){
   const row = (k, v) => `<div class="gec-mrow"><span>${k}</span><b>${v}</b></div>`;
   const money = `<div class="gea-card" data-gshare="money"><h3 class="gec-h">${en ? 'In baht' : 'มูลค่าเป็นเงิน'}</h3>
     <p class="gec-mbig">${gecBaht(d.sum, en)}</p>
-    <label class="gec-mprice">${en ? 'Price' : 'ราคา'} <input class="gec-price" inputmode="decimal" value="${gecPrice}" onchange="gecSetPrice(this.value)" aria-label="${en ? 'Baht per token' : 'บาทต่อโทเคน'}"> ${en ? 'baht a token' : 'บาท/โทเคน'}</label>
+    ${state.isOwner ? `<label class="gec-mprice">${en ? 'Price' : 'ราคา'} <input class="gec-price" inputmode="decimal" value="${gecPrice}" onchange="gecSetPrice(this.value)" aria-label="${en ? 'Baht per token' : 'บาทต่อโทเคน'}"> ${en ? 'baht a token' : 'บาท/โทเคน'}</label>`
+      : `<p class="gec-mprice">${en ? `At ${gecPrice} baht a token` : `คิดที่ราคา ${gecPrice} บาท/โทเคน`}</p>`}
     <div class="gec-mrows">
       ${row(en ? 'Per wallet' : 'เฉลี่ยต่อกระเป๋า', gecBaht(d.sum / wl.length, en))}
       ${row(en ? 'Per vote' : 'เฉลี่ยต่อครั้ง', gecBaht(d.sum / d.n, en))}
@@ -14350,7 +14432,7 @@ function renderMain(){
   hb('.cal-btn', state.view === 'calendar'); hb('.shop-btn:not(.cal-btn)', state.view === 'shop'); hb('.ge-btn', state.view === 'timeline');
   if(state.view === 'stats') addBoxShareButtons(main);
   if(state.view === 'gelive') bindGEAdmin();
-  if(state.view === 'gechain') gecAddShare(main);
+  if(state.view === 'gechain' || (state.view === 'timeline' && state.geTab === 'chain')) gecAddShare(main);
   attachMainEvents();
   startBirthdayFireworks();
   bindEdgeFades();
@@ -14717,6 +14799,7 @@ function urlForSnapshot(snap){
                                if(snap.compareWith) p.set('vs', snap.compareWith); }
   else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
   else if(snap.view === 'timeline' && snap.geTab === 'results') p.set('v', 'results');
+  else if(snap.view === 'timeline' && snap.geTab === 'chain') p.set('v', 'vote');
   else if(snap.view === 'gelive') p.set('v', 'gelive');
   else if(snap.view === 'gechain') p.set('v', 'gechain');
   // not one to share, but a reload should land back on it rather than on Home
@@ -14760,6 +14843,7 @@ function applyUrlToState(){
     state.view='single'; state.selectedSingle=sng; return;
   }
   if(view === 'results'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results'; return; }
+  if(view === 'vote'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; return; }
   if(view === 'gelive'){ state.view = 'gelive'; return; }
   if(view === 'gechain'){ state.view = 'gechain'; return; }
   if(view === 'profile'){ state.view = 'profile'; return; }

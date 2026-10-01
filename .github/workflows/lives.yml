@@ -1,6 +1,6 @@
-# Refresh every member's iAM48 live stats and the song videos' view counts
-# and publish them. The site reads data/lives.json and data/youtube.json;
-# nothing else is touched.
+# Refresh every member's iAM48 live stats and the song videos' view counts,
+# and the GE vote's copy from the chain, and publish them. The site reads
+# data/lives.json, data/youtube.json and data/chain-*.json; nothing else is touched.
 name: Refresh live stats
 
 on:
@@ -42,6 +42,13 @@ jobs:
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python3 scripts/collect-youtube.py
+
+      - name: Read the GE vote off the chain
+        # Leaves data/chain-ge2025.json and data/chain-ge2026.json, which the
+        # GE2026 vote tab starts from; it then reads only what came since.
+        continue-on-error: true      # an explorer that turns us away must not hold back the rest
+        timeout-minutes: 8
+        run: node scripts/collect-chain.mjs
 
       - name: Publish if anything changed
         env:
