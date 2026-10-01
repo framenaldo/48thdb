@@ -40,6 +40,8 @@ if(!done25) writeFileSync(F25, JSON.stringify(g.ge2025));
 writeFileSync(F26, JSON.stringify({ ge2026:g.ge2026, tok:g.tok }));
 // a few KB for the home page's running total: where the count stands, the
 // last two minutes' votes (so they are not counted twice), and GE2025 by the hour
+// w8: each voting wallet by its last 8 hex digits, enough to count wallets
+// (and tell a new one) without shipping whole addresses
 writeFileSync('data/chain-summary.json', JSON.stringify({ to:g.ge2026.to, n:g.ge2026.n, sum:g.ge2026.sum, recent:g.ge2026.recent,
-  hours25:Array.from(g.ge2025.hours, v => v || 0) }));
+  w8:Object.keys(g.ge2026.wallets).map(w => w.slice(-8)), hours25:Array.from(g.ge2025.hours, v => v || 0) }));
 console.log(`GE2025 ${g.ge2025.n} votes to block ${g.ge2025.to}; GE2026 ${g.ge2026.n} votes, ${g.tok.n} transfers, to block ${g.ge2026.to}`);

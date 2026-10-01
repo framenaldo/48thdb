@@ -10520,7 +10520,8 @@ async function gecLiteSync(){
   try{
     const p = GEC_POLLS.ge2026, full = gecLoad('ge2026'), past = gecLoad('ge2025');
     if(full && (!gecLite || full.to > gecLite.to))
-      gecLite = { to:full.to, n:full.n, sum:full.sum, recent:full.recent.slice(), hours25:(gecLite && gecLite.hours25) || (past && past.hours) || null };
+      gecLite = { to:full.to, n:full.n, sum:full.sum, recent:full.recent.slice(), w8:Object.keys(full.wallets).map(w => w.slice(-8)),
+        hours25:(gecLite && gecLite.hours25) || (past && past.hours) || null };
     if(!gecLite || !gecLite.hours25){
       const r = await fetch('data/chain-summary.json', { cache:'no-cache' });
       if(r.ok){ const j = await r.json(); if(!gecLite || j.to > gecLite.to) gecLite = j; else gecLite.hours25 = j.hours25; }
@@ -10528,10 +10529,11 @@ async function gecLiteSync(){
     if(!gecLite) return;
     const head = parseInt(await gecRpc('eth_blockNumber', []), 16), L = gecLite;
     const seen = new Set(L.recent.map(r => r[0]));
+    if(!(L.ws instanceof Set)) L.ws = new Set(L.w8 || []);
     await gecLogs(p, Math.max(p.start, L.to + 1 - 40), Math.min(head, p.end), [GEC_VOTED], (logs, b) => {
       for(const l of logs){
         const k = gecKeyTx(l); if(seen.has(k)) continue; seen.add(k);
-        L.recent.push([k, parseInt(l.blockNumber, 16)]); L.n++; L.sum += gecAmt(l);
+        L.recent.push([k, parseInt(l.blockNumber, 16)]); L.n++; L.sum += gecAmt(l); L.ws.add(l.topics[1].slice(-8));
       }
       L.to = Math.max(L.to, b);
     });
@@ -10559,11 +10561,10 @@ function gecHomeTeaser(en){
   const poster = `<img class="gec-t-poster" src="posters/election-2026-s.jpg" alt="" loading="lazy" decoding="async">`;
   if(!L) return `<button class="gec-teaser is-home is-wait" data-action="nav-vote">${poster}<span class="gec-t-k"><i class="gec-live"></i>${en ? 'The vote, live' : 'ยอดโหวตสด'}</span>
     <span class="gec-t-row">${en ? 'Reading the votes…' : 'กำลังโหลดยอดโหวต…'}</span></button>`;
-  const hNow = (L.to - p.start + 1) * GEC_BLOCK / 3600, same = L.hours25 ? gecUpTo({ hours:L.hours25 }, hNow) : 0;
   return `<button class="gec-teaser is-home" data-action="nav-vote">${poster}
     <span class="gec-t-k"><i class="gec-live"></i>${en ? 'Tokens voted · from the blockchain' : 'โทเคนที่โหวตแล้ว · จากบล็อกเชน'}</span>
     <span class="gec-t-v">${gecTok(L.sum)}</span>
-    <span class="gec-t-row"><b>${gecN(L.n)}</b> ${en ? 'votes' : 'ครั้ง'}${same > 0 ? ` · <b class="gec-t-x">×${(L.sum / same).toFixed(2)}</b> ${en ? 'GE2025 at this point' : 'เทียบ GE2025'}` : ''}</span>
+    <span class="gec-t-row"><b>${gecN(L.n)}</b> ${en ? 'votes' : 'ครั้ง'}${L.ws && L.ws.size ? ` · <b>${gecN(L.ws.size)}</b> ${en ? 'wallets' : 'กระเป๋า'} · ${en ? 'average' : 'เฉลี่ย'} <b class="gec-t-x">${gecTok(L.sum / L.ws.size)}</b> ${en ? 'a wallet' : 'ต่อกระเป๋า'}` : ''}</span>
     <span class="gec-t-row">${en ? `Voting closes in ${left} days · 12 Nov` : `ปิดโหวตในอีก ${left} วัน · 12 พ.ย.`}</span>
     <span class="gec-t-go">${en ? 'All the vote figures →' : 'ดูสถิติการโหวต →'}</span></button>`;
 }
