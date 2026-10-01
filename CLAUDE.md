@@ -41,7 +41,10 @@ results desk. It reads the iAM48 vote straight off TokenX in the browser
 are cached by its CDN and repeat page 1) and keeps running sums in
 localStorage. Each vote carries a salted hash, so there are no per-member
 counts on the chain; don't promise them. A new election needs its poll
-address and start/end blocks from the ElectionFactory's `createPoll`.
+address and start/end blocks from the ElectionFactory's `createPoll`, and its
+token's address and mint block in `GEC_TOKEN` (the supply card follows every
+Transfer: mint → organiser's vault → the wallets the vault pays = sales channels
+→ buyers; it checks out exactly against the votes).
 
 ## House rules
 
