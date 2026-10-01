@@ -2872,9 +2872,6 @@
   .gec-axis{ display:flex; justify-content:space-between; gap:8px; margin-top:4px; font-size:11px; font-weight:700; color:var(--ink-soft); }
   .gec-key i{ display:inline-block; width:14px; height:3px; border-radius:2px; vertical-align:middle; margin:0 4px 0 8px; }
   .gec-key i.is-26{ background:var(--bnk); } .gec-key i.is-25{ background:var(--cgm); }
-  .gec-bars{ display:flex; align-items:flex-end; gap:2px; height:90px; padding:4px; border-radius:10px; background:var(--paper-dim); }
-  .gec-bars span{ flex:1; height:100%; display:flex; align-items:flex-end; }
-  .gec-bars i{ display:block; width:100%; min-height:2px; border-radius:3px 3px 0 0; background:var(--bnk); }
   .gec-rows{ display:flex; flex-direction:column; gap:7px; }
   .gec-row{ display:grid; grid-template-columns:62px 1fr auto; align-items:center; gap:8px; font-size:12px; font-weight:700; }
   .gec-l{ color:var(--ink); } .gec-r{ color:var(--ink-soft); white-space:nowrap; }
@@ -2897,6 +2894,14 @@
   .gec-mrow + .gec-mrow{ border-top:1px solid color-mix(in srgb, var(--ink-soft) 14%, transparent); }
   .gec-mrow span{ color:var(--ink-soft); font-weight:600; }
   .gec-mrow b{ font-variant-numeric:tabular-nums; text-align:right; }
+  .gec-hours{ display:flex; flex-direction:column; gap:2px; max-height:420px; overflow:auto; padding:4px 10px; border-radius:12px; background:var(--paper-dim); }
+  .gec-hr{ display:grid; grid-template-columns:88px 1fr auto; align-items:center; gap:8px; padding:4px 0; font-size:12.5px; }
+  .gec-hl{ color:var(--ink-soft); font-weight:700; font-variant-numeric:tabular-nums; }
+  .gec-hr b{ font-variant-numeric:tabular-nums; min-width:76px; text-align:right; }
+  .gec-hr .gec-bar{ background:var(--card); }
+  .gec-hr .gec-bar i{ background:var(--bnk); }
+  .gec-hr.is-now .gec-hl::after{ content:''; display:inline-block; width:6px; height:6px; margin-left:5px; border-radius:50%; background:#E0243A; vertical-align:1px; animation:gec-pulse 1.6s ease-in-out infinite; }
+  .gec-hr.is-best b{ color:var(--bnk); }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -9914,12 +9919,22 @@ async function gecLogs(p, from, last, topics, each, step = 5000){
 const gecAmt = l => Number(BigInt('0x' + l.data.slice(2, 66))) / 1e18;
 async function gecSync(id, head){
   const p = GEC_POLLS[id];
-  const d = gecLoad(id) || (gecData[id] = { to:p.start - 1, n:0, sum:0, top:-1, hours:[], wallets:{} });
-  // a minute short of the tip, so a block the explorer has not finished indexing is not passed over
-  const last = Math.min(head - 20, p.end);
-  await gecLogs(p, d.to + 1, last, [GEC_VOTED], (logs, b) => {
+  const d = gecLoad(id) || (gecData[id] = { to:p.start - 1, n:0, sum:0, top:-1, hours:[], wallets:{}, recent:[] });
+  if(d.to >= p.end) return;
+  // Right up to the tip, but each pass reads the last 40 blocks (two minutes)
+  // again, in case the explorer had not finished indexing them, and skips any
+  // vote it has already counted. A copy from before `recent` existed starts clean.
+  const last = Math.min(head, p.end);
+  const seen = new Set((d.recent || []).map(r => r[0]));
+  const from = d.recent ? Math.max(p.start, d.to + 1 - 40) : d.to + 1;
+  if(!d.recent) d.recent = [];
+  await gecLogs(p, from, last, [GEC_VOTED], (logs, b) => {
     for(const l of logs){
+      const key = l.transactionHash + ':' + l.logIndex;
+      if(seen.has(key)) continue;
+      seen.add(key);
       const bn = parseInt(l.blockNumber, 16), w = '0x' + l.topics[1].slice(26);
+      d.recent.push([key, bn]);
       const amt = gecAmt(l), h = gecHour(p, bn);
       d.n++; d.sum += amt; d.top = Math.max(d.top, parseInt(l.topics[2], 16));
       d.hours[h] = (d.hours[h] || 0) + amt;
@@ -9927,10 +9942,11 @@ async function gecSync(id, head){
       const ow = gecWallet && gecWallet.v && gecWallet.w === w && gecWallet.v[id];
       if(ow && !ow.some(v => v.tx === l.transactionHash)) ow.push({ b:bn, amt, tx:l.transactionHash });
     }
-    d.to = b;
+    d.to = Math.max(d.to, b);
     gecProg = { id, pct:Math.min(1, (b - p.start + 1) / Math.max(1, last - p.start + 1)) };
     gecPaintProgress();
   });
+  d.recent = d.recent.filter(r => r[1] > d.to - 60);
   gecSave(id, d);
 }
 
@@ -10000,7 +10016,7 @@ function renderGECWallet(en, N, hm){
 }
 function gecKick(force){
   if(!state.isOwner || gecBusy) return;
-  if(!force && Date.now() - gecAt < 8000 && gecLoad('ge2026')) return;
+  if(!force && Date.now() - gecAt < 2500 && gecLoad('ge2026')) return;
   const before = gecLoad('ge2026'), n0 = before ? before.n : -1, had25 = !!gecLoad('ge2025'), err0 = gecErr;
   gecErr = null;
   gecBusy = (async () => {
@@ -10016,11 +10032,11 @@ function gecKick(force){
     if(force || !had25 || gecErr !== err0 || !d || d.n !== n0) gecDraw();
     else gecStamp();
   })();
-  // a block every 3 seconds; looking every 10 is near enough to live
+  // a block every 3 seconds, so a look every 3 seconds
   if(!gecTimer) gecTimer = setInterval(() => {
     if(state.view !== 'gechain'){ clearInterval(gecTimer); gecTimer = null; return; }
     if(!document.hidden) gecKick();
-  }, 10000);
+  }, 3000);
 }
 // the "up to" line alone, when a check found nothing new
 function gecStamp(){
@@ -10123,8 +10139,11 @@ function renderGEChain(){
   const peak = Math.max(1, ...bars.map(b => b[1]));
   const best = bars.reduce((a, b) => b[1] > a[1] ? b : a, bars[0]);
   const hourly = `<div class="gea-card"><h3 class="gec-h">${en ? 'Tokens an hour, last 24 hours' : 'โทเคนรายชั่วโมง 24 ชม. ล่าสุด'}</h3>
-    <div class="gec-bars">${bars.map(([h, v]) => `<span title="${hm(gecMs(p, p.start + h * 1200))} · ${gecTok(v)}"><i style="height:${(v / peak * 100).toFixed(1)}%"></i></span>`).join('')}</div>
-    <div class="gec-axis"><span>${hm(gecMs(p, p.start + from * 1200))}</span><span>${hm(gecMs(p, p.start + (hi + 1) * 1200))}</span></div>
+    <div class="gec-hours">${bars.slice().reverse().map(([h, v]) => `<div class="gec-hr${h === hi ? ' is-now' : ''}${h === best[0] ? ' is-best' : ''}">
+      <span class="gec-hl">${hm(gecMs(p, p.start + h * 1200))}–${hm(gecMs(p, p.start + (h + 1) * 1200))}</span>
+      <span class="gec-bar"><i style="width:${Math.max(.5, v / peak * 100).toFixed(1)}%"></i></span>
+      <b>${gecTok(v)}</b></div>`).join('')}</div>
+    <p class="gec-sub">${en ? 'The top row is the hour still running.' : 'แถวบนสุดคือชั่วโมงที่ยังไม่จบ'}</p>
     <p class="gec-sub">${en ? `Busiest hour: ${hm(gecMs(p, p.start + best[0] * 1200))} with ${gecTok(best[1])}` : `ชั่วโมงที่โหวตมากสุด ${hm(gecMs(p, p.start + best[0] * 1200))} น. ได้ ${gecTok(best[1])} โทเคน`}</p></div>`;
 
   // how big the wallets are, and how much of the vote the biggest hold
