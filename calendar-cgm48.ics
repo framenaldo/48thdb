@@ -238,6 +238,17 @@ DTSTART;TZID=Asia/Bangkok:20260929T180000
 DTEND;TZID=Asia/Bangkok:20260929T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-live-1001-2026-10-01@48thdb
+DTSTAMP:20261001T000000Z
+SUMMARY:CGM48 11th Single "Koi Tsunjatta – Let me know!" Pop Up Live
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Ginna\, Kwan\, Nana\, Else\n\nhttps:/
+ /48thdb.com/?e=ev-cgm48-popup-live-1001
+URL:https://48thdb.com/?e=ev-cgm48-popup-live-1001
+DTSTART;TZID=Asia/Bangkok:20261001T180000
+DTEND;TZID=Asia/Bangkok:20261001T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:ยกเลิก: CGM48 11th Single "Koi Tsunjatta – Let me kno
