@@ -332,18 +332,47 @@ DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
  โปรยประจำงาน\n• เข้างานฟรี\n
  • ช่วงกิจกรรม 3 ต.ค. 11:00–16:00 · 4 ต.
  ค. 11:00–20:00\n• 3 ต.ค. ประกาศผลโหวต 48
-  ชั่วโมงแรก\n• 3 ต.ค. เปิดตัวเ
- พลง "Kimi to Doko ka e Ikitai" ครั้งแรก\n• บั
- ตรเข้าร่วม Group Hi-Touch ได้จากการ
- ซื้อเข็มกลัดภายในงาน\n• Hachi Ch
- a และ Merchandise เมมเบอร์อยู่เต็ม 1
-  ชั่วโมง ไม่สลับกลุ่ม\n• ตาร
- างกิจกรรมอาจเปลี่ยนแปลงภ
- ายหลัง\n• รายละเอียดอื่นรอ
- ประกาศ\n\nhttps://48thdb.com/?e=ev-election-fanfest
+  ชั่วโมงแรก\n• 3 ต.ค. 18:00 น. First Performan
+ ce & MV Premiere เพลง "Kimi to Doko ka e Ikitai – อยาก
+ จะไปกับเธอ"\n• บัตรเข้าร่วม 
+ Group Hi-Touch ได้จากการซื้อเข็มกล
+ ัดภายในงาน\n• Hachi Cha และ Merchandise เม
+ มเบอร์อยู่เต็ม 1 ชั่วโมง ไม
+ ่สลับกลุ่ม\n• ตารางกิจกรรม
+ อาจเปลี่ยนแปลงภายหลัง\n• ร
+ ายละเอียดอื่นรอประกาศ\n\nhttps:/
+ /48thdb.com/?e=ev-election-fanfest
 URL:https://48thdb.com/?e=ev-election-fanfest
 DTSTART;VALUE=DATE:20261003
 DTEND;VALUE=DATE:20261005
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-first-performance-2026-10-03@48thdb
+DTSTAMP:20261003T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai – อย
+ ากจะไปกับเธอ" First Performance & MV Premiere
+LOCATION:MCC Hall\, The Mall Lifestore Bangkapi (Bangkok)
+DESCRIPTION:รอประกาศรายชื่อ\n• การแ
+ สดงเพลง "Kimi to Doko ka e Ikitai – อยากจะไ
+ ปกับเธอ" ครั้งแรก และ MV Premiere\n•
+  ส่วนหนึ่งของ Senbatsu General Election 2026: Fan 
+ Festival 2026\n• KIDS ZONE: สำหรับผู้ชมอาย
+ ุไม่เกิน 12 ปี\n• STANDING ZONE: โซนยืน
+ รับชม ใช้โทรศัพท์มือถือบั
+ นทึกภาพและวิดีโอได้ โดยไม
+ ่ยกสูงเกินระดับศีรษะ\n• CAMERA Z
+ ONE: สำหรับผู้ที่ต้องการบันท
+ ึกภาพและวิดีโอด้วยกล้องถ
+ ่ายภาพและอุปกรณ์เสริม\n• ร
+ ายละเอียดการต่อคิวและการ
+ เข้า Camera Zone จะแจ้งให้ทราบอีก
+ ครั้งบริเวณหน้างาน\n• ตรวจ
+ สอบรายละเอียดและข้อปฏิบั
+ ติของแต่ละโซนจากภาพประกา
+ ศ\n\nhttps://48thdb.com/?e=ev-kimi-first-performance
+URL:https://48thdb.com/?e=ev-kimi-first-performance
+DTSTART;TZID=Asia/Bangkok:20261003T180000
+DTEND;TZID=Asia/Bangkok:20261003T200000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-ge6-single@48thdb
