@@ -2990,6 +2990,12 @@
   .gec-t-poster{ position:absolute; right:14px; top:50%; transform:translateY(-50%) rotate(3deg); width:84px; height:auto; border-radius:10px;
     box-shadow:0 6px 16px rgba(0,0,0,.45), 0 0 0 2px rgba(243,201,105,.55); }
   .gec-teaser.is-home .gec-t-v{ font-size:30px; }
+  .gec-mrow.has-bar{ flex-wrap:wrap; row-gap:6px; }
+  .gec-mrow.has-bar > span:first-child{ flex:1 1 0; min-width:0; }
+  .gec-mrow.has-bar > b{ flex:none; }
+  .gec-mbar{ flex:0 0 100%; height:10px; border-radius:99px; background:color-mix(in srgb, var(--ink-soft) 14%, transparent); overflow:hidden; }
+  .gec-mbar i{ display:block; height:100%; border-radius:99px; background:var(--bnk); }
+  .gec-mbar.is-early i{ background:var(--cgm); }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -10665,7 +10671,8 @@ function gecStretchCard(en, pc, o){
   const d0 = new Date(q.t0 * 1000), d1 = new Date(gecMs(q, q.end));
   const dt = t => `${t.getDate()} ${M[t.getMonth()]}`;
   return `<div class="gea-card" data-gshare="stretch"><h3 class="gec-h">${en ? 'How GE2025 finished' : 'ช่วงโค้งสุดท้ายของ GE2025'}</h3>
-    <div class="gec-mrows">${rows.map(([k, v]) => `<div class="gec-mrow"><span>${k}</span><b>${gecTok(v)}<small>${pc(v / o.sum)}</small></b></div>`).join('')}</div>
+    <div class="gec-mrows">${rows.map(([k, v], i) => `<div class="gec-mrow has-bar"><span>${k}</span><b>${gecTok(v)}<small>${pc(v / o.sum)}</small></b>
+      <span class="gec-mbar${i < 2 ? ' is-early' : ''}"><i style="width:${Math.max(1, v / o.sum * 100).toFixed(1)}%"></i></span></div>`).join('')}</div>
     <p class="gec-sub">${en ? `GE2025 ran ${Math.round(L / 24)} days (${dt(d0)} – ${dt(d1)} 2025); this year runs ${Math.round((GEC_POLLS.ge2026.end - GEC_POLLS.ge2026.start) * GEC_BLOCK / 86400)}. It only reached half its final total on day ${Math.floor(half / 24) + 1} of ${Math.round(L / 24)}. That late surge is what the “on last year’s curve” figure assumes will happen again.`
       : `GE2025 เปิดโหวต ${Math.round(L / 24)} วัน (${dt(d0)} – ${dt(d1)} 2025) ปีนี้ ${Math.round((GEC_POLLS.ge2026.end - GEC_POLLS.ge2026.start) * GEC_BLOCK / 86400)} วัน · กว่ายอดจะถึงครึ่งหนึ่งของยอดสุดท้ายต้องรอถึงวันที่ ${Math.floor(half / 24) + 1} จาก ${Math.round(L / 24)} วัน · ตัวเลข “ถ้าเดินตามเส้นปีที่แล้ว” คือสมมติว่าช่วงโค้งสุดท้ายแบบนี้จะเกิดขึ้นอีก`}</p></div>`;
 }
