@@ -2997,9 +2997,14 @@
   .gec-mbar i{ display:block; height:100%; border-radius:99px; background:var(--bnk); }
   .gec-mbar.is-early i{ background:var(--cgm); }
   /* an event that is over: faded back, full colour again under a finger or a pointer */
-  .ev-card.is-done{ opacity:.55; filter:saturate(.55); transition:opacity .2s, filter .2s; }
-  .ev-card.is-done:active, .ev-card.is-done:focus-within{ opacity:.85; filter:none; }
-  @media (hover:hover){ .ev-card.is-done:hover{ opacity:.85; filter:none; } }
+  /* the fade is on what is inside: the card itself is faded in by the scroll
+     reveal, whose animation would put its opacity back to full */
+  /* !important: the themed and dark-mode card rules would paint it back */
+  .ev-card.is-done, .ev-card.is-done.is-themed{ background:transparent !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+    box-shadow:none !important; border:1.5px dashed color-mix(in srgb, var(--ink-soft) 45%, transparent) !important; }
+  .ev-card.is-done > *{ opacity:.4; filter:grayscale(.9); transition:opacity .2s, filter .2s; }
+  .ev-card.is-done:active > *, .ev-card.is-done:focus-within > *{ opacity:.8; filter:none; }
+  @media (hover:hover){ .ev-card.is-done:hover > *{ opacity:.8; filter:none; } }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
