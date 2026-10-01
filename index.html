@@ -2985,6 +2985,7 @@
   .gec-t-row b{ color:#fff; } .gec-t-row .gec-t-x{ color:#F3C969; }
   .gec-t-go{ margin-top:6px; font-size:13px; font-weight:800; color:#fff; }
   .ge-page .gec{ max-width:none; }
+  .ge-sched-seg{ margin:2px 0 14px; }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -9694,6 +9695,10 @@ function renderGEPosterViewer(id){
 }
 const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo-v2.webp', red:'#B3121E',
   vote:'ev-election-voting', results:'ev-election-results' };
+// "กำหนดการ" holds two views of the same dates: the timeline, and every event as a card
+const geSchedSwitch = (tab, en) => `<div class="gea-seg ge-sched-seg">
+  <button class="${tab === 'timeline' ? 'is-on' : ''}" data-action="ge-tab" data-value="timeline">${en ? 'Timeline' : 'ไทม์ไลน์'}</button>
+  <button class="${tab === 'events' ? 'is-on' : ''}" data-action="ge-tab" data-value="events">${en ? 'All events' : 'งานทั้งหมด'}</button></div>`;
 function renderGEPage(){
   const en = isEN();
   const iso = toYmd(todayStart());
@@ -9734,9 +9739,9 @@ function renderGEPage(){
   // the results tab appears once there is something in it (always for the owner)
   const hasResults = state.isOwner || GE_ROUNDS.some(r => geHasData(r.id) || ((state.geRounds || {})[r.id] || {}).live);
   const liveRound = geLiveRound();
-  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ['chain', en ? 'Live vote' : 'ยอดโหวตสด'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
-    ['timeline', en ? 'Timeline' : 'ไทม์ไลน์'], ['events', en ? 'All events' : 'งานทั้งหมด']]
-    .map(([v, l]) => `<button class="sub-tab${tab === v ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
+  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ['chain', en ? 'Live vote' : 'โหวตสด'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
+    ['timeline', en ? 'Schedule' : 'กำหนดการ']]
+    .map(([v, l]) => `<button class="sub-tab${tab === v || (v === 'timeline' && tab === 'events') ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
   const liveBanner = liveRound && tab !== 'results' ? `<button class="ge-live-banner" data-action="ge-tab" data-value="results">
     <span class="gel-live"><i></i>LIVE</span><span>${en ? 'Announcing' : 'กำลังประกาศ'} ${geRoundLabel(liveRound)}
     <small>· ${en ? `${geAnnounced(liveRound.id)} / ${GE_SEATS} so far` : `ประกาศแล้ว ${geAnnounced(liveRound.id)} / ${GE_SEATS}`}</small></span>→</button>` : '';
@@ -9745,10 +9750,10 @@ function renderGEPage(){
   if(tab === 'results') body = renderGEResults();
   else if(tab === 'chain') body = renderGEChain(true);
   else if(tab === 'candidates') body = renderGECandidates();
-  else if(tab === 'timeline') body = renderTimelinePage(true);
+  else if(tab === 'timeline') body = geSchedSwitch(tab, en) + renderTimelinePage(true);
   else if(tab === 'events'){
     const ahead = events.filter(e => eventLastDay(e) >= iso), past = events.filter(e => eventLastDay(e) < iso);
-    body = `${ahead.map(e => renderEventCard(e, iso)).join('')}
+    body = `${geSchedSwitch(tab, en)}${ahead.map(e => renderEventCard(e, iso)).join('')}
       ${past.length ? `<h3 class="section-label">${en ? 'Over' : 'จบไปแล้ว'}</h3>${past.map(e => renderEventCard(e, iso)).join('')}` : ''}`;
   } else {
     const next = items.filter(it => (it.to || it.d) >= iso).slice(0, 4);
