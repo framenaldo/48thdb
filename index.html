@@ -9852,7 +9852,7 @@ function renderGEPage(){
   // the results tab appears once there is something in it (always for the owner)
   const hasResults = state.isOwner || GE_ROUNDS.some(r => geHasData(r.id) || ((state.geRounds || {})[r.id] || {}).live);
   const liveRound = geLiveRound();
-  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ['chain', en ? 'Live vote' : 'โหวตสด'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
+  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ['chain', en ? 'Live Voting' : 'โหวตสด'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
     ['timeline', en ? 'Schedule' : 'กำหนดการ']]
     .map(([v, l]) => `<button class="sub-tab${tab === v || (v === 'timeline' && tab === 'events') ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
   const liveBanner = liveRound && tab !== 'results' ? `<button class="ge-live-banner" data-action="ge-tab" data-value="results">
@@ -10682,7 +10682,7 @@ function gecHomeCard(en){
     if(state.view !== 'feed'){ clearInterval(gecLiteTimer); gecLiteTimer = null; return; }
     if(!document.hidden) gecLiteSync();
   }, 15000);
-  return `<section class="feed-block is-gevote"><h2 class="section-label">${en ? 'GE2026 · the vote, live' : 'GE2026 · โหวตสด'}</h2>${gecHomeTeaser(en)}</section>`;
+  return `<section class="feed-block is-gevote"><h2 class="section-label">${en ? 'GE2026 · Live Voting' : 'GE2026 · โหวตสด'}</h2>${gecHomeTeaser(en)}</section>`;
 }
 function gecHomeTeaser(en){
   const p = GEC_POLLS.ge2026, L = gecLite;
@@ -10690,10 +10690,10 @@ function gecHomeTeaser(en){
   const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote);
   const left = vote ? Math.max(0, Math.round((parseYmd(eventLastDay(vote)) - parseYmd(toYmd(todayStart()))) / 864e5)) : 0;
   const poster = `<img class="gec-t-poster" src="posters/election-2026-s.jpg" alt="" loading="lazy" decoding="async">`;
-  if(!L) return `<button class="gec-teaser is-home is-wait" data-action="nav-vote">${poster}<span class="gec-t-k"><i class="gec-live"></i>${en ? 'The vote, live' : 'ยอดโหวตสด'}</span>
+  if(!L) return `<button class="gec-teaser is-home is-wait" data-action="nav-vote">${poster}<span class="gec-t-k"><i class="gec-live"></i>${en ? 'Live Voting' : 'ยอดโหวตสด'}</span>
     <span class="gec-t-row">${en ? 'Reading the votes…' : 'กำลังโหลดยอดโหวต…'}</span></button>`;
   return `<button class="gec-teaser is-home" data-action="nav-vote">${poster}
-    <span class="gec-t-k"><i class="gec-live"></i>${en ? 'Tokens voted · from the blockchain' : 'โทเคนที่โหวตแล้ว · จากบล็อกเชน'}</span>
+    <span class="gec-t-k"><i class="gec-live"></i>${en ? 'Voting · live on the blockchain' : 'โทเคนที่โหวตแล้ว · จากบล็อกเชน'}</span>
     <span class="gec-t-v">${gecTok(L.sum)}</span>
     <span class="gec-t-row"><b>${gecN(L.n)}</b> ${en ? 'votes' : 'ครั้ง'}${L.ws && L.ws.size ? ` · <b>${gecN(L.ws.size)}</b> ${en ? 'wallets' : 'กระเป๋า'}` : ''}</span>
     <span class="gec-t-row">${en ? 'Worth' : 'มูลค่า'} <b class="gec-t-x">${gecBaht(L.sum, en)}</b></span>
@@ -10710,11 +10710,11 @@ function gecHomePaint(){
 function gecTeaser(en){
   gecKick();
   const { d, o, hNow, wl } = gecCtx();
-  if(!d || !d.n) return `<button class="gec-teaser is-wait" data-action="ge-tab" data-value="chain"><span class="gec-t-k"><i class="gec-live"></i>${en ? 'The vote, live' : 'ยอดโหวตสด'}</span>
+  if(!d || !d.n) return `<button class="gec-teaser is-wait" data-action="ge-tab" data-value="chain"><span class="gec-t-k"><i class="gec-live"></i>${en ? 'Live Voting' : 'ยอดโหวตสด'}</span>
     <span class="gec-t-row">${en ? 'Reading the votes…' : 'กำลังโหลดยอดโหวต…'}</span></button>`;
   const same = o ? gecUpTo(o, hNow) : 0;
   return `<button class="gec-teaser" data-action="ge-tab" data-value="chain">
-    <span class="gec-t-k"><i class="gec-live"></i>${en ? 'The vote, live · from the blockchain' : 'ยอดโหวตสด · จากบล็อกเชน'}</span>
+    <span class="gec-t-k"><i class="gec-live"></i>${en ? 'Voting · live on the blockchain' : 'ยอดโหวตสด · จากบล็อกเชน'}</span>
     <span class="gec-t-v">${gecTok(d.sum)}<small>${en ? 'tokens voted' : 'โทเคนที่โหวตแล้ว'}</small></span>
     <span class="gec-t-row"><b>${gecN(d.n)}</b> ${en ? 'votes' : 'ครั้ง'} · <b>${gecN(wl.length)}</b> ${en ? 'wallets' : 'กระเป๋า'}${same > 0 ? ` · <b class="gec-t-x">×${(d.sum / same).toFixed(2)}</b> ${en ? 'on GE2025 at this point' : 'เทียบ GE2025 ณ เวลาเดียวกัน'}` : ''}</span>
     <span class="gec-t-go">${en ? 'All the vote figures →' : 'ดูสถิติการโหวตทั้งหมด →'}</span></button>`;
