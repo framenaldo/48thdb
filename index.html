@@ -3006,6 +3006,26 @@
   .ev-card.is-done:active > *, .ev-card.is-done:focus-within > *{ opacity:.8; filter:none; }
   @media (hover:hover){ .ev-card.is-done:hover > *{ opacity:.8; filter:none; } }
   .ff-show-link{ border:0; background:none; padding:0; font:inherit; font-weight:800; color:inherit; text-align:left; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+  /* the big-throw alert: drops in under the header, gold on red */
+  .gec-alert{ position:fixed; z-index:80; left:50%; top:calc(env(safe-area-inset-top, 0px) + 12px); width:min(560px, calc(100% - 24px));
+    transform:translate(-50%, -140%); transition:transform .35s cubic-bezier(.2,.9,.3,1.2), opacity .35s; opacity:0;
+    display:flex; align-items:center; gap:10px; padding:12px 12px 12px 14px; box-sizing:border-box; border-radius:18px; color:#fff;
+    font-family:'Noto Sans Thai',sans-serif; background:radial-gradient(120% 160% at 0% 0%, #D4202E 0%, #7A0C16 60%, #3A050B 100%);
+    box-shadow:0 0 0 2px #F3C969, 0 14px 34px rgba(122,12,22,.45); }
+  .gec-alert.show{ transform:translate(-50%, 0); opacity:1; animation:gec-glow 1.4s ease-in-out 2; }
+  @keyframes gec-glow{ 50%{ box-shadow:0 0 0 3px #FFE29A, 0 0 34px rgba(243,201,105,.75); } }
+  .gec-alert-fire{ font-size:28px; line-height:1; }
+  .gec-alert-txt{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .gec-alert-txt b{ font-size:16px; font-weight:800; color:#F3C969; }
+  .gec-alert-txt small{ font-size:12px; font-weight:600; color:rgba(255,255,255,.85); }
+  .gec-alert-go{ flex:none; border:0; border-radius:12px; padding:8px 14px; font:inherit; font-size:14px; font-weight:800; color:#3A050B; background:#F3C969;
+    cursor:pointer; box-shadow:0 3px 0 #B8862E; }
+  .gec-alert-go:active{ transform:translateY(2px); box-shadow:none; }
+  .gec-alert-x{ flex:none; border:0; background:none; color:rgba(255,255,255,.75); font-size:16px; cursor:pointer; padding:4px; }
+  @media (prefers-reduced-motion: reduce){ .gec-alert{ transition:opacity .2s; } .gec-alert.show{ animation:none; } }
+  .gec-t-huge{ align-self:flex-start; margin-top:4px; font-size:12.5px; font-weight:800; color:#3A050B; background:#F3C969; border-radius:99px; padding:3px 10px; }
+  .gec-feed li.is-huge{ background:color-mix(in srgb, #F3C969 22%, transparent); border-radius:8px; }
+  .gec-bigtag.is-huge{ background:#C8901F; }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -10079,6 +10099,7 @@ const gecNewVotes = p => ({ to:p.start - 1, n:0, sum:0, hours:[], wallets:{}, re
 const gecNewTok = () => ({ to:GEC_TOKEN.start - 1, n:0, minted:0, burnt:0, bal:{}, vault:[], chan:{}, recent:[] });
 // one vote into the running sums
 function gecVote(d, p, id, w, amt, bn, tx){
+  if(id === 'ge2026' && typeof gecWatch === 'function') gecWatch(w, amt, bn);
   const h = gecHour(p, bn);
   d.n++; d.sum += amt;
   d.hours[h] = (d.hours[h] || 0) + amt;
@@ -10533,7 +10554,9 @@ async function gecLiteSync(){
     await gecLogs(p, Math.max(p.start, L.to + 1 - 40), Math.min(head, p.end), [GEC_VOTED], (logs, b) => {
       for(const l of logs){
         const k = gecKeyTx(l); if(seen.has(k)) continue; seen.add(k);
-        L.recent.push([k, parseInt(l.blockNumber, 16)]); L.n++; L.sum += gecAmt(l); L.ws.add(l.topics[1].slice(-8));
+        const bn = parseInt(l.blockNumber, 16), amt = gecAmt(l);
+        L.recent.push([k, bn]); L.n++; L.sum += amt; L.ws.add(l.topics[1].slice(-8));
+        gecWatch('0x' + l.topics[1].slice(26), amt, bn);
       }
       L.to = Math.max(L.to, b);
     });
@@ -10542,6 +10565,57 @@ async function gecLiteSync(){
   }catch(e){}
   finally{ gecLiteBusy = false; }
   gecHomePaint();
+}
+/* A big throw: one wallet putting 10,000 tokens or more into the vote within
+   ten minutes — in one go, or 1,000 at a time as the big voters do. Every page
+   that follows the vote watches for it; one that happened in the last quarter
+   of an hour pops up an alert, and the home card keeps a line about it for an hour. */
+const GEC_HUGE = 10000, GEC_HUGE_GAP = 200;   // 200 blocks = 10 minutes
+const gecBursts = new Map();   // wallet → { start, last, sum, n, told }
+let gecLastHuge = null, gecAlertQ = [], gecAlertOn = false;
+const gecTold = (() => { try{ return new Set(JSON.parse(sessionStorage.getItem('gec-told') || '[]')); }catch(e){ return new Set(); } })();
+function gecWatch(w, amt, bn){
+  let b = gecBursts.get(w);
+  if(!b || bn - b.last > GEC_HUGE_GAP){ b = { start:bn, last:bn, sum:0, n:0, told:false }; gecBursts.set(w, b); }
+  b.sum += amt; b.n++; b.last = Math.max(b.last, bn);
+  if(b.sum < GEC_HUGE) return;
+  const p = GEC_POLLS.ge2026, at = gecMs(p, b.last);
+  if(!gecLastHuge || b.last >= gecLastHuge.last) gecLastHuge = { w, ...b };
+  const key = `${w}:${b.start}`;
+  if(b.told || gecTold.has(key)) return;
+  b.told = true;
+  if(Date.now() - at > 15 * 60000) return;   // an old one, met while catching up: no pop-up
+  gecTold.add(key); try{ sessionStorage.setItem('gec-told', JSON.stringify([...gecTold])); }catch(e){}
+  gecAlertQ.push({ w, ...b });
+  if(!gecAlertOn) setTimeout(gecAlertNext, 0);
+}
+function gecAlertNext(){
+  const a = gecAlertQ.shift();
+  if(!a){ gecAlertOn = false; return; }
+  gecAlertOn = true;
+  const en = isEN(), p = GEC_POLLS.ge2026, t0 = gecHM(gecMs(p, a.start)), t1 = gecHM(gecMs(p, a.last));
+  const el = document.createElement('div');
+  el.className = 'gec-alert'; el.setAttribute('role', 'status');
+  el.innerHTML = `<span class="gec-alert-fire" aria-hidden="true">🔥</span>
+    <span class="gec-alert-txt"><b>${en ? `${gecN(a.sum)} tokens thrown in!` : `มีคนปาโหวต ${gecN(a.sum)} โทเคน!`}</b>
+      <small>${en ? 'wallet' : 'กระเป๋า'} ${gecShort(a.w)} · ${a.n > 1 ? `${gecN(a.n)} ${en ? 'votes' : 'ครั้ง'} · ${t0}–${t1}` : t1}${en ? '' : ' น.'} · ${gecBaht(a.sum, en)}</small></span>
+    <button class="gec-alert-go" data-action="nav-vote">${en ? 'See' : 'ดู'}</button>
+    <button class="gec-alert-x" aria-label="${en ? 'Close' : 'ปิด'}">✕</button>`;
+  document.body.appendChild(el);
+  try{ navigator.vibrate && navigator.vibrate([60, 40, 60]); }catch(e){}
+  requestAnimationFrame(() => el.classList.add('show'));
+  const close = () => { el.classList.remove('show'); setTimeout(() => { el.remove(); gecAlertNext(); }, 350); };
+  el.querySelector('.gec-alert-x').addEventListener('click', close);
+  el.querySelector('.gec-alert-go').addEventListener('click', () => setTimeout(close, 0));
+  setTimeout(close, 14000);
+  if(state.view === 'feed') gecHomePaint();
+}
+// the line on the home card about the latest big throw, while it is under an hour old
+function gecHugeLine(en){
+  const h = gecLastHuge; if(!h) return '';
+  const p = GEC_POLLS.ge2026, at = gecMs(p, h.last);
+  if(Date.now() - at > 3600000) return '';
+  return `<span class="gec-t-huge">🔥 ${gecHM(at)}${en ? '' : ' น.'} ${en ? `${gecN(h.sum)} thrown in` : `ปาโหวต ${gecN(h.sum)}`}</span>`;
 }
 function gecHomeCard(en){
   const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), iso = toYmd(todayStart());
@@ -10566,6 +10640,7 @@ function gecHomeTeaser(en){
     <span class="gec-t-v">${gecTok(L.sum)}</span>
     <span class="gec-t-row"><b>${gecN(L.n)}</b> ${en ? 'votes' : 'ครั้ง'}${L.ws && L.ws.size ? ` · <b>${gecN(L.ws.size)}</b> ${en ? 'wallets' : 'กระเป๋า'}` : ''}</span>
     <span class="gec-t-row">${en ? 'Worth' : 'มูลค่า'} <b class="gec-t-x">${gecBaht(L.sum, en)}</b></span>
+    ${gecHugeLine(en)}
     <span class="gec-t-row">${en ? `Voting closes in ${left} days · 12 Nov` : `ปิดโหวตในอีก ${left} วัน · 12 พ.ย.`}</span>
     <span class="gec-t-go">${en ? 'All the vote figures →' : 'ดูสถิติการโหวต →'}</span></button>`;
 }
@@ -10650,11 +10725,12 @@ function gecFeedCard(en, N, pc, hms){
   gecFeedSeen = new Set(d.feed.map(v => v.tx + v.b));
   const bigSum = d.big.reduce((s, v) => s + v.amt, 0);
   return `<div class="gea-card" data-gshare="feed"><h3 class="gec-h"><i class="gec-live"></i>${en ? 'Latest votes' : 'โหวตล่าสุด'}</h3>
-    <ol class="gec-feed">${list.map(v => `<li class="${v.amt >= GEC_BIG ? 'is-big' : ''}${before && !before.has(v.tx + v.b) ? ' is-new' : ''}">
+    <ol class="gec-feed">${list.map(v => { const hb = gecBursts.get(v.w); const huge = hb && hb.sum >= GEC_HUGE && v.b >= hb.start && v.b <= hb.last;
+      return `<li class="${v.amt >= GEC_BIG ? 'is-big' : ''}${huge ? ' is-huge' : ''}${before && !before.has(v.tx + v.b) ? ' is-new' : ''}">
       <span class="gec-ft">${hms(gecMs(p, v.b))}</span>
       <button class="gec-w" data-action="gec-wallet" data-id="${v.w}">${v.w.slice(0, 6)}…${v.w.slice(-4)}</button>
-      ${v.amt >= GEC_BIG ? `<span class="gec-bigtag">${en ? 'big' : 'ก้อนใหญ่'}</span>` : ''}
-      <b>${gecTok(v.amt, 4)}</b></li>`).join('')}</ol>
+      ${huge ? `<span class="gec-bigtag is-huge">🔥 ${gecN(hb.sum)}</span>` : v.amt >= GEC_BIG ? `<span class="gec-bigtag">${en ? 'big' : 'ก้อนใหญ่'}</span>` : ''}
+      <b>${gecTok(v.amt, 4)}</b></li>`; }).join('')}</ol>
     <p class="gec-sub">${en ? `Big votes (${N(GEC_BIG)} tokens or more): <b>${N(d.big.length)}</b>, together <b>${gecTok(bigSum)}</b> — ${pc(bigSum / d.sum)} of everything voted.`
       : `โหวตก้อนใหญ่ (${N(GEC_BIG)} โทเคนขึ้นไป) <b>${N(d.big.length)}</b> ครั้ง รวม <b>${gecTok(bigSum)}</b> โทเคน คิดเป็น ${pc(bigSum / d.sum)} ของที่โหวตทั้งหมด`}</p></div>`;
 }
