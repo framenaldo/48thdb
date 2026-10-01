@@ -2890,6 +2890,13 @@
   @keyframes gec-pulse{ 50%{ opacity:.25; } }
   @media (prefers-reduced-motion: reduce){ .gec-live{ animation:none; } }
   .gec-status b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+  .gec-mbig{ margin:0; text-align:center; font-size:26px; font-weight:800; letter-spacing:-.01em; color:var(--cgm); font-variant-numeric:tabular-nums; }
+  .gec-mprice{ display:flex; justify-content:center; align-items:center; gap:6px; margin:6px 0 12px; font-size:13px; font-weight:700; color:var(--ink-soft); }
+  .gec-mrows{ display:flex; flex-direction:column; border-radius:12px; background:var(--paper-dim); padding:2px 12px; }
+  .gec-mrow{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:8px 0; font-size:13px; }
+  .gec-mrow + .gec-mrow{ border-top:1px solid color-mix(in srgb, var(--ink-soft) 14%, transparent); }
+  .gec-mrow span{ color:var(--ink-soft); font-weight:600; }
+  .gec-mrow b{ font-variant-numeric:tabular-nums; text-align:right; }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -9937,10 +9944,10 @@ function gecSetPrice(v){
   try{ localStorage.setItem('gec-price', String(n)); }catch(e){}
   gecDraw();
 }
+const gecTok = (v, max = 2) => v.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:max });
 function gecBaht(t, en){
-  const b = t * gecPrice;
-  if(b >= 1e6) return en ? `฿${(b / 1e6).toFixed(2)}M` : `${(b / 1e6).toFixed(2)} ล้านบาท`;
-  return en ? `฿${Math.round(b).toLocaleString('en-US')}` : `${Math.round(b).toLocaleString('en-US')} บาท`;
+  const b = gecTok(t * gecPrice);
+  return en ? `฿${b}` : `${b} บาท`;
 }
 
 /* One wallet's own votes, both years: every one goes into the poll contract
@@ -9979,9 +9986,9 @@ function renderGECWallet(en, N, hm){
       const p = GEC_POLLS[id], list = W.v[id], sum = list.reduce((t, x) => t + x.amt, 0);
       const day = ms => { const t = new Date(ms); return `${t.getDate()} ${monthsShort()[t.getMonth()]}`; };
       if(!list.length) return `<div class="gec-wy"><h4>${id.toUpperCase()}</h4><p class="gec-sub">${en ? 'No votes.' : 'ไม่ได้โหวต'}</p></div>`;
-      const rows = list.slice().reverse().slice(0, 30).map(x => `<li><a href="${GEC_API}/tx/${x.tx}" target="_blank" rel="noopener">${day(gecMs(p, x.b))} ${hm(gecMs(p, x.b))}</a><b>${x.amt.toLocaleString('en-US', { maximumFractionDigits:1 })}</b></li>`).join('');
+      const rows = list.slice().reverse().slice(0, 30).map(x => `<li><a href="${GEC_API}/tx/${x.tx}" target="_blank" rel="noopener">${day(gecMs(p, x.b))} ${hm(gecMs(p, x.b))}</a><b>${gecTok(x.amt, 4)}</b></li>`).join('');
       return `<div class="gec-wy"><h4>${id.toUpperCase()}</h4>
-        <p class="gec-wsum"><b>${N(sum)}</b> ${en ? 'tokens' : 'โทเคน'} · ${gecBaht(sum, en)} · ${N(list.length)} ${en ? (list.length === 1 ? 'vote' : 'votes') : 'ครั้ง'}</p>
+        <p class="gec-wsum"><b>${gecTok(sum)}</b> ${en ? 'tokens' : 'โทเคน'} · ${gecBaht(sum, en)} · ${N(list.length)} ${en ? (list.length === 1 ? 'vote' : 'votes') : 'ครั้ง'}</p>
         <ol class="gec-wl">${rows}</ol>${list.length > 30 ? `<p class="gec-sub">${en ? `and ${N(list.length - 30)} earlier` : `และอีก ${N(list.length - 30)} ครั้งก่อนหน้า`}</p>` : ''}</div>`;
     };
     body = `<p class="gec-wid"><a href="${GEC_API}/address/${W.w}" target="_blank" rel="noopener">${W.w.slice(0, 10)}…${W.w.slice(-8)}</a></p>
@@ -10070,12 +10077,28 @@ function renderGEChain(){
     : (en ? `${Math.floor(hNow / 24)} days` : `${Math.floor(hNow / 24)} วัน`);
   const big = `<div class="gea-card gec-big">
     <p class="gec-k">${en ? 'GE tokens voted so far' : 'โทเคนที่โหวตแล้ว'}</p>
-    <p class="gec-v">${N(d.sum)}</p>
-    <p class="gec-thb">≈ ${gecBaht(d.sum, en)} <label>${en ? 'at' : 'ที่'} <input class="gec-price" inputmode="decimal" value="${gecPrice}" onchange="gecSetPrice(this.value)" aria-label="${en ? 'Baht per token' : 'บาทต่อโทเคน'}"> ${en ? '฿ a token' : 'บาท/โทเคน'}</label></p>
-    <div class="gec-trio"><span><b>${N(d.n)}</b>${en ? 'votes' : 'ครั้งที่โหวต'}</span><span><b>${N(wl.length)}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${(d.sum / wl.length).toFixed(1)}</b>${en ? 'per wallet' : 'ต่อกระเป๋า'}</span></div>
+    <p class="gec-v">${gecTok(d.sum)}</p>
+    <div class="gec-trio"><span><b>${N(d.n)}</b>${en ? 'votes' : 'ครั้งที่โหวต'}</span><span><b>${N(wl.length)}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${gecTok(d.sum / wl.length)}</b>${en ? 'per wallet' : 'ต่อกระเป๋า'}</span></div>
     <div class="gec-run"><i style="width:${Math.min(100, hNow / hAll * 100).toFixed(1)}%"></i></div>
     <p class="gec-sub">${en ? `Open for ${elapsed} of ${Math.round(hAll / 24)} days · closes 12 Nov` : `เปิดโหวตมาแล้ว ${elapsed} จาก ${Math.round(hAll / 24)} วัน · ปิด 12 พ.ย.`}</p>
     ${gaps ? `<p class="gec-err">${en ? 'Some votes are missing from this copy — press Refresh.' : 'ข้อมูลในเครื่องขาดบางโหวต กด "อัปเดต" ใหม่'}</p>` : ''}</div>`;
+
+  // the same in baht, at the price per token the owner keeps up to date
+  const o2 = o && o.n && o.to >= GEC_POLLS.ge2025.end - 20 ? o : null;
+  const same25 = o2 ? gecUpTo(o2, hNow) : 0;
+  const row = (k, v) => `<div class="gec-mrow"><span>${k}</span><b>${v}</b></div>`;
+  const money = `<div class="gea-card"><h3 class="gec-h">${en ? 'In baht' : 'มูลค่าเป็นเงิน'}</h3>
+    <p class="gec-mbig">${gecBaht(d.sum, en)}</p>
+    <label class="gec-mprice">${en ? 'Price' : 'ราคา'} <input class="gec-price" inputmode="decimal" value="${gecPrice}" onchange="gecSetPrice(this.value)" aria-label="${en ? 'Baht per token' : 'บาทต่อโทเคน'}"> ${en ? 'baht a token' : 'บาท/โทเคน'}</label>
+    <div class="gec-mrows">
+      ${row(en ? 'Per wallet' : 'เฉลี่ยต่อกระเป๋า', gecBaht(d.sum / wl.length, en))}
+      ${row(en ? 'Per vote' : 'เฉลี่ยต่อครั้ง', gecBaht(d.sum / d.n, en))}
+      ${row(en ? 'Biggest wallet' : 'กระเป๋าที่โหวตมากสุด', gecBaht(wl[0][1][0], en))}
+      ${o2 ? row(en ? 'GE2025 at this point' : 'GE2025 ณ เวลาเดียวกัน', gecBaht(same25, en)) : ''}
+      ${o2 ? row(en ? 'GE2025, whole run' : 'GE2025 ทั้งรอบ', gecBaht(o2.sum, en)) : ''}
+      ${o2 && same25 > 0 ? row(en ? 'On last year’s curve' : 'ถ้าเดินตามเส้นปีที่แล้ว', gecBaht(d.sum * o2.sum / same25, en)) : ''}
+    </div>
+    <p class="gec-sub">${en ? 'GE2025 is priced at today’s token price, not what it was then.' : 'GE2025 คิดที่ราคาวันนี้ ไม่ใช่ราคาตอนนั้น'}</p></div>`;
 
   // last year at the same hour of its run, and where it ended
   let cmp = '';
@@ -10085,11 +10108,11 @@ function renderGEChain(){
     const back = wl.filter(([w]) => o.wallets[w]).length;
     const proj = same > 0 ? d.sum * o.sum / same : 0;
     cmp = `<div class="gea-card"><h3 class="gec-h">${en ? 'Against GE2025 at the same point' : 'เทียบ GE2025 ณ เวลาเดียวกันของการโหวต'}</h3>
-      <div class="gec-vs"><div><small>GE2026</small><b>${N(d.sum)}</b><em>${gecBaht(d.sum, en)}</em><em>${N(wl.length)} ${en ? 'wallets' : 'กระเป๋า'}</em></div>
+      <div class="gec-vs"><div><small>GE2026</small><b>${gecTok(d.sum)}</b><em>${N(wl.length)} ${en ? 'wallets' : 'กระเป๋า'}</em></div>
         <div class="gec-x">${same > 0 ? '×' + (d.sum / same).toFixed(2) : '–'}</div>
-        <div><small>GE2025</small><b>${N(same)}</b><em>${gecBaht(same, en)}</em><em>${N(sameW)} ${en ? 'wallets' : 'กระเป๋า'}</em></div></div>
-      <p class="gec-sub">${en ? `GE2025 ended at ${N(o.sum)} tokens from ${N(Object.keys(o.wallets).length)} wallets.` : `GE2025 ปิดที่ ${N(o.sum)} โทเคน จาก ${N(Object.keys(o.wallets).length)} กระเป๋า`}
-        ${proj ? (en ? ` On last year's curve this one would close near <b>${N(proj)}</b> — a rough guess that firms up as the weeks pass.` : ` ถ้าเดินตามเส้นของปีที่แล้ว ปีนี้จะปิดราว <b>${N(proj)}</b> (คาดการณ์คร่าว ๆ ยิ่งใกล้ปิดยิ่งแม่น)`) : ''}</p>
+        <div><small>GE2025</small><b>${gecTok(same)}</b><em>${N(sameW)} ${en ? 'wallets' : 'กระเป๋า'}</em></div></div>
+      <p class="gec-sub">${en ? `GE2025 ended at ${gecTok(o.sum)} tokens from ${N(Object.keys(o.wallets).length)} wallets.` : `GE2025 ปิดที่ ${gecTok(o.sum)} โทเคน จาก ${N(Object.keys(o.wallets).length)} กระเป๋า`}
+        ${proj ? (en ? ` On last year's curve this one would close near <b>${gecTok(proj)}</b> — a rough guess that firms up as the weeks pass.` : ` ถ้าเดินตามเส้นของปีที่แล้ว ปีนี้จะปิดราว <b>${gecTok(proj)}</b> (คาดการณ์คร่าว ๆ ยิ่งใกล้ปิดยิ่งแม่น)`) : ''}</p>
       <p class="gec-sub">${en ? `${N(back)} of this year's ${N(wl.length)} wallets also voted in GE2025.` : `กระเป๋าปีนี้ ${N(back)} จาก ${N(wl.length)} เคยโหวต GE2025 ด้วย`}</p>
       ${gecCurve(d, o, hNow, en)}</div>`;
   }
@@ -10100,9 +10123,9 @@ function renderGEChain(){
   const peak = Math.max(1, ...bars.map(b => b[1]));
   const best = bars.reduce((a, b) => b[1] > a[1] ? b : a, bars[0]);
   const hourly = `<div class="gea-card"><h3 class="gec-h">${en ? 'Tokens an hour, last 24 hours' : 'โทเคนรายชั่วโมง 24 ชม. ล่าสุด'}</h3>
-    <div class="gec-bars">${bars.map(([h, v]) => `<span title="${hm(gecMs(p, p.start + h * 1200))} · ${N(v)}"><i style="height:${(v / peak * 100).toFixed(1)}%"></i></span>`).join('')}</div>
+    <div class="gec-bars">${bars.map(([h, v]) => `<span title="${hm(gecMs(p, p.start + h * 1200))} · ${gecTok(v)}"><i style="height:${(v / peak * 100).toFixed(1)}%"></i></span>`).join('')}</div>
     <div class="gec-axis"><span>${hm(gecMs(p, p.start + from * 1200))}</span><span>${hm(gecMs(p, p.start + (hi + 1) * 1200))}</span></div>
-    <p class="gec-sub">${en ? `Busiest hour: ${hm(gecMs(p, p.start + best[0] * 1200))} with ${N(best[1])}` : `ชั่วโมงที่โหวตมากสุด ${hm(gecMs(p, p.start + best[0] * 1200))} น. ได้ ${N(best[1])} โทเคน`}</p></div>`;
+    <p class="gec-sub">${en ? `Busiest hour: ${hm(gecMs(p, p.start + best[0] * 1200))} with ${gecTok(best[1])}` : `ชั่วโมงที่โหวตมากสุด ${hm(gecMs(p, p.start + best[0] * 1200))} น. ได้ ${gecTok(best[1])} โทเคน`}</p></div>`;
 
   // how big the wallets are, and how much of the vote the biggest hold
   const B = [[0, 1, '< 1'], [1, 10, '1–9'], [10, 100, '10–99'], [100, 1000, '100–999'], [1000, Infinity, '1,000+']].map(([a, b, label]) => {
@@ -10114,17 +10137,17 @@ function renderGEChain(){
     <div class="gec-rows">${B.map(b => `<div class="gec-row"><span class="gec-l">${b.label}</span>
       <span class="gec-bar"><i style="width:${(b.s / d.sum * 100).toFixed(1)}%"></i></span>
       <span class="gec-r">${N(b.n)} ${en ? 'wallets' : 'กระเป๋า'} · ${pc(b.s / d.sum)}</span></div>`).join('')}</div>
-    <p class="gec-sub">${en ? `The 10 biggest wallets hold ${pc(share(10))} of the tokens, the top 100 ${pc(share(100))}. Half the wallets voted ${wl[wl.length >> 1][1][0].toFixed(1)} or less.`
-      : `10 กระเป๋าใหญ่สุดรวมกัน ${pc(share(10))} ของโทเคนทั้งหมด · 100 กระเป๋าแรก ${pc(share(100))} · ครึ่งหนึ่งของกระเป๋าโหวตไม่เกิน ${wl[wl.length >> 1][1][0].toFixed(1)}`}</p></div>`;
+    <p class="gec-sub">${en ? `The 10 biggest wallets hold ${pc(share(10))} of the tokens, the top 100 ${pc(share(100))}. Half the wallets voted ${gecTok(wl[wl.length >> 1][1][0])} or less.`
+      : `10 กระเป๋าใหญ่สุดรวมกัน ${pc(share(10))} ของโทเคนทั้งหมด · 100 กระเป๋าแรก ${pc(share(100))} · ครึ่งหนึ่งของกระเป๋าโหวตไม่เกิน ${gecTok(wl[wl.length >> 1][1][0])}`}</p></div>`;
 
   const top = `<div class="gea-card"><h3 class="gec-h">${en ? 'Biggest wallets' : 'กระเป๋าที่โหวตมากสุด'}</h3>
     <p class="gec-sub gec-tip">${en ? 'Tap a wallet to see its votes. “voted 2025” marks a wallet that also voted in GE2025.' : 'กดที่กระเป๋าเพื่อดูประวัติการโหวต · ป้าย “เคยโหวต 2025” คือกระเป๋านี้โหวต GE2025 ด้วย'}</p>
     <ol class="gec-top">${wl.slice(0, 10).map(([w, x]) => `<li><button class="gec-w" data-action="gec-wallet" data-id="${w}">${w.slice(0, 6)}…${w.slice(-4)}</button>
-      ${o && o.wallets[w] ? `<span class="gec-tag">${en ? 'voted 2025' : 'เคยโหวต 2025'}</span>` : ''}<b>${N(x[0])}<small class="gec-b">${gecBaht(x[0], en)}</small></b><small>${N(x[1])} ${en ? (x[1] === 1 ? 'vote' : 'votes') : 'ครั้ง'}</small></li>`).join('')}</ol></div>`;
+      ${o && o.wallets[w] ? `<span class="gec-tag">${en ? 'voted 2025' : 'เคยโหวต 2025'}</span>` : ''}<b>${gecTok(x[0])}<small class="gec-b">${gecBaht(x[0], en)}</small></b><small>${N(x[1])} ${en ? (x[1] === 1 ? 'vote' : 'votes') : 'ครั้ง'}</small></li>`).join('')}</ol></div>`;
 
   const note = `<p class="gea-hint">${en ? `Who each vote is for is not on the chain: every vote carries its own scrambled code (${N(d.n)} votes, ${N(d.n)} different codes), so per-member counts only come from the official results. Read from ${GEC_API.replace('https://', '')}; this browser keeps a copy so a revisit only fetches what is new.`
     : `ผลแยกรายเมมเบอร์ดูจากบล็อกเชนไม่ได้ เพราะแต่ละโหวตเก็บเป็นรหัสที่สุ่มไม่ซ้ำกัน (${N(d.n)} โหวต = ${N(d.n)} รหัส) คะแนนรายคนต้องรอประกาศผล · ข้อมูลจาก ${GEC_API.replace('https://', '')} เครื่องนี้เก็บสำเนาไว้ เปิดครั้งหน้าดึงเฉพาะส่วนที่เพิ่ม`}</p>`;
-  return `<section class="gea gec">${head}${big}${cmp}${hourly}${sizes}${top}${renderGECWallet(en, N, hm)}${note}</section>`;
+  return `<section class="gea gec">${head}${big}${money}${cmp}${hourly}${sizes}${top}${renderGECWallet(en, N, hm)}${note}</section>`;
 }
 // both runs, tokens so far against hours since voting opened, over this year's span
 function gecCurve(d, o, hNow, en){
