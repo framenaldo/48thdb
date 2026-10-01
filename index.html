@@ -1633,21 +1633,30 @@
     color:transparent; -webkit-text-fill-color:transparent;
   }
 
-  /* A notice from the owner: red enough to catch the eye, quiet enough to
-     sit above the day's events without shouting over them. */
+  /* The owner's own list of notices on the profile page; readers see them
+     only on the LED sign under the header. */
   .flash-card{
     position:relative; margin:0 0 10px; padding:13px 15px 13px 18px;
-    border-radius:16px; border:1px solid color-mix(in srgb, #C8231A 26%, var(--line));
-    background:color-mix(in srgb, #C8231A 7%, var(--card)); overflow:hidden;
+    border-radius:16px; border:1px solid color-mix(in srgb, #E4457E 28%, var(--line));
+    background:color-mix(in srgb, #E4457E 7%, var(--card)); overflow:hidden;
   }
-  .flash-card::before{ content:''; position:absolute; inset:0 auto 0 0; width:5px; background:#C8231A; }
-  .flash-line{ display:flex; align-items:center; gap:9px; margin:0 0 5px; }
+  .flash-card::before{ content:''; position:absolute; inset:0 auto 0 0; width:5px; background:#E4457E; }
+  .flash-card.is-wait{ opacity:.62; border-style:dashed; }
+  .flash-line{ display:flex; align-items:center; flex-wrap:wrap; gap:4px 9px; margin:0 0 5px; }
   .flash-tag{
     display:inline-flex; align-items:center; gap:5px; padding:2px 9px; border-radius:999px;
-    background:#C8231A; color:#fff; font-size:11px; font-weight:800; letter-spacing:.7px;
+    background:#E4457E; color:#fff; font-size:11px; font-weight:800; letter-spacing:.5px;
   }
-  .flash-tag::before{ content:''; width:6px; height:6px; border-radius:50%; background:#fff; animation:today-pulse 1.6s ease-out infinite; }
+  .flash-card.is-wait .flash-tag{ background:var(--ink-soft); }
   .flash-when{ font-size:12px; color:var(--ink-soft); }
+  .flash-span{ display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:8px 10px; align-items:end; }
+  .flash-span[hidden]{ display:none; }
+  .flash-span label{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .flash-span label span{ font-size:11px; font-weight:800; color:var(--ink-soft); }
+  .flash-span input{ display:block; min-width:0; width:100%; max-width:100%; box-sizing:border-box;
+    -webkit-appearance:none; appearance:none; min-height:42px; text-align:left; }
+  .flash-span input::-webkit-date-and-time-value{ text-align:left; }
+  .flash-span .flash-note{ grid-column:1 / -1; margin:0; font-size:12px; color:var(--ink-soft); }
   .flash-text{ margin:0; font-size:15.5px; line-height:1.45; font-weight:600; color:var(--ink); }
   .flash-foot{ display:flex; flex-wrap:wrap; gap:7px; margin-top:9px; }
   .flash-foot:empty{ display:none; }
@@ -1660,10 +1669,9 @@
     border:1px solid var(--line); background:var(--card); color:var(--ink);
     font-family:'Noto Sans Thai',sans-serif; font-size:14px;
   }
-  .flash-input:focus{ outline:2px solid color-mix(in srgb, #C8231A 55%, transparent); outline-offset:1px; }
+  .flash-input:focus{ outline:2px solid color-mix(in srgb, #E4457E 55%, transparent); outline-offset:1px; }
   textarea.flash-input{ resize:vertical; min-height:56px; }
   .flash-list{ margin:0 0 18px; }
-  @media (prefers-reduced-motion: reduce){ .flash-tag::before{ animation:none; } }
 
   .feed-block{ margin:0 0 24px; }
   .feed-block .section-label{
@@ -6617,7 +6625,12 @@ const EN = {
   '48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ': '48thdb.com is an unofficial fan site',
   'ด่วน': 'FLASH',
   'ประกาศด่วน': 'Latest word',
+  'รอขึ้น': 'Scheduled',
   'ขึ้นทันทีทุกเครื่องที่เปิดเว็บอยู่': 'Appears at once on every open page',
+  'ขึ้นบนป้ายไฟ LED ทุกเครื่องทันที': 'On the LED sign on every open page at once',
+  'ประกาศบนป้ายไฟ': 'Notice on the LED sign',
+  'บนป้ายไฟ': 'On the sign',
+  'เอาลง': 'Take down',
   'ส่งประกาศ': 'Post',
   'ลบประกาศ': 'Remove',
   'ยังไม่มีประกาศที่แสดงอยู่': 'Nothing posted right now',
@@ -7473,30 +7486,50 @@ const plain = o => o ? JSON.parse(JSON.stringify(o)) : null;   // Firestore refu
    pushes the change, so nothing here is deployed, polled or reloaded.
    Everyone may read these; only the owner may write one (rules do that). */
 let _flashUnsub = null;
-/* One that has passed its own use-by is simply not shown any more. */
+/* Shown between its own start (`from`, when the owner set one) and its
+   use-by; before and after, it simply isn't there. */
 function flashLive(list){
   const now = Date.now();
-  return (list || []).filter(f => (f.th || f.en) && (!f.until || Date.parse(f.until) > now));
+  return (list || []).filter(f => (f.th || f.en) && (!f.until || Date.parse(f.until) > now)
+    && (!f.from || Date.parse(f.from) <= now));
 }
+/* Set for later: the owner sees these waiting on the profile page. */
+function flashWaiting(list){
+  const now = Date.now();
+  return (list || []).filter(f => (f.th || f.en) && f.from && Date.parse(f.from) > now
+    && (!f.until || Date.parse(f.until) > now));
+}
+/* Which notices are up, so the clock can put one on the sign when it starts
+   and take it off when it ends. */
+let _flashKey = null;
+const flashKey = () => flashLive(state.flash).map(f => f.id).join(',');
 function listenFlash(){
   if(_flashUnsub) return;
   try{
     _flashUnsub = fbDb.collection('flash').orderBy('at', 'desc').limit(12).onSnapshot(snap => {
       state.flash = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      _flashKey = flashKey();
       // the first answer can beat the first paint; that paint will show it
       if(!document.getElementById('main')) return;
       syncTicker();
       // a notice arriving must not yank the page out from under a reader
       if(state.selectedId || state.selectedEvent || state.posterOf || state.editingId) return;
       if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
-      if(state.view === 'feed' || state.view === 'profile') renderMain();
+      if(state.view === 'profile') renderMain();
     }, () => {});
   }catch(e){}
 }
 /* Written in Thai; English only where the owner bothered to add it. */
 const flashText = f => (isEN() && f.en ? f.en : f.th) || f.en || '';
+/* "2 ต.ค. 18:00" — the day left out when it is today. */
+function flashAt(ms){
+  const d = new Date(ms), hm = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  return toYmd(d) === toYmd(new Date()) ? hm : `${d.getDate()} ${monthsShort()[d.getMonth()]} ${hm}`;
+}
 function flashWhen(f){
-  const ms = f.at && f.at.seconds ? f.at.seconds * 1000 : null;
+  if(f.from && Date.parse(f.from) > Date.now())
+    return (isEN() ? 'Goes up ' : 'จะขึ้น ') + flashAt(Date.parse(f.from)) + (f.until ? ' – ' + flashAt(Date.parse(f.until)) : '');
+  const ms = f.from ? Date.parse(f.from) : f.at && f.at.seconds ? f.at.seconds * 1000 : null;
   if(!ms) return '';
   const mins = Math.round((Date.now() - ms) / 60000);
   const en = isEN();
@@ -9230,6 +9263,11 @@ function tickClock(){
       && e.start <= iso && eventLastDay(e) >= iso && !doneForToday(e, iso)).sort((a,b) => a.start.localeCompare(b.start)).map(e => e.id).join(',');
     if(_feedLiveKey !== null && live !== _feedLiveKey){ renderMain(); return; }
   }
+  const fk = flashKey();
+  if(_flashKey !== null && fk !== _flashKey){
+    _flashKey = fk; syncTicker();
+  }
+  _flashKey = fk;
   if(!_drawnDay || now === _drawnDay) return;
   // Redrawing under someone loses their place, so the date is left unturned
   // until they have nothing open — the next tick finds it again.
@@ -12605,12 +12643,14 @@ function renderSearch(){
    to the event they are about. The owner sees a button to take it down. */
 function renderFlashCard(f){
   const ev = f.eventId ? SEED_SCHEDULE.find(e => e.id === f.eventId) : null;
-  return `<article class="flash-card">
-    <p class="flash-line"><span class="flash-tag">ด่วน</span><span class="flash-when">${escapeHtml(flashWhen(f))}</span></p>
+  const wait = f.from && Date.parse(f.from) > Date.now();
+  const till = !wait && f.until ? (isEN() ? ' · until ' : ' · ถึง ') + flashAt(Date.parse(f.until)) : '';
+  return `<article class="flash-card${wait ? ' is-wait' : ''}">
+    <p class="flash-line"><span class="flash-tag">${wait ? 'รอขึ้น' : 'บนป้ายไฟ'}</span><span class="flash-when">${escapeHtml(flashWhen(f) + till)}</span></p>
     <p class="flash-text">${escapeHtml(flashText(f))}</p>
     <div class="flash-foot">
       ${ev ? `<button class="chip chip-link" data-action="open-event" data-id="${ev.id}">${escapeHtml(ev.title)} ↗</button>` : ''}
-      ${state.isOwner ? `<button class="chip flash-del" data-action="delete-flash" data-id="${f.id}">ลบประกาศ</button>` : ''}
+      <button class="chip flash-del" data-action="delete-flash" data-id="${f.id}">เอาลง</button>
     </div>
   </article>`;
 }
@@ -12743,12 +12783,6 @@ function renderFeed(){
     </header>
 
     <div class="feed-cols"><div class="feed-main">
-    ${flashLive(state.flash).length ? `
-    <section class="feed-block is-flash">
-      <h2 class="section-label">ประกาศด่วน</h2>
-      ${flashLive(state.flash).map(renderFlashCard).join('')}
-    </section>` : ''}
-
     ${nowOn.length ? `
     <section class="feed-block today-hero-block">
       <h2 class="section-label">งานวันนี้</h2>
@@ -13228,16 +13262,17 @@ function pendingValue(k, v){
    It is on every open page before the button finishes its press. */
 function renderFlashComposer(){
   if(!state.isOwner) return '';
-  const live = flashLive(state.flash);
+  const live = [...flashLive(state.flash), ...flashWaiting(state.flash)];
+  const now = new Date(), day = toYmd(now), hm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   const iso = toYmd(todayStart());
   const soon = SEED_SCHEDULE.filter(e => !e.shop && eventLastDay(e) >= iso)
     .sort((a, b) => a.start.localeCompare(b.start)).slice(0, 14);
-  return `<div class="pd-head"><h3 class="section-label">ประกาศด่วน</h3>
-      <span class="muted-note">ขึ้นทันทีทุกเครื่องที่เปิดเว็บอยู่</span></div>
+  return `<div class="pd-head"><h3 class="section-label">ประกาศบนป้ายไฟ</h3>
+      <span class="muted-note">ขึ้นบนป้ายไฟ LED ทุกเครื่องทันที</span></div>
     <div class="flash-box">
-      <textarea class="flash-input" id="flash-th" rows="2" maxlength="180"
-        placeholder="เช่น งานเลื่อนเป็น 19:00 น. หรือ Khaimook แสดงแทน Niya"></textarea>
-      <input class="flash-input" id="flash-en" maxlength="180" placeholder="ภาษาอังกฤษ (ไม่ใส่ก็ได้)">
+      <textarea class="flash-input" id="flash-th" rows="3" maxlength="300"
+        placeholder="พิมพ์อะไรก็ได้ที่อยากบอก เช่น เว็บเพิ่มแท็บโหวตสดแล้ว หรือ งานเลื่อนเป็น 19:00 น."></textarea>
+      <input class="flash-input" id="flash-en" maxlength="300" placeholder="ภาษาอังกฤษ (ไม่ใส่ก็ได้)">
       <div class="flash-row">
         <select class="flash-input" id="flash-event">
           <option value="">ไม่ผูกกับงาน</option>
@@ -13248,8 +13283,17 @@ function renderFlashComposer(){
           <option value="today" selected>ถึงสิ้นวันนี้</option>
           <option value="24">แสดง 24 ชั่วโมง</option>
           <option value="72">แสดง 3 วัน</option>
+          <option value="168">แสดง 7 วัน</option>
           <option value="0">ไม่กำหนด (ลบเอง)</option>
+          <option value="custom">เลือกช่วงเวลาเอง…</option>
         </select>
+      </div>
+      <div class="flash-span" id="flash-span" hidden>
+        <label><span>เริ่มวันที่</span><input class="flash-input" type="date" id="flash-from-d" value="${day}"></label>
+        <label><span>เวลา</span><input class="flash-input" type="time" id="flash-from-t" value="${hm}"></label>
+        <label><span>ถึงวันที่</span><input class="flash-input" type="date" id="flash-to-d" value="${day}"></label>
+        <label><span>เวลา</span><input class="flash-input" type="time" id="flash-to-t" value="23:59"></label>
+        <p class="flash-note">ลบวันที่ "ถึง" ออก = แสดงไปจนกว่าจะลบเอง</p>
       </div>
       <button class="btn-add" data-action="post-flash">ส่งประกาศ</button>
     </div>
@@ -14514,7 +14558,7 @@ const NAV_HIDDEN_VIEWS = ['auth','editprofile','form'];
    is about and opens it. Built on every draw, but only swapped in when its
    words change, so the scroll does not jump back to the start on a tap. */
 const TICKER_KINDS = {
-  flash:  { th:'ด่วน',      en:'FLASH',    color:'#C8231A' },
+  flash:  { th:'ประกาศ',    en:'NOTICE',   color:'#E4457E' },
   live:   { th:'LIVE',     en:'LIVE',     color:'#1E9E57' },
   today:  { th:'วันนี้',     en:'TODAY',    color:'#138A8A' },
   news:   { th:'ประกาศ',    en:'NEWS',     color:'#3A66D6' },
@@ -17606,8 +17650,16 @@ function bindDelegatedEvents(){
       const th = (document.getElementById('flash-th')?.value || '').trim();
       if(!th){ alert('พิมพ์ข้อความประกาศก่อน'); return; }
       const life = document.getElementById('flash-life')?.value || 'today';
-      let until = null;
-      if(life === 'today'){ const d = todayStart(); d.setHours(23, 59, 0, 0); until = d.toISOString(); }
+      let until = null, from = null;
+      if(life === 'custom'){
+        const val = k => (document.getElementById(k)?.value || '').trim();
+        const at = (d, t, dflt) => d ? new Date(`${d}T${t || dflt}`) : null;
+        const a = at(val('flash-from-d'), val('flash-from-t'), '00:00'), b = at(val('flash-to-d'), val('flash-to-t'), '23:59');
+        if(b && b <= (a && a > new Date() ? a : new Date())){ alert('เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่ม และยังไม่ผ่านไป'); return; }
+        if(a && a > new Date(Date.now() + 60000)) from = a.toISOString();
+        if(b) until = b.toISOString();
+      }
+      else if(life === 'today'){ const d = todayStart(); d.setHours(23, 59, 0, 0); until = d.toISOString(); }
       else if(Number(life) > 0) until = new Date(Date.now() + Number(life) * 3600000).toISOString();
       el.disabled = true;
       try{
@@ -17615,12 +17667,12 @@ function bindDelegatedEvents(){
           th,
           en: (document.getElementById('flash-en')?.value || '').trim() || null,
           eventId: document.getElementById('flash-event')?.value || null,
-          until,
+          from, until,
           at: firebase.firestore.FieldValue.serverTimestamp(),
           by: { uid: fbAuth.currentUser ? fbAuth.currentUser.uid : null,
                 name: (state.account && state.account.name) || '' },
         });
-        toast('ส่งประกาศแล้ว');
+        toast(from ? 'ตั้งเวลาประกาศแล้ว' : 'ส่งประกาศแล้ว');
       }catch(err){ alert('ส่งประกาศไม่สำเร็จ ลองใหม่อีกครั้ง'); }
       el.disabled = false;
       render();     // the listener brings the new notice in on its own
@@ -17630,7 +17682,7 @@ function bindDelegatedEvents(){
       try{
         await fbDb.collection('flash').doc(id).delete();
         state.flash = state.flash.filter(f => f.id !== id);
-        toast('ลบประกาศแล้ว');
+        toast('เอาประกาศลงแล้ว');
       }catch(err){ alert('ลบไม่สำเร็จ ลองใหม่อีกครั้ง'); }
       render();
     }
@@ -17757,6 +17809,7 @@ function bindDelegatedEvents(){
     if(e.target.id==='birth-month'){ state.birthMonth = e.target.value; renderMain(); replaceHistory(); }
     else if(e.target.id==='team-filter'){ state.teamFilter = e.target.value; state.genFilter = 'all'; state.captainFilter = 'all'; renderMain(); replaceHistory(); }
     else if(e.target.id==='sort-filter'){ state.sortBy = e.target.value; state.sortDir = 'asc'; renderMain(); replaceHistory(); }
+    else if(e.target.id==='flash-life'){ const sp = document.getElementById('flash-span'); if(sp) sp.hidden = e.target.value !== 'custom'; }
   });
 
   document.body.addEventListener('input', (e)=>{
