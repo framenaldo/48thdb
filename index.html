@@ -1387,6 +1387,23 @@
   .bday-chip .when{ font-size:11px; color:var(--ink-soft); }
   .bday-chip .who{ font-size:14px; font-weight:600; margin-top:1px; }
   .bday-chip.today{ border-color:var(--gold); background:var(--bnk-soft); }
+  /* ช่วงที่เปิดอยู่: the posters alone in a strip, each framed, with a press */
+  .per-list{ display:flex; gap:12px; overflow-x:auto; padding:2px 2px 8px; margin:0 -2px; scroll-snap-type:x proximity; align-items:flex-start; }
+  .per-tile{ flex:none; width:min-content; display:flex; flex-direction:column; gap:2px; padding:0; border:0; background:none;
+    color:var(--ink); font-family:'Noto Sans Thai',sans-serif; text-align:center; scroll-snap-align:start; }
+  .per-pic{ position:relative; display:block; border:1.5px solid color-mix(in srgb, var(--c) 40%, var(--line)); border-radius:13px; overflow:hidden;
+    background:var(--card); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.09), 0 6px 16px color-mix(in srgb, var(--c) 16%, transparent);
+    transition:transform .12s, box-shadow .12s; }
+  button.per-tile{ cursor:pointer; }
+  button.per-tile:active .per-pic{ transform:translateY(2px); box-shadow:0 1px 0 rgba(var(--shadow-rgb),.09); }
+  .per-pic img{ display:block; height:150px; width:auto; max-width:200px; object-fit:cover; }
+  .per-noimg{ display:grid; place-items:center; width:120px; height:150px; box-sizing:border-box; padding:10px; font-size:12.5px; font-weight:700; line-height:1.3;
+    background:color-mix(in srgb, var(--c) 18%, var(--card)); }
+  .per-left{ position:absolute; left:6px; bottom:6px; font-size:10.5px; font-weight:800; color:#fff; background:var(--c);
+    border-radius:999px; padding:3px 8px; white-space:nowrap; box-shadow:0 1px 4px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.22); }
+  .per-pic{ margin-bottom:5px; }
+  .per-name{ font-size:12.5px; font-weight:800; line-height:1.25; color:var(--ink); }
+  .per-sub{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
   /* วันนี้ในอดีต: framed rows with the group's colour down the left edge */
   .otd-list{ display:flex; flex-direction:column; gap:8px; }
   .otd-row{ display:flex; flex-direction:column; gap:3px; width:100%; box-sizing:border-box; text-align:left;
@@ -4642,7 +4659,7 @@ const SEED_SCHEDULE = [
      "today" card, which would otherwise be taken over for a month and a half. */
   { id:'ev-election-voting', start:'2026-10-01', end:'2026-11-12', period:true,
     ticker:{ name:'Senbatsu General Election 2026', results:'ev-election-results' },
-    title:'BNK48 & CGM48 Senbatsu General Election 2026 · Voting', groups:['bnk48','cgm48'],
+    title:'BNK48 & CGM48 Senbatsu General Election 2026 · Voting', short:'Voting', groups:['bnk48','cgm48'],
     related:['ev-election-fanfest','ev-election-results','ev-ge6-single','ev-ge6-photoset'],
     timeline:'ge2026',
     poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-2026.jpg', w:959, h:1200 },
@@ -4783,7 +4800,7 @@ const SEED_SCHEDULE = [
       'Super Super Rare (SSR) — 1 ท่า พร้อมลายเซ็นจริง มีเพียง 5 ใบต่อสมาชิกหนึ่งคน'] }] },
   { id:'ev-ge6-bundle', start:'2026-09-26', end:'2026-10-10', period:true, bar:'Ticket Bundle: Journey of Dreams + Final Results',
     sales:{ from:'2026-09-26T12:00', to:'2026-10-10T21:00' },
-    title:'Journey of Dreams 夢の旅 + Final Results · Ticket Bundle', groups:['bnk48','cgm48'],
+    title:'Journey of Dreams 夢の旅 + Final Results · Ticket Bundle', short:'Ticket Bundle Available', groups:['bnk48','cgm48'],
     // its dates are the sales, not a shows; the plan is Journey of Dreams, priced as the bundle
     dateTag:'วันขายบันเดิล',
     timeline:'ge2026', related:['ev-concert-2026','ev-election-results'],
@@ -5656,10 +5673,10 @@ const SEED_SPECIALS = [
         members:['bnk-blythe', 'bnk-grape', 'bnk-mail', 'bnk-mirin'] },
     ] },
   { id:'bnk-sp-cry', groupId:'bnk48', groups:['bnk48'], kind:'digital',
-    title:'Cry', alt:'', date:'2026-03-20', year:2026,
+    title:'Cry', alt:'ฉันต้องนอนร้องไห้', date:'2026-03-20', year:2026,
     note:'เพลงเดี่ยวของแจนรี่',
     tracks:[
-      { track:'Cry', centers:[],
+      { track:'Cry – ฉันต้องนอนร้องไห้', centers:[],
         members:['bnk-janry'] },
     ] },
   { id:'bnk-sp-kimigairu', groupId:'bnk48', groups:['bnk48'], kind:'special',
@@ -9033,6 +9050,24 @@ function renderEventCard(ev, todayIso){
   </article>`;
 }
 
+/* Runs that stay open for weeks (ticket sales, voting) sit on the feed the
+   whole time, so they show as their posters alone, like the GE poster wall:
+   days left on the corner, the last day under it, a tap opens the sheet. */
+function renderPeriodTile(ev, todayIso){
+  const M = monthsShort(), [, m, d] = eventLastDay(ev).split('-').map(Number);
+  const accent = ev.poster ? ev.poster.accent : ((ev.groups || []).length === 1 ? getGroup(ev.groups[0]).color : 'var(--pink)');
+  const img = ev.poster && ev.poster.img, open = eventHasMore(ev);
+  const tag = open ? 'button' : 'div';
+  return `<${tag} class="per-tile" style="--c:${accent}"${open ? ` data-action="open-event" data-id="${ev.id}"` : ''} title="${escapeAttr(ev.title)}" aria-label="${escapeAttr(ev.title)}">
+    <span class="per-pic">${img
+      ? `<img src="${escapeAttr(evThumb(img))}" width="${ev.poster.w || 1200}" height="${ev.poster.h || 1200}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeAttr(img)}'">`
+      : `<span class="per-noimg">${escapeHtml(ev.title)}</span>`}
+      <span class="per-left">${eventWhenLabel(ev, todayIso)}</span></span>
+    <span class="per-name">${escapeHtml(ev.short || ev.title.split(' · ').pop())}</span>
+    <span class="per-sub">${isEN() ? 'Until' : 'ถึง'} ${d} ${M[m - 1]}</span>
+  </${tag}>`;
+}
+
 const evThumb = src => String(src).replace(/\.\w+$/, '-s.jpg');
 
 /* A line-up that is every current member, or every current member of one
@@ -11539,7 +11574,7 @@ function renderFeed(){
     ${periods.length ? `
     <section class="feed-block is-periods">
       <h2 class="section-label">ช่วงที่เปิดอยู่</h2>
-      ${periods.map(e => renderEventCard(e, iso)).join('')}
+      <div class="per-list">${periods.map(e => renderPeriodTile(e, iso)).join('')}</div>
     </section>` : ''}
 
 
