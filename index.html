@@ -10346,7 +10346,7 @@ function gecShareSpec(id){
   }
   if(id === 'stretch' && o){
     const q = GEC_POLLS.ge2025, L = (q.end - q.start) * GEC_BLOCK / 3600;
-    const rows = [[en ? 'First 48 hours' : '48 ชม. แรก', gecUpTo(o, 48)], [en ? 'First 7 days' : '7 วันแรก', gecUpTo(o, 168)],
+    const rows = [[en ? 'First 24 hours' : '24 ชม. แรก', gecUpTo(o, 24)], [en ? 'First 7 days' : '7 วันแรก', gecUpTo(o, 168)],
       [en ? 'Last 7 days' : '7 วันสุดท้าย', o.sum - gecUpTo(o, L - 168)], [en ? 'Last 3 days' : '3 วันสุดท้าย', o.sum - gecUpTo(o, L - 72)], [en ? 'Last 24 hours' : '24 ชม. สุดท้าย', o.sum - gecUpTo(o, L - 24)]];
     let half = 0; while(half < L && gecUpTo(o, half) < o.sum / 2) half++;
     return spec(en ? 'How GE2025 finished' : 'ช่วงโค้งสุดท้ายของ GE2025', [
@@ -10493,7 +10493,7 @@ function gecStretchCard(en, pc, o){
   const q = GEC_POLLS.ge2025, L = (q.end - q.start) * GEC_BLOCK / 3600, M = monthsShort();
   const firstH = h => gecUpTo(o, h), lastH = h => o.sum - gecUpTo(o, L - h);
   const rows = [
-    [en ? 'First 48 hours' : '48 ชม. แรก', firstH(48)],
+    [en ? 'First 24 hours (before last year’s first results)' : '24 ชม. แรก (ก่อนประกาศผลด่วนปีที่แล้ว)', firstH(24)],
     [en ? 'First 7 days' : '7 วันแรก', firstH(168)],
     [en ? 'Last 7 days' : '7 วันสุดท้าย', lastH(168)],
     [en ? 'Last 3 days' : '3 วันสุดท้าย', lastH(72)],
@@ -16117,11 +16117,315 @@ async function drawMilestoneCard(g, sub){
   await shareFooter(g, true, sub.url);
 }
 
+/* The public cards for the vote on the chain. Made to be posted, so each says
+   one thing: a big figure, one picture of it, and a line in plain words of
+   what it means. The GE2026 poster's night red and gold, the site's name on
+   the foot, and a reminder that these are all votes together, not anyone's
+   score. */
+const GCD = { P:72, gold:'#F3C969', pink:'#FF6FA5', teal:'#5FD6BE', grey:'#A7AEB8', ink:'#FFFFFF', soft:'rgba(255,255,255,.66)', faint:'rgba(255,255,255,.12)' };
+const gcdF = (w, s) => `${w} ${s}px "Noto Sans Thai", sans-serif`;
+function gcdFit(g, text, maxW, size, weight = 800, min = 28){
+  let s = size; g.font = gcdF(weight, s);
+  while(g.measureText(text).width > maxW && s > min){ s -= 2; g.font = gcdF(weight, s); }
+  return s;
+}
+function gcdPanel(g, x, y, w, h, r = 30){
+  g.fillStyle = 'rgba(255,255,255,.06)'; shareRound(g, x, y, w, h, r); g.fill();
+  g.strokeStyle = 'rgba(243,201,105,.20)'; g.lineWidth = 2; shareRound(g, x, y, w, h, r); g.stroke();
+}
+// shareWrap, but the segmenter does not know some loanwords and would break
+// them in two ("โท|เคน"), so those are kept whole
+const GCD_WHOLE = ['โทเคน', 'บล็อกเชน', 'เมมเบอร์'];
+function gcdWrap(g, text, maxW, maxLines){
+  let seg = typeof Intl !== 'undefined' && Intl.Segmenter ? [...new Intl.Segmenter('th', { granularity:'word' }).segment(text)].map(s => s.segment) : [...text];
+  for(let i = 0; i < seg.length - 1; i++){
+    for(const w of GCD_WHOLE){
+      let j = i, acc = '';
+      while(j < seg.length && acc.length < w.length){ acc += seg[j]; j++; }
+      if(acc === w && j - i > 1){ seg.splice(i, j - i, w); break; }
+    }
+  }
+  const lines = []; let cur = '';
+  for(const piece of seg){
+    const next = cur + piece;
+    if(g.measureText(next).width <= maxW || !cur){ cur = next; continue; }
+    lines.push(cur.trimEnd()); cur = piece.trimStart();
+    if(lines.length === maxLines) break;
+  }
+  if(lines.length < maxLines && cur) lines.push(cur.trimEnd());
+  return lines.slice(0, maxLines);
+}
+// the line under everything: what it means, in a gold-edged box
+function gcdTake(g, text, y){
+  const { P } = GCD, W = SHARE_W - P * 2;
+  g.font = gcdF(700, 32); const lines = gcdWrap(g, text, W - 70, 3);
+  const h = 44 + lines.length * 46;
+  g.fillStyle = 'rgba(243,201,105,.10)'; shareRound(g, P, y, W, h, 26); g.fill();
+  g.fillStyle = GCD.gold; shareRound(g, P, y, 8, h, 4); g.fill();
+  lines.forEach((l, i) => shareText(g, l, P + 36, y + 58 + i * 46, gcdF(700, 32), GCD.ink));
+  return y + h;
+}
+async function gcdFrame(g, title, when){
+  const { P } = GCD, en = isEN();
+  g.fillStyle = '#12060A'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  shareGlow(g, 160, 120, 760, '#B3121E', .55);
+  shareGlow(g, 1000, 360, 520, '#E8B04B', .16);
+  shareGlow(g, 560, SHARE_H + 80, 760, '#5B1A6E', .45);
+  g.save(); g.globalAlpha = .28; shareBurst(g, 960, 120, 150, '#FFD36E', 7); shareBurst(g, 70, 1010, 110, '#FF8FB0', 8); g.restore();
+  sharePill(g, 'GE2026 · SENBATSU GENERAL ELECTION', P, 64, 'rgba(243,201,105,.16)', GCD.gold, 22);
+  g.font = gcdF(800, 64); const tl = gcdWrap(g, title, SHARE_W - P * 2, 2);
+  let y = 132; tl.forEach(l => { y += 74; shareText(g, l, P, y, gcdF(800, 64), GCD.ink); });
+  shareText(g, when, P, y + 50, gcdF(600, 28), GCD.soft);
+  // the foot: the site, and what these numbers are
+  g.fillStyle = GCD.faint; g.fillRect(P, SHARE_H - 150, SHARE_W - P * 2, 2);
+  const logo = await shareLogo('#ffffff');
+  if(logo) g.drawImage(logo, P, SHARE_H - 122, 118, 68);
+  shareText(g, '48thdb.com', SHARE_W - P, SHARE_H - 86, gcdF(800, 32), GCD.ink, 'right');
+  shareText(g, en ? 'All votes together, from the public blockchain — not any member’s score' : 'ยอดโหวตรวมจากบล็อกเชนสาธารณะ · ไม่ใช่คะแนนรายเมมเบอร์',
+    SHARE_W - P, SHARE_H - 48, gcdF(600, 21), GCD.soft, 'right');
+  return y + 100;
+}
+// small tiles in a row: [label, value, colour]
+function gcdTiles(g, y, tiles, h = 150){
+  const { P } = GCD, n = tiles.length, tw = (SHARE_W - P * 2 - (n - 1) * 18) / n;
+  tiles.forEach(([label, value, colour], i) => {
+    const x = P + i * (tw + 18); gcdPanel(g, x, y, tw, h, 26);
+    g.font = gcdF(600, 24); shareText(g, shareWrap(g, label, tw - 44, 1)[0] || '', x + 26, y + 46, gcdF(600, 24), GCD.soft);
+    const s = gcdFit(g, value, tw - 52, 54);
+    shareText(g, value, x + 26, y + 112, gcdF(800, s), colour || GCD.ink);
+  });
+  return y + h;
+}
+// rows of label / value, in one panel
+function gcdRows(g, y, rows, rowH = 76){
+  const { P } = GCD, W = SHARE_W - P * 2;
+  gcdPanel(g, P, y, W, rows.length * rowH + 24, 28);
+  rows.forEach(([label, value, sub, colour], i) => {
+    const ry = y + 12 + i * rowH;
+    if(i) { g.fillStyle = GCD.faint; g.fillRect(P + 30, ry, W - 60, 2); }
+    g.font = gcdF(800, 32); const vw = g.measureText(value).width;
+    g.font = gcdF(600, 28); shareText(g, shareWrap(g, label, W - 90 - vw, 1)[0] || '', P + 30, ry + (sub ? 40 : 48), gcdF(600, 28), GCD.soft);
+    shareText(g, value, P + W - 30, ry + (sub ? 40 : 48), gcdF(800, 32), colour || GCD.ink, 'right');
+    if(sub) shareText(g, sub, P + W - 30, ry + 66, gcdF(600, 22), GCD.soft, 'right');
+  });
+  return y + rows.length * rowH + 24;
+}
+// horizontal bars: [label, value text, fraction, colour]
+function gcdBars(g, y, rows, rowH = 86){
+  const { P } = GCD, W = SHARE_W - P * 2;
+  gcdPanel(g, P, y, W, rows.length * rowH + 30, 28);
+  rows.forEach(([label, value, frac, colour], i) => {
+    const ry = y + 22 + i * rowH;
+    g.font = gcdF(800, 30); const vw = g.measureText(value).width;
+    g.font = gcdF(700, 27); shareText(g, shareWrap(g, label, W - 80 - vw, 1)[0] || '', P + 30, ry + 32, gcdF(700, 27), GCD.ink);
+    shareText(g, value, P + W - 30, ry + 32, gcdF(800, 30), colour, 'right');
+    g.fillStyle = 'rgba(255,255,255,.10)'; shareRound(g, P + 30, ry + 48, W - 60, 16, 8); g.fill();
+    if(frac > 0){ g.fillStyle = colour; shareRound(g, P + 30, ry + 48, Math.max(16, (W - 60) * Math.min(1, frac)), 16, 8); g.fill(); }
+  });
+  return y + rows.length * rowH + 30;
+}
+// the hero figure: a label, then the number large
+function gcdHero(g, y, label, value, unit, colour = GCD.gold){
+  const { P } = GCD, W = SHARE_W - P * 2;
+  shareText(g, label, P, y + 34, gcdF(700, 32), GCD.soft);
+  g.font = gcdF(800, 40); const uw = unit ? g.measureText(' ' + unit).width : 0;
+  const s = gcdFit(g, value, W - uw, 150, 800, 60);
+  g.save(); g.shadowColor = 'rgba(243,201,105,.35)'; g.shadowBlur = 30;
+  shareText(g, value, P, y + 34 + s * .95, gcdF(800, s), colour); g.restore();
+  g.font = gcdF(800, s); const vw = g.measureText(value).width;
+  if(unit) shareText(g, unit, P + vw + 16, y + 34 + s * .95, gcdF(700, 40), GCD.soft);
+  return y + 34 + s * .95 + 34;
+}
+function gcdWhen(p, d){
+  const en = isEN(), t = new Date(gecMs(p, d.to)), M = monthsShort();
+  return en ? `As of ${t.getDate()} ${M[t.getMonth()]} ${t.getFullYear()} · ${gecHM(t.getTime())}`
+    : `ข้อมูล ณ ${t.getDate()} ${M[t.getMonth()]} ${t.getFullYear() + 543} · ${gecHM(t.getTime())} น.`;
+}
+async function drawGECCard(g, sub){
+  const en = isEN(), id = sub.id, { p, d, o, hNow, hAll, wl } = gecCtx();
+  const { P } = GCD, W = SHARE_W - P * 2, T = v => gecTok(v), N = gecN, pc = gecPc, L = (th, e) => en ? e : th;
+  const when = gcdWhen(p, d);
+  const same = o ? gecUpTo(o, hNow) : 0, ratio = same > 0 ? d.sum / same : 0;
+  const dayNo = Math.floor(hNow / 24) + 1, days = Math.round(hAll / 24);
+  const elapsed = hNow < 48 ? L(`${Math.floor(hNow)} ชม. ${Math.round(hNow % 1 * 60)} นาที`, `${Math.floor(hNow)} h ${Math.round(hNow % 1 * 60)} min`) : L(`${Math.floor(hNow / 24)} วัน`, `${Math.floor(hNow / 24)} days`);
+  let y;
+
+  if(id === 'total'){
+    y = await gcdFrame(g, L('ยอดโหวตรวม GE2026', 'GE2026: all votes so far'), when);
+    y = gcdHero(g, y, L('โทเคนที่โหวตแล้ว', 'Tokens voted'), T(d.sum), L('โทเคน', 'tokens'));
+    y = gcdTiles(g, y + 10, [[L('ครั้งที่โหวต', 'Votes'), N(d.n), GCD.pink], [L('กระเป๋าที่โหวต', 'Wallets'), N(wl.length), GCD.teal], [L('เฉลี่ยต่อกระเป๋า', 'Per wallet'), T(d.sum / wl.length), GCD.ink]]);
+    y += 56;
+    shareText(g, L(`วันที่ ${dayNo} จาก ${days} วัน`, `Day ${dayNo} of ${days}`), P, y, gcdF(700, 28), GCD.ink);
+    shareText(g, L('ปิดโหวต 12 พ.ย.', 'Closes 12 Nov'), P + W, y, gcdF(600, 26), GCD.soft, 'right');
+    g.fillStyle = 'rgba(255,255,255,.10)'; shareRound(g, P, y + 20, W, 20, 10); g.fill();
+    g.fillStyle = GCD.gold; shareRound(g, P, y + 20, Math.max(20, W * Math.min(1, hNow / hAll)), 20, 10); g.fill();
+    gcdTake(g, ratio ? L(`เปิดโหวตมา ${elapsed} มาแรงกว่า GE2025 ณ เวลาเดียวกัน ${ratio.toFixed(2)} เท่า`, `${elapsed} in, ${ratio.toFixed(2)}× GE2025 at the same point`)
+      : L(`เปิดโหวตมาแล้ว ${elapsed}`, `Voting open for ${elapsed}`), y + 90);
+  }
+  else if(id === 'money'){
+    y = await gcdFrame(g, L('มูลค่าการโหวต GE2026', 'GE2026: the vote in baht'), when);
+    y = gcdHero(g, y, L('มูลค่าโทเคนที่โหวตแล้ว', 'Value of the tokens voted'), gecTok(d.sum * gecPrice), L('บาท', 'baht'));
+    y = gcdRows(g, y + 10, [[L('เฉลี่ยต่อกระเป๋า', 'Average a wallet'), gecBaht(d.sum / wl.length, en)], [L('เฉลี่ยต่อครั้ง', 'Average a vote'), gecBaht(d.sum / d.n, en)],
+      ...(o ? [[L('GE2025 ณ เวลาเดียวกัน', 'GE2025 at the same point'), gecBaht(same, en)], [L('GE2025 ยอดรวมตอนปิดโหวต', 'GE2025 final total'), gecBaht(o.sum, en)]] : [])]);
+    gcdTake(g, L(`คิดที่ราคา ${gecPrice} บาทต่อโทเคน${o ? ' · ตัวเลข GE2025 คิดที่ราคาเดียวกัน' : ''}`, `At ${gecPrice} baht a token${o ? '; GE2025 at the same price' : ''}`), y + 40);
+  }
+  else if(id === 'supply'){
+    const t = gecLoad('tok'); const poll = p.addr.toLowerCase(), chans = Object.keys(t.chan);
+    const sumOf = ks => ks.reduce((s, k) => s + Math.max(0, t.bal[k] || 0), 0);
+    const skip = new Set([...t.vault, ...chans, poll]); let buyers = 0;
+    for(const [a, v] of Object.entries(t.bal)) if(!skip.has(a) && v > 1e-9) buyers += v;
+    const voted = Math.max(0, t.bal[poll] || 0), sold = buyers + voted;
+    const parts = [[L('ยังอยู่ในคลังผู้จัด', 'Still in the organiser’s vault'), sumOf(t.vault), GCD.grey], [L('อยู่ที่ช่องทางขาย', 'With the sales channels'), sumOf(chans), GCD.gold],
+      [L('แฟนซื้อแล้ว ยังไม่โหวต', 'Bought, not voted yet'), buyers, GCD.teal], [L('โหวตแล้ว', 'Voted'), voted, GCD.pink]];
+    y = await gcdFrame(g, L('โทเคน GE6 อยู่ที่ไหนบ้าง', 'Where all the GE6 tokens are'), when);
+    // a ring of the whole supply, each slice at least a sliver so the small ones show
+    const cx = SHARE_W / 2, cy = y + 230, R = 200, ring = 64;
+    let a = -Math.PI / 2; const tot = t.minted;
+    g.lineWidth = ring; g.lineCap = 'butt';
+    parts.forEach(([, v, c]) => { const sw = Math.max(.035, v / tot * Math.PI * 2); g.strokeStyle = c; g.beginPath(); g.arc(cx, cy, R, a, a + sw - .012); g.stroke(); a += sw; });
+    shareText(g, gecN(tot), cx, cy + 6, gcdF(800, 60), GCD.ink, 'center');
+    shareText(g, L('GE6 ทั้งหมด', 'GE6 in all'), cx, cy + 50, gcdF(600, 26), GCD.soft, 'center');
+    y = cy + R + ring / 2 + 30;
+    parts.forEach(([label, v, c], i) => {
+      const ry = y + i * 58;
+      g.fillStyle = c; g.beginPath(); g.arc(P + 14, ry - 10, 12, 0, Math.PI * 2); g.fill();
+      shareText(g, label, P + 42, ry, gcdF(700, 28), GCD.ink);
+      shareText(g, `${gecN(v)} · ${pc(v / tot)}`, P + W, ry, gcdF(800, 28), c, 'right');
+    });
+    gcdTake(g, L(`แฟนซื้อไปแล้ว ${gecN(sold)} โทเคน และโหวตไปแล้ว ${pc(sold ? voted / sold : 0)} ของที่ซื้อ`, `Fans have bought ${gecN(sold)} tokens and voted ${pc(sold ? voted / sold : 0)} of them`), y + 4 * 58 + 6);
+  }
+  else if(id === 'feed'){
+    y = await gcdFrame(g, L('โหวตล่าสุด', 'Latest votes'), when);
+    const list = d.feed.slice(-8).reverse();
+    gcdPanel(g, P, y, W, list.length * 76 + 24, 28);
+    list.forEach((v, i) => { const ry = y + 12 + i * 76; if(i){ g.fillStyle = GCD.faint; g.fillRect(P + 30, ry, W - 60, 2); }
+      const big = v.amt >= GEC_BIG;
+      shareText(g, gecHMS(gecMs(p, v.b)), P + 30, ry + 48, gcdF(700, 28), GCD.soft);
+      shareText(g, gecShort(v.w), P + 210, ry + 48, gcdF(600, 26), GCD.ink);
+      shareText(g, gecTok(v.amt, 4), P + W - 30, ry + 48, gcdF(800, big ? 36 : 30), big ? GCD.gold : GCD.ink, 'right'); });
+    const bigSum = d.big.reduce((s, v) => s + v.amt, 0);
+    gcdTake(g, L(`โหวตก้อนใหญ่ (1,000 โทเคนขึ้นไป) ${N(d.big.length)} ครั้ง รวมกันเป็น ${pc(bigSum / d.sum)} ของยอดโหวตทั้งหมด`, `Big votes (1,000+): ${N(d.big.length)}, together ${pc(bigSum / d.sum)} of everything voted`), y + list.length * 76 + 60);
+  }
+  else if(id === 'vs' && o){
+    y = await gcdFrame(g, L('GE2026 เทียบ GE2025', 'GE2026 against GE2025'), when);
+    shareText(g, L(`ณ เวลาเดียวกันของการโหวต (เปิดมา ${elapsed})`, `At the same point of the vote (${elapsed} in)`), P, y + 20, gcdF(600, 28), GCD.soft);
+    const base = y + 560, maxH = 420, top = Math.max(d.sum, same), bw = 250;
+    [[d.sum, 'GE2026', GCD.pink, wl.length, P + 70], [same, 'GE2025', GCD.teal, Object.values(o.wallets).filter(x => x[2] < hNow).length, P + W - 70 - bw]].forEach(([v, lab, c, wn, x]) => {
+      const h = Math.max(12, maxH * v / top);
+      const gr = g.createLinearGradient(0, base - h, 0, base); gr.addColorStop(0, c); gr.addColorStop(1, 'rgba(255,255,255,.08)');
+      g.fillStyle = gr; shareRound(g, x, base - h, bw, h, 22); g.fill();
+      shareText(g, gecN(v), x + bw / 2, base - h - 22, gcdF(800, 44), GCD.ink, 'center');
+      shareText(g, lab, x + bw / 2, base + 50, gcdF(800, 34), c, 'center');
+      shareText(g, `${N(wn)} ${L('กระเป๋า', 'wallets')}`, x + bw / 2, base + 88, gcdF(600, 24), GCD.soft, 'center');
+    });
+    g.save(); g.fillStyle = GCD.gold; g.shadowColor = 'rgba(243,201,105,.6)'; g.shadowBlur = 30; g.beginPath(); g.arc(SHARE_W / 2, base - 170, 92, 0, Math.PI * 2); g.fill(); g.restore();
+    shareText(g, '×' + (ratio ? ratio.toFixed(2) : '–'), SHARE_W / 2, base - 156, gcdF(800, gcdFit(g, '×' + ratio.toFixed(2), 160, 52)), '#2A0A0E', 'center');
+    gcdTake(g, L(`GE2025 ปิดโหวตที่ ${gecN(o.sum)} โทเคน จาก ${N(Object.keys(o.wallets).length)} กระเป๋า`, `GE2025 closed at ${gecN(o.sum)} tokens from ${N(Object.keys(o.wallets).length)} wallets`), base + 130);
+  }
+  else if(id === 'daily' && o){
+    y = await gcdFrame(g, L('ยอดโหวตรายวัน เทียบ GE2025', 'Day by day, against GE2025'), when);
+    const cur = dayNo - 1, from = Math.max(0, cur - 13), list = [];
+    for(let i = from; i <= cur; i++){ const a = i * 24; list.push([i, (i === cur ? d.sum : gecUpTo(d, a + 24)) - gecUpTo(d, a), gecUpTo(o, Math.min(a + 24, hNow)) - gecUpTo(o, a)]); }
+    const ch = 430, base = y + ch, top = Math.max(1, ...list.flatMap(r => [r[1], r[2]]));
+    const slot = W / list.length, bw = Math.min(90, slot * .36);
+    gcdPanel(g, P, y - 20, W, ch + 110, 28);
+    list.forEach(([i, a, b], k) => { const x = P + k * slot + slot / 2;
+      const h1 = Math.max(6, (ch - 70) * a / top), h2 = Math.max(6, (ch - 70) * b / top);
+      g.fillStyle = GCD.pink; shareRound(g, x - bw - 4, base - h1, bw, h1, 10); g.fill();
+      g.fillStyle = 'rgba(95,214,190,.55)'; shareRound(g, x + 4, base - h2, bw, h2, 10); g.fill();
+      shareText(g, L(`วันที่ ${i + 1}`, `Day ${i + 1}`), x, base + 42, gcdF(700, list.length > 7 ? 18 : 24), GCD.soft, 'center');
+      if(list.length <= 4){ shareText(g, gecN(a), x - bw / 2 - 4, base - h1 - 14, gcdF(800, 26), GCD.ink, 'center'); shareText(g, gecN(b), x + bw / 2 + 4, base - h2 - 14, gcdF(700, 22), GCD.soft, 'center'); }
+    });
+    y = base + 110;
+    g.fillStyle = GCD.pink; shareRound(g, P, y, 26, 18, 6); g.fill(); shareText(g, 'GE2026', P + 38, y + 17, gcdF(700, 24), GCD.ink);
+    g.fillStyle = 'rgba(95,214,190,.55)'; shareRound(g, P + 190, y, 26, 18, 6); g.fill(); shareText(g, L('GE2025 วันเดียวกัน', 'GE2025, same day'), P + 228, y + 17, gcdF(700, 24), GCD.ink);
+    const last = list[list.length - 1];
+    gcdTake(g, L(`วันที่ ${last[0] + 1}${last[0] === cur ? ' (ถึงตอนนี้)' : ''} ได้ ${gecN(last[1])} โทเคน${last[2] > 0 ? ` · ${(last[1] / last[2]).toFixed(2)} เท่าของปีที่แล้ววันเดียวกัน` : ''}`,
+      `Day ${last[0] + 1}${last[0] === cur ? ' so far' : ''}: ${gecN(last[1])} tokens${last[2] > 0 ? `, ${(last[1] / last[2]).toFixed(2)}× the same day last year` : ''}`), y + 60);
+  }
+  else if(id === 'hourly'){
+    const f48 = gecHourMode === 'first48', rows = gecHourRows(d, o, hNow);
+    const list = f48 ? rows : rows.slice().reverse();
+    y = await gcdFrame(g, f48 ? L('ยอดโหวตรายชั่วโมง 48 ชม. แรก', 'Hour by hour, the first 48 hours') : L('ยอดโหวตรายชั่วโมง 24 ชม. ล่าสุด', 'Hour by hour, the last 24 hours'), when);
+    const n = f48 ? 48 : 24, ch = 470, base = y + ch, slot = W / n, bw = Math.max(6, slot * .7);
+    const top = Math.max(1, ...list.map(r => Math.max(r[1], r[2] || 0)));
+    gcdPanel(g, P, y - 20, W, ch + 90, 28);
+    const best = list.reduce((a, b) => b[1] > a[1] ? b : a, list[0]);
+    list.forEach(([h, v, v25], k) => { const x = P + (f48 ? h : k) * slot + (slot - bw) / 2;
+      const hh = Math.max(4, (ch - 80) * v / top);
+      g.fillStyle = h === best[0] ? GCD.gold : GCD.pink; shareRound(g, x, base - hh, bw, hh, Math.min(6, bw / 2)); g.fill();
+      if(v25 != null){ g.fillStyle = 'rgba(95,214,190,.9)'; g.beginPath(); g.arc(x + bw / 2, base - Math.max(4, (ch - 80) * v25 / top), Math.max(3, bw * .28), 0, Math.PI * 2); g.fill(); } });
+    for(let k = 0; k < n; k += 6){ const h = f48 ? k : (list[0] ? list[0][0] + k : k);
+      shareText(g, gecHM(gecMs(p, p.start + h * 1200)), P + k * slot + slot / 2, base + 40, gcdF(600, 20), GCD.soft, 'center'); }
+    const bx = P + (f48 ? best[0] : list.indexOf(best)) * slot + slot / 2;
+    shareText(g, gecN(best[1]), Math.min(P + W - 70, Math.max(P + 70, bx)), base - Math.max(4, (ch - 80) * best[1] / top) - 16, gcdF(800, 28), GCD.gold, 'center');
+    y = base + 92;
+    if(f48 && o){ g.fillStyle = 'rgba(95,214,190,.9)'; g.beginPath(); g.arc(P + 12, y + 2, 10, 0, Math.PI * 2); g.fill(); shareText(g, L('จุดสีเขียว = ชั่วโมงเดียวกันของ GE2025', 'Green dots: the same hour of GE2025'), P + 34, y + 12, gcdF(600, 24), GCD.soft); }
+    const t = new Date(gecMs(p, p.start + best[0] * 1200));
+    gcdTake(g, f48 ? L(`ปีนี้ประกาศผลด่วนหลัง 48 ชม. แรก · ชั่วโมงที่โหวตมากสุด ${t.getDate()} ${monthsShort()[t.getMonth()]} ${gecHM(t.getTime())} น. ได้ ${gecN(best[1])} โทเคน`, `This year the first results come after 48 hours. Busiest hour: ${gecHM(t.getTime())}, ${gecN(best[1])} tokens`)
+      : L(`ชั่วโมงที่โหวตมากสุดใน 24 ชม. ล่าสุด ${gecHM(t.getTime())} น. ได้ ${gecN(best[1])} โทเคน`, `Busiest of the last 24 hours: ${gecHM(t.getTime())}, ${gecN(best[1])} tokens`), y + 44);
+  }
+  else if(id === 'stretch' && o){
+    const q = GEC_POLLS.ge2025, LL = (q.end - q.start) * GEC_BLOCK / 3600;
+    y = await gcdFrame(g, L('GE2025 คะแนนมาตอนไหน', 'GE2025: when the votes came'), L('GE2025 · 11 ก.พ. – 27 มี.ค. 2568', 'GE2025 · 11 Feb – 27 Mar 2025'));
+    const rows = [[L('24 ชม. แรก', 'First 24 hours'), gecUpTo(o, 24)], [L('7 วันแรก', 'First 7 days'), gecUpTo(o, 168)],
+      [L('7 วันสุดท้าย', 'Last 7 days'), o.sum - gecUpTo(o, LL - 168)], [L('3 วันสุดท้าย', 'Last 3 days'), o.sum - gecUpTo(o, LL - 72)], [L('24 ชม. สุดท้าย', 'Last 24 hours'), o.sum - gecUpTo(o, LL - 24)]];
+    y = gcdBars(g, y, rows.map(([l, v], i) => [l, `${pc(v / o.sum)}`, v / o.sum, i < 2 ? GCD.teal : GCD.gold]), 96);
+    const last = rows[4][1];
+    gcdTake(g, L(`ปีที่แล้ว ${pc(last / o.sum)} ของคะแนนทั้งหมดมาใน 24 ชม. สุดท้าย · ยอดรวม ${gecN(o.sum)} โทเคน`, `Last year ${pc(last / o.sum)} of all the votes came in the final 24 hours, of ${gecN(o.sum)} in all`), y + 40);
+  }
+  else if(id === 'sizes'){
+    y = await gcdFrame(g, L('ใครโหวตเท่าไหร่', 'How big the voting wallets are'), when);
+    const Bk = [[1000, Infinity, '1,000+'], [100, 1000, '100–999'], [10, 100, '10–99'], [1, 10, '1–9'], [0, 1, L('ต่ำกว่า 1', 'under 1')]].map(([a, b, label]) => {
+      const ws = wl.filter(([, x]) => x[0] >= a && x[0] < b); return { label, n:ws.length, s:ws.reduce((t, [, x]) => t + x[0], 0) }; });
+    y = gcdBars(g, y, Bk.map((b, i) => [`${L('โหวต', '')} ${b.label} ${L('โทเคน', 'tokens')} · ${N(b.n)} ${L('กระเป๋า', 'wallets')}`, pc(b.s / d.sum), b.s / d.sum, i < 2 ? GCD.gold : GCD.teal]), 96);
+    shareText(g, L('แถบ = สัดส่วนของโทเคนที่โหวตทั้งหมด', 'Bar: share of all tokens voted'), P, y + 40, gcdF(600, 24), GCD.soft);
+    gcdTake(g, L(`${N(Bk[0].n)} กระเป๋าที่โหวต 1,000 โทเคนขึ้นไป รวมกันเป็น ${pc(Bk[0].s / d.sum)} ของยอดโหวต · ครึ่งหนึ่งของกระเป๋าโหวตไม่เกิน ${gecTok(wl[wl.length >> 1][1][0])} โทเคน`,
+      `${N(Bk[0].n)} wallets of 1,000+ hold ${pc(Bk[0].s / d.sum)} of the vote; half of all wallets voted ${gecTok(wl[wl.length >> 1][1][0])} or less`), y + 76);
+  }
+  else if(id === 'top'){
+    y = await gcdFrame(g, L('10 กระเป๋าที่โหวตมากสุด', 'The 10 biggest voting wallets'), when);
+    const top = wl.slice(0, 10), mx = top[0][1][0];
+    gcdPanel(g, P, y, W, top.length * 74 + 24, 28);
+    top.forEach(([w, x], i) => { const ry = y + 12 + i * 74;
+      g.fillStyle = i < 3 ? GCD.gold : 'rgba(255,255,255,.14)'; g.beginPath(); g.arc(P + 50, ry + 37, 22, 0, Math.PI * 2); g.fill();
+      shareText(g, String(i + 1), P + 50, ry + 46, gcdF(800, 24), i < 3 ? '#2A0A0E' : GCD.ink, 'center');
+      shareText(g, gecShort(w), P + 92, ry + 32, gcdF(700, 26), GCD.ink);
+      g.fillStyle = 'rgba(255,255,255,.10)'; shareRound(g, P + 92, ry + 46, W - 360, 12, 6); g.fill();
+      g.fillStyle = i < 3 ? GCD.gold : GCD.pink; shareRound(g, P + 92, ry + 46, Math.max(12, (W - 360) * x[0] / mx), 12, 6); g.fill();
+      shareText(g, gecN(x[0]), P + W - 30, ry + 48, gcdF(800, 32), GCD.ink, 'right'); });
+    const share10 = top.reduce((t, [, x]) => t + x[0], 0) / d.sum;
+    gcdTake(g, L(`10 กระเป๋านี้รวมกันเป็น ${pc(share10)} ของยอดโหวตทั้งหมด`, `These 10 wallets hold ${pc(share10)} of everything voted`), y + top.length * 74 + 60);
+  }
+  else if(id === 'wallet' && gecWallet && gecWallet.v){
+    const Wt = gecWallet, s = k => Wt.v[k].reduce((t, x) => t + x.amt, 0), tk = gecLoad('tok');
+    y = await gcdFrame(g, L('กระเป๋า ', 'Wallet ') + gecShort(Wt.w), when);
+    y = gcdTiles(g, y, [['GE2026', T(s('ge2026')), GCD.pink], ['GE2025', T(s('ge2025')), GCD.teal]], 160);
+    shareText(g, L(`โหวต ${N(Wt.v.ge2026.length)} ครั้ง ในปีนี้ · ${N(Wt.v.ge2025.length)} ครั้ง ปีที่แล้ว`, `${N(Wt.v.ge2026.length)} votes this year · ${N(Wt.v.ge2025.length)} last year`), P, y + 48, gcdF(600, 26), GCD.soft);
+    const list = Wt.v.ge2026.slice(-6).reverse(), M = monthsShort();
+    if(list.length) y = gcdRows(g, y + 80, list.map(x => { const t = new Date(gecMs(p, x.b)); return [`${t.getDate()} ${M[t.getMonth()]} ${gecHMS(t.getTime())}`, gecTok(x.amt, 4)]; }), 70);
+    else y += 80;
+    if(tk) gcdTake(g, L(`ยังถือ GE6 ที่ยังไม่โหวตอีก ${T(Math.max(0, tk.bal[Wt.w] || 0))} โทเคน`, `Still holds ${T(Math.max(0, tk.bal[Wt.w] || 0))} GE6 not yet voted`), y + 40);
+  }
+  else if(id === 'window' && gecWin && gecWin.res){
+    const r = gecWin.res, s = gecWinStats(r);
+    const wt = new Date(`${gecWin.date}T12:00:00`), M = monthsShort();
+    y = await gcdFrame(g, L('ยอดโหวตตามช่วงเวลา', 'Votes in a chosen time'),
+      L(`${wt.getDate()} ${M[wt.getMonth()]} ${wt.getFullYear() + 543} · ${gecWin.from}–${gecWin.to} น.`, `${wt.getDate()} ${M[wt.getMonth()]} ${wt.getFullYear()} · ${gecWin.from}–${gecWin.to}`));
+    y = gcdHero(g, y, L('โทเคนที่โหวตในช่วงนี้', 'Tokens voted in this time'), T(s.sum), L('โทเคน', 'tokens'));
+    y = gcdTiles(g, y + 6, [[L('ครั้งที่โหวต', 'Votes'), N(s.n), GCD.pink], [L('กระเป๋า', 'Wallets'), N(s.wallets.length), GCD.teal], [L('โหวตครั้งใหญ่สุด', 'Biggest vote'), gecTok(s.max.amt), GCD.ink]]);
+    y = gcdBars(g, y + 30, s.wallets.slice(0, 3).map(([w, x], i) => [gecShort(w), gecN(x[0]), x[0] / s.wallets[0][1][0], i ? GCD.pink : GCD.gold]), 84);
+    gcdTake(g, r.o25 != null && r.o25 > 0 ? L(`GE2025 ช่วงเวลาเดียวกัน (วันที่ ${r.day} ของการโหวต) ได้ ${gecN(r.o25)} โทเคน · ปีนี้ ${(s.sum / r.o25).toFixed(2)} เท่า`, `GE2025 in the same hours of day ${r.day}: ${gecN(r.o25)} tokens — this year ${(s.sum / r.o25).toFixed(2)}×`)
+      : L(`มูลค่าราว ${gecBaht(s.sum, en)}`, `Worth about ${gecBaht(s.sum, en)}`), y + 40);
+  }
+}
+
 async function buildShareCard(sub){
   try{ await Promise.all(['500', '600', '700', '800'].map(w => document.fonts.load(`${w} 40px "Noto Sans Thai"`, 'กขABC'))); }catch(e){}
   const c = document.createElement('canvas'); c.width = SHARE_W; c.height = SHARE_H;
   const g = c.getContext('2d');
   if(sub.kind === 'box') await drawBoxCard(g, sub);
+  else if(sub.kind === 'gec') await drawGECCard(g, sub);
   else if(sub.kind === 'member') await drawMemberCard(g, sub.m, sub.url);
   else if(sub.kind === 'event') await drawEventCard(g, sub.ev, sub.url);
   else if(sub.kind === 'single') await drawSingleCard(g, sub.s, sub.url);
@@ -16607,8 +16911,8 @@ function bindDelegatedEvents(){
     else if(action==='gec-win'){ gecWinLoad(gecWinRange(id)); }
     else if(action==='gec-hours'){ gecHourMode = id === 'last24' ? 'last24' : 'first48'; gecDraw(); }
     else if(action==='gec-share'){
-      const spec = gecShareSpec(id);
-      if(spec) openShareSheet({ kind:'box', spec, url:location.origin + '/', title:`${spec.title} — 48thDb`, file:`48thdb-ge2026-${id}` });
+      const spec = gecShareSpec(id);   // still names the picture and its file
+      if(spec) openShareSheet({ kind:'gec', id, url:location.origin + '/', title:`${spec.title} — 48thDb`, file:`48thdb-ge2026-${id}` });
     }
     else if(action==='gec-chan'){ gecChanOpen = !gecChanOpen; gecDraw(); }
     else if(action==='ge-back'){
