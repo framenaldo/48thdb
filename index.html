@@ -3005,6 +3005,7 @@
   .ev-card.is-done > *{ opacity:.4; filter:grayscale(.9); transition:opacity .2s, filter .2s; }
   .ev-card.is-done:active > *, .ev-card.is-done:focus-within > *{ opacity:.8; filter:none; }
   @media (hover:hover){ .ev-card.is-done:hover > *{ opacity:.8; filter:none; } }
+  .ff-show-link{ border:0; background:none; padding:0; font:inherit; font-weight:800; color:inherit; text-align:left; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -4923,19 +4924,31 @@ const SEED_SCHEDULE = [
   { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04', boothPlan:'fanfest',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
-    related:['ev-election-voting','ev-election-results','ev-ge6-single'],
+    related:['ev-kimi-first-performance','ev-election-voting','ev-election-results','ev-ge6-single'],
     timeline:'ge2026',
     poster:{ accent:'#8C2A22', surface:'#FAF2E4', ink:'#4E1512', img:'posters/election-fanfest-free.jpg', w:1366, h:2048 },
     info:['女神たちよ、世界へ響け！ — คำโปรยประจำงาน',
       'เข้างานฟรี',
       'ช่วงกิจกรรม 3 ต.ค. 11:00–16:00 · 4 ต.ค. 11:00–20:00',
       '3 ต.ค. ประกาศผลโหวต 48 ชั่วโมงแรก',
-      '3 ต.ค. เปิดตัวเพลง "Kimi to Doko ka e Ikitai" ครั้งแรก',
+      '3 ต.ค. 18:00 น. First Performance & MV Premiere เพลง "Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ"',
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
       'Hachi Cha และ Merchandise เมมเบอร์อยู่เต็ม 1 ชั่วโมง ไม่สลับกลุ่ม',
       'ตารางกิจกรรมอาจเปลี่ยนแปลงภายหลัง',
       'รายละเอียดอื่นรอประกาศ'],
     allMembers:true },
+  // the evening of the festival's first day: the single's first performance and its MV
+  { id:'ev-kimi-first-performance', logo:'kimi', start:'2026-10-03', time:'18:00',
+    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ" First Performance & MV Premiere',
+    venue:'MCC Hall, The Mall Lifestore Bangkapi (Bangkok)', groups:['bnk48','cgm48'], lineupTba:true,
+    timeline:'ge2026', related:['ev-election-fanfest','ev-ge6-single'],
+    info:['การแสดงเพลง "Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ" ครั้งแรก และ MV Premiere',
+      'ส่วนหนึ่งของ Senbatsu General Election 2026: Fan Festival 2026',
+      'KIDS ZONE: สำหรับผู้ชมอายุไม่เกิน 12 ปี',
+      'STANDING ZONE: โซนยืนรับชม ใช้โทรศัพท์มือถือบันทึกภาพและวิดีโอได้ โดยไม่ยกสูงเกินระดับศีรษะ',
+      'CAMERA ZONE: สำหรับผู้ที่ต้องการบันทึกภาพและวิดีโอด้วยกล้องถ่ายภาพและอุปกรณ์เสริม',
+      'รายละเอียดการต่อคิวและการเข้า Camera Zone จะแจ้งให้ทราบอีกครั้งบริเวณหน้างาน',
+      'ตรวจสอบรายละเอียดและข้อปฏิบัติของแต่ละโซนจากภาพประกาศ'] },
   /* The single and the photoset are what the GE6 Tokens come in, so they sit
      with the election rather than in the discography until they are released. */
   { id:'ev-ge6-single', logo:'kimi', start:'2026-09-26', end:'2026-10-30', period:true, bar:'Pre-Order: Kimi to Doko ka e Ikitai',
@@ -5122,7 +5135,9 @@ const TIMELINES = {
     { d:'2026-10-01', time:'12:00', kind:'vote', track:'vote', title:'เปิดโหวต', ev:'ev-election-voting' },
     { d:'2026-10-03', to:'2026-10-04', kind:'event', track:'event', title:'BNK48 & CGM48 Fan Festival 2026',
       venue:'MCC Hall, The Mall Lifestore Bangkapi', ev:'ev-election-fanfest',
-      note:'3 ต.ค. ประกาศผลโหวต 48 ชั่วโมงแรก และเปิดตัวเพลง "Kimi to Doko ka e Ikitai" ครั้งแรก' },
+      note:'3 ต.ค. ประกาศผลโหวต 48 ชั่วโมงแรก' },
+    { d:'2026-10-03', time:'18:00', kind:'event', track:'event', title:'First Performance & MV Premiere "Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ"',
+      venue:'MCC Hall, The Mall Lifestore Bangkapi (Bangkok)', ev:'ev-kimi-first-performance' },
     { d:'2026-10-07', time:'12:00', kind:'start', track:'myo', title:'เปิดให้แลกบัตร Meeting You Online' },
     { d:'2026-10-10', time:'21:00', kind:'end', track:'event', title:'ปิดขายบันเดิล', ev:'ev-ge6-bundle' },
     { d:'2026-10-13', to:'2026-10-14', time:'10:00', kind:'start', track:'event', title:'เลือกที่นั่งบันเดิล',
@@ -11760,7 +11775,7 @@ const FF_ROW = [49,58,13,87,93];   // [first, last, x start%, x end%, y%]
 /* booth 1 upward */
 const FF_BOOTHS = ['bnk-nall', 'bnk-neen', 'bnk-arlee', 'bnk-l', 'bnk-grape', 'cgm-satangpound', 'cgm-lewlew', 'cgm-punpon', 'cgm-lingling', 'bnk-patt', 'bnk-micha', 'bnk-mint', 'bnk-mail', 'cgm-else', 'cgm-shenae', 'bnk-nammonn', 'bnk-pancake', 'bnk-monet', 'bnk-praew', 'bnk-luksorn', 'bnk-cartoon', 'cgm-emma', 'bnk-palmmy', 'cgm-chifa', 'cgm-lookked', 'cgm-ginna', 'cgm-jingjing', 'bnk-khaimook', 'bnk-marine', 'bnk-janry', 'bnk-berry', 'bnk-galeya', 'bnk-mayji', 'cgm-praifa', 'bnk-emmy', 'bnk-blythe', 'bnk-mirin', 'bnk-wawa', 'bnk-hoop', 'bnk-sindy', 'bnk-inkcha', 'cgm-nisha', 'bnk-jew', 'cgm-tara', 'cgm-nana', 'cgm-namphet', 'cgm-kwan', 'cgm-hongyok', 'bnk-saonoi', 'bnk-rose', 'bnk-niya', 'bnk-khowjow', 'bnk-proud', 'bnk-yoghurt', 'bnk-fame', 'cgm-ploen', 'cgm-prae', 'cgm-valentine'];
 const FF_DAYS = [
-  { date:'2026-10-03', slots:[
+  { date:'2026-10-03', show:{ t:'18:00', ev:'ev-kimi-first-performance', th:'First Performance & MV Premiere "Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ"', en:'First Performance & MV Premiere "Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ"' }, slots:[
     { t:'11:00', to:'12:00', stage:['cgm-praifa', 'bnk-luksorn', 'bnk-blythe', 'bnk-rose'], booth:['bnk-mirin', 'cgm-nana', 'cgm-chifa', 'bnk-wawa'], hitouch:['bnk-fame', 'cgm-namphet', 'cgm-lewlew', 'cgm-satangpound', 'cgm-lookked', 'bnk-inkcha', 'bnk-grape'],
       hachi:['cgm-emma', 'bnk-emmy', 'cgm-tara', 'cgm-punpon'], merch:['bnk-hoop', 'bnk-saonoi', 'cgm-shenae', 'bnk-mail'] },
     { t:'12:00', to:'13:00', stage:['cgm-tara', 'cgm-ploen', 'bnk-mirin', 'bnk-cartoon'], booth:['cgm-lookked', 'cgm-shenae', 'bnk-blythe', 'bnk-marine'],
@@ -11854,7 +11869,18 @@ function ffLivePanel(now, keep, en, away, onFeed){
     : (en ? `in ${n} min` : `อีก ${n} นาที`);
   const stageNames = sl => (sl.stage || []).filter(keep).map(id => (getMember(id) || {}).name).filter(Boolean).join(', ');
   let head, body = '', foot = '', on = false;
-  if(now.after){
+  // an evening show after the day's activities (day 1: the single's first performance)
+  const show = FF_DAYS[now.di].show, showRow = () => `<div class="ff-live-row is-show" style="--a:#B3121E"><span class="ff-live-lab">${en ? 'Show' : 'โชว์'}</span>
+      <span class="ff-live-ppl"><button class="ff-show-link" data-action="open-event" data-id="${show.ev}">${escapeHtml(en ? show.en : show.th)}</button></span></div>`;
+  const showIn = show ? ffMins(now.hm, show.t) : null;
+  if(now.after && show && showIn > 0){
+    head = `<b>${en ? 'Next at' : 'ถัดไป'} ${show.t}${en ? '' : ' น.'}</b><span>${inWords(showIn)}</span>`;
+    body = showRow();
+  } else if(now.after && show && showIn > -120){
+    on = true;
+    head = `<b>${en ? 'Now' : 'ตอนนี้'} <span class="ff-live-clock">${now.hm}</span>${en ? '' : ' น.'}</b><span>${en ? 'the evening show' : 'โชว์ช่วงค่ำ'}</span>`;
+    body = showRow();
+  } else if(now.after){
     head = `<b>${en ? "That's all for today" : 'กิจกรรมของวันนี้จบแล้ว'}</b>`;
     const tmr = FF_DAYS[now.di + 1];
     if(tmr) foot = `${en ? 'Tomorrow from' : 'พรุ่งนี้เริ่ม'} ${tmr.slots[0].t}${en ? '' : ' น.'}`;
@@ -11869,6 +11895,7 @@ function ffLivePanel(now, keep, en, away, onFeed){
     body = rows(sl) || none;
     const nxStage = nx && stageNames(nx);
     if(nx) foot = `${en ? 'Next' : 'ถัดไป'} ${nx.t}${en ? '' : ' น.'}${nxStage ? ` · ${en ? 'on stage' : 'ขึ้นเวที'} ${escapeHtml(nxStage)}` : ''}`;
+    else if(show) foot = `${en ? 'Then at' : 'ต่อด้วย'} ${show.t}${en ? '' : ' น.'} · ${escapeHtml(en ? show.en : show.th)}`;
   }
   const back = onFeed || state.ffFollow ? '' : `<button class="ff-live-back" data-action="ff-live">${en ? 'Back to now' : 'กลับไปตอนนี้'}</button>`;
   return `<div class="ff-live${on ? ' is-on' : ''}">
