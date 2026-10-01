@@ -15672,12 +15672,13 @@ function gp3Sheet(g, t, G){
   }
   // the light, kept to the sheet
   g.save(); g.beginPath(); G.q.forEach((p, k) => k ? g.lineTo(...p) : g.moveTo(...p)); g.closePath(); g.clip();
-  const k = G.back ? .55 : 1;
+  // soft: for the share picture, where a bright streak would cross her face
+  const k = (G.back ? .55 : 1) * (G.soft ? .3 : 1);
   const tip = Math.min(1, Math.abs(G.sa) * 1.6 + Math.abs(G.sb) * 1.8), glare = .14 + tip * .86;
   g.fillStyle = `rgba(0,0,0,${((1 - Math.abs(G.ca)) * .42).toFixed(3)})`;     // the side turned from the light
   g.fillRect(-1e4, -1e4, 2e4, 2e4);
   const off = Math.min(90, Math.abs(((G.deg % 180) + 270) % 180 - 90)), band = 1.55 - off / 45 * 2.1;
-  if(band > -.3 && band < 1.3){                                               // the band sweeping across as it turns
+  if(!G.soft && band > -.3 && band < 1.3){                                    // the band sweeping across as it turns
     const A = G.at(band - .2, .5), B = G.at(band + .2, .5), sg = g.createLinearGradient(A[0], A[1], B[0], B[1]);
     const peak = Math.min(1, glare * 1.25 * k);
     [[0, 0], [.3, .2], [.5, .66], [.7, .2], [1, 0]].forEach(([x, al]) => sg.addColorStop(x, `rgba(255,255,255,${(al * peak).toFixed(3)})`));
@@ -15692,13 +15693,14 @@ function gp3Sheet(g, t, G){
 /* o: { W, H, a, b (degrees, as the viewer turns it), h (poster height), cx, cy, keepBg, layer (a canvas to reuse) } */
 function gp3Scene(g, t, o){
   const G = gp3Geom(t, o), s = o.h / 354;
+  G.soft = !!o.soft;
   if(!o.keepBg){ g.fillStyle = '#08060C'; g.fillRect(0, 0, o.W, o.H); }
   // painted once on a layer of its own, so the faint reflection shows no seams between tiles
   const layer = o.layer || document.createElement('canvas');
   if(layer.width !== o.W || layer.height !== o.H){ layer.width = o.W; layer.height = o.H; }
   const lg = layer.getContext('2d'); lg.clearRect(0, 0, o.W, o.H); gp3Sheet(lg, t, G);
   // the reflection: the sheet mirrored at the floor, faint, sinking into it
-  g.save(); g.translate(0, 2 * G.floor); g.scale(1, -1); g.globalAlpha = .24; g.drawImage(layer, 0, 0); g.restore();
+  g.save(); g.translate(0, 2 * G.floor); g.scale(1, -1); g.globalAlpha = o.soft ? .14 : .24; g.drawImage(layer, 0, 0); g.restore();
   const f = g.createLinearGradient(0, G.floor, 0, G.floor + o.h * .42);
   f.addColorStop(0, 'rgba(8,6,12,0)'); f.addColorStop(.43, 'rgba(8,6,12,.6)'); f.addColorStop(1, 'rgba(8,6,12,1)');
   g.fillStyle = f; g.fillRect(0, G.floor, o.W, o.H - G.floor);
@@ -15806,7 +15808,7 @@ async function drawPosterCard(g, sub){
   if(Math.abs(a) < 8 && Math.abs(b) < 4){ a = -24; b = 6; }   // square on, it would look flat
   g.fillStyle = '#08060C'; g.fillRect(0, 0, SHARE_W, SHARE_H);
   shareGlow(g, SHARE_W / 2, 420, 720, grp.color || '#E4457E', .2);
-  if(im) gp3Scene(g, gp3Textures(im, 1500), { W:SHARE_W, H:SHARE_H, a, b, h:760, cx:SHARE_W / 2, cy:470, keepBg:true });
+  if(im) gp3Scene(g, gp3Textures(im, 1500), { W:SHARE_W, H:SHARE_H, a, b, h:760, cx:SHARE_W / 2, cy:470, keepBg:true, soft:true });
   shareText(g, en ? m.name : nickName(m), SHARE_W / 2, 1030, '800 64px "Noto Sans Thai", sans-serif', '#ffffff', 'center');
   shareText(g, `${grp.name || ''}${team ? ' · ' + team.name : ''} · ${en ? 'GE2026 candidate' : 'ผู้สมัคร GE2026'}`, SHARE_W / 2, 1086,
     '600 30px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.72)', 'center');
@@ -16435,7 +16437,7 @@ function shareSubject(){
     const st = document.querySelector('.poster-viewer.is-ge .gp3');
     // /p/<id> is a small page of its own, so a chat shows her poster in the preview
     const link = location.origin + '/p/' + id;
-    if(m) return { kind:'poster', m, ang: st && st._ang ? { ...st._ang } : null, url: link, link, clip:`posters/ge2026/clips/${id}.mp4`,
+    if(m) return { kind:'poster', m, ang: st && st._ang ? { ...st._ang } : null, url: link, link, clip:`posters/ge2026/clips/${id}.mp4`, orig:gePoster(id),
       title:`${nickName(m)} · Senbatsu General Election 2026 — 48thDb`, file:`48thdb-ge2026-${m.name || m.id}` };
   }
   const m = state.selectedId ? getMember(state.selectedId) : null;
@@ -16942,13 +16944,17 @@ async function openShareSheet(given){
       <div class="share-actions">
         ${sub.clip ? `<button class="share-act is-clip" data-share="clip" disabled><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg><span>${en ? 'Getting the clip…' : 'กำลังเตรียมคลิป…'}</span></button>` : ''}
         <button class="share-act is-main" data-share="image" disabled>${ICONS.share}<span>${en ? 'Share image' : 'แชร์รูป'}</span></button>
-        <button class="share-act" data-share="save" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg><span>${en ? 'Save image' : 'บันทึกรูป'}</span></button>
+        <button class="share-act" data-share="save" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg><span>${sub.orig ? (en ? 'Save the poster' : 'บันทึกโปสเตอร์') : (en ? 'Save image' : 'บันทึกรูป')}</span></button>
         <button class="share-act" data-share="link">${ICONS.link}<span>${en ? 'Share link' : 'แชร์ลิงก์'}</span></button>
       </div>
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
-  let blob = null, clip = null;
+  let blob = null, clip = null, orig = null;
+  /* a poster's original, fetched as the sheet opens so a tap can save it at once */
+  if(sub.orig) fetch(sub.orig).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(v => {
+    orig = v; const sb = el.querySelector('[data-share="save"]'); if(sb && blob) sb.disabled = false;
+  }).catch(() => {});
   const file = () => new File([blob], sub.file.replace(/[^\w.-]+/g, '-') + '.png', { type:'image/png' });
   /* The spinning poster clip is fetched as the sheet opens, so a tap can hand it
      to the share menu at once: a phone lets the menu open only straight after a tap. */
@@ -16985,7 +16991,14 @@ async function openShareSheet(given){
       }catch(err){ if(err && err.name === 'AbortError') return; }
       act === 'image' && saveShareBlob(blob, f.name);
     }
-    if(act === 'save') saveShareBlob(blob, file().name);
+    if(act === 'save'){
+      if(sub.orig){
+        if(!orig) return;
+        const name = sub.file.replace(/[^\w.-]+/g, '-') + '-poster.png';
+        return saveShareBlob(orig, name, en ? 'Poster saved' : 'บันทึกโปสเตอร์แล้ว');
+      }
+      saveShareBlob(blob, file().name);
+    }
   });
   let ticket = 0;
   const paint = async () => {
@@ -17002,7 +17015,7 @@ async function openShareSheet(given){
       _shareUrl = URL.createObjectURL(blob);
       pv.classList.remove('is-loading');
       pv.innerHTML = `<img src="${_shareUrl}" alt="${escapeAttr(sub.title)}">`;
-      el.querySelectorAll('.share-act[disabled]').forEach(x => x.disabled = false);
+      el.querySelectorAll('.share-act[disabled]').forEach(x => { if(!(x.dataset.share === 'save' && sub.orig && !orig) && x.dataset.share !== 'clip') x.disabled = false; });
     }catch(err){
       pv.classList.remove('is-loading');
       pv.innerHTML = `<span>${en ? 'Could not make the card — the link still works.' : 'สร้างการ์ดไม่สำเร็จ แชร์ลิงก์ได้ตามปกติ'}</span>`;
