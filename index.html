@@ -10078,7 +10078,7 @@ function renderGEChain(){
   const big = `<div class="gea-card gec-big">
     <p class="gec-k">${en ? 'GE tokens voted so far' : 'โทเคนที่โหวตแล้ว'}</p>
     <p class="gec-v">${gecTok(d.sum)}</p>
-    <div class="gec-trio"><span><b>${N(d.n)}</b>${en ? 'votes' : 'ครั้งที่โหวต'}</span><span><b>${N(wl.length)}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${gecTok(d.sum / wl.length)}</b>${en ? 'per wallet' : 'ต่อกระเป๋า'}</span></div>
+    <div class="gec-trio"><span><b>${N(d.n)}</b>${en ? 'votes' : 'ครั้งที่โหวต'}</span><span><b>${N(wl.length)}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${gecTok(d.sum / wl.length)}</b>${en ? 'average a wallet' : 'เฉลี่ยต่อกระเป๋า'}</span></div>
     <div class="gec-run"><i style="width:${Math.min(100, hNow / hAll * 100).toFixed(1)}%"></i></div>
     <p class="gec-sub">${en ? `Open for ${elapsed} of ${Math.round(hAll / 24)} days · closes 12 Nov` : `เปิดโหวตมาแล้ว ${elapsed} จาก ${Math.round(hAll / 24)} วัน · ปิด 12 พ.ย.`}</p>
     ${gaps ? `<p class="gec-err">${en ? 'Some votes are missing from this copy — press Refresh.' : 'ข้อมูลในเครื่องขาดบางโหวต กด "อัปเดต" ใหม่'}</p>` : ''}</div>`;
