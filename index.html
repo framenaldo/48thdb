@@ -12774,7 +12774,7 @@ function renderFeed(){
       </button>
       ${state.pastOpen ? `<div class="past-list">${past.map(e => renderEventCard(e, iso)).join('')}</div>` : ''}
     </section>` : ''}
-    ${fbSent || !fbAskedLately() ? `<section class="feed-block is-feedback">${renderFeedbackCard('feed')}</section>` : ''}
+    <section class="feed-block is-feedback">${renderFeedbackCard('feed')}</section>
     </div>
     <aside class="feed-side">
     ${todays.length ? `
@@ -13270,11 +13270,11 @@ function renderPendingQueue(){
 
 /* Feedback: five faces and a few words, sent to Firestore feedback/ — anyone
    with the visitor's session may add one, only the owner reads them (see
-   firebase-rules). The home page asks once a month at most per device; the
-   profile page always has it. Nothing about who sent it is kept. */
+   firebase-rules). It stays at the foot of the home page and on the profile
+   page; after a send it says thank you until the page is next opened.
+   Nothing about who sent it is kept. */
 const FB_FACES = [['😠', 'แย่มาก', 'Awful'], ['😔', 'ไม่ค่อยดี', 'Not great'], ['😐', 'เฉย ๆ', 'Okay'], ['😊', 'ดี', 'Good'], ['😃', 'ดีมาก', 'Great']];
 let fbDraft = { rate:0, text:'' }, fbSent = false;
-const fbAskedLately = () => { try{ return Date.now() - (+localStorage.getItem('fb-at') || 0) < 30 * 864e5; }catch(e){ return false; } };
 function renderFeedbackCard(where){
   const en = isEN();
   if(fbSent) return `<section class="fb-card is-done"><span class="fb-heart" aria-hidden="true">💗</span>
@@ -13311,7 +13311,6 @@ async function fbSend(btn, where){
     await fbDb.collection('feedback').add({ rate:fbDraft.rate, text:String(fbDraft.text || '').trim().slice(0, 1000),
       view:String(where || state.view).slice(0, 20), lang:String(state.lang || 'mix').slice(0, 4), at:firebase.firestore.FieldValue.serverTimestamp() });
     fbSent = true; fbDraft = { rate:0, text:'' };
-    try{ localStorage.setItem('fb-at', String(Date.now())); }catch(e){}
     renderMain();
   }catch(e){
     btn.disabled = false; btn.textContent = en ? 'Send feedback' : 'ส่งความคิดเห็น';
