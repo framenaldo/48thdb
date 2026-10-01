@@ -340,6 +340,7 @@
   .feed-main, .feed-side{ display:contents; }
   .today-hero-block{ order:1; } .is-fflive{ order:1; } .is-over-today{ order:1; } .is-periods{ order:2; } .is-bday-today{ order:3; }
   .is-bday-next{ order:4; } .is-schedule{ order:5; } .is-otd{ order:6; } .is-calendar{ order:6; } .is-past{ order:7; }
+  .is-gevote{ order:1; } .is-feedback{ order:8; }
 
 
   /* Room to scroll past the end. Collapsing a stage plot makes the page
@@ -3026,6 +3027,45 @@
   .gec-t-huge{ align-self:flex-start; margin-top:4px; font-size:12.5px; font-weight:800; color:#3A050B; background:#F3C969; border-radius:99px; padding:3px 10px; }
   .gec-feed li.is-huge{ background:color-mix(in srgb, #F3C969 22%, transparent); border-radius:8px; }
   .gec-bigtag.is-huge{ background:#C8901F; }
+  /* feedback: a framed card, five faces with a press, the picked one large in a gold ring */
+  .fb-card{ text-align:center; padding:22px 18px 20px; border-radius:22px; background:var(--card); border:1.5px solid var(--line);
+    box-shadow:0 4px 0 rgba(var(--shadow-rgb),.06); font-family:'Noto Sans Thai',sans-serif; }
+  .fb-h{ margin:0; font-size:19px; font-weight:800; }
+  .fb-sub{ margin:6px 0 16px; font-size:13px; color:var(--ink-soft); line-height:1.5; }
+  .fb-faces{ display:flex; justify-content:center; gap:8px; }
+  .fb-face{ width:52px; height:52px; border-radius:50%; border:0; cursor:pointer; padding:0; display:grid; place-items:center;
+    background:color-mix(in srgb, #F3C969 22%, var(--card)); transition:transform .15s, box-shadow .15s, background .15s; }
+  .fb-face span{ font-size:26px; line-height:1; filter:grayscale(.35); transition:filter .15s; }
+  .fb-face:active{ transform:scale(.92); }
+  .fb-face.is-on{ background:#F3C969; transform:scale(1.14); box-shadow:0 0 0 4px color-mix(in srgb, #F3C969 35%, transparent), 0 6px 14px rgba(184,134,46,.35); }
+  .fb-face.is-on span{ filter:none; }
+  .fb-pick{ margin:10px 0 14px; min-height:20px; font-size:13.5px; font-weight:800; color:var(--bnk); }
+  .fb-l{ display:block; text-align:left; font-size:13px; font-weight:700; color:var(--ink-soft); margin:0 2px 6px; }
+  .fb-text{ width:100%; box-sizing:border-box; resize:vertical; min-height:84px; font:inherit; font-size:15px; color:var(--ink); background:var(--paper-dim);
+    border:1.5px solid var(--line); border-radius:14px; padding:10px 12px; }
+  .fb-text:focus{ outline:none; border-color:var(--bnk); box-shadow:0 0 0 3px color-mix(in srgb, var(--bnk) 18%, transparent); }
+  .fb-send{ margin-top:14px; min-width:200px; min-height:46px; border:0; border-radius:99px; cursor:pointer; font:inherit; font-size:15px; font-weight:800;
+    color:#fff; background:var(--bnk); box-shadow:0 3px 0 color-mix(in srgb, var(--bnk) 60%, #000); transition:transform .12s, box-shadow .12s, opacity .15s; }
+  .fb-send:active{ transform:translateY(3px); box-shadow:none; }
+  .fb-send:disabled{ opacity:.45; cursor:default; transform:none; }
+  .fb-card.is-done .fb-heart{ font-size:34px; }
+  .feed-block.is-feedback{ margin-top:8px; }
+  .fb-inbox{ display:flex; flex-direction:column; gap:12px; margin-bottom:18px; }
+  .fb-sum{ display:flex; align-items:baseline; gap:10px; }
+  .fb-sum b{ font-size:30px; font-weight:800; color:var(--bnk); }
+  .fb-sum span{ font-size:13px; color:var(--ink-soft); font-weight:600; }
+  .fb-dist{ display:flex; flex-direction:column; gap:5px; }
+  .fb-drow{ display:grid; grid-template-columns:24px 1fr 30px; align-items:center; gap:8px; font-size:13px; }
+  .fb-drow i{ height:10px; border-radius:99px; background:var(--paper-dim); overflow:hidden; }
+  .fb-drow i b{ display:block; height:100%; background:#F3C969; border-radius:99px; }
+  .fb-drow em{ font-style:normal; font-weight:700; color:var(--ink-soft); text-align:right; }
+  .fb-list{ display:flex; flex-direction:column; gap:8px; max-height:520px; overflow:auto; }
+  .fb-item{ display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:14px; background:var(--card); border:1.5px solid var(--line); }
+  .fb-item-face{ font-size:24px; line-height:1; }
+  .fb-item-body{ flex:1; min-width:0; }
+  .fb-item-body p{ margin:0 0 4px; font-size:14px; line-height:1.5; white-space:pre-wrap; word-break:break-word; }
+  .fb-item-body small{ font-size:11.5px; color:var(--ink-soft); }
+  .fb-del{ border:0; background:none; color:var(--ink-soft); cursor:pointer; font-size:14px; padding:2px 4px; }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -12734,6 +12774,7 @@ function renderFeed(){
       </button>
       ${state.pastOpen ? `<div class="past-list">${past.map(e => renderEventCard(e, iso)).join('')}</div>` : ''}
     </section>` : ''}
+    ${fbSent || !fbAskedLately() ? `<section class="feed-block is-feedback">${renderFeedbackCard('feed')}</section>` : ''}
     </div>
     <aside class="feed-side">
     ${todays.length ? `
@@ -13227,6 +13268,83 @@ function renderPendingQueue(){
     ${items.length ? `<div class="pd-list">${items.map(card).join('')}</div>` : `<p class="muted-note">ยังไม่มีข้อมูลที่รอตรวจ</p>`}`;
 }
 
+/* Feedback: five faces and a few words, sent to Firestore feedback/ — anyone
+   with the visitor's session may add one, only the owner reads them (see
+   firebase-rules). The home page asks once a month at most per device; the
+   profile page always has it. Nothing about who sent it is kept. */
+const FB_FACES = [['😠', 'แย่มาก', 'Awful'], ['😔', 'ไม่ค่อยดี', 'Not great'], ['😐', 'เฉย ๆ', 'Okay'], ['😊', 'ดี', 'Good'], ['😃', 'ดีมาก', 'Great']];
+let fbDraft = { rate:0, text:'' }, fbSent = false;
+const fbAskedLately = () => { try{ return Date.now() - (+localStorage.getItem('fb-at') || 0) < 30 * 864e5; }catch(e){ return false; } };
+function renderFeedbackCard(where){
+  const en = isEN();
+  if(fbSent) return `<section class="fb-card is-done"><span class="fb-heart" aria-hidden="true">💗</span>
+    <h3 class="fb-h">${en ? 'Thank you!' : 'ขอบคุณนะ!'}</h3><p class="fb-sub">${en ? 'Every word is read.' : 'ทุกความเห็นถูกอ่านแน่นอน'}</p></section>`;
+  const r = fbDraft.rate;
+  return `<section class="fb-card" data-fb="${where}">
+    <h3 class="fb-h">${en ? 'How is 48thDb for you?' : '48thDb เป็นยังไงบ้าง?'}</h3>
+    <p class="fb-sub">${en ? 'Your word helps make the site better.' : 'ความเห็นของคุณช่วยให้เราทำเว็บนี้ให้ดีขึ้น'}</p>
+    <div class="fb-faces" role="radiogroup" aria-label="${en ? 'Your rating' : 'ให้คะแนน'}">${FB_FACES.map(([e, th, enl], i) =>
+      `<button class="fb-face${r === i + 1 ? ' is-on' : ''}" data-action="fb-rate" data-value="${i + 1}" role="radio" aria-checked="${r === i + 1}" aria-label="${en ? enl : th}"><span>${e}</span></button>`).join('')}</div>
+    <p class="fb-pick">${r ? (en ? FB_FACES[r - 1][2] : FB_FACES[r - 1][1]) : (en ? 'Tap a face' : 'แตะเลือกหน้า')}</p>
+    <label class="fb-l" for="fb-text-${where}">${en ? 'Anything else you would like to share?' : 'มีอะไรอยากบอกเพิ่มไหม?'}</label>
+    <textarea id="fb-text-${where}" class="fb-text" rows="3" maxlength="1000" oninput="fbDraft.text = this.value"
+      placeholder="${en ? 'Optional — what you like, what to add, anything wrong' : 'ไม่บังคับ เช่น ชอบอะไร อยากให้เพิ่มอะไร เจอข้อมูลผิดตรงไหน'}">${escapeHtml(fbDraft.text)}</textarea>
+    <button class="fb-send" data-action="fb-send" data-value="${where}"${r ? '' : ' disabled'}>${en ? 'Send feedback' : 'ส่งความคิดเห็น'}</button>
+  </section>`;
+}
+// a face picked: changed in place, so a half-typed message is not redrawn away
+function fbRate(n){
+  fbDraft.rate = n;
+  const en = isEN();
+  document.querySelectorAll('.fb-card').forEach(card => {
+    card.querySelectorAll('.fb-face').forEach((b, i) => { b.classList.toggle('is-on', i + 1 === n); b.setAttribute('aria-checked', i + 1 === n); });
+    const pick = card.querySelector('.fb-pick'); if(pick) pick.textContent = en ? FB_FACES[n - 1][2] : FB_FACES[n - 1][1];
+    const send = card.querySelector('.fb-send'); if(send) send.disabled = false;
+  });
+}
+async function fbSend(btn, where){
+  if(!fbDraft.rate || typeof fbDb === 'undefined') return;
+  const en = isEN();
+  btn.disabled = true; btn.textContent = en ? 'Sending…' : 'กำลังส่ง…';
+  try{
+    if(!fbAuth.currentUser) await fbAuth.signInAnonymously();
+    await fbDb.collection('feedback').add({ rate:fbDraft.rate, text:String(fbDraft.text || '').trim().slice(0, 1000),
+      view:String(where || state.view).slice(0, 20), lang:String(state.lang || 'mix').slice(0, 4), at:firebase.firestore.FieldValue.serverTimestamp() });
+    fbSent = true; fbDraft = { rate:0, text:'' };
+    try{ localStorage.setItem('fb-at', String(Date.now())); }catch(e){}
+    renderMain();
+  }catch(e){
+    btn.disabled = false; btn.textContent = en ? 'Send feedback' : 'ส่งความคิดเห็น';
+    toast(en ? 'Could not send — try again' : 'ส่งไม่ได้ ลองอีกครั้งนะ');
+  }
+}
+/* The owner's inbox, on the profile page: the average, how the faces split, the words. */
+async function loadFeedback(){
+  if(!state.isOwner){ state.feedback = []; return; }
+  try{
+    const snap = await fbDb.collection('feedback').orderBy('at', 'desc').limit(200).get();
+    state.feedback = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  }catch(e){ state.feedback = state.feedback || []; }
+}
+function renderFeedbackInbox(){
+  if(!state.isOwner) return '';
+  const list = state.feedback || [], n = list.length;
+  const avg = n ? list.reduce((t, f) => t + (f.rate || 0), 0) / n : 0;
+  const by = [1, 2, 3, 4, 5].map(k => list.filter(f => f.rate === k).length);
+  const top = Math.max(1, ...by);
+  const when = f => { const t = f.at && f.at.seconds ? new Date(f.at.seconds * 1000) : null;
+    return t ? `${formatDateShort(toYmd(t))} ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}` : ''; };
+  return `<div class="pd-head"><h3 class="section-label">ฟีดแบ็ก (${n})</h3><button class="chip chip-link" data-action="fb-refresh">รีเฟรช</button></div>
+    ${n ? `<div class="fb-inbox">
+      <div class="fb-sum"><b>${avg.toFixed(2)}</b><span>${FB_FACES[Math.max(0, Math.round(avg) - 1)][0]} เฉลี่ยจาก ${n} ความเห็น</span></div>
+      <div class="fb-dist">${by.map((c, i) => `<div class="fb-drow"><span>${FB_FACES[i][0]}</span><i><b style="width:${(c / top * 100).toFixed(1)}%"></b></i><em>${c}</em></div>`).reverse().join('')}</div>
+      <div class="fb-list">${list.map(f => `<article class="fb-item"><span class="fb-item-face">${(FB_FACES[(f.rate || 3) - 1] || FB_FACES[2])[0]}</span>
+        <div class="fb-item-body">${f.text ? `<p>${escapeHtml(f.text)}</p>` : '<p class="muted-note">ไม่ได้เขียนอะไร</p>'}
+          <small>${when(f)}${f.view ? ` · จากหน้า ${escapeHtml(f.view)}` : ''}</small></div>
+        <button class="fb-del" data-action="fb-del" data-id="${f.id}" aria-label="ลบ">✕</button></article>`).join('')}</div></div>`
+      : `<p class="muted-note">ยังไม่มีฟีดแบ็ก</p>`}`;
+}
+
 function renderProfile(){
   const loggedIn = state.account && state.account.loggedIn;
   const kamiMember = state.kamiOshi ? getMember(state.kamiOshi) : null;
@@ -13258,10 +13376,14 @@ function renderProfile(){
   ${accountBlock}
   ${renderFlashComposer()}
   ${renderPendingQueue()}
+  ${renderFeedbackInbox()}
   <h3 class="section-label">Kami Oshi ของคุณ</h3>
   ${kamiMember ? renderKamiOshiFeatured(kamiMember) : `<p class="muted-note">ยังไม่ได้เลือก Kami Oshi — เปิดโปรไฟล์สมาชิกแล้วกดปุ่มมงกุฎเพื่อเลือก (เลือกได้คนเดียว)</p>`}
   <h3 class="section-label">Oshi ทั้งหมด (${oshiMembers.length})</h3>
   ${oshiMembers.length ? `<div class="grid-mini grid-mini-oshi">${oshiMembers.map(m => renderMiniCard(m)).join('')}</div>` : `<p class="muted-note">ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม</p>`}
+
+  <h3 class="section-label">ส่งความคิดเห็นถึง 48thDb</h3>
+  ${renderFeedbackCard('profile')}
 
   <h3 class="section-label">แอปของวง</h3>
   <a class="iam-link" href="https://app.bnk48.com/" target="_blank" rel="noopener noreferrer">
@@ -17213,6 +17335,14 @@ function bindDelegatedEvents(){
     else if(action==='gec-wallet'){ gecOpenWallet(el.dataset.id); }
     else if(action==='gec-about'){ gecAbout = !gecAbout; gecDraw(); }
     else if(action==='gec-win'){ gecWinLoad(gecWinRange(id)); }
+    else if(action==='fb-rate'){ fbRate(+el.dataset.value); }
+    else if(action==='fb-send'){ fbSend(el, el.dataset.value); }
+    else if(action==='fb-refresh'){ loadFeedback().then(() => renderMain()); }
+    else if(action==='fb-del'){
+      if(!confirm('ลบฟีดแบ็กนี้?')) return;
+      fbDb.collection('feedback').doc(id).delete().then(() => { state.feedback = (state.feedback || []).filter(f => f.id !== id); renderMain(); })
+        .catch(() => toast('ลบไม่ได้'));
+    }
     else if(action==='nav-vote'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; state.selectedId = null; render(); pushHistory(); window.scrollTo(0, 0); }
     else if(action==='gec-hours'){ gecHourMode = id === 'last24' ? 'last24' : 'first48'; gecDraw(); }
     else if(action==='gec-share'){
@@ -17730,6 +17860,7 @@ async function init(){
     }
     state.isOwner = await checkOwner();
     await loadPending();
+    await loadFeedback();
     listenFlash();
     listenGE();
     listenEventLinks();
