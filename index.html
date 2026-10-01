@@ -2950,12 +2950,20 @@
   .gec .gec-share{ top:10px; right:10px; }
   .gec [data-gshare] > .gec-h{ padding-right:40px; }
   .gec-big[data-gshare]{ padding-top:20px; }
-  .gec-winf{ display:grid; grid-template-columns:1.3fr 1fr 1fr auto; gap:6px; align-items:end; }
+  .gec-winf{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px 10px; align-items:end; margin-top:10px; }
+  .gec-winf .is-day, .gec-go{ grid-column:1 / -1; }
   .gec-winf label{ display:flex; flex-direction:column; gap:3px; min-width:0; }
   .gec-winf label span{ font-size:11px; font-weight:800; color:var(--ink-soft); }
-  .gec-winf input{ min-width:0; width:100%; box-sizing:border-box; font:inherit; font-size:13px; color:var(--ink); background:var(--paper-dim);
-    border:1.5px solid var(--line); border-radius:10px; padding:7px 6px; }
-  .gec-winp{ display:flex; gap:6px; margin-top:8px; }
+  /* iOS gives date and time fields a width of their own unless their look is reset */
+  .gec-winf input{ display:block; min-width:0; width:100%; max-width:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none;
+    min-height:44px; font:inherit; font-size:15px; font-weight:700; color:var(--ink); background:var(--paper-dim); text-align:left;
+    border:1.5px solid var(--line); border-radius:12px; padding:9px 12px; }
+  .gec-winf input::-webkit-date-and-time-value{ text-align:left; }
+  .gec-winp{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .gec-winp > span{ font-size:12px; font-weight:800; color:var(--ink-soft); }
+  .gec-go{ min-height:46px; margin-top:4px; border:0; border-radius:14px; cursor:pointer; font:inherit; font-size:15px; font-weight:800; color:#fff;
+    background:var(--bnk); box-shadow:0 3px 0 color-mix(in srgb, var(--bnk) 60%, #000); transition:transform .12s, box-shadow .12s; }
+  .gec-go:active{ transform:translateY(3px); box-shadow:0 0 0 transparent; }
   .gec-wlabel{ margin:14px 2px 8px; font-size:14px; font-weight:800; color:var(--bnk); }
   .gec-h4{ margin:14px 2px 6px; font-size:12.5px; font-weight:800; color:var(--ink-soft); }
   .gec-wfeed{ max-height:360px; overflow:auto; }
@@ -10300,12 +10308,12 @@ function gecWinLabel(q, en){
 function gecWinCard(en){
   const p = GEC_POLLS.ge2026, W = gecWin || gecWinRange('today');
   const day = ms => toYmd(new Date(ms));
-  const form = `<form class="gec-winf" onsubmit="gecWinGo(event)">
-      <label><span>${en ? 'Day' : 'วันที่'}</span><input type="date" name="date" min="${day(p.t0 * 1000)}" max="${day(gecMs(p, p.end))}" value="${escapeAttr(W.date)}"></label>
+  const form = `<div class="gec-winp"><span>${en ? 'Quick:' : 'ทางลัด'}</span><button class="chip" data-action="gec-win" data-id="today">${en ? 'Today' : 'วันนี้'}</button><button class="chip" data-action="gec-win" data-id="yesterday">${en ? 'Yesterday' : 'เมื่อวาน'}</button></div>
+    <form class="gec-winf" onsubmit="gecWinGo(event)">
+      <label class="is-day"><span>${en ? 'Day' : 'วันที่'}</span><input type="date" name="date" min="${day(p.t0 * 1000)}" max="${day(gecMs(p, p.end))}" value="${escapeAttr(W.date)}"></label>
       <label><span>${en ? 'From' : 'ตั้งแต่'}</span><input type="time" name="from" value="${escapeAttr(W.from)}"></label>
       <label><span>${en ? 'To' : 'ถึง'}</span><input type="time" name="to" value="${escapeAttr(W.to)}"></label>
-      <button class="chip chip-link" type="submit">${en ? 'Show' : 'ดู'}</button></form>
-    <div class="gec-winp"><button class="chip" data-action="gec-win" data-id="today">${en ? 'Today' : 'วันนี้'}</button><button class="chip" data-action="gec-win" data-id="yesterday">${en ? 'Yesterday' : 'เมื่อวาน'}</button></div>`;
+      <button class="gec-go" type="submit">${en ? 'Show the votes in this time' : 'ดูโหวตช่วงนี้'}</button></form>`;
   let body = '';
   if(gecWin && gecWin.err) body = `<p class="gec-err">${escapeHtml(gecWin.err)}</p>`;
   else if(gecWin && gecWin.loading) body = `<p class="gea-hint">${en ? 'Reading the votes in that time…' : 'กำลังอ่านโหวตในช่วงเวลานั้น…'}</p>`;
