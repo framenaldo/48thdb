@@ -10564,7 +10564,8 @@ function gecHomeTeaser(en){
   return `<button class="gec-teaser is-home" data-action="nav-vote">${poster}
     <span class="gec-t-k"><i class="gec-live"></i>${en ? 'Tokens voted · from the blockchain' : 'โทเคนที่โหวตแล้ว · จากบล็อกเชน'}</span>
     <span class="gec-t-v">${gecTok(L.sum)}</span>
-    <span class="gec-t-row"><b>${gecN(L.n)}</b> ${en ? 'votes' : 'ครั้ง'}${L.ws && L.ws.size ? ` · <b>${gecN(L.ws.size)}</b> ${en ? 'wallets' : 'กระเป๋า'} · ${en ? 'average' : 'เฉลี่ย'} <b class="gec-t-x">${gecTok(L.sum / L.ws.size)}</b> ${en ? 'a wallet' : 'ต่อกระเป๋า'}` : ''}</span>
+    <span class="gec-t-row"><b>${gecN(L.n)}</b> ${en ? 'votes' : 'ครั้ง'}${L.ws && L.ws.size ? ` · <b>${gecN(L.ws.size)}</b> ${en ? 'wallets' : 'กระเป๋า'}` : ''}</span>
+    <span class="gec-t-row">${en ? 'Worth' : 'มูลค่า'} <b class="gec-t-x">${gecBaht(L.sum, en)}</b></span>
     <span class="gec-t-row">${en ? `Voting closes in ${left} days · 12 Nov` : `ปิดโหวตในอีก ${left} วัน · 12 พ.ย.`}</span>
     <span class="gec-t-go">${en ? 'All the vote figures →' : 'ดูสถิติการโหวต →'}</span></button>`;
 }
