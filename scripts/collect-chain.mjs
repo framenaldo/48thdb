@@ -4,6 +4,7 @@
  * reading every vote since voting opened:
  *   data/chain-ge2025.json   GE2025, final — written once
  *   data/chain-ge2026.json   GE2026 votes and the GE6 token tally, to now
+ *   data/chain-summary.json  just the running total, for the home page
  * It runs the very code the page runs (the GEC-CORE block of index.html), so
  * the two cannot drift apart. Each run carries on from the copy already there.
  *   node scripts/collect-chain.mjs
@@ -37,4 +38,8 @@ await core.gecSyncToken(head);
 const g = core.gecData;
 if(!done25) writeFileSync(F25, JSON.stringify(g.ge2025));
 writeFileSync(F26, JSON.stringify({ ge2026:g.ge2026, tok:g.tok }));
+// a few KB for the home page's running total: where the count stands, the
+// last two minutes' votes (so they are not counted twice), and GE2025 by the hour
+writeFileSync('data/chain-summary.json', JSON.stringify({ to:g.ge2026.to, n:g.ge2026.n, sum:g.ge2026.sum, recent:g.ge2026.recent,
+  hours25:Array.from(g.ge2025.hours, v => v || 0) }));
 console.log(`GE2025 ${g.ge2025.n} votes to block ${g.ge2025.to}; GE2026 ${g.ge2026.n} votes, ${g.tok.n} transfers, to block ${g.ge2026.to}`);

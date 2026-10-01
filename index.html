@@ -2986,6 +2986,10 @@
   .gec-t-go{ margin-top:6px; font-size:13px; font-weight:800; color:#fff; }
   .ge-page .gec{ max-width:none; }
   .ge-sched-seg{ margin:2px 0 14px; }
+  .gec-teaser.is-home{ position:relative; margin:0; padding-right:112px; min-height:150px; }
+  .gec-t-poster{ position:absolute; right:14px; top:50%; transform:translateY(-50%) rotate(3deg); width:84px; height:auto; border-radius:10px;
+    box-shadow:0 6px 16px rgba(0,0,0,.45), 0 0 0 2px rgba(243,201,105,.55); }
+  .gec-teaser.is-home .gec-t-v{ font-size:30px; }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
   .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
@@ -10473,6 +10477,69 @@ function gecHourRows(d, o, hNow){
   else for(let h = hi; h >= Math.max(0, hi - 23); h--) out.push([h, d.hours[h] || 0, null]);
   return out;
 }
+/* The vote on the home page, kept light: it starts from data/chain-summary.json
+   (a few KB, left nightly) — or from the full copy if this phone has opened the
+   vote tab — adds the votes since, and looks again every 15 seconds while the
+   home page is open. Only the card is redrawn, never the page under the reader. */
+let gecLite = null, gecLiteBusy = false, gecLiteAt = 0, gecLiteTimer = null;
+async function gecLiteSync(){
+  if(gecLiteBusy) return;
+  gecLiteBusy = true;
+  try{
+    const p = GEC_POLLS.ge2026, full = gecLoad('ge2026'), past = gecLoad('ge2025');
+    if(full && (!gecLite || full.to > gecLite.to))
+      gecLite = { to:full.to, n:full.n, sum:full.sum, recent:full.recent.slice(), hours25:(gecLite && gecLite.hours25) || (past && past.hours) || null };
+    if(!gecLite || !gecLite.hours25){
+      const r = await fetch('data/chain-summary.json', { cache:'no-cache' });
+      if(r.ok){ const j = await r.json(); if(!gecLite || j.to > gecLite.to) gecLite = j; else gecLite.hours25 = j.hours25; }
+    }
+    if(!gecLite) return;
+    const head = parseInt(await gecRpc('eth_blockNumber', []), 16), L = gecLite;
+    const seen = new Set(L.recent.map(r => r[0]));
+    await gecLogs(p, Math.max(p.start, L.to + 1 - 40), Math.min(head, p.end), [GEC_VOTED], (logs, b) => {
+      for(const l of logs){
+        const k = gecKeyTx(l); if(seen.has(k)) continue; seen.add(k);
+        L.recent.push([k, parseInt(l.blockNumber, 16)]); L.n++; L.sum += gecAmt(l);
+      }
+      L.to = Math.max(L.to, b);
+    });
+    L.recent = L.recent.filter(r => r[1] > L.to - 60);
+    gecLiteAt = Date.now();
+  }catch(e){}
+  finally{ gecLiteBusy = false; }
+  gecHomePaint();
+}
+function gecHomeCard(en){
+  const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), iso = toYmd(todayStart());
+  if(!vote || iso < vote.start || iso > eventLastDay(vote)) return '';
+  if(Date.now() - gecLiteAt > 15000) setTimeout(gecLiteSync, 0);
+  if(!gecLiteTimer) gecLiteTimer = setInterval(() => {
+    if(state.view !== 'feed'){ clearInterval(gecLiteTimer); gecLiteTimer = null; return; }
+    if(!document.hidden) gecLiteSync();
+  }, 15000);
+  return `<section class="feed-block is-gevote"><h2 class="section-label">${en ? 'GE2026 · the vote, live' : 'GE2026 · โหวตสด'}</h2>${gecHomeTeaser(en)}</section>`;
+}
+function gecHomeTeaser(en){
+  const p = GEC_POLLS.ge2026, L = gecLite;
+  // counted in days, as the GE2026 page counts them
+  const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote);
+  const left = vote ? Math.max(0, Math.round((parseYmd(eventLastDay(vote)) - parseYmd(toYmd(todayStart()))) / 864e5)) : 0;
+  const poster = `<img class="gec-t-poster" src="posters/election-2026-s.jpg" alt="" loading="lazy" decoding="async">`;
+  if(!L) return `<button class="gec-teaser is-home is-wait" data-action="nav-vote">${poster}<span class="gec-t-k"><i class="gec-live"></i>${en ? 'The vote, live' : 'ยอดโหวตสด'}</span>
+    <span class="gec-t-row">${en ? 'Reading the votes…' : 'กำลังโหลดยอดโหวต…'}</span></button>`;
+  const hNow = (L.to - p.start + 1) * GEC_BLOCK / 3600, same = L.hours25 ? gecUpTo({ hours:L.hours25 }, hNow) : 0;
+  return `<button class="gec-teaser is-home" data-action="nav-vote">${poster}
+    <span class="gec-t-k"><i class="gec-live"></i>${en ? 'Tokens voted · from the blockchain' : 'โทเคนที่โหวตแล้ว · จากบล็อกเชน'}</span>
+    <span class="gec-t-v">${gecTok(L.sum)}</span>
+    <span class="gec-t-row"><b>${gecN(L.n)}</b> ${en ? 'votes' : 'ครั้ง'}${same > 0 ? ` · <b class="gec-t-x">×${(L.sum / same).toFixed(2)}</b> ${en ? 'GE2025 at this point' : 'เทียบ GE2025'}` : ''}</span>
+    <span class="gec-t-row">${en ? `Voting closes in ${left} days · 12 Nov` : `ปิดโหวตในอีก ${left} วัน · 12 พ.ย.`}</span>
+    <span class="gec-t-go">${en ? 'All the vote figures →' : 'ดูสถิติการโหวต →'}</span></button>`;
+}
+function gecHomePaint(){
+  if(state.view !== 'feed') return;
+  const el = document.querySelector('.gec-teaser.is-home');
+  if(el) el.outerHTML = gecHomeTeaser(isEN());
+}
 // The vote so far, small, at the top of the GE2026 overview; a tap opens the vote tab
 function gecTeaser(en){
   gecKick();
@@ -12476,7 +12543,8 @@ function renderFeed(){
   const nowOn = running.filter(e => !e.period && !doneForToday(e, iso));
   const overToday = running.filter(e => !e.period && doneForToday(e, iso));
   _feedLiveKey = nowOn.map(e => e.id).join(',');
-  const periods = running.filter(e => e.period);
+  const voteLive = SEED_SCHEDULE.some(e => e.id === GE_PAGE.vote && e.start <= iso && eventLastDay(e) >= iso);
+  const periods = running.filter(e => e.period && !(voteLive && e.id === GE_PAGE.vote));
   const soon = events.filter(e => e.start > iso || (e.cancelled && eventLastDay(e) >= iso));
   const past = events.filter(e => eventLastDay(e) < iso).reverse();
   const otd = onThisDay(today, mine);
@@ -12507,6 +12575,7 @@ function renderFeed(){
       ${nowOn.map(e => renderTodayHero(e, iso)).join('')}
     </section>` : ''}
     ${renderFeedFanFest(mine)}
+    ${gecHomeCard(isEN())}
 
     ${overToday.length ? `
     <section class="feed-block is-over-today">
@@ -16227,7 +16296,8 @@ function gcdFit(g, text, maxW, size, weight = 800, min = 28){
   return s;
 }
 function gcdPanel(g, x, y, w, h, r = 30){
-  g.fillStyle = 'rgba(255,255,255,.06)'; shareRound(g, x, y, w, h, r); g.fill();
+  g.fillStyle = 'rgba(14,4,8,.66)'; shareRound(g, x, y, w, h, r); g.fill();
+  g.fillStyle = 'rgba(255,255,255,.05)'; shareRound(g, x, y, w, h, r); g.fill();
   g.strokeStyle = 'rgba(243,201,105,.20)'; g.lineWidth = 2; shareRound(g, x, y, w, h, r); g.stroke();
 }
 // shareWrap, but the segmenter does not know some loanwords and would break
@@ -16257,18 +16327,32 @@ function gcdTake(g, text, y){
   const { P } = GCD, W = SHARE_W - P * 2;
   g.font = gcdF(700, 32); const lines = gcdWrap(g, text, W - 70, 3);
   const h = 44 + lines.length * 46;
-  g.fillStyle = 'rgba(243,201,105,.10)'; shareRound(g, P, y, W, h, 26); g.fill();
+  g.fillStyle = 'rgba(14,4,8,.72)'; shareRound(g, P, y, W, h, 26); g.fill();
+  g.fillStyle = 'rgba(243,201,105,.12)'; shareRound(g, P, y, W, h, 26); g.fill();
   g.fillStyle = GCD.gold; shareRound(g, P, y, 8, h, 4); g.fill();
   lines.forEach((l, i) => shareText(g, l, P + 36, y + 58 + i * 46, gcdF(700, 32), GCD.ink));
   return y + h;
 }
+const GCD_BG = 'posters/ge2026/share-bg.jpg';   // the owner's own art for these cards (4:5, like the card)
 async function gcdFrame(g, title, when){
   const { P } = GCD, en = isEN();
   g.fillStyle = '#12060A'; g.fillRect(0, 0, SHARE_W, SHARE_H);
-  shareGlow(g, 160, 120, 760, '#B3121E', .55);
-  shareGlow(g, 1000, 360, 520, '#E8B04B', .16);
-  shareGlow(g, 560, SHARE_H + 80, 760, '#5B1A6E', .45);
-  g.save(); g.globalAlpha = .28; shareBurst(g, 960, 120, 150, '#FFD36E', 7); shareBurst(g, 70, 1010, 110, '#FF8FB0', 8); g.restore();
+  const bg = await shareLoad(GCD_BG);
+  if(bg){
+    // the picture whole, then dimmed where words sit: the heading at the top,
+    // the figures from the middle down; the X and its fireworks show between
+    shareCover(g, bg, 0, 0, SHARE_W, SHARE_H);
+    g.fillStyle = 'rgba(8,2,4,.38)'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+    let gr = g.createLinearGradient(0, 0, 0, 440); gr.addColorStop(0, 'rgba(8,2,4,.82)'); gr.addColorStop(1, 'rgba(8,2,4,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, SHARE_W, 440);
+    gr = g.createLinearGradient(0, 520, 0, SHARE_H); gr.addColorStop(0, 'rgba(8,2,4,0)'); gr.addColorStop(.35, 'rgba(8,2,4,.55)'); gr.addColorStop(1, 'rgba(8,2,4,.9)');
+    g.fillStyle = gr; g.fillRect(0, 520, SHARE_W, SHARE_H - 520);
+  } else {
+    shareGlow(g, 160, 120, 760, '#B3121E', .55);
+    shareGlow(g, 1000, 360, 520, '#E8B04B', .16);
+    shareGlow(g, 560, SHARE_H + 80, 760, '#5B1A6E', .45);
+    g.save(); g.globalAlpha = .28; shareBurst(g, 960, 120, 150, '#FFD36E', 7); shareBurst(g, 70, 1010, 110, '#FF8FB0', 8); g.restore();
+  }
   sharePill(g, 'GE2026 · SENBATSU GENERAL ELECTION', P, 64, 'rgba(243,201,105,.16)', GCD.gold, 22);
   g.font = gcdF(800, 64); const tl = gcdWrap(g, title, SHARE_W - P * 2, 2);
   let y = 132; tl.forEach(l => { y += 74; shareText(g, l, P, y, gcdF(800, 64), GCD.ink); });
@@ -16327,7 +16411,7 @@ function gcdHero(g, y, label, value, unit, colour = GCD.gold){
   shareText(g, label, P, y + 34, gcdF(700, 32), GCD.soft);
   g.font = gcdF(800, 40); const uw = unit ? g.measureText(' ' + unit).width : 0;
   const s = gcdFit(g, value, W - uw, 150, 800, 60);
-  g.save(); g.shadowColor = 'rgba(243,201,105,.35)'; g.shadowBlur = 30;
+  g.save(); g.shadowColor = 'rgba(0,0,0,.75)'; g.shadowBlur = 24; g.shadowOffsetY = 4;
   shareText(g, value, P, y + 34 + s * .95, gcdF(800, s), colour); g.restore();
   g.font = gcdF(800, s); const vw = g.measureText(value).width;
   if(unit) shareText(g, unit, P + vw + 16, y + 34 + s * .95, gcdF(700, 40), GCD.soft);
@@ -17006,6 +17090,7 @@ function bindDelegatedEvents(){
     else if(action==='gec-wallet'){ gecOpenWallet(el.dataset.id); }
     else if(action==='gec-about'){ gecAbout = !gecAbout; gecDraw(); }
     else if(action==='gec-win'){ gecWinLoad(gecWinRange(id)); }
+    else if(action==='nav-vote'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; state.selectedId = null; render(); pushHistory(); window.scrollTo(0, 0); }
     else if(action==='gec-hours'){ gecHourMode = id === 'last24' ? 'last24' : 'first48'; gecDraw(); }
     else if(action==='gec-share'){
       const spec = gecShareSpec(id);   // still names the picture and its file

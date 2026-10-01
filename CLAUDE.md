@@ -39,7 +39,9 @@ Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`?
 teaser on its overview. `?v=gechain` is the owner's copy (price box, refresh).
 A cold start reads `data/chain-ge2025.json` (final) and `data/chain-ge2026.json`
 (left nightly by `scripts/collect-chain.mjs`, which runs the page's own
-GEC-CORE block), then follows the chain: near the tip, one read of GE6
+GEC-CORE block), then follows the chain. The home page shows a light card
+(`data/chain-summary.json`, then votes since, every 15 s). Share cards draw on
+the owner's art, `posters/ge2026/share-bg.jpg` (1080×1350); it then follows the chain: near the tip, one read of GE6
 transfers a look updates both the votes and the token tally. It reads the iAM48 vote straight off TokenX in the browser
 (`GEC_POLLS`, POST `eth_getLogs` to scan.tokenx.finance — its paged GET lists
 are cached by its CDN and repeat page 1) and keeps running sums in
