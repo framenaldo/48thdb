@@ -181,15 +181,91 @@ async function iamRecent(env) {
   return body;
 }
 
+/* How many people came: the owner's profile page asks, and this reads
+ * Cloudflare Web Analytics (the beacon Cloudflare puts on 48thdb.com) through
+ * its GraphQL API. That needs a read-only token, kept as the Worker secret
+ * CF_ANALYTICS_TOKEN — set once by the owner, never in this repo.
+ *
+ * Only the owner may look. The page sends its Firebase ID token and this asks
+ * Firestore for admin/owner with it: the same rule that makes the page treat
+ * them as the owner, so the two can never disagree about who that is. */
+const CF_ACCOUNT = '8e5e921b23884747506b07a3ba030dcf';
+const SITE_HOST = '48thdb.com';
+const FIREBASE_PROJECT = 'thdatabase';
+const VISITS_KEY = 'https://live.state/visits-v1';
+const VISITS_TTL = 120;
+
+async function isOwner(request) {
+  const m = (request.headers.get('authorization') || '').match(/^Bearer\s+(\S{20,})$/);
+  if (!m) return false;
+  const res = await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/admin/owner`,
+    { headers: { authorization: `Bearer ${m[1]}` } });
+  return res.ok;
+}
+
+const VISITS_QUERY = `query ($a: String!, $host: String!, $s: Time!, $w: Time!, $e: Time!) {
+  viewer { accounts(filter: { accountTag: $a }) {
+    hours: rumPageloadEventsAdaptiveGroups(limit: 1000, filter: { requestHost: $host, datetime_geq: $s, datetime_lt: $e }) {
+      count sum { visits } dimensions { datetimeHour } }
+    countries: rumPageloadEventsAdaptiveGroups(limit: 8, orderBy: [sum_visits_DESC], filter: { requestHost: $host, datetime_geq: $w, datetime_lt: $e }) {
+      count sum { visits } dimensions { countryName } }
+    referers: rumPageloadEventsAdaptiveGroups(limit: 8, orderBy: [sum_visits_DESC], filter: { requestHost: $host, datetime_geq: $w, datetime_lt: $e }) {
+      count sum { visits } dimensions { refererHost } }
+    devices: rumPageloadEventsAdaptiveGroups(limit: 5, orderBy: [sum_visits_DESC], filter: { requestHost: $host, datetime_geq: $w, datetime_lt: $e }) {
+      count sum { visits } dimensions { deviceType } }
+  } }
+}`;
+
+async function visits(env) {
+  const hit = await readCache(VISITS_KEY);
+  if (hit) return hit;
+  const now = Date.now(), hour = 3600000;
+  // 31 Bangkok days back, whole hours, so the oldest day is complete
+  const end = new Date(Math.ceil(now / hour) * hour);
+  const start = new Date(end.getTime() - 31 * 24 * hour);
+  const week = new Date(end.getTime() - 7 * 24 * hour);
+  const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` },
+    body: JSON.stringify({ query: VISITS_QUERY, variables: {
+      a: CF_ACCOUNT, host: SITE_HOST, s: start.toISOString(), w: week.toISOString(), e: end.toISOString() } }),
+  });
+  const d = await res.json();
+  if (d.errors && d.errors.length) throw new Error(d.errors.map((e) => e.message).join('; '));
+  const acc = d.data && d.data.viewer && d.data.viewer.accounts && d.data.viewer.accounts[0];
+  if (!acc) throw new Error('no analytics for this account');
+  const rows = (list, key) => (list || []).map((r) => [r.dimensions[key] || '', r.sum.visits, r.count]);
+  const body = {
+    at: new Date(now).toISOString(),
+    hours: rows(acc.hours, 'datetimeHour'),         // [hour (UTC), visits, page views]
+    countries: rows(acc.countries, 'countryName'),  // the last 7 days
+    referers: rows(acc.referers, 'refererHost'),
+    devices: rows(acc.devices, 'deviceType'),
+  };
+  await writeCache(VISITS_KEY, body, VISITS_TTL);
+  return body;
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: { ...JSON_HEADERS, 'access-control-max-age': '86400' } });
+      return new Response(null, { headers: { ...JSON_HEADERS, 'access-control-allow-headers': 'authorization',
+        'access-control-max-age': '86400' } });
     }
     if (request.method !== 'GET') {
       return new Response('Method not allowed', { status: 405, headers: JSON_HEADERS });
     }
     const url = new URL(request.url);
+    if (url.pathname === '/visits') {
+      const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
+      try {
+        if (!(await isOwner(request))) return new Response(JSON.stringify({ error: 'owner only' }), { status: 403, headers: own });
+        if (!env.CF_ANALYTICS_TOKEN) return new Response(JSON.stringify({ error: 'no-token' }), { status: 503, headers: own });
+        return new Response(JSON.stringify(await visits(env)), { headers: own });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: String((err && err.message) || err) }), { status: 502, headers: own });
+      }
+    }
     if (url.pathname === '/iam') {
       try {
         return new Response(JSON.stringify(await iamRecent(env)), { headers: { ...JSON_HEADERS, 'cache-control': 'public, max-age=60' } });

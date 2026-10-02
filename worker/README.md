@@ -39,6 +39,21 @@
 - ตัวเลขที่ต้องดูเป็นคู่หรือเป็นวัน (ไลฟ์วันเดียวกัน, ไลฟ์พร้อมกัน, ติดกันหลายวัน ฯลฯ) ยังรอรอบเที่ยงคืน
 - `checked` คือเวลาที่ดูครบทุกคนแล้ว ถ้าเป็น `null` แปลว่ายังดูไม่ครบสามกลุ่ม (เช่นเพิ่ง deploy)
 
+### จำนวนผู้เข้าชม (เห็นเฉพาะเจ้าของเว็บ)
+
+`https://api.48thdb.com/visits` อ่านตัวเลขจาก Cloudflare Web Analytics ให้การ์ด "ผู้เข้าชมเว็บ" ในหน้าโปรไฟล์
+ตอบเฉพาะเมื่อส่ง Firebase ID token ของเจ้าของเว็บมา (Worker เอาโทเค็นนั้นไปขอ `admin/owner` จาก Firestore —
+กฎเดียวกับที่หน้าเว็บใช้) คนอื่นได้ 403
+
+ต้องมี secret `CF_ANALYTICS_TOKEN` (สิทธิ์ Account · Account Analytics · Read) ตั้งครั้งเดียว:
+
+```bash
+cd worker
+npm_config_cache="$HOME/.npm-wrangler" npx wrangler secret put CF_ANALYTICS_TOKEN
+```
+
+ตัวเลขเก็บแคชไว้ 2 นาที
+
 ## ตรวจว่าทำงานไหม
 
 ```bash

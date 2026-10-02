@@ -3064,6 +3064,33 @@
   .fb-sum b{ font-size:30px; font-weight:800; color:var(--bnk); }
   .fb-sum span{ font-size:13px; color:var(--ink-soft); font-weight:600; }
   .fb-dist{ display:flex; flex-direction:column; gap:5px; }
+  /* The owner's visitor numbers on the profile page. */
+  .vis-card{ display:flex; flex-direction:column; gap:14px; margin:0 0 18px; padding:14px; border-radius:18px;
+    border:1px solid var(--line); background:var(--card); box-shadow:0 3px 0 var(--line); }
+  .vis-tiles{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+  @media (min-width:640px){ .vis-tiles{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+  .vis-tile{ padding:10px 12px; border-radius:14px; border:1px solid var(--line); background:var(--paper-dim); min-width:0; }
+  .vis-tile.is-today{ border-color:color-mix(in srgb, #E4457E 45%, var(--line)); background:color-mix(in srgb, #E4457E 8%, var(--card)); }
+  .vis-tile span{ display:block; font-size:11.5px; font-weight:800; color:var(--ink-soft); }
+  .vis-tile b{ display:block; font-size:24px; line-height:1.2; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .vis-tile small{ display:block; font-size:11.5px; color:var(--ink-soft); }
+  .vis-h{ margin:0 0 6px; font-size:12.5px; font-weight:800; color:var(--ink-soft); }
+  .vis-bars{ display:flex; align-items:flex-end; gap:3px; height:92px; }
+  .vis-bars i{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%; font-style:normal; }
+  .vis-bars i b{ display:block; width:100%; min-height:2px; border-radius:5px 5px 2px 2px; background:#2E8C82; }
+  .vis-bars i.is-today b{ background:#E4457E; }
+  .vis-bars i em{ font-style:normal; font-size:9.5px; color:var(--ink-soft); margin-top:3px; font-variant-numeric:tabular-nums; }
+  .vis-bars i u{ text-decoration:none; font-size:9.5px; font-weight:800; color:var(--ink); margin-bottom:2px; font-variant-numeric:tabular-nums; }
+  .vis-bars.is-hours{ height:64px; gap:2px; }
+  .vis-lists{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; }
+  .vis-row{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 8px; font-size:13px; margin:0 0 6px; }
+  .vis-row span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .vis-row em{ font-style:normal; font-weight:800; font-variant-numeric:tabular-nums; }
+  .vis-row i{ grid-column:1 / -1; height:6px; border-radius:99px; background:var(--paper-dim); overflow:hidden; }
+  .vis-row i b{ display:block; height:100%; border-radius:99px; background:#F3C969; }
+  .vis-note{ margin:0; font-size:12px; line-height:1.5; color:var(--ink-soft); }
+  .vis-setup{ margin:0; padding-left:20px; font-size:13.5px; line-height:1.6; }
+  .vis-setup code{ font-size:12px; word-break:break-all; }
   .fb-drow{ display:grid; grid-template-columns:24px 1fr 30px; align-items:center; gap:8px; font-size:13px; }
   .fb-drow i{ height:10px; border-radius:99px; background:var(--paper-dim); overflow:hidden; }
   .fb-drow i b{ display:block; height:100%; background:#F3C969; border-radius:99px; }
@@ -13405,6 +13432,75 @@ function renderFeedbackInbox(){
       : `<p class="muted-note">ยังไม่มีฟีดแบ็ก</p>`}`;
 }
 
+/* How many came to the site — the owner only. api.48thdb.com/visits reads
+   Cloudflare Web Analytics and answers only to the owner's sign-in. */
+const VISITS_API = 'https://api.48thdb.com/visits';
+let visitsState = null;     // { at, loading, data, err }
+async function loadVisits(){
+  if(!state.isOwner || !fbAuth.currentUser || (visitsState && visitsState.loading)) return;
+  visitsState = { ...(visitsState || {}), loading:true, at:Date.now() };
+  try{
+    const tok = await fbAuth.currentUser.getIdToken();
+    const res = await fetch(VISITS_API, { headers:{ authorization:`Bearer ${tok}` }, cache:'no-store' });
+    const d = await res.json().catch(() => ({}));
+    visitsState = res.ok ? { at:Date.now(), data:d } : { at:Date.now(), data:visitsState.data || null, err:d.error || `HTTP ${res.status}` };
+  }catch(e){ visitsState = { at:Date.now(), data:(visitsState && visitsState.data) || null, err:'net' }; }
+  if(state.view !== 'profile') return;
+  if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+  renderMain();
+}
+/* Hours come in UTC; the owner counts days in Bangkok. */
+const bkkDay = ms => new Date(ms + 7 * 3600000).toISOString().slice(0, 10);
+function visitsByDay(hours){
+  const days = {};
+  for(const [h, v, n] of hours){
+    const d = bkkDay(Date.parse(h));
+    const o = days[d] || (days[d] = { v:0, n:0 }); o.v += v; o.n += n;
+  }
+  return days;
+}
+function renderVisitsCard(){
+  if(!state.isOwner) return '';
+  if(!visitsState || (!visitsState.loading && Date.now() - visitsState.at > 120000)) setTimeout(loadVisits, 0);
+  const head = `<div class="pd-head"><h3 class="section-label">ผู้เข้าชมเว็บ</h3><button class="chip chip-link" data-action="visits-refresh">รีเฟรช</button></div>`;
+  const V = visitsState || { loading:true };
+  if(V.err === 'no-token') return head + `<div class="vis-card"><p class="vis-note">ยังไม่ได้ต่อกับ Cloudflare Web Analytics — ทำครั้งเดียว:</p>
+    <ol class="vis-setup"><li>สร้างโทเค็นที่ dash.cloudflare.com/profile/api-tokens → Create Token → Custom token → สิทธิ์ <b>Account · Account Analytics · Read</b></li>
+    <li>ในเทอร์มินัล: <code>cd ~/Downloads/48thdb-deploy-package/worker && npm_config_cache="$HOME/.npm-wrangler" npx wrangler secret put CF_ANALYTICS_TOKEN</code> แล้ววางโทเค็น</li></ol></div>`;
+  const D = V.data;
+  if(!D) return head + `<div class="vis-card"><p class="vis-note">${V.err ? `โหลดตัวเลขไม่ได้ (${escapeHtml(V.err === 'net' ? 'ต่อเน็ตไม่ได้' : V.err)}) ลองกดรีเฟรช` : 'กำลังโหลด…'}</p></div>`;
+  const fmt = n => Number(n || 0).toLocaleString('en-US');
+  const short = n => n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + 'k' : String(n);
+  const days = visitsByDay(D.hours || []);
+  const key = k => bkkDay(Date.now() - k * 86400000);
+  const sum = (from, to) => { let v = 0, n = 0; for(let k = from; k <= to; k++){ const o = days[key(k)]; if(o){ v += o.v; n += o.n; } } return { v, n }; };
+  const tile = (label, o, cls) => `<div class="vis-tile${cls ? ' ' + cls : ''}"><span>${label}</span><b>${fmt(o.v)}</b><small>${fmt(o.n)} หน้าที่เปิด</small></div>`;
+  const last14 = [...Array(14).keys()].reverse().map(k => ({ k, d:key(k), o:days[key(k)] || { v:0, n:0 } }));
+  const top = Math.max(1, ...last14.map(x => x.o.v));
+  const bars = last14.map(x => `<i class="${x.k === 0 ? 'is-today' : ''}"><u>${x.o.v ? short(x.o.v) : ''}</u><b style="height:${(x.o.v / top * 70).toFixed(1)}%"></b><em>${Number(x.d.slice(8))}</em></i>`).join('');
+  // today, hour by hour (Bangkok)
+  const hrs = Array(24).fill(0), tk = key(0);
+  for(const [h, v] of (D.hours || [])) if(bkkDay(Date.parse(h)) === tk) hrs[new Date(Date.parse(h) + 7 * 3600000).getUTCHours()] += v;
+  const hTop = Math.max(1, ...hrs), nowH = new Date(Date.now() + 7 * 3600000).getUTCHours();
+  const hBars = hrs.map((v, h) => `<i class="${h === nowH ? 'is-today' : ''}"><b style="height:${(v / hTop * 78).toFixed(1)}%${h > nowH ? ';visibility:hidden' : ''}"></b><em>${h % 3 ? '' : h}</em></i>`).join('');
+  let region = null; try{ region = new Intl.DisplayNames(['th'], { type:'region' }); }catch(e){}
+  const DEV = { mobile:'มือถือ', desktop:'คอมพิวเตอร์', tablet:'แท็บเล็ต' };
+  const list = (title, rows, name) => { const t = Math.max(1, ...rows.map(r => r[1]));
+    return `<div><p class="vis-h">${title}</p>${rows.length ? rows.map(r => `<div class="vis-row"><span>${escapeHtml(name(r[0]))}</span><em>${fmt(r[1])}</em><i><b style="width:${(r[1] / t * 100).toFixed(1)}%"></b></i></div>`).join('') : '<p class="vis-note">—</p>'}</div>`; };
+  const at = new Date(D.at);
+  return head + `<div class="vis-card">
+    <div class="vis-tiles">${tile('วันนี้', sum(0, 0), 'is-today')}${tile('เมื่อวาน', sum(1, 1))}${tile('7 วัน', sum(0, 6))}${tile('30 วัน', sum(0, 29))}</div>
+    <div><p class="vis-h">14 วันล่าสุด (ครั้งที่เข้าเว็บ)</p><div class="vis-bars">${bars}</div></div>
+    <div><p class="vis-h">วันนี้ รายชั่วโมง</p><div class="vis-bars is-hours">${hBars}</div></div>
+    <div class="vis-lists">
+      ${list('มาจากไหน · 7 วัน', D.referers || [], h => !h ? 'เข้าตรง / แอป' : h === '48thdb.com' ? 'ภายในเว็บ' : h)}
+      ${list('ประเทศ · 7 วัน', D.countries || [], c => { try{ return (region && c && region.of(c)) || c || 'ไม่ทราบ'; }catch(e){ return c || 'ไม่ทราบ'; } })}
+      ${list('อุปกรณ์ · 7 วัน', D.devices || [], d => DEV[d] || d || 'ไม่ทราบ')}
+    </div>
+    <p class="vis-note">ตัวเลขใหญ่คือจำนวนครั้งที่มีคนเข้าเว็บ ไม่ใช่จำนวนคนไม่ซ้ำ (Cloudflare ไม่นับคนเพื่อความเป็นส่วนตัว) · "หน้าที่เปิด" นับทุกครั้งที่เปลี่ยนหน้าในเว็บ · ข้อมูลถึง ${String(at.getHours()).padStart(2,'0')}:${String(at.getMinutes()).padStart(2,'0')} น. ช้ากว่าจริงไม่กี่นาที · เห็นเฉพาะคุณ</p>
+  </div>`;
+}
+
 function renderProfile(){
   const loggedIn = state.account && state.account.loggedIn;
   const kamiMember = state.kamiOshi ? getMember(state.kamiOshi) : null;
@@ -13434,6 +13530,7 @@ function renderProfile(){
 
   return `
   ${accountBlock}
+  ${renderVisitsCard()}
   ${renderFlashComposer()}
   ${renderPendingQueue()}
   ${renderFeedbackInbox()}
@@ -17411,6 +17508,7 @@ function bindDelegatedEvents(){
     else if(action==='fb-rate'){ fbRate(+el.dataset.value); }
     else if(action==='fb-send'){ fbSend(el, el.dataset.value); }
     else if(action==='fb-refresh'){ loadFeedback().then(() => renderMain()); }
+    else if(action==='visits-refresh'){ if(visitsState) visitsState.at = 0; el.textContent = 'กำลังโหลด…'; loadVisits(); }
     else if(action==='fb-del'){
       if(!confirm('ลบฟีดแบ็กนี้?')) return;
       fbDb.collection('feedback').doc(id).delete().then(() => { state.feedback = (state.feedback || []).filter(f => f.id !== id); renderMain(); })
