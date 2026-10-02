@@ -45,7 +45,8 @@ the owner's art, `posters/ge2026/share-bg.jpg` (1080×1350); it then follows the
 transfers a look updates both the votes and the token tally. It reads the iAM48 vote straight off TokenX in the browser
 (`GEC_POLLS`, POST `eth_getLogs` to scan.tokenx.finance — its paged GET lists
 are cached by its CDN and repeat page 1) and keeps running sums in
-localStorage. Each vote carries a salted hash, so there are no per-member
+localStorage. The explorer's websocket (`GEC_WS`, Phoenix: `blocks:new_block` and the
+poll's `addresses:` topic) only says *when* to look; the 3-second poll is the fallback. Each vote carries a salted hash, so there are no per-member
 counts on the chain; don't promise them. A new election needs its poll
 address and start/end blocks from the ElectionFactory's `createPoll`, and its
 token's address and mint block in `GEC_TOKEN` (the supply card follows every
