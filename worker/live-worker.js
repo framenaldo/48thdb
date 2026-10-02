@@ -186,21 +186,33 @@ async function iamRecent(env) {
  * its GraphQL API. That needs a read-only token, kept as the Worker secret
  * CF_ANALYTICS_TOKEN — set once by the owner, never in this repo.
  *
- * Only the owner may look. The page sends its Firebase ID token and this asks
- * Firestore for admin/owner with it: the same rule that makes the page treat
- * them as the owner, so the two can never disagree about who that is. */
+ * Only the owner may look. The page sends its Firebase ID token; this checks
+ * Google's signature on it and that it names the owner's verified address,
+ * kept as the Worker secret OWNER_EMAIL so it stays out of this repo — the
+ * same test the Firestore rules apply. (Asking Firestore's REST API instead
+ * was tried: it answers 429 to requests from here.) */
 const CF_ACCOUNT = '8e5e921b23884747506b07a3ba030dcf';
 const SITE_HOST = '48thdb.com';
 const FIREBASE_PROJECT = 'thdatabase';
 const VISITS_KEY = 'https://live.state/visits-v1';
 const VISITS_TTL = 120;
+const GOOGLE_JWK = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
 
-async function isOwner(request) {
-  const m = (request.headers.get('authorization') || '').match(/^Bearer\s+(\S{20,})$/);
-  if (!m) return false;
-  const res = await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/admin/owner`,
-    { headers: { authorization: `Bearer ${m[1]}` } });
-  return res.ok;
+const b64url = (t) => Uint8Array.from(atob(t.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((t.length + 3) % 4)), (c) => c.charCodeAt(0));
+async function isOwner(request, env) {
+  const m = (request.headers.get('authorization') || '').match(/^Bearer\s+([\w-]+)\.([\w-]+)\.([\w-]+)$/);
+  if (!m || !env.OWNER_EMAIL) return false;
+  const head = JSON.parse(new TextDecoder().decode(b64url(m[1])));
+  const body = JSON.parse(new TextDecoder().decode(b64url(m[2])));
+  const now = Date.now() / 1000;
+  if (head.alg !== 'RS256' || body.aud !== FIREBASE_PROJECT || body.iss !== `https://securetoken.google.com/${FIREBASE_PROJECT}`
+    || !(body.exp > now) || !(body.iat < now + 300) || body.email_verified !== true
+    || String(body.email || '').toLowerCase() !== env.OWNER_EMAIL.trim().toLowerCase()) return false;
+  const keys = await (await fetch(GOOGLE_JWK, { cf: { cacheTtl: 3600, cacheEverything: true } })).json();
+  const jwk = (keys.keys || []).find((k) => k.kid === head.kid);
+  if (!jwk) return false;
+  const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+  return crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64url(m[3]), new TextEncoder().encode(`${m[1]}.${m[2]}`));
 }
 
 const VISITS_QUERY = `query ($a: String!, $host: String!, $s: Time!, $w: Time!, $e: Time!) {
@@ -259,7 +271,7 @@ export default {
     if (url.pathname === '/visits') {
       const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
       try {
-        if (!(await isOwner(request))) return new Response(JSON.stringify({ error: 'owner only' }), { status: 403, headers: own });
+        if (!(await isOwner(request, env))) return new Response(JSON.stringify({ error: 'owner only' }), { status: 403, headers: own });
         if (!env.CF_ANALYTICS_TOKEN) return new Response(JSON.stringify({ error: 'no-token' }), { status: 503, headers: own });
         return new Response(JSON.stringify(await visits(env)), { headers: own });
       } catch (err) {

@@ -42,10 +42,11 @@
 ### จำนวนผู้เข้าชม (เห็นเฉพาะเจ้าของเว็บ)
 
 `https://api.48thdb.com/visits` อ่านตัวเลขจาก Cloudflare Web Analytics ให้การ์ด "ผู้เข้าชมเว็บ" ในหน้าโปรไฟล์
-ตอบเฉพาะเมื่อส่ง Firebase ID token ของเจ้าของเว็บมา (Worker เอาโทเค็นนั้นไปขอ `admin/owner` จาก Firestore —
-กฎเดียวกับที่หน้าเว็บใช้) คนอื่นได้ 403
+ตอบเฉพาะเมื่อส่ง Firebase ID token ของเจ้าของเว็บมา: Worker ตรวจลายเซ็นของ Google บนโทเค็น
+และดูว่าเป็นอีเมลเจ้าของเว็บที่ยืนยันแล้ว (secret `OWNER_EMAIL` — ไม่เก็บอีเมลไว้ใน repo) คนอื่นได้ 403
+(เคยให้ถาม Firestore REST แทน แต่ตอบ 429 Quota exceeded)
 
-ต้องมี secret `CF_ANALYTICS_TOKEN` (สิทธิ์ Account · Account Analytics · Read) ตั้งครั้งเดียว:
+ต้องมี secret `CF_ANALYTICS_TOKEN` (สิทธิ์ Account · Account Analytics · Read) และ `OWNER_EMAIL` ตั้งครั้งเดียว:
 
 ```bash
 cd worker
