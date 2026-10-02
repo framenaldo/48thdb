@@ -10389,12 +10389,57 @@ function gecKick(force){
     if(force || !had25 || gecErr !== err0 || mark() !== m0) gecDraw();
     else gecStamp();
     const pb = document.querySelector('.gec-prog'); if(pb) pb.hidden = true;
+    if(gecAgain){ gecAgain = false; setTimeout(gecPushed, 0); }
   })();
-  // a block every 3 seconds, so a look every 3 seconds
+  gecSocket();
+  // a block every 3 seconds, so a look every 3 seconds — unless the explorer
+  // is already telling us when to look
   if(!gecTimer) gecTimer = setInterval(() => {
     if(!gecOnScreen()){ clearInterval(gecTimer); gecTimer = null; return; }
-    if(!document.hidden) gecKick();
+    gecSocket();
+    if(!document.hidden && Date.now() - gecWsAt > 6000) gecKick();
   }, 3000);
+}
+/* The explorer also pushes: its websocket says the moment a block is in or a
+   vote reaches the poll, so the page looks then rather than on its next turn.
+   That only says *when* to look — the counting still comes from eth_getLogs —
+   and if the socket drops, the 3-second look carries on by itself. */
+const GEC_WS = 'wss://scan.tokenx.finance/socket/v2/websocket?vsn=2.0.0';
+let gecWs = null, gecWsAt = 0, gecWsBeat = null, gecWsRetry = 0, gecAgain = false, gecLiteAgain = false;
+const gecWsWanted = () => gecOnScreen() || (state.view === 'feed' && !!gecLiteTimer);
+function gecSocket(){
+  if(gecWs || typeof WebSocket === 'undefined' || !gecWsWanted()) return;
+  let ws, ref = 0;
+  try{ ws = new WebSocket(GEC_WS); }catch(e){ return; }
+  gecWs = ws;
+  // Phoenix frames: [join ref, ref, topic, event, payload]
+  const send = (topic, event) => { const r = String(++ref);
+    try{ ws.send(JSON.stringify([event === 'phx_join' ? r : null, r, topic, event, {}])); }catch(e){} };
+  ws.onopen = () => {
+    gecWsRetry = 0;
+    send('blocks:new_block', 'phx_join');
+    send('addresses:' + GEC_POLLS.ge2026.addr.toLowerCase(), 'phx_join');
+    gecWsBeat = setInterval(() => { if(!gecWsWanted()) ws.close(); else send('phoenix', 'heartbeat'); }, 25000);
+  };
+  ws.onmessage = e => {
+    let m; try{ m = JSON.parse(e.data); }catch(err){ return; }
+    const ev = m && m[3];
+    if(ev !== 'new_block' && ev !== 'token_transfer' && ev !== 'transaction') return;
+    gecWsAt = Date.now();
+    if(document.hidden) return;
+    if(gecOnScreen()) gecPushed();
+    else if(ev !== 'new_block' && state.view === 'feed'){ if(gecLiteBusy) gecLiteAgain = true; else gecLiteSync(); }
+  };
+  ws.onerror = () => {};
+  ws.onclose = () => {
+    clearInterval(gecWsBeat); gecWsBeat = null; gecWsAt = 0;
+    if(gecWs === ws) gecWs = null;
+    if(gecWsWanted()) setTimeout(gecSocket, Math.min(60000, 2000 * 2 ** gecWsRetry++));
+  };
+}
+function gecPushed(){
+  if(gecBusy){ gecAgain = true; return; }
+  gecAt = 0; gecKick();
 }
 // the "up to" line alone, when a check found nothing new
 function gecStamp(){
@@ -10685,7 +10730,7 @@ async function gecLiteSync(){
     L.recent = L.recent.filter(r => r[1] > L.to - 60);
     gecLiteAt = Date.now();
   }catch(e){}
-  finally{ gecLiteBusy = false; }
+  finally{ gecLiteBusy = false; if(gecLiteAgain){ gecLiteAgain = false; setTimeout(gecLiteSync, 0); } }
   gecHomePaint();
 }
 /* A big throw: one wallet putting 10,000 tokens or more into the vote within
@@ -10745,8 +10790,10 @@ function gecHomeCard(en){
   if(Date.now() - gecLiteAt > 15000) setTimeout(gecLiteSync, 0);
   if(!gecLiteTimer) gecLiteTimer = setInterval(() => {
     if(state.view !== 'feed'){ clearInterval(gecLiteTimer); gecLiteTimer = null; return; }
+    gecSocket();
     if(!document.hidden) gecLiteSync();
   }, 15000);
+  setTimeout(gecSocket, 0);
   return `<section class="feed-block is-gevote"><h2 class="section-label">${en ? 'GE2026 · Live Voting' : 'GE2026 · โหวตสด'}</h2>${gecHomeTeaser(en)}</section>`;
 }
 function gecHomeTeaser(en){
