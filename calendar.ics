@@ -677,17 +677,38 @@ DTEND;VALUE=DATE:20261011
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-union@48thdb
+UID:ev-kimi-roadshow-union-2026-10-10@48thdb
 DTSTAMP:20261010T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
 LOCATION:UNION CO-EVENT SPACE 4 FL.\, UNION MALL\, Bangkok
 DESCRIPTION:เมมเบอร์: Hoop\, Pancake\, Praew\, Chifa\, Ling
- ling\, Prae\n• Mini Concert & Group Hi-Touch\n• รอบเวลา
- รอประกาศอีกครั้ง\n\nhttps://48thdb.com/?e=
- ev-kimi-roadshow-union
+ ling\, Prae\n• รอบเวลาเดียวกันทั้ง
+ สองวัน 10 และ 11 ต.ค.\n• 12:00–13:00 Mini Concer
+ t\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 พบสมาช
+ ิกที่จุด Merchandise และ Hachi Cha\n• 17:00–18:0
+ 0 Group Hi-Touch\n• บัตรเข้าร่วม Group Hi-Touch 
+ ได้จากการซื้อเข็มกลัดภาย
+ ในงาน\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-union
 URL:https://48thdb.com/?e=ev-kimi-roadshow-union
-DTSTART;VALUE=DATE:20261010
-DTEND;VALUE=DATE:20261012
+DTSTART;TZID=Asia/Bangkok:20261010T120000
+DTEND;TZID=Asia/Bangkok:20261010T180000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-union-2026-10-11@48thdb
+DTSTAMP:20261010T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:UNION CO-EVENT SPACE 4 FL.\, UNION MALL\, Bangkok
+DESCRIPTION:เมมเบอร์: Hoop\, Pancake\, Praew\, Chifa\, Ling
+ ling\, Prae\n• รอบเวลาเดียวกันทั้ง
+ สองวัน 10 และ 11 ต.ค.\n• 12:00–13:00 Mini Concer
+ t\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 พบสมาช
+ ิกที่จุด Merchandise และ Hachi Cha\n• 17:00–18:0
+ 0 Group Hi-Touch\n• บัตรเข้าร่วม Group Hi-Touch 
+ ได้จากการซื้อเข็มกลัดภาย
+ ในงาน\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-union
+URL:https://48thdb.com/?e=ev-kimi-roadshow-union
+DTSTART;TZID=Asia/Bangkok:20261011T120000
+DTEND;TZID=Asia/Bangkok:20261011T180000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-kimi-roadshow-t21@48thdb
