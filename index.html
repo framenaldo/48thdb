@@ -12421,9 +12421,17 @@ function ffPaint(){
     // re-anchor it), and the timetable where it was scrolled sideways
     const sc = old.closest('.modal-scroll'), top = sc ? sc.scrollTop : 0;
     const wrap = old.querySelector('.ff-tt-wrap'), left = wrap ? wrap.scrollLeft : 0;
+    const hrs = old.querySelector('.ff-times'), hrsLeft = hrs ? hrs.scrollLeft : 0;
     old.replaceWith(fresh[i]);
     localize(fresh[i]);
     const w2 = fresh[i].querySelector('.ff-tt-wrap'); if(w2) w2.scrollLeft = left;
+    // the row of hours stays where it was swiped to, with the chosen hour in sight
+    const h2 = fresh[i].querySelector('.ff-times');
+    if(h2){ h2.scrollLeft = hrsLeft;
+      const on = h2.querySelector('button.on');
+      if(on){ const a = on.getBoundingClientRect().left - h2.getBoundingClientRect().left + h2.scrollLeft, z = a + on.offsetWidth;
+        if(a < h2.scrollLeft) h2.scrollLeft = a - 8;
+        else if(z > h2.scrollLeft + h2.clientWidth) h2.scrollLeft = z - h2.clientWidth + 8; } }
     if(sc) sc.scrollTop = top;
   });
   ffFit();
