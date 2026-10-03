@@ -2834,6 +2834,11 @@
   .gel-mv.is-up{ color:#1E8E4E; background:#E3F6EA; } .gel-mv.is-dn{ color:#C62B2B; background:#FBE7E7; }
   .gel-mv.is-eq{ color:var(--ink-soft); background:var(--paper-dim); } .gel-mv.is-new{ color:#7A4BC4; background:#EFE6FB; }
   .gel-foot{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:12px; }
+  .feed-ge-strip{ display:block; width:100%; border:0; font:inherit; text-align:left; cursor:pointer;
+    box-shadow:0 4px 0 rgba(0,0,0,.25); transition:transform .12s ease, box-shadow .12s ease; }
+  .feed-ge-strip:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.25); }
+  .feed-ge .gel-prog-t span:last-child{ font-weight:700; opacity:1; }
+  .feed-ge .gel-now{ margin-top:18px; }
   .ge-live-banner{ display:flex; align-items:center; gap:10px; width:100%; margin:0 0 12px; padding:10px 14px; border-radius:14px; cursor:pointer;
     background:#2A0508; color:#fff; border:0; font:inherit; font-weight:700; text-align:left; }
   .ge-live-banner span{ flex:1; }
@@ -10011,7 +10016,7 @@ function listenGE(){
       if(state.selectedId || state.selectedEvent || state.posterOf || state.editingId) return;
       // the owner mid-entry keeps their cursor; the page catches up after
       if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
-      if(state.view === 'timeline' || state.view === 'gelive') renderMain();
+      if(state.view === 'timeline' || state.view === 'gelive' || state.view === 'feed') renderMain();
     }, () => {});
   }catch(e){}
 }
@@ -10073,6 +10078,54 @@ function geRemember(round){
   const seen = _geSeen && _geSeen.__round === round ? _geSeen : { __round:round };
   for(let n = 1; n <= GE_SEATS; n++){ const x = s[n] || {}; seen[round + ':' + n] = (x.id || '') + '|' + (x.v == null ? '' : x.v); }
   _geSeen = seen;
+}
+
+/* The election results on the home page, once a round has anything in it:
+   the round being read out (or the latest one), how far it has got, who is
+   being called right now, and the ranks around her — or, with the round
+   complete, the Senbatsu. The full list is one tap away. */
+const GE_TONE = { gold:'#B8862E', silver:'#76828E', bronze:'#9A5733' };
+function renderHomeGE(){
+  const live = geLiveRound(), done = GE_ROUNDS.filter(r => geHasData(r.id));
+  const round = live || done[done.length - 1];
+  if(!round) return '';
+  const en = isEN(), doc = (state.geRounds || {})[round.id] || {}, slots = doc.slots || {};
+  const told = geAnnounced(round.id), prev = gePrevRanks(round.id), last = +doc.last;
+  const known = Object.keys(slots).map(Number).filter(n => slots[n] && (slots[n].id || slots[n].v != null)).sort((a, b) => a - b);
+  const tone = n => GE_TONE[(GE_BANDS.find(b => n >= b.from && n <= b.to) || GE_BANDS[0]).tone];
+  const at = doc.at && doc.at.seconds ? new Date(doc.at.seconds * 1000) : null;
+  const hhmm = at ? `${String(at.getHours()).padStart(2, '0')}:${String(at.getMinutes()).padStart(2, '0')}` : '';
+  const strip = `<button class="gel-strip feed-ge-strip" data-action="open-ge-results">
+    <div class="gel-strip-top">${live ? '<span class="gel-live"><i></i>LIVE</span>' : ''}${hhmm ? `<small>${en ? 'Updated' : 'อัปเดต'} ${hhmm}${en ? '' : ' น.'}</small>` : ''}</div>
+    <h2>${en ? 'GE2026 results' : 'ผลเลือกตั้ง GE2026'} · ${geRoundLabel(round)}</h2>
+    <small>${live ? (en ? 'Being read out now, from 36 upward' : 'กำลังประกาศ ไล่จากอันดับ 36 ขึ้นไป')
+      : told >= GE_SEATS ? (en ? 'All 36 ranks announced' : 'ประกาศครบ 36 อันดับแล้ว') : (en ? 'Partial results' : 'ผลบางส่วน')}</small>
+    <div class="gel-prog"><b style="width:${told / GE_SEATS * 100}%"></b></div>
+    <div class="gel-prog-t"><span>${en ? `Announced ${told} / ${GE_SEATS}` : `ประกาศแล้ว ${told} / ${GE_SEATS}`}</span><span>${en ? 'See all →' : 'ดูผลทั้งหมด →'}</span></div>
+  </button>`;
+  const row = n => {
+    const s = slots[n], m = s.id && getMember(s.id);
+    if(!m) return `<div class="gel-row is-pending" style="--t:${tone(n)}"><span class="gel-n">${n}</span><span class="gel-q">?</span>
+      <span class="gel-who"><b>${en ? 'Announcing…' : 'กำลังประกาศ…'}</b></span><span class="gel-v"><b>${geVotes(s.v)}</b></span></div>`;
+    return `<button class="gel-row" style="--t:${tone(n)}" data-action="open-member" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
+      <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small></span>
+      <span class="gel-v"><b>${geVotes(s.v)}</b>${geMove(prev, m.id, n)}</span></button>`;
+  };
+  let now = '', list;
+  if(live && last && slots[last]){
+    const s = slots[last], m = s.id && getMember(s.id), band = GE_BANDS.find(b => last >= b.from && last <= b.to);
+    now = `<div class="gel-now is-${band.tone}"><span class="gel-now-tag">LIVE</span>
+      <div class="gel-now-rank"><b>${last}</b><small>${band.name.replace(' Girls', '')}</small></div>
+      ${m ? geFace(m, 'gel-now-face') : '<span class="gel-q gel-now-face">?</span>'}
+      <div class="gel-now-who">${m ? `<b>${escapeHtml(m.name)}</b>` : `<b class="gel-dots">${en ? 'Announcing' : 'กำลังประกาศ'}<i>.</i><i>.</i><i>.</i></b>`}
+        ${s.v != null ? `<span>${geVotes(s.v)} <small>${en ? 'votes' : 'คะแนน'}</small></span>` : ''}</div>
+      ${m ? geMove(prev, m.id, last) : ''}</div>`;
+    list = known.filter(n => n > last).slice(0, 4);          // the ones called just before
+  } else {
+    const top = known.filter(n => n <= 12);
+    list = top.length ? top : known.slice(0, 5);
+  }
+  return `<section class="feed-block feed-ge">${strip}${now}${list.length ? `<div class="gel-rows">${list.map(row).join('')}</div>` : ''}</section>`;
 }
 
 function renderGEResults(){
@@ -12886,6 +12939,8 @@ function renderFeed(){
     </header>
 
     <div class="feed-cols"><div class="feed-main">
+    ${renderHomeGE()}
+
     ${nowOn.length ? `
     <section class="feed-block today-hero-block">
       <h2 class="section-label">งานวันนี้</h2>
@@ -17510,6 +17565,13 @@ function bindDelegatedEvents(){
       state.selectedEvent = null; state.selectedId = null; state.editingId = null;
       state.query = '';
       render(); pushHistory();
+    }
+    else if(action==='open-ge-results'){
+      state.timelineId = 'ge2026'; state.geTab = 'results'; state.geRound = null;
+      state.view = 'timeline';
+      state.selectedEvent = null; state.selectedId = null; state.editingId = null;
+      state.query = '';
+      render(); pushHistory(); window.scrollTo(0, 0);
     }
     else if(action==='open-ge'){
       state.timelineId = 'ge2026'; state.geTab = 'overview';
