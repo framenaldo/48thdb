@@ -10048,7 +10048,9 @@ function geMove(prev, mid, rank){
   return was > rank ? `<span class="gel-mv is-up">▲ ${en ? 'from' : 'จาก'} ${was}</span>`
     : `<span class="gel-mv is-dn">▼ ${en ? 'from' : 'จาก'} ${was}</span>`;
 }
-const geVotes = v => (typeof v === 'number' && isFinite(v)) ? v.toLocaleString('en-US') : '';
+// scores can carry two decimals (1,724.50); whole ones print without
+const geVotes = v => (typeof v === 'number' && isFinite(v))
+  ? v.toLocaleString('en-US', Number.isInteger(v) ? {} : { minimumFractionDigits:2, maximumFractionDigits:2 }) : '';
 function geFace(m, cls){
   const g = getGroup(m.groupId) || {};
   return renderAvatar(m, 'avatar-sm ' + cls, g.color || 'var(--ink-soft)');
@@ -11099,7 +11101,7 @@ function renderGEAdmin(){
     for(let n = b.to; n >= b.from; n--){
       const s = slots[n] || {}, m = s.id && getMember(s.id);
       rows.push(`<div class="gea-row" data-rank="${n}"><span class="gea-n">${n}</span>
-        <input class="gea-v" inputmode="numeric" autocomplete="off" data-rank="${n}" value="${geVotes(s.v)}" placeholder="${en ? 'Votes' : 'คะแนน'}">
+        <input class="gea-v" inputmode="decimal" autocomplete="off" data-rank="${n}" value="${geVotes(s.v)}" placeholder="${en ? 'Votes' : 'คะแนน'}">
         <div class="gea-name">${m ? geFace(m, 'gea-face') : ''}<input class="gea-q" autocomplete="off" data-rank="${n}" value="${m ? escapeAttr(m.name) : ''}" placeholder="${en ? 'Name' : 'ชื่อ'}">
           <div class="gea-sug" hidden></div></div>
         ${s.id || s.v != null ? `<button class="gea-x" data-action="ge-clear" data-value="${n}" aria-label="${en ? 'Clear' : 'ล้าง'}">×</button>` : '<span></span>'}</div>`);
@@ -11152,10 +11154,12 @@ function bindGEAdmin(){
   const round = () => state.geAdminRound;
   const markOk = (row) => { if(!row) return; row.classList.remove('is-ok'); void row.offsetWidth; row.classList.add('is-ok'); };
   const saveVotes = async (inp) => {
-    const n = +inp.dataset.rank, raw = inp.value.replace(/[^\d]/g, '');
+    // digits and one decimal point; thousands commas are dropped
+    const n = +inp.dataset.rank, [whole, ...frac] = inp.value.replace(/[^\d.]/g, '').split('.');
+    const raw = whole + (frac.length ? '.' + frac.join('') : '');
     const cur = geSlots(round())[n] || {};
-    if(!raw){ return; }
-    const v = +raw;
+    if(!/\d/.test(raw)){ return; }
+    const v = Math.round(parseFloat(raw) * 100) / 100;
     inp.value = geVotes(v);
     if(cur.v === v) return true;
     if(await geWrite(round(), { v }, n)) markOk(inp.closest('.gea-row'));
