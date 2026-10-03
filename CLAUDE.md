@@ -30,8 +30,9 @@ the Firebase CLI from the owner's machine.
   / "All BNK48 Members" / "All CGM48 Members" by itself — still list the ids.
 - Three languages: `EN/TH` (mix, the default), TH and EN. New Thai UI strings
   need an entry in the `EN` table.
-- Member photos: files under `photos/<member id>.jpg`, about 400×400. Older
-  members still carry a base64 `photo:` — either form works.
+- Member photos: files under `photos/<member id>.jpg`, about 400×400 (the
+  owner's 1500px originals live in Documents/48TH/…/Profile). A few still carry
+  a base64 `photo:` — either form works. A replaced photo needs a new file name.
 
 ## The GE vote on the chain
 
