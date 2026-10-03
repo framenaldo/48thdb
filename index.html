@@ -5139,13 +5139,20 @@ const SEED_SCHEDULE = [
       'นำ Ticket Reference Code มาเลือกที่นั่งได้เฉพาะ 13 ต.ค. 10:00 – 14 ต.ค. 2026 23:59 ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้'] },
   /* The single's roadshows, from the September–October schedule. Where the
      line-up says "to be announced", lineupTba says so on the card. */
-  { id:'ev-kimi-roadshow-union', logo:'kimi', start:'2026-10-10', end:'2026-10-11',
+  { id:'ev-kimi-roadshow-union', logo:'kimi', start:'2026-10-10', end:'2026-10-11', time:'12:00',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'UNION CO-EVENT SPACE 4 FL., UNION MALL, Bangkok', groups:['bnk48','cgm48'],
     related:['ev-ge6-single'],
     poster:{ accent:'#5A5638', surface:'#EEF3F5', ink:'#34321F', img:'posters/kimi-roadshow-union.jpg', w:1200, h:1804 },
     members:['bnk-hoop','bnk-pancake','bnk-praew','cgm-chifa','cgm-lingling','cgm-prae'],
-    info:['Mini Concert & Group Hi-Touch', 'รอบเวลารอประกาศอีกครั้ง'] },
+    detail:[
+      'รอบเวลาเดียวกันทั้งสองวัน 10 และ 11 ต.ค.',
+      '12:00–13:00 Mini Concert',
+      '14:00–15:00 Group Hi-Touch',
+      '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
+      '17:00–18:00 Group Hi-Touch'],
+    info:[
+      'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน'] },
   { id:'ev-partner-1017', start:'2026-10-17', title:'To be announced',
     venue:'Chiang Mai', tag:'partner', tba:true },
   { id:'ev-kimi-roadshow-t21', logo:'kimi', start:'2026-10-17', end:'2026-10-18',
@@ -6904,6 +6911,7 @@ const EN = {
   'เดินทางไป-กลับโดยรถบัส':
     'Return travel by coach',
   'รอบเวลาเดียวกันทั้งสองวัน 26 และ 27 ก.ย.': 'The same times on both days, 26 and 27 Sep',
+  'รอบเวลาเดียวกันทั้งสองวัน 10 และ 11 ต.ค.': 'The same times on both days, 10 and 11 Oct',
   '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha': '15:30–16:30 Meet the members at the Merchandise and Hachi Cha stands',
   'รอบเวลาเดียวกันทั้งสองวัน 19 และ 20 ก.ย.':
     'The same times on both days, 19 and 20 Sep',
