@@ -10023,7 +10023,9 @@ function listenGE(){
 const geRoundLabel = r => isEN() ? r.en : r.th;
 const geSlots = id => ((state.geRounds || {})[id] || {}).slots || {};
 const geHasData = id => Object.keys(geSlots(id)).length > 0;
-const geLiveRound = () => GE_ROUNDS.find(r => ((state.geRounds || {})[r.id] || {}).live);
+// LIVE while the owner says it is being read out, and only until all 36 have names
+const geIsLive = id => !!((state.geRounds || {})[id] || {}).live && geAnnounced(id) < GE_SEATS;
+const geLiveRound = () => GE_ROUNDS.find(r => geIsLive(r.id));
 function geDefaultRound(){
   const live = geLiveRound();
   if(live) return live.id;
@@ -10134,14 +10136,14 @@ function renderGEResults(){
   const round = GE_ROUNDS.find(r => r.id === state.geRound) || GE_ROUNDS.find(r => r.id === geDefaultRound());
   const doc = rounds[round.id] || {};
   const slots = doc.slots || {};
-  const live = !!doc.live;
+  const live = geIsLive(round.id);
   const prev = gePrevRanks(round.id);
   const told = geAnnounced(round.id);
   const top = Math.max(1, ...Object.values(slots).map(s => (s && s.v) || 0));
   if(!_geSeen || _geSeen.__round !== round.id) _geSeen = null;
 
   const picks = `<div class="sub-tabs gel-rounds">${GE_ROUNDS.map(r => {
-    const on = r.id === round.id, isLive = !!(rounds[r.id] || {}).live;
+    const on = r.id === round.id, isLive = geIsLive(r.id);
     return `<button class="sub-tab${on ? ' active' : ''}" data-action="ge-round" data-value="${r.id}">${geRoundLabel(r)}${isLive ? '<i class="gel-dot"></i>' : ''}</button>`;
   }).join('')}</div>`;
 
@@ -11230,6 +11232,12 @@ function bindGEAdmin(){
       const old = row.querySelector('.gea-face'); if(old) old.remove();
       inp.insertAdjacentHTML('beforebegin', geFace(m, 'gea-face'));
       markOk(row);
+      // all 36 named: the round is over, so the LIVE switch turns itself off
+      if(geAnnounced(round()) >= GE_SEATS && (state.geRounds[round()] || {}).live && await geWrite(round(), { live:false })){
+        const sw = document.querySelector('.gea-switch');
+        if(sw){ sw.classList.remove('is-on'); sw.setAttribute('aria-pressed', 'false'); }
+        toast(isEN() ? 'All 36 in: LIVE switched off' : 'ครบ 36 อันดับแล้ว ปิด LIVE ให้อัตโนมัติ');
+      }
     }
     if(n > 1) focusGE(n - 1, 'gea-v');
   };
