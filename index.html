@@ -2839,6 +2839,17 @@
   .feed-ge-strip:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.25); }
   .feed-ge .gel-prog-t span:last-child{ font-weight:700; opacity:1; }
   .feed-ge .gel-now{ margin-top:18px; }
+  .feed-ge.is-compact{ margin:16px 0 4px; }
+  .gel-mini{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px; margin-top:6px; }
+  .gel-mini-c{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 4px 7px; border-radius:14px;
+    background:var(--card); border:1.5px solid var(--line); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.05);
+    color:var(--ink); font:inherit; cursor:pointer; min-width:0; }
+  button.gel-mini-c:active{ transform:translateY(2px); box-shadow:none; }
+  .gel-mini-c.is-pending{ border-style:dashed; border-color:var(--t); cursor:default; }
+  .gel-mini-c b{ font-size:13px; font-weight:800; color:var(--t); line-height:1; }
+  .gel-mini-face{ width:40px !important; height:40px !important; border-radius:10px !important; font-size:11px; }
+  .gel-mini-c small{ font-size:11px; font-weight:600; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .gel-mini-c > span:not(.gel-q){ font-size:12.5px; font-weight:700; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .ge-live-banner{ display:flex; align-items:center; gap:10px; width:100%; margin:0 0 12px; padding:10px 14px; border-radius:14px; cursor:pointer;
     background:#2A0508; color:#fff; border:0; font:inherit; font-weight:700; text-align:left; }
   .ge-live-banner span{ flex:1; }
@@ -9962,6 +9973,7 @@ function renderGEPage(){
     const cands = geCandidates(), oshiFirst = [...cands.filter(m => state.oshi.includes(m.id)), ...cands.filter(m => !state.oshi.includes(m.id))];
     body = `
       ${vote && iso >= vote.start ? gecTeaser(en) : ''}
+      ${renderHomeGE({ compact:true })}
       <h3 class="section-label">${en ? `Candidates · ${cands.length}` : `ผู้สมัคร ${cands.length} คน`}</h3>
       <div class="gec-strip">${oshiFirst.map(geCandCard).join('')}</div>
       <button class="chip chip-link ge-more" data-action="ge-tab" data-value="candidates">${en ? 'All candidates →' : 'ดูผู้สมัครทั้งหมด →'}</button>
@@ -10087,7 +10099,7 @@ function geRemember(round){
    being called right now, and the ranks around her — or, with the round
    complete, the Senbatsu. The full list is one tap away. */
 const GE_TONE = { gold:'#B8862E', silver:'#76828E', bronze:'#9A5733' };
-function renderHomeGE(){
+function renderHomeGE(opt = {}){
   const live = geLiveRound(), done = GE_ROUNDS.filter(r => geHasData(r.id));
   const round = live || done[done.length - 1];
   if(!round) return '';
@@ -10127,7 +10139,15 @@ function renderHomeGE(){
     const top = known.filter(n => n <= 12);
     list = top.length ? top : known.slice(0, 5);
   }
-  return `<section class="feed-block feed-ge">${strip}${now}${list.length ? `<div class="gel-rows">${list.map(row).join('')}</div>` : ''}</section>`;
+  // compact (the GE page's overview): the top three in full, the rest of the Senbatsu as small tiles
+  let mini = '';
+  if(opt.compact && !now && list.length > 3){
+    mini = `<div class="gel-mini">${list.slice(3).map(n => { const s = slots[n], m = s.id && getMember(s.id);
+      return m ? `<button class="gel-mini-c" style="--t:${tone(n)}" data-action="open-member" data-id="${m.id}"><b>${n}</b>${geFace(m, 'gel-mini-face')}<span>${escapeHtml(m.name)}</span><small>${geVotes(s.v)}</small></button>`
+        : `<span class="gel-mini-c is-pending" style="--t:${tone(n)}"><b>${n}</b><span class="gel-q gel-mini-face">?</span><span>${en ? 'Announcing' : 'กำลังประกาศ'}</span><small>${geVotes(s.v)}</small></span>`; }).join('')}</div>`;
+    list = list.slice(0, 3);
+  }
+  return `<section class="feed-block feed-ge${opt.compact ? ' is-compact' : ''}">${strip}${now}${list.length ? `<div class="gel-rows">${list.map(row).join('')}</div>` : ''}${mini}</section>`;
 }
 
 function renderGEResults(){
