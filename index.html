@@ -2856,6 +2856,43 @@
   .feed-ge .gel-prog-t span:last-child{ font-weight:700; opacity:1; }
   .feed-ge .gel-now{ margin-top:18px; }
   .feed-ge.is-compact{ margin:16px 0 4px; }
+  .feed-ge:not(.is-compact) .gel-mini > *{ flex-basis:calc((100% - 18px) / 4); }
+  /* the election summed up, once it is over */
+  .ge-sum-top{ display:block; width:100%; text-align:left; border:0; cursor:pointer; font:inherit; }
+  .ge-sum-kicker{ display:block; font-size:11px !important; font-weight:800; letter-spacing:.08em; color:#F3C969; opacity:1 !important; }
+  .ge-sum-face{ width:84px !important; height:84px !important; border-radius:50% !important; border:3px solid #F3C969; flex:none; }
+  .ge-sum-center small{ display:block; font-size:12px; font-weight:800; }
+  .ge-sum-center b{ display:block; font-size:28px; line-height:1.15; }
+  .ge-sum-center span{ font-size:14px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .ge-sum-all{ display:block; text-align:right; font-size:13px; font-weight:700; }
+  .ge-sum-h{ margin:14px 2px 6px; font-size:13px; font-weight:800; color:var(--ink-soft); }
+  .ge-sum-stats{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; margin-top:12px; }
+  .ge-sum-stat{ padding:10px 12px; border-radius:14px; border:1px solid var(--line); background:var(--card); box-shadow:0 2px 0 var(--line); min-width:0; }
+  .ge-sum-stat span{ display:block; font-size:11.5px; font-weight:800; color:var(--ink-soft); }
+  .ge-sum-stat b{ display:block; font-size:15px; font-variant-numeric:tabular-nums; }
+  /* Kami 7: ranks 1–7 in a gold frame of their own */
+  .ge-k7{ position:relative; margin:14px 0 10px; padding:16px 8px 8px; border-radius:20px; border:2px solid #D4A73E;
+    background:linear-gradient(180deg, color-mix(in srgb, #F3C969 14%, var(--card)), transparent 70%); box-shadow:0 3px 0 color-mix(in srgb, #B8862E 45%, transparent); }
+  .ge-k7-tag{ position:absolute; top:-12px; left:14px; padding:2px 12px; border-radius:99px; background:linear-gradient(90deg, #B8862E, #F3C969);
+    color:#2A1A00; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+  .ge-k7 > .gel-row + .gel-row, .ge-k7 > .gel-row{ margin-top:0; }
+  .gel-rows > .ge-k7{ display:flex; flex-direction:column; gap:8px; }
+  .gel-rows > .ge-k7 + *{ margin-top:4px; }
+  .ge-sum .ge-k7 .gel-mini > *{ flex-basis:calc((100% - 12px) / 3); }
+  .ge-sum-five > *{ flex-basis:calc((100% - 24px) / 5) !important; }
+  .ge-sum-center{ display:flex; align-items:center; gap:14px; width:100%; margin:0 0 8px; padding:6px 8px; border:0; background:none;
+    text-align:left; color:var(--ink); font:inherit; cursor:pointer; }
+  .ge-sum-center .ge-sum-face{ border-color:#D4A73E; }
+  .ge-sum-center small{ color:#B8862E !important; }
+  .ge-sum-list{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:6px; }
+  .ge-sum-row{ display:grid; grid-template-columns:24px 28px minmax(0,1fr) auto; align-items:center; gap:6px; padding:6px 8px; border-radius:12px;
+    border:1px solid var(--line); background:var(--card); box-shadow:0 2px 0 var(--line); color:var(--ink); font:inherit; text-align:left; cursor:pointer; min-width:0; }
+  .ge-sum-row:active{ transform:translateY(2px); box-shadow:none; }
+  .ge-sum-row b{ font-size:12px; color:var(--t); text-align:center; }
+  .ge-sum-row .ge-sum-rface{ width:28px !important; height:28px !important; }
+  .ge-sum-row span{ font-size:13px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ge-sum-row small{ font-size:11px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  @media (max-width:420px){ .ge-sum-list{ grid-template-columns:1fr; } }
   .gel-mini{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:6px; }
   .gel-mini > *{ flex:0 0 calc((100% - 12px) / 3); }
   .gel-mini-c{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 4px 7px; border-radius:14px;
@@ -10143,6 +10180,10 @@ function geRemember(round){
    being called right now, and the ranks around her — or, with the round
    complete, the Senbatsu. The full list is one tap away. */
 const GE_TONE = { gold:'#B8862E', silver:'#76828E', bronze:'#9A5733' };
+const GE_HOME_SUMMARY = true;
+/* Ranks 1–7 are "Kami 7": wherever they are listed, they sit in a frame of their own. */
+const GE_KAMI7 = 7;
+const geKami7 = (inner, en) => `<div class="ge-k7"><span class="ge-k7-tag">Kami 7</span>${inner}</div>`;   // the final results' summary on the home page — the owner says when it goes
 function renderHomeGE(opt = {}){
   const live = geLiveRound(), done = GE_ROUNDS.filter(r => geHasData(r.id));
   const round = live || done[done.length - 1];
@@ -10153,6 +10194,10 @@ function renderHomeGE(opt = {}){
   const tone = n => GE_TONE[(GE_BANDS.find(b => n >= b.from && n <= b.to) || GE_BANDS[0]).tone];
   const at = doc.at && doc.at.seconds ? new Date(doc.at.seconds * 1000) : null;
   const hhmm = at ? `${String(at.getHours()).padStart(2, '0')}:${String(at.getMinutes()).padStart(2, '0')}` : '';
+  // the final round, once read out in full, stays on the home page as a summary until the owner
+  // says to take it down (set GE_HOME_SUMMARY to false)
+  if(!opt.compact && round.id === GE_ROUNDS[GE_ROUNDS.length - 1].id && !live && told >= GE_SEATS)
+    return GE_HOME_SUMMARY ? renderGESummary(round.id) : '';
   const strip = `<button class="gel-strip feed-ge-strip" data-action="open-ge-results">
     <div class="gel-strip-top">${live ? '<span class="gel-live"><i></i>LIVE</span>' : ''}${hhmm ? `<small>${en ? 'Updated' : 'อัปเดต'} ${hhmm}${en ? '' : ' น.'}</small>` : ''}</div>
     <h2>${en ? 'GE2026 results' : 'ผลเลือกตั้ง GE2026'} · ${geRoundLabel(round)}</h2>
@@ -10182,20 +10227,63 @@ function renderHomeGE(opt = {}){
   } else if(live){
     list = known.slice(0, 5);        // being read out, nothing marked as "now" yet: the latest called
   } else if(!opt.compact){
-    list = [];      // the home page keeps to the strip once a round is done; the ranks are a tap away
+    // a quick result read out in full stays on the home page, all 36, for a day; after that only the strip
+    list = told >= GE_SEATS && at && Date.now() - at.getTime() < 24 * 3600000 ? known : [];
   } else {
     const top = known.filter(n => n <= 12);
     list = top.length ? top : known.slice(0, 5);
   }
-  // compact (the GE page's overview): the top seven in full, the rest of the Senbatsu as small tiles
+  // a long list (the GE page's overview, or the home page after a round): the top seven in full, the rest as small tiles
   let mini = '';
-  if(opt.compact && !now && list.length > 7){
+  if(!now && list.length > 7){
     mini = `<div class="gel-mini">${list.slice(7).map(n => { const s = slots[n], m = s.id && getMember(s.id);
       return m ? `<button class="gel-mini-c" style="--t:${tone(n)}" data-action="open-member" data-id="${m.id}"><b>${n}</b>${geFace(m, 'gel-mini-face')}<span>${escapeHtml(m.name)}</span><small>${geVotes(s.v)}</small></button>`
         : `<span class="gel-mini-c is-pending" style="--t:${tone(n)}"><b>${n}</b><span class="gel-q gel-mini-face">?</span><span>${en ? 'Announcing' : 'กำลังประกาศ'}</span><small>${geVotes(s.v)}</small></span>`; }).join('')}</div>`;
     list = list.slice(0, 7);
   }
-  return `<section class="feed-block feed-ge${opt.compact ? ' is-compact' : ''}">${strip}${now}${list.length ? `<div class="gel-rows">${list.map(row).join('')}</div>` : ''}${mini}</section>`;
+  const k7 = !now ? list.filter(n => n <= GE_KAMI7) : [];
+  const rows = (k7.length ? geKami7(k7.map(row).join(''), en) : '') + list.filter(n => !k7.includes(n)).map(row).join('');
+  return `<section class="feed-block feed-ge${opt.compact ? ' is-compact' : ''}">${strip}${now}${rows ? `<div class="gel-rows">${rows}</div>` : ''}${mini}</section>`;
+}
+
+/* The election, summed up on the home page once it is over: the Center, the
+   rest of the Senbatsu, a few numbers, and the Under and Next Girls by name. */
+function renderGESummary(id){
+  const en = isEN(), slots = geSlots(id), first = geSlots(GE_ROUNDS[0].id);
+  const M = n => slots[n] && slots[n].id && getMember(slots[n].id);
+  const V = n => geVotes(slots[n] && slots[n].v);
+  const tone = n => GE_TONE[(GE_BANDS.find(b => n >= b.from && n <= b.to) || GE_BANDS[0]).tone];
+  const range = (a, b) => { const r = []; for(let n = a; n <= b; n++) r.push(n); return r; };
+  const c = M(1);
+  const sen = range(1, 12).map(M).filter(Boolean);
+  const bnk = sen.filter(m => m.groupId === 'bnk48').length, cgm = sen.length - bnk;
+  let total = 0; for(let n = 1; n <= GE_SEATS; n++) total += (slots[n] && typeof slots[n].v === 'number') ? slots[n].v : 0;
+  // the biggest climb from the first quick result to the final
+  const was = {}; Object.keys(first).forEach(k => { if(first[k] && first[k].id) was[first[k].id] = +k; });
+  let climb = null;
+  for(let n = 1; n <= GE_SEATS; n++){ const m = M(n); if(m && was[m.id] && was[m.id] - n > ((climb && climb.d) || 0)) climb = { m, d:was[m.id] - n, from:was[m.id], to:n }; }
+  const tile = n => { const m = M(n); return m ? `<button class="gel-mini-c" style="--t:${tone(n)}" data-action="open-member" data-id="${m.id}"><b>${n}</b>${geFace(m, 'gel-mini-face')}<span>${escapeHtml(m.name)}</span><small>${V(n)}</small></button>` : ''; };
+  const line = n => { const m = M(n); return m ? `<button class="ge-sum-row" style="--t:${tone(n)}" data-action="open-member" data-id="${m.id}"><b>${n}</b>${geFace(m, 'ge-sum-rface')}<span>${escapeHtml(m.name)}</span><small>${V(n)}</small></button>` : ''; };
+  const stat = (k, v) => `<div class="ge-sum-stat"><span>${k}</span><b>${v}</b></div>`;
+  const center = c ? `<button class="ge-sum-center" data-action="open-member" data-id="${c.id}">${geFace(c, 'ge-sum-face')}<div><small>${en ? 'No. 1 · Center' : 'อันดับ 1 · เซ็นเตอร์'}</small><b>${escapeHtml(c.name)}</b>
+      <span>${V(1)} ${en ? 'votes' : 'คะแนน'}</span></div></button>` : '';
+  return `<section class="feed-block feed-ge ge-sum">
+    <button class="gel-strip ge-sum-top" data-action="open-ge-results">
+      <small class="ge-sum-kicker">SENBATSU GENERAL ELECTION 2026</small>
+      <h2>${en ? 'GE2026 · the results' : 'สรุปผล GE2026'}</h2>
+      <span class="ge-sum-all">${en ? 'All 36 ranks →' : 'ดูผลทั้ง 36 อันดับ →'}</span>
+    </button>
+    ${geKami7(`${center}<div class="gel-mini">${range(2, 7).map(tile).join('')}</div>`, en)}
+    <p class="ge-sum-h">Senbatsu · ${en ? 'ranks 8–12' : 'อันดับ 8–12'}</p>
+    <div class="gel-mini ge-sum-five">${range(8, 12).map(tile).join('')}</div>
+    <div class="ge-sum-stats">
+      ${stat(en ? 'In the Senbatsu' : 'ใน Senbatsu', `BNK48 ${bnk} · CGM48 ${cgm}`)}
+      ${total ? stat(en ? 'Votes, all 36' : 'คะแนนรวม 36 อันดับ', geVotes(Math.round(total * 100) / 100)) : ''}
+      ${climb ? stat(en ? `Climbed most since ${geRoundLabel(GE_ROUNDS[0])}` : `ขึ้นมากสุดจาก${geRoundLabel(GE_ROUNDS[0])}`, `${escapeHtml(climb.m.name)} ▲${climb.d} (${climb.from}→${climb.to})`) : ''}
+    </div>
+    <p class="ge-sum-h">Under Girls · 13–24</p><div class="ge-sum-list">${range(13, 24).map(line).join('')}</div>
+    <p class="ge-sum-h">Next Girls · 25–36</p><div class="ge-sum-list">${range(25, 36).map(line).join('')}</div>
+  </section>`;
 }
 
 function renderGEResults(){
@@ -10249,7 +10337,7 @@ function renderGEResults(){
     const ranks = []; for(let n = b.from; n <= b.to; n++) ranks.push(n);
     const known = ranks.filter(n => slots[n] && (slots[n].id || slots[n].v != null));
     const waiting = ranks.filter(n => !known.includes(n));
-    const rows = known.map(n => {
+    const rowOf = n => {
       const s = slots[n], m = s.id && getMember(s.id);
       const fresh = geFresh(round.id, n, s) ? ' is-fresh' : '';
       const bar = s.v ? `<span class="gel-bar" style="width:${Math.min(100, s.v / top * 100)}%"></span>` : '';
@@ -10259,7 +10347,9 @@ function renderGEResults(){
       return `<button class="gel-row${fresh}" data-action="open-member" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
         <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small></span>
         <span class="gel-v"><b>${geVotes(s.v)}</b>${geMove(prev, m.id, n)}</span>${bar}</button>`;
-    }).join('');
+    };
+    const k7 = known.filter(n => n <= GE_KAMI7);
+    const rows = (k7.length ? geKami7(k7.map(rowOf).join(''), en) : '') + known.filter(n => n > GE_KAMI7).map(rowOf).join('');
     return `<section class="gel-band is-${b.tone}">
       <div class="gel-band-h">${b.name}<small>${en ? `Ranks ${b.from}–${b.to}` : `อันดับ ${b.from}–${b.to}`}</small></div>
       ${waiting.length ? `<div class="gel-seats">${waiting.map(n => `<span>${n}</span>`).join('')}</div>
