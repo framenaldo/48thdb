@@ -2834,6 +2834,22 @@
   .gel-mv.is-up{ color:#1E8E4E; background:#E3F6EA; } .gel-mv.is-dn{ color:#C62B2B; background:#FBE7E7; }
   .gel-mv.is-eq{ color:var(--ink-soft); background:var(--paper-dim); } .gel-mv.is-new{ color:#7A4BC4; background:#EFE6FB; }
   .gel-foot{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:12px; }
+  /* What changed since the round before */
+  .gec-ch{ margin:12px 0 4px; }
+  .gec-ch-h{ margin:0 2px 8px; font-size:13px; font-weight:800; color:var(--ink-soft); }
+  .gec-ch-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+  @media (min-width:760px){ .gec-ch-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+  .gec-ch-box{ padding:10px; border-radius:14px; border:1px solid var(--line); background:var(--card); box-shadow:0 2px 0 var(--line); min-width:0; }
+  .gec-ch-box h4{ margin:0 0 6px; font-size:12px; font-weight:800; }
+  .gec-ch-box.is-up h4, .gec-ch-box.is-up span{ color:#1E8E4E; }
+  .gec-ch-box.is-gain h4, .gec-ch-box.is-gain span{ color:#B8862E; }
+  .gec-ch-box.is-new h4, .gec-ch-box.is-new span{ color:#7A4BC4; }
+  .gec-ch-box.is-dn h4, .gec-ch-box.is-dn span{ color:#C62B2B; }
+  .gec-ch-i{ display:grid; grid-template-columns:24px minmax(0,1fr); grid-template-rows:auto auto; column-gap:7px; align-items:center;
+    width:100%; padding:4px 0; border:0; background:none; text-align:left; cursor:pointer; color:var(--ink); font:inherit; }
+  .gec-ch-i .gec-ch-face{ grid-row:1 / 3; width:24px; height:24px; }
+  .gec-ch-i b{ font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gec-ch-i span{ font-size:11.5px; font-weight:800; font-variant-numeric:tabular-nums; }
   .feed-ge-strip{ display:block; width:100%; border:0; font:inherit; text-align:left; cursor:pointer;
     box-shadow:0 4px 0 rgba(0,0,0,.25); transition:transform .12s ease, box-shadow .12s ease; }
   .feed-ge-strip:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.25); }
@@ -3121,7 +3137,6 @@
   .fb-del{ border:0; background:none; color:var(--ink-soft); cursor:pointer; font-size:14px; padding:2px 4px; }
   .gec-thb{ margin:-6px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .gec-thb label{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-weight:600; }
-  .gec-price{ width:52px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--paper-dim); border:1.5px solid var(--line); border-radius:8px; padding:2px 4px; }
   .gec-vs em + em{ margin-top:1px; }
   .gec-tip{ margin:-4px 2px 8px; }
   .gec-w{ font:inherit; font-family:ui-monospace,Menlo,monospace; font-size:12.5px; color:var(--ink); background:var(--card); border:1.5px solid var(--line);
@@ -9960,7 +9975,7 @@ function renderGEPage(){
 
   let body = '';
   if(tab === 'results') body = renderGEResults();
-  else if(tab === 'chain') body = renderGEChain(true);
+  else if(tab === 'chain') body = renderGEChain();
   else if(tab === 'candidates') body = renderGECandidates();
   else if(tab === 'timeline') body = geSchedSwitch(tab, en) + renderTimelinePage(true);
   else if(tab === 'events'){
@@ -10068,6 +10083,34 @@ function geMove(prev, mid, rank){
   return was > rank ? `<span class="gel-mv is-up">▲ ${en ? 'from' : 'จาก'} ${was}</span>`
     : `<span class="gel-mv is-dn">▼ ${en ? 'from' : 'จาก'} ${was}</span>`;
 }
+/* What changed since the round before, in four short lists: who climbed most,
+   who gained most votes, who is new to the 36 and who has dropped out of it.
+   Only names both rounds agree on are compared; a dropped name counts only
+   once this round is complete, since a missing name may still be read out. */
+function geChanges(id){
+  const i = GE_ROUNDS.findIndex(r => r.id === id);
+  if(i < 1) return '';
+  const was = geSlots(GE_ROUNDS[i - 1].id), now = geSlots(id), en = isEN();
+  const pick = s => { const o = {}; Object.keys(s).forEach(k => { if(s[k] && s[k].id) o[s[k].id] = { n:+k, v:s[k].v }; }); return o; };
+  const A = pick(was), B = pick(now);
+  if(!Object.keys(A).length || !Object.keys(B).length) return '';
+  const both = Object.keys(B).filter(m => A[m] && getMember(m));
+  const up = both.map(m => ({ m, d:A[m].n - B[m].n })).filter(x => x.d > 0).sort((a, b) => b.d - a.d || B[a.m].n - B[b.m].n).slice(0, 3);
+  const gain = both.filter(m => typeof A[m].v === 'number' && typeof B[m].v === 'number')
+    .map(m => ({ m, d:B[m].v - A[m].v })).filter(x => x.d > 0).sort((a, b) => b.d - a.d).slice(0, 3);
+  const fresh = Object.keys(B).filter(m => !A[m] && getMember(m)).sort((a, b) => B[a].n - B[b].n);
+  const gone = geAnnounced(id) >= GE_SEATS ? Object.keys(A).filter(m => !B[m] && getMember(m)).sort((a, b) => A[a].n - A[b].n) : [];
+  const nm = m => escapeHtml(getMember(m).name);
+  const item = (m, tail) => `<button class="gec-ch-i" data-action="open-member" data-id="${m}">${geFace(getMember(m), 'gec-ch-face')}<b>${nm(m)}</b>${tail}</button>`;
+  const box = (title, cls, rows) => rows.length ? `<div class="gec-ch-box ${cls}"><h4>${title}</h4>${rows.join('')}</div>` : '';
+  const boxes = [
+    box(en ? 'Climbed most' : 'ขึ้นมากสุด', 'is-up', up.map(x => item(x.m, `<span>▲${x.d} · ${A[x.m].n}→${B[x.m].n}</span>`))),
+    box(en ? 'Most votes gained' : 'คะแนนเพิ่มมากสุด', 'is-gain', gain.map(x => item(x.m, `<span>+${geVotes(Math.round(x.d * 100) / 100)}</span>`))),
+    box(en ? 'New in the 36' : 'เข้ามาใหม่', 'is-new', fresh.map(m => item(m, `<span>${en ? 'now' : 'อันดับ'} ${B[m].n}</span>`))),
+    box(en ? 'Dropped out' : 'หลุดจาก 36', 'is-dn', gone.map(m => item(m, `<span>${en ? 'was' : 'เดิม'} ${A[m].n}</span>`))),
+  ].join('');
+  return boxes ? `<section class="gec-ch"><p class="gec-ch-h">${en ? 'Since' : 'เทียบกับ'} ${geRoundLabel(GE_ROUNDS[i - 1])}</p><div class="gec-ch-grid">${boxes}</div></section>` : '';
+}
 // scores can carry two decimals (1,724.50); whole ones print without
 const geVotes = v => (typeof v === 'number' && isFinite(v))
   ? v.toLocaleString('en-US', Number.isInteger(v) ? {} : { minimumFractionDigits:2, maximumFractionDigits:2 }) : '';
@@ -10135,7 +10178,10 @@ function renderHomeGE(opt = {}){
       <div class="gel-now-who">${m ? `<b>${escapeHtml(m.name)}</b>` : `<b class="gel-dots">${en ? 'Announcing' : 'กำลังประกาศ'}<i>.</i><i>.</i><i>.</i></b>`}
         ${s.v != null ? `<span>${geVotes(s.v)} <small>${en ? 'votes' : 'คะแนน'}</small></span>` : ''}</div>
       ${m ? geMove(prev, m.id, last) : ''}</div>`;
-    list = known.filter(n => n > last).slice(0, 4);          // the ones called just before
+    // the ones called just before — on the GE page; the home page keeps to who is on now
+    list = opt.compact ? known.filter(n => n > last).slice(0, 4) : [];
+  } else if(!opt.compact){
+    list = [];      // the home page keeps to the strip; the ranks are a tap away
   } else {
     const top = known.filter(n => n <= 12);
     list = top.length ? top : known.slice(0, 5);
@@ -10222,8 +10268,8 @@ function renderGEResults(){
   }).join('');
 
   const owner = state.isOwner ? `<div class="gel-owner-row"><button class="chip chip-link gel-owner" data-action="nav" data-view="gelive">${en ? 'Enter results →' : 'กรอกผล →'}</button>
-    <button class="chip chip-link gel-owner" data-action="nav" data-view="gechain">${en ? 'Vote on the chain →' : 'โหวตบนบล็อกเชน →'}</button></div>` : '';
-  const out = `<div class="gel">${strip}${now}${picks}${owner}<div class="gel-bands">${bands}</div>
+</div>` : '';
+  const out = `<div class="gel">${strip}${now}${picks}${owner}${geChanges(round.id)}<div class="gel-bands">${bands}</div>
     ${prev ? `<p class="gel-foot">${en ? 'Arrows compare with' : 'ลูกศรเทียบกับ'} ${geRoundLabel(GE_ROUNDS[GE_ROUNDS.findIndex(r => r.id === round.id) - 1])}</p>` : ''}</div>`;
   geRemember(round.id);
   return out;
@@ -10394,16 +10440,9 @@ async function gecSeed(){
 }
 /* GEC-CORE END */
 
-/* Baht, at a price per token the owner types in (it moves); kept in this browser. */
-let gecPrice = 68;
-try{ const v = parseFloat(localStorage.getItem('gec-price')); if(v > 0) gecPrice = v; }catch(e){}
-function gecSetPrice(v){
-  const n = parseFloat(String(v).replace(/,/g, ''));
-  if(!(n > 0)) return;
-  gecPrice = n;
-  try{ localStorage.setItem('gec-price', String(n)); }catch(e){}
-  gecDraw();
-}
+/* Baht, at what a token goes for (about 68 baht, and it holds steady). */
+const gecPrice = 68;
+try{ localStorage.removeItem('gec-price'); }catch(e){}
 const gecTok = (v, max = 2) => v.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:max });
 function gecBaht(t, en){
   const b = gecTok(t * gecPrice);
@@ -10461,7 +10500,7 @@ function renderGECWallet(en, N, hm){
   return `<div class="gea-card gec-wallet"${W && W.v ? ' data-gshare="wallet"' : ''}><h3 class="gec-h">${en ? 'Look up a wallet' : 'ดูกระเป๋า'}</h3>${form}${body}</div>`;
 }
 // the owner's desk, or the GE2026 page's vote tab and its overview
-const gecOnScreen = () => state.view === 'gechain' || (state.view === 'timeline' && ['chain', 'overview', undefined, null, ''].includes(state.geTab));
+const gecOnScreen = () => (state.view === 'timeline' && ['chain', 'overview', undefined, null, ''].includes(state.geTab));
 function gecKick(force){
   if(gecBusy || !gecOnScreen()) return;
   if(!force && Date.now() - gecAt < 2500 && gecLoad('ge2026')) return;
@@ -11044,18 +11083,17 @@ function gecStretchCard(en, pc, o){
     <p class="gec-sub">${en ? `GE2025 ran ${Math.round(L / 24)} days (${dt(d0)} – ${dt(d1)} 2025); this year runs ${Math.round((GEC_POLLS.ge2026.end - GEC_POLLS.ge2026.start) * GEC_BLOCK / 86400)}. It only reached half its final total on day ${Math.floor(half / 24) + 1} of ${Math.round(L / 24)}. That late surge is what the “on last year’s curve” figure assumes will happen again.`
       : `GE2025 เปิดโหวต ${Math.round(L / 24)} วัน (${dt(d0)} – ${dt(d1)} 2025) ปีนี้ ${Math.round((GEC_POLLS.ge2026.end - GEC_POLLS.ge2026.start) * GEC_BLOCK / 86400)} วัน · กว่ายอดจะถึงครึ่งหนึ่งของยอดสุดท้ายต้องรอถึงวันที่ ${Math.floor(half / 24) + 1} จาก ${Math.round(L / 24)} วัน · ตัวเลข “ถ้าเดินตามเส้นปีที่แล้ว” คือสมมติว่าช่วงโค้งสุดท้ายแบบนี้จะเกิดขึ้นอีก`}</p></div>`;
 }
-function renderGEChain(embed){
+function renderGEChain(){
   const en = isEN();
-  if(!embed && !state.isOwner) return `<section class="gea"><div class="empty-state">${en ? 'This page is for the site owner.' : 'หน้านี้สำหรับเจ้าของเว็บเท่านั้น'}</div></section>`;
   gecKick();
   const p = GEC_POLLS.ge2026, d = gecLoad('ge2026'), o = gecLoad('ge2025');
   const N = v => Math.round(v).toLocaleString('en-US');
   const pc = v => (v * 100).toFixed(v < .1 ? 1 : 0) + '%';
   const hms = ms => { const t = new Date(ms); return [t.getHours(), t.getMinutes(), t.getSeconds()].map(v => String(v).padStart(2, '0')).join(':'); };
   const hm = ms => { const t = new Date(Math.round(ms / 60000) * 60000); return `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`; };
-  const head = `${embed ? '' : `<div class="gea-head"><button class="chip" data-action="ge-back">←</button><h2>${en ? 'The vote on the chain' : 'โหวตบนบล็อกเชน'}</h2><span class="gea-lock">${en ? 'Owner only' : 'เฉพาะเจ้าของเว็บ'}</span></div>`}
+  const head = `
     <div class="gec-status"><span>${d ? `<i class="gec-live"></i>${en ? 'Live · up to ' : 'สด · ข้อมูลถึง '}<b class="gec-when">${hms(gecMs(p, d.to))}</b>${en ? '' : ' น.'} · ${en ? 'block' : 'บล็อก'} ${d.to.toLocaleString('en-US')}` : ''}</span>
-      ${embed ? '' : `<button class="chip" data-action="gec-refresh"${gecBusy ? ' disabled' : ''}>${en ? 'Refresh' : 'อัปเดต'}</button>`}</div>
+      </div>
     <div class="gec-prog"${gecBusy && gecProg ? '' : ' hidden'}><span></span><b><i></i></b></div>
     ${gecErr ? `<p class="gec-err">${en ? 'Could not reach the explorer: ' : 'ดึงข้อมูลไม่สำเร็จ: '}${escapeHtml(gecErr)}</p>` : ''}`;
   if(!d || !d.n) return `<section class="gea gec">${head}${gecAboutCard(en)}<div class="gea-card"><p class="gea-hint">${gecBusy ? (en ? 'Reading the votes…' : 'กำลังอ่านโหวต…') : (en ? 'No votes yet.' : 'ยังไม่มีโหวต')}</p></div></section>`;
@@ -11078,8 +11116,7 @@ function renderGEChain(embed){
   const row = (k, v) => `<div class="gec-mrow"><span>${k}</span><b>${v}</b></div>`;
   const money = `<div class="gea-card" data-gshare="money"><h3 class="gec-h">${en ? 'In baht' : 'มูลค่าเป็นเงิน'}</h3>
     <p class="gec-mbig">${gecBaht(d.sum, en)}</p>
-    ${state.isOwner ? `<label class="gec-mprice">${en ? 'Price' : 'ราคา'} <input class="gec-price" inputmode="decimal" value="${gecPrice}" onchange="gecSetPrice(this.value)" aria-label="${en ? 'Baht per token' : 'บาทต่อโทเคน'}"> ${en ? 'baht a token' : 'บาท/โทเคน'}</label>`
-      : `<p class="gec-mprice">${en ? `At ${gecPrice} baht a token` : `คิดที่ราคา ${gecPrice} บาท/โทเคน`}</p>`}
+    <p class="gec-mprice">${en ? `At ${gecPrice} baht a token` : `คิดที่ราคา ${gecPrice} บาท/โทเคน`}</p>
     <div class="gec-mrows">
       ${row(en ? 'Per wallet' : 'เฉลี่ยต่อกระเป๋า', gecBaht(d.sum / wl.length, en))}
       ${row(en ? 'Per vote' : 'เฉลี่ยต่อครั้ง', gecBaht(d.sum / d.n, en))}
@@ -11186,7 +11223,6 @@ function renderGEAdmin(){
   }).join('');
   return `<section class="gea">
     <div class="gea-head"><button class="chip" data-action="ge-back">←</button><h2>${en ? 'Live results' : 'รายงานผลสด'}</h2><span class="gea-lock">${en ? 'Owner only' : 'เฉพาะเจ้าของเว็บ'}</span></div>
-    <button class="chip chip-link gec-link" data-action="nav" data-view="gechain">${en ? 'The vote on the chain →' : 'โหวตบนบล็อกเชน →'}</button>
     <div class="gea-card">${seg}${toggle}</div>
     <p class="gea-hint">${en ? 'Type the votes and press Enter — they go up at once. Then the name when it is read out; pick from the list and Enter. Photo, team and arrows fill themselves. Anything can be typed over.'
       : 'ใส่คะแนนแล้วกด Enter คะแนนขึ้นเว็บทันที แล้วค่อยพิมพ์ชื่อตอนเขาประกาศ เลือกจากรายการแล้วกด Enter · รูป ทีม และลูกศรขึ้น/ลงดึงให้เอง · กรอกผิดพิมพ์ทับได้ตลอด'}</p>
@@ -15032,7 +15068,6 @@ function renderMain(){
     state.view==='feed' ? renderFeed() :
     state.view==='timeline' ? renderGEPage() :
     state.view==='gelive' ? renderGEAdmin() :
-    state.view==='gechain' ? renderGEChain() :
     state.view==='shop' ? renderShopPage() :
     state.view==='calendar' ? renderCalendarPage() :
     state.view==='browse' ? renderBrowse() :
@@ -15076,7 +15111,7 @@ function renderMain(){
   hb('.cal-btn', state.view === 'calendar'); hb('.shop-btn:not(.cal-btn)', state.view === 'shop'); hb('.ge-btn', state.view === 'timeline');
   if(state.view === 'stats') addBoxShareButtons(main);
   if(state.view === 'gelive') bindGEAdmin();
-  if(state.view === 'gechain' || (state.view === 'timeline' && state.geTab === 'chain')) gecAddShare(main);
+  if(state.view === 'timeline' && state.geTab === 'chain') gecAddShare(main);
   attachMainEvents();
   startBirthdayFireworks();
   bindEdgeFades();
@@ -15445,7 +15480,6 @@ function urlForSnapshot(snap){
   else if(snap.view === 'timeline' && snap.geTab === 'results') p.set('v', 'results');
   else if(snap.view === 'timeline' && snap.geTab === 'chain') p.set('v', 'vote');
   else if(snap.view === 'gelive') p.set('v', 'gelive');
-  else if(snap.view === 'gechain') p.set('v', 'gechain');
   // not one to share, but a reload should land back on it rather than on Home
   else if(snap.view === 'profile') p.set('v', 'profile');
   else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view))
@@ -15489,7 +15523,7 @@ function applyUrlToState(){
   if(view === 'results'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results'; return; }
   if(view === 'vote'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; return; }
   if(view === 'gelive'){ state.view = 'gelive'; return; }
-  if(view === 'gechain'){ state.view = 'gechain'; return; }
+  if(view === 'gechain'){ state.view = 'timeline'; state.geTab = 'chain'; return; }   // the owner's old copy, now the public tab
   if(view === 'profile'){ state.view = 'profile'; return; }
   if(view && SHAREABLE_VIEWS.includes(view)){ state.view = view; if(view === 'timeline') state.timelineId = 'ge2026'; }
 }
@@ -16743,7 +16777,9 @@ function shareSubject(){
   }
   const m = state.selectedId ? getMember(state.selectedId) : null;
   const ev = state.selectedEvent ? SEED_SCHEDULE.find(x => x.id === state.selectedEvent) : null;
-  if(m) return { kind:'member', m, url, title:`${nickName(m)} — 48thDb`, file:`48thdb-${m.name || m.id}` };
+  // /m/<id> is her page of its own, so a chat shows her in the preview; ?go sends people on to this sheet
+  if(m){ const page = location.origin + '/m/' + m.id, link = page + '?go';
+    return { kind:'member', m, url:page, link, title:`${nickName(m)} — 48thDb`, file:`48thdb-${m.name || m.id}` }; }
   // the festival sheet on its booth plan shares the plan itself, for the day and hour on screen
   if(ev && ev.boothPlan === 'fanfest' && state.ffTab !== 'acts' && document.querySelector('.modal-scroll .ff-board')){
     const d = FF_DAYS[state.ffDay] ? state.ffDay : 0, sl = FF_DAYS[d].slots[state.ffSlot] ? state.ffSlot : null;
@@ -17668,7 +17704,6 @@ function bindDelegatedEvents(){
       state.geAdminRound = el.dataset.value;
       renderMain();
     }
-    else if(action==='gec-refresh'){ gecKick(true); renderMain(); }
     else if(action==='gec-wallet'){ gecOpenWallet(el.dataset.id); }
     else if(action==='gec-about'){ gecAbout = !gecAbout; gecDraw(); }
     else if(action==='gec-win'){ gecWinLoad(gecWinRange(id)); }

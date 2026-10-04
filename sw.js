@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v12';
+const VERSION = 'v13';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
@@ -44,7 +44,9 @@ async function pageFirst(request) {
   const cache = await caches.open(PAGES);
   try {
     const fresh = await fetch(request);
-    if (fresh && fresh.ok) cache.put('./index.html', fresh.clone());
+    // only the app itself is the offline copy — not /m/<id> or /p/<id>, which are pages of their own
+    const path = new URL(request.url).pathname;
+    if (fresh && fresh.ok && (path === '/' || path === '/index.html')) cache.put('./index.html', fresh.clone());
     return fresh;
   } catch (err) {
     return (await cache.match('./index.html')) || (await cache.match('./')) || Response.error();

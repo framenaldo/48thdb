@@ -37,7 +37,8 @@ the Firebase CLI from the owner's machine.
 ## The GE vote on the chain
 
 Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`?v=vote`) and a
-teaser on its overview. `?v=gechain` is the owner's copy (price box, refresh).
+teaser on its overview. (`?v=gechain`, the owner's old copy, now opens that tab;
+the baht figure is fixed at 68 a token — `gecPrice`.)
 A cold start reads `data/chain-ge2025.json` (final) and `data/chain-ge2026.json`
 (left nightly by `scripts/collect-chain.mjs`, which runs the page's own
 GEC-CORE block), then follows the chain. The home page shows a light card
