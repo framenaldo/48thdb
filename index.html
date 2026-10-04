@@ -10178,10 +10178,11 @@ function renderHomeGE(opt = {}){
       <div class="gel-now-who">${m ? `<b>${escapeHtml(m.name)}</b>` : `<b class="gel-dots">${en ? 'Announcing' : 'กำลังประกาศ'}<i>.</i><i>.</i><i>.</i></b>`}
         ${s.v != null ? `<span>${geVotes(s.v)} <small>${en ? 'votes' : 'คะแนน'}</small></span>` : ''}</div>
       ${m ? geMove(prev, m.id, last) : ''}</div>`;
-    // the ones called just before — on the GE page; the home page keeps to who is on now
-    list = opt.compact ? known.filter(n => n > last).slice(0, 4) : [];
+    list = known.filter(n => n > last).slice(0, 4);          // the ones called just before
+  } else if(live){
+    list = known.slice(0, 5);        // being read out, nothing marked as "now" yet: the latest called
   } else if(!opt.compact){
-    list = [];      // the home page keeps to the strip; the ranks are a tap away
+    list = [];      // the home page keeps to the strip once a round is done; the ranks are a tap away
   } else {
     const top = known.filter(n => n <= 12);
     list = top.length ? top : known.slice(0, 5);
