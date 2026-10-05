@@ -2185,19 +2185,65 @@
   /* a date on the timeline opens its day */
   button.tlp-when{ border:0; background:none; font:inherit; font-size:12px; font-weight:800; cursor:pointer; }
   button.tlp-when:hover{ color:var(--pc, var(--ink)); text-decoration:underline; text-underline-offset:3px; }
-  .day-kicker{ margin:0; font-size:12px; font-weight:800; letter-spacing:.06em; color:var(--ink-soft); padding-right:70px; }
-  .day-list{ display:flex; flex-direction:column; gap:8px; }
-  .day-row{
-    display:flex; flex-direction:column; gap:2px; width:100%; padding:10px 13px; text-align:left;
-    font:inherit; color:inherit; border:1px solid var(--line); border-left:4px solid var(--k); border-radius:14px;
-    background:color-mix(in srgb, var(--k) 6%, transparent);
+  /* the day sheet: a phone calendar's day view */
+  .modal-glass-card.is-day-sheet{ height:calc(100% - 8px); }
+  .dv-head{ flex:none; padding:14px 12px 10px; border-bottom:1px solid var(--line); }
+  .dv-top{ display:flex; align-items:center; gap:8px; min-height:32px; padding:0 44px 0 6px; }
+  .dv-month{ font-size:17px; font-weight:800; }
+  .dv-today{ margin-left:auto; }
+  .dv-strip{ display:grid; grid-template-columns:20px repeat(7, 1fr) 20px; align-items:center; margin-top:8px; }
+  .dv-wk{ border:0; background:none; font:inherit; font-size:20px; font-weight:700; color:var(--ink-soft); cursor:pointer; padding:0; height:52px; }
+  .dv-day{ display:flex; flex-direction:column; align-items:center; gap:3px; border:0; background:none; font:inherit; color:var(--ink); cursor:pointer; padding:2px 0; -webkit-tap-highlight-color:transparent; }
+  .dv-day small{ font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .dv-day.is-weekend small{ color:var(--bnk); }
+  .dv-num{ width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700;
+    border:1px solid transparent; transition:transform .12s, background .15s; }
+  .dv-day:active .dv-num{ transform:scale(.9); }
+  .dv-day.is-today .dv-num{ color:var(--bnk); font-weight:800; border-color:color-mix(in srgb, var(--bnk) 45%, transparent); }
+  .dv-day.is-on .dv-num{ background:var(--bnk); color:#fff; border-color:var(--bnk); box-shadow:0 3px 0 color-mix(in srgb, var(--bnk) 45%, #000); }
+  .dv-dot{ width:5px; height:5px; border-radius:50%; background:var(--ink-soft); opacity:.7; }
+  .dv-dot.is-none{ visibility:hidden; }
+  .dv-date{ margin:8px 0 0; text-align:center; font-size:15px; font-weight:800; }
+  .dv-body{ flex:1; min-height:0; padding:0 0 24px; position:relative; }
+  .dv-body.is-from-right{ animation:dvFromRight .24s var(--ease-out, ease-out); }
+  .dv-body.is-from-left{ animation:dvFromLeft .24s var(--ease-out, ease-out); }
+  @keyframes dvFromRight{ from{ transform:translateX(22px); opacity:0; } }
+  @keyframes dvFromLeft{ from{ transform:translateX(-22px); opacity:0; } }
+  .dv-allday{ display:grid; grid-template-columns:44px 1fr; gap:6px; align-items:start; margin:10px 0 0; max-height:154px; overflow-y:auto; padding:2px 4px 4px 0; }
+  .dv-lab{ padding-top:6px; text-align:right; font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .dv-chips{ display:flex; flex-direction:column; gap:5px; min-width:0; }
+  .dv-none{ margin:18px 0 0; text-align:center; font-size:13.5px; color:var(--ink-soft); }
+  .dv-chip{
+    display:flex; align-items:center; gap:8px; width:100%; min-height:28px; padding:3px 12px; text-align:left;
+    font:inherit; color:inherit; border:1px solid color-mix(in srgb, var(--k) 40%, var(--line)); border-radius:999px;
+    background:color-mix(in srgb, var(--k) 16%, var(--card)); box-shadow:0 2px 0 color-mix(in srgb, var(--k) 30%, transparent);
   }
-  button.day-row{ cursor:pointer; }
-  button.day-row:hover{ background:color-mix(in srgb, var(--k) 13%, transparent); }
-  .day-main{ font-size:14.5px; font-weight:700; line-height:1.45; }
-  .day-main .ev-icon{ vertical-align:-4px; }
-  .day-sub{ font-size:12.5px; color:var(--ink-soft); line-height:1.45; }
-  .day-sub:empty{ display:none; }
+  button.dv-chip, button.dv-ev{ cursor:pointer; transition:transform .1s, box-shadow .1s; }
+  button.dv-chip:active, button.dv-ev:active{ transform:translateY(2px); box-shadow:none; }
+  .dv-chip-t{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:13px; font-weight:700; line-height:1.5; color:color-mix(in srgb, var(--k) 70%, var(--ink)); }
+  .dv-chip-s{ flex:none; max-width:45%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11.5px; color:var(--ink-soft); }
+  .dv-chip .ev-icon, .dv-ev .ev-icon{ vertical-align:-4px; }
+  .dv-grid{ position:relative; margin-top:14px; }
+  .dv-hr{ position:absolute; left:0; right:0; height:0; border-top:1px solid var(--line); margin-left:58px; }
+  .dv-hr span{ position:absolute; right:calc(100% + 8px); top:-8px; font-size:11.5px; font-weight:600; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .dv-evs{ position:absolute; top:0; bottom:0; left:62px; right:10px; }
+  .dv-ev{
+    position:absolute; top:var(--t); height:var(--h); left:calc(var(--c) * 100% / var(--n)); width:calc(100% / var(--n) - 4px);
+    display:flex; flex-direction:column; gap:1px; padding:4px 8px; overflow:hidden; text-align:left;
+    font:inherit; color:inherit; border:1px solid color-mix(in srgb, var(--k) 40%, var(--line)); border-left:4px solid var(--k); border-radius:10px;
+    background:color-mix(in srgb, var(--k) 16%, var(--card)); box-shadow:0 2px 0 color-mix(in srgb, var(--k) 30%, transparent);
+  }
+  .dv-ev-t{ font-size:13px; font-weight:700; line-height:1.35; color:color-mix(in srgb, var(--k) 70%, var(--ink));
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+  .dv-ev-s{ font-size:11.5px; color:var(--ink-soft); line-height:1.35; }
+  .dv-ev.is-mid .dv-ev-t{ -webkit-line-clamp:1; }
+  .dv-ev.is-mid .dv-ev-s{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dv-ev.is-short{ flex-direction:row; align-items:baseline; gap:6px; padding-top:5px; }
+  .dv-ev.is-short .dv-ev-t{ -webkit-line-clamp:1; flex:1; min-width:0; }
+  .dv-ev.is-short .dv-ev-s{ flex:none; white-space:nowrap; max-width:40%; overflow:hidden; text-overflow:ellipsis; }
+  .dv-now{ position:absolute; left:-4px; right:0; height:0; border-top:2px solid var(--bnk); z-index:1; pointer-events:none; }
+  .dv-now::before{ content:''; position:absolute; left:-4px; top:-5px; width:8px; height:8px; border-radius:50%; background:var(--bnk); }
+  .dv-now span{ position:absolute; right:calc(100% + 8px); top:-10px; padding:1px 5px; border-radius:6px; background:var(--bnk); color:#fff; font-size:10.5px; font-weight:800; font-variant-numeric:tabular-nums; }
   .day-tag{ display:inline-block; margin-right:4px; padding:1px 8px; border-radius:999px; background:var(--k); color:#fff; font-size:11px; font-weight:800; }
   /* the badge that gives a sheet its face */
   .evm-icon{
@@ -4117,7 +4163,7 @@
      accent picked for a light card is mixed toward white. */
   :root[data-theme="dark"]{ --on-fill:#1B1326; --ge-text:#FF8790; }
   :root[data-theme="dark"] :is(.badge-link, .kami-badge, .captain-badge, .work-centre,
-      .track-tag, .scope-btn.is-on, .calp-cell.is-today .calp-num){ color:var(--on-fill); }
+      .track-tag, .scope-btn.is-on, .calp-cell.is-today .calp-num, .dv-day.is-on .dv-num, .dv-now span){ color:var(--on-fill); }
   :root[data-theme="dark"] .kami-badge .crown-ico{ color:var(--on-fill); }
   :root[data-theme="dark"] .shop-price,
   :root[data-theme="dark"] .ge-shop-card small{ color:color-mix(in srgb, var(--c) 45%, #fff); }
@@ -12052,7 +12098,6 @@ function renderDayModal(){
     : ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
   const title = en ? `${DAYS_LONG[d.getDay()]} ${d.getDate()} ${EN_MONTHS[d.getMonth()]} ${d.getFullYear()}`
     : `${DAYS_LONG[d.getDay()]}ที่ ${d.getDate()} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear() + 543}`;
-  const hm = s => s && s.length > 10 ? s.slice(11, 16) + (en ? '' : ' น.') : '';
 
   const covering = SEED_SCHEDULE.filter(e => e.start <= iso && eventLastDay(e) >= iso)
     .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
@@ -12066,14 +12111,15 @@ function renderDayModal(){
 
   // tickets and merchandise opening or closing on this day
   const sales = [];
+  const tOf = s => s && s.length > 10 ? s.slice(11, 16) : '';
   for(const e of SEED_SCHEDULE){
     if(e.sales){
-      if(e.sales.from && e.sales.from.slice(0,10) === iso) sales.push({ e, what: en ? 'Tickets on sale' : 'เปิดขายบัตร', at: hm(e.sales.from), kind:'open' });
-      if(e.sales.to && e.sales.to.slice(0,10) === iso) sales.push({ e, what: en ? 'Ticket sales close' : 'ปิดขายบัตร', at: hm(e.sales.to), kind:'close' });
+      if(e.sales.from && e.sales.from.slice(0,10) === iso) sales.push({ e, what: en ? 'Tickets on sale' : 'เปิดขายบัตร', t: tOf(e.sales.from), kind:'open' });
+      if(e.sales.to && e.sales.to.slice(0,10) === iso) sales.push({ e, what: en ? 'Ticket sales close' : 'ปิดขายบัตร', t: tOf(e.sales.to), kind:'close' });
     }
     if(e.shop){
-      if(e.shop.from.slice(0,10) === iso) sales.push({ e, what: en ? 'On sale' : 'เปิดขาย', at: hm(e.shop.from), kind:'open', name: e.shop.name });
-      if(e.shop.to.slice(0,10) === iso) sales.push({ e, what: en ? 'Sale closes' : 'ปิดขาย', at: hm(e.shop.to), kind:'close', name: e.shop.name });
+      if(e.shop.from.slice(0,10) === iso) sales.push({ e, what: en ? 'On sale' : 'เปิดขาย', t: tOf(e.shop.from), kind:'open', name: e.shop.name });
+      if(e.shop.to.slice(0,10) === iso) sales.push({ e, what: en ? 'Sale closes' : 'ปิดขาย', t: tOf(e.shop.to), kind:'close', name: e.shop.name });
     }
   }
 
@@ -12086,29 +12132,96 @@ function renderDayModal(){
   const byStep = new Set(steps.map(({ it }) => it.ev).filter(Boolean));
   const open = covering.filter(e => (e.period || e.shop) && !shown.has(e.id) && !byStep.has(e.id));
 
-  const evRow = e => `<button class="day-row" data-action="open-event" data-id="${e.id}"
-      style="--k:${e.poster ? e.poster.accent : (getGroup((e.groups || [])[0]) || {}).color || 'var(--ink-soft)'}">
-      <span class="day-main">${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}${renderLiveChip(e)}</span>
-      <span class="day-sub">${[e.time ? e.time + (en ? '' : ' น.') : '', e.part ? escapeHtml(e.part) : '',
-        e.venue ? escapeHtml(e.venue) : e.online ? escapeHtml(e.online) : ''].filter(Boolean).join(' · ')}</span>
-    </button>`;
-  const stepRow = ({ it }) => {
+  // Laid out like a phone calendar's day: the week across the top, what has no
+  // hour of its own in an all-day row, the rest placed on the hours.
+  const accent = e => e.poster ? e.poster.accent : (getGroup((e.groups || [])[0]) || {}).color || 'var(--ink-soft)';
+  const isHm = t => /^\d{2}:\d{2}/.test(t || '');
+  const mins = t => +t.slice(0, 2) * 60 + +t.slice(3, 5);
+  const hhmm = m => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+  const sub = parts => parts.filter(Boolean).map(escapeHtml).join(' · ');
+  const box = (o, cls, style) => o.id
+    ? `<button class="${cls}" data-action="${o.act || 'open-event'}" data-id="${escapeAttr(o.id)}" style="--k:${o.k};${style || ''}">${o.inner}</button>`
+    : `<div class="${cls}" style="--k:${o.k};${style || ''}">${o.inner}</div>`;
+  const chipInner = (head, s) => `<span class="dv-chip-t">${head}</span>${s ? `<span class="dv-chip-s">${s}</span>` : ''}`;
+  const allDay = [], timed = [];
+
+  for(const m of bdays){
+    const g = getGroup(m.groupId), age = d.getFullYear() - +m.birthday.slice(0,4);
+    allDay.push(box({ id:m.id, act:'open-member', k:g.color,
+      inner:chipInner(`🎂 ${en ? `${escapeHtml(nickName(m))}’s birthday` : `วันเกิด ${escapeHtml(nickName(m))}`}`,
+        age > 0 && age < 60 ? (en ? `turns ${age}` : `ครบ ${age} ปี`) : '') }, 'dv-chip'));
+  }
+  for(const e of outings){
+    const sl = e.slots ? slotsOn(e, iso) : [];
+    const from = sl.length ? sl[0].time : e.time;
+    const head = `${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}${renderLiveChip(e)}`;
+    const where = e.venue || e.online || '';
+    if(!isHm(from)){ allDay.push(box({ id:e.id, k:accent(e), inner:chipInner(head, escapeHtml(where.split(',')[0])) }, 'dv-chip')); continue; }
+    const until = sl.length ? sl[sl.length - 1].until : eventUntil(e);
+    const a = mins(from), b = isHm(until) && mins(until) > a ? mins(until) : a + 120;
+    timed.push({ a, b, id:e.id, k:accent(e), head, s:sub([isHm(until) ? `${from}–${until}` : from + (en ? '' : ' น.'), e.part, where]) });
+  }
+  for(const { it } of steps){
     const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
-    const inner = `<span class="day-main">${trackIcon(it, 'ev-icon')}${escapeHtml(it.title)}</span>
-      <span class="day-sub">${[it.time ? it.time + (en ? '' : ' น.') : '', it.part ? escapeHtml(it.part) : '', it.venue ? escapeHtml(it.venue) : ''].filter(Boolean).join(' · ')}</span>`;
-    return it.ev
-      ? `<button class="day-row" data-action="open-event" data-id="${it.ev}" style="--k:${tr.color}">${inner}</button>`
-      : `<div class="day-row" style="--k:${tr.color}">${inner}</div>`;
-  };
-  const saleRow = s => `<button class="day-row" data-action="open-event" data-id="${s.e.id}" style="--k:${s.kind === 'open' ? '#1B8E52' : '#C8231A'}">
-      <span class="day-main"><span class="day-tag">${s.what}${s.at ? ' ' + s.at : ''}</span> ${escapeHtml(s.name || s.e.title)}</span>
-    </button>`;
-  const block = (head, rows) => rows ? `<h3 class="evm-head">${head}</h3><div class="day-list">${rows}</div>` : '';
-  const nothing = !outings.length && !open.length && !steps.length && !sales.length && !bdays.length;
-  const bdayRow = m => { const g = getGroup(m.groupId); const age = d.getFullYear() - +m.birthday.slice(0,4);
-    return `<button class="day-row" data-action="open-member" data-id="${m.id}" style="--k:${g.color}">
-      <span class="day-main">🎂 ${escapeHtml(nickName(m))}</span>
-      <span class="day-sub">${g.name}${age > 0 && age < 60 ? ` · ${en ? `turns ${age}` : `ครบ ${age} ปี`}` : ''}</span></button>`; };
+    const head = `${trackIcon(it, 'ev-icon')}${escapeHtml(it.title)}`;
+    if(!isHm(it.time)){ allDay.push(box({ id:it.ev, k:tr.color, inner:chipInner(head, '') }, 'dv-chip')); continue; }
+    const linked = it.ev && SEED_SCHEDULE.find(e => e.id === it.ev), until = linked && eventUntil(linked);
+    const a = mins(it.time);
+    const b = isHm(until) && mins(until) > a ? mins(until) : a + (['event', 'concert', 'result'].includes(it.kind) ? 120 : 30);
+    timed.push({ a, b, id:it.ev, k:tr.color, head, s:sub([it.time + (en ? '' : ' น.'), it.part, it.venue]) });
+  }
+  for(const s of sales){
+    const k = s.kind === 'open' ? '#1B8E52' : '#C8231A';
+    const head = `<span class="day-tag">${s.what}</span> ${escapeHtml(s.name || s.e.title)}`;
+    if(!isHm(s.t)){ allDay.push(box({ id:s.e.id, k, inner:chipInner(head, '') }, 'dv-chip')); continue; }
+    timed.push({ a:mins(s.t), b:mins(s.t) + 30, id:s.e.id, k, head, s:s.t + (en ? '' : ' น.') });
+  }
+  for(const e of open){
+    const last = eventLastDay(e), ld = parseYmd(last);
+    allDay.push(box({ id:e.id, k:e.period && eventIconName(e) === 'token' ? TL_TRACKS.vote.color : accent(e),
+      inner:chipInner(`${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.bar || e.title)}`,
+        last === iso ? (en ? 'last day' : 'วันสุดท้าย') : `${en ? 'until' : 'ถึง'} ${ld.getDate()} ${M[ld.getMonth()]}`) }, 'dv-chip'));
+  }
+
+  // side by side where they overlap; a block is never drawn shorter than a line of text
+  const HOUR = 56, MIN_PX = 34;
+  timed.sort((x, y) => x.a - y.a || y.b - x.b);
+  for(const t of timed) t.ve = Math.max(t.b, t.a + MIN_PX / HOUR * 60);
+  let group = [], groupEnd = -1, cols = [];
+  const close = () => { for(const t of group) t.n = cols.length; group = []; cols = []; };
+  for(const t of timed){
+    if(t.a >= groupEnd) close();
+    let c = cols.findIndex(end => end <= t.a);
+    if(c < 0) c = cols.length;
+    cols[c] = t.ve; t.c = c; group.push(t); groupEnd = Math.max(groupEnd, t.ve);
+  }
+  close();
+
+  const todayIso = toYmd(todayStart());
+  const nowMin = iso === todayIso ? new Date().getHours() * 60 + new Date().getMinutes() : null;
+  const h0 = Math.min(8, ...timed.map(t => Math.floor(t.a / 60)), ...(nowMin != null ? [Math.floor(nowMin / 60)] : []));
+  const h1 = 24;
+  const y = m => (m - h0 * 60) / 60 * HOUR;
+  const hours = [];
+  for(let h = h0; h <= h1; h++) hours.push(`<div class="dv-hr" style="top:${y(h * 60)}px"><span>${String(h % 24).padStart(2, '0')}:00</span></div>`);
+  const blocks = timed.map(t => {
+    const hgt = Math.max(MIN_PX, y(t.b) - y(t.a)) - 3;
+    return box({ id:t.id, k:t.k, inner:`<span class="dv-ev-t">${t.head}</span>${t.s ? `<span class="dv-ev-s">${t.s}</span>` : ''}` },
+      `dv-ev${hgt < 44 ? ' is-short' : hgt < 80 ? ' is-mid' : ''}`, `--t:${y(t.a) + 1}px;--h:${hgt}px;--c:${t.c};--n:${t.n}`);
+  });
+  const nowLine = nowMin != null ? `<div class="dv-now" style="top:${y(nowMin)}px"><span>${hhmm(nowMin)}</span></div>` : '';
+
+  const { events: calEv, births: calBd } = calendarIndex();
+  const sun = new Date(d); sun.setDate(d.getDate() - d.getDay());
+  const LET = en ? ['S','M','T','W','T','F','S'] : ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  const shift = n => { const x = new Date(d); x.setDate(d.getDate() + n); return toYmd(x); };
+  const strip = LET.map((l, i) => {
+    const x = new Date(sun); x.setDate(sun.getDate() + i);
+    const xi = toYmd(x), has = (calEv[xi] || []).length || (calBd[xi.slice(5)] || []).length;
+    return `<button class="dv-day${xi === iso ? ' is-on' : ''}${xi === todayIso ? ' is-today' : ''}${i === 0 || i === 6 ? ' is-weekend' : ''}" data-action="day-go" data-id="${xi}">
+      <small>${l}</small><b class="dv-num">${x.getDate()}</b><i class="dv-dot${has ? '' : ' is-none'}"></i></button>`;
+  }).join('');
+  const monthName = en ? `${EN_MONTHS[d.getMonth()]} ${d.getFullYear()}` : `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear() + 543}`;
 
   return `
   <div class="modal-backdrop" data-action="close-modal">
@@ -12116,19 +12229,73 @@ function renderDayModal(){
       <button class="modal-close-btn" data-action="close-modal" title="${en ? 'Close' : 'ปิด'}" aria-label="${en ? 'Close' : 'ปิด'}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
-      <div class="modal-scroll">
-        <p class="day-kicker">${en ? 'On this day' : 'ในวันนี้'}</p>
-        <h2 class="evm-title">${title}</h2>
-        ${block(en ? 'Birthdays' : 'วันเกิด', bdays.map(bdayRow).join(''))}
-        ${block(en ? 'Events' : 'งานและกิจกรรม', outings.map(evRow).join(''))}
-        ${block(en ? 'Timeline' : 'ไทม์ไลน์ GE2026', steps.map(stepRow).join(''))}
-        ${block(en ? 'Tickets and merchandise' : 'เปิด–ปิดขายบัตรและสินค้า', sales.map(saleRow).join(''))}
-        ${block(en ? 'Open that day' : 'ช่วงที่เปิดอยู่ในวันนี้', open.map(evRow).join(''))}
-        ${nothing ? `<p class="muted-note">${en ? 'Nothing is on this day.' : 'ไม่มีงานในวันนี้'}</p>` : ''}
+      <div class="dv-head">
+        <div class="dv-top"><span class="dv-month">${monthName}</span>
+          ${iso !== todayIso ? `<button class="chip chip-link dv-today" data-action="day-go" data-id="${todayIso}">${en ? 'Today' : 'วันนี้'}</button>` : ''}</div>
+        <div class="dv-strip">
+          <button class="dv-wk" data-action="day-go" data-id="${shift(-7)}" aria-label="${en ? 'Previous week' : 'สัปดาห์ก่อน'}">‹</button>
+          ${strip}
+          <button class="dv-wk" data-action="day-go" data-id="${shift(7)}" aria-label="${en ? 'Next week' : 'สัปดาห์ถัดไป'}">›</button>
+        </div>
+        <h2 class="dv-date">${title}</h2>
+        ${allDay.length ? `<div class="dv-allday"><span class="dv-lab">${en ? 'all-day' : 'ทั้งวัน'}</span><div class="dv-chips">${allDay.join('')}</div></div>` : ''}
+      </div>
+      <div class="modal-scroll dv-body">
+        ${!allDay.length && !timed.length ? `<p class="dv-none">${en ? 'Nothing is on this day.' : 'ไม่มีงานในวันนี้'}</p>` : ''}
+        <div class="dv-grid" style="height:${y(h1 * 60) + 12}px">${hours.join('')}<div class="dv-evs">${blocks.join('')}${nowLine}</div></div>
       </div>
     </div>
   </div>`;
 }
+
+/* Changing day inside the sheet redraws only the sheet, sliding the hours in
+   from the side it came from; the history entry is replaced, not added to, so
+   back still closes the sheet. */
+function dayGo(iso){
+  const was = state.dayOf;
+  if(!iso || iso === was) return;
+  state.dayOf = iso;
+  const card = document.querySelector('.is-day-sheet');
+  const t = document.createElement('div'); t.innerHTML = renderDayModal();
+  const fresh = t.querySelector('.is-day-sheet');
+  if(card && fresh){
+    fresh.querySelector('.dv-body').classList.add(iso > was ? 'is-from-right' : 'is-from-left');
+    card.innerHTML = fresh.innerHTML;
+  } else renderMain();
+  dayScroll();
+  replaceHistory();
+}
+let _dvTop = null;
+document.addEventListener('scroll', e => {
+  if(e.target.classList && e.target.classList.contains('dv-body')) _dvTop = { day:state.dayOf, top:e.target.scrollTop };
+}, true);
+/* Open on the hours that matter: now, on today, or else the first thing on. */
+function dayScroll(){
+  const body = document.querySelector('.is-day-sheet .dv-body');
+  if(!body) return;
+  const top = n => n.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
+  const now = body.querySelector('.dv-now'), evs = [...body.querySelectorAll('.dv-ev')];
+  const at = now ? top(now) : evs.length ? Math.min(...evs.map(top)) : 0;
+  body.scrollTop = Math.max(0, at - 40);
+  _dvTop = { day:state.dayOf, top:body.scrollTop };
+}
+(() => {
+  let sx = null, sy = 0, inStrip = false;
+  document.addEventListener('touchstart', e => {
+    const el = e.target.closest && e.target.closest('.is-day-sheet .dv-body, .is-day-sheet .dv-strip');
+    const x = e.touches[0] ? e.touches[0].clientX : 0;
+    sx = el && e.touches.length === 1 && x > 28 && x < innerWidth - 28 ? x : null;
+    sy = e.touches[0] ? e.touches[0].clientY : 0; inStrip = !!(el && el.classList.contains('dv-strip'));
+  }, { passive:true });
+  document.addEventListener('touchend', e => {
+    if(sx == null || !state.dayOf) return;
+    const p = e.changedTouches[0], dx = p.clientX - sx, dy = p.clientY - sy;
+    sx = null;
+    if(Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const x = parseYmd(state.dayOf); x.setDate(x.getDate() + (dx < 0 ? 1 : -1) * (inStrip ? 7 : 1));
+    dayGo(toYmd(x));
+  }, { passive:true });
+})();
 
 /* ===== Event links the owner can correct from the page =====
    A stream, ticket or shop link that turns out wrong is fixed from the event's
@@ -15674,6 +15841,7 @@ function renderMain(){
       <button class="chip chip-link" data-action="nav" data-view="feed">${isEN() ? 'Back to home' : 'กลับหน้าแรก'}</button></div>`;
   }
   main.innerHTML = html;
+  if(_dvTop && _dvTop.day === state.dayOf){ const nb = main.querySelector('.is-day-sheet .dv-body'); if(nb) nb.scrollTop = _dvTop.top; }   // a redraw keeps the day sheet where it was
   const arrived = state.view !== _lastRenderedView;
   if(arrived){
     main.classList.remove('view-fade-in');
@@ -18812,8 +18980,9 @@ function bindDelegatedEvents(){
     }
     else if(action==='open-day'){
       state.dayOf = id;
-      renderMain(); pushHistory();
+      renderMain(); dayScroll(); pushHistory();
     }
+    else if(action==='day-go') dayGo(id);
     else if(action==='sub-tab'){
       state.view = el.dataset.view;
       leaveOverlays();
