@@ -9421,7 +9421,7 @@ function tickClock(){
   document.querySelectorAll('[data-live-from]').forEach(el=>{
     const ms = Date.now();
     el.classList.toggle('is-on', ms >= Number(el.dataset.liveFrom) && ms <= Number(el.dataset.liveTo));
-    el.hidden = ms > Number(el.dataset.liveTo);
+    el.hidden = ms < Number(el.dataset.liveFrom) || ms > Number(el.dataset.liveTo);
   });
   document.querySelectorAll('[data-replay-from]').forEach(el=>{
     el.hidden = Date.now() <= Number(el.dataset.replayFrom);
@@ -11728,6 +11728,10 @@ function renderLiveChip(ev, cls){
   if(!w) return '';
   const now = Date.now();
   const on = now >= w.from && now <= w.to;
+  // Before the show the badge stays out of sight — "LIVE" on a show that has
+  // not started reads as if it were on now. The stream icon by the title
+  // links to the channel all along; the clock tick shows the badge on time.
+  const early = now < w.from ? ' hidden' : '';
   const air = liveOnAir(ev);
   // Confirmed on air: the badge says so and goes straight to that stream —
   // the event's own video when one was given, else what the channel is airing.
@@ -11740,13 +11744,13 @@ function renderLiveChip(ev, cls){
   const replay = isReplayLink(ev.stream.url) ? `<a class="live-chip is-replay${cls ? ' ' + cls : ''}" href="${escapeAttr(ev.stream.url)}"
     target="_blank" rel="noopener noreferrer" data-replay-from="${w.to}"${now > w.to ? '' : ' hidden'}>ดูย้อนหลัง</a>` : '';
   if(now > w.to) return replay;
-  // The show's own video was given: the badge opens it, before and during the
-  // show, whether or not the channel check has seen it go on air yet.
+  // The show's own video was given: the badge opens it during the show,
+  // whether or not the channel check has seen it go on air yet.
   if(replay) return replay + `<a class="live-chip is-link${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}" href="${escapeAttr(ev.stream.url)}"
-    target="_blank" rel="noopener noreferrer" data-live-from="${w.from}" data-live-to="${w.to}"
+    target="_blank" rel="noopener noreferrer" data-live-from="${w.from}" data-live-to="${w.to}"${early}
     title="${escapeAttr(`ดูถ่ายทอดสดทาง ${ev.stream.label || 'YouTube'}`)}">LIVE · ดูไลฟ์</a>`;
   return replay + `<span class="live-chip${cls ? ' ' + cls : ''}${on ? ' is-on' : ''}"
-    data-live-from="${w.from}" data-live-to="${w.to}"
+    data-live-from="${w.from}" data-live-to="${w.to}"${early}
     title="${escapeAttr(ev.stream.label || '')}">LIVE</span>`;
 }
 function hostOf(url){ try { return new URL(url).hostname; } catch(e){ return ''; } }
