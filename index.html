@@ -5183,7 +5183,7 @@ const SEED_SCHEDULE = [
         '01. Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ',
         '02. Kegareteiru Shinjitsu – ความจริงสีเทา',
         '03. Aisuru Hito – เธอ',
-        '04. Yobisute Fantasy – เรียกชื่อฉันที ใจไม่ดีแล้ว!',
+        '04. Yobisute Fantasy – เรียกชื่อที ใจไม่ดีแล้ว!',
         '05.–08. เวอร์ชันบรรเลง (off vocal)'] },
       { head:'รูปแบบที่วางจำหน่าย', lines:[
         'CD Edition + บัตร Handshake Event — 420 บาท (จำนวนจำกัด)',
@@ -6132,6 +6132,23 @@ const SEED_SPECIALS = [
       { track:'รำวง Matsuri', centers:[],
         members:['bnk-hoop', 'bnk-luksorn', 'bnk-praew', 'bnk-arlee', 'bnk-saonoi', 'bnk-nall', 'bnk-nammonn', 'bnk-rose'] },
     ] },
+  /* Line-ups from the official announcement cards (5 Oct 2026): the two on the
+     top row of each card are its centres. Every current member of both groups
+     sings on it once; `unit` is the team a coupling song was given to. */
+  { id:'bnk-sp-kimitodoko', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'special',
+    title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', date:'2026-10-03', year:2026,
+    note:'ซิงเกิลร่วม BNK48 & CGM48 ของ Senbatsu General Election 2026',
+    tracks:[
+      { track:'Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ', centers:['bnk-praew', 'cgm-prae'],
+        members:['bnk-praew', 'cgm-prae', 'bnk-arlee', 'bnk-emmy', 'bnk-hoop', 'bnk-janry', 'bnk-jew', 'cgm-chifa', 'cgm-emma', 'cgm-ginna', 'cgm-jingjing', 'cgm-kwan',
+          'bnk-l', 'bnk-luksorn', 'bnk-marine', 'bnk-monet', 'bnk-pancake', 'bnk-yoghurt', 'cgm-lewlew', 'cgm-lingling', 'cgm-lookked', 'cgm-nana', 'cgm-satangpound', 'cgm-shenae'] },
+      { track:'Kegareteiru Shinjitsu – ความจริงสีเทา', unit:'Team Performers', centers:['bnk-wawa', 'cgm-nisha'],
+        members:['bnk-wawa', 'cgm-nisha', 'bnk-fame', 'bnk-grape', 'bnk-khowjow', 'bnk-mail', 'bnk-nall', 'bnk-neen', 'bnk-patt', 'cgm-namphet'] },
+      { track:'Aisuru Hito – เธอ', unit:'Team Vocalists', centers:['bnk-sindy', 'cgm-ploen'],
+        members:['bnk-sindy', 'cgm-ploen', 'bnk-galeya', 'bnk-inkcha', 'bnk-mayji', 'bnk-micha', 'bnk-mint', 'bnk-mirin', 'bnk-rose', 'bnk-saonoi', 'cgm-praifa', 'cgm-valentine'] },
+      { track:'Yobisute Fantasy – เรียกชื่อที ใจไม่ดีแล้ว!', unit:'Team Cuteness', centers:['bnk-palmmy', 'cgm-else'],
+        members:['bnk-palmmy', 'cgm-else', 'bnk-berry', 'bnk-blythe', 'bnk-cartoon', 'bnk-khaimook', 'bnk-nammonn', 'bnk-niya', 'bnk-proud', 'cgm-hongyok', 'cgm-punpon', 'cgm-tara'] },
+    ] },
 ];
 SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 const ICONS = {
@@ -6793,6 +6810,7 @@ const EN = {
   'ร่วมกับ Nok Air': 'With Nok Air',
   'เพลงฉลองครบรอบ 20 ปี AKB48': "Celebrating AKB48's 20th anniversary",
   'ซิงเกิลร่วม BNK48 & CGM48': 'A joint BNK48 & CGM48 single',
+  'ซิงเกิลร่วม BNK48 & CGM48 ของ Senbatsu General Election 2026': 'A joint BNK48 & CGM48 single for the Senbatsu General Election 2026',
   'ซิงเกิลร่วม BNK48 & TSH48 (เซี่ยงไฮ้) โครงการทูตวัฒนธรรมไทย-จีน': 'A joint single with TSH48 (Shanghai), for the Thai-Chinese Cultural Ambassador Project',
   'ซิงเกิลพิเศษรุ่น 3 — ทุกคนเป็นเซ็นเตอร์': 'Generation 3 special single — everyone is centre',
   'เพลงเดี่ยวของแจนรี่': "Janry's solo song",
@@ -14818,6 +14836,7 @@ const SEED_YOUTUBE = {
   'bnk-sp-celebration#0':['mV-OxpZZEm4','mv'],
   'bnk-sp-cry#0':['12VmOt8T5jk','mv'],
   'bnk-sp-kimigairu#0':['GZDde4_izAw','mv'],
+  'bnk-sp-kimitodoko#0':['qdBtGpZl_jE','mv'],
   'cgm-sp-maliremix#0':['QMqby5BvIJ0','video'],
   'cgm-sp-daimairemix#0':['uqdjTzZw4Mc','video'],
   'bnk-sp-ramwong#0':['-dR3WbLrVPQ','video'],
@@ -14916,7 +14935,7 @@ function renderSingleDetail(){
         <span class="track-name">${escapeHtml(t.track)}</span>
         ${renderYouTube(s.id, i, t.track)}
       </div>
-      <div class="track-sub">${t.members.length} คน${t.centers.length
+      <div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}${t.members.length} คน${t.centers.length
         ? ` · ${isMix() ? 'Center' : 'เซ็นเตอร์'} ` + t.centers.map(id=>linkMember(getMember(id))).join(', ')
         : ''}</div>
       <div class="grid-mini">
