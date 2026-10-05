@@ -14737,36 +14737,65 @@ function renderMemberEvents(m){
 }
 
 function renderStatsTimeline(){
-  // One entry per year, merging what the database actually knows: group
-  // debuts, single releases and graduations.
-  const years = {};
-  const slot = y => (years[y] = years[y] || { debuts:[], singles:[], grads:[] });
-  GROUPS.forEach(g=> slot(+g.debut.slice(0,4)).debuts.push(g));
-  SEED_SINGLES.forEach(s=> slot(s.year).singles.push(s));
-  state.members.filter(m=>m.graduated).forEach(m=> slot(+m.graduated.slice(0,4)).grads.push(m));
+  // One entry per year, from what the database knows: group debuts, the
+  // election, singles, albums and special singles, members joining, promoted,
+  // moving and taking the Shihainin post, and graduations.
+  const en = isEN(), years = {};
+  const slot = y => (years[y] = years[y] || { debuts:[], singles:[], albums:[], specials:[], people:[], grads:[], ge:null });
+  GROUPS.forEach(g => slot(+g.debut.slice(0, 4)).debuts.push(g));
+  SEED_SINGLES.forEach(s => slot(s.year).singles.push(s));
+  SEED_ALBUMS.forEach(a => slot(a.year).albums.push(a));
+  (typeof SEED_SPECIALS !== 'undefined' ? SEED_SPECIALS : []).forEach(s => slot(s.year || +String(s.date).slice(0, 4)).specials.push(s));
+  state.members.filter(m => m.graduated).forEach(m => slot(+m.graduated.slice(0, 4)).grads.push(m));
+  pastEvents().filter(r => ['join', 'promote', 'transfer', 'shihainin'].includes(r.kind)).forEach(r => slot(r.year).people.push(r));
+  // the election this site follows, with the latest result once there is one
+  const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), res = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
+  if(vote) slot(+vote.start.slice(0, 4)).ge = { vote, res };
 
-  const sorted = Object.keys(years).map(Number).sort((a,b)=>b-a);
+  const names = ids => ids.map(getMember).filter(Boolean)
+    .map(m => `<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(nickName(m))}</button>`).join(' · ');
+  const row = (c, html) => `<div class="ev-row" style="--c:${c}"><span class="ev-dot"></span><span>${html}</span></div>`;
+  const works = (list, word, g) => list.length ? row(g.color, `${linkGroup(g)} ${en ? `released ${list.length} ${word[1]}${list.length > 1 ? 's' : ''}` : `ปล่อย ${list.length} ${word[0]}`}
+    <span class="ev-names">${list.sort((a, b) => (a.num || 0) - (b.num || 0) || String(a.date).localeCompare(String(b.date))).map(w => linkWork(w)).join(' · ')}</span>`) : '';
+  const sorted = Object.keys(years).map(Number).sort((a, b) => b - a);
   return `
   <div class="timeline" style="margin-top:6px;">
-    ${sorted.map(y=>{
+    ${sorted.map(y => {
       const e = years[y];
-      const byGroup = gid => e.grads.filter(m=>m.groupId===gid);
+      const people = (kind, g) => { const ids = [...new Set(e.people.filter(r => r.kind === kind && r.groupId === g.id).flatMap(r => r.ids))]; return ids; };
+      const geRow = e.ge ? (() => {
+        const { vote, res } = e.ge, M = monthsShort(), dm = d => { const t = parseYmd(d); return `${t.getDate()} ${M[t.getMonth()]}`; };
+        const r = geLatestRound(), top = r && geSlots(r.id)[1], w = top && top.id && getMember(top.id);
+        return row('#B3121E', `<button class="link-inline" data-action="open-ge"><b>Senbatsu General Election ${y}</b></button>
+          · ${en ? 'voting' : 'โหวต'} ${dm(vote.start)} – ${dm(eventLastDay(vote))}${res ? ` · ${en ? 'results' : 'ประกาศผล'} ${dm(res.start)}` : ''}
+          ${w ? `<span class="ev-names">${geRoundLabel(r)} · ${en ? 'No. 1' : 'อันดับ 1'} <button class="link-inline" data-action="open-member" data-id="${w.id}">${escapeHtml(nickName(w))}</button></span>` : ''}`);
+      })() : '';
+      // special singles: by group, the joint ones once in gold
+      const joint = e.specials.filter(s => (s.groups || []).length > 1);
+      const specialRows = GROUPS.map(g => works(e.specials.filter(s => (s.groups || [s.groupId]).length < 2 && s.groupId === g.id),
+        [en ? '' : 'ซิงเกิลพิเศษ/ดิจิทัล', 'special single'], g)).join('')
+        + (joint.length ? row('var(--gold)', `BNK48 & CGM48 ${en ? `released ${joint.length} joint special single${joint.length > 1 ? 's' : ''}` : `ปล่อยซิงเกิลพิเศษร่วม ${joint.length} เพลง`}
+          <span class="ev-names">${joint.map(w => linkWork(w)).join(' · ')}</span>`) : '');
       return `<div class="timeline-item" style="--c:var(--ink-soft)">
         <div class="year-head">${y}</div>
-        ${e.debuts.map(g=>`<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
-          <span><b>${linkGroup(g)}</b> เดบิวต์ · ${formatDate(g.debut)}</span></div>`).join('')}
-        ${e.singles.length ? GROUPS.map(g=>{
-          const ss = e.singles.filter(s=>s.groupId===g.id).sort((a,b)=>a.num-b.num);
-          if(!ss.length) return '';
-          return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
-            <span>${linkGroup(g)} ปล่อย ${ss.length} ซิงเกิล <span class="ev-names">${ss.map(s=>linkWork(s)).join(' · ')}</span></span></div>`;
-        }).join('') : ''}
-        ${GROUPS.map(g=>{
-          const gs = byGroup(g.id);
-          if(!gs.length) return '';
-          return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
-            <span>${gs.length} คนจบการศึกษาจาก ${linkGroup(g)}
-            <span class="ev-names">${gs.map(m=>`<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(nickName(m))}</button>`).join(' · ')}</span></span></div>`;
+        ${e.debuts.map(g => row(g.color, `<b>${linkGroup(g)}</b> ${en ? 'debuted' : 'เดบิวต์'} · ${formatDate(g.debut)}`)).join('')}
+        ${geRow}
+        ${GROUPS.map(g => works(e.singles.filter(s => s.groupId === g.id), [en ? '' : 'ซิงเกิล', 'single'], g)).join('')}
+        ${GROUPS.map(g => works(e.albums.filter(a => a.groupId === g.id), [en ? '' : 'อัลบั้ม', 'album'], g)).join('')}
+        ${specialRows}
+        ${GROUPS.map(g => {
+          const out = [];
+          const joined = people('join', g);
+          if(joined.length) out.push(row(g.color, `${en ? `${joined.length} joined` : `${joined.length} คนเข้าวง`} ${linkGroup(g)} <span class="ev-names">${names(joined)}</span>`));
+          const up = people('promote', g);
+          if(up.length) out.push(row(g.color, `${en ? `${up.length} promoted from trainee in` : `${up.length} คนได้เลื่อนขั้นจากเด็กฝึก`} ${linkGroup(g)} <span class="ev-names">${names(up)}</span>`));
+          const moved = people('transfer', g);
+          if(moved.length) out.push(row(g.color, `${en ? `${moved.length} moved to` : `${moved.length} คนย้ายมา`} ${linkGroup(g)} <span class="ev-names">${names(moved)}</span>`));
+          const sh = people('shihainin', g);
+          if(sh.length) out.push(row(g.color, `${names(sh)} ${en ? `became ${g.name}'s Shihainin` : `รับตำแหน่งชิไฮนิน ${linkGroup(g)}`}`));
+          const gs = e.grads.filter(m => m.groupId === g.id);
+          if(gs.length) out.push(row(g.color, `${en ? `${gs.length} graduated from` : `${gs.length} คนจบการศึกษาจาก`} ${linkGroup(g)} <span class="ev-names">${names(gs.map(m => m.id))}</span>`));
+          return out.join('');
         }).join('')}
       </div>`;
     }).join('')}
@@ -15117,7 +15146,39 @@ function loadYouTubeStats(){
     .then(r => r.ok ? r.json() : null)
     .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single' || state.view === 'stats' || state.view === 'feed') renderMain(); syncTicker(); })
     .catch(() => { YT_STATS = { videos:{} }; })
-    .finally(() => { _ytLoading = false; });
+    .finally(() => { _ytLoading = false; ytFollow(); });
+}
+/* The file above is written by GitHub's jobs, which run every few hours at
+   best. api.48thdb.com/yt counts every song video every five minutes, so a
+   video passing a round number is celebrated here within minutes: its count
+   and milestone are laid over the file, and a page left open hears of it. */
+const YT_LIVE_API = 'https://api.48thdb.com/yt';
+let _ytTimer = null, _ytSeen = null;
+function ytFollow(){
+  if(!YT_STATS) return;
+  const pull = () => fetch(YT_LIVE_API, { cache:'no-store' }).then(r => r.ok ? r.json() : null).then(d => {
+    if(!d || !YT_STATS) return;
+    YT_STATS.videos = YT_STATS.videos || {};
+    for(const [vid, n] of Object.entries(d.views || {})){
+      const v = YT_STATS.videos[vid]; if(v && n > (v.views || 0)) v.views = n;
+    }
+    const ms = YT_STATS.milestones = YT_STATS.milestones || {};
+    const fresh = [];
+    for(const [vid, m] of Object.entries(d.milestones || {})){
+      const had = ms[vid];
+      if(!had || m.mark > had.mark){ ms[vid] = { ...m, cover: !!(had && had.cover && had.mark === m.mark) }; fresh.push(vid); }
+    }
+    // the first answer only fills in; after that, a new one is news
+    if(_ytSeen && fresh.length){
+      const it = ytMilestones().find(x => fresh.includes(x.vid));
+      if(it) toast(isEN() ? `🎉 ${it.track} just passed ${milestoneWords(it.mark)}!` : `🎉 ${it.track} ครบ ${milestoneWords(it.mark)}แล้ว!`);
+      if(state.view === 'single' || state.view === 'feed') renderMain();
+    }
+    _ytSeen = true;
+    syncTicker();
+  }).catch(() => {});
+  pull();
+  if(!_ytTimer) _ytTimer = setInterval(() => { if(!document.hidden) pull(); }, 5 * 60000);
 }
 /* 206,864,587 reads as "206.9 ล้าน" or "206.9M"; the exact figure is in the tooltip. */
 function shortViews(n){
@@ -15362,6 +15423,7 @@ const TICKER_KINDS = {
   news:   { th:'ประกาศ',    en:'NEWS',     color:'#3A66D6' },
   hbd:    { th:'HBD',      en:'HBD',      color:'#E0457B' },
   ticket: { th:'บัตร',      en:'TICKETS',  color:'#C8961E' },
+  views:  { th:'ยอดวิว',    en:'VIEWS',    color:'#D4A017' },
   vote:   { th:'โหวต',      en:'VOTE',     color:'#C8231A' },
   result: { th:'ผลโหวต',    en:'RESULTS',  color:'#C8231A' },
 };
@@ -15400,6 +15462,12 @@ function tickerItems(){
     if(mine && e && !hasMyOshi(e)) continue;
     items.push({ kind:'live', to: e ? ev(e) : null, parts:[
       en ? 'On air now' : 'กำลังไลฟ์อยู่', l.title || (e && e.title) || l.channel ] });
+  }
+
+  // 0c. a song video that has just passed a round number of views (two days on the sign)
+  for(const x of (YT_STATS ? ytMilestones() : []).filter(x => Date.now() - ytAt(x.at) < 2 * 86400000).slice(0, 2)){
+    items.push({ kind:'views', to:{ action:'open-single', id:x.workId }, parts:[
+      `${x.track} ${en ? `passed ${milestoneWords(x.mark)}` : `ครบ ${milestoneWords(x.mark)}`} 🎉` ] });
   }
 
   // 1. on now, or on later today

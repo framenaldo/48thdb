@@ -258,6 +258,85 @@ async function visits(env) {
   return body;
 }
 
+/* Song videos passing a round number of views — every 100,000 to a million,
+ * then every million — noticed within minutes instead of whenever GitHub's
+ * hourly job gets to run (it is throttled to every few hours). The cron asks
+ * the YouTube Data API for every video the site links to (50 a call, about
+ * four calls, a unit each), compares with the last round number seen, and
+ * keeps what passed in KV. The page reads /yt and lays it over
+ * data/youtube.json. Needs the Worker secret YOUTUBE_API_KEY (set by the
+ * owner); without it this does nothing and the page has the file alone. */
+const YT_VIEWS_KEY = 'https://live.state/yt-views-v1';
+const YT_IDS_KEY = 'https://live.state/yt-ids-v1';
+const ytMark = (n) => (n < 100000 ? 0 : n < 1000000 ? Math.floor(n / 100000) * 100000 : Math.floor(n / 1000000) * 1000000);
+// "2026-10-05T14:23+07:00", the way the nightly script writes it
+const bkkMinute = (ms) => new Date(ms + 7 * 3600000).toISOString().slice(0, 16) + '+07:00';
+
+async function ytBase() {
+  const hit = await readCache(YT_IDS_KEY);
+  if (hit) return hit;
+  for (const url of ['https://48thdb.com/data/youtube.json', 'https://raw.githubusercontent.com/framenaldo/48thdb/main/data/youtube.json']) {
+    try {
+      const r = await fetch(url, { cf: { cacheTtl: 0 } });
+      if (!r.ok) continue;
+      const d = await r.json();
+      const views = {};
+      for (const [vid, v] of Object.entries(d.videos || {})) views[vid] = v.views || 0;
+      if (!Object.keys(views).length) continue;
+      const body = { views };
+      await writeCache(YT_IDS_KEY, body, 6 * 3600);
+      return body;
+    } catch (e) { /* the next copy */ }
+  }
+  return null;
+}
+
+async function ytCheck(env) {
+  if (!env.YOUTUBE_API_KEY) return { skipped: 'no-key' };
+  const base = await ytBase();
+  if (!base) return { skipped: 'no-list' };
+  const ids = Object.keys(base.views), views = {};
+  for (let i = 0; i < ids.length; i += 50) {
+    const q = new URLSearchParams({ part: 'statistics', id: ids.slice(i, i + 50).join(','), key: env.YOUTUBE_API_KEY });
+    const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?${q}`);
+    if (!r.ok) throw new Error(`YouTube said ${r.status}`);
+    for (const it of (await r.json()).items || []) views[it.id] = +((it.statistics || {}).viewCount || 0);
+  }
+  const now = Date.now();
+  const marks = (await env.IAM.get('yt-marks', 'json')) || {};
+  const ms = (await env.IAM.get('yt-milestones', 'json')) || {};
+  let changed = false;
+  for (const [vid, n] of Object.entries(views)) {
+    const was = marks[vid] != null ? marks[vid] : ytMark(base.views[vid] || 0);
+    if (marks[vid] == null) { marks[vid] = was; changed = true; }
+    const mark = ytMark(n);
+    if (mark > was) { marks[vid] = mark; ms[vid] = { mark, at: bkkMinute(now) }; changed = true; }
+  }
+  for (const [vid, m] of Object.entries(ms)) {
+    if (now - Date.parse(m.at) > 30 * 86400000) { delete ms[vid]; changed = true; }
+  }
+  if (changed) {
+    await env.IAM.put('yt-marks', JSON.stringify(marks));
+    await env.IAM.put('yt-milestones', JSON.stringify(ms));
+  }
+  const body = { at: new Date(now).toISOString(), views, milestones: ms };
+  // the Cache API is per data centre, so the counts also go to KV — every
+  // quarter hour, to stay well inside the free plan's 1,000 writes a day
+  if (Math.floor(now / 300000) % 3 === 0) await env.IAM.put('yt-views', JSON.stringify({ at: body.at, views }));
+  await writeCache(YT_VIEWS_KEY, body, 600);
+  return { videos: Object.keys(views).length };
+}
+
+async function ytRecent(env) {
+  const hit = await readCache(YT_VIEWS_KEY);
+  if (hit) return hit;
+  // a data centre the cron has not run in reads KV, then keeps it a minute
+  const [ms, v] = await Promise.all([env.IAM.get('yt-milestones', 'json'), env.IAM.get('yt-views', 'json')]);
+  const body = { at: (v && v.at) || null, views: (v && v.views) || {}, milestones: ms || {} };
+  await writeCache(YT_VIEWS_KEY, body, 60);
+  return body;
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
@@ -276,6 +355,13 @@ export default {
         return new Response(JSON.stringify(await visits(env)), { headers: own });
       } catch (err) {
         return new Response(JSON.stringify({ error: String((err && err.message) || err) }), { status: 502, headers: own });
+      }
+    }
+    if (url.pathname === '/yt') {
+      try {
+        return new Response(JSON.stringify(await ytRecent(env)), { headers: { ...JSON_HEADERS, 'cache-control': 'public, max-age=60' } });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: String((err && err.message) || err), milestones: {} }), { status: 502, headers: JSON_HEADERS });
       }
     }
     if (url.pathname === '/iam') {
@@ -302,12 +388,14 @@ export default {
     }
   },
 
-  /* Every five minutes: a third of the members' iAM48 lists, and in the
-     evening (Thailand) a YouTube answer kept warm for the first visitor. */
+  /* Every five minutes: a third of the members' iAM48 lists, every song
+     video's view count, and in the evening (Thailand) a YouTube answer kept
+     warm for the first visitor. */
   async scheduled(event, env, ctx) {
     const at = new Date(event.scheduledTime);
     const h = at.getUTCHours();
     if (h >= 10 && h <= 16) ctx.waitUntil(check(true).catch(() => {}));
     ctx.waitUntil(iamLook(env, Math.floor(event.scheduledTime / 300000) % IAM_SLICES).catch(() => {}));
+    ctx.waitUntil(ytCheck(env).catch(() => {}));
   },
 };
