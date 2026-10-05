@@ -2863,6 +2863,31 @@
   .gel-share{ display:inline-flex; align-items:center; gap:6px; margin:10px 0 2px; }
   .gel-share svg{ width:16px; height:16px; }
   .gec-ch{ margin:12px 0 4px; }
+  /* the songs the candidates asked for */
+  .ge-songs{ margin-top:12px; }
+  .ge-song-card .bar-row{ grid-template-columns:minmax(0, 1fr) 30px; grid-template-areas:'l v' 't v'; gap:3px 10px; margin-bottom:10px; }
+  .ge-song-card .bar-label{ grid-area:l; text-align:left; font-size:13.5px; font-weight:700; color:var(--ink); white-space:normal; }
+  .ge-song-card .bar-track{ grid-area:t; }
+  .ge-song-card .bar-val{ grid-area:v; align-self:center; font-weight:800; }
+  .ge-song-card .stat-grid{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+  button.bar-row{ width:100%; border:0; background:none; padding:0; font:inherit; color:inherit; text-align:left; cursor:pointer; }
+  .ge-song-who{ margin:-12px 0 20px; padding:12px 14px; border-radius:14px; background:color-mix(in srgb, #E4457E 7%, var(--card)); border:1px solid color-mix(in srgb, #E4457E 25%, var(--line)); }
+  .ge-song-who p{ margin:0 0 8px; font-size:14px; }
+  .ge-song-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .ge-song-chips .chip{ display:inline-flex; align-items:center; gap:6px; }
+  .ge-song-chips i{ font-style:normal; font-size:11px; color:var(--ink-soft); }
+  .ge-song-face{ width:22px !important; height:22px !important; border-radius:50% !important; font-size:9px; }
+  .ge-clash, .ge-hope, .ge-ifnow, .ge-once{ list-style:none; margin:0; padding:0; }
+  .ge-clash li, .ge-ifnow li{ padding:9px 0; border-bottom:1px solid var(--line); font-size:14px; }
+  .ge-clash li:last-child, .ge-ifnow li:last-child{ border-bottom:0; }
+  .ge-clash li span, .ge-ifnow li span{ display:block; color:var(--ink-soft); font-size:13px; margin-top:2px; }
+  .ge-ifnow li em{ display:block; font-style:normal; font-weight:800; color:#B8862E; margin-top:2px; }
+  .ge-hope{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:4px 12px; }
+  .ge-hope li{ font-size:14px; font-weight:700; }
+  .ge-hope li span{ font-weight:600; font-size:12px; color:var(--ink-soft); }
+  .ge-once{ columns:2 220px; column-gap:16px; }
+  .ge-once li{ break-inside:avoid; font-size:13px; padding:3px 0; }
+  .ge-once li span{ color:var(--ink-soft); }
   .gec-ch-h{ margin:0 2px 8px; font-size:13px; font-weight:800; color:var(--ink-soft); }
   .gec-ch-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
   @media (min-width:760px){ .gec-ch-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
@@ -9937,13 +9962,13 @@ const GE_WISH = {
   'bnk-mint':     { hope:20, songs:[['Love Jump', 'AKB48 Team B'], ['Sustainable', 'AKB48'], ['Osaekirenai Shoudou', 'AKB48']] },
   'cgm-hongyok':  { hope:27, songs:[['Suki! Suki! Skip!', 'HKT48'], ['Nagiichi', 'NMB48'], ['Sentimental Train', 'AKB48']] },
   'cgm-punpon':   { hope:'25–36', songs:[['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Durian Shounen', 'NMB48'], ['Cecile', 'AKB48']] },
-  'cgm-satangpound': { hope:'26 (-1)', songs:[['Ima, Happy', 'AKB48'], ['Houtte Okenai yo Unicorn', 'SKE48'], ['Seishun wa Hazukashii', 'SKE48']] },
+  'cgm-satangpound': { hope:'26 (-1)', aim:25, songs:[['Ima, Happy', 'AKB48'], ['Houtte Okenai yo Unicorn', 'SKE48'], ['Seishun wa Hazukashii', 'SKE48']] },
   'cgm-praifa':   { hope:25, songs:[['Yasai Sisters', 'AKB48'], ['Hayaokuri Calendar', 'HKT48'], ['Yumemite Gomen', 'AKB48']] },
   'cgm-nisha':    { hope:'25 (Center)', songs:[['Donchou wo Agete Kure!', 'AKB48'], ['Sou Yuu Toko Aru yo ne?', 'SKE48'], ['Pin to Kita', 'AKB48']] },
-  'cgm-prae':     { hope:'Center or Front Mem', songs:[['Shisou de Shinai Kiss', 'NGT48'], ['SNS WORLD', 'HKT48'], ['Donchou wo Agete Kure!', 'AKB48']] },
+  'cgm-prae':     { hope:'Center or Front Mem', aim:[[1, 7], [13, 15], [25, 27]], songs:[['Shisou de Shinai Kiss', 'NGT48'], ['SNS WORLD', 'HKT48'], ['Donchou wo Agete Kure!', 'AKB48']] },
   'cgm-jingjing': { hope:13, songs:[['Seishun no Deadline', 'NMB48'], ['Sandal da ze', 'SKE48'], ['Cecile', 'AKB48']] },
   'cgm-chifa':    { hope:'25–36', songs:[['Yumemite Gomen', 'AKB48'], ['1!2!3!4! Yoroshiku!', 'SKE48'], ['Ano sa, Iya Betsu ni...', 'NGT48']] },
-  'bnk-wawa':     { hope:'21 (12)', songs:[['Moto Kare Desu', 'AKB48'], ['Nagori Zakura', 'AKB48'], ['Suki-ish', 'AKB48']] },
+  'bnk-wawa':     { hope:'21 (12)', aim:21, songs:[['Moto Kare Desu', 'AKB48'], ['Nagori Zakura', 'AKB48'], ['Suki-ish', 'AKB48']] },
   'bnk-emmy':     { hope:7, songs:[['Seishun no Deadline', 'NMB48'], ['Juuryoku Sympathy', 'AKB48 Team Surprise'], ['Time Machine Fuyouron', 'AKB48']] },
   'bnk-monet':    { hope:3, songs:[['Manatsu no Sounds good !', 'AKB48'], ['Kiss wa Matsu Shikanai no deshou ka?', 'HKT48'], ['Hachinosu Dance', 'AKB48 Team 8']] },
   'bnk-patt':     { hope:13, songs:[['Hitsuzensei', 'IZ4648'], ['Ano Natsu no Bouhatei', 'AKB48'], ['Juuryoku Sympathy', 'AKB48 Team Surprise']] },
@@ -9976,7 +10001,7 @@ const GE_WISH = {
   'bnk-galeya':   { hope:13, songs:[['Suki-ish', 'AKB48'], ['Everyday, Kachuusha', 'AKB48'], ['Sustainable', 'AKB48']] },
   'bnk-pancake':  { hope:1, songs:[['Nagori Zakura', 'AKB48'], ['Ano sa, Iya Betsu ni...', 'NGT48'], ['Kuchibiru ni Be My Baby', 'AKB48']] },
   'bnk-sindy':    { hope:'Center or Kami 7', songs:[['Nagiichi', 'NMB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Oh My God!', 'NMB48']] },
-  'cgm-else':     { hope:'6+7 = 13', songs:[['Kuchibiru ni Be My Baby', 'AKB48'], ['Time Machine Fuyouron', 'AKB48'], ['Igai ni Mango', 'SKE48']] },
+  'cgm-else':     { hope:'6+7 = 13', aim:13, songs:[['Kuchibiru ni Be My Baby', 'AKB48'], ['Time Machine Fuyouron', 'AKB48'], ['Igai ni Mango', 'SKE48']] },
   'bnk-mayji':    { hope:25, songs:[['Ue Kara Mariko', 'AKB48'], ['Sou Yuu Toko Aru yo ne?', 'SKE48'], ['Ganbaranuwai', 'NMB48']] },
   'bnk-grape':    { hope:19, songs:[['Ano Natsu no Bouhatei', 'AKB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Moto Kare Desu', 'AKB48']] },
   'bnk-praew':    { hope:'Senbatsu', songs:[['Suki-ish', 'AKB48'], ['Ano sa, Iya Betsu ni...', 'NGT48'], ['Hoshi ga Kienai Uchi ni', 'AKB48']] },
@@ -10050,6 +10075,129 @@ function geCandCard(m){
     <img src="${gePoster(m.id, true)}" width="360" height="509" alt="" loading="lazy" decoding="async">
     ${state.oshi.includes(m.id) ? '<span class="gec-star" aria-hidden="true">★</span>' : ''}</button>`;
 }
+const geCandSwitch = (tab, en) => `<div class="gea-seg ge-sched-seg">
+  <button class="${tab === 'candidates' ? 'is-on' : ''}" data-action="ge-tab" data-value="candidates">${en ? 'Candidates' : 'ผู้สมัคร'}</button>
+  <button class="${tab === 'songs' ? 'is-on' : ''}" data-action="ge-tab" data-value="songs">${en ? 'Songs they want' : 'เพลงที่อยากได้'}</button></div>`;
+
+/* ---------- The songs the candidates asked for, counted ----------
+   From GE_WISH: what each wrote on her form. Six boxes, each shareable:
+   the favourites, songs wanted first by more than one, the source groups,
+   hope against the latest result, the songs if it ended today, the one-offs. */
+const GE_SRC_COL = { AKB48:'#E4457E', HKT48:'#3A3A44', NMB48:'#E2A400', NGT48:'#D9363E', SKE48:'#F07D1A', IZ4648:'#7A4BC4', 'Nogizaka AKB':'#7E57C2' };
+const geSrc = g => /^AKB48/.test(g) ? 'AKB48' : g;
+const geSongKey = t => String(t).toLowerCase().replace(/[^a-z0-9]/g, '');
+/* The latest round with names in it — complete if there is one. */
+function geLatestRound(){
+  const withData = GE_ROUNDS.filter(r => geHasData(r.id));
+  const full = withData.filter(r => geAnnounced(r.id) >= GE_SEATS);
+  return (full.length ? full[full.length - 1] : withData[withData.length - 1]) || null;
+}
+/* A hope written in words, as a range of ranks [best, worst] — or several.
+   Prae: the Center or front of any group — Kami 7 in the Senbatsu; in the
+   other groups the front is position 0 (the Center) and the two beside her,
+   so the top three. */
+function geAim(w){
+  if(w.aim != null) return Array.isArray(w.aim) ? w.aim : [w.aim, w.aim];
+  const h = String(w.hope), nums = (h.match(/\d+/g) || []).map(Number);
+  if(/kami\s*7|lucky 7/i.test(h) && !nums.filter(n => n !== 7).length) return /lucky/i.test(h) ? [7, 7] : [1, 7];
+  if(/center or kami/i.test(h)) return [1, 7];
+  if(/senbatsu/i.test(h)) return [1, Math.max(12, ...nums)];
+  if(nums.length >= 2) return [Math.min(...nums), Math.max(...nums)];
+  if(nums.length === 1) return [nums[0], nums[0]];
+  return null;
+}
+function renderGESongs(){
+  const en = isEN(), W = GE_WISH, ids = Object.keys(W).filter(id => getMember(id));
+  const nm = id => escapeHtml(getMember(id).name);
+  // every pick, with who made it and at which place
+  const songs = {};
+  ids.forEach(id => W[id].songs.forEach(([t, g], k) => {
+    const s = songs[geSongKey(t)] || (songs[geSongKey(t)] = { t, g, by:[] });
+    s.by.push({ id, k:k + 1 });
+  }));
+  const firsts = s => s.by.filter(x => x.k === 1).length;
+  const list = Object.values(songs).sort((a, b) => b.by.length - a.by.length || firsts(b) - firsts(a) || a.t.localeCompare(b.t));
+  const picks = ids.length * 3, once = list.filter(s => s.by.length === 1);
+  const round = geLatestRound(), slots = round ? geSlots(round.id) : {};
+  const rankOf = {}; Object.keys(slots).forEach(n => { if(slots[n] && slots[n].id) rankOf[slots[n].id] = +n; });
+  const roundNote = round ? (en ? `By ${geRoundLabel(round)}` : `อิงจาก${geRoundLabel(round)}`) : '';
+  const card = (title, body, c) => `<div class="group-card ge-song-card" style="--c:${c || '#E4457E'}"><div class="group-head"><h2 style="font-size:21px;">${title}</h2></div>${body}</div>`;
+  const label = s => `${s.t} (${s.g})`;
+
+  // 1 — the favourites
+  const top = list.slice(0, 12), max = top.length ? top[0].by.length : 1;
+  const open = state.geSong && songs[state.geSong];
+  const who = open ? `<div class="ge-song-who"><p><b>♪ ${escapeHtml(label(open))}</b> · ${en ? `${open.by.length} chose it` : `เลือก ${open.by.length} คน`}</p>
+    <div class="ge-song-chips">${open.by.sort((a, b) => a.k - b.k).map(x => `<button class="chip" data-action="open-member" data-id="${x.id}">${geFace(getMember(x.id), 'ge-song-face')}${nm(x.id)} <i>${en ? `#${x.k}` : `อันดับ ${x.k}`}</i></button>`).join('')}</div></div>` : '';
+  const c1 = card(en ? 'Most wanted songs' : 'เพลงที่ถูกเลือกมากที่สุด', `
+    <div class="stat-grid" style="margin-bottom:12px;">
+      <div class="stat-cell"><div class="label">${en ? 'Picks' : 'เลือกทั้งหมด'}</div><div class="value">${picks}</div></div>
+      <div class="stat-cell"><div class="label">${en ? 'Different songs' : 'เพลงไม่ซ้ำ'}</div><div class="value">${list.length}</div></div>
+      <div class="stat-cell"><div class="label">${en ? 'Chosen once' : 'มีคนเลือกคนเดียว'}</div><div class="value">${once.length}</div></div>
+    </div>
+    ${top.map(s => `<button class="bar-row" style="--c:${GE_SRC_COL[geSrc(s.g)] || '#E4457E'}" data-action="ge-song" data-value="${geSongKey(s.t)}">
+      <span class="bar-label">${escapeHtml(label(s))}</span><span class="bar-track"><span class="bar-fill" style="width:${Math.round(s.by.length / max * 100)}%"></span></span><span class="bar-val">${s.by.length}</span></button>`).join('')}
+    <p class="stats-note">${en ? 'Tap a song to see who chose it.' : 'กดชื่อเพลงเพื่อดูว่าใครเลือกบ้าง'}</p>`);
+
+  // 2 — the same first choice
+  const clash = list.map(s => ({ s, first:s.by.filter(x => x.k === 1) })).filter(x => x.first.length > 1)
+    .sort((a, b) => b.first.length - a.first.length || a.s.t.localeCompare(b.s.t));
+  const c2 = card(en ? 'Same first choice' : 'ศึกเพลงชน · เลือกเป็นอันดับ 1 ตรงกัน', `
+    <ul class="ge-clash">${clash.map(({ s, first }) => {
+      const order = first.slice().sort((a, b) => (rankOf[a.id] || 99) - (rankOf[b.id] || 99));
+      const lead = order[0] && rankOf[order[0].id] ? order[0].id : null;
+      return `<li><b>♪ ${escapeHtml(label(s))}</b> <span>${order.map(x => `${nm(x.id)}${rankOf[x.id] ? ` (${rankOf[x.id]})` : ''}${x.id === lead ? ' ★' : ''}`).join(' · ')}</span></li>`; }).join('')}</ul>
+    <p class="stats-note">${en ? `If two Centers want the same song, the higher rank gets it. ★ = highest of them ${round ? `in ${geRoundLabel(round)}` : ''}; (n) = her rank.`
+      : `ถ้าเซ็นเตอร์เลือกเพลงชนกัน อันดับสูงกว่าได้ไป · ★ = อันดับสูงสุดในกลุ่มนั้น${round ? `ตาม${geRoundLabel(round)}` : ''} · (n) = อันดับตอนนี้`}</p>`, '#C8961E');
+
+  // 3 — where the songs come from
+  const bySrc = (gid) => { const c = {}; ids.filter(id => !gid || getMember(id).groupId === gid).forEach(id => W[id].songs.forEach(([, g]) => { c[geSrc(g)] = (c[geSrc(g)] || 0) + 1; }));
+    return Object.entries(c).sort((a, b) => b[1] - a[1]); };
+  const srcBars = rows => { const m = rows.length ? rows[0][1] : 1;
+    return rows.map(([g, n]) => `<div class="bar-row" style="--c:${GE_SRC_COL[g] || '#888'}"><span class="bar-label">${escapeHtml(g)}</span><span class="bar-track"><span class="bar-fill" style="width:${Math.round(n / m * 100)}%"></span></span><span class="bar-val">${n}</span></div>`).join(''); };
+  const c3 = card(en ? 'Which group the songs come from' : 'เพลงมาจากวงไหน', `${srcBars(bySrc())}
+    <h3 class="section-label">BNK48</h3>${srcBars(bySrc('bnk48'))}
+    <h3 class="section-label">CGM48</h3>${srcBars(bySrc('cgm48'))}`, '#7A4BC4');
+
+  // 4 — hope against the latest result
+  let c4 = '';
+  if(round){
+    const rows = ids.map(id => { const a = geAim(W[id]); return { id, aims:a ? (Array.isArray(a[0]) ? a : [a]) : null, r:rankOf[id] || null }; }).filter(x => x.aims);
+    const inAim = x => x.aims.some(([lo, hi]) => x.r >= lo && x.r <= hi);
+    const beyond = rows.filter(x => x.r && !inAim(x) && x.r < x.aims[0][0]).sort((a, b) => a.r - b.r);
+    const met = rows.filter(x => x.r && inAim(x)).sort((a, b) => a.r - b.r);
+    const short = rows.filter(x => !x.r || (!inAim(x) && x.r > x.aims[0][0]));
+    const aimTxt = x => x.aims.map(([lo, hi]) => lo === hi ? lo : `${lo}–${hi}`).join(' / ');
+    const line = x => `<li>${nm(x.id)} <span>${en ? `hoped ${aimTxt(x)} · now ${x.r}` : `หวัง ${aimTxt(x)} · ได้ ${x.r}`}</span></li>`;
+    c4 = card(en ? 'Hope vs. result' : 'ฝันกับความจริง', `
+      <div class="stat-grid" style="margin-bottom:12px;">
+        <div class="stat-cell"><div class="label">${en ? 'Beyond her hope' : 'เกินเป้า'}</div><div class="value">${beyond.length}</div></div>
+        <div class="stat-cell"><div class="label">${en ? 'Right on it' : 'ตรงเป้า'}</div><div class="value">${met.length}</div></div>
+        <div class="stat-cell"><div class="label">${en ? 'Not there yet' : 'ยังไม่ถึง'}</div><div class="value">${short.length}</div></div>
+      </div>
+      ${beyond.length ? `<h3 class="section-label">${en ? 'Beyond her hope' : 'เกินเป้า'}</h3><ul class="ge-hope">${beyond.map(line).join('')}</ul>` : ''}
+      ${met.length ? `<h3 class="section-label">${en ? 'Right on it' : 'ตรงเป้า'}</h3><ul class="ge-hope">${met.map(line).join('')}</ul>` : ''}
+      <p class="stats-note">${roundNote} · ${en ? 'Senbatsu counts as 1–12, Kami 7 as 1–7; a range is met anywhere inside it.' : 'Senbatsu = อันดับ 1–12 · Kami 7 = 1–7 · ถ้าเขียนเป็นช่วง อยู่ในช่วงถือว่าตรงเป้า'}</p>`, '#2E8C82');
+  }
+
+  // 5 — the songs, if it ended today
+  let c5 = '';
+  if(round){
+    const bs = geBandSongs(round.id);
+    c5 = card(en ? 'If it ended today' : 'ถ้าเลือกตั้งจบวันนี้', `<ul class="ge-ifnow">${GE_CENTERS.map((n, i) => {
+      const m = slots[n] && slots[n].id ? getMember(slots[n].id) : null, x = bs[n], band = GE_BANDS[i].name;
+      return `<li><b>${band}</b> <span>${m ? `${en ? 'Center' : 'เซ็นเตอร์'} ${escapeHtml(m.name)} (${n})` : (en ? 'Center not known' : 'ยังไม่รู้เซ็นเตอร์')}</span>
+        <em>${x ? `♪ ${escapeHtml(label({ t:x.song[0], g:x.song[1] }))}${x.choice > 1 ? (en ? ` · her choice ${x.choice}` : ` · ตัวเลือกที่ ${x.choice}`) : ''}` : '—'}</em></li>`; }).join('')}</ul>
+      <p class="stats-note">${roundNote}</p>`, '#B8862E');
+  }
+
+  // 6 — chosen by one candidate only
+  const c6 = card(en ? `Only one wanted it · ${once.length}` : `เพลงที่มีคนเลือกคนเดียว · ${once.length} เพลง`, `
+    <ul class="ge-once">${once.sort((a, b) => a.t.localeCompare(b.t)).map(s => `<li>♪ ${escapeHtml(label(s))} <span>${nm(s.by[0].id)}</span></li>`).join('')}</ul>`, '#5A6B7A');
+
+  return `<div class="ge-songs">${c5}${c1}${who}${c2}${c4}${c3}${c6}</div>`;
+}
+
 function renderGECandidates(){
   const en = isEN(), all = geCandidates();
   const mine = all.filter(m => state.oshi.includes(m.id));
@@ -10155,7 +10303,7 @@ function renderGEPage(){
   const liveRound = geLiveRound();
   const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ['chain', en ? 'Live Voting' : 'โหวตสด'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
     ['timeline', en ? 'Schedule' : 'กำหนดการ']]
-    .map(([v, l]) => `<button class="sub-tab${tab === v || (v === 'timeline' && tab === 'events') ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
+    .map(([v, l]) => `<button class="sub-tab${tab === v || (v === 'timeline' && tab === 'events') || (v === 'candidates' && tab === 'songs') ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
   const liveBanner = liveRound && tab !== 'results' ? `<button class="ge-live-banner" data-action="ge-tab" data-value="results">
     <span class="gel-live"><i></i>LIVE</span><span>${en ? 'Announcing' : 'กำลังประกาศ'} ${geRoundLabel(liveRound)}
     <small>· ${en ? `${geAnnounced(liveRound.id)} / ${GE_SEATS} so far` : `ประกาศแล้ว ${geAnnounced(liveRound.id)} / ${GE_SEATS}`}</small></span>→</button>` : '';
@@ -10163,7 +10311,8 @@ function renderGEPage(){
   let body = '';
   if(tab === 'results') body = renderGEResults();
   else if(tab === 'chain') body = renderGEChain();
-  else if(tab === 'candidates') body = renderGECandidates();
+  else if(tab === 'candidates') body = geCandSwitch(tab, en) + renderGECandidates();
+  else if(tab === 'songs') body = geCandSwitch(tab, en) + renderGESongs();
   else if(tab === 'timeline') body = geSchedSwitch(tab, en) + renderTimelinePage(true);
   else if(tab === 'events'){
     const ahead = events.filter(e => eventLastDay(e) >= iso), past = events.filter(e => eventLastDay(e) < iso);
@@ -15468,6 +15617,7 @@ function renderMain(){
   if(state.view === 'stats') addBoxShareButtons(main);
   if(state.view === 'gelive') bindGEAdmin();
   if(state.view === 'timeline' && state.geTab === 'chain') gecAddShare(main);
+  if(state.view === 'timeline' && state.geTab === 'songs') addBoxShareButtons(main);
   geAnimate(main);
   odoRun(main);
   attachMainEvents();
@@ -15837,6 +15987,7 @@ function urlForSnapshot(snap){
   else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
   else if(snap.view === 'timeline' && snap.geTab === 'results') p.set('v', 'results');
   else if(snap.view === 'timeline' && snap.geTab === 'chain') p.set('v', 'vote');
+  else if(snap.view === 'timeline' && snap.geTab === 'songs') p.set('v', 'gesongs');
   else if(snap.view === 'gelive') p.set('v', 'gelive');
   // not one to share, but a reload should land back on it rather than on Home
   else if(snap.view === 'profile') p.set('v', 'profile');
@@ -15880,6 +16031,7 @@ function applyUrlToState(){
   }
   if(view === 'results'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results'; return; }
   if(view === 'vote'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; return; }
+  if(view === 'gesongs'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'songs'; return; }
   if(view === 'gelive'){ state.view = 'gelive'; return; }
   if(view === 'gechain'){ state.view = 'timeline'; state.geTab = 'chain'; return; }   // the owner's old copy, now the public tab
   if(view === 'profile'){ state.view = 'profile'; return; }
@@ -17105,7 +17257,8 @@ async function drawBoxCard(g, sub){
   const tmp = document.createElement('canvas'); tmp.width = SHARE_W; tmp.height = 4200;
   const t = tmp.getContext('2d');
   const tab = (STATS_TABS.find(x => x.id === state.statsTab) || { label: '' }).label;
-  shareText(t, spec ? spec.kicker : `48thDb · ${en ? 'STATS' : 'สถิติ'}${tab ? ' · ' + tab : ''}`, 60, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
+  const kick = spec ? spec.kicker : box.closest('.ge-songs') ? `GE2026 · ${en ? 'SONGS THEY WANT' : 'เพลงที่ผู้สมัครอยากได้'}` : `48thDb · ${en ? 'STATS' : 'สถิติ'}${tab ? ' · ' + tab : ''}`;
+  shareText(t, kick, 60, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
   t.font = '800 62px "Noto Sans Thai", sans-serif';
   const tl = shareWrap(t, title.trim(), SHARE_W - 120, 2);
   let y = 100;
@@ -18235,6 +18388,11 @@ function bindDelegatedEvents(){
       if(state.geRounds[r] && state.geRounds[r].slots) delete state.geRounds[r].slots[n];
       fbDb.collection('ge').doc(r).update({ ['slots.' + n]: firebase.firestore.FieldValue.delete() }).catch(() => {});
       renderMain();
+    }
+    else if(action==='ge-song'){
+      state.geSong = state.geSong === el.dataset.value ? null : el.dataset.value;
+      const y = window.scrollY; renderMain(); window.scrollTo(0, y);
+      const w = document.querySelector('.ge-song-who'); if(w && w.getBoundingClientRect().top > innerHeight - 80) w.scrollIntoView({ block:'nearest', behavior:'smooth' });
     }
     else if(action==='ge-tab'){
       state.geTab = el.dataset.value;
