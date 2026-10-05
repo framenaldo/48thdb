@@ -10948,13 +10948,13 @@ function gecShareSpec(id){
   const spec = (title, blocks, subtitle = '') => ({ kicker:'48thDb · GE2026', title, subtitle, at, blocks });
   if(id === 'total') return spec(en ? 'Tokens voted so far' : 'โทเคนที่โหวตแล้ว', [
     { type:'tiles', tiles:[{ label:en ? 'Tokens voted' : 'โทเคนที่โหวตแล้ว', value:T(d.sum) }, { label:en ? 'Votes' : 'ครั้งที่โหวต', value:N(d.n) }] },
-    { type:'tiles', tiles:[{ label:en ? 'Wallets' : 'กระเป๋า', value:N(wl.length) }, { label:en ? 'Median wallet' : 'ค่ากลางต่อกระเป๋า', value:T(gecMed(wl)) }] },
+    { type:'tiles', tiles:[{ label:en ? 'Wallets' : 'กระเป๋า', value:N(wl.length) }, { label:en ? 'Median wallet' : 'ยอดโหวตของกระเป๋าทั่วไป', value:T(gecMed(wl)) }] },
     { type:'note', text:elapsed }]);
   if(id === 'money'){
     const same = o ? gecUpTo(o, hNow) : 0;
     return spec(en ? 'The vote in baht' : 'มูลค่าการโหวตเป็นเงิน', [
       { type:'tiles', tiles:[{ label:en ? 'Voted so far' : 'มูลค่าที่โหวตแล้ว', value:Bh(d.sum) }] },
-      { type:'days', rows:[row(en ? 'Median wallet' : 'ค่ากลางต่อกระเป๋า', Bh(gecMed(wl))), row(en ? 'Average a vote' : 'เฉลี่ยต่อครั้ง', Bh(d.sum / d.n)),
+      { type:'days', rows:[row(en ? 'Median wallet' : 'ยอดโหวตของกระเป๋าทั่วไป', Bh(gecMed(wl))), row(en ? 'Average a vote' : 'เฉลี่ยต่อครั้ง', Bh(d.sum / d.n)),
         row(en ? 'Biggest wallet' : 'กระเป๋าที่โหวตมากสุด', Bh(wl[0][1][0])),
         ...(o ? [row(en ? 'GE2025 at this point' : 'GE2025 ณ เวลาเดียวกัน', Bh(same)), row(en ? 'GE2025 final total, when voting closed' : 'GE2025 ยอดรวมตอนปิดโหวต', Bh(o.sum))] : [])] },
       { type:'note', text:en ? `At ${gecPrice} baht a token.` : `คิดที่ราคา ${gecPrice} บาทต่อโทเคน` }]);
@@ -11360,7 +11360,7 @@ function renderGEChain(){
   const big = `<div class="gea-card gec-big" data-gshare="total">
     <p class="gec-k">${en ? 'GE tokens voted so far' : 'โทเคนที่โหวตแล้ว'}</p>
     <p class="gec-v">${odo('v-sum', gecTok(d.sum))}</p>
-    <div class="gec-trio"><span><b>${odo('v-n', N(d.n))}</b>${en ? 'votes' : 'ครั้งที่โหวต'}</span><span><b>${odo('v-w', N(wl.length))}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${gecTok(gecMed(wl))}</b>${en ? 'median wallet' : 'ค่ากลางต่อกระเป๋า'}</span></div>
+    <div class="gec-trio"><span><b>${odo('v-n', N(d.n))}</b>${en ? 'votes' : 'ครั้งที่โหวต'}</span><span><b>${odo('v-w', N(wl.length))}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${gecTok(gecMed(wl))}</b>${en ? 'median wallet' : 'ยอดโหวตของกระเป๋าทั่วไป'}</span></div>
     <div class="gec-run"><i style="width:${Math.min(100, hNow / hAll * 100).toFixed(1)}%"></i></div>
     <p class="gec-sub">${en ? `Open for ${elapsed} of ${Math.round(hAll / 24)} days · closes 12 Nov` : `เปิดโหวตมาแล้ว ${elapsed} จาก ${Math.round(hAll / 24)} วัน · ปิด 12 พ.ย.`}</p>
 </div>`;
@@ -11373,7 +11373,7 @@ function renderGEChain(){
     <p class="gec-mbig">${en ? '฿' : ''}${odo('v-baht', gecTok(d.sum * gecPrice))}${en ? '' : ' บาท'}</p>
     <p class="gec-mprice">${en ? `At ${gecPrice} baht a token` : `คิดที่ราคา ${gecPrice} บาท/โทเคน`}</p>
     <div class="gec-mrows">
-      ${row(en ? 'Median wallet' : 'ค่ากลางต่อกระเป๋า', gecBaht(gecMed(wl), en))}
+      ${row(en ? 'Median wallet' : 'ยอดโหวตของกระเป๋าทั่วไป', gecBaht(gecMed(wl), en))}
       ${row(en ? 'Per vote' : 'เฉลี่ยต่อครั้ง', gecBaht(d.sum / d.n, en))}
       ${row(en ? 'Biggest wallet' : 'กระเป๋าที่โหวตมากสุด', gecBaht(wl[0][1][0], en))}
       ${o2 ? row(en ? 'GE2025 at this point' : 'GE2025 ณ เวลาเดียวกัน', gecBaht(same25, en)) : ''}
@@ -11381,7 +11381,7 @@ function renderGEChain(){
       ${o2 && same25 > 0 ? row(en ? 'On last year’s curve' : 'ถ้าเดินตามเส้นปีที่แล้ว', gecBaht(d.sum * o2.sum / same25, en)) : ''}
     </div>
     <p class="gec-sub">${en ? 'Median wallet: half the wallets voted this much or less, so a few big wallets don’t pull it up. GE2025 is priced at today’s token price, not what it was then.'
-      : 'ค่ากลางต่อกระเป๋า: ครึ่งหนึ่งของกระเป๋าโหวตไม่เกินเท่านี้ กระเป๋าใหญ่ไม่กี่ใบจึงดึงตัวเลขขึ้นไม่ได้ · GE2025 คิดที่ราคาวันนี้ ไม่ใช่ราคาตอนนั้น'}</p></div>`;
+      : 'ยอดโหวตของกระเป๋าทั่วไป: ครึ่งหนึ่งของกระเป๋าโหวตไม่เกินเท่านี้ กระเป๋าใหญ่ไม่กี่ใบจึงดึงตัวเลขขึ้นไม่ได้ · GE2025 คิดที่ราคาวันนี้ ไม่ใช่ราคาตอนนั้น'}</p></div>`;
 
   // last year at the same hour of its run, and where it ended
   let cmp = '';
@@ -17298,7 +17298,7 @@ async function drawGECCard(g, sub){
   if(id === 'total'){
     y = await gcdFrame(g, L('ยอดโหวตรวม GE2026', 'GE2026: all votes so far'), when);
     y = gcdHero(g, y, L('โทเคนที่โหวตแล้ว', 'Tokens voted'), T(d.sum), L('โทเคน', 'tokens'));
-    y = gcdTiles(g, y + 10, [[L('ครั้งที่โหวต', 'Votes'), N(d.n), GCD.pink], [L('กระเป๋าที่โหวต', 'Wallets'), N(wl.length), GCD.teal], [L('ค่ากลางต่อกระเป๋า', 'Median wallet'), T(gecMed(wl)), GCD.ink]]);
+    y = gcdTiles(g, y + 10, [[L('ครั้งที่โหวต', 'Votes'), N(d.n), GCD.pink], [L('กระเป๋าที่โหวต', 'Wallets'), N(wl.length), GCD.teal], [L('กระเป๋าทั่วไปโหวต', 'Median wallet'), T(gecMed(wl)), GCD.ink]]);
     y += 56;
     shareText(g, L(`วันที่ ${dayNo} จาก ${days} วัน`, `Day ${dayNo} of ${days}`), P, y, gcdF(700, 28), GCD.ink);
     shareText(g, L('ปิดโหวต 12 พ.ย.', 'Closes 12 Nov'), P + W, y, gcdF(600, 26), GCD.soft, 'right');
@@ -17310,7 +17310,7 @@ async function drawGECCard(g, sub){
   else if(id === 'money'){
     y = await gcdFrame(g, L('มูลค่าการโหวต GE2026', 'GE2026: the vote in baht'), when);
     y = gcdHero(g, y, L('มูลค่าโทเคนที่โหวตแล้ว', 'Value of the tokens voted'), gecTok(d.sum * gecPrice), L('บาท', 'baht'));
-    y = gcdRows(g, y + 10, [[L('ค่ากลางต่อกระเป๋า', 'Median wallet'), gecBaht(gecMed(wl), en)], [L('เฉลี่ยต่อครั้ง', 'Average a vote'), gecBaht(d.sum / d.n, en)],
+    y = gcdRows(g, y + 10, [[L('ยอดโหวตของกระเป๋าทั่วไป', 'Median wallet'), gecBaht(gecMed(wl), en)], [L('เฉลี่ยต่อครั้ง', 'Average a vote'), gecBaht(d.sum / d.n, en)],
       ...(o ? [[L('GE2025 ณ เวลาเดียวกัน', 'GE2025 at the same point'), gecBaht(same, en)], [L('GE2025 ยอดรวมตอนปิดโหวต', 'GE2025 final total'), gecBaht(o.sum, en)]] : [])]);
     gcdTake(g, L(`คิดที่ราคา ${gecPrice} บาทต่อโทเคน${o ? ' · ตัวเลข GE2025 คิดที่ราคาเดียวกัน' : ''}`, `At ${gecPrice} baht a token${o ? '; GE2025 at the same price' : ''}`), y + 40);
   }
