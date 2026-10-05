@@ -2845,6 +2845,11 @@
   .gel-who b{ display:block; font-size:15px; line-height:1.25; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .gel-row.is-pending .gel-who b{ color:var(--ink-soft); }
   .gel-who small{ font-size:11.5px; color:var(--ink-soft); }
+  .gel-who .gel-song{ display:block; margin-top:2px; font-size:11.5px; line-height:1.3; font-weight:700; color:#B8862E; }
+  .gel-who .gel-song i, .gel-band-song i{ font-style:normal; font-weight:600; color:var(--ink-soft); }
+  .gel-who .gel-song em, .gel-band-song em{ white-space:nowrap; font-style:normal; font-size:10.5px; font-weight:800; padding:0 6px; border-radius:99px; background:var(--paper-dim); color:var(--ink-soft); }
+  .gel-band-song{ margin:6px 4px 2px; font-size:12.5px; color:var(--ink-soft); }
+  .gel-band-song b{ color:#B8862E; }
   .gel-g{ display:inline-block; font-size:10px; font-weight:800; padding:0 6px; border-radius:5px; color:#fff; margin-right:4px; }
   .gel-g.is-bnk{ background:var(--bnk); } .gel-g.is-cgm{ background:var(--cgm); }
   .gel-v{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
@@ -9920,6 +9925,91 @@ function renderSongLogo(key, cls){
    came, untouched; the grid and the profile card show a small copy
    (<id>-s.webp, 360 wide), which at their size is just as sharp and keeps
    a phone from loading 17MB to show the grid. */
+/* What each candidate wrote on her application form: the rank she hopes for
+   and the three AKB48 Group songs she would most like, as Center, for the
+   single if she comes 1st, 13th or 25th — her first choice is shown beside
+   her result. Titles as BNK48's own post of the form spells them. */
+const GE_WISH = {
+  'bnk-fame':   { hope:'Kami 7', songs:[['Tick tack zack', 'SKE48'], ['Hitsuzensei', 'IZ4648'], ['Zettai Inspiration', 'SKE48']] },
+  'bnk-inkcha': { hope:25, songs:[['Ano sa, Iya Betsu ni...', 'NGT48'], ['Nagori Zakura', 'AKB48'], ['Suki-ish', 'AKB48']] },
+  'cgm-lingling': { hope:13, songs:[['Chikai no ni Hanareteru', 'AKB48'], ['Ano sa, Iya Betsu ni...', 'NGT48'], ['Suki-ish', 'AKB48']] },
+  'cgm-shenae':   { hope:25, songs:[['Shoot Sign', 'AKB48'], ['Juuryoku Sympathy', 'AKB48 Team Surprise'], ['Sasameyuki Regret', 'AKB48 Team K']] },
+  'bnk-mint':     { hope:20, songs:[['Love Jump', 'AKB48 Team B'], ['Sustainable', 'AKB48'], ['Osaekirenai Shoudou', 'AKB48']] },
+  'cgm-hongyok':  { hope:27, songs:[['Suki! Suki! Skip!', 'HKT48'], ['Nagiichi', 'NMB48'], ['Sentimental Train', 'AKB48']] },
+  'cgm-punpon':   { hope:'25–36', songs:[['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Durian Shounen', 'NMB48'], ['Cecile', 'AKB48']] },
+  'cgm-satangpound': { hope:'26 (-1)', songs:[['Ima, Happy', 'AKB48'], ['Houtte Okenai yo Unicorn', 'SKE48'], ['Seishun wa Hazukashii', 'SKE48']] },
+  'cgm-praifa':   { hope:25, songs:[['Yasai Sisters', 'AKB48'], ['Hayaokuri Calendar', 'HKT48'], ['Yumemite Gomen', 'AKB48']] },
+  'cgm-nisha':    { hope:'25 (Center)', songs:[['Donchou wo Agete Kure!', 'AKB48'], ['Sou Yuu Toko Aru yo ne?', 'SKE48'], ['Pin to Kita', 'AKB48']] },
+  'cgm-prae':     { hope:'Center or Front Mem', songs:[['Shisou de Shinai Kiss', 'NGT48'], ['SNS WORLD', 'HKT48'], ['Donchou wo Agete Kure!', 'AKB48']] },
+  'cgm-jingjing': { hope:13, songs:[['Seishun no Deadline', 'NMB48'], ['Sandal da ze', 'SKE48'], ['Cecile', 'AKB48']] },
+  'cgm-chifa':    { hope:'25–36', songs:[['Yumemite Gomen', 'AKB48'], ['1!2!3!4! Yoroshiku!', 'SKE48'], ['Ano sa, Iya Betsu ni...', 'NGT48']] },
+  'bnk-wawa':     { hope:'21 (12)', songs:[['Moto Kare Desu', 'AKB48'], ['Nagori Zakura', 'AKB48'], ['Suki-ish', 'AKB48']] },
+  'bnk-emmy':     { hope:7, songs:[['Seishun no Deadline', 'NMB48'], ['Juuryoku Sympathy', 'AKB48 Team Surprise'], ['Time Machine Fuyouron', 'AKB48']] },
+  'bnk-monet':    { hope:3, songs:[['Manatsu no Sounds good !', 'AKB48'], ['Kiss wa Matsu Shikanai no deshou ka?', 'HKT48'], ['Hachinosu Dance', 'AKB48 Team 8']] },
+  'bnk-patt':     { hope:13, songs:[['Hitsuzensei', 'IZ4648'], ['Ano Natsu no Bouhatei', 'AKB48'], ['Juuryoku Sympathy', 'AKB48 Team Surprise']] },
+  'bnk-khaimook': { hope:25, songs:[['Hayaokuri Calendar', 'HKT48'], ['12-Byou', 'HKT48'], ['Hansode Tenshi', 'HKT48']] },
+  'bnk-palmmy':   { hope:13, songs:[['Halloween Night', 'AKB48'], ['Mousou Girlfriend', 'NMB48'], ['Neko Allergy', 'AKB48 Team 4']] },
+  'cgm-emma':     { hope:22, songs:[['74-Okubun no 1 no Kimi e', 'HKT48'], ['Sherbet Pink', 'NGT48'], ['Hoshi ga Kienai Uchi ni', 'AKB48']] },
+  'bnk-l':        { hope:4, songs:[['Wataridoritachi ni Sora wa Mienai', 'NGT48'], ['Seishun no Deadline', 'NMB48'], ['Bokura no Eureka', 'NMB48']] },
+  'cgm-nana':     { hope:7, songs:[['Labrador Retriever', 'AKB48'], ['Ganbaranuwai', 'NMB48'], ['Sentimental Train', 'AKB48']] },
+  'cgm-ginna':    { hope:'25–36', songs:[['Ano sa, Iya Betsu ni...', 'NGT48'], ['Utsukushii Inazuma', 'SKE48'], ['Cinderella Nante Inai', 'HKT48']] },
+  'cgm-lewlew':   { hope:'25–36', songs:[['Sentimental Train', 'AKB48'], ['Suki! Suki! Skip!', 'HKT48'], ['Sustainable', 'AKB48']] },
+  'bnk-nall':     { hope:12, songs:[['Shoot Sign', 'AKB48'], ['Seishun no Deadline', 'NMB48'], ['Suki-ish', 'AKB48']] },
+  'bnk-luksorn':  { hope:'Senbatsu', songs:[['Everyday, Kachuusha', 'AKB48'], ['Boku Datte Naichau yo', 'NMB48'], ['Sentimental Train', 'AKB48']] },
+  'bnk-arlee':    { hope:'Senbatsu (or 13)', songs:[['Kuchibiru ni Be My Baby', 'AKB48'], ['Nagiichi', 'NMB48'], ['Ano Natsu no Bouhatei', 'AKB48']] },
+  'bnk-proud':    { hope:'25 Center Next Girls', songs:[['Sandal da ze', 'SKE48'], ['Seishun no Deadline', 'NMB48'], ['Shidare Yanagi', 'NMB48']] },
+  'cgm-lookked':  { hope:'Senbatsu', songs:[['Wataridoritachi ni Sora wa Mienai', 'NGT48'], ['Cinderella Nante Inai', 'HKT48'], ['Boku Datte Naichau yo', 'NMB48']] },
+  'cgm-namphet':  { hope:25, songs:[['Sekai no Hito e', 'NGT48'], ['Hatsukoi Shijou Shugi', 'NMB48'], ['Boku Datte Naichau yo', 'NMB48']] },
+  'bnk-saonoi':   { hope:'Lucky 7', songs:[['Kimi wa Motto Dekiru', 'HKT48'], ['Hayaokuri Calendar', 'HKT48'], ['Hitsuzensei', 'IZ4648']] },
+  'bnk-cartoon':  { hope:27, songs:[['Sustainable', 'AKB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Durian Shounen', 'NMB48']] },
+  'bnk-micha':    { hope:13, songs:[['Biisan wa Naze Nakunaru no ka?', 'HKT48'], ['Ano Natsu no Bouhatei', 'AKB48'], ['Sustainable', 'AKB48']] },
+  'cgm-ploen':    { hope:'Kami 7', songs:[['Sekai no Hito e', 'NGT48'], ['Nagori Zakura', 'AKB48'], ['Kokoro no Placard', 'AKB48']] },
+  'bnk-mail':     { hope:20, songs:[['Kokuhaku Shinpakusuu', 'SKE48'], ['Hachinosu Dance', 'AKB48 Team 8'], ['Ano Natsu no Bouhatei', 'AKB48']] },
+  'cgm-kwan':     { hope:25, songs:[['Romance Kenjuu', 'AKB48 Team B'], ['12-Byou', 'HKT48'], ['Hoshi ga Kienai Uchi ni', 'AKB48']] },
+  'bnk-rose':     { hope:5, songs:[['Flying Get', 'AKB48'], ['Shoot Sign', 'AKB48'], ['Ue Kara Mariko', 'AKB48']] },
+  'bnk-mirin':    { hope:26, songs:[['Kuchibiru ni Be My Baby', 'AKB48'], ['Overtake', 'AKB48 Team A'], ['Suzukake no Ki no Michi de "Kimi no Hohoemi wo Yume ni Miru" to Itte Shimattara Bokutachi no Kankei wa Dou Kawatte Shimau no ka, Bokunari ni Nannichi ka Kangaeta Ue de no Yaya Kihazukashii Ketsuron no You na Mono', 'AKB48']] },
+  'cgm-tara':     { hope:25, songs:[['Kokoro no Placard', 'AKB48'], ['Love Jump', 'AKB48 Team B'], ['Christmas ga Ippai', 'AKB48 Team K']] },
+  'bnk-janry':    { hope:'3–7', songs:[['Hayaokuri Calendar', 'HKT48'], ['Sandal da ze', 'SKE48'], ['Ano Natsu no Bouhatei', 'AKB48']] },
+  'bnk-nammonn':  { hope:13, songs:[['Sekai wa Doko Made Aozora na no ka?', 'NGT48'], ['Romantic Junbichuu', 'AKB48 Team A'], ['Mazariau Mono', 'Nogizaka AKB']] },
+  'bnk-niya':     { hope:'13 or Senbatsu', songs:[['Ano sa, Iya Betsu ni...', 'NGT48'], ['Hayaokuri Calendar', 'HKT48'], ['Kokoro no Placard', 'AKB48']] },
+  'bnk-berry':    { hope:25, songs:[['Hayaokuri Calendar', 'HKT48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Yumemite Gomen', 'AKB48']] },
+  'bnk-galeya':   { hope:13, songs:[['Suki-ish', 'AKB48'], ['Everyday, Kachuusha', 'AKB48'], ['Sustainable', 'AKB48']] },
+  'bnk-pancake':  { hope:1, songs:[['Nagori Zakura', 'AKB48'], ['Ano sa, Iya Betsu ni...', 'NGT48'], ['Kuchibiru ni Be My Baby', 'AKB48']] },
+  'bnk-sindy':    { hope:'Center or Kami 7', songs:[['Nagiichi', 'NMB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Oh My God!', 'NMB48']] },
+  'cgm-else':     { hope:'6+7 = 13', songs:[['Kuchibiru ni Be My Baby', 'AKB48'], ['Time Machine Fuyouron', 'AKB48'], ['Igai ni Mango', 'SKE48']] },
+  'bnk-mayji':    { hope:25, songs:[['Ue Kara Mariko', 'AKB48'], ['Sou Yuu Toko Aru yo ne?', 'SKE48'], ['Ganbaranuwai', 'NMB48']] },
+  'bnk-grape':    { hope:19, songs:[['Ano Natsu no Bouhatei', 'AKB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Moto Kare Desu', 'AKB48']] },
+  'bnk-praew':    { hope:'Senbatsu', songs:[['Suki-ish', 'AKB48'], ['Ano sa, Iya Betsu ni...', 'NGT48'], ['Hoshi ga Kienai Uchi ni', 'AKB48']] },
+  'bnk-yoghurt':  { hope:'12–7', songs:[['Sentimental Train', 'AKB48'], ['Everyday, Kachuusha', 'AKB48'], ['Kimi wa Motto Dekiru', 'HKT48']] },
+  'bnk-hoop':     { hope:1, songs:[['Nagori Zakura', 'AKB48'], ['Suki-ish', 'AKB48'], ['Kokoro no Placard', 'AKB48']] },
+  'bnk-neen':     { hope:'13 (Center)', songs:[['Yokuboumono', 'NMB48'], ['Ishi', 'HKT48'], ['Wataridoritachi ni Sora wa Mienai', 'NGT48']] },
+  'bnk-khowjow':  { hope:13, songs:[['Seishun no Deadline', 'NMB48'], ['UZA', 'AKB48'], ['Flying Get', 'AKB48']] },
+  'bnk-blythe':   { hope:'Senbatsu · 13', songs:[['Sherbet Pink', 'NGT48'], ['Everyday, Kachuusha', 'AKB48'], ['Namida no Seesaw Game', 'AKB48']] },
+  'bnk-marine':   { hope:'Senbatsu', songs:[['Ano Natsu no Bouhatei', 'AKB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Suki! Suki! Skip!', 'HKT48']] },
+  'bnk-jew':      { hope:'1–13', songs:[['Utsukushii Inazuma', 'SKE48'], ['Flying Get', 'AKB48'], ['UZA', 'AKB48']] },
+  'cgm-valentine': { hope:25, songs:[['Biisan wa Naze Nakunaru no ka?', 'HKT48'], ['Hansode Tenshi', 'HKT48'], ['Nagori Zakura', 'AKB48']] },
+};
+/* Each group's song is chosen by its Center — 1st for the Senbatsu, 13th for
+   the Under Girls, 25th for the Next Girls — from her list, in order. A song
+   already taken by a higher-ranked Center goes to her, and the next one down
+   takes her next choice. Until every higher Center's list is known, a lower
+   group's song can't be told for sure, so it is left blank. */
+const GE_CENTERS = [1, 13, 25];
+function geBandSongs(round){
+  const sl = geSlots(round), taken = new Set(), out = {};
+  const key = t => String(t).toLowerCase().replace(/[^a-z0-9]/g, '');
+  let sure = true;
+  for(const n of GE_CENTERS){
+    const id = sl[n] && sl[n].id, w = id && GE_WISH[id];
+    if(!sure || !w){ sure = false; continue; }
+    const i = w.songs.findIndex(x => !taken.has(key(x[0])));
+    if(i < 0){ sure = false; continue; }
+    taken.add(key(w.songs[i][0]));
+    out[n] = { song:w.songs[i], choice:i + 1 };
+  }
+  return out;
+}
+const geSongLine = (x, en) => `♪ ${escapeHtml(x.song[0])} <i>(${escapeHtml(x.song[1])})</i>${x.choice > 1 ? ` <em>${en ? `choice ${x.choice}` : `ตัวเลือกที่ ${x.choice}`}</em>` : ''}`;
 const GE_CANDIDATES = [
   'bnk-arlee', 'bnk-berry', 'bnk-blythe', 'bnk-cartoon', 'cgm-chifa', 'cgm-else', 'cgm-emma', 'bnk-emmy',
   'bnk-fame', 'bnk-galeya', 'cgm-ginna', 'bnk-grape', 'cgm-hongyok', 'bnk-hoop', 'bnk-inkcha', 'bnk-janry',
@@ -10461,6 +10551,7 @@ function renderGEResults(){
     if(pm) now += `<div class="gel-before">${en ? 'Before' : 'ก่อนหน้า'} · <b>${p}</b> ${geFace(pm, 'gel-before-face')} ${escapeHtml(pm.name)} ${geVotes(slots[p].v)} ${geMove(prev, pm.id, p)}</div>`;
   }
 
+  const bandSongs = geBandSongs(round.id);
   const bands = GE_BANDS.map(b => {
     const ranks = []; for(let n = b.from; n <= b.to; n++) ranks.push(n);
     const known = ranks.filter(n => slots[n] && (slots[n].id || slots[n].v != null));
@@ -10474,8 +10565,9 @@ function renderGEResults(){
       if(!m) return `<div class="gel-row is-pending${fresh}"><span class="gel-n">${n}</span><span class="gel-q">?</span>
         <span class="gel-who"><b>${live ? (en ? 'Announcing…' : 'กำลังประกาศ…') : '—'}</b></span>
         <span class="gel-v">${geCount(mk, s.v)}</span>${bar}</div>`;
+      const song = bandSongs[n];
       return `<button class="gel-row${fresh}" data-action="open-member" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
-        <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small></span>
+        <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small>${song ? `<small class="gel-song">${geSongLine(song, en)}</small>` : ''}</span>
         <span class="gel-v">${geCount(mk, s.v)}${geMove(prev, m.id, n)}</span>${bar}</button>`;
     };
     const k7 = known.filter(n => n <= GE_KAMI7);
@@ -10483,6 +10575,7 @@ function renderGEResults(){
     const rows = (k7.length ? geKami7(k7rows, en, lit) : '') + known.filter(n => n > GE_KAMI7).map(rowOf).join('');
     return `<section class="gel-band is-${b.tone}">
       <div class="gel-band-h">${b.name}<small>${en ? `Ranks ${b.from}–${b.to}` : `อันดับ ${b.from}–${b.to}`}</small></div>
+      ${bandSongs[b.from] ? `<p class="gel-band-song">${en ? `${b.name} song` : `เพลงของ ${b.name}`} · <b>${geSongLine(bandSongs[b.from], en)}</b></p>` : ''}
       ${waiting.length ? `<div class="gel-seats">${waiting.map(n => `<span>${n}</span>`).join('')}</div>
         ${!known.length ? `<p class="gel-wait">${en ? 'Not announced yet' : 'ยังไม่ประกาศ'}</p>` : ''}` : ''}
       ${rows ? `<div class="gel-rows">${rows}</div>` : ''}
@@ -17252,6 +17345,10 @@ async function drawGEResCard(g, sub){
   const c = M(1);
   circle(faces[1], P + 108, ky + 116, 76, '#F3C969');
   shareText(g, en ? 'No. 1 · Center' : 'อันดับ 1 · เซ็นเตอร์', P + 210, ky + 66, F(800, 26), GCD.gold);
+  // each group's song, as its Center chose it
+  const bs = geBandSongs(round.id);
+  const songTxt = x => `♪ ${x.song[0]} (${x.song[1]})${x.choice > 1 ? (en ? ` · choice ${x.choice}` : ` · ตัวเลือกที่ ${x.choice}`) : ''}`;
+  if(bs[1]) fitName(songTxt(bs[1]), P + W - 26, ky + 66, W - 500, 24, GCD.gold, 'right');
   fitName(c ? c.name : (en ? 'Announcing' : 'กำลังประกาศ'), P + 210, ky + 126, W - 250, 60, GCD.ink, 'left');
   if(c) shareText(g, unit(c), P + 210, ky + 166, F(700, 24), unitCol(c));
   shareText(g, V(1) ? `${V(1)} ${en ? 'votes' : 'คะแนน'}` : '', P + 210, ky + 210, F(800, 34), VOTE);
@@ -17284,8 +17381,9 @@ async function drawGEResCard(g, sub){
     const x = P + col * (cw + 40), m = M(from);
     shareText(g, label, x, ly, F(800, 22), tone);
     // the Center of the Under Girls / Next Girls song
-    g.fillStyle = 'rgba(255,255,255,.07)'; shareRound(g, x, ly + 14, cw, 92, 18); g.fill();
-    g.strokeStyle = tone; g.lineWidth = 2; shareRound(g, x, ly + 14, cw, 92, 18); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.07)'; shareRound(g, x, ly + 14, cw, 114, 18); g.fill();
+    g.strokeStyle = tone; g.lineWidth = 2; shareRound(g, x, ly + 14, cw, 114, 18); g.stroke();
+    if(bs[from]) fitName(songTxt(bs[from]), x + 18, ly + 118, cw - 36, 17, GCD.gold, 'left');
     circle(cen[from], x + 50, ly + 60, 34, tone);
     shareText(g, `${from} · ${en ? 'Center' : 'เซ็นเตอร์'}`, x + 98, ly + 44, F(800, 18), tone);
     g.font = F(800, 26); let nm = m ? m.name : V(from) ? (en ? 'Announcing' : 'กำลังประกาศ') : '—'; while(g.measureText(nm).width > cw - 230 && nm.length > 3) nm = nm.slice(0, -1);
@@ -17293,7 +17391,7 @@ async function drawGEResCard(g, sub){
     if(m) shareText(g, unit(m), x + 98, ly + 98, F(700, 16), unitCol(m));
     shareText(g, V(from), x + cw - 14, ly + 76, F(800, 24), VOTE, 'right');
     for(let k = 1; k < 12; k++){
-      const n = from + k, mm = M(n), y = ly + 130 + (k - 1) * 18.6;
+      const n = from + k, mm = M(n), y = ly + 152 + (k - 1) * 18.2;
       shareText(g, String(n), x, y, F(800, 17), tone);
       g.font = F(800, 18); let name = mm ? mm.name : V(n) ? (en ? 'Announcing' : 'กำลังประกาศ') : '—'; while(g.measureText(name).width > 150 && name.length > 3) name = name.slice(0, -1);
       shareText(g, name, x + 34, y, F(800, 18), GCD.ink);
