@@ -2845,6 +2845,11 @@
   .gel-who b{ display:block; font-size:15px; line-height:1.25; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .gel-row.is-pending .gel-who b{ color:var(--ink-soft); }
   .gel-who small{ font-size:11.5px; color:var(--ink-soft); }
+  .gel-who .gel-song{ display:block; margin-top:2px; font-size:11.5px; line-height:1.3; font-weight:700; color:#B8862E; }
+  .gel-who .gel-song i, .gel-band-song i{ font-style:normal; font-weight:600; color:var(--ink-soft); }
+  .gel-who .gel-song em, .gel-band-song em{ white-space:nowrap; font-style:normal; font-size:10.5px; font-weight:800; padding:0 6px; border-radius:99px; background:var(--paper-dim); color:var(--ink-soft); }
+  .gel-band-song{ margin:6px 4px 2px; font-size:12.5px; color:var(--ink-soft); }
+  .gel-band-song b{ color:#B8862E; }
   .gel-g{ display:inline-block; font-size:10px; font-weight:800; padding:0 6px; border-radius:5px; color:#fff; margin-right:4px; }
   .gel-g.is-bnk{ background:var(--bnk); } .gel-g.is-cgm{ background:var(--cgm); }
   .gel-v{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
@@ -2855,7 +2860,34 @@
   .gel-mv.is-eq{ color:var(--ink-soft); background:var(--paper-dim); } .gel-mv.is-new{ color:#7A4BC4; background:#EFE6FB; }
   .gel-foot{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:12px; }
   /* What changed since the round before */
+  .gel-share{ display:inline-flex; align-items:center; gap:6px; margin:10px 0 2px; }
+  .gel-share svg{ width:16px; height:16px; }
   .gec-ch{ margin:12px 0 4px; }
+  /* the songs the candidates asked for */
+  .ge-songs{ margin-top:12px; }
+  .ge-song-card .bar-row{ grid-template-columns:minmax(0, 1fr) 30px; grid-template-areas:'l v' 't v'; gap:3px 10px; margin-bottom:10px; }
+  .ge-song-card .bar-label{ grid-area:l; text-align:left; font-size:13.5px; font-weight:700; color:var(--ink); white-space:normal; }
+  .ge-song-card .bar-track{ grid-area:t; }
+  .ge-song-card .bar-val{ grid-area:v; align-self:center; font-weight:800; }
+  .ge-song-card .stat-grid{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+  button.bar-row{ width:100%; border:0; background:none; padding:0; font:inherit; color:inherit; text-align:left; cursor:pointer; }
+  .ge-song-who{ margin:-12px 0 20px; padding:12px 14px; border-radius:14px; background:color-mix(in srgb, #E4457E 7%, var(--card)); border:1px solid color-mix(in srgb, #E4457E 25%, var(--line)); }
+  .ge-song-who p{ margin:0 0 8px; font-size:14px; }
+  .ge-song-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .ge-song-chips .chip{ display:inline-flex; align-items:center; gap:6px; }
+  .ge-song-chips i{ font-style:normal; font-size:11px; color:var(--ink-soft); }
+  .ge-song-face{ width:22px !important; height:22px !important; border-radius:50% !important; font-size:9px; }
+  .ge-clash, .ge-hope, .ge-ifnow, .ge-once{ list-style:none; margin:0; padding:0; }
+  .ge-clash li, .ge-ifnow li{ padding:9px 0; border-bottom:1px solid var(--line); font-size:14px; }
+  .ge-clash li:last-child, .ge-ifnow li:last-child{ border-bottom:0; }
+  .ge-clash li span, .ge-ifnow li span{ display:block; color:var(--ink-soft); font-size:13px; margin-top:2px; }
+  .ge-ifnow li em{ display:block; font-style:normal; font-weight:800; color:#B8862E; margin-top:2px; }
+  .ge-hope{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:4px 12px; }
+  .ge-hope li{ font-size:14px; font-weight:700; }
+  .ge-hope li span{ font-weight:600; font-size:12px; color:var(--ink-soft); }
+  .ge-once{ columns:2 220px; column-gap:16px; }
+  .ge-once li{ break-inside:avoid; font-size:13px; padding:3px 0; }
+  .ge-once li span{ color:var(--ink-soft); }
   .gec-ch-h{ margin:0 2px 8px; font-size:13px; font-weight:800; color:var(--ink-soft); }
   .gec-ch-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
   @media (min-width:760px){ .gec-ch-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
@@ -9918,6 +9950,91 @@ function renderSongLogo(key, cls){
    came, untouched; the grid and the profile card show a small copy
    (<id>-s.webp, 360 wide), which at their size is just as sharp and keeps
    a phone from loading 17MB to show the grid. */
+/* What each candidate wrote on her application form: the rank she hopes for
+   and the three AKB48 Group songs she would most like, as Center, for the
+   single if she comes 1st, 13th or 25th — her first choice is shown beside
+   her result. Titles as BNK48's own post of the form spells them. */
+const GE_WISH = {
+  'bnk-fame':   { hope:'Kami 7', songs:[['Tick tack zack', 'SKE48'], ['Hitsuzensei', 'IZ4648'], ['Zettai Inspiration', 'SKE48']] },
+  'bnk-inkcha': { hope:25, songs:[['Ano sa, Iya Betsu ni...', 'NGT48'], ['Nagori Zakura', 'AKB48'], ['Suki-ish', 'AKB48']] },
+  'cgm-lingling': { hope:13, songs:[['Chikai no ni Hanareteru', 'AKB48'], ['Ano sa, Iya Betsu ni...', 'NGT48'], ['Suki-ish', 'AKB48']] },
+  'cgm-shenae':   { hope:25, songs:[['Shoot Sign', 'AKB48'], ['Juuryoku Sympathy', 'AKB48 Team Surprise'], ['Sasameyuki Regret', 'AKB48 Team K']] },
+  'bnk-mint':     { hope:20, songs:[['Love Jump', 'AKB48 Team B'], ['Sustainable', 'AKB48'], ['Osaekirenai Shoudou', 'AKB48']] },
+  'cgm-hongyok':  { hope:27, songs:[['Suki! Suki! Skip!', 'HKT48'], ['Nagiichi', 'NMB48'], ['Sentimental Train', 'AKB48']] },
+  'cgm-punpon':   { hope:'25–36', songs:[['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Durian Shounen', 'NMB48'], ['Cecile', 'AKB48']] },
+  'cgm-satangpound': { hope:'26 (-1)', aim:25, songs:[['Ima, Happy', 'AKB48'], ['Houtte Okenai yo Unicorn', 'SKE48'], ['Seishun wa Hazukashii', 'SKE48']] },
+  'cgm-praifa':   { hope:25, songs:[['Yasai Sisters', 'AKB48'], ['Hayaokuri Calendar', 'HKT48'], ['Yumemite Gomen', 'AKB48']] },
+  'cgm-nisha':    { hope:'25 (Center)', songs:[['Donchou wo Agete Kure!', 'AKB48'], ['Sou Yuu Toko Aru yo ne?', 'SKE48'], ['Pin to Kita', 'AKB48']] },
+  'cgm-prae':     { hope:'Center or Front Mem', aim:[[1, 7], [13, 15], [25, 27]], songs:[['Shisou de Shinai Kiss', 'NGT48'], ['SNS WORLD', 'HKT48'], ['Donchou wo Agete Kure!', 'AKB48']] },
+  'cgm-jingjing': { hope:13, songs:[['Seishun no Deadline', 'NMB48'], ['Sandal da ze', 'SKE48'], ['Cecile', 'AKB48']] },
+  'cgm-chifa':    { hope:'25–36', songs:[['Yumemite Gomen', 'AKB48'], ['1!2!3!4! Yoroshiku!', 'SKE48'], ['Ano sa, Iya Betsu ni...', 'NGT48']] },
+  'bnk-wawa':     { hope:'21 (12)', aim:21, songs:[['Moto Kare Desu', 'AKB48'], ['Nagori Zakura', 'AKB48'], ['Suki-ish', 'AKB48']] },
+  'bnk-emmy':     { hope:7, songs:[['Seishun no Deadline', 'NMB48'], ['Juuryoku Sympathy', 'AKB48 Team Surprise'], ['Time Machine Fuyouron', 'AKB48']] },
+  'bnk-monet':    { hope:3, songs:[['Manatsu no Sounds good !', 'AKB48'], ['Kiss wa Matsu Shikanai no deshou ka?', 'HKT48'], ['Hachinosu Dance', 'AKB48 Team 8']] },
+  'bnk-patt':     { hope:13, songs:[['Hitsuzensei', 'IZ4648'], ['Ano Natsu no Bouhatei', 'AKB48'], ['Juuryoku Sympathy', 'AKB48 Team Surprise']] },
+  'bnk-khaimook': { hope:25, songs:[['Hayaokuri Calendar', 'HKT48'], ['12-Byou', 'HKT48'], ['Hansode Tenshi', 'HKT48']] },
+  'bnk-palmmy':   { hope:13, songs:[['Halloween Night', 'AKB48'], ['Mousou Girlfriend', 'NMB48'], ['Neko Allergy', 'AKB48 Team 4']] },
+  'cgm-emma':     { hope:22, songs:[['74-Okubun no 1 no Kimi e', 'HKT48'], ['Sherbet Pink', 'NGT48'], ['Hoshi ga Kienai Uchi ni', 'AKB48']] },
+  'bnk-l':        { hope:4, songs:[['Wataridoritachi ni Sora wa Mienai', 'NGT48'], ['Seishun no Deadline', 'NMB48'], ['Bokura no Eureka', 'NMB48']] },
+  'cgm-nana':     { hope:7, songs:[['Labrador Retriever', 'AKB48'], ['Ganbaranuwai', 'NMB48'], ['Sentimental Train', 'AKB48']] },
+  'cgm-ginna':    { hope:'25–36', songs:[['Ano sa, Iya Betsu ni...', 'NGT48'], ['Utsukushii Inazuma', 'SKE48'], ['Cinderella Nante Inai', 'HKT48']] },
+  'cgm-lewlew':   { hope:'25–36', songs:[['Sentimental Train', 'AKB48'], ['Suki! Suki! Skip!', 'HKT48'], ['Sustainable', 'AKB48']] },
+  'bnk-nall':     { hope:12, songs:[['Shoot Sign', 'AKB48'], ['Seishun no Deadline', 'NMB48'], ['Suki-ish', 'AKB48']] },
+  'bnk-luksorn':  { hope:'Senbatsu', songs:[['Everyday, Kachuusha', 'AKB48'], ['Boku Datte Naichau yo', 'NMB48'], ['Sentimental Train', 'AKB48']] },
+  'bnk-arlee':    { hope:'Senbatsu (or 13)', songs:[['Kuchibiru ni Be My Baby', 'AKB48'], ['Nagiichi', 'NMB48'], ['Ano Natsu no Bouhatei', 'AKB48']] },
+  'bnk-proud':    { hope:'25 Center Next Girls', songs:[['Sandal da ze', 'SKE48'], ['Seishun no Deadline', 'NMB48'], ['Shidare Yanagi', 'NMB48']] },
+  'cgm-lookked':  { hope:'Senbatsu', songs:[['Wataridoritachi ni Sora wa Mienai', 'NGT48'], ['Cinderella Nante Inai', 'HKT48'], ['Boku Datte Naichau yo', 'NMB48']] },
+  'cgm-namphet':  { hope:25, songs:[['Sekai no Hito e', 'NGT48'], ['Hatsukoi Shijou Shugi', 'NMB48'], ['Boku Datte Naichau yo', 'NMB48']] },
+  'bnk-saonoi':   { hope:'Lucky 7', songs:[['Kimi wa Motto Dekiru', 'HKT48'], ['Hayaokuri Calendar', 'HKT48'], ['Hitsuzensei', 'IZ4648']] },
+  'bnk-cartoon':  { hope:27, songs:[['Sustainable', 'AKB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Durian Shounen', 'NMB48']] },
+  'bnk-micha':    { hope:13, songs:[['Biisan wa Naze Nakunaru no ka?', 'HKT48'], ['Ano Natsu no Bouhatei', 'AKB48'], ['Sustainable', 'AKB48']] },
+  'cgm-ploen':    { hope:'Kami 7', songs:[['Sekai no Hito e', 'NGT48'], ['Nagori Zakura', 'AKB48'], ['Kokoro no Placard', 'AKB48']] },
+  'bnk-mail':     { hope:20, songs:[['Kokuhaku Shinpakusuu', 'SKE48'], ['Hachinosu Dance', 'AKB48 Team 8'], ['Ano Natsu no Bouhatei', 'AKB48']] },
+  'cgm-kwan':     { hope:25, songs:[['Romance Kenjuu', 'AKB48 Team B'], ['12-Byou', 'HKT48'], ['Hoshi ga Kienai Uchi ni', 'AKB48']] },
+  'bnk-rose':     { hope:5, songs:[['Flying Get', 'AKB48'], ['Shoot Sign', 'AKB48'], ['Ue Kara Mariko', 'AKB48']] },
+  'bnk-mirin':    { hope:26, songs:[['Kuchibiru ni Be My Baby', 'AKB48'], ['Overtake', 'AKB48 Team A'], ['Suzukake no Ki no Michi de "Kimi no Hohoemi wo Yume ni Miru" to Itte Shimattara Bokutachi no Kankei wa Dou Kawatte Shimau no ka, Bokunari ni Nannichi ka Kangaeta Ue de no Yaya Kihazukashii Ketsuron no You na Mono', 'AKB48']] },
+  'cgm-tara':     { hope:25, songs:[['Kokoro no Placard', 'AKB48'], ['Love Jump', 'AKB48 Team B'], ['Christmas ga Ippai', 'AKB48 Team K']] },
+  'bnk-janry':    { hope:'3–7', songs:[['Hayaokuri Calendar', 'HKT48'], ['Sandal da ze', 'SKE48'], ['Ano Natsu no Bouhatei', 'AKB48']] },
+  'bnk-nammonn':  { hope:13, songs:[['Sekai wa Doko Made Aozora na no ka?', 'NGT48'], ['Romantic Junbichuu', 'AKB48 Team A'], ['Mazariau Mono', 'Nogizaka AKB']] },
+  'bnk-niya':     { hope:'13 or Senbatsu', songs:[['Ano sa, Iya Betsu ni...', 'NGT48'], ['Hayaokuri Calendar', 'HKT48'], ['Kokoro no Placard', 'AKB48']] },
+  'bnk-berry':    { hope:25, songs:[['Hayaokuri Calendar', 'HKT48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Yumemite Gomen', 'AKB48']] },
+  'bnk-galeya':   { hope:13, songs:[['Suki-ish', 'AKB48'], ['Everyday, Kachuusha', 'AKB48'], ['Sustainable', 'AKB48']] },
+  'bnk-pancake':  { hope:1, songs:[['Nagori Zakura', 'AKB48'], ['Ano sa, Iya Betsu ni...', 'NGT48'], ['Kuchibiru ni Be My Baby', 'AKB48']] },
+  'bnk-sindy':    { hope:'Center or Kami 7', songs:[['Nagiichi', 'NMB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Oh My God!', 'NMB48']] },
+  'cgm-else':     { hope:'6+7 = 13', aim:13, songs:[['Kuchibiru ni Be My Baby', 'AKB48'], ['Time Machine Fuyouron', 'AKB48'], ['Igai ni Mango', 'SKE48']] },
+  'bnk-mayji':    { hope:25, songs:[['Ue Kara Mariko', 'AKB48'], ['Sou Yuu Toko Aru yo ne?', 'SKE48'], ['Ganbaranuwai', 'NMB48']] },
+  'bnk-grape':    { hope:19, songs:[['Ano Natsu no Bouhatei', 'AKB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Moto Kare Desu', 'AKB48']] },
+  'bnk-praew':    { hope:'Senbatsu', songs:[['Suki-ish', 'AKB48'], ['Ano sa, Iya Betsu ni...', 'NGT48'], ['Hoshi ga Kienai Uchi ni', 'AKB48']] },
+  'bnk-yoghurt':  { hope:'12–7', songs:[['Sentimental Train', 'AKB48'], ['Everyday, Kachuusha', 'AKB48'], ['Kimi wa Motto Dekiru', 'HKT48']] },
+  'bnk-hoop':     { hope:1, songs:[['Nagori Zakura', 'AKB48'], ['Suki-ish', 'AKB48'], ['Kokoro no Placard', 'AKB48']] },
+  'bnk-neen':     { hope:'13 (Center)', songs:[['Yokuboumono', 'NMB48'], ['Ishi', 'HKT48'], ['Wataridoritachi ni Sora wa Mienai', 'NGT48']] },
+  'bnk-khowjow':  { hope:13, songs:[['Seishun no Deadline', 'NMB48'], ['UZA', 'AKB48'], ['Flying Get', 'AKB48']] },
+  'bnk-blythe':   { hope:'Senbatsu · 13', songs:[['Sherbet Pink', 'NGT48'], ['Everyday, Kachuusha', 'AKB48'], ['Namida no Seesaw Game', 'AKB48']] },
+  'bnk-marine':   { hope:'Senbatsu', songs:[['Ano Natsu no Bouhatei', 'AKB48'], ['Hoshi ga Kienai Uchi ni', 'AKB48'], ['Suki! Suki! Skip!', 'HKT48']] },
+  'bnk-jew':      { hope:'1–13', songs:[['Utsukushii Inazuma', 'SKE48'], ['Flying Get', 'AKB48'], ['UZA', 'AKB48']] },
+  'cgm-valentine': { hope:25, songs:[['Biisan wa Naze Nakunaru no ka?', 'HKT48'], ['Hansode Tenshi', 'HKT48'], ['Nagori Zakura', 'AKB48']] },
+};
+/* Each group's song is chosen by its Center — 1st for the Senbatsu, 13th for
+   the Under Girls, 25th for the Next Girls — from her list, in order. A song
+   already taken by a higher-ranked Center goes to her, and the next one down
+   takes her next choice. Until every higher Center's list is known, a lower
+   group's song can't be told for sure, so it is left blank. */
+const GE_CENTERS = [1, 13, 25];
+function geBandSongs(round){
+  const sl = geSlots(round), taken = new Set(), out = {};
+  const key = t => String(t).toLowerCase().replace(/[^a-z0-9]/g, '');
+  let sure = true;
+  for(const n of GE_CENTERS){
+    const id = sl[n] && sl[n].id, w = id && GE_WISH[id];
+    if(!sure || !w){ sure = false; continue; }
+    const i = w.songs.findIndex(x => !taken.has(key(x[0])));
+    if(i < 0){ sure = false; continue; }
+    taken.add(key(w.songs[i][0]));
+    out[n] = { song:w.songs[i], choice:i + 1 };
+  }
+  return out;
+}
+const geSongLine = (x, en) => `♪ ${escapeHtml(x.song[0])} <i>(${escapeHtml(x.song[1])})</i>${x.choice > 1 ? ` <em>${en ? `choice ${x.choice}` : `ตัวเลือกที่ ${x.choice}`}</em>` : ''}`;
 const GE_CANDIDATES = [
   'bnk-arlee', 'bnk-berry', 'bnk-blythe', 'bnk-cartoon', 'cgm-chifa', 'cgm-else', 'cgm-emma', 'bnk-emmy',
   'bnk-fame', 'bnk-galeya', 'cgm-ginna', 'bnk-grape', 'cgm-hongyok', 'bnk-hoop', 'bnk-inkcha', 'bnk-janry',
@@ -9958,6 +10075,129 @@ function geCandCard(m){
     <img src="${gePoster(m.id, true)}" width="360" height="509" alt="" loading="lazy" decoding="async">
     ${state.oshi.includes(m.id) ? '<span class="gec-star" aria-hidden="true">★</span>' : ''}</button>`;
 }
+const geCandSwitch = (tab, en) => `<div class="gea-seg ge-sched-seg">
+  <button class="${tab === 'candidates' ? 'is-on' : ''}" data-action="ge-tab" data-value="candidates">${en ? 'Candidates' : 'ผู้สมัคร'}</button>
+  <button class="${tab === 'songs' ? 'is-on' : ''}" data-action="ge-tab" data-value="songs">${en ? 'Songs they want' : 'เพลงที่อยากได้'}</button></div>`;
+
+/* ---------- The songs the candidates asked for, counted ----------
+   From GE_WISH: what each wrote on her form. Six boxes, each shareable:
+   the favourites, songs wanted first by more than one, the source groups,
+   hope against the latest result, the songs if it ended today, the one-offs. */
+const GE_SRC_COL = { AKB48:'#E4457E', HKT48:'#3A3A44', NMB48:'#E2A400', NGT48:'#D9363E', SKE48:'#F07D1A', IZ4648:'#7A4BC4', 'Nogizaka AKB':'#7E57C2' };
+const geSrc = g => /^AKB48/.test(g) ? 'AKB48' : g;
+const geSongKey = t => String(t).toLowerCase().replace(/[^a-z0-9]/g, '');
+/* The latest round with names in it — complete if there is one. */
+function geLatestRound(){
+  const withData = GE_ROUNDS.filter(r => geHasData(r.id));
+  const full = withData.filter(r => geAnnounced(r.id) >= GE_SEATS);
+  return (full.length ? full[full.length - 1] : withData[withData.length - 1]) || null;
+}
+/* A hope written in words, as a range of ranks [best, worst] — or several.
+   Prae: the Center or front of any group — Kami 7 in the Senbatsu; in the
+   other groups the front is position 0 (the Center) and the two beside her,
+   so the top three. */
+function geAim(w){
+  if(w.aim != null) return Array.isArray(w.aim) ? w.aim : [w.aim, w.aim];
+  const h = String(w.hope), nums = (h.match(/\d+/g) || []).map(Number);
+  if(/kami\s*7|lucky 7/i.test(h) && !nums.filter(n => n !== 7).length) return /lucky/i.test(h) ? [7, 7] : [1, 7];
+  if(/center or kami/i.test(h)) return [1, 7];
+  if(/senbatsu/i.test(h)) return [1, Math.max(12, ...nums)];
+  if(nums.length >= 2) return [Math.min(...nums), Math.max(...nums)];
+  if(nums.length === 1) return [nums[0], nums[0]];
+  return null;
+}
+function renderGESongs(){
+  const en = isEN(), W = GE_WISH, ids = Object.keys(W).filter(id => getMember(id));
+  const nm = id => escapeHtml(getMember(id).name);
+  // every pick, with who made it and at which place
+  const songs = {};
+  ids.forEach(id => W[id].songs.forEach(([t, g], k) => {
+    const s = songs[geSongKey(t)] || (songs[geSongKey(t)] = { t, g, by:[] });
+    s.by.push({ id, k:k + 1 });
+  }));
+  const firsts = s => s.by.filter(x => x.k === 1).length;
+  const list = Object.values(songs).sort((a, b) => b.by.length - a.by.length || firsts(b) - firsts(a) || a.t.localeCompare(b.t));
+  const picks = ids.length * 3, once = list.filter(s => s.by.length === 1);
+  const round = geLatestRound(), slots = round ? geSlots(round.id) : {};
+  const rankOf = {}; Object.keys(slots).forEach(n => { if(slots[n] && slots[n].id) rankOf[slots[n].id] = +n; });
+  const roundNote = round ? (en ? `By ${geRoundLabel(round)}` : `อิงจาก${geRoundLabel(round)}`) : '';
+  const card = (title, body, c) => `<div class="group-card ge-song-card" style="--c:${c || '#E4457E'}"><div class="group-head"><h2 style="font-size:21px;">${title}</h2></div>${body}</div>`;
+  const label = s => `${s.t} (${s.g})`;
+
+  // 1 — the favourites
+  const top = list.slice(0, 12), max = top.length ? top[0].by.length : 1;
+  const open = state.geSong && songs[state.geSong];
+  const who = open ? `<div class="ge-song-who"><p><b>♪ ${escapeHtml(label(open))}</b> · ${en ? `${open.by.length} chose it` : `เลือก ${open.by.length} คน`}</p>
+    <div class="ge-song-chips">${open.by.sort((a, b) => a.k - b.k).map(x => `<button class="chip" data-action="open-member" data-id="${x.id}">${geFace(getMember(x.id), 'ge-song-face')}${nm(x.id)} <i>${en ? `#${x.k}` : `อันดับ ${x.k}`}</i></button>`).join('')}</div></div>` : '';
+  const c1 = card(en ? 'Most wanted songs' : 'เพลงที่ถูกเลือกมากที่สุด', `
+    <div class="stat-grid" style="margin-bottom:12px;">
+      <div class="stat-cell"><div class="label">${en ? 'Picks' : 'เลือกทั้งหมด'}</div><div class="value">${picks}</div></div>
+      <div class="stat-cell"><div class="label">${en ? 'Different songs' : 'เพลงไม่ซ้ำ'}</div><div class="value">${list.length}</div></div>
+      <div class="stat-cell"><div class="label">${en ? 'Chosen once' : 'มีคนเลือกคนเดียว'}</div><div class="value">${once.length}</div></div>
+    </div>
+    ${top.map(s => `<button class="bar-row" style="--c:${GE_SRC_COL[geSrc(s.g)] || '#E4457E'}" data-action="ge-song" data-value="${geSongKey(s.t)}">
+      <span class="bar-label">${escapeHtml(label(s))}</span><span class="bar-track"><span class="bar-fill" style="width:${Math.round(s.by.length / max * 100)}%"></span></span><span class="bar-val">${s.by.length}</span></button>`).join('')}
+    <p class="stats-note">${en ? 'Tap a song to see who chose it.' : 'กดชื่อเพลงเพื่อดูว่าใครเลือกบ้าง'}</p>`);
+
+  // 2 — the same first choice
+  const clash = list.map(s => ({ s, first:s.by.filter(x => x.k === 1) })).filter(x => x.first.length > 1)
+    .sort((a, b) => b.first.length - a.first.length || a.s.t.localeCompare(b.s.t));
+  const c2 = card(en ? 'Same first choice' : 'ศึกเพลงชน · เลือกเป็นอันดับ 1 ตรงกัน', `
+    <ul class="ge-clash">${clash.map(({ s, first }) => {
+      const order = first.slice().sort((a, b) => (rankOf[a.id] || 99) - (rankOf[b.id] || 99));
+      const lead = order[0] && rankOf[order[0].id] ? order[0].id : null;
+      return `<li><b>♪ ${escapeHtml(label(s))}</b> <span>${order.map(x => `${nm(x.id)}${rankOf[x.id] ? ` (${rankOf[x.id]})` : ''}${x.id === lead ? ' ★' : ''}`).join(' · ')}</span></li>`; }).join('')}</ul>
+    <p class="stats-note">${en ? `If two Centers want the same song, the higher rank gets it. ★ = highest of them ${round ? `in ${geRoundLabel(round)}` : ''}; (n) = her rank.`
+      : `ถ้าเซ็นเตอร์เลือกเพลงชนกัน อันดับสูงกว่าได้ไป · ★ = อันดับสูงสุดในกลุ่มนั้น${round ? `ตาม${geRoundLabel(round)}` : ''} · (n) = อันดับตอนนี้`}</p>`, '#C8961E');
+
+  // 3 — where the songs come from
+  const bySrc = (gid) => { const c = {}; ids.filter(id => !gid || getMember(id).groupId === gid).forEach(id => W[id].songs.forEach(([, g]) => { c[geSrc(g)] = (c[geSrc(g)] || 0) + 1; }));
+    return Object.entries(c).sort((a, b) => b[1] - a[1]); };
+  const srcBars = rows => { const m = rows.length ? rows[0][1] : 1;
+    return rows.map(([g, n]) => `<div class="bar-row" style="--c:${GE_SRC_COL[g] || '#888'}"><span class="bar-label">${escapeHtml(g)}</span><span class="bar-track"><span class="bar-fill" style="width:${Math.round(n / m * 100)}%"></span></span><span class="bar-val">${n}</span></div>`).join(''); };
+  const c3 = card(en ? 'Which group the songs come from' : 'เพลงมาจากวงไหน', `${srcBars(bySrc())}
+    <h3 class="section-label">BNK48</h3>${srcBars(bySrc('bnk48'))}
+    <h3 class="section-label">CGM48</h3>${srcBars(bySrc('cgm48'))}`, '#7A4BC4');
+
+  // 4 — hope against the latest result
+  let c4 = '';
+  if(round){
+    const rows = ids.map(id => { const a = geAim(W[id]); return { id, aims:a ? (Array.isArray(a[0]) ? a : [a]) : null, r:rankOf[id] || null }; }).filter(x => x.aims);
+    const inAim = x => x.aims.some(([lo, hi]) => x.r >= lo && x.r <= hi);
+    const beyond = rows.filter(x => x.r && !inAim(x) && x.r < x.aims[0][0]).sort((a, b) => a.r - b.r);
+    const met = rows.filter(x => x.r && inAim(x)).sort((a, b) => a.r - b.r);
+    const short = rows.filter(x => !x.r || (!inAim(x) && x.r > x.aims[0][0]));
+    const aimTxt = x => x.aims.map(([lo, hi]) => lo === hi ? lo : `${lo}–${hi}`).join(' / ');
+    const line = x => `<li>${nm(x.id)} <span>${en ? `hoped ${aimTxt(x)} · now ${x.r}` : `หวัง ${aimTxt(x)} · ได้ ${x.r}`}</span></li>`;
+    c4 = card(en ? 'Hope vs. result' : 'ฝันกับความจริง', `
+      <div class="stat-grid" style="margin-bottom:12px;">
+        <div class="stat-cell"><div class="label">${en ? 'Beyond her hope' : 'เกินเป้า'}</div><div class="value">${beyond.length}</div></div>
+        <div class="stat-cell"><div class="label">${en ? 'Right on it' : 'ตรงเป้า'}</div><div class="value">${met.length}</div></div>
+        <div class="stat-cell"><div class="label">${en ? 'Not there yet' : 'ยังไม่ถึง'}</div><div class="value">${short.length}</div></div>
+      </div>
+      ${beyond.length ? `<h3 class="section-label">${en ? 'Beyond her hope' : 'เกินเป้า'}</h3><ul class="ge-hope">${beyond.map(line).join('')}</ul>` : ''}
+      ${met.length ? `<h3 class="section-label">${en ? 'Right on it' : 'ตรงเป้า'}</h3><ul class="ge-hope">${met.map(line).join('')}</ul>` : ''}
+      <p class="stats-note">${roundNote} · ${en ? 'Senbatsu counts as 1–12, Kami 7 as 1–7; a range is met anywhere inside it.' : 'Senbatsu = อันดับ 1–12 · Kami 7 = 1–7 · ถ้าเขียนเป็นช่วง อยู่ในช่วงถือว่าตรงเป้า'}</p>`, '#2E8C82');
+  }
+
+  // 5 — the songs, if it ended today
+  let c5 = '';
+  if(round){
+    const bs = geBandSongs(round.id);
+    c5 = card(en ? 'If it ended today' : 'ถ้าเลือกตั้งจบวันนี้', `<ul class="ge-ifnow">${GE_CENTERS.map((n, i) => {
+      const m = slots[n] && slots[n].id ? getMember(slots[n].id) : null, x = bs[n], band = GE_BANDS[i].name;
+      return `<li><b>${band}</b> <span>${m ? `${en ? 'Center' : 'เซ็นเตอร์'} ${escapeHtml(m.name)} (${n})` : (en ? 'Center not known' : 'ยังไม่รู้เซ็นเตอร์')}</span>
+        <em>${x ? `♪ ${escapeHtml(label({ t:x.song[0], g:x.song[1] }))}${x.choice > 1 ? (en ? ` · her choice ${x.choice}` : ` · ตัวเลือกที่ ${x.choice}`) : ''}` : '—'}</em></li>`; }).join('')}</ul>
+      <p class="stats-note">${roundNote}</p>`, '#B8862E');
+  }
+
+  // 6 — chosen by one candidate only
+  const c6 = card(en ? `Only one wanted it · ${once.length}` : `เพลงที่มีคนเลือกคนเดียว · ${once.length} เพลง`, `
+    <ul class="ge-once">${once.sort((a, b) => a.t.localeCompare(b.t)).map(s => `<li>♪ ${escapeHtml(label(s))} <span>${nm(s.by[0].id)}</span></li>`).join('')}</ul>`, '#5A6B7A');
+
+  return `<div class="ge-songs">${c5}${c1}${who}${c2}${c4}${c3}${c6}</div>`;
+}
+
 function renderGECandidates(){
   const en = isEN(), all = geCandidates();
   const mine = all.filter(m => state.oshi.includes(m.id));
@@ -10063,7 +10303,7 @@ function renderGEPage(){
   const liveRound = geLiveRound();
   const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ['chain', en ? 'Live Voting' : 'โหวตสด'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
     ['timeline', en ? 'Schedule' : 'กำหนดการ']]
-    .map(([v, l]) => `<button class="sub-tab${tab === v || (v === 'timeline' && tab === 'events') ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
+    .map(([v, l]) => `<button class="sub-tab${tab === v || (v === 'timeline' && tab === 'events') || (v === 'candidates' && tab === 'songs') ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
   const liveBanner = liveRound && tab !== 'results' ? `<button class="ge-live-banner" data-action="ge-tab" data-value="results">
     <span class="gel-live"><i></i>LIVE</span><span>${en ? 'Announcing' : 'กำลังประกาศ'} ${geRoundLabel(liveRound)}
     <small>· ${en ? `${geAnnounced(liveRound.id)} / ${GE_SEATS} so far` : `ประกาศแล้ว ${geAnnounced(liveRound.id)} / ${GE_SEATS}`}</small></span>→</button>` : '';
@@ -10071,7 +10311,8 @@ function renderGEPage(){
   let body = '';
   if(tab === 'results') body = renderGEResults();
   else if(tab === 'chain') body = renderGEChain();
-  else if(tab === 'candidates') body = renderGECandidates();
+  else if(tab === 'candidates') body = geCandSwitch(tab, en) + renderGECandidates();
+  else if(tab === 'songs') body = geCandSwitch(tab, en) + renderGESongs();
   else if(tab === 'timeline') body = geSchedSwitch(tab, en) + renderTimelinePage(true);
   else if(tab === 'events'){
     const ahead = events.filter(e => eventLastDay(e) >= iso), past = events.filter(e => eventLastDay(e) < iso);
@@ -10370,6 +10611,9 @@ function renderHomeGE(opt = {}){
 
 /* The election, summed up on the home page once it is over: the Center, the
    rest of the Senbatsu, a few numbers, and the Under and Next Girls by name. */
+const geResShare = id => { const r = GE_ROUNDS.find(x => x.id === id) || GE_ROUNDS[0];
+  return { kind:'geres', round:r.id, url:location.origin + '/?v=results', link:location.origin + '/?v=results',
+    title:`GE2026 ${r.en} — 48thDb`, file:`48thdb-ge2026-${r.id.replace('ge2026-', '')}` }; };
 function renderGESummary(id){
   const en = isEN(), slots = geSlots(id), first = geSlots(GE_ROUNDS[0].id);
   const M = n => slots[n] && slots[n].id && getMember(slots[n].id);
@@ -10405,6 +10649,7 @@ function renderGESummary(id){
     </div>
     <p class="ge-sum-h">Under Girls · 13–24</p><div class="ge-sum-list">${range(13, 24).map(line).join('')}</div>
     <p class="ge-sum-h">Next Girls · 25–36</p><div class="ge-sum-list">${range(25, 36).map(line).join('')}</div>
+    <button class="chip chip-link gel-share" data-action="share-geres" data-value="${id}">${ICONS.share}<span>${en ? 'Share the results as a picture' : 'แชร์ภาพสรุปผล'}</span></button>
   </section>`;
 }
 
@@ -10455,6 +10700,7 @@ function renderGEResults(){
     if(pm) now += `<div class="gel-before">${en ? 'Before' : 'ก่อนหน้า'} · <b>${p}</b> ${geFace(pm, 'gel-before-face')} ${escapeHtml(pm.name)} ${geVotes(slots[p].v)} ${geMove(prev, pm.id, p)}</div>`;
   }
 
+  const bandSongs = geBandSongs(round.id);
   const bands = GE_BANDS.map(b => {
     const ranks = []; for(let n = b.from; n <= b.to; n++) ranks.push(n);
     const known = ranks.filter(n => slots[n] && (slots[n].id || slots[n].v != null));
@@ -10468,8 +10714,9 @@ function renderGEResults(){
       if(!m) return `<div class="gel-row is-pending${fresh}"><span class="gel-n">${n}</span><span class="gel-q">?</span>
         <span class="gel-who"><b>${live ? (en ? 'Announcing…' : 'กำลังประกาศ…') : '—'}</b></span>
         <span class="gel-v">${geCount(mk, s.v)}</span>${bar}</div>`;
+      const song = bandSongs[n];
       return `<button class="gel-row${fresh}" data-action="open-member" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
-        <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small></span>
+        <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small>${song ? `<small class="gel-song">${geSongLine(song, en)}</small>` : ''}</span>
         <span class="gel-v">${geCount(mk, s.v)}${geMove(prev, m.id, n)}</span>${bar}</button>`;
     };
     const k7 = known.filter(n => n <= GE_KAMI7);
@@ -10477,6 +10724,7 @@ function renderGEResults(){
     const rows = (k7.length ? geKami7(k7rows, en, lit) : '') + known.filter(n => n > GE_KAMI7).map(rowOf).join('');
     return `<section class="gel-band is-${b.tone}">
       <div class="gel-band-h">${b.name}<small>${en ? `Ranks ${b.from}–${b.to}` : `อันดับ ${b.from}–${b.to}`}</small></div>
+      ${bandSongs[b.from] ? `<p class="gel-band-song">${en ? `${b.name} song` : `เพลงของ ${b.name}`} · <b>${geSongLine(bandSongs[b.from], en)}</b></p>` : ''}
       ${waiting.length ? `<div class="gel-seats">${waiting.map(n => `<span>${n}</span>`).join('')}</div>
         ${!known.length ? `<p class="gel-wait">${en ? 'Not announced yet' : 'ยังไม่ประกาศ'}</p>` : ''}` : ''}
       ${rows ? `<div class="gel-rows">${rows}</div>` : ''}
@@ -10485,7 +10733,8 @@ function renderGEResults(){
 
   const owner = state.isOwner ? `<div class="gel-owner-row"><button class="chip chip-link gel-owner" data-action="nav" data-view="gelive">${en ? 'Enter results →' : 'กรอกผล →'}</button>
 </div>` : '';
-  const out = `<div class="gel">${strip}${now}${picks}${owner}${geChanges(round.id)}<div class="gel-bands">${bands}</div>
+  const shareBtn = told ? `<button class="chip chip-link gel-share" data-action="share-geres" data-value="${round.id}">${ICONS.share}<span>${en ? 'Share the results as a picture' : 'แชร์ภาพสรุปผล'}</span></button>` : '';
+  const out = `<div class="gel">${strip}${now}${picks}${shareBtn}${owner}${geChanges(round.id)}<div class="gel-bands">${bands}</div>
     ${prev ? `<p class="gel-foot">${en ? 'Arrows compare with' : 'ลูกศรเทียบกับ'} ${geRoundLabel(GE_ROUNDS[GE_ROUNDS.findIndex(r => r.id === round.id) - 1])}</p>` : ''}</div>`;
   geRemember(round.id);
   geMarkDone(round.id);
@@ -14494,36 +14743,65 @@ function renderMemberEvents(m){
 }
 
 function renderStatsTimeline(){
-  // One entry per year, merging what the database actually knows: group
-  // debuts, single releases and graduations.
-  const years = {};
-  const slot = y => (years[y] = years[y] || { debuts:[], singles:[], grads:[] });
-  GROUPS.forEach(g=> slot(+g.debut.slice(0,4)).debuts.push(g));
-  SEED_SINGLES.forEach(s=> slot(s.year).singles.push(s));
-  state.members.filter(m=>m.graduated).forEach(m=> slot(+m.graduated.slice(0,4)).grads.push(m));
+  // One entry per year, from what the database knows: group debuts, the
+  // election, singles, albums and special singles, members joining, promoted,
+  // moving and taking the Shihainin post, and graduations.
+  const en = isEN(), years = {};
+  const slot = y => (years[y] = years[y] || { debuts:[], singles:[], albums:[], specials:[], people:[], grads:[], ge:null });
+  GROUPS.forEach(g => slot(+g.debut.slice(0, 4)).debuts.push(g));
+  SEED_SINGLES.forEach(s => slot(s.year).singles.push(s));
+  SEED_ALBUMS.forEach(a => slot(a.year).albums.push(a));
+  (typeof SEED_SPECIALS !== 'undefined' ? SEED_SPECIALS : []).forEach(s => slot(s.year || +String(s.date).slice(0, 4)).specials.push(s));
+  state.members.filter(m => m.graduated).forEach(m => slot(+m.graduated.slice(0, 4)).grads.push(m));
+  pastEvents().filter(r => ['join', 'promote', 'transfer', 'shihainin'].includes(r.kind)).forEach(r => slot(r.year).people.push(r));
+  // the election this site follows, with the latest result once there is one
+  const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), res = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
+  if(vote) slot(+vote.start.slice(0, 4)).ge = { vote, res };
 
-  const sorted = Object.keys(years).map(Number).sort((a,b)=>b-a);
+  const names = ids => ids.map(getMember).filter(Boolean)
+    .map(m => `<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(nickName(m))}</button>`).join(' · ');
+  const row = (c, html) => `<div class="ev-row" style="--c:${c}"><span class="ev-dot"></span><span>${html}</span></div>`;
+  const works = (list, word, g) => list.length ? row(g.color, `${linkGroup(g)} ${en ? `released ${list.length} ${word[1]}${list.length > 1 ? 's' : ''}` : `ปล่อย ${list.length} ${word[0]}`}
+    <span class="ev-names">${list.sort((a, b) => (a.num || 0) - (b.num || 0) || String(a.date).localeCompare(String(b.date))).map(w => linkWork(w)).join(' · ')}</span>`) : '';
+  const sorted = Object.keys(years).map(Number).sort((a, b) => b - a);
   return `
   <div class="timeline" style="margin-top:6px;">
-    ${sorted.map(y=>{
+    ${sorted.map(y => {
       const e = years[y];
-      const byGroup = gid => e.grads.filter(m=>m.groupId===gid);
+      const people = (kind, g) => { const ids = [...new Set(e.people.filter(r => r.kind === kind && r.groupId === g.id).flatMap(r => r.ids))]; return ids; };
+      const geRow = e.ge ? (() => {
+        const { vote, res } = e.ge, M = monthsShort(), dm = d => { const t = parseYmd(d); return `${t.getDate()} ${M[t.getMonth()]}`; };
+        const r = geLatestRound(), top = r && geSlots(r.id)[1], w = top && top.id && getMember(top.id);
+        return row('#B3121E', `<button class="link-inline" data-action="open-ge"><b>Senbatsu General Election ${y}</b></button>
+          · ${en ? 'voting' : 'โหวต'} ${dm(vote.start)} – ${dm(eventLastDay(vote))}${res ? ` · ${en ? 'results' : 'ประกาศผล'} ${dm(res.start)}` : ''}
+          ${w ? `<span class="ev-names">${geRoundLabel(r)} · ${en ? 'No. 1' : 'อันดับ 1'} <button class="link-inline" data-action="open-member" data-id="${w.id}">${escapeHtml(nickName(w))}</button></span>` : ''}`);
+      })() : '';
+      // special singles: by group, the joint ones once in gold
+      const joint = e.specials.filter(s => (s.groups || []).length > 1);
+      const specialRows = GROUPS.map(g => works(e.specials.filter(s => (s.groups || [s.groupId]).length < 2 && s.groupId === g.id),
+        [en ? '' : 'ซิงเกิลพิเศษ/ดิจิทัล', 'special single'], g)).join('')
+        + (joint.length ? row('var(--gold)', `BNK48 & CGM48 ${en ? `released ${joint.length} joint special single${joint.length > 1 ? 's' : ''}` : `ปล่อยซิงเกิลพิเศษร่วม ${joint.length} เพลง`}
+          <span class="ev-names">${joint.map(w => linkWork(w)).join(' · ')}</span>`) : '');
       return `<div class="timeline-item" style="--c:var(--ink-soft)">
         <div class="year-head">${y}</div>
-        ${e.debuts.map(g=>`<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
-          <span><b>${linkGroup(g)}</b> เดบิวต์ · ${formatDate(g.debut)}</span></div>`).join('')}
-        ${e.singles.length ? GROUPS.map(g=>{
-          const ss = e.singles.filter(s=>s.groupId===g.id).sort((a,b)=>a.num-b.num);
-          if(!ss.length) return '';
-          return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
-            <span>${linkGroup(g)} ปล่อย ${ss.length} ซิงเกิล <span class="ev-names">${ss.map(s=>linkWork(s)).join(' · ')}</span></span></div>`;
-        }).join('') : ''}
-        ${GROUPS.map(g=>{
-          const gs = byGroup(g.id);
-          if(!gs.length) return '';
-          return `<div class="ev-row" style="--c:${g.color}"><span class="ev-dot"></span>
-            <span>${gs.length} คนจบการศึกษาจาก ${linkGroup(g)}
-            <span class="ev-names">${gs.map(m=>`<button class="link-inline" data-action="open-member" data-id="${m.id}">${escapeHtml(nickName(m))}</button>`).join(' · ')}</span></span></div>`;
+        ${e.debuts.map(g => row(g.color, `<b>${linkGroup(g)}</b> ${en ? 'debuted' : 'เดบิวต์'} · ${formatDate(g.debut)}`)).join('')}
+        ${geRow}
+        ${GROUPS.map(g => works(e.singles.filter(s => s.groupId === g.id), [en ? '' : 'ซิงเกิล', 'single'], g)).join('')}
+        ${GROUPS.map(g => works(e.albums.filter(a => a.groupId === g.id), [en ? '' : 'อัลบั้ม', 'album'], g)).join('')}
+        ${specialRows}
+        ${GROUPS.map(g => {
+          const out = [];
+          const joined = people('join', g);
+          if(joined.length) out.push(row(g.color, `${en ? `${joined.length} joined` : `${joined.length} คนเข้าวง`} ${linkGroup(g)} <span class="ev-names">${names(joined)}</span>`));
+          const up = people('promote', g);
+          if(up.length) out.push(row(g.color, `${en ? `${up.length} promoted from trainee in` : `${up.length} คนได้เลื่อนขั้นจากเด็กฝึก`} ${linkGroup(g)} <span class="ev-names">${names(up)}</span>`));
+          const moved = people('transfer', g);
+          if(moved.length) out.push(row(g.color, `${en ? `${moved.length} moved to` : `${moved.length} คนย้ายมา`} ${linkGroup(g)} <span class="ev-names">${names(moved)}</span>`));
+          const sh = people('shihainin', g);
+          if(sh.length) out.push(row(g.color, `${names(sh)} ${en ? `became ${g.name}'s Shihainin` : `รับตำแหน่งชิไฮนิน ${linkGroup(g)}`}`));
+          const gs = e.grads.filter(m => m.groupId === g.id);
+          if(gs.length) out.push(row(g.color, `${en ? `${gs.length} graduated from` : `${gs.length} คนจบการศึกษาจาก`} ${linkGroup(g)} <span class="ev-names">${names(gs.map(m => m.id))}</span>`));
+          return out.join('');
         }).join('')}
       </div>`;
     }).join('')}
@@ -14874,7 +15152,39 @@ function loadYouTubeStats(){
     .then(r => r.ok ? r.json() : null)
     .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single' || state.view === 'stats' || state.view === 'feed') renderMain(); syncTicker(); })
     .catch(() => { YT_STATS = { videos:{} }; })
-    .finally(() => { _ytLoading = false; });
+    .finally(() => { _ytLoading = false; ytFollow(); });
+}
+/* The file above is written by GitHub's jobs, which run every few hours at
+   best. api.48thdb.com/yt counts every song video every five minutes, so a
+   video passing a round number is celebrated here within minutes: its count
+   and milestone are laid over the file, and a page left open hears of it. */
+const YT_LIVE_API = 'https://api.48thdb.com/yt';
+let _ytTimer = null, _ytSeen = null;
+function ytFollow(){
+  if(!YT_STATS) return;
+  const pull = () => fetch(YT_LIVE_API, { cache:'no-store' }).then(r => r.ok ? r.json() : null).then(d => {
+    if(!d || !YT_STATS) return;
+    YT_STATS.videos = YT_STATS.videos || {};
+    for(const [vid, n] of Object.entries(d.views || {})){
+      const v = YT_STATS.videos[vid]; if(v && n > (v.views || 0)) v.views = n;
+    }
+    const ms = YT_STATS.milestones = YT_STATS.milestones || {};
+    const fresh = [];
+    for(const [vid, m] of Object.entries(d.milestones || {})){
+      const had = ms[vid];
+      if(!had || m.mark > had.mark){ ms[vid] = { ...m, cover: !!(had && had.cover && had.mark === m.mark) }; fresh.push(vid); }
+    }
+    // the first answer only fills in; after that, a new one is news
+    if(_ytSeen && fresh.length){
+      const it = ytMilestones().find(x => fresh.includes(x.vid));
+      if(it) toast(isEN() ? `🎉 ${it.track} just passed ${milestoneWords(it.mark)}!` : `🎉 ${it.track} ครบ ${milestoneWords(it.mark)}แล้ว!`);
+      if(state.view === 'single' || state.view === 'feed') renderMain();
+    }
+    _ytSeen = true;
+    syncTicker();
+  }).catch(() => {});
+  pull();
+  if(!_ytTimer) _ytTimer = setInterval(() => { if(!document.hidden) pull(); }, 5 * 60000);
 }
 /* 206,864,587 reads as "206.9 ล้าน" or "206.9M"; the exact figure is in the tooltip. */
 function shortViews(n){
@@ -15119,6 +15429,7 @@ const TICKER_KINDS = {
   news:   { th:'ประกาศ',    en:'NEWS',     color:'#3A66D6' },
   hbd:    { th:'HBD',      en:'HBD',      color:'#E0457B' },
   ticket: { th:'บัตร',      en:'TICKETS',  color:'#C8961E' },
+  views:  { th:'ยอดวิว',    en:'VIEWS',    color:'#D4A017' },
   vote:   { th:'โหวต',      en:'VOTE',     color:'#C8231A' },
   result: { th:'ผลโหวต',    en:'RESULTS',  color:'#C8231A' },
 };
@@ -15157,6 +15468,12 @@ function tickerItems(){
     if(mine && e && !hasMyOshi(e)) continue;
     items.push({ kind:'live', to: e ? ev(e) : null, parts:[
       en ? 'On air now' : 'กำลังไลฟ์อยู่', l.title || (e && e.title) || l.channel ] });
+  }
+
+  // 0c. a song video that has just passed a round number of views (two days on the sign)
+  for(const x of (YT_STATS ? ytMilestones() : []).filter(x => Date.now() - ytAt(x.at) < 2 * 86400000).slice(0, 2)){
+    items.push({ kind:'views', to:{ action:'open-single', id:x.workId }, parts:[
+      `${x.track} ${en ? `passed ${milestoneWords(x.mark)}` : `ครบ ${milestoneWords(x.mark)}`} 🎉` ] });
   }
 
   // 1. on now, or on later today
@@ -15374,6 +15691,7 @@ function renderMain(){
   if(state.view === 'stats') addBoxShareButtons(main);
   if(state.view === 'gelive') bindGEAdmin();
   if(state.view === 'timeline' && state.geTab === 'chain') gecAddShare(main);
+  if(state.view === 'timeline' && state.geTab === 'songs') addBoxShareButtons(main);
   geAnimate(main);
   odoRun(main);
   attachMainEvents();
@@ -15743,6 +16061,7 @@ function urlForSnapshot(snap){
   else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
   else if(snap.view === 'timeline' && snap.geTab === 'results') p.set('v', 'results');
   else if(snap.view === 'timeline' && snap.geTab === 'chain') p.set('v', 'vote');
+  else if(snap.view === 'timeline' && snap.geTab === 'songs') p.set('v', 'gesongs');
   else if(snap.view === 'gelive') p.set('v', 'gelive');
   // not one to share, but a reload should land back on it rather than on Home
   else if(snap.view === 'profile') p.set('v', 'profile');
@@ -15786,6 +16105,7 @@ function applyUrlToState(){
   }
   if(view === 'results'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results'; return; }
   if(view === 'vote'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; return; }
+  if(view === 'gesongs'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'songs'; return; }
   if(view === 'gelive'){ state.view = 'gelive'; return; }
   if(view === 'gechain'){ state.view = 'timeline'; state.geTab = 'chain'; return; }   // the owner's old copy, now the public tab
   if(view === 'profile'){ state.view = 'profile'; return; }
@@ -17011,7 +17331,8 @@ async function drawBoxCard(g, sub){
   const tmp = document.createElement('canvas'); tmp.width = SHARE_W; tmp.height = 4200;
   const t = tmp.getContext('2d');
   const tab = (STATS_TABS.find(x => x.id === state.statsTab) || { label: '' }).label;
-  shareText(t, spec ? spec.kicker : `48thDb · ${en ? 'STATS' : 'สถิติ'}${tab ? ' · ' + tab : ''}`, 60, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
+  const kick = spec ? spec.kicker : box.closest('.ge-songs') ? `GE2026 · ${en ? 'SONGS THEY WANT' : 'เพลงที่ผู้สมัครอยากได้'}` : `48thDb · ${en ? 'STATS' : 'สถิติ'}${tab ? ' · ' + tab : ''}`;
+  shareText(t, kick, 60, 92, '800 28px "Noto Sans Thai", sans-serif', '#FF9DC3');
   t.font = '800 62px "Noto Sans Thai", sans-serif';
   const tl = shareWrap(t, title.trim(), SHARE_W - 120, 2);
   let y = 100;
@@ -17054,6 +17375,10 @@ function shareSubject(){
   if(ev) return { kind:'event', ev, url, title:`${ev.title} — 48thDb`, file:`48thdb-${ev.id}` };
   if(state.view === 'single' && state.selectedSingle){ const s = findWork(state.selectedSingle);
     if(s) return { kind:'single', s, url, title:`${s.title} — 48thDb`, file:`48thdb-${s.id}` }; }
+  if(state.view === 'timeline' && state.geTab === 'results'){
+    const r = GE_ROUNDS.find(x => x.id === state.geRound) || GE_ROUNDS.find(x => x.id === geDefaultRound());
+    if(r && geHasData(r.id)) return geResShare(r.id);
+  }
   if(state.view === 'timeline') return { kind:'ge', url, title:'Senbatsu General Election 2026 — 48thDb', file:'48thdb-ge2026' };
   if(state.view === 'stats') return { kind:'stats', cat: state.statsTab || 'overview', url, title:'สถิติ BNK48 & CGM48 — 48thDb', file:'48thdb-stats' };
   if(state.view === 'feed') return { kind:'today', url, title:'วันนี้ที่ 48 — 48thDb', file:`48thdb-today-${toYmd(todayStart())}` };
@@ -17198,6 +17523,139 @@ function gcdTake(g, text, y){
   return y + h;
 }
 const GCD_BG = 'posters/ge2026/share-bg.jpg';   // the owner's own art for these cards (4:5, like the card)
+/* One round's results on one picture, for posting: the Kami 7 in a gold frame
+   (the Center large, 2–7 beside her), the rest of the Senbatsu, then the Under
+   and Next Girls by name — each with the score read out. Same art as the vote
+   cards. */
+async function drawGEResCard(g, sub){
+  const en = isEN(), { P } = GCD, W = SHARE_W - P * 2, F = gcdF;
+  const round = GE_ROUNDS.find(r => r.id === sub.round) || GE_ROUNDS[0];
+  const doc = (state.geRounds || {})[round.id] || {}, slots = doc.slots || {};
+  const M = n => slots[n] && slots[n].id ? getMember(slots[n].id) : null;
+  const V = n => slots[n] && slots[n].v != null ? geVotes(slots[n].v) : '';
+  const told = geAnnounced(round.id);
+  // the ground: the owner's art, dimmed to read on
+  g.fillStyle = '#12060A'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  const bg = await shareLoad(GCD_BG);
+  if(bg){
+    // blurred so the names read — smoothly: the art at a quarter size, a soft
+    // blur done by hand (canvas filters are not everywhere yet), then scaled back up
+    g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(shareSoften(bg, 270, 338, 9), 0, 0, SHARE_W, SHARE_H); g.restore();
+    g.fillStyle = 'rgba(8,2,4,.55)'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  }
+  else { shareGlow(g, 160, 120, 760, '#B3121E', .55); shareGlow(g, 560, SHARE_H + 80, 760, '#5B1A6E', .45); }
+  sharePill(g, 'GE2026 · SENBATSU GENERAL ELECTION', P, 48, 'rgba(243,201,105,.16)', GCD.gold, 22);
+  shareText(g, geRoundLabel(round), P, 160, F(800, 68), GCD.ink);
+  const at = doc.at && doc.at.seconds ? new Date(doc.at.seconds * 1000) : null;
+  shareText(g, [at ? shareThaiDate(at) : '', told >= GE_SEATS ? (en ? 'all 36 ranks' : 'ครบ 36 อันดับ') : (en ? `${told} of 36 announced` : `ประกาศแล้ว ${told} จาก 36`)].filter(Boolean).join(' · '),
+    P + W, 160, F(600, 26), GCD.soft, 'right');
+  const faces = {};
+  await Promise.all(range36().map(async n => { const m = M(n); if(m && n <= 12) faces[n] = await shareLoad(m.photo); }));
+  const circle = (im, x, y, r, ring) => {
+    g.save(); g.beginPath(); g.arc(x, y, r + 4, 0, Math.PI * 2); g.fillStyle = ring; g.fill();
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.clip(); g.fillStyle = '#2A2230'; g.fillRect(x - r, y - r, r * 2, r * 2);
+    if(im){ const k = Math.max(r * 2 / im.width, r * 2 / im.height); g.drawImage(im, x - im.width * k / 2, y - im.height * k / 2, im.width * k, im.height * k); }
+    g.restore();
+  };
+  const fitName = (t, x, y, maxW, size, colour, align = 'center') => { let f = size; do { g.font = F(800, f); f -= 2; } while(g.measureText(t).width > maxW && f > 16); g.fillStyle = colour; g.textAlign = align; g.fillText(t, x, y); g.textAlign = 'left'; };
+  // group and team, short: "BNK · Team NV", "CGM · Trainee"
+  const unit = m => { if(!m) return ''; const t = getTeam(m.teamId);
+    return (m.groupId === 'cgm48' ? 'CGM' : 'BNK') + (t ? ' · ' + (/Trainee/.test(t.name) ? 'Trainee' : t.name) : ''); };
+  // the team stays in the background; names and scores carry the card
+  const unitCol = m => m && m.groupId === 'cgm48' ? '#7FE3CD' : '#FF9CC2';
+  const VOTE = '#F3C969';
+  // Kami 7
+  const ky = 188, kh = 436;
+  g.fillStyle = 'rgba(243,201,105,.10)'; shareRound(g, P, ky, W, kh, 30); g.fill();
+  g.strokeStyle = '#D4A73E'; g.lineWidth = 4; shareRound(g, P, ky, W, kh, 30); g.stroke();
+  sharePill(g, 'KAMI 7', P + 26, ky - 22, '#D4A73E', '#2A1A00', 22);
+  const c = M(1);
+  circle(faces[1], P + 108, ky + 116, 76, '#F3C969');
+  shareText(g, en ? 'No. 1 · Center' : 'อันดับ 1 · เซ็นเตอร์', P + 210, ky + 66, F(800, 26), GCD.gold);
+  // each group's song, as its Center chose it
+  const bs = geBandSongs(round.id);
+  const songTxt = x => `♪ ${x.song[0]} (${x.song[1]})${x.choice > 1 ? (en ? ` · choice ${x.choice}` : ` · ตัวเลือกที่ ${x.choice}`) : ''}`;
+  if(bs[1]) fitName(songTxt(bs[1]), P + W - 26, ky + 66, W - 500, 24, GCD.gold, 'right');
+  fitName(c ? c.name : (en ? 'Announcing' : 'กำลังประกาศ'), P + 210, ky + 126, W - 250, 60, GCD.ink, 'left');
+  if(c) shareText(g, unit(c), P + 210, ky + 166, F(700, 24), unitCol(c));
+  shareText(g, V(1) ? `${V(1)} ${en ? 'votes' : 'คะแนน'}` : '', P + 210, ky + 210, F(800, 34), VOTE);
+  const tw = (W - 40) / 6;
+  for(let i = 0; i < 6; i++){
+    const n = i + 2, m = M(n), cx = P + 20 + tw * i + tw / 2, cy = ky + 286;
+    circle(faces[n], cx, cy, 44, '#D4A73E');
+    shareText(g, String(n), cx - 50, cy - 36, F(800, 24), GCD.gold, 'center');
+    fitName(m ? m.name : '—', cx, cy + 80, tw - 10, 28, GCD.ink);
+    if(m) fitName(unit(m), cx, cy + 104, tw - 6, 17, unitCol(m));
+    shareText(g, V(n), cx, cy + 132, F(800, 22), VOTE, 'center');
+  }
+  // Senbatsu 8–12
+  const sy = 664;
+  shareText(g, en ? 'SENBATSU · 8–12' : 'SENBATSU · อันดับ 8–12', P, sy, F(800, 24), GCD.gold);
+  const sw = W / 5;
+  for(let i = 0; i < 5; i++){
+    const n = i + 8, m = M(n), cx = P + sw * i + sw / 2, cy = sy + 64;
+    circle(faces[n], cx, cy, 38, 'rgba(243,201,105,.7)');
+    shareText(g, String(n), cx - 46, cy - 30, F(800, 22), GCD.gold, 'center');
+    fitName(m ? m.name : '—', cx, cy + 70, sw - 12, 27, GCD.ink);
+    if(m) fitName(unit(m), cx, cy + 94, sw - 8, 17, unitCol(m));
+    shareText(g, V(n), cx, cy + 120, F(800, 21), VOTE, 'center');
+  }
+  // Under Girls and Next Girls: the top of each is that song's Center, drawn as such; the rest listed
+  const ly = 880, cw = (W - 40) / 2;
+  const cen = {};
+  await Promise.all([13, 25].map(async n => { const m = M(n); if(m) cen[n] = await shareLoad(m.photo); }));
+  [[13, 'UNDER GIRLS · 13–24', '#C9D1DA'], [25, 'NEXT GIRLS · 25–36', '#E3A27C']].forEach(([from, label, tone], col) => {
+    const x = P + col * (cw + 40), m = M(from);
+    shareText(g, label, x, ly, F(800, 22), tone);
+    // the Center of the Under Girls / Next Girls song
+    g.fillStyle = 'rgba(255,255,255,.07)'; shareRound(g, x, ly + 14, cw, 114, 18); g.fill();
+    g.strokeStyle = tone; g.lineWidth = 2; shareRound(g, x, ly + 14, cw, 114, 18); g.stroke();
+    if(bs[from]) fitName(songTxt(bs[from]), x + 18, ly + 118, cw - 36, 17, GCD.gold, 'left');
+    circle(cen[from], x + 50, ly + 60, 34, tone);
+    shareText(g, `${from} · ${en ? 'Center' : 'เซ็นเตอร์'}`, x + 98, ly + 44, F(800, 18), tone);
+    g.font = F(800, 26); let nm = m ? m.name : V(from) ? (en ? 'Announcing' : 'กำลังประกาศ') : '—'; while(g.measureText(nm).width > cw - 230 && nm.length > 3) nm = nm.slice(0, -1);
+    shareText(g, nm, x + 98, ly + 76, F(800, 26), GCD.ink);
+    if(m) shareText(g, unit(m), x + 98, ly + 98, F(700, 16), unitCol(m));
+    shareText(g, V(from), x + cw - 14, ly + 76, F(800, 24), VOTE, 'right');
+    for(let k = 1; k < 12; k++){
+      const n = from + k, mm = M(n), y = ly + 152 + (k - 1) * 18.2;
+      shareText(g, String(n), x, y, F(800, 17), tone);
+      g.font = F(800, 18); let name = mm ? mm.name : V(n) ? (en ? 'Announcing' : 'กำลังประกาศ') : '—'; while(g.measureText(name).width > 150 && name.length > 3) name = name.slice(0, -1);
+      shareText(g, name, x + 34, y, F(800, 18), GCD.ink);
+      if(mm) shareText(g, unit(mm), x + 192, y, F(700, 15), unitCol(mm));
+      shareText(g, V(n), x + cw, y, F(800, 18), VOTE, 'right');
+    }
+  });
+  // the foot
+  g.fillStyle = GCD.faint; g.fillRect(P, SHARE_H - 128, W, 2);
+  const logo = await shareLogo('#ffffff');
+  if(logo) g.drawImage(logo, P, SHARE_H - 106, 104, 60);
+  shareText(g, '48thdb.com', SHARE_W - P, SHARE_H - 66, F(800, 30), GCD.ink, 'right');
+}
+const range36 = () => Array.from({ length:GE_SEATS }, (_, i) => i + 1);
+/* A picture made small and soft: three passes of a box blur, which together
+   look like a Gaussian one and scale back up without blocks. */
+function shareSoften(im, w, h, r){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'); shareCover(x, im, 0, 0, w, h);
+  const d = x.getImageData(0, 0, w, h), px = d.data, tmp = new Float32Array(px.length);
+  const pass = (src, dst, horiz) => {
+    const n = horiz ? w : h, m = horiz ? h : w, k = 2 * r + 1;
+    for(let j = 0; j < m; j++) for(let ch = 0; ch < 4; ch++){
+      const at = i => ((horiz ? j * w + i : i * w + j) << 2) + ch;
+      let sum = 0;
+      for(let i = -r; i <= r; i++) sum += src[at(Math.min(n - 1, Math.max(0, i)))];
+      for(let i = 0; i < n; i++){
+        dst[at(i)] = sum / k;
+        sum += src[at(Math.min(n - 1, i + r + 1))] - src[at(Math.max(0, i - r))];
+      }
+    }
+  };
+  for(let t = 0; t < 3; t++){ pass(px, tmp, true); pass(tmp, px, false); }
+  x.putImageData(d, 0, 0);
+  return c;
+}
+
 async function gcdFrame(g, title, when){
   const { P } = GCD, en = isEN();
   g.fillStyle = '#12060A'; g.fillRect(0, 0, SHARE_W, SHARE_H);
@@ -17476,6 +17934,7 @@ async function buildShareCard(sub){
   else if(sub.kind === 'single') await drawSingleCard(g, sub.s, sub.url);
   else if(sub.kind === 'milestone') await drawMilestoneCard(g, sub);
   else if(sub.kind === 'ge') await drawGECard(g, sub.url);
+  else if(sub.kind === 'geres') await drawGEResCard(g, sub);
   else if(sub.kind === 'poster') await drawPosterCard(g, sub);
   else if(sub.kind === 'ffplan') await drawFFPlanCard(g, sub);
   else if(sub.kind === 'stats') await ({ lives: drawStatsLivesCard, songs: drawStatsSongsCard, birthdays: drawStatsBirthdaysCard,
@@ -18004,6 +18463,11 @@ function bindDelegatedEvents(){
       fbDb.collection('ge').doc(r).update({ ['slots.' + n]: firebase.firestore.FieldValue.delete() }).catch(() => {});
       renderMain();
     }
+    else if(action==='ge-song'){
+      state.geSong = state.geSong === el.dataset.value ? null : el.dataset.value;
+      const y = window.scrollY; renderMain(); window.scrollTo(0, y);
+      const w = document.querySelector('.ge-song-who'); if(w && w.getBoundingClientRect().top > innerHeight - 80) w.scrollIntoView({ block:'nearest', behavior:'smooth' });
+    }
     else if(action==='ge-tab'){
       state.geTab = el.dataset.value;
       renderMain(); replaceHistory();
@@ -18061,6 +18525,7 @@ function bindDelegatedEvents(){
     else if(action==='share'){
       openShareSheet();
     }
+    else if(action==='share-geres'){ openShareSheet(geResShare(el.dataset.value)); }
     else if(action==='share-box'){
       const node = document.querySelector(`.group-card[data-box="${id}"]`);
       if(node){
