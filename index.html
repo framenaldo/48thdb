@@ -2855,6 +2855,8 @@
   .gel-mv.is-eq{ color:var(--ink-soft); background:var(--paper-dim); } .gel-mv.is-new{ color:#7A4BC4; background:#EFE6FB; }
   .gel-foot{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:12px; }
   /* What changed since the round before */
+  .gel-share{ display:inline-flex; align-items:center; gap:6px; margin:10px 0 2px; }
+  .gel-share svg{ width:16px; height:16px; }
   .gec-ch{ margin:12px 0 4px; }
   .gec-ch-h{ margin:0 2px 8px; font-size:13px; font-weight:800; color:var(--ink-soft); }
   .gec-ch-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
@@ -10370,6 +10372,9 @@ function renderHomeGE(opt = {}){
 
 /* The election, summed up on the home page once it is over: the Center, the
    rest of the Senbatsu, a few numbers, and the Under and Next Girls by name. */
+const geResShare = id => { const r = GE_ROUNDS.find(x => x.id === id) || GE_ROUNDS[0];
+  return { kind:'geres', round:r.id, url:location.origin + '/?v=results', link:location.origin + '/?v=results',
+    title:`GE2026 ${r.en} — 48thDb`, file:`48thdb-ge2026-${r.id.replace('ge2026-', '')}` }; };
 function renderGESummary(id){
   const en = isEN(), slots = geSlots(id), first = geSlots(GE_ROUNDS[0].id);
   const M = n => slots[n] && slots[n].id && getMember(slots[n].id);
@@ -10405,6 +10410,7 @@ function renderGESummary(id){
     </div>
     <p class="ge-sum-h">Under Girls · 13–24</p><div class="ge-sum-list">${range(13, 24).map(line).join('')}</div>
     <p class="ge-sum-h">Next Girls · 25–36</p><div class="ge-sum-list">${range(25, 36).map(line).join('')}</div>
+    <button class="chip chip-link gel-share" data-action="share-geres" data-value="${id}">${ICONS.share}<span>${en ? 'Share the results as a picture' : 'แชร์ภาพสรุปผล'}</span></button>
   </section>`;
 }
 
@@ -10485,7 +10491,8 @@ function renderGEResults(){
 
   const owner = state.isOwner ? `<div class="gel-owner-row"><button class="chip chip-link gel-owner" data-action="nav" data-view="gelive">${en ? 'Enter results →' : 'กรอกผล →'}</button>
 </div>` : '';
-  const out = `<div class="gel">${strip}${now}${picks}${owner}${geChanges(round.id)}<div class="gel-bands">${bands}</div>
+  const shareBtn = told ? `<button class="chip chip-link gel-share" data-action="share-geres" data-value="${round.id}">${ICONS.share}<span>${en ? 'Share the results as a picture' : 'แชร์ภาพสรุปผล'}</span></button>` : '';
+  const out = `<div class="gel">${strip}${now}${picks}${shareBtn}${owner}${geChanges(round.id)}<div class="gel-bands">${bands}</div>
     ${prev ? `<p class="gel-foot">${en ? 'Arrows compare with' : 'ลูกศรเทียบกับ'} ${geRoundLabel(GE_ROUNDS[GE_ROUNDS.findIndex(r => r.id === round.id) - 1])}</p>` : ''}</div>`;
   geRemember(round.id);
   geMarkDone(round.id);
@@ -17048,6 +17055,10 @@ function shareSubject(){
   if(ev) return { kind:'event', ev, url, title:`${ev.title} — 48thDb`, file:`48thdb-${ev.id}` };
   if(state.view === 'single' && state.selectedSingle){ const s = findWork(state.selectedSingle);
     if(s) return { kind:'single', s, url, title:`${s.title} — 48thDb`, file:`48thdb-${s.id}` }; }
+  if(state.view === 'timeline' && state.geTab === 'results'){
+    const r = GE_ROUNDS.find(x => x.id === state.geRound) || GE_ROUNDS.find(x => x.id === geDefaultRound());
+    if(r && geHasData(r.id)) return geResShare(r.id);
+  }
   if(state.view === 'timeline') return { kind:'ge', url, title:'Senbatsu General Election 2026 — 48thDb', file:'48thdb-ge2026' };
   if(state.view === 'stats') return { kind:'stats', cat: state.statsTab || 'overview', url, title:'สถิติ BNK48 & CGM48 — 48thDb', file:'48thdb-stats' };
   if(state.view === 'feed') return { kind:'today', url, title:'วันนี้ที่ 48 — 48thDb', file:`48thdb-today-${toYmd(todayStart())}` };
@@ -17192,6 +17203,134 @@ function gcdTake(g, text, y){
   return y + h;
 }
 const GCD_BG = 'posters/ge2026/share-bg.jpg';   // the owner's own art for these cards (4:5, like the card)
+/* One round's results on one picture, for posting: the Kami 7 in a gold frame
+   (the Center large, 2–7 beside her), the rest of the Senbatsu, then the Under
+   and Next Girls by name — each with the score read out. Same art as the vote
+   cards. */
+async function drawGEResCard(g, sub){
+  const en = isEN(), { P } = GCD, W = SHARE_W - P * 2, F = gcdF;
+  const round = GE_ROUNDS.find(r => r.id === sub.round) || GE_ROUNDS[0];
+  const doc = (state.geRounds || {})[round.id] || {}, slots = doc.slots || {};
+  const M = n => slots[n] && slots[n].id ? getMember(slots[n].id) : null;
+  const V = n => slots[n] && slots[n].v != null ? geVotes(slots[n].v) : '';
+  const told = geAnnounced(round.id);
+  // the ground: the owner's art, dimmed to read on
+  g.fillStyle = '#12060A'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  const bg = await shareLoad(GCD_BG);
+  if(bg){
+    // blurred so the names read — smoothly: the art at a quarter size, a soft
+    // blur done by hand (canvas filters are not everywhere yet), then scaled back up
+    g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(shareSoften(bg, 270, 338, 9), 0, 0, SHARE_W, SHARE_H); g.restore();
+    g.fillStyle = 'rgba(8,2,4,.55)'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  }
+  else { shareGlow(g, 160, 120, 760, '#B3121E', .55); shareGlow(g, 560, SHARE_H + 80, 760, '#5B1A6E', .45); }
+  sharePill(g, 'GE2026 · SENBATSU GENERAL ELECTION', P, 48, 'rgba(243,201,105,.16)', GCD.gold, 22);
+  shareText(g, geRoundLabel(round), P, 160, F(800, 68), GCD.ink);
+  const at = doc.at && doc.at.seconds ? new Date(doc.at.seconds * 1000) : null;
+  shareText(g, [at ? shareThaiDate(at) : '', told >= GE_SEATS ? (en ? 'all 36 ranks' : 'ครบ 36 อันดับ') : (en ? `${told} of 36 announced` : `ประกาศแล้ว ${told} จาก 36`)].filter(Boolean).join(' · '),
+    P + W, 160, F(600, 26), GCD.soft, 'right');
+  const faces = {};
+  await Promise.all(range36().map(async n => { const m = M(n); if(m && n <= 12) faces[n] = await shareLoad(m.photo); }));
+  const circle = (im, x, y, r, ring) => {
+    g.save(); g.beginPath(); g.arc(x, y, r + 4, 0, Math.PI * 2); g.fillStyle = ring; g.fill();
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.clip(); g.fillStyle = '#2A2230'; g.fillRect(x - r, y - r, r * 2, r * 2);
+    if(im){ const k = Math.max(r * 2 / im.width, r * 2 / im.height); g.drawImage(im, x - im.width * k / 2, y - im.height * k / 2, im.width * k, im.height * k); }
+    g.restore();
+  };
+  const fitName = (t, x, y, maxW, size, colour, align = 'center') => { let f = size; do { g.font = F(800, f); f -= 2; } while(g.measureText(t).width > maxW && f > 16); g.fillStyle = colour; g.textAlign = align; g.fillText(t, x, y); g.textAlign = 'left'; };
+  // group and team, short: "BNK · Team NV", "CGM · Trainee"
+  const unit = m => { if(!m) return ''; const t = getTeam(m.teamId);
+    return (m.groupId === 'cgm48' ? 'CGM' : 'BNK') + (t ? ' · ' + (/Trainee/.test(t.name) ? 'Trainee' : t.name) : ''); };
+  // the team stays in the background; names and scores carry the card
+  const unitCol = m => m && m.groupId === 'cgm48' ? '#7FE3CD' : '#FF9CC2';
+  const VOTE = '#F3C969';
+  // Kami 7
+  const ky = 188, kh = 436;
+  g.fillStyle = 'rgba(243,201,105,.10)'; shareRound(g, P, ky, W, kh, 30); g.fill();
+  g.strokeStyle = '#D4A73E'; g.lineWidth = 4; shareRound(g, P, ky, W, kh, 30); g.stroke();
+  sharePill(g, 'KAMI 7', P + 26, ky - 22, '#D4A73E', '#2A1A00', 22);
+  const c = M(1);
+  circle(faces[1], P + 108, ky + 116, 76, '#F3C969');
+  shareText(g, en ? 'No. 1 · Center' : 'อันดับ 1 · เซ็นเตอร์', P + 210, ky + 66, F(800, 26), GCD.gold);
+  fitName(c ? c.name : (en ? 'Announcing' : 'กำลังประกาศ'), P + 210, ky + 126, W - 250, 60, GCD.ink, 'left');
+  if(c) shareText(g, unit(c), P + 210, ky + 166, F(700, 24), unitCol(c));
+  shareText(g, V(1) ? `${V(1)} ${en ? 'votes' : 'คะแนน'}` : '', P + 210, ky + 210, F(800, 34), VOTE);
+  const tw = (W - 40) / 6;
+  for(let i = 0; i < 6; i++){
+    const n = i + 2, m = M(n), cx = P + 20 + tw * i + tw / 2, cy = ky + 286;
+    circle(faces[n], cx, cy, 44, '#D4A73E');
+    shareText(g, String(n), cx - 50, cy - 36, F(800, 24), GCD.gold, 'center');
+    fitName(m ? m.name : '—', cx, cy + 80, tw - 10, 28, GCD.ink);
+    if(m) fitName(unit(m), cx, cy + 104, tw - 6, 17, unitCol(m));
+    shareText(g, V(n), cx, cy + 132, F(800, 22), VOTE, 'center');
+  }
+  // Senbatsu 8–12
+  const sy = 664;
+  shareText(g, en ? 'SENBATSU · 8–12' : 'SENBATSU · อันดับ 8–12', P, sy, F(800, 24), GCD.gold);
+  const sw = W / 5;
+  for(let i = 0; i < 5; i++){
+    const n = i + 8, m = M(n), cx = P + sw * i + sw / 2, cy = sy + 64;
+    circle(faces[n], cx, cy, 38, 'rgba(243,201,105,.7)');
+    shareText(g, String(n), cx - 46, cy - 30, F(800, 22), GCD.gold, 'center');
+    fitName(m ? m.name : '—', cx, cy + 70, sw - 12, 27, GCD.ink);
+    if(m) fitName(unit(m), cx, cy + 94, sw - 8, 17, unitCol(m));
+    shareText(g, V(n), cx, cy + 120, F(800, 21), VOTE, 'center');
+  }
+  // Under Girls and Next Girls: the top of each is that song's Center, drawn as such; the rest listed
+  const ly = 880, cw = (W - 40) / 2;
+  const cen = {};
+  await Promise.all([13, 25].map(async n => { const m = M(n); if(m) cen[n] = await shareLoad(m.photo); }));
+  [[13, 'UNDER GIRLS · 13–24', '#C9D1DA'], [25, 'NEXT GIRLS · 25–36', '#E3A27C']].forEach(([from, label, tone], col) => {
+    const x = P + col * (cw + 40), m = M(from);
+    shareText(g, label, x, ly, F(800, 22), tone);
+    // the Center of the Under Girls / Next Girls song
+    g.fillStyle = 'rgba(255,255,255,.07)'; shareRound(g, x, ly + 14, cw, 92, 18); g.fill();
+    g.strokeStyle = tone; g.lineWidth = 2; shareRound(g, x, ly + 14, cw, 92, 18); g.stroke();
+    circle(cen[from], x + 50, ly + 60, 34, tone);
+    shareText(g, `${from} · ${en ? 'Center' : 'เซ็นเตอร์'}`, x + 98, ly + 44, F(800, 18), tone);
+    g.font = F(800, 26); let nm = m ? m.name : V(from) ? (en ? 'Announcing' : 'กำลังประกาศ') : '—'; while(g.measureText(nm).width > cw - 230 && nm.length > 3) nm = nm.slice(0, -1);
+    shareText(g, nm, x + 98, ly + 76, F(800, 26), GCD.ink);
+    if(m) shareText(g, unit(m), x + 98, ly + 98, F(700, 16), unitCol(m));
+    shareText(g, V(from), x + cw - 14, ly + 76, F(800, 24), VOTE, 'right');
+    for(let k = 1; k < 12; k++){
+      const n = from + k, mm = M(n), y = ly + 130 + (k - 1) * 18.6;
+      shareText(g, String(n), x, y, F(800, 17), tone);
+      g.font = F(800, 18); let name = mm ? mm.name : V(n) ? (en ? 'Announcing' : 'กำลังประกาศ') : '—'; while(g.measureText(name).width > 150 && name.length > 3) name = name.slice(0, -1);
+      shareText(g, name, x + 34, y, F(800, 18), GCD.ink);
+      if(mm) shareText(g, unit(mm), x + 192, y, F(700, 15), unitCol(mm));
+      shareText(g, V(n), x + cw, y, F(800, 18), VOTE, 'right');
+    }
+  });
+  // the foot
+  g.fillStyle = GCD.faint; g.fillRect(P, SHARE_H - 128, W, 2);
+  const logo = await shareLogo('#ffffff');
+  if(logo) g.drawImage(logo, P, SHARE_H - 106, 104, 60);
+  shareText(g, '48thdb.com', SHARE_W - P, SHARE_H - 66, F(800, 30), GCD.ink, 'right');
+}
+const range36 = () => Array.from({ length:GE_SEATS }, (_, i) => i + 1);
+/* A picture made small and soft: three passes of a box blur, which together
+   look like a Gaussian one and scale back up without blocks. */
+function shareSoften(im, w, h, r){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'); shareCover(x, im, 0, 0, w, h);
+  const d = x.getImageData(0, 0, w, h), px = d.data, tmp = new Float32Array(px.length);
+  const pass = (src, dst, horiz) => {
+    const n = horiz ? w : h, m = horiz ? h : w, k = 2 * r + 1;
+    for(let j = 0; j < m; j++) for(let ch = 0; ch < 4; ch++){
+      const at = i => ((horiz ? j * w + i : i * w + j) << 2) + ch;
+      let sum = 0;
+      for(let i = -r; i <= r; i++) sum += src[at(Math.min(n - 1, Math.max(0, i)))];
+      for(let i = 0; i < n; i++){
+        dst[at(i)] = sum / k;
+        sum += src[at(Math.min(n - 1, i + r + 1))] - src[at(Math.max(0, i - r))];
+      }
+    }
+  };
+  for(let t = 0; t < 3; t++){ pass(px, tmp, true); pass(tmp, px, false); }
+  x.putImageData(d, 0, 0);
+  return c;
+}
+
 async function gcdFrame(g, title, when){
   const { P } = GCD, en = isEN();
   g.fillStyle = '#12060A'; g.fillRect(0, 0, SHARE_W, SHARE_H);
@@ -17470,6 +17609,7 @@ async function buildShareCard(sub){
   else if(sub.kind === 'single') await drawSingleCard(g, sub.s, sub.url);
   else if(sub.kind === 'milestone') await drawMilestoneCard(g, sub);
   else if(sub.kind === 'ge') await drawGECard(g, sub.url);
+  else if(sub.kind === 'geres') await drawGEResCard(g, sub);
   else if(sub.kind === 'poster') await drawPosterCard(g, sub);
   else if(sub.kind === 'ffplan') await drawFFPlanCard(g, sub);
   else if(sub.kind === 'stats') await ({ lives: drawStatsLivesCard, songs: drawStatsSongsCard, birthdays: drawStatsBirthdaysCard,
@@ -18055,6 +18195,7 @@ function bindDelegatedEvents(){
     else if(action==='share'){
       openShareSheet();
     }
+    else if(action==='share-geres'){ openShareSheet(geResShare(el.dataset.value)); }
     else if(action==='share-box'){
       const node = document.querySelector(`.group-card[data-box="${id}"]`);
       if(node){
