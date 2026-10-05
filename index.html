@@ -5020,6 +5020,14 @@ const SEED_SCHEDULE = [
     related:['ev-cgm48-popup-live-0929'],
     poster:{ accent:'#8E1E2E', surface:'#F4EEEF', ink:'#2A1116', img:'posters/cgm48-popup-live-1001.jpg', w:1501, h:1501 },
     stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://youtu.be/4lul1kYrNt8' } },
+  // the first pop-up for the special single: a tape recorded beforehand, shown on YouTube
+  { id:'ev-cgm48-popup-live-1006', logo:'kimi', start:'2026-10-06', time:'18:00',
+    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Pop Up Live',
+    online:'YouTube CGM48 OFFICIAL', groups:['cgm48'],
+    members:['cgm-kwan','cgm-lingling','cgm-else','cgm-lookked'],
+    related:['ev-cgm48-popup-live-1001','ev-kimi-first-performance'],
+    info:['ครั้งนี้เป็นเทปที่บันทึกไว้ล่วงหน้า'],
+    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL/live' } },
   { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27', time:'12:00',
     cancelled:'ยกเลิกการจัดงาน เนื่องจากศูนย์การค้าแฟชั่นไอส์แลนด์ปิดให้บริการชั่วคราว (สถานการณ์น้ำท่วม)',
     title:'CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow',
@@ -6810,6 +6818,7 @@ const EN = {
   'ร่วมกับ Nok Air': 'With Nok Air',
   'เพลงฉลองครบรอบ 20 ปี AKB48': "Celebrating AKB48's 20th anniversary",
   'ซิงเกิลร่วม BNK48 & CGM48': 'A joint BNK48 & CGM48 single',
+  'ครั้งนี้เป็นเทปที่บันทึกไว้ล่วงหน้า': 'This one is a tape recorded in advance',
   'ซิงเกิลร่วม BNK48 & CGM48 ของ Senbatsu General Election 2026': 'A joint BNK48 & CGM48 single for the Senbatsu General Election 2026',
   'ซิงเกิลร่วม BNK48 & TSH48 (เซี่ยงไฮ้) โครงการทูตวัฒนธรรมไทย-จีน': 'A joint single with TSH48 (Shanghai), for the Thai-Chinese Cultural Ambassador Project',
   'ซิงเกิลพิเศษรุ่น 3 — ทุกคนเป็นเซ็นเตอร์': 'Generation 3 special single — everyone is centre',
@@ -11618,6 +11627,7 @@ const EVENT_ICON = {
   'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
   'ev-getaway-pudthailee':'plane', 'ev-pancake-perfume':'sparkles', 'ev-pancake-captured':'photos',
   'ev-cgm48-popup-live-cnx':'live', 'ev-cgm48-popup-live-0924':'live', 'ev-cgm48-popup-live-0929':'live', 'ev-cgm48-popup-live-1001':'live',
+  'ev-cgm48-popup-live-1006':'live',
 };
 function eventIconName(ev){
   if(!ev) return '';
