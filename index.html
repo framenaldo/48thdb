@@ -1624,16 +1624,29 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gal-sub::before, .gal-sub::after{ content:''; width:28px; height:1px; background:currentColor; opacity:.5; }
   .gal-rooms{ display:flex; justify-content:center; flex-wrap:wrap; gap:6px; margin-top:12px; }
 
-  .gal-hall{
-    position:relative; border-radius:24px; overflow:hidden; isolation:isolate;
-    border:1px solid color-mix(in srgb, var(--gink) 14%, transparent);
+  /* The page itself is the gallery wall: no card around the room — the prints
+     hang on the page's own background, with the floor running edge to edge. */
+  body.is-gallery{
     background:
-      linear-gradient(180deg, transparent 0 79%, rgba(0,0,0,.10) 79%, rgba(0,0,0,0) 80.5%),
-      linear-gradient(180deg, var(--wall) 0%, var(--wall-2) 79%, var(--floor) 79%, var(--floor-2) 100%);
-    box-shadow:0 14px 40px rgba(50,35,20,.14);
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,250,238,.7), transparent 70%),
+      linear-gradient(180deg, #EEE8DC 0%, #E6DFD1 55%, #DCD3C2 100%);
+    background-attachment:fixed; overflow-x:clip;
+  }
+  :root[data-theme="dark"] body.is-gallery{
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,226,180,.08), transparent 70%),
+      linear-gradient(180deg, #25221D 0%, #1F1D19 60%, #191714 100%);
+    background-attachment:fixed;
+  }
+  body.is-gallery header.top{ background:color-mix(in srgb, #EEE8DC 72%, transparent); }
+  :root[data-theme="dark"] body.is-gallery header.top{ background:color-mix(in srgb, #25221D 78%, transparent); }
+  .gal-hall{
+    position:relative; isolation:isolate; margin:0 calc(50% - 50vw); width:100vw;
+    background:linear-gradient(180deg, transparent 0 79%, rgba(0,0,0,.09) 79%, transparent 80.5%),
+      linear-gradient(180deg, transparent 0 79%, var(--floor) 79%, var(--floor-2) 100%);
   }
   /* the room starts in the dark and the lights come up, one print at a time */
-  .gal-hall::after{ content:''; position:absolute; inset:0; z-index:3; pointer-events:none; background:#0d0b09; opacity:.55; transition:opacity 1.1s ease .1s; }
+  .gal-hall::after{ content:''; position:absolute; inset:0; z-index:3; pointer-events:none; background:#0d0b09; opacity:.4; transition:opacity 1.1s ease .1s; }
   .gal-hall.is-lit::after{ opacity:0; }
   .gal-track{
     display:flex; gap:clamp(26px, 5vw, 64px); overflow-x:auto; overscroll-behavior-x:contain;
@@ -1705,7 +1718,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
 
   /* the viewing room */
   .gal-room{ position:fixed; inset:0; z-index:90; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    background:rgba(12,11,9,0); transition:background .3s; touch-action:pan-y; }
+    background:rgba(12,11,9,0); transition:background .3s; touch-action:none; overflow:hidden; }
+  .gal-room-pic img{ transform-origin:50% 50%; will-change:transform; cursor:zoom-in; }
+  .gal-room.is-zoomed .gal-room-pic img{ cursor:grab; }
+  .gal-room.is-zoomed .gal-room-cap, .gal-room.is-zoomed .gal-room-prev, .gal-room.is-zoomed .gal-room-next{ opacity:0; pointer-events:none; }
+  .gal-room-hint{ position:absolute; bottom:max(24px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); font-size:11.5px; color:#8F8778; letter-spacing:.04em; white-space:nowrap; opacity:0; transition:opacity .3s .3s; }
+  .gal-room.is-open .gal-room-hint{ opacity:1; }
+  .gal-room.is-zoomed .gal-room-hint{ opacity:0; }
+  @media (max-width:700px){ .gal-room-hint{ bottom:max(80px, calc(env(safe-area-inset-bottom) + 64px)); } }
   .gal-room.is-open{ background:rgba(12,11,9,.96); }
   .gal-room-pic{ position:relative; max-width:min(92vw, 1100px); max-height:76vh; transform-origin:0 0; will-change:transform; }
   .gal-room-pic img{ display:block; max-width:min(92vw, 1100px); max-height:76vh; width:auto; height:auto; box-shadow:0 30px 70px rgba(0,0,0,.6); }
@@ -15830,23 +15850,25 @@ function renderSingleDetail(){
    prints: `f` names the file in the room's folder — the original, opened
    full size in the viewing room — and `f-s.jpg` beside it is the small copy
    that hangs on the wall (sips -Z 960). Add a print by adding a line. The
-   prints carry no titles, only their number. */
+   prints carry no titles, only their number, and hang in the order the owner
+   saved them into the folder (oldest first). */
 const GALLERY = [
   { id:'kimi', no:1, title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', kicker:'BNK48 & CGM48 Special Single', year:2026,
     work:'bnk-sp-kimitodoko', dir:'gallery/kimi/',
-    note:{ th:'ภาพทีเซอร์ชุดสถานีรถไฟของซิงเกิลพิเศษ ชานชาลา หน้าต่างรถไฟ และนาฬิกาที่บอกเวลาขบวนถัดไป ภาพจะเพิ่มขึ้นเรื่อย ๆ',
-      en:'The railway-station teasers for the special single: the platform, the carriage window and the clock that tells the next train. More pictures will join the wall.' },
+    note:{ th:'ภาพทีเซอร์ชุดสถานีรถไฟของซิงเกิลพิเศษ ชานชาลา หน้าต่างรถไฟ และนาฬิกาที่บอกเวลาขบวนถัดไป',
+      en:'The railway-station teasers for the special single: the platform, the carriage window and the clock that tells the next train.' },
+    // in the order the owner saved them into the folder
     items:[
-      { f:'01', w:2000, h:2500 },
-      { f:'02', w:2000, h:2500 },
-      { f:'03', w:2000, h:2500 },
-      { f:'04', w:2000, h:2500 },
-      { f:'05', w:2000, h:2500 },
-      { f:'06', w:2000, h:2500 },
-      { f:'07', w:1200, h:1200 },
       { f:'08', w:2000, h:2500 },
       { f:'09', w:2000, h:2500 },
-      { f:'10', w:2000, h:2500 }] },
+      { f:'10', w:2000, h:2500 },
+      { f:'06', w:2000, h:2500 },
+      { f:'05', w:2000, h:2500 },
+      { f:'01', w:2000, h:2500 },
+      { f:'04', w:2000, h:2500 },
+      { f:'02', w:2000, h:2500 },
+      { f:'03', w:2000, h:2500 },
+      { f:'07', w:1200, h:1200 }] },
 ];
 const galRoom = id => GALLERY.find(g => g.id === id) || GALLERY[0];
 const galPad = n => String(n).padStart(2, '0');
@@ -15888,8 +15910,6 @@ function renderGallery(){
     <section class="gal-hall" aria-label="${en ? 'The exhibition wall' : 'ผนังจัดแสดง'}">
       <div class="gal-track" data-gal="${g.id}">
         <div class="gal-bay gal-intro" style="--i:0">
-          <p class="gal-kick">Exhibition ${galPad(g.no)}</p>
-          <h2>${escapeHtml(g.title)}</h2>
           ${g.note ? `<p>${escapeHtml(en ? g.note.en : g.note.th)}</p>` : ''}
           <span class="gal-walk">${en ? 'WALK THIS WAY' : 'เดินชมทางนี้'} <i>→</i></span>
         </div>
@@ -15897,7 +15917,7 @@ function renderGallery(){
           <span class="gal-spot" aria-hidden="true"></span>
           <div class="gal-hang"><button class="gal-frame" data-action="gal-view" data-id="${g.id}" data-i="${i}" style="--ar:${it.w} / ${it.h}"
             aria-label="${escapeAttr(`${en ? 'View' : 'ดู'} ${galAlt(i, en)}`)}">
-            <span class="gal-mat"><img src="${g.dir}${it.f}-s.jpg" width="${it.w}" height="${it.h}" alt="${galAlt(i, en)}"
+            <span class="gal-mat"><img src="${g.dir}${it.f}-s.jpg" data-full="${g.dir}${it.f}.jpg" width="${it.w}" height="${it.h}" alt="${galAlt(i, en)}"
               loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async"></span></button></div>
           <figcaption class="gal-label">${galLabel(g, it, i, en)}</figcaption>
         </figure>`).join('')}
@@ -15934,6 +15954,10 @@ function setupGallery(root){
       const br = b.getBoundingClientRect();
       const d = Math.max(-1, Math.min(1, (br.left + br.width / 2 - mid) / (br.width * 1.4)));
       b.style.setProperty('--d', d.toFixed(3));
+      // the print you are at, and its neighbours, hang as the original file
+      const im = b.querySelector('img[data-full]');
+      if(im && Math.abs(d) < 1){ const full = im.dataset.full; im.removeAttribute('data-full');
+        const pre = new Image(); pre.onload = () => { im.src = full; }; pre.src = full; }
       b.style.setProperty('--ad', Math.abs(d).toFixed(3));
       if(Math.abs(d) < bestD){ bestD = Math.abs(d); best = i; }
     });
@@ -15966,13 +15990,34 @@ function galView(id, i, from){
     <div class="gal-room-pic"><img alt=""></div>
     <div class="gal-room-cap"></div>
     <button class="gal-room-btn gal-room-prev" aria-label="${en ? 'Previous' : 'ภาพก่อนหน้า'}">‹</button>
-    <button class="gal-room-btn gal-room-next" aria-label="${en ? 'Next' : 'ภาพถัดไป'}">›</button>`;
+    <button class="gal-room-btn gal-room-next" aria-label="${en ? 'Next' : 'ภาพถัดไป'}">›</button>
+    <span class="gal-room-hint">${en ? 'Pinch, double-tap or scroll to zoom' : 'ถ่างนิ้ว แตะสองครั้ง หรือเลื่อนลูกกลิ้ง เพื่อซูม'}</span>`;
   document.body.appendChild(room);
   document.documentElement.style.overflow = 'hidden';
   const pic = room.querySelector('.gal-room-pic'), img = pic.querySelector('img');
+  /* Zoom, on the original: pinch, double-tap or the wheel, about the point
+     under the fingers; drag to look around once zoomed. The page itself
+     cannot be zoomed (the viewport says so), so the room does it. */
+  let z = 1, tx = 0, ty = 0;
+  const paint = anim => {
+    const mx = img.offsetWidth * (z - 1) / 2, my = img.offsetHeight * (z - 1) / 2;
+    tx = Math.max(-mx, Math.min(mx, tx)); ty = Math.max(-my, Math.min(my, ty));
+    img.style.transition = anim ? 'transform .25s ease-out' : 'none';
+    img.style.transform = z > 1.001 ? `translate(${tx}px, ${ty}px) scale(${z})` : '';
+    room.classList.toggle('is-zoomed', z > 1.001);
+  };
+  const zoomAt = (nz, cx, cy, anim) => {
+    nz = Math.max(1, Math.min(5, nz));
+    const r = img.getBoundingClientRect();
+    const vx = cx - (r.left + r.width / 2 - tx), vy = cy - (r.top + r.height / 2 - ty);
+    tx = vx - nz * (vx - tx) / z; ty = vy - nz * (vy - ty) / z; z = nz;
+    if(z === 1){ tx = ty = 0; }
+    paint(anim);
+  };
   const show = (k, grow) => {
     at = (k + g.items.length) % g.items.length;
     const it = g.items[at], small = `${g.dir}${it.f}-s.jpg`, full = `${g.dir}${it.f}.jpg`;
+    z = 1; tx = ty = 0; paint(false);
     img.src = small; img.alt = galAlt(at, en);
     const big = new Image(); big.onload = () => { if(g.items[at] === it) img.src = full; }; big.src = full;
     room.querySelector('.gal-room-count').textContent = `${galPad(at + 1)} / ${galPad(g.items.length)}`;
@@ -16002,15 +16047,58 @@ function galView(id, i, from){
   room.querySelector('.gal-room-x').onclick = close;
   room.querySelector('.gal-room-prev').onclick = e => { e.stopPropagation(); show(at - 1, -1); };
   room.querySelector('.gal-room-next').onclick = e => { e.stopPropagation(); show(at + 1, 1); };
-  room.addEventListener('click', e => { if(e.target === room) close(); });
-  let x0 = null, y0 = null;
-  room.addEventListener('pointerdown', e => { x0 = e.clientX; y0 = e.clientY; });
-  room.addEventListener('pointerup', e => {
-    if(x0 == null) return;
-    const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+  let handled = false;
+  room.addEventListener('click', e => { if(e.target === room && !handled && z === 1) close(); handled = false; });
+  const pts = new Map();
+  let pinch = null, start = null, lastTap = 0;
+  const two = () => { const [a, b] = [...pts.values()]; return { d:Math.hypot(a.x - b.x, a.y - b.y) || 1, x:(a.x + b.x) / 2, y:(a.y + b.y) / 2 }; };
+  room.addEventListener('pointerdown', e => {
+    if(e.target.closest('button')) return;
+    pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if(pts.size === 2){ const t = two(); pinch = { d:t.d, z, x:t.x, y:t.y }; start = null; }
+    else if(pts.size === 1) start = { x:e.clientX, y:e.clientY, tx, ty, moved:false };
+  });
+  room.addEventListener('pointermove', e => {
+    if(!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if(pinch && pts.size >= 2){
+      const t = two();
+      zoomAt(pinch.z * t.d / pinch.d, t.x, t.y, false);
+      tx += t.x - pinch.x; ty += t.y - pinch.y; pinch.x = t.x; pinch.y = t.y; paint(false);
+      handled = true;
+    } else if(start){
+      const dx = e.clientX - start.x, dy = e.clientY - start.y;
+      if(Math.hypot(dx, dy) > 6) start.moved = true;
+      if(z > 1){ tx = start.tx + dx; ty = start.ty + dy; paint(false); }
+    }
+  });
+  const lift = e => {
+    if(!pts.has(e.pointerId)) return;
+    pts.delete(e.pointerId);
+    if(pinch){
+      if(pts.size < 2){ pinch = null; if(z < 1.08) zoomAt(1, 0, 0, true);
+        const rest = [...pts.values()][0]; start = rest ? { x:rest.x, y:rest.y, tx, ty, moved:true } : null; }
+      return;
+    }
+    if(!start) return;
+    const dx = e.clientX - start.x, dy = e.clientY - start.y, moved = start.moved; start = null;
+    if(!moved){
+      // a tap: two in quick succession zoom in on that point, or back out
+      const now = Date.now();
+      if(now - lastTap < 320){ lastTap = 0; handled = true; z > 1.001 ? zoomAt(1, 0, 0, true) : zoomAt(2.5, e.clientX, e.clientY, true); }
+      else lastTap = now;
+      return;
+    }
+    handled = true;
+    if(z > 1.001) return;
     if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(at + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
     else if(dy > 90) close();
-  });
+  };
+  room.addEventListener('pointerup', lift);
+  room.addEventListener('pointercancel', lift);
+  room.addEventListener('wheel', e => { e.preventDefault(); zoomAt(z * Math.exp(-e.deltaY * .0025), e.clientX, e.clientY, false); }, { passive:false });
+  // Safari's own pinch gesture would otherwise try to zoom the page
+  room.addEventListener('gesturestart', e => e.preventDefault());
   show(i, from);
   requestAnimationFrame(() => room.classList.add('is-open'));
 }
@@ -16381,6 +16469,7 @@ function renderMain(){
   }
   main.innerHTML = html;
   paintSheetGrads(main);
+  document.body.classList.toggle('is-gallery', state.view === 'gallery');
   if(state.view === 'gallery') setupGallery(main);
   if(_dvTop && _dvTop.day === state.dayOf){ const nb = main.querySelector('.is-day-sheet .dv-body'); if(nb) nb.scrollTop = _dvTop.top; }   // a redraw keeps the day sheet where it was
   const arrived = state.view !== _lastRenderedView;
