@@ -12,7 +12,9 @@ takes about a minute. Check it landed with
 `curl -s https://48thdb.com/ | grep <something you changed>`.
 
 Other pieces: `worker/` holds the YouTube live checker at api.48thdb.com, which
-is deployed by hand with wrangler. Firebase holds the shared member list,
+is deployed by hand with wrangler. An event whose stream link is one YouTube video
+follows that video (`/stream`, `STREAMS` in the page): it closes when the stream
+ends and stays on while it runs late. Firebase holds the shared member list,
 sign-in, the review queue, flash announcements, election results and event-link
 corrections. The Firestore rules are **not in this repo** and are deployed with
 the Firebase CLI from the owner's machine.

@@ -96,6 +96,53 @@ async function check(force) {
   return { live: found, at: now, fresh: true, failed };
 }
 
+/* Videos' own live state, for events whose stream link is one video.
+ *
+ * videos.list with liveStreamingDetails gives actualStartTime and, once the
+ * stream is over, actualEndTime (1 unit of quota for up to 50 videos). The
+ * watch page says the same for free, but YouTube answers Cloudflare's
+ * requests for it with 429. The page uses this to close the event the moment
+ * the stream ends, and to keep it open while a stream runs late. An ended
+ * stream never changes again, so that answer is kept a day; a live or
+ * upcoming one a minute. */
+const STREAM_KEY = 'https://live.state/stream-v2/';
+const STREAM_TTL_S = 60;
+const STREAM_MAX = 6;
+
+async function streamStates(ids, env) {
+  const out = {}, ask = [], old = {};
+  for (const id of ids) {
+    const hit = await readCache(STREAM_KEY + id);
+    if (hit && Date.now() - hit.at < (hit.state.end ? 86400000 : STREAM_TTL_S * 1000)) out[id] = hit.state;
+    else { ask.push(id); if (hit) old[id] = hit; }
+  }
+  if (!ask.length) return { streams: out };
+  try {
+    if (!env.YOUTUBE_API_KEY) throw new Error('no-key');
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${ask.join(',')}&key=${env.YOUTUBE_API_KEY}`,
+      { cf: { cacheTtl: 0 } });
+    if (!res.ok) throw new Error(`YouTube said ${res.status}`);
+    const d = await res.json();
+    const got = {};
+    for (const it of d.items || []) {
+      const l = it.liveStreamingDetails;
+      got[it.id] = !l ? { live: false, vod: true }
+        : { live: !!l.actualStartTime && !l.actualEndTime, start: l.actualStartTime || null,
+            end: l.actualEndTime || null, planned: l.scheduledStartTime || null };
+    }
+    for (const id of ask) {
+      if (!got[id]) continue;   // private or removed: no answer
+      out[id] = got[id];
+      await writeCache(STREAM_KEY + id, { at: Date.now(), state: got[id] }, got[id].end ? 86400 : 600);
+    }
+    return { streams: out };
+  } catch (e) {
+    // a refusal is not an answer: the last one stands a while, else none
+    for (const id of ask) if (old[id] && Date.now() - old[id].at < KEEP_MS) out[id] = old[id].state;
+    return { streams: out, error: String((e && e.message) || e) };
+  }
+}
+
 /* iAM48 lives that ended since last night.
  *
  * data/lives.json is rebuilt once a night from every member's catch-up list.
@@ -363,6 +410,15 @@ export default {
       } catch (err) {
         return new Response(JSON.stringify({ error: String((err && err.message) || err), milestones: {} }), { status: 502, headers: JSON_HEADERS });
       }
+    }
+    if (url.pathname === '/stream') {
+      const ids = [...new Set((url.searchParams.get('v') || '').split(','))]
+        .filter((v) => /^[\w-]{11}$/.test(v)).slice(0, STREAM_MAX);
+      const got = ids.length ? await streamStates(ids, env) : { streams: {} };
+      const body = { checked: new Date().toISOString(), streams: got.streams };
+      if (got.error) body.error = got.error;
+      return new Response(JSON.stringify(body),
+        { headers: { ...JSON_HEADERS, 'cache-control': `public, max-age=${STREAM_TTL_S / 2}` } });
     }
     if (url.pathname === '/iam') {
       try {

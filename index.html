@@ -9466,9 +9466,8 @@ function endsAtToday(ev, iso){
     return today.length ? slotTime(iso, today[today.length - 1].until) : slotTime(iso, '00:00');
   }
   const until = eventUntil(ev);
-  if(until) return slotTime(iso, until);
-  if(ev.time) return slotTime(iso, ev.time) + DEFAULT_RUN_MS;
-  return null;
+  const planned = until ? slotTime(iso, until) : ev.time ? slotTime(iso, ev.time) + DEFAULT_RUN_MS : null;
+  return streamEndOn(ev, iso, planned);
 }
 const doneForToday = (ev, iso) => { const end = endsAtToday(ev, iso); return end != null && end <= Date.now(); };
 
@@ -11990,6 +11989,7 @@ function loadLiveNow(again){
       .then(d => { if(!take(d)) return file(); })
       .catch(file);
   } else file();
+  loadStreams();
 
   if(again && !_liveNowTimer){
     _liveNowTimer = setInterval(() => {
@@ -12001,9 +12001,56 @@ function loadLiveNow(again){
   }
 }
 
+/* An event whose stream link is one YouTube video follows that video: it is
+   over the moment the stream ends — early or late — and stays on while the
+   stream runs past its time. The Worker reads the video's watch page
+   (api.48thdb.com/stream); a channel link, or no answer, leaves the schedule's
+   own hours in charge. */
+const STREAM_API = 'https://api.48thdb.com/stream';
+let STREAMS = {}, _streamsKey = '', _streamsDrawn = 0;
+function streamVid(u){
+  const m = String(u || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|live\/))([\w-]{11})/);
+  return m ? m[1] : null;
+}
+function streamOf(ev){
+  const v = ev && ev.stream && !ev.cancelled && streamVid(ev.stream.url);
+  return v ? STREAMS[v] || null : null;
+}
+/** When the day's part ends, given the planned end: the stream's own end if it
+    ended that day; while it is on, not before half an hour from now. */
+function streamEndOn(ev, iso, planned){
+  const st = streamOf(ev);
+  if(!st) return planned;
+  const day = t => toYmd(new Date(t));
+  if(st.end && day(st.end) === iso) return Date.parse(st.end);
+  if(st.live && st.start && day(st.start) === iso) return Math.max(planned || 0, Date.now() + 30 * 60000);
+  return planned;
+}
+function loadStreams(){
+  const iso = toYmd(todayStart());
+  const ids = [...new Set(SEED_SCHEDULE.filter(e => !e.cancelled && e.stream && e.start <= iso && eventLastDay(e) >= iso)
+    .map(e => streamVid(e.stream.url)).filter(Boolean))].slice(0, 6);
+  if(!ids.length) return;
+  fetch(`${STREAM_API}?v=${ids.join(',')}`, { cache:'no-store' })
+    .then(r => r.ok ? r.json() : null).then(d => {
+      if(!d || !d.streams) return;
+      STREAMS = { ...STREAMS, ...d.streams };
+      const key = JSON.stringify(ids.map(v => STREAMS[v] || null));
+      // a stream still on is drawn again now and then, so its half-hour margin keeps moving
+      const stale = Object.values(d.streams).some(x => x.live) && Date.now() - _streamsDrawn > 15 * 60000;
+      if(key === _streamsKey && !stale) return;
+      _streamsKey = key; _streamsDrawn = Date.now();
+      if(!document.getElementById('main')) return;
+      syncTicker();
+      if(!state.selectedId && !state.posterOf && !state.editingId) renderMain();
+    }).catch(() => {});
+}
+
 /** The stream YouTube is carrying for this event, if there is one. */
 function liveOnAir(ev){
   if(!ev || !ev.stream) return null;
+  const own = streamOf(ev);
+  if(own && own.live) return { eventId: ev.id, url: ev.stream.url, title: ev.title };
   const key = ev.stream.channel || (ev.groups || [])[0];
   const hit = (LIVE_NOW.live || []).find(l => l.eventId === ev.id || (key && l.group === key));
   if(!hit) return null;
@@ -12033,7 +12080,8 @@ function streamWindow(ev){
   const from = at(ev.time);
   if(!from) return null;
   const to = at(eventUntil(ev) || '');
-  return { from, to: to && to > from ? to : from + 2 * 3600000 };
+  const planned = to && to > from ? to : from + 2 * 3600000;
+  return { from, to: streamEndOn(ev, day, planned) };
 }
 function isReplayLink(u){
   u = u || '';
