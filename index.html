@@ -1554,6 +1554,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .lang-menu{ position:absolute; top:calc(100% + 8px); right:0; z-index:80; min-width:210px;
     padding:6px; border-radius:18px; background:var(--paper); border:1px solid var(--line); box-shadow:0 12px 32px rgba(0,0,0,.18);
     display:flex; flex-direction:column; gap:2px; }
+  /* when the header wraps and the button starts a row, the menu opens rightward */
+  .lang-menu.is-left{ right:auto; left:0; }
   .lang-opt{ display:flex; align-items:baseline; gap:10px; padding:9px 12px; border-radius:12px; border:0; background:none;
     color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
   .lang-opt b{ min-width:48px; font-size:13.5px; }
@@ -16524,6 +16526,8 @@ function render(){
     // Said once, under everything: this is a fan's database, not the groups'.
     + '<footer class="site-foot"><p>48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ</p></footer>';
   renderProfileSlot();
+  const menu = app.querySelector('.lang-menu');
+  if(menu && menu.getBoundingClientRect().left < 8) menu.classList.add('is-left');
   renderMain();
 }
 function syncBodyScrollLock(){
