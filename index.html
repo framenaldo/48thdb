@@ -1675,6 +1675,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     transition:transform .18s ease-out, box-shadow .25s;
   }
   .gal-frame:active{ transform:rotateY(calc(var(--d, 0) * -24deg)) scale(calc(.97 - var(--ad) * .1)); }
+  .gal-bay.is-wide{ width:calc(var(--bay) * 1.5); }
+  .gal-mat{ position:relative; }
+  .gal-play{ position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%; pointer-events:none;
+    background:rgba(20,16,12,.55); box-shadow:0 0 0 1.5px rgba(255,255,255,.85), 0 4px 14px rgba(0,0,0,.35); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
+  .gal-play::after{ content:''; position:absolute; left:18px; top:14px; border-style:solid; border-width:9px 0 9px 14px; border-color:transparent transparent transparent #fff; }
+  .gal-mini .gal-play{ width:34px; height:34px; margin:-17px 0 0 -17px; }
+  .gal-mini .gal-play::after{ left:13px; top:10px; border-width:7px 0 7px 11px; }
   .gal-mat{ display:block; padding:9%; background:#FBF9F4; box-shadow:inset 0 0 0 1px rgba(0,0,0,.06), inset 3px 3px 8px rgba(0,0,0,.13); }
   .gal-mat img{ display:block; width:100%; height:auto; aspect-ratio:var(--ar); object-fit:cover; background:#e9e4da; outline:1px solid rgba(0,0,0,.12); }
   .gal-label{
@@ -1728,7 +1735,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @media (max-width:700px){ .gal-room-hint{ bottom:max(80px, calc(env(safe-area-inset-bottom) + 64px)); } }
   .gal-room.is-open{ background:rgba(12,11,9,.96); }
   .gal-room-pic{ position:relative; max-width:min(92vw, 1100px); max-height:76vh; transform-origin:0 0; will-change:transform; }
-  .gal-room-pic img{ display:block; max-width:min(92vw, 1100px); max-height:76vh; width:auto; height:auto; box-shadow:0 30px 70px rgba(0,0,0,.6); }
+  .gal-room-pic img, .gal-room-pic video{ display:block; max-width:min(92vw, 1100px); max-height:76vh; width:auto; height:auto; box-shadow:0 30px 70px rgba(0,0,0,.6); }
+  .gal-room-pic [hidden]{ display:none; }
+  .gal-room.is-clip .gal-room-hint{ visibility:hidden; }
   .gal-room-cap{ margin-top:16px; text-align:center; color:#E9E2D2; opacity:0; transform:translateY(8px); transition:opacity .35s .15s, transform .35s .15s; padding:0 20px; }
   .gal-room.is-open .gal-room-cap{ opacity:1; transform:none; }
   .gal-room-cap .gal-no{ font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:15px; color:#A99F8D; }
@@ -15851,14 +15860,16 @@ function renderSingleDetail(){
    Rooms of pictures, each hung like an exhibition. A room is a list of
    prints: `f` names the file in the room's folder — the original, opened
    full size in the viewing room — and `f-s.jpg` beside it is the small copy
-   that hangs on the wall (sips -Z 960). Add a print by adding a line. The
+   that hangs on the wall (sips -Z 960, or -Z 1200 for a wide one). A clip
+   is `video:true`: `f.mp4` beside a still of it as `f.jpg` / `f-s.jpg`; it
+   hangs as that still and plays in the viewing room. Add a print by adding a line. The
    prints carry no titles, only their number, and hang in the order the owner
    saved them into the folder (oldest first). */
 const GALLERY = [
   { id:'kimi', no:1, title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', kicker:'BNK48 & CGM48 Special Single', year:2026,
     work:'bnk-sp-kimitodoko', dir:'gallery/kimi/',
-    note:{ th:'ภาพทีเซอร์ชุดสถานีรถไฟของซิงเกิลพิเศษ ชานชาลา หน้าต่างรถไฟ และนาฬิกาที่บอกเวลาขบวนถัดไป',
-      en:'The railway-station teasers for the special single: the platform, the carriage window and the clock that tells the next train.' },
+    note:{ th:'ภาพชุดสถานีรถไฟของซิงเกิลพิเศษ ชานชาลา นาฬิกาที่บอกเวลาขบวนถัดไป สมาชิกทุกคนริมหน้าต่างรถไฟ ภาพหมู่ และคลิปสั้น',
+      en:'The railway pictures for the special single: the platform, the clock that tells the next train, every member at the carriage window, the group shots and two short clips.' },
     // in the order the owner saved them into the folder
     items:[
       { f:'08', w:2000, h:2500 },
@@ -15870,7 +15881,97 @@ const GALLERY = [
       { f:'04', w:2000, h:2500 },
       { f:'02', w:2000, h:2500 },
       { f:'03', w:2000, h:2500 },
-      { f:'07', w:1200, h:1200 }] },
+      { f:'07', w:1200, h:1200 },
+      { f:'11', w:2000, h:2500 },
+      { f:'12', w:2000, h:2500 },
+      { f:'13', w:2000, h:2500 },
+      { f:'14', w:2000, h:2500 },
+      { f:'15', w:2000, h:2500 },
+      { f:'16', w:2000, h:2500 },
+      { f:'17', w:2000, h:2500 },
+      { f:'18', w:2000, h:2500 },
+      { f:'19', w:2000, h:2500 },
+      { f:'20', w:2000, h:2500 },
+      { f:'21', w:2000, h:2500 },
+      { f:'22', w:2000, h:2500 },
+      { f:'23', w:2000, h:2500 },
+      { f:'24', w:2000, h:2500 },
+      { f:'25', w:2000, h:2500 },
+      { f:'26', w:2000, h:2500 },
+      { f:'27', w:2000, h:2500 },
+      { f:'28', w:2000, h:2500 },
+      { f:'29', w:2000, h:2500 },
+      { f:'30', w:2000, h:2500 },
+      { f:'31', w:2000, h:2500 },
+      { f:'32', w:2000, h:2500 },
+      { f:'33', w:2000, h:2500 },
+      { f:'34', w:2000, h:2500 },
+      { f:'35', w:2000, h:2500 },
+      { f:'36', w:2000, h:2500 },
+      { f:'37', w:2000, h:2500 },
+      { f:'38', w:2000, h:2500 },
+      { f:'39', w:2000, h:2500 },
+      { f:'40', w:2000, h:2500 },
+      { f:'41', w:2000, h:2500 },
+      { f:'42', w:2000, h:2500 },
+      { f:'43', w:2000, h:2500 },
+      { f:'44', w:2000, h:2500 },
+      { f:'45', w:2000, h:2500 },
+      { f:'46', w:2000, h:2500 },
+      { f:'47', w:2000, h:2500 },
+      { f:'48', w:2000, h:2500 },
+      { f:'49', w:2000, h:2500 },
+      { f:'50', w:2000, h:2500 },
+      { f:'51', w:2000, h:2500 },
+      { f:'52', w:2000, h:2500 },
+      { f:'53', w:2000, h:2500 },
+      { f:'54', w:2000, h:2500 },
+      { f:'55', w:2000, h:2500 },
+      { f:'56', w:2000, h:2500 },
+      { f:'57', w:2000, h:2500 },
+      { f:'58', w:2000, h:2500 },
+      { f:'59', w:3938, h:2500 },
+      { f:'60', w:3938, h:2500 },
+      { f:'61', w:2000, h:2500, video:true },
+      { f:'62', w:2000, h:2500, video:true },
+      { f:'63', w:3938, h:2500 },
+      { f:'64', w:3938, h:2500 },
+      { f:'65', w:3938, h:2500 },
+      { f:'66', w:2500, h:2500 },
+      { f:'67', w:3938, h:2500 },
+      { f:'68', w:3938, h:2500 },
+      { f:'69', w:2000, h:2500 },
+      { f:'70', w:2000, h:2500 },
+      { f:'71', w:2000, h:2500 },
+      { f:'72', w:2000, h:2500 },
+      { f:'73', w:2000, h:2500 },
+      { f:'74', w:2000, h:2500 },
+      { f:'75', w:2000, h:2500 },
+      { f:'76', w:2000, h:2500 },
+      { f:'77', w:2000, h:2500 },
+      { f:'78', w:2000, h:2500 },
+      { f:'79', w:2000, h:2500 },
+      { f:'80', w:2000, h:2500 },
+      { f:'81', w:2000, h:2500 },
+      { f:'82', w:2000, h:2500 },
+      { f:'83', w:2000, h:2500 },
+      { f:'84', w:2000, h:2500 },
+      { f:'85', w:2000, h:2500 },
+      { f:'86', w:2000, h:2500 },
+      { f:'87', w:2000, h:2500 },
+      { f:'88', w:2000, h:2500 },
+      { f:'89', w:2000, h:2500 },
+      { f:'90', w:2000, h:2500 },
+      { f:'91', w:2000, h:2500 },
+      { f:'92', w:2000, h:2500 },
+      { f:'93', w:2000, h:2500 },
+      { f:'94', w:2000, h:2500 },
+      { f:'95', w:2000, h:2500 },
+      { f:'96', w:2000, h:2500 },
+      { f:'97', w:2000, h:2500 },
+      { f:'98', w:3938, h:2500 },
+      { f:'99', w:3938, h:2500 },
+      { f:'100', w:1920, h:1080 }] },
 ];
 const galRoom = id => GALLERY.find(g => g.id === id) || GALLERY[0];
 const galPad = n => String(n).padStart(2, '0');
@@ -15915,12 +16016,12 @@ function renderGallery(){
           ${g.note ? `<p>${escapeHtml(en ? g.note.en : g.note.th)}</p>` : ''}
           <span class="gal-walk">${en ? 'WALK THIS WAY' : 'เดินชมทางนี้'} <i>→</i></span>
         </div>
-        ${g.items.map((it, i) => `<figure class="gal-bay" data-i="${i}" style="--i:${i}">
+        ${g.items.map((it, i) => `<figure class="gal-bay${it.w > it.h * 1.15 ? ' is-wide' : ''}" data-i="${i}" style="--i:${Math.min(i, 6)}">
           <span class="gal-spot" aria-hidden="true"></span>
           <div class="gal-hang"><button class="gal-frame" data-action="gal-view" data-id="${g.id}" data-i="${i}" style="--ar:${it.w} / ${it.h}"
             aria-label="${escapeAttr(`${en ? 'View' : 'ดู'} ${galAlt(i, en)}`)}">
             <span class="gal-mat"><img src="${g.dir}${it.f}-s.jpg" data-full="${g.dir}${it.f}.jpg" width="${it.w}" height="${it.h}" alt="${galAlt(i, en)}"
-              loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async"></span></button></div>
+              loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async">${it.video ? '<i class="gal-play" aria-hidden="true"></i>' : ''}</span></button></div>
           <figcaption class="gal-label">${galLabel(g, it, i, en)}</figcaption>
         </figure>`).join('')}
       </div>
@@ -15934,7 +16035,7 @@ function renderGallery(){
     <h2 class="section-label gal-wallhead">${en ? `The whole wall · ${n}` : `ผนังรวม · ${n} ภาพ`}</h2>
     <div class="gal-salon">
       ${g.items.map((it, i) => `<button class="gal-mini" data-action="gal-view" data-id="${g.id}" data-i="${i}" aria-label="${galAlt(i, en)}">
-        <span class="gal-mat"><img src="${g.dir}${it.f}-s.jpg" width="${it.w}" height="${it.h}" alt="" loading="lazy" decoding="async" style="--ar:${it.w} / ${it.h}"></span></button>`).join('')}
+        <span class="gal-mat"><img src="${g.dir}${it.f}-s.jpg" width="${it.w}" height="${it.h}" alt="" loading="lazy" decoding="async" style="--ar:${it.w} / ${it.h}">${it.video ? '<i class="gal-play" aria-hidden="true"></i>' : ''}</span></button>`).join('')}
     </div>
     ${g.work && findWork(g.work) ? `<div class="gal-foot"><button class="chip chip-link" data-action="open-single" data-id="${g.work}">${en ? 'The song' : 'ไปที่หน้าเพลง'} ${escapeHtml(g.title)} →</button></div>` : ''}
   </div>`;
@@ -15989,14 +16090,14 @@ function galView(id, i, from){
   room.className = 'gal-room';
   room.innerHTML = `<span class="gal-room-count"></span>
     <button class="gal-room-btn gal-room-x" aria-label="${en ? 'Close' : 'ปิด'}">✕</button>
-    <div class="gal-room-pic"><img alt=""></div>
+    <div class="gal-room-pic"><img alt=""><video playsinline loop controls preload="metadata" hidden></video></div>
     <div class="gal-room-cap"></div>
     <button class="gal-room-btn gal-room-prev" aria-label="${en ? 'Previous' : 'ภาพก่อนหน้า'}">‹</button>
     <button class="gal-room-btn gal-room-next" aria-label="${en ? 'Next' : 'ภาพถัดไป'}">›</button>
     <span class="gal-room-hint">${en ? 'Pinch, double-tap or scroll to zoom' : 'ถ่างนิ้ว แตะสองครั้ง หรือเลื่อนลูกกลิ้ง เพื่อซูม'}</span>`;
   document.body.appendChild(room);
   document.documentElement.style.overflow = 'hidden';
-  const pic = room.querySelector('.gal-room-pic'), img = pic.querySelector('img');
+  const pic = room.querySelector('.gal-room-pic'), img = pic.querySelector('img'), vid = pic.querySelector('video');
   /* Zoom, on the original: pinch, double-tap or the wheel, about the point
      under the fingers; drag to look around once zoomed. The page itself
      cannot be zoomed (the viewport says so), so the room does it. */
@@ -16009,6 +16110,7 @@ function galView(id, i, from){
     room.classList.toggle('is-zoomed', z > 1.001);
   };
   const zoomAt = (nz, cx, cy, anim) => {
+    if(g.items[at].video) return;
     nz = Math.max(1, Math.min(5, nz));
     const r = img.getBoundingClientRect();
     const vx = cx - (r.left + r.width / 2 - tx), vy = cy - (r.top + r.height / 2 - ty);
@@ -16020,8 +16122,17 @@ function galView(id, i, from){
     at = (k + g.items.length) % g.items.length;
     const it = g.items[at], small = `${g.dir}${it.f}-s.jpg`, full = `${g.dir}${it.f}.jpg`;
     z = 1; tx = ty = 0; paint(false);
-    img.src = small; img.alt = galAlt(at, en);
-    const big = new Image(); big.onload = () => { if(g.items[at] === it) img.src = full; }; big.src = full;
+    room.classList.toggle('is-clip', !!it.video);
+    img.hidden = !!it.video; vid.hidden = !it.video;
+    if(it.video){
+      img.removeAttribute('src');
+      vid.poster = full; vid.src = `${g.dir}${it.f}.mp4`; vid.setAttribute('aria-label', galAlt(at, en));
+      vid.play().catch(() => {});
+    } else {
+      vid.pause(); vid.removeAttribute('src'); vid.load();
+      img.src = small; img.alt = galAlt(at, en);
+      const big = new Image(); big.onload = () => { if(g.items[at] === it) img.src = full; }; big.src = full;
+    }
     room.querySelector('.gal-room-count').textContent = `${galPad(at + 1)} / ${galPad(g.items.length)}`;
     room.querySelector('.gal-room-cap').innerHTML = galLabel(g, it, at, en);
     if(grow && grow.width){
@@ -16038,6 +16149,7 @@ function galView(id, i, from){
     }
   };
   const close = () => {
+    vid.pause();
     room.classList.remove('is-open');
     pic.style.transition = 'transform .25s ease-in, opacity .25s';
     pic.style.transform = 'scale(.92)'; pic.style.opacity = '0';
@@ -16055,7 +16167,7 @@ function galView(id, i, from){
   let pinch = null, start = null, lastTap = 0;
   const two = () => { const [a, b] = [...pts.values()]; return { d:Math.hypot(a.x - b.x, a.y - b.y) || 1, x:(a.x + b.x) / 2, y:(a.y + b.y) / 2 }; };
   room.addEventListener('pointerdown', e => {
-    if(e.target.closest('button')) return;
+    if(e.target.closest('button, video')) return;
     pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
     if(pts.size === 2){ const t = two(); pinch = { d:t.d, z, x:t.x, y:t.y }; start = null; }
     else if(pts.size === 1) start = { x:e.clientX, y:e.clientY, tx, ty, moved:false };
