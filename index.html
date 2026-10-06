@@ -1601,6 +1601,149 @@
   .profile-dropdown button:hover{ background:var(--paper-dim); }
   .profile-dropdown button.danger{ color:var(--danger); }
 
+  /* ---------------------------- gallery ---------------------------- */
+  /* A room of an exhibition: a lit wall the prints hang along, walked past
+     sideways; a salon wall of everything below; a dark viewing room for one
+     print at full size. The room keeps its own colours — gallery white and a
+     wooden floor — in light mode, and a dimmed room in dark mode. */
+  .gal-page{
+    --wall:#E9E2D4; --wall-2:#D8CEBC; --floor:#C7B79B; --floor-2:#B8A88C; --gink:#34312A; --gsoft:#7A7266;
+    --serif:'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif;
+  }
+  :root[data-theme="dark"] .gal-page{
+    --wall:#29261F; --wall-2:#1F1D18; --floor:#3B3227; --floor-2:#2C251D; --gink:#EFE8D8; --gsoft:#A79F90;
+  }
+  .gal-hero{ text-align:center; margin:4px 0 18px; }
+  .gal-kick{ margin:0; font-size:11px; font-weight:800; letter-spacing:.24em; color:var(--gsoft); text-transform:uppercase; }
+  .gal-kick span{ letter-spacing:.04em; }
+  .gal-title{ margin:6px 0 0; font-family:var(--serif); font-weight:600; font-size:clamp(30px, 7vw, 54px); line-height:1.08; color:var(--gink); letter-spacing:.01em; }
+  .gal-alt{ margin:4px 0 0; font-size:15px; font-weight:700; color:var(--gink); opacity:.8; }
+  .gal-sub{ margin:8px auto 0; display:inline-flex; align-items:center; gap:10px; font-size:12px; font-weight:700; color:var(--gsoft); letter-spacing:.06em; }
+  .gal-sub::before, .gal-sub::after{ content:''; width:28px; height:1px; background:currentColor; opacity:.5; }
+  .gal-rooms{ display:flex; justify-content:center; flex-wrap:wrap; gap:6px; margin-top:12px; }
+
+  .gal-hall{
+    position:relative; border-radius:24px; overflow:hidden; isolation:isolate;
+    border:1px solid color-mix(in srgb, var(--gink) 14%, transparent);
+    background:
+      linear-gradient(180deg, transparent 0 79%, rgba(0,0,0,.10) 79%, rgba(0,0,0,0) 80.5%),
+      linear-gradient(180deg, var(--wall) 0%, var(--wall-2) 79%, var(--floor) 79%, var(--floor-2) 100%);
+    box-shadow:0 14px 40px rgba(50,35,20,.14);
+  }
+  /* the room starts in the dark and the lights come up, one print at a time */
+  .gal-hall::after{ content:''; position:absolute; inset:0; z-index:3; pointer-events:none; background:#0d0b09; opacity:.55; transition:opacity 1.1s ease .1s; }
+  .gal-hall.is-lit::after{ opacity:0; }
+  .gal-track{
+    display:flex; gap:clamp(26px, 5vw, 64px); overflow-x:auto; overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+    padding:46px calc(50% - var(--bay) / 2) 20px; --bay:min(56vw, 300px);
+  }
+  .gal-track::-webkit-scrollbar{ display:none; }
+  @media (min-width:900px){ .gal-track{ --bay:330px; padding-top:56px; } }
+  .gal-bay{ position:relative; flex:none; width:var(--bay); margin:0; scroll-snap-align:center; display:flex; flex-direction:column; align-items:center;
+    --ad:1; }
+  /* a light on the wall above each print */
+  .gal-spot{ position:absolute; left:50%; top:-46px; width:150%; height:calc(100% + 30px); transform:translateX(-50%); pointer-events:none; z-index:0;
+    background:radial-gradient(ellipse 44% 66% at 50% 0%, rgba(255,252,242,.98), rgba(255,247,228,.62) 42%, rgba(255,244,220,.18) 62%, transparent 76%);
+    opacity:calc(1 - var(--ad) * .8); transition:opacity .25s; }
+  .gal-spot::before{ content:''; position:absolute; left:50%; top:30px; width:34px; height:7px; transform:translateX(-50%); border-radius:0 0 8px 8px;
+    background:linear-gradient(180deg, #2b2620, #4a4136); box-shadow:0 2px 6px rgba(0,0,0,.3); }
+  :root[data-theme="dark"] .gal-spot{ mix-blend-mode:screen; opacity:calc(.55 - var(--ad) * .45);
+    background:radial-gradient(ellipse 46% 62% at 50% 0%, rgba(255,232,190,.55), rgba(255,220,170,.14) 55%, transparent 72%); }
+  .gal-hang{ position:relative; z-index:1; width:100%; perspective:1100px; animation:gal-hang 1.15s cubic-bezier(.3,1.35,.5,1) both; animation-delay:calc(var(--i) * 90ms + .25s); transform-origin:50% -30px; }
+  @keyframes gal-hang{ 0%{ opacity:0; transform:translateY(-34px) rotate(-5deg); } 45%{ opacity:1; transform:translateY(0) rotate(2.4deg); } 70%{ transform:rotate(-1.1deg); } 88%{ transform:rotate(.4deg); } 100%{ opacity:1; transform:none; } }
+  .gal-frame{
+    display:block; width:100%; padding:8px; border:0; border-radius:3px; cursor:zoom-in;
+    background:linear-gradient(145deg, #3d352c, #1f1a15 60%, #2e2721);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 22px 30px -14px rgba(35,24,12,.55), 0 5px 10px rgba(35,24,12,.22);
+    transform:rotateY(calc(var(--d, 0) * -24deg)) scale(calc(1 - var(--ad) * .1));
+    transition:transform .18s ease-out, box-shadow .25s;
+  }
+  .gal-frame:active{ transform:rotateY(calc(var(--d, 0) * -24deg)) scale(calc(.97 - var(--ad) * .1)); }
+  .gal-mat{ display:block; padding:9%; background:#FBF9F4; box-shadow:inset 0 0 0 1px rgba(0,0,0,.06), inset 3px 3px 8px rgba(0,0,0,.13); }
+  .gal-mat img{ display:block; width:100%; height:auto; aspect-ratio:var(--ar); object-fit:cover; background:#e9e4da; outline:1px solid rgba(0,0,0,.12); }
+  .gal-label{
+    position:relative; z-index:1; margin-top:18px; min-width:62%; max-width:100%; padding:8px 12px 9px; text-align:left;
+    background:color-mix(in srgb, #fff 82%, var(--wall)); border-radius:2px; box-shadow:0 2px 6px rgba(40,30,20,.14);
+    opacity:calc(1 - var(--ad) * .6); transition:opacity .25s;
+  }
+  :root[data-theme="dark"] .gal-label{ background:#E9E2D2; }
+  .gal-label .gal-no{ display:block; font-family:var(--serif); font-size:13px; font-style:italic; color:#8A8174; line-height:1.1; }
+  .gal-label b{ display:block; font-size:13.5px; font-weight:800; color:#2F2B24; line-height:1.3; }
+  .gal-label small{ display:block; margin-top:2px; font-size:10.5px; font-weight:600; color:#8A8174; letter-spacing:.02em; }
+  /* the wall text an exhibition opens with */
+  .gal-intro{ justify-content:center; text-align:left; padding:0 4px; align-self:stretch; }
+  .gal-intro .gal-kick{ text-align:left; }
+  .gal-intro h2{ margin:10px 0 0; font-family:var(--serif); font-weight:600; font-size:30px; line-height:1.1; color:var(--gink); }
+  .gal-intro p{ margin:12px 0 0; font-size:13px; line-height:1.65; color:var(--gink); opacity:.82; }
+  .gal-intro .gal-walk{ margin-top:16px; display:inline-flex; gap:8px; align-items:center; font-size:12px; font-weight:800; letter-spacing:.04em; color:var(--gsoft); }
+  .gal-intro .gal-walk i{ display:inline-block; font-style:normal; animation:gal-walk 1.6s ease-in-out infinite; }
+  @keyframes gal-walk{ 0%,100%{ transform:none; } 50%{ transform:translateX(6px); } }
+  .gal-ctrl{ position:relative; z-index:2; display:flex; align-items:center; justify-content:center; gap:14px; padding:6px 16px 18px; color:var(--gink); }
+  .gal-arrow{ width:40px; height:40px; border-radius:50%; border:1px solid color-mix(in srgb, var(--gink) 22%, transparent); cursor:pointer;
+    background:color-mix(in srgb, #fff 60%, transparent); color:var(--gink); font-size:20px; line-height:1; box-shadow:0 3px 0 color-mix(in srgb, var(--gink) 18%, transparent); }
+  .gal-arrow:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--gink) 18%, transparent); }
+  :root[data-theme="dark"] .gal-arrow{ background:rgba(255,255,255,.08); }
+  .gal-count{ font-family:var(--serif); font-size:17px; min-width:70px; text-align:center; }
+  .gal-count b{ font-size:22px; }
+  .gal-prog{ position:absolute; left:16%; right:16%; bottom:8px; height:2px; background:color-mix(in srgb, var(--gink) 14%, transparent); border-radius:2px; overflow:hidden; }
+  .gal-prog i{ display:block; height:100%; width:var(--p, 10%); background:var(--gink); opacity:.55; transition:width .2s; }
+
+  .gal-wallhead{ margin-top:26px; }
+  .gal-salon{ columns:2; column-gap:14px; }
+  @media (min-width:700px){ .gal-salon{ columns:3; } }
+  @media (min-width:1100px){ .gal-salon{ columns:4; column-gap:18px; } }
+  .gal-mini{ display:block; width:100%; margin:0 0 14px; break-inside:avoid; padding:5px; border:0; border-radius:3px; cursor:zoom-in;
+    background:linear-gradient(145deg, #3d352c, #1f1a15); box-shadow:0 10px 18px -10px rgba(35,24,12,.5), 0 2px 5px rgba(35,24,12,.18);
+    transition:transform .2s, box-shadow .2s; }
+  .gal-mini .gal-mat{ padding:6%; }
+  .gal-mini:hover{ transform:translateY(-3px) rotate(-.4deg); box-shadow:0 16px 24px -12px rgba(35,24,12,.55), 0 3px 6px rgba(35,24,12,.2); }
+  .gal-mini:active{ transform:translateY(1px) scale(.98); }
+  .gal-foot{ display:flex; justify-content:center; margin:6px 0 10px; }
+
+  /* the viewing room */
+  .gal-room{ position:fixed; inset:0; z-index:90; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:rgba(12,11,9,0); transition:background .3s; touch-action:pan-y; }
+  .gal-room.is-open{ background:rgba(12,11,9,.96); }
+  .gal-room-pic{ position:relative; max-width:min(92vw, 1100px); max-height:76vh; transform-origin:0 0; will-change:transform; }
+  .gal-room-pic img{ display:block; max-width:min(92vw, 1100px); max-height:76vh; width:auto; height:auto; box-shadow:0 30px 70px rgba(0,0,0,.6); }
+  .gal-room-cap{ margin-top:16px; text-align:center; color:#E9E2D2; opacity:0; transform:translateY(8px); transition:opacity .35s .15s, transform .35s .15s; padding:0 20px; }
+  .gal-room.is-open .gal-room-cap{ opacity:1; transform:none; }
+  .gal-room-cap .gal-no{ font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:15px; color:#A99F8D; }
+  .gal-room-cap b{ display:block; font-size:16px; font-weight:800; }
+  .gal-room-cap small{ display:block; margin-top:3px; font-size:11.5px; color:#A99F8D; }
+  .gal-room-btn{ position:absolute; width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08);
+    color:#fff; font-size:22px; line-height:1; cursor:pointer; opacity:0; transition:opacity .3s .1s; }
+  .gal-room.is-open .gal-room-btn{ opacity:1; }
+  .gal-room-btn:active{ transform:scale(.94); }
+  .gal-room-x{ top:max(16px, env(safe-area-inset-top)); right:16px; }
+  .gal-room-prev{ left:14px; top:50%; margin-top:-22px; }
+  .gal-room-next{ right:14px; top:50%; margin-top:-22px; }
+  @media (max-width:700px){ .gal-room-prev, .gal-room-next{ top:auto; bottom:max(18px, env(safe-area-inset-bottom)); margin:0; } }
+  .gal-room-count{ position:absolute; top:max(26px, calc(env(safe-area-inset-top) + 10px)); left:20px; font-family:'Cormorant Garamond', Georgia, serif; font-size:17px; color:#A99F8D; }
+  @media (prefers-reduced-motion:reduce){
+    .gal-hang{ animation:none; } .gal-hall::after{ transition:none; } .gal-frame{ transition:none; }
+  }
+
+  /* the way in: a little hang of three prints, on the music page and the single's page */
+  .gal-teaser{ display:flex; align-items:center; gap:16px; width:100%; margin:0 0 16px; padding:14px 16px; text-align:left; cursor:pointer;
+    border-radius:20px; border:1px solid var(--glass-edge); background:var(--glass-card); color:var(--ink);
+    box-shadow:0 4px 0 color-mix(in srgb, var(--ink) 10%, transparent); }
+  .gal-teaser:active{ transform:translateY(2px); box-shadow:0 2px 0 color-mix(in srgb, var(--ink) 10%, transparent); }
+  .gal-fan{ position:relative; flex:none; width:96px; height:72px; }
+  .gal-fan img{ position:absolute; top:6px; width:46px; height:58px; object-fit:cover; border:3px solid #FBF9F4; outline:2px solid #2a241e;
+    box-shadow:0 6px 10px rgba(0,0,0,.25); transition:transform .3s; }
+  .gal-fan img:nth-child(1){ left:0; transform:rotate(-9deg); }
+  .gal-fan img:nth-child(2){ left:25px; top:2px; z-index:1; }
+  .gal-fan img:nth-child(3){ left:50px; transform:rotate(8deg); }
+  .gal-teaser:hover .gal-fan img:nth-child(1){ transform:rotate(-13deg) translateX(-3px); }
+  .gal-teaser:hover .gal-fan img:nth-child(3){ transform:rotate(12deg) translateX(3px); }
+  .gal-teaser-text{ min-width:0; }
+  .gal-teaser-text small{ display:block; font-size:10.5px; font-weight:800; letter-spacing:.08em; color:var(--ink-soft); }
+  .gal-teaser-text b{ display:block; margin-top:2px; font-family:'Cormorant Garamond', Georgia, serif; font-size:21px; font-weight:600; line-height:1.15; }
+  .gal-teaser-text span{ display:block; margin-top:2px; font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .gal-teaser-go{ margin-left:auto; flex:none; font-size:18px; color:var(--ink-soft); }
+
   /* ---------------------------- feed ---------------------------- */
   .feed-scope{
     display:inline-flex; gap:3px; margin-top:12px; padding:3px;
@@ -6316,7 +6459,7 @@ let state = {
   ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOshi:false,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
-  calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current', livesScope:'current',
+  calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current', livesScope:'current', galleryId:null,
   lang:'mix',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
@@ -7956,7 +8099,7 @@ function currentNavValue(){
   if(state.view==='feed') return 'feed';
   if(state.view==='browse') return state.favoritesOnly ? 'oshi' : 'groups';
   if(state.view==='groups' || state.view==='org') return 'groups';
-  if(state.view==='discography' || state.view==='single') return 'discography';
+  if(state.view==='discography' || state.view==='single' || state.view==='gallery') return 'discography';
   if(state.view==='stats') return 'stats';
   if(state.view==='profile') return 'profile';
   return 'browse';
@@ -15642,6 +15785,7 @@ function renderSingleDetail(){
     ${s.alt?`<p class="single-th">${escapeHtml(s.alt)}</p>`:''}
     ${s.note?`<p class="muted-note">${escapeHtml(s.note)}</p>`:''}
   </div>
+  ${GALLERY.filter(r => r.work === s.id).map(r => renderGalleryTeaser(r.id)).join('')}
   ${(()=>{ // an album lists its singles; a single should lead back to its album too
     if(isAlbum) return '';
     const albums = SEED_ALBUMS.filter(a => (a.singles || []).includes(s.id));
@@ -15663,6 +15807,196 @@ function renderSingleDetail(){
       <p class="muted-note">เพิ่มได้ที่ SEED_SENBATSU ในไฟล์ index.html</p>
     </div>`)
   : tracks.map(renderTrack).join('')}</div>`;
+}
+
+/* ================= GALLERY =================
+   Rooms of pictures, each hung like an exhibition. A room is a list of
+   prints: `f` names the file in the room's folder — the original, opened
+   full size in the viewing room — and `f-s.jpg` beside it is the small copy
+   that hangs on the wall (sips -Z 960). Add a print by adding a line. The
+   prints carry no titles, only their number. */
+const GALLERY = [
+  { id:'kimi', no:1, title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', kicker:'BNK48 & CGM48 Special Single', year:2026,
+    work:'bnk-sp-kimitodoko', dir:'gallery/kimi/',
+    note:{ th:'ภาพทีเซอร์ชุดสถานีรถไฟของซิงเกิลพิเศษ ชานชาลา หน้าต่างรถไฟ และนาฬิกาที่บอกเวลาขบวนถัดไป ภาพจะเพิ่มขึ้นเรื่อย ๆ',
+      en:'The railway-station teasers for the special single: the platform, the carriage window and the clock that tells the next train. More pictures will join the wall.' },
+    items:[
+      { f:'01', w:2000, h:2500 },
+      { f:'02', w:2000, h:2500 },
+      { f:'03', w:2000, h:2500 },
+      { f:'04', w:2000, h:2500 },
+      { f:'05', w:2000, h:2500 },
+      { f:'06', w:2000, h:2500 },
+      { f:'07', w:1200, h:1200 },
+      { f:'08', w:2000, h:2500 },
+      { f:'09', w:2000, h:2500 },
+      { f:'10', w:2000, h:2500 }] },
+];
+const galRoom = id => GALLERY.find(g => g.id === id) || GALLERY[0];
+const galPad = n => String(n).padStart(2, '0');
+// the room's serif is fetched only when someone walks in
+function galFont(){
+  if(document.getElementById('gal-font')) return;
+  const l = document.createElement('link');
+  l.id = 'gal-font'; l.rel = 'stylesheet';
+  l.href = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap';
+  document.head.appendChild(l);
+}
+const galAlt = (i, en) => en ? `Picture ${i + 1}` : `ภาพที่ ${i + 1}`;
+function galLabel(g, it, i, en){
+  return `<span class="gal-no">No. ${galPad(i + 1)}</span><small>${escapeHtml(g.kicker)} · ${g.year}</small>`;
+}
+function renderGalleryTeaser(id){
+  const g = galRoom(id), en = isEN();
+  if(!g) return '';
+  return `<button class="gal-teaser" data-action="open-gallery" data-id="${g.id}">
+    <span class="gal-fan" aria-hidden="true">${g.items.slice(0, 3).map(it => `<img src="${g.dir}${it.f}-s.jpg" alt="" loading="lazy" decoding="async">`).join('')}</span>
+    <span class="gal-teaser-text"><small>${en ? 'GALLERY' : 'แกลเลอรี'} · EXHIBITION ${galPad(g.no)}</small>
+      <b>${escapeHtml(g.title)}</b><span>${en ? `${g.items.length} pictures` : `${g.items.length} ภาพ`}</span></span>
+    <span class="gal-teaser-go" aria-hidden="true">→</span></button>`;
+}
+function renderGallery(){
+  galFont();
+  const en = isEN(), g = galRoom(state.galleryId), n = g.items.length;
+  return `
+  <div class="gal-page">
+    <div class="page-top-row"><button class="back-btn" data-action="go-back">← กลับ</button>
+      <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></div>
+    <header class="gal-hero">
+      <p class="gal-kick">Exhibition ${galPad(g.no)} · <span>${n} ${en ? 'works' : 'ภาพ'}</span></p>
+      <h1 class="gal-title">${escapeHtml(g.title)}</h1>
+      ${g.alt ? `<p class="gal-alt">${escapeHtml(g.alt)}</p>` : ''}
+      <p class="gal-sub">${escapeHtml(g.kicker)}</p>
+      ${GALLERY.length > 1 ? `<div class="gal-rooms">${GALLERY.map(r => `<button class="pill${r.id === g.id ? ' active' : ''}" data-action="open-gallery" data-id="${r.id}">${escapeHtml(r.title)}</button>`).join('')}</div>` : ''}
+    </header>
+    <section class="gal-hall" aria-label="${en ? 'The exhibition wall' : 'ผนังจัดแสดง'}">
+      <div class="gal-track" data-gal="${g.id}">
+        <div class="gal-bay gal-intro" style="--i:0">
+          <p class="gal-kick">Exhibition ${galPad(g.no)}</p>
+          <h2>${escapeHtml(g.title)}</h2>
+          ${g.note ? `<p>${escapeHtml(en ? g.note.en : g.note.th)}</p>` : ''}
+          <span class="gal-walk">${en ? 'WALK THIS WAY' : 'เดินชมทางนี้'} <i>→</i></span>
+        </div>
+        ${g.items.map((it, i) => `<figure class="gal-bay" data-i="${i}" style="--i:${i}">
+          <span class="gal-spot" aria-hidden="true"></span>
+          <div class="gal-hang"><button class="gal-frame" data-action="gal-view" data-id="${g.id}" data-i="${i}" style="--ar:${it.w} / ${it.h}"
+            aria-label="${escapeAttr(`${en ? 'View' : 'ดู'} ${galAlt(i, en)}`)}">
+            <span class="gal-mat"><img src="${g.dir}${it.f}-s.jpg" width="${it.w}" height="${it.h}" alt="${galAlt(i, en)}"
+              loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async"></span></button></div>
+          <figcaption class="gal-label">${galLabel(g, it, i, en)}</figcaption>
+        </figure>`).join('')}
+      </div>
+      <div class="gal-ctrl">
+        <button class="gal-arrow" data-action="gal-step" data-id="-1" aria-label="${en ? 'Previous' : 'ภาพก่อนหน้า'}">‹</button>
+        <span class="gal-count"><b>01</b> / ${galPad(n)}</span>
+        <button class="gal-arrow" data-action="gal-step" data-id="1" aria-label="${en ? 'Next' : 'ภาพถัดไป'}">›</button>
+        <span class="gal-prog"><i></i></span>
+      </div>
+    </section>
+    <h2 class="section-label gal-wallhead">${en ? `The whole wall · ${n}` : `ผนังรวม · ${n} ภาพ`}</h2>
+    <div class="gal-salon">
+      ${g.items.map((it, i) => `<button class="gal-mini" data-action="gal-view" data-id="${g.id}" data-i="${i}" aria-label="${galAlt(i, en)}">
+        <span class="gal-mat"><img src="${g.dir}${it.f}-s.jpg" width="${it.w}" height="${it.h}" alt="" loading="lazy" decoding="async" style="--ar:${it.w} / ${it.h}"></span></button>`).join('')}
+    </div>
+    ${g.work && findWork(g.work) ? `<div class="gal-foot"><button class="chip chip-link" data-action="open-single" data-id="${g.work}">${en ? 'The song' : 'ไปที่หน้าเพลง'} ${escapeHtml(g.title)} →</button></div>` : ''}
+  </div>`;
+}
+/* Walking the wall: each print turns toward you as it comes to the middle and
+   its light comes up; the ones either side turn away and dim. */
+function setupGallery(root){
+  const track = root.querySelector('.gal-track');
+  if(!track) return;
+  const hall = track.closest('.gal-hall'), bays = [...track.querySelectorAll('.gal-bay:not(.gal-intro)')];
+  const intro = track.querySelector('.gal-intro');
+  const count = hall.querySelector('.gal-count b'), prog = hall.querySelector('.gal-prog');
+  let raf = 0;
+  const paint = () => {
+    raf = 0;
+    const r = track.getBoundingClientRect(), mid = r.left + r.width / 2;
+    let best = 0, bestD = Infinity;
+    bays.forEach((b, i) => {
+      const br = b.getBoundingClientRect();
+      const d = Math.max(-1, Math.min(1, (br.left + br.width / 2 - mid) / (br.width * 1.4)));
+      b.style.setProperty('--d', d.toFixed(3));
+      b.style.setProperty('--ad', Math.abs(d).toFixed(3));
+      if(Math.abs(d) < bestD){ bestD = Math.abs(d); best = i; }
+    });
+    if(intro){ const ir = intro.getBoundingClientRect(); intro.style.opacity = Math.max(.25, 1 - Math.abs(ir.left + ir.width / 2 - mid) / r.width * 1.3).toFixed(2); }
+    if(count) count.textContent = galPad(best + 1);
+    if(prog) prog.style.setProperty('--p', `${(best + 1) / bays.length * 100}%`);
+    track.dataset.at = best;
+  };
+  track.addEventListener('scroll', () => { if(!raf) raf = requestAnimationFrame(paint); }, { passive:true });
+  paint();
+  requestAnimationFrame(() => hall.classList.add('is-lit'));
+}
+function galStep(dir){
+  const track = document.querySelector('.gal-track');
+  if(!track) return;
+  const bays = track.querySelectorAll('.gal-bay:not(.gal-intro)');
+  const at = Math.max(0, Math.min(bays.length - 1, (+track.dataset.at || 0) + dir));
+  bays[at].scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+}
+/* The viewing room: the print grows out of its frame to fill a dark room,
+   the small copy first and the original over it once it has arrived. Swipe,
+   the arrows or the keys walk on; a tap outside or Esc leaves. */
+function galView(id, i, from){
+  const g = galRoom(id), en = isEN();
+  let at = i;
+  const room = document.createElement('div');
+  room.className = 'gal-room';
+  room.innerHTML = `<span class="gal-room-count"></span>
+    <button class="gal-room-btn gal-room-x" aria-label="${en ? 'Close' : 'ปิด'}">✕</button>
+    <div class="gal-room-pic"><img alt=""></div>
+    <div class="gal-room-cap"></div>
+    <button class="gal-room-btn gal-room-prev" aria-label="${en ? 'Previous' : 'ภาพก่อนหน้า'}">‹</button>
+    <button class="gal-room-btn gal-room-next" aria-label="${en ? 'Next' : 'ภาพถัดไป'}">›</button>`;
+  document.body.appendChild(room);
+  document.documentElement.style.overflow = 'hidden';
+  const pic = room.querySelector('.gal-room-pic'), img = pic.querySelector('img');
+  const show = (k, grow) => {
+    at = (k + g.items.length) % g.items.length;
+    const it = g.items[at], small = `${g.dir}${it.f}-s.jpg`, full = `${g.dir}${it.f}.jpg`;
+    img.src = small; img.alt = galAlt(at, en);
+    const big = new Image(); big.onload = () => { if(g.items[at] === it) img.src = full; }; big.src = full;
+    room.querySelector('.gal-room-count').textContent = `${galPad(at + 1)} / ${galPad(g.items.length)}`;
+    room.querySelector('.gal-room-cap').innerHTML = galLabel(g, it, at, en);
+    if(grow && grow.width){
+      // from where the frame hangs to the middle of the room
+      requestAnimationFrame(() => {
+        const to = pic.getBoundingClientRect();
+        if(!to.width) return;
+        pic.style.transition = 'none';
+        pic.style.transform = `translate(${grow.left - to.left}px, ${grow.top - to.top}px) scale(${grow.width / to.width}, ${grow.height / to.height})`;
+        requestAnimationFrame(() => { pic.style.transition = 'transform .45s cubic-bezier(.2,.8,.2,1)'; pic.style.transform = 'none'; });
+      });
+    } else {
+      pic.animate([{ opacity:0, transform:`translateX(${grow === -1 ? -30 : 30}px)` }, { opacity:1, transform:'none' }], { duration:260, easing:'ease-out' });
+    }
+  };
+  const close = () => {
+    room.classList.remove('is-open');
+    pic.style.transition = 'transform .25s ease-in, opacity .25s';
+    pic.style.transform = 'scale(.92)'; pic.style.opacity = '0';
+    document.removeEventListener('keydown', key);
+    setTimeout(() => { room.remove(); document.documentElement.style.overflow = ''; }, 260);
+  };
+  const key = e => { if(e.key === 'Escape') close(); else if(e.key === 'ArrowRight') show(at + 1, 1); else if(e.key === 'ArrowLeft') show(at - 1, -1); };
+  document.addEventListener('keydown', key);
+  room.querySelector('.gal-room-x').onclick = close;
+  room.querySelector('.gal-room-prev').onclick = e => { e.stopPropagation(); show(at - 1, -1); };
+  room.querySelector('.gal-room-next').onclick = e => { e.stopPropagation(); show(at + 1, 1); };
+  room.addEventListener('click', e => { if(e.target === room) close(); });
+  let x0 = null, y0 = null;
+  room.addEventListener('pointerdown', e => { x0 = e.clientX; y0 = e.clientY; });
+  room.addEventListener('pointerup', e => {
+    if(x0 == null) return;
+    const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+    if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(at + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+    else if(dy > 90) close();
+  });
+  show(i, from);
+  requestAnimationFrame(() => room.classList.add('is-open'));
 }
 
 const DISC_TABS = [{ id:'singles', label:'ซิงเกิล' }, { id:'albums', label:'อัลบั้ม' }, { id:'specials', label:'เพลงพิเศษ' }];
@@ -15711,7 +16045,7 @@ function renderDiscography(){
 
   // A phone shows the tab it is on; a wide screen shows all three side by side
   // and the tabs go away. Each column carries its own heading for that case.
-  return tabBar + `
+  return renderGalleryTeaser('kimi') + tabBar + `
   <div class="disc-cols">
     ${DISC_TABS.map(t => `
     <section class="disc-col${state.discTab===t.id ? ' is-active' : ''}">
@@ -16010,6 +16344,7 @@ function renderMain(){
     state.view==='discography' ? renderDiscography() :
     state.view==='stats' ? renderStats() :
     state.view==='single' ? renderSingleDetail() :
+    state.view==='gallery' ? renderGallery() :
     state.view==='profile' ? renderProfile() :
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
@@ -16030,6 +16365,7 @@ function renderMain(){
   }
   main.innerHTML = html;
   paintSheetGrads(main);
+  if(state.view === 'gallery') setupGallery(main);
   if(_dvTop && _dvTop.day === state.dayOf){ const nb = main.querySelector('.is-day-sheet .dv-body'); if(nb) nb.scrollTop = _dvTop.top; }   // a redraw keeps the day sheet where it was
   const arrived = state.view !== _lastRenderedView;
   if(arrived){
@@ -16397,12 +16733,12 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','geClip','timelineId','dayOf','geTab','bdayScope','livesScope'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','geClip','timelineId','dayOf','geTab','bdayScope','livesScope','galleryId'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
 // stays put, which is what lets this work on static hosting with no rewrites.
-const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','timeline','shop','calendar'];
+const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','timeline','shop','calendar','gallery'];
 
 // Read at load time. The first history entry is written before the member list
 // has arrived, and writing it derives the address from a state that is still
@@ -16420,6 +16756,7 @@ function urlForSnapshot(snap){
   else if(snap.view === 'timeline' && snap.geTab === 'chain') p.set('v', 'vote');
   else if(snap.view === 'timeline' && snap.geTab === 'songs') p.set('v', 'gesongs');
   else if(snap.view === 'gelive') p.set('v', 'gelive');
+  else if(snap.view === 'gallery'){ p.set('v', 'gallery'); if(snap.galleryId && snap.galleryId !== GALLERY[0].id) p.set('g', snap.galleryId); }
   // not one to share, but a reload should land back on it rather than on Home
   else if(snap.view === 'profile') p.set('v', 'profile');
   else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view))
@@ -16466,6 +16803,7 @@ function applyUrlToState(){
   if(view === 'gelive'){ state.view = 'gelive'; return; }
   if(view === 'gechain'){ state.view = 'timeline'; state.geTab = 'chain'; return; }   // the owner's old copy, now the public tab
   if(view === 'profile'){ state.view = 'profile'; return; }
+  if(view === 'gallery'){ state.view = 'gallery'; state.galleryId = galRoom(p.get('g')).id; return; }
   if(view && SHAREABLE_VIEWS.includes(view)){ state.view = view; if(view === 'timeline') state.timelineId = 'ge2026'; }
 }
 
@@ -17739,7 +18077,7 @@ function shareSubject(){
   if(state.view === 'timeline') return { kind:'ge', url, title:'Senbatsu General Election 2026 — 48thDb', file:'48thdb-ge2026' };
   if(state.view === 'stats') return { kind:'stats', cat: state.statsTab || 'overview', url, title:'สถิติ BNK48 & CGM48 — 48thDb', file:'48thdb-stats' };
   if(state.view === 'feed') return { kind:'today', url, title:'วันนี้ที่ 48 — 48thDb', file:`48thdb-today-${toYmd(todayStart())}` };
-  const names = { feed:'วันนี้ที่ 48', browse:'สมาชิกทั้งหมด', groups:'ประวัติวง', org:'ตำแหน่ง', discography:'ผลงานเพลง', stats:'สถิติ', shop:'ร้านค้า', calendar:'ปฏิทิน' };
+  const names = { feed:'วันนี้ที่ 48', browse:'สมาชิกทั้งหมด', groups:'ประวัติวง', org:'ตำแหน่ง', discography:'ผลงานเพลง', stats:'สถิติ', shop:'ร้านค้า', calendar:'ปฏิทิน', gallery:`แกลเลอรี ${galRoom(state.galleryId).title}` };
   return { kind:'page', url, title:`${names[state.view] || '48thDb'} — 48thDb`, file:`48thdb-${state.view}` };
 }
 
@@ -19114,6 +19452,16 @@ function bindDelegatedEvents(){
       }
     }
     else if(action==='share-milestone'){ const sub = milestoneShare(id); if(sub) openShareSheet(sub); }
+    else if(action==='open-gallery'){
+      state.view = 'gallery'; state.galleryId = el.dataset.id;
+      leaveOverlays();
+      render(); pushHistory(); window.scrollTo(0, 0);
+    }
+    else if(action==='gal-view'){
+      const f = el.querySelector('img');
+      galView(el.dataset.id, +el.dataset.i, f ? f.getBoundingClientRect() : null);
+    }
+    else if(action==='gal-step') galStep(+el.dataset.id);
     else if(action==='open-single'){
       state.selectedSingle = el.dataset.id;
       state.view = 'single';
