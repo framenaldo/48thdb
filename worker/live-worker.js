@@ -215,7 +215,7 @@ async function isOwner(request, env) {
   return crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64url(m[3]), new TextEncoder().encode(`${m[1]}.${m[2]}`));
 }
 
-const VISITS_QUERY = `query ($a: String!, $host: String!, $s: Time!, $w: Time!, $e: Time!) {
+const VISITS_QUERY = `query ($a: String!, $host: String!, $s: Time!, $w: Time!, $f: Time!, $e: Time!) {
   viewer { accounts(filter: { accountTag: $a }) {
     hours: rumPageloadEventsAdaptiveGroups(limit: 1000, filter: { requestHost: $host, datetime_geq: $s, datetime_lt: $e }) {
       count sum { visits } dimensions { datetimeHour } }
@@ -225,8 +225,39 @@ const VISITS_QUERY = `query ($a: String!, $host: String!, $s: Time!, $w: Time!, 
       count sum { visits } dimensions { refererHost } }
     devices: rumPageloadEventsAdaptiveGroups(limit: 5, orderBy: [sum_visits_DESC], filter: { requestHost: $host, datetime_geq: $w, datetime_lt: $e }) {
       count sum { visits } dimensions { deviceType } }
+    refDays: rumPageloadEventsAdaptiveGroups(limit: 5000, filter: { requestHost: $host, datetime_geq: $f, datetime_lt: $e }) {
+      sum { visits } dimensions { datetimeHour refererHost } }
   } }
 }`;
+
+/* Which screen people open. The site is one page and Web Analytics keeps the
+ * path without its query, so every screen is "/" there; the page says which
+ * screen it drew instead (/hit, below), and it is counted in Workers Analytics
+ * Engine (the binding HITS). Only a screen's name and the member or event id
+ * on it are kept — nothing about who looked. Read back with the SQL API under
+ * the same CF_ANALYTICS_TOKEN. */
+const HITS_DATASET = 'hits_48thdb';
+const hitOk = (v, max) => typeof v === 'string' && v.length <= max && /^[a-z0-9:_.-]*$/i.test(v);
+async function hitsSql(env, sql) {
+  const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/analytics_engine/sql`, {
+    method: 'POST', headers: { authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` }, body: `${sql} FORMAT JSON`,
+  });
+  if (!r.ok) throw new Error(`Analytics Engine ${r.status}: ${(await r.text()).slice(0, 160)}`);
+  return (await r.json()).data || [];
+}
+async function hitsSummary(env) {
+  const week = `timestamp > NOW() - INTERVAL '7' DAY`;
+  const [pages, items, since] = await Promise.all([
+    hitsSql(env, `SELECT blob1 AS p, SUM(_sample_interval) AS n FROM ${HITS_DATASET} WHERE ${week} GROUP BY p ORDER BY n DESC LIMIT 100`),
+    hitsSql(env, `SELECT blob1 AS p, blob2 AS i, SUM(_sample_interval) AS n FROM ${HITS_DATASET} WHERE ${week} AND (blob1 = 'member' OR blob1 = 'event') AND blob2 != '' GROUP BY p, i ORDER BY n DESC LIMIT 20`),
+    hitsSql(env, `SELECT MIN(timestamp) AS t FROM ${HITS_DATASET}`),
+  ]);
+  return {
+    pages: pages.map((r) => [r.p, Number(r.n)]),                 // [screen, opens] over 7 days
+    pageItems: items.map((r) => [r.p, r.i, Number(r.n)]),        // the members and events opened most
+    pagesSince: (since[0] && since[0].t) || null,
+  };
+}
 
 async function visits(env) {
   const hit = await readCache(VISITS_KEY);
@@ -236,11 +267,13 @@ async function visits(env) {
   const end = new Date(Math.ceil(now / hour) * hour);
   const start = new Date(end.getTime() - 31 * 24 * hour);
   const week = new Date(end.getTime() - 7 * 24 * hour);
+  const fortnight = new Date(end.getTime() - 15 * 24 * hour);
+  const hitsP = env.HITS ? hitsSummary(env).catch((e) => ({ pagesErr: String((e && e.message) || e) })) : Promise.resolve({ pagesErr: 'no-binding' });
   const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` },
     body: JSON.stringify({ query: VISITS_QUERY, variables: {
-      a: CF_ACCOUNT, host: SITE_HOST, s: start.toISOString(), w: week.toISOString(), e: end.toISOString() } }),
+      a: CF_ACCOUNT, host: SITE_HOST, s: start.toISOString(), w: week.toISOString(), f: fortnight.toISOString(), e: end.toISOString() } }),
   });
   const d = await res.json();
   if (d.errors && d.errors.length) throw new Error(d.errors.map((e) => e.message).join('; '));
@@ -253,6 +286,9 @@ async function visits(env) {
     countries: rows(acc.countries, 'countryName'),  // the last 7 days
     referers: rows(acc.referers, 'refererHost'),
     devices: rows(acc.devices, 'deviceType'),
+    // [hour (UTC), referring site, visits], only the hours someone arrived
+    refDays: (acc.refDays || []).filter((r) => r.sum.visits > 0).map((r) => [r.dimensions.datetimeHour, r.dimensions.refererHost || '', r.sum.visits]),
+    ...(await hitsP),
   };
   await writeCache(VISITS_KEY, body, VISITS_TTL);
   return body;
@@ -347,6 +383,11 @@ export default {
       return new Response('Method not allowed', { status: 405, headers: JSON_HEADERS });
     }
     const url = new URL(request.url);
+    if (url.pathname === '/hit') {
+      const p = url.searchParams.get('p') || '', i = url.searchParams.get('i') || '';
+      if (env.HITS && p && hitOk(p, 40) && hitOk(i, 80)) env.HITS.writeDataPoint({ blobs: [p, i], indexes: [p] });
+      return new Response(null, { status: 204, headers: { 'access-control-allow-origin': '*', 'cache-control': 'no-store' } });
+    }
     if (url.pathname === '/visits') {
       const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
       try {

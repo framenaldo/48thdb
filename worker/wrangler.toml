@@ -18,3 +18,9 @@ crons = ["*/5 * * * *"]
 [[kv_namespaces]]
 binding = "IAM"
 id = "6fa61537e8444dbba588454ec4323753"
+
+# Which screen of the site was opened (GET /hit from the page), counted for the
+# owner's visitors card. Free plan: 100,000 a day.
+[[analytics_engine_datasets]]
+binding = "HITS"
+dataset = "hits_48thdb"

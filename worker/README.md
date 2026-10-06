@@ -55,6 +55,15 @@ npm_config_cache="$HOME/.npm-wrangler" npx wrangler secret put CF_ANALYTICS_TOKE
 
 ตัวเลขเก็บแคชไว้ 2 นาที
 
+#### หน้าไหนถูกเปิด
+
+Web Analytics เห็นทุกหน้าเป็น `/` เพราะตัด `?v=...` ทิ้ง หน้าเว็บจึงบอกเองทุกครั้งที่เปลี่ยนหน้า
+ด้วย `GET https://api.48thdb.com/hit?p=<ชื่อหน้า>&i=<id สมาชิกหรืองาน>` (ไม่ส่งอะไรที่บอกว่าเป็นใคร
+ไม่นับการเข้าของเจ้าของเว็บ และไม่นับเมื่อเปิดจากที่อื่นที่ไม่ใช่ 48thdb.com)
+Worker เก็บลง Workers Analytics Engine (binding `HITS`, dataset `hits_48thdb` ใน `wrangler.toml` สร้างเองตอนเขียนครั้งแรก)
+แล้ว `/visits` อ่านกลับด้วย SQL API ใช้โทเค็น `CF_ANALYTICS_TOKEN` ตัวเดิม
+แผนฟรีเขียนได้วันละ 100,000 ครั้ง
+
 ## ตรวจว่าทำงานไหม
 
 ```bash

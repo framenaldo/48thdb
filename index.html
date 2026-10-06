@@ -3265,6 +3265,24 @@
   .vis-row i{ grid-column:1 / -1; height:6px; border-radius:99px; background:var(--paper-dim); overflow:hidden; }
   .vis-row i b{ display:block; height:100%; border-radius:99px; background:#F3C969; }
   .vis-note{ margin:0; font-size:12px; line-height:1.5; color:var(--ink-soft); }
+  .vis-row.is-most em{ color:var(--bnk); }
+  .vis-row.is-least span, .vis-row.is-least em{ color:var(--ink-soft); }
+  .vis-card{ --vis-c1:#14907E; --vis-c2:#C8961E; --vis-c3:#E4457E; --vis-c4:#3D6FB6; --vis-other:#A39CAB; }
+  :root[data-theme="dark"] .vis-card{ --vis-c2:#B4861A; --vis-c4:#4A7CC4; --vis-other:#6F6779; }
+  .vis-legend{ display:flex; flex-wrap:wrap; gap:4px 12px; margin:0 0 8px; font-size:12px; color:var(--ink-soft); }
+  .vis-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .vis-legend i, .vis-day-k i{ width:9px; height:9px; border-radius:3px; flex:none; }
+  .vis-days{ display:flex; flex-direction:column; gap:7px; }
+  .vis-day{ display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:2px 8px; font-size:12px; }
+  .vis-day-d{ color:var(--ink-soft); font-weight:700; }
+  .vis-stack{ display:flex; gap:2px; height:12px; min-width:2px; }
+  .vis-stack b{ display:block; min-width:2px; height:100%; }
+  .vis-stack b:first-child{ border-radius:4px 0 0 4px; }
+  .vis-stack b:last-child{ border-radius:0 4px 4px 0; }
+  .vis-stack b:only-child{ border-radius:4px; }
+  .vis-day-n{ font-weight:800; font-variant-numeric:tabular-nums; }
+  .vis-day-k{ grid-column:2 / -1; display:flex; flex-wrap:wrap; gap:2px 10px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .vis-day-k em{ display:inline-flex; align-items:center; gap:4px; font-style:normal; }
   .vis-setup{ margin:0; padding-left:20px; font-size:13.5px; line-height:1.6; }
   .vis-setup code{ font-size:12px; word-break:break-all; }
   .fb-drow{ display:grid; grid-template-columns:24px 1fr 30px; align-items:center; gap:8px; font-size:13px; }
@@ -14322,6 +14340,40 @@ async function loadVisits(){
   if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
   renderMain();
 }
+/* Which screen was opened, for the owner's card: Web Analytics sees every
+   screen as "/" (it drops the query), so the page says it. Only the screen's
+   name and the member or event on it are sent; a redraw of the same screen,
+   the owner's own visits and copies served anywhere else are not counted. */
+const HIT_API = 'https://api.48thdb.com/hit';
+let _lastHit = null;
+function screenKey(){
+  if(state.query && state.query.trim()) return ['search', ''];
+  if(String(state.posterOf || '').startsWith('ge:')) return ['poster', state.posterOf.slice(3)];
+  if(state.selectedEvent) return ['event', state.selectedEvent];
+  if(state.compareWith && state.selectedId) return ['vs', ''];
+  if(state.selectedId) return ['member', state.selectedId];
+  if(state.dayOf) return ['day', ''];
+  if(state.view === 'timeline') return ['ge:' + (state.geTab || 'overview'), ''];
+  if(state.view === 'stats') return ['stats:' + (state.statsTab || 'overview'), ''];
+  if(state.view === 'single') return ['single', state.selectedSingle || ''];
+  return [state.view || 'feed', ''];
+}
+function sendHit(){
+  if(location.hostname !== '48thdb.com' || state.isOwner) return;
+  const [p, i] = screenKey(), k = p + '|' + i;
+  if(k === _lastHit) return;
+  _lastHit = k;
+  try{ fetch(`${HIT_API}?p=${encodeURIComponent(p)}&i=${encodeURIComponent(i)}`, { mode:'no-cors', keepalive:true, cache:'no-store' }).catch(() => {}); }catch(e){}
+}
+const PAGE_NAMES = {
+  feed:'หน้าแรก', browse:'รายชื่อสมาชิก', groups:'วงและทีม', org:'ผังวง', discography:'ผลงานเพลง', single:'หน้าเพลง',
+  'stats:overview':'สถิติ · ภาพรวม', 'stats:songs':'สถิติ · เพลง', 'stats:birthdays':'สถิติ · วันเกิด', 'stats:timeline':'สถิติ · ไทม์ไลน์', 'stats:lives':'สถิติ · ไลฟ์',
+  'ge:overview':'GE2026 · ภาพรวม', 'ge:candidates':'GE2026 · ผู้สมัคร', 'ge:songs':'GE2026 · เพลงที่อยากได้', 'ge:chain':'GE2026 · โหวตสด',
+  'ge:results':'GE2026 · ผลเลือกตั้ง', 'ge:timeline':'GE2026 · กำหนดการ', 'ge:events':'GE2026 · งานทั้งหมด',
+  shop:'ร้านค้า', calendar:'ปฏิทิน', search:'ค้นหา', profile:'โปรไฟล์', auth:'เข้าสู่ระบบ',
+  member:'ชีตสมาชิก', event:'ชีตงาน', day:'ชีตวัน (ปฏิทิน)', poster:'โปสเตอร์ผู้สมัคร', vs:'เทียบสมาชิก',
+};
+
 /* Hours come in UTC; the owner counts days in Bangkok. */
 const bkkDay = ms => new Date(ms + 7 * 3600000).toISOString().slice(0, 10);
 function visitsByDay(hours){
@@ -14331,6 +14383,54 @@ function visitsByDay(hours){
     const o = days[d] || (days[d] = { v:0, n:0 }); o.v += v; o.n += n;
   }
   return days;
+}
+const refName = h => !h ? 'เข้าตรง / แอป' : h === '48thdb.com' ? 'ภายในเว็บ' : h.replace(/^www\./, '');
+/* Where each day's visits came from: one stacked bar a day, the four biggest
+   sources over the fortnight in fixed colours, the rest together as "อื่นๆ". */
+function visitsRefDays(D){
+  if(!D.refDays) return `<div><p class="vis-h">มาจากไหน รายวัน</p><p class="vis-note">ต้องอัปเดต Worker ก่อน (wrangler deploy) จึงจะมีตัวเลขนี้</p></div>`;
+  const days = {}, tot = {};
+  for(const [h, host, v] of D.refDays){
+    const d = bkkDay(Date.parse(h)), k = refName(host);
+    (days[d] ||= {})[k] = (days[d][k] || 0) + v; tot[k] = (tot[k] || 0) + v;
+  }
+  const top = Object.entries(tot).sort((a, b) => b[1] - a[1]).slice(0, 4).map(x => x[0]);
+  const keys = [...top, ...(Object.keys(tot).length > 4 ? ['อื่นๆ'] : [])];
+  const color = (k, i) => k === 'อื่นๆ' ? 'var(--vis-other)' : `var(--vis-c${i + 1})`;
+  const list = [...Array(14).keys()].map(k => bkkDay(Date.now() - k * 86400000)).map(d => {
+    const o = days[d] || {}, parts = keys.map(k => k === 'อื่นๆ' ? Object.entries(o).filter(([x]) => !top.includes(x)).reduce((t, [, v]) => t + v, 0) : (o[k] || 0));
+    return { d, parts, sum:parts.reduce((t, v) => t + v, 0) };
+  });
+  const max = Math.max(1, ...list.map(x => x.sum));
+  const M = monthsShort();
+  return `<div><p class="vis-h">มาจากไหน รายวัน · 14 วัน</p>
+    <div class="vis-legend">${keys.map((k, i) => `<span><i style="background:${color(k, i)}"></i>${escapeHtml(k)}</span>`).join('')}</div>
+    <div class="vis-days">${list.map(x => { const dt = parseYmd(x.d);
+      return `<div class="vis-day"><span class="vis-day-d">${dt.getDate()} ${M[dt.getMonth()]}</span>
+        <span class="vis-stack" style="width:${(x.sum / max * 100).toFixed(1)}%">${x.parts.map((v, i) => v ? `<b style="flex:${v};background:${color(keys[i], i)}" title="${escapeAttr(keys[i])}: ${v.toLocaleString('en-US')}"></b>` : '').join('')}</span>
+        <span class="vis-day-n">${x.sum.toLocaleString('en-US')}</span>
+        <span class="vis-day-k">${x.parts.map((v, i) => v ? `<em><i style="background:${color(keys[i], i)}"></i>${v.toLocaleString('en-US')}</em>` : '').join('')}</span></div>`; }).join('')}</div></div>`;
+}
+/* Every screen with how often it was opened this week, most first, so the
+   least opened are at the bottom — screens nobody opened included. */
+function visitsPages(D){
+  if(!D.pages) return `<div><p class="vis-h">หน้าที่เปิด · 7 วัน</p><p class="vis-note">${D.pagesErr === 'no-binding' || !D.pagesErr ? 'ต้องอัปเดต Worker ก่อน (wrangler deploy) แล้วเว็บจะเริ่มนับว่าเปิดหน้าไหน'
+    : 'อ่านตัวเลขหน้าไม่ได้: ' + escapeHtml(D.pagesErr)}</p></div>`;
+  const got = new Map(D.pages.map(([p, n]) => [p, n]));
+  const rows = [...new Set([...Object.keys(PAGE_NAMES), ...got.keys()])].map(p => [p, got.get(p) || 0]).sort((a, b) => b[1] - a[1]);
+  const top = Math.max(1, rows[0] ? rows[0][1] : 1);
+  const since = D.pagesSince ? new Date(D.pagesSince.replace(' ', 'T') + (/Z|[+-]\d\d:?\d\d$/.test(D.pagesSince) ? '' : 'Z')) : null;
+  const M = monthsShort();
+  const itemName = ([p, i]) => p === 'member' ? (getMember(i) ? nickName(getMember(i)) : i) : ((SEED_SCHEDULE.find(e => e.id === i) || {}).title || i);
+  const items = (D.pageItems || []).slice(0, 8);
+  const iTop = Math.max(1, ...items.map(r => r[2]));
+  const row = (label, n, t, cls) => `<div class="vis-row${cls ? ' ' + cls : ''}"><span>${escapeHtml(label)}</span><em>${n.toLocaleString('en-US')}</em><i><b style="width:${(n / t * 100).toFixed(1)}%"></b></i></div>`;
+  const used = rows.filter(r => r[1] > 0), none = rows.filter(r => !r[1]);
+  return `<div><p class="vis-h">หน้าที่เปิด · 7 วัน</p>
+    ${used.map(([p, n], k) => row(PAGE_NAMES[p] || p, n, top, k === 0 ? 'is-most' : k === used.length - 1 ? 'is-least' : '')).join('')}
+    ${none.length ? `<p class="vis-note"><b>ไม่มีใครเปิดเลย:</b> ${none.map(([p]) => escapeHtml(PAGE_NAMES[p] || p)).join(' · ')}</p>` : ''}
+    ${since && Date.now() - since.getTime() < 7 * 86400000 ? `<p class="vis-note">เริ่มนับเมื่อ ${since.getDate()} ${M[since.getMonth()]} ยังไม่ครบ 7 วัน</p>` : ''}</div>
+  ${items.length ? `<div><p class="vis-h">สมาชิกและงานที่เปิดดูบ่อย · 7 วัน</p>${items.map(r => row(`${r[0] === 'member' ? '👤' : '📅'} ${itemName(r)}`, r[2], iTop)).join('')}</div>` : ''}`;
 }
 function renderVisitsCard(){
   if(!state.isOwner) return '';
@@ -14370,6 +14470,8 @@ function renderVisitsCard(){
       ${list('ประเทศ · 7 วัน', D.countries || [], c => { try{ return (region && c && region.of(c)) || c || 'ไม่ทราบ'; }catch(e){ return c || 'ไม่ทราบ'; } })}
       ${list('อุปกรณ์ · 7 วัน', D.devices || [], d => DEV[d] || d || 'ไม่ทราบ')}
     </div>
+    ${visitsRefDays(D)}
+    ${visitsPages(D)}
     <p class="vis-note">ตัวเลขใหญ่คือจำนวนครั้งที่มีคนเข้าเว็บ ไม่ใช่จำนวนคนไม่ซ้ำ (Cloudflare ไม่นับคนเพื่อความเป็นส่วนตัว) · "หน้าที่เปิด" นับทุกครั้งที่เปลี่ยนหน้าในเว็บ · เป็นตัวเลขประมาณ Cloudflare สุ่มนับบางส่วนแล้วคูณกลับ จึงลงท้ายด้วย 0 บ่อย · ข้อมูลถึง ${String(at.getHours()).padStart(2,'0')}:${String(at.getMinutes()).padStart(2,'0')} น. ช้ากว่าจริงไม่กี่นาที · เห็นเฉพาะคุณ</p>
   </div>`;
 }
@@ -15868,6 +15970,7 @@ function renderMain(){
   bindPosterZoom();
   bindOrgZoom();
   bindReveal(arrived);
+  sendHit();
 }
 
 /* Scroll reveal. After each draw, whatever sits below the fold is hidden a
