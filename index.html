@@ -1693,9 +1693,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     opacity:calc(1 - var(--ad) * .6); transition:opacity .25s;
   }
   :root[data-theme="dark"] .gal-label{ background:#E9E2D2; }
-  .gal-label .gal-no{ display:block; font-family:var(--gal-serif); font-size:13px; font-weight:500; color:#8A8174; line-height:1.1; }
   .gal-label b{ display:block; font-size:13.5px; font-weight:800; color:#2F2B24; line-height:1.3; }
-  .gal-label small{ display:block; margin-top:2px; font-family:var(--gal-serif); font-size:10.5px; font-weight:500; color:#8A8174; letter-spacing:.02em; }
+  .gal-label small{ display:block; font-family:var(--gal-serif); font-size:10.5px; font-weight:500; color:#8A8174; letter-spacing:.02em; }
   /* the wall text an exhibition opens with */
   .gal-intro{ justify-content:center; text-align:left; padding:0 4px; align-self:stretch; }
   .gal-intro .gal-kick{ text-align:left; }
@@ -1732,18 +1731,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gal-room-pic img{ transform-origin:50% 50%; will-change:transform; cursor:zoom-in; }
   .gal-room.is-zoomed .gal-room-pic img{ cursor:grab; }
   .gal-room.is-zoomed .gal-room-cap, .gal-room.is-zoomed .gal-room-prev, .gal-room.is-zoomed .gal-room-next{ opacity:0; pointer-events:none; }
-  .gal-room-hint{ position:absolute; bottom:max(24px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); font-size:11.5px; color:#8F8778; letter-spacing:.04em; white-space:nowrap; opacity:0; transition:opacity .3s .3s; }
+  /* under the caption in the room's own column, so a tall picture never pushes the caption onto it */
+  .gal-room-hint{ margin-top:10px; padding:0 20px; text-align:center; font-size:11.5px; color:#8F8778; letter-spacing:.04em; opacity:0; transition:opacity .3s .3s; }
   .gal-room.is-open .gal-room-hint{ opacity:1; }
   .gal-room.is-zoomed .gal-room-hint{ opacity:0; }
-  @media (max-width:700px){ .gal-room-hint{ bottom:max(80px, calc(env(safe-area-inset-bottom) + 64px)); } }
-  .gal-room.is-open{ background:rgba(12,11,9,.96); }
+  .gal-room.is-open{ background:rgba(12,11,9,.99); }
   .gal-room-pic{ position:relative; max-width:min(92vw, 1100px); max-height:76vh; transform-origin:0 0; will-change:transform; }
   .gal-room-pic img, .gal-room-pic video{ display:block; max-width:min(92vw, 1100px); max-height:76vh; width:auto; height:auto; box-shadow:0 30px 70px rgba(0,0,0,.6); }
   .gal-room-pic [hidden]{ display:none; }
-  .gal-room.is-clip .gal-room-hint{ visibility:hidden; }
+  .gal-room.is-clip .gal-room-hint{ display:none; }
   .gal-room-cap{ margin-top:16px; text-align:center; color:#E9E2D2; opacity:0; transform:translateY(8px); transition:opacity .35s .15s, transform .35s .15s; padding:0 20px; }
   .gal-room.is-open .gal-room-cap{ opacity:1; transform:none; }
-  .gal-room-cap .gal-no{ font-family:var(--gal-serif); font-weight:500; font-size:15px; color:#A99F8D; }
   .gal-room-cap b{ display:block; font-size:16px; font-weight:800; }
   .gal-room-cap small{ display:block; margin-top:3px; font-family:var(--gal-serif); font-size:11.5px; color:#A99F8D; }
   .gal-room-btn{ position:absolute; width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08);
@@ -15866,7 +15864,7 @@ function renderSingleDetail(){
    that hangs on the wall (sips -Z 960, or -Z 1200 for a wide one). A clip
    is `video:true`: `f.mp4` beside a still of it as `f.jpg` / `f-s.jpg`; it
    hangs as that still and plays in the viewing room. Add a print by adding a line. The
-   prints carry no titles, only their number, and hang in the order the owner
+   prints carry no titles and no numbers, and hang in the order the owner
    saved them into the folder (oldest first). */
 const GALLERY = [
   { id:'kimi', no:1, title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', kicker:'BNK48 & CGM48 Special Single', year:2026,
@@ -15988,7 +15986,7 @@ function galFont(){
 }
 const galAlt = (i, en) => en ? `Picture ${i + 1}` : `ภาพที่ ${i + 1}`;
 function galLabel(g, it, i, en){
-  return `<span class="gal-no">No. ${galPad(i + 1)}</span><small>${escapeHtml(g.kicker)} · ${g.year}</small>`;
+  return `<small>${escapeHtml(g.kicker)} · ${g.year}</small>`;
 }
 function renderGalleryTeaser(id){
   const g = galRoom(id), en = isEN();
@@ -17682,6 +17680,81 @@ async function drawGECard(g, url){
   await shareFooter(g, true, url);
 }
 
+/* The gallery, shared as the room itself: the cream wall, the print you are
+   at hung large under its light with its neighbours either side running off
+   the edge, the wooden floor, and the room's name in its own type. */
+async function drawGalleryCard(g, sub){
+  const en = isEN(), room = sub.room, N = room.items.length, at = sub.at;
+  galFont();
+  try{ await Promise.all(['500', '600'].map(w => document.fonts.load(`${w} 40px "tt-ricordi-allegria"`, 'Kimi EXHIBITION 01'))); }catch(e){}
+  const serif = w => `${w} "tt-ricordi-allegria", Georgia, serif`;
+  const FLOOR = 1100;
+  let bg = g.createLinearGradient(0, 0, 0, FLOOR);
+  bg.addColorStop(0, '#EAE3D6'); bg.addColorStop(.6, '#DFD6C6'); bg.addColorStop(1, '#D2C7B3');
+  g.fillStyle = bg; g.fillRect(0, 0, SHARE_W, FLOOR);
+  // the room is dim at its edges, so the lamps have something to light
+  bg = g.createRadialGradient(SHARE_W / 2, 640, 200, SHARE_W / 2, 640, 900);
+  bg.addColorStop(0, 'rgba(70,52,30,0)'); bg.addColorStop(1, 'rgba(70,52,30,.22)');
+  g.fillStyle = bg; g.fillRect(0, 0, SHARE_W, FLOOR);
+  bg = g.createLinearGradient(0, FLOOR, 0, SHARE_H);
+  bg.addColorStop(0, '#C9B99C'); bg.addColorStop(1, '#B09F82');
+  g.fillStyle = bg; g.fillRect(0, FLOOR, SHARE_W, SHARE_H - FLOOR);
+  g.fillStyle = 'rgba(60,42,22,.18)'; g.fillRect(0, FLOOR, SHARE_W, 6);
+  g.strokeStyle = 'rgba(80,60,36,.10)'; g.lineWidth = 2;
+  for(let y = FLOOR + 40; y < SHARE_H; y += 46){ g.beginPath(); g.moveTo(0, y); g.lineTo(SHARE_W, y); g.stroke(); }
+
+  const pick = k => room.items[(k + N) % N];
+  const [im0, imL, imR] = await Promise.all([at, at - 1, at + 1].map(k => shareLoad(`${room.dir}${pick(k).f}-s.jpg`)));
+  // a lamp on the wall and the pool of light it throws
+  const lamp = (cx, top, w, a) => {
+    g.save(); g.translate(cx, top + w * .45); g.scale(1, 1.25);
+    const gr = g.createRadialGradient(0, -w * .25, 0, 0, 0, w * .85);
+    gr.addColorStop(0, `rgba(255,250,232,${a})`); gr.addColorStop(.5, `rgba(255,243,215,${a * .45})`); gr.addColorStop(1, 'rgba(255,240,210,0)');
+    g.globalCompositeOperation = 'screen'; g.fillStyle = gr; g.fillRect(-w, -w, w * 2, w * 2); g.restore();
+    g.fillStyle = '#3A322A'; shareRound(g, cx - 28, top - 64, 56, 12, 6); g.fill();
+  };
+  // a print: dark wooden frame, cream mat, the picture
+  const hang = (im, it, cx, top, maxW, maxH, dim) => {
+    const ar = it.w / it.h;
+    let pw = maxW, ph = pw / ar; if(ph > maxH){ ph = maxH; pw = ph * ar; }
+    const mat = Math.round(Math.max(pw, ph) * .085), bd = 16;
+    const fw = pw + mat * 2 + bd * 2, fh = ph + mat * 2 + bd * 2, x = cx - fw / 2;
+    g.save(); g.shadowColor = 'rgba(45,30,14,.42)'; g.shadowBlur = 46; g.shadowOffsetY = 26;
+    const fr = g.createLinearGradient(x, top, x + fw, top + fh);
+    fr.addColorStop(0, '#3F362C'); fr.addColorStop(.6, '#1F1A15'); fr.addColorStop(1, '#2F2821');
+    g.fillStyle = fr; g.fillRect(x, top, fw, fh); g.restore();
+    g.fillStyle = '#FBF9F4'; g.fillRect(x + bd, top + bd, fw - bd * 2, fh - bd * 2);
+    g.fillStyle = 'rgba(0,0,0,.07)'; g.fillRect(x + bd, top + bd, fw - bd * 2, 5);
+    if(im){ g.save(); g.beginPath(); g.rect(x + bd + mat, top + bd + mat, pw, ph); g.clip(); shareCover(g, im, x + bd + mat, top + bd + mat, pw, ph); g.restore(); }
+    if(dim){ g.fillStyle = `rgba(40,30,18,${dim})`; g.fillRect(x - 2, top - 2, fw + 4, fh + 4); }
+    return { x, top, w: fw, h: fh };
+  };
+  const TOP = 470;
+  lamp(70, TOP + 50, 300, .55); lamp(SHARE_W - 70, TOP + 50, 300, .55); lamp(SHARE_W / 2, TOP, 470, .95);
+  hang(imL, pick(at - 1), 70, TOP + 50, 300, 380, .16);
+  hang(imR, pick(at + 1), SHARE_W - 70, TOP + 50, 300, 380, .16);
+  hang(im0, pick(at), SHARE_W / 2, TOP, 470, 470, 0);
+
+  // the room's name
+  g.textBaseline = 'alphabetic';
+  // spaced capitals, but Thai is never letter-spaced
+  const k1 = `EXHIBITION ${galPad(room.no)} · ${N} `, k2 = en ? 'WORKS' : 'ภาพ';
+  const sp = 'letterSpacing' in g;
+  g.font = serif('600 26px'); if(sp) g.letterSpacing = '8px'; const w1 = g.measureText(k1).width;
+  if(sp && !en) g.letterSpacing = '0px'; g.font = `${en ? 600 : 700} 26px "tt-ricordi-allegria", "Noto Sans Thai", sans-serif`; const w2 = g.measureText(k2).width;
+  const kx = (SHARE_W - w1 - w2) / 2;
+  if(sp) g.letterSpacing = '8px'; shareText(g, k1, kx, 132, serif('600 26px'), '#857C6E');
+  if(sp && !en) g.letterSpacing = '0px'; shareText(g, k2, kx + w1, 132, `${en ? 600 : 700} 26px "tt-ricordi-allegria", "Noto Sans Thai", sans-serif`, '#857C6E');
+  if(sp) g.letterSpacing = '0px';
+  g.font = serif('600 84px'); g.fillStyle = '#2E2A24'; g.textAlign = 'center';
+  let y = 132;
+  shareWrap(g, room.title, SHARE_W - 140, 2).forEach(l => { y += 96; g.fillText(l, SHARE_W / 2, y); });
+  if(room.alt) shareText(g, room.alt, SHARE_W / 2, y + 58, '700 36px "Noto Sans Thai", sans-serif', '#4A443B', 'center');
+  shareText(g, room.kicker, SHARE_W / 2, y + (room.alt ? 108 : 60), serif('500 28px'), '#857C6E', 'center');
+  g.textAlign = 'left';
+  await shareFooter(g, false, sub.url);
+}
+
 async function drawPageCard(g, title, url){
   const bg = g.createLinearGradient(0, 0, SHARE_W, SHARE_H);
   bg.addColorStop(0, '#FBD9E7'); bg.addColorStop(1, '#D3F1E6');
@@ -18310,6 +18383,12 @@ function shareSubject(){
   if(state.view === 'timeline') return { kind:'ge', url, title:'Senbatsu General Election 2026 — 48thDb', file:'48thdb-ge2026' };
   if(state.view === 'stats') return { kind:'stats', cat: state.statsTab || 'overview', url, title:'สถิติ BNK48 & CGM48 — 48thDb', file:'48thdb-stats' };
   if(state.view === 'feed') return { kind:'today', url, title:'วันนี้ที่ 48 — 48thDb', file:`48thdb-today-${toYmd(todayStart())}` };
+  if(state.view === 'gallery'){
+    const room = galRoom(state.galleryId);
+    // the print open in the viewing room, else the one you stand at on the wall
+    const n = parseInt((document.querySelector('.gal-room-count') || document.querySelector('.gal-count b') || {}).textContent, 10) || 1;
+    return { kind:'gallery', room, at: Math.min(room.items.length, n) - 1, url, title:`แกลเลอรี ${room.title} — 48thDb`, file:`48thdb-gallery-${room.id}` };
+  }
   const names = { feed:'วันนี้ที่ 48', browse:'สมาชิกทั้งหมด', groups:'ประวัติวง', org:'ตำแหน่ง', discography:'ผลงานเพลง', stats:'สถิติ', shop:'ร้านค้า', calendar:'ปฏิทิน', gallery:`แกลเลอรี ${galRoom(state.galleryId).title}` };
   return { kind:'page', url, title:`${names[state.view] || '48thDb'} — 48thDb`, file:`48thdb-${state.view}` };
 }
@@ -18868,6 +18947,7 @@ async function buildShareCard(sub){
   else if(sub.kind === 'stats') await ({ lives: drawStatsLivesCard, songs: drawStatsSongsCard, birthdays: drawStatsBirthdaysCard,
       timeline: drawStatsTimelineCard }[sub.cat] || drawStatsCard)(g, sub.url);
   else if(sub.kind === 'today') await drawTodayCard(g, sub.url);
+  else if(sub.kind === 'gallery') await drawGalleryCard(g, sub);
   else await drawPageCard(g, sub.title.replace(/ — 48thDb$/, ''), sub.url);
   return new Promise(res => c.toBlob(res, 'image/png'));
 }
