@@ -581,6 +581,11 @@
   .modal-glass-card.is-postered.is-scene-meadow{
     background:linear-gradient(180deg, #86B5DA 0%, #B9D5EB 14%, #E6EFF5 32%, #F6F4EC 56%, #EFEBCB 76%, #D3DB9D 90%, #B3C07A 100%);
   }
+  /* Every other poster lends its sheet the same kind of wash, worked out from
+     the poster itself: its colours from top to bottom, lightened so the text
+     still reads (sheetGrad in the script). */
+  .modal-glass-card.is-postered.has-grad{ background:var(--sheet-grad); }
+  :root[data-theme="dark"] .modal-glass-card.is-postered.has-grad{ background:var(--sheet-grad-d); }
   /* The same palette on the cards in the feed, so an event looks like itself
      before it is opened. */
   .ev-card.is-themed{ border-color:color-mix(in srgb, var(--c) 32%, transparent); box-shadow:0 5px 20px color-mix(in srgb, var(--c) 14%, transparent); }
@@ -1608,7 +1613,27 @@
   }
   .scope-btn.is-on{ background:var(--bnk); color:#fff; }
 
-  .feed-head{ margin:4px 0 22px; }
+  /* The masthead is one framed panel: the date and the share button on top,
+     the title, then a hairline, then the scope switch and a count of what is
+     on. Framed, it holds together at any width instead of scattering its
+     pieces to the far edges of a wide screen. */
+  .feed-head{
+    margin:4px 0 22px; padding:14px 18px 12px; border-radius:22px;
+    background:var(--glass-card); border:1px solid var(--glass-edge);
+    backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%);
+    box-shadow:0 6px 22px rgba(60, 30, 60, .06);
+  }
+  .feed-head-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .feed-head .feed-today{ background:var(--paper-dim); backdrop-filter:none; -webkit-backdrop-filter:none; }
+  .feed-head .feed-title{ margin-top:4px; }
+  .feed-head-foot{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 14px;
+    margin-top:8px; padding-top:11px; border-top:1px solid var(--line);
+  }
+  .feed-head-foot .feed-scope{ margin-top:0; }
+  .feed-sum{ display:flex; flex-wrap:wrap; gap:4px 12px; margin:0; font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .feed-sum b{ color:var(--ink); font-weight:800; }
+  .feed-sum .is-now b{ color:var(--bnk); }
   /* the date sits in the same frosted material as the cards below it */
   .feed-today{
     display:inline-flex; align-items:center; gap:7px; margin:0;
@@ -5337,7 +5362,12 @@ const SEED_SCHEDULE = [
       '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
       '17:00–18:00 Group Hi-Touch'],
     info:[
-      'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน'] },
+      'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
+      'Zone 1 โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ',
+      'Zone 2 โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้',
+      'Zone 3 โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้',
+      'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก',
+      'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
   { id:'ev-partner-1017', start:'2026-10-17', title:'To be announced',
     venue:'Chiang Mai', tag:'partner', tba:true },
   { id:'ev-kimi-roadshow-t21', logo:'kimi', start:'2026-10-17', end:'2026-10-18',
@@ -5354,7 +5384,7 @@ const SEED_SCHEDULE = [
       'cgm-lingling','cgm-lookked','cgm-nana','cgm-prae','cgm-satangpound','cgm-shenae'],
     detail:[
       'รอบเวลาเดียวกันทั้งสองวัน 17 และ 18 ต.ค.',
-      '12:00–13:00 Mini Concert (ฟรี)',
+      '12:00–13:00 Free Mini Concert',
       '14:00–15:00 Group Hi-Touch',
       '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
       '17:00–18:00 Group Hi-Touch',
@@ -5364,11 +5394,11 @@ const SEED_SCHEDULE = [
       'Group Hi-Touch 18 ต.ค. — Prae, Nana, Lookked, Lewlew, Ginna, Shenae'],
     info:[
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
-      'Zone 1 โซนนั่งด้านในบริเวณกิจกรรม ถ่ายได้ด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ',
+      'Zone 1 โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ',
       'Zone 2 โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้',
-      'Zone 3 โซนรอบนอกสำหรับคนทั่วไป ใช้กล้องได้ทุกชนิด แต่ห้ามใช้อุปกรณ์เสริม เช่น ขาตั้ง บันได เก้าอี้',
+      'Zone 3 โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้',
       'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก',
-      'อาจมีการเปลี่ยนแปลงตามความเหมาะสม'] },
+      'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
   { id:'ev-kimi-roadshow-mbk', logo:'kimi', start:'2026-10-24', end:'2026-10-25',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'MBK Center, Bangkok', groups:['bnk48','cgm48'], lineupTba:true,
@@ -7134,6 +7164,9 @@ const EN = {
     'Return travel by coach',
   'รอบเวลาเดียวกันทั้งสองวัน 26 และ 27 ก.ย.': 'The same times on both days, 26 and 27 Sep',
   'รอบเวลาเดียวกันทั้งสองวัน 10 และ 11 ต.ค.': 'The same times on both days, 10 and 11 Oct',
+  'รอบเวลาเดียวกันทั้งสองวัน 17 และ 18 ต.ค.': 'The same times on both days, 17 and 18 Oct',
+  'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก':
+    'Group Hi-Touch: no wristwatches, rings or bracelets, and nothing in your hands that could hurt a member',
   '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha': '15:30–16:30 Meet the members at the Merchandise and Hachi Cha stands',
   'รอบเวลาเดียวกันทั้งสองวัน 19 และ 20 ก.ย.':
     'The same times on both days, 19 and 20 Sep',
@@ -13301,6 +13334,70 @@ function ffPaint(){
   ffFit();
 }
 
+/* A sheet's wash from its poster. The small copy is read into a canvas a few
+   pixels wide, averaged into seven bands from top to bottom, and each band is
+   kept to its hue but lifted to a pale tint (a deep one in dark mode), so the
+   sheet carries the poster's colours in their places without ever fighting
+   the text. Worked out once per poster, then drawn straight into the sheet. */
+const SHEET_GRAD = new Map();
+function sheetGrad(src){
+  return new Promise(res => {
+    const im = new Image();
+    im.onload = () => {
+      try{
+        const W = 20, H = 42, BANDS = 7, EDGE = 4, c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const g = c.getContext('2d', { willReadFrequently:true });
+        g.imageSmoothingQuality = 'high';
+        g.drawImage(im, 0, 0, W, H);
+        const px = g.getImageData(0, 0, W, H).data, rows = H / BANDS;
+        const hsl = (r, gg, b) => {
+          r /= 255; gg /= 255; b /= 255;
+          const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b), l = (mx + mn) / 2, d = mx - mn;
+          if(!d) return [0, 0, l];
+          const s = d / (1 - Math.abs(2 * l - 1));
+          const h = mx === r ? ((gg - b) / d) % 6 : mx === gg ? (b - r) / d + 2 : (r - gg) / d + 4;
+          return [(h * 60 + 360) % 360, s, l];
+        };
+        // the poster's ground is at its sides — the people stand in the middle —
+        // and the livelier pixels there count for more, so a band is the colour
+        // of the backdrop rather than grey from everything mixed together
+        const bands = [];
+        for(let k = 0; k < BANDS; k++){
+          let r = 0, gg = 0, b = 0, n = 0;
+          for(let y = Math.round(k * rows); y < Math.round((k + 1) * rows); y++)
+            for(let x = 0; x < W; x++){
+              if(x >= EDGE && x < W - EDGE) continue;
+              const i = (y * W + x) * 4, w = .08 + hsl(px[i], px[i + 1], px[i + 2])[1];
+              r += px[i] * w; gg += px[i + 1] * w; b += px[i + 2] * w; n += w;
+            }
+          bands.push(hsl(r / n, gg / n, b / n));
+        }
+        const clamp = (v, a, z) => Math.min(z, Math.max(a, v));
+        const pct = v => Math.round(v * 100) + '%';
+        const stops = f => bands.map((x, k) => `${f(x)} ${Math.round(k / (BANDS - 1) * 100)}%`).join(', ');
+        const light = stops(([h, s, l]) => `hsl(${Math.round(h)} ${pct(Math.min(s, .7))} ${pct(clamp(.84 + (l - .5) * .2, .78, .93))})`);
+        const dark = stops(([h, s, l]) => `hsl(${Math.round(h)} ${pct(Math.min(s, .5) * .7)} ${pct(clamp(.15 + (l - .5) * .1, .1, .21))})`);
+        res({ light:`linear-gradient(180deg, ${light})`, dark:`linear-gradient(180deg, ${dark})` });
+      }catch(e){ res(null); }
+    };
+    im.onerror = () => res(null);
+    im.src = evThumb(src);
+  });
+}
+function paintSheetGrads(root){
+  root.querySelectorAll('.is-event-sheet[data-grad-src]').forEach(el => {
+    const src = el.dataset.gradSrc;
+    el.removeAttribute('data-grad-src');
+    sheetGrad(src).then(g => {
+      if(!g) return;
+      SHEET_GRAD.set(src, g);
+      el.style.setProperty('--sheet-grad', g.light);
+      el.style.setProperty('--sheet-grad-d', g.dark);
+      el.classList.add('has-grad');
+    });
+  });
+}
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
   if(!ev) return '';
@@ -13312,9 +13409,11 @@ function renderEventModal(){
     : groupTags.length === 1 ? groupTags[0].color
     : (people.length ? getGroup(people[0].groupId).color : 'var(--ink-soft)');
   const mine = people.filter(m => state.oshi.includes(m.id));
+  const wantsGrad = ev.poster && ev.poster.img && !ev.poster.scene;
+  const grad = wantsGrad ? SHEET_GRAD.get(ev.poster.img) : null;
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.scene?` is-scene-${ev.poster.scene}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}" data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}">
+    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.scene?` is-scene-${ev.poster.scene}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}${grad?' has-grad':''}"${wantsGrad && !grad ? ` data-grad-src="${escapeAttr(ev.poster.img)}"` : ''} data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}${grad?`; --sheet-grad:${grad.light}; --sheet-grad-d:${grad.dark}`:''}">
       <button class="modal-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -13708,6 +13807,18 @@ function renderPastRow({ r, d }, today){
       <span class="otd-faces">${people.map(m => `<button class="otd-face" data-action="open-member" data-id="${m.id}" title="${escapeAttr(nickName(m))}" aria-label="${escapeAttr(nickName(m))}">${renderAvatar(m, 'avatar-sm', g.color)}</button>`).join('')}</span></div>`;
 }
 
+/* What the day holds, in three counts, for the foot of the masthead. */
+function feedSummary(nowOn, running, soon, iso){
+  const en = isEN();
+  const week = toYmd(new Date(parseYmd(iso).getTime() + 7 * 86400000));
+  const today = running.filter(e => !e.period && !e.cancelled).length;
+  const ahead = soon.filter(e => !e.cancelled && !e.period && e.start <= week).length;
+  const n = (k, th, one, many) => en ? `<b>${k}</b> ${k === 1 ? one : many}` : `${th} <b>${k}</b> งาน`;
+  return `<p class="feed-sum">
+    ${nowOn.length ? `<span class="is-now">${en ? `<b>${nowOn.length}</b> on now` : `กำลังจัด <b>${nowOn.length}</b> งาน`}</span>` : ''}
+    <span>${n(today, 'วันนี้', 'event today', 'events today')}</span>
+    <span>${n(ahead, '7 วันข้างหน้า', 'in the next 7 days', 'in the next 7 days')}</span></p>`;
+}
 function renderFeed(){
   const today = todayStart();
   const iso = toYmd(today);
@@ -13735,14 +13846,19 @@ function renderFeed(){
   return `
   <div class="feed-page">
     <header class="feed-head">
-      <p class="feed-today">วัน${dayName}ที่ ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()+543}</p>
-      <div class="feed-title-row"><h1 class="feed-title">วันนี้ที่ 48</h1>
-        <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></div>
-      ${state.oshi.length ? `
-      <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
-        <button class="scope-btn${state.oshiOnly?'':' is-on'}" data-action="set-oshi-only" data-id="0">ทั้งหมด</button>
-        <button class="scope-btn${state.oshiOnly?' is-on':''}" data-action="set-oshi-only" data-id="1">เฉพาะโอชิของฉัน</button>
-      </div>` : ''}
+      <div class="feed-head-top">
+        <p class="feed-today">วัน${dayName}ที่ ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()+543}</p>
+        <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button>
+      </div>
+      <div class="feed-title-row"><h1 class="feed-title">วันนี้ที่ 48</h1></div>
+      <div class="feed-head-foot">
+        ${state.oshi.length ? `
+        <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
+          <button class="scope-btn${state.oshiOnly?'':' is-on'}" data-action="set-oshi-only" data-id="0">ทั้งหมด</button>
+          <button class="scope-btn${state.oshiOnly?' is-on':''}" data-action="set-oshi-only" data-id="1">เฉพาะโอชิของฉัน</button>
+        </div>` : ''}
+        ${feedSummary(nowOn, running, soon, iso)}
+      </div>
     </header>
 
     <div class="feed-cols"><div class="feed-main">
@@ -15906,6 +16022,7 @@ function renderMain(){
       <button class="chip chip-link" data-action="nav" data-view="feed">${isEN() ? 'Back to home' : 'กลับหน้าแรก'}</button></div>`;
   }
   main.innerHTML = html;
+  paintSheetGrads(main);
   if(_dvTop && _dvTop.day === state.dayOf){ const nb = main.querySelector('.is-day-sheet .dv-body'); if(nb) nb.scrollTop = _dvTop.top; }   // a redraw keeps the day sheet where it was
   const arrived = state.view !== _lastRenderedView;
   if(arrived){
