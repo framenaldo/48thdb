@@ -3058,12 +3058,12 @@
   .odo{ font-variant-numeric:tabular-nums; }
   .odo.is-rolling{ display:inline-flex; align-items:flex-start; vertical-align:bottom; }
   .odo-d{ display:inline-block; height:1.2em; line-height:1.2em; overflow:hidden; }
-  .odo-col{ display:flex; flex-direction:column; transition:transform 1.05s cubic-bezier(.2,.8,.2,1); }
+  .odo-col{ display:flex; flex-direction:column; transition:transform .75s cubic-bezier(.3,.85,.35,1); }
   .odo-col i{ font-style:normal; height:1.2em; line-height:1.2em; }
   .odo-s{ display:inline-block; height:1.2em; line-height:1.2em; }
   .gec-v{ margin:2px 0 10px; font-size:38px; font-weight:800; letter-spacing:-.02em; color:var(--bnk); line-height:1.1; }
   .gec-trio{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
-  .gec-trio span{ display:flex; flex-direction:column; font-size:11.5px; font-weight:700; color:var(--ink-soft); padding:8px 4px; border-radius:12px; background:var(--paper-dim); }
+  .gec-trio > span{ display:flex; flex-direction:column; font-size:11.5px; font-weight:700; color:var(--ink-soft); padding:8px 4px; border-radius:12px; background:var(--paper-dim); }
   .gec-trio b{ font-size:17px; color:var(--ink); }
   .gec-run{ height:6px; margin:12px 0 0; border-radius:99px; background:var(--paper-dim); overflow:hidden; }
   .gec-run i{ display:block; height:100%; background:var(--cgm); }
@@ -11505,6 +11505,8 @@ function odoRun(root){
   if(!root) return;
   let still = false; try{ still = matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
   root.querySelectorAll('.odo[data-odo]').forEach(el => {
+    // still turning from the last change: its text is the wheels', not a number
+    if(el.classList.contains('is-rolling')) return;
     const key = el.dataset.odo, now = el.textContent, was = _odoLast[key];
     _odoLast[key] = now;
     if(still || was == null || was === now) return;
@@ -11520,11 +11522,16 @@ function odoRun(root){
     }
     el.innerHTML = html; el.classList.add('is-rolling');
     void el.offsetWidth;
-    el.querySelectorAll('.odo-col').forEach((col, k) => {
-      col.style.transitionDelay = (k * 35) + 'ms';
+    const cols = el.querySelectorAll('.odo-col');
+    cols.forEach((col, k) => {
+      col.style.transitionDelay = (k * 30) + 'ms';
       col.style.transform = `translateY(-${col.dataset.to * 10}%)`;
     });
-    setTimeout(() => { if(el.isConnected){ el.textContent = now; el.classList.remove('is-rolling'); } }, 1400);
+    // back to plain text the moment the wheels stop, so no digit is left part-way
+    const done = () => { if(el.isConnected && el.classList.contains('is-rolling')){ el.textContent = now; el.classList.remove('is-rolling'); } };
+    const last = cols[cols.length - 1];
+    if(last) last.addEventListener('transitionend', done, { once:true });
+    setTimeout(done, 750 + cols.length * 30 + 150);
   });
 }
 function gecHomeTeaser(en){
