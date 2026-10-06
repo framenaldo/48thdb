@@ -87,7 +87,10 @@ Senbatsu always on top.
 **Design.** Keep the framed look: cards, pill buttons and chips with a visible
 press effect. Flatter redesigns were previewed and rejected — don't propose them
 again. Keep the pink (#E4457E) and teal (#2E8C82) accents; the official orchid
-and mint appear only as a swatch on the group history card.
+and mint appear only as a swatch on the group history card. An event sheet with a
+poster is washed top to bottom in that poster's colours, worked out in the
+browser from its small copy (`sheetGrad`); `poster.scene` (MYO's meadow) is the
+hand-made exception.
 
 **Hidden on purpose.** Member-vs-member comparison stays reachable only by a
 `?vs=` link — no buttons, no links to it. The site is web only; native apps were
