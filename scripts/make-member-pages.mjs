@@ -180,7 +180,7 @@ const sect = (title, list) => list.length ? `<section class="grp"><h2>${esc(titl
 const byName = (a, b) => a.name.localeCompare(b.name);
 put('m/index.html', `${HEAD('สมาชิก BNK48 และ CGM48 ทั้งหมด — 48thDb', 'รายชื่อสมาชิกและอดีตสมาชิก BNK48 และ CGM48 พร้อมโปรไฟล์ วันเกิด ส่วนสูง บ้านเกิด ทีม และรุ่น', `${ORIGIN}/m/`, `${ORIGIN}/og-image2.jpg`)}
 </head><body><div class="wrap">
-<div class="top"><a href="/">48thDb</a><a href="/?v=browse">เปิดในเว็บ →</a></div>
+<div class="top"><a href="/">48thDb</a><a href="/members">เปิดในเว็บ →</a></div>
 <h1>สมาชิก BNK48 และ CGM48</h1>
 ${groups.map(g => sect(g, people.filter(p => p.group === g && !p.graduated).sort(byName))).join('')}
 ${groups.map(g => sect(`อดีตสมาชิก ${g}`, people.filter(p => p.group === g && p.graduated).sort(byName))).join('')}

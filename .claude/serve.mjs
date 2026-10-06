@@ -46,19 +46,30 @@ createServer(async (req, res) => {
       res.writeHead(403).end('Forbidden');
       return;
     }
-    const info = await stat(full).catch(() => null);
+    let info = await stat(full).catch(() => null);
+    let file = full;
+    // a folder with a page of its own (/m, /p) gets its slash, as the host does
+    if (info && info.isDirectory() && await stat(join(full, 'index.html')).catch(() => null)) {
+      res.writeHead(301, { location: url.pathname + '/' + url.search }).end();
+      return;
+    }
+    // any other address a browser opens is the site's own page, which reads
+    // the path itself (the host's not_found_handling = "single-page-application")
+    if ((!info || !info.isFile()) && (req.headers['sec-fetch-mode'] === 'navigate' || /text\/html/.test(req.headers.accept || ''))) {
+      file = join(ROOT, 'index.html'); info = await stat(file);
+    }
     if (!info || !info.isFile()) {
       res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' }).end('Not found');
       return;
     }
     res.writeHead(200, {
-      'content-type': TYPES[extname(full).toLowerCase()] || 'application/octet-stream',
+      'content-type': TYPES[extname(file).toLowerCase()] || 'application/octet-stream',
       'content-length': info.size,
       // a preview should always show what is on disk right now
       'cache-control': 'no-store',
     });
     if (req.method === 'HEAD') { res.end(); return; }
-    createReadStream(full).pipe(res);
+    createReadStream(file).pipe(res);
   } catch (err) {
     res.writeHead(500, { 'content-type': 'text/plain; charset=utf-8' }).end(String(err));
   }

@@ -21,6 +21,13 @@ the Firebase CLI from the owner's machine.
 
 ## Shape of index.html
 
+- Every view has a clean address — 48thdb.com/gallery, /vote, /results,
+  /stats, /members, /music, /ge2026 … (`VIEW_SLUG`, `urlForSnapshot`,
+  `applyUrlToState`). The host hands any address that is not a file to
+  index.html (`not_found_handling` in site.wrangler.toml); the older `?v=<view>`
+  links still open and are rewritten. An event, member or song is still `?e=`,
+  `?m=`, `?s=`. Don't name a folder after a view slug unless it has no index.html.
+
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
   handler, and views switched on `state.view`.
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
@@ -39,7 +46,7 @@ the Firebase CLI from the owner's machine.
 
 ## The GE vote on the chain
 
-Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`?v=vote`) and a
+Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`/vote`) and a
 teaser on its overview. (`?v=gechain`, the owner's old copy, now opens that tab;
 the baht figure is fixed at 68 a token — `gecPrice`.)
 A cold start reads `data/chain-ge2025.json` (final) and `data/chain-ge2026.json`

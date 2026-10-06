@@ -2,6 +2,8 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<script>/* /gallery/ and /gallery are the same page; without the slash, relative addresses stay at the root */
+if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.replaceState(null, '', location.pathname.replace(/\/+$/, '') + location.search + location.hash);</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>48thDb — 48 Thailand Database</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -10850,7 +10852,7 @@ function renderHomeGE(opt = {}){
 /* The election, summed up on the home page once it is over: the Center, the
    rest of the Senbatsu, a few numbers, and the Under and Next Girls by name. */
 const geResShare = id => { const r = GE_ROUNDS.find(x => x.id === id) || GE_ROUNDS[0];
-  return { kind:'geres', round:r.id, url:location.origin + '/?v=results', link:location.origin + '/?v=results',
+  return { kind:'geres', round:r.id, url:location.origin + '/results', link:location.origin + '/results',
     title:`GE2026 ${r.en} — 48thDb`, file:`48thdb-ge2026-${r.id.replace('ge2026-', '')}` }; };
 function renderGESummary(id){
   const en = isEN(), slots = geSlots(id), first = geSlots(GE_ROUNDS[0].id);
@@ -16758,32 +16760,42 @@ const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','t
 // has arrived, and writing it derives the address from a state that is still
 // empty — which erases the very query string this boot is supposed to honour.
 const BOOT_QUERY = location.search;
+/* A page of the site has an address of its own — 48thdb.com/gallery, /vote,
+   /stats — and the host hands any address that is not a file to this page
+   (not_found_handling in site.wrangler.toml), which reads the path here.
+   A view's address is its slug; ?v=<view>, the older form, still opens it. */
+const BOOT_PATH = location.pathname;
+const VIEW_SLUG = { browse:'members', discography:'music', timeline:'ge2026' };
+const SLUG_VIEW = Object.fromEntries(Object.entries(VIEW_SLUG).map(([v, sl]) => [sl, v]));
 
 function urlForSnapshot(snap){
   const p = new URLSearchParams();
+  let path = '/';
+  const at = v => { path = '/' + (VIEW_SLUG[v] || v); };
   if(String(snap.posterOf || '').startsWith('ge:')) p.set('p', snap.posterOf.slice(3));
   else if(snap.selectedEvent)  p.set('e', snap.selectedEvent);
   else if(snap.selectedId){    p.set('m', snap.selectedId);
                                if(snap.compareWith) p.set('vs', snap.compareWith); }
   else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
-  else if(snap.view === 'timeline' && snap.geTab === 'results') p.set('v', 'results');
-  else if(snap.view === 'timeline' && snap.geTab === 'chain') p.set('v', 'vote');
-  else if(snap.view === 'timeline' && snap.geTab === 'songs') p.set('v', 'gesongs');
-  else if(snap.view === 'gelive') p.set('v', 'gelive');
-  else if(snap.view === 'gallery'){ p.set('v', 'gallery'); if(snap.galleryId && snap.galleryId !== GALLERY[0].id) p.set('g', snap.galleryId); }
+  else if(snap.view === 'timeline' && snap.geTab === 'results') at('results');
+  else if(snap.view === 'timeline' && snap.geTab === 'chain') at('vote');
+  else if(snap.view === 'timeline' && snap.geTab === 'songs') at('gesongs');
+  else if(snap.view === 'gelive') at('gelive');
+  else if(snap.view === 'gallery'){ at('gallery'); if(snap.galleryId && snap.galleryId !== GALLERY[0].id) path += '/' + snap.galleryId; }
   // not one to share, but a reload should land back on it rather than on Home
-  else if(snap.view === 'profile') p.set('v', 'profile');
-  else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view))
-    p.set('v', snap.view);
+  else if(snap.view === 'profile') at('profile');
+  else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view)) at(snap.view);
   const q = p.toString();
-  return location.pathname + (q ? '?' + q : '') ;
+  return path + (q ? '?' + q : '') ;
 }
 
 // Runs once at boot, after members are loaded so an id can be checked. An id
 // that matches nothing is ignored rather than left to render a blank screen.
 function applyUrlToState(){
   const p = new URLSearchParams(BOOT_QUERY);
-  const ev = p.get('e'), mem = p.get('m'), sng = p.get('s'), view = p.get('v'), pst = p.get('p');
+  const seg = BOOT_PATH.split('/').filter(Boolean).map(x => decodeURIComponent(x).toLowerCase());
+  const view = p.get('v') || (seg[0] ? SLUG_VIEW[seg[0]] || seg[0] : null);
+  const ev = p.get('e'), mem = p.get('m'), sng = p.get('s'), pst = p.get('p');
 
   if(pst && isGECandidate(pst)){
     state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'candidates';
@@ -16817,7 +16829,7 @@ function applyUrlToState(){
   if(view === 'gelive'){ state.view = 'gelive'; return; }
   if(view === 'gechain'){ state.view = 'timeline'; state.geTab = 'chain'; return; }   // the owner's old copy, now the public tab
   if(view === 'profile'){ state.view = 'profile'; return; }
-  if(view === 'gallery'){ state.view = 'gallery'; state.galleryId = galRoom(p.get('g')).id; return; }
+  if(view === 'gallery'){ state.view = 'gallery'; state.galleryId = galRoom(p.get('g') || seg[1]).id; return; }
   if(view && SHAREABLE_VIEWS.includes(view)){ state.view = view; if(view === 'timeline') state.timelineId = 'ge2026'; }
 }
 
@@ -18098,7 +18110,7 @@ function shareSubject(){
 function milestoneShare(vid){
   const m = ytMilestones().find(x => x.vid === vid);
   if(!m) return null;
-  const url = location.origin + location.pathname + '?s=' + encodeURIComponent(m.workId);
+  const url = location.origin + '/?s=' + encodeURIComponent(m.workId);
   return { kind:'milestone', ...m, url,
     title:`${m.track} ${isEN() ? `passed ${m.mark.toLocaleString('en-US')} views` : `ครบ ${m.mark.toLocaleString('en-US')} วิว`} — 48thDb`,
     file:`48thdb-${m.workId}-${m.mark}` };
