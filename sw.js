@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v13';
+const VERSION = 'v14';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
@@ -72,11 +72,16 @@ async function staleWhileRevalidate(request) {
  * removes that whole class of mistake — a replaced file heals itself on the
  * next visit whether or not anyone remembered the version.
  */
+/* The host answers an address with no file behind it with the site's page
+ * (status 200), so the clean addresses work. That is never an image or data,
+ * and must not be kept as one. */
+const real = (request, res) => res && res.ok && !(/text\/html/.test(res.headers.get('content-type') || '') && !/\.html?$|\/$/.test(new URL(request.url).pathname));
+
 async function assetFresh(request) {
   const cache = await caches.open(ASSETS);
   const hit = await cache.match(request);
   const network = fetch(request)
-    .then(res => { if (res && res.ok) cache.put(request, res.clone()); return res; })
+    .then(res => { if (real(request, res)) cache.put(request, res.clone()); return res; })
     .catch(() => null);
   return hit || (await network) || Response.error();
 }
@@ -86,7 +91,7 @@ async function dataFirst(request) {
   const cache = await caches.open(ASSETS);
   try {
     const fresh = await fetch(request);
-    if (fresh && fresh.ok) cache.put(request, fresh.clone());
+    if (real(request, fresh)) cache.put(request, fresh.clone());
     return fresh;
   } catch (err) {
     return (await cache.match(request)) || Response.error();
