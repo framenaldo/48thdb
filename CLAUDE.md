@@ -27,7 +27,8 @@ the Firebase CLI from the owner's machine.
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.
 - An event poster (`poster.img`) shows on its card from a small copy,
-  `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one.
+  `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
+  then `node scripts/make-poster-grads.mjs` for its sheet colours.
   A line-up of every current member (or a whole group) prints as "All Members"
   / "All BNK48 Members" / "All CGM48 Members" by itself — still list the ids.
 - Three languages: `EN/TH` (mix, the default), TH and EN. New Thai UI strings
@@ -88,9 +89,10 @@ Senbatsu always on top.
 press effect. Flatter redesigns were previewed and rejected — don't propose them
 again. Keep the pink (#E4457E) and teal (#2E8C82) accents; the official orchid
 and mint appear only as a swatch on the group history card. An event sheet with a
-poster is washed top to bottom in that poster's colours, worked out in the
-browser from its small copy (`sheetGrad`); `poster.scene` (MYO's meadow) is the
-hand-made exception.
+poster is washed top to bottom in that poster's colours (`sheetGrad`), kept in
+`data/poster-grads.json` — run `node scripts/make-poster-grads.mjs` after
+adding a poster, because Safari on the iPhone will not let the page read a
+canvas back; `poster.scene` (MYO's meadow) is the hand-made exception.
 
 **Hidden on purpose.** Member-vs-member comparison stays reachable only by a
 `?vs=` link — no buttons, no links to it. The site is web only; native apps were

@@ -13490,6 +13490,14 @@ function ffPaint(){
    sheet carries the poster's colours in their places without ever fighting
    the text. Worked out once per poster, then drawn straight into the sheet. */
 const SHEET_GRAD = new Map();
+/* Worked out ahead of time by scripts/make-poster-grads.mjs into
+   data/poster-grads.json. Safari on the iPhone will not let a page read a
+   canvas back (it hands over blank pixels, which came out as flat grey), so
+   for the posters in that file it is the only source; a poster added since is
+   worked out here, where the browser allows it. */
+let POSTER_GRADS = null, _posterGrads = null;
+const posterGrads = () => _posterGrads || (_posterGrads = fetch('data/poster-grads.json')
+  .then(r => r.ok ? r.json() : {}).catch(() => ({})).then(d => (POSTER_GRADS = d || {})));
 function sheetGrad(src){
   return new Promise(res => {
     const im = new Image();
@@ -13501,6 +13509,11 @@ function sheetGrad(src){
         g.imageSmoothingQuality = 'high';
         g.drawImage(im, 0, 0, W, H);
         const px = g.getImageData(0, 0, W, H).data, rows = H / BANDS;
+        // a browser that guards against fingerprinting reads back nothing (or
+        // one flat colour): no wash then, rather than a grey one
+        let alpha = 0, lo = 255, hi = 0;
+        for(let i = 0; i < px.length; i += 4){ alpha += px[i + 3]; const v = px[i] + px[i + 1] + px[i + 2]; lo = Math.min(lo, v); hi = Math.max(hi, v); }
+        if(alpha < W * H * 128 || hi - lo < 6){ res(null); return; }
         const hsl = (r, gg, b) => {
           r /= 255; gg /= 255; b /= 255;
           const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b), l = (mx + mn) / 2, d = mx - mn;
@@ -13539,7 +13552,7 @@ function paintSheetGrads(root){
   root.querySelectorAll('.is-event-sheet[data-grad-src]').forEach(el => {
     const src = el.dataset.gradSrc;
     el.removeAttribute('data-grad-src');
-    sheetGrad(src).then(g => {
+    posterGrads().then(file => file[src] || sheetGrad(src)).then(g => {
       if(!g) return;
       SHEET_GRAD.set(src, g);
       el.style.setProperty('--sheet-grad', g.light);
@@ -13560,7 +13573,8 @@ function renderEventModal(){
     : (people.length ? getGroup(people[0].groupId).color : 'var(--ink-soft)');
   const mine = people.filter(m => state.oshi.includes(m.id));
   const wantsGrad = ev.poster && ev.poster.img && !ev.poster.scene;
-  const grad = wantsGrad ? SHEET_GRAD.get(ev.poster.img) : null;
+  const grad = wantsGrad ? SHEET_GRAD.get(ev.poster.img) || (POSTER_GRADS && POSTER_GRADS[ev.poster.img]) || null : null;
+  if(wantsGrad && !POSTER_GRADS) posterGrads();
   return `
   <div class="modal-backdrop" data-action="close-modal">
     <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.scene?` is-scene-${ev.poster.scene}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}${grad?' has-grad':''}"${wantsGrad && !grad ? ` data-grad-src="${escapeAttr(ev.poster.img)}"` : ''} data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}${grad?`; --sheet-grad:${grad.light}; --sheet-grad-d:${grad.dark}`:''}">
