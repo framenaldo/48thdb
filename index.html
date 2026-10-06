@@ -1610,17 +1610,20 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      wooden floor — in light mode, and a dimmed room in dark mode. */
   .gal-page{
     --wall:#E9E2D4; --wall-2:#D8CEBC; --floor:#C7B79B; --floor-2:#B8A88C; --gink:#34312A; --gsoft:#7A7266;
-    --serif:'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif;
   }
+  /* TT Ricordi Allegria, from the owner's Adobe Fonts web project (kit sam6dsu,
+     allowed on 48thdb.com and localhost). It has no Thai, so Thai falls through
+     to the site's own face; it has no italic either, so nothing slants. */
+  :root{ --gal-serif:"tt-ricordi-allegria", 'Noto Sans Thai', Georgia, serif; }
   :root[data-theme="dark"] .gal-page{
     --wall:#29261F; --wall-2:#1F1D18; --floor:#3B3227; --floor-2:#2C251D; --gink:#EFE8D8; --gsoft:#A79F90;
   }
   .gal-hero{ text-align:center; margin:4px 0 18px; }
-  .gal-kick{ margin:0; font-size:11px; font-weight:800; letter-spacing:.24em; color:var(--gsoft); text-transform:uppercase; }
+  .gal-kick{ margin:0; font-family:var(--gal-serif); font-size:11px; font-weight:600; letter-spacing:.24em; color:var(--gsoft); text-transform:uppercase; }
   .gal-kick span{ letter-spacing:.04em; }
-  .gal-title{ margin:6px 0 0; font-family:var(--serif); font-weight:600; font-size:clamp(30px, 7vw, 54px); line-height:1.08; color:var(--gink); letter-spacing:.01em; }
+  .gal-title{ margin:6px 0 0; font-family:var(--gal-serif); font-weight:600; font-size:clamp(30px, 7vw, 54px); line-height:1.08; color:var(--gink); letter-spacing:.01em; }
   .gal-alt{ margin:4px 0 0; font-size:15px; font-weight:700; color:var(--gink); opacity:.8; }
-  .gal-sub{ margin:8px auto 0; display:inline-flex; align-items:center; gap:10px; font-size:12px; font-weight:700; color:var(--gsoft); letter-spacing:.06em; }
+  .gal-sub{ margin:8px auto 0; display:inline-flex; align-items:center; gap:10px; font-family:var(--gal-serif); font-size:12.5px; font-weight:500; color:var(--gsoft); letter-spacing:.06em; }
   .gal-sub::before, .gal-sub::after{ content:''; width:28px; height:1px; background:currentColor; opacity:.5; }
   .gal-rooms{ display:flex; justify-content:center; flex-wrap:wrap; gap:6px; margin-top:12px; }
 
@@ -1690,15 +1693,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     opacity:calc(1 - var(--ad) * .6); transition:opacity .25s;
   }
   :root[data-theme="dark"] .gal-label{ background:#E9E2D2; }
-  .gal-label .gal-no{ display:block; font-family:var(--serif); font-size:13px; font-style:italic; color:#8A8174; line-height:1.1; }
+  .gal-label .gal-no{ display:block; font-family:var(--gal-serif); font-size:13px; font-weight:500; color:#8A8174; line-height:1.1; }
   .gal-label b{ display:block; font-size:13.5px; font-weight:800; color:#2F2B24; line-height:1.3; }
-  .gal-label small{ display:block; margin-top:2px; font-size:10.5px; font-weight:600; color:#8A8174; letter-spacing:.02em; }
+  .gal-label small{ display:block; margin-top:2px; font-family:var(--gal-serif); font-size:10.5px; font-weight:500; color:#8A8174; letter-spacing:.02em; }
   /* the wall text an exhibition opens with */
   .gal-intro{ justify-content:center; text-align:left; padding:0 4px; align-self:stretch; }
   .gal-intro .gal-kick{ text-align:left; }
-  .gal-intro h2{ margin:10px 0 0; font-family:var(--serif); font-weight:600; font-size:30px; line-height:1.1; color:var(--gink); }
+  .gal-intro h2{ margin:10px 0 0; font-family:var(--gal-serif); font-weight:600; font-size:30px; line-height:1.1; color:var(--gink); }
   .gal-intro p{ margin:12px 0 0; font-size:13px; line-height:1.65; color:var(--gink); opacity:.82; }
-  .gal-intro .gal-walk{ margin-top:16px; display:inline-flex; gap:8px; align-items:center; font-size:12px; font-weight:800; letter-spacing:.04em; color:var(--gsoft); }
+  .gal-intro .gal-walk{ margin-top:16px; display:inline-flex; gap:8px; align-items:center; font-family:var(--gal-serif); font-size:12px; font-weight:600; letter-spacing:.04em; color:var(--gsoft); }
   .gal-intro .gal-walk i{ display:inline-block; font-style:normal; animation:gal-walk 1.6s ease-in-out infinite; }
   @keyframes gal-walk{ 0%,100%{ transform:none; } 50%{ transform:translateX(6px); } }
   .gal-ctrl{ position:relative; z-index:2; display:flex; align-items:center; justify-content:center; gap:14px; padding:6px 16px 18px; color:var(--gink); }
@@ -1706,7 +1709,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     background:color-mix(in srgb, #fff 60%, transparent); color:var(--gink); font-size:20px; line-height:1; box-shadow:0 3px 0 color-mix(in srgb, var(--gink) 18%, transparent); }
   .gal-arrow:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--gink) 18%, transparent); }
   :root[data-theme="dark"] .gal-arrow{ background:rgba(255,255,255,.08); }
-  .gal-count{ font-family:var(--serif); font-size:17px; min-width:70px; text-align:center; }
+  .gal-count{ font-family:var(--gal-serif); font-size:17px; min-width:70px; text-align:center; }
   .gal-count b{ font-size:22px; }
   .gal-prog{ position:absolute; left:16%; right:16%; bottom:8px; height:2px; background:color-mix(in srgb, var(--gink) 14%, transparent); border-radius:2px; overflow:hidden; }
   .gal-prog i{ display:block; height:100%; width:var(--p, 10%); background:var(--gink); opacity:.55; transition:width .2s; }
@@ -1740,9 +1743,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gal-room.is-clip .gal-room-hint{ visibility:hidden; }
   .gal-room-cap{ margin-top:16px; text-align:center; color:#E9E2D2; opacity:0; transform:translateY(8px); transition:opacity .35s .15s, transform .35s .15s; padding:0 20px; }
   .gal-room.is-open .gal-room-cap{ opacity:1; transform:none; }
-  .gal-room-cap .gal-no{ font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:15px; color:#A99F8D; }
+  .gal-room-cap .gal-no{ font-family:var(--gal-serif); font-weight:500; font-size:15px; color:#A99F8D; }
   .gal-room-cap b{ display:block; font-size:16px; font-weight:800; }
-  .gal-room-cap small{ display:block; margin-top:3px; font-size:11.5px; color:#A99F8D; }
+  .gal-room-cap small{ display:block; margin-top:3px; font-family:var(--gal-serif); font-size:11.5px; color:#A99F8D; }
   .gal-room-btn{ position:absolute; width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08);
     color:#fff; font-size:22px; line-height:1; cursor:pointer; opacity:0; transition:opacity .3s .1s; }
   .gal-room.is-open .gal-room-btn{ opacity:1; }
@@ -1751,7 +1754,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gal-room-prev{ left:14px; top:50%; margin-top:-22px; }
   .gal-room-next{ right:14px; top:50%; margin-top:-22px; }
   @media (max-width:700px){ .gal-room-prev, .gal-room-next{ top:auto; bottom:max(18px, env(safe-area-inset-bottom)); margin:0; } }
-  .gal-room-count{ position:absolute; top:max(26px, calc(env(safe-area-inset-top) + 10px)); left:20px; font-family:'Cormorant Garamond', Georgia, serif; font-size:17px; color:#A99F8D; }
+  .gal-room-count{ position:absolute; top:max(26px, calc(env(safe-area-inset-top) + 10px)); left:20px; font-family:var(--gal-serif); font-size:17px; color:#A99F8D; }
   @media (prefers-reduced-motion:reduce){
     .gal-hang{ animation:none; } .gal-hall::after{ transition:none; } .gal-frame{ transition:none; }
   }
@@ -1770,8 +1773,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gal-teaser:hover .gal-fan img:nth-child(1){ transform:rotate(-13deg) translateX(-3px); }
   .gal-teaser:hover .gal-fan img:nth-child(3){ transform:rotate(12deg) translateX(3px); }
   .gal-teaser-text{ min-width:0; }
-  .gal-teaser-text small{ display:block; font-size:10.5px; font-weight:800; letter-spacing:.08em; color:var(--ink-soft); }
-  .gal-teaser-text b{ display:block; margin-top:2px; font-family:'Cormorant Garamond', Georgia, serif; font-size:21px; font-weight:600; line-height:1.15; }
+  .gal-teaser-text small{ display:block; font-family:var(--gal-serif); font-size:10.5px; font-weight:600; letter-spacing:.08em; color:var(--ink-soft); }
+  .gal-teaser-text b{ display:block; margin-top:2px; font-family:var(--gal-serif); font-size:21px; font-weight:600; line-height:1.15; }
   .gal-teaser-text span{ display:block; margin-top:2px; font-size:12px; font-weight:700; color:var(--ink-soft); }
   .gal-teaser-go{ margin-left:auto; flex:none; font-size:18px; color:var(--ink-soft); }
 
@@ -15980,7 +15983,7 @@ function galFont(){
   if(document.getElementById('gal-font')) return;
   const l = document.createElement('link');
   l.id = 'gal-font'; l.rel = 'stylesheet';
-  l.href = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap';
+  l.href = 'https://use.typekit.net/sam6dsu.css';
   document.head.appendChild(l);
 }
 const galAlt = (i, en) => en ? `Picture ${i + 1}` : `ภาพที่ ${i + 1}`;
@@ -15990,6 +15993,7 @@ function galLabel(g, it, i, en){
 function renderGalleryTeaser(id){
   const g = galRoom(id), en = isEN();
   if(!g) return '';
+  galFont();
   return `<button class="gal-teaser" data-action="open-gallery" data-id="${g.id}">
     <span class="gal-fan" aria-hidden="true">${g.items.slice(0, 3).map(it => `<img src="${g.dir}${it.f}-s.jpg" alt="" loading="lazy" decoding="async">`).join('')}</span>
     <span class="gal-teaser-text"><small>${en ? 'GALLERY' : 'แกลเลอรี'} · EXHIBITION ${galPad(g.no)}</small>
