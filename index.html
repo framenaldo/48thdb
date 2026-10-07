@@ -7136,6 +7136,7 @@ const EN = {
   'กำลังจัดอยู่': 'On now',
   'กำลังไลฟ์อยู่': 'On air now',
   '48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ': '48thdb.com is an unofficial fan site',
+  'นโยบายความเป็นส่วนตัว': 'Privacy policy',
   'ด่วน': 'FLASH',
   'ประกาศด่วน': 'Latest word',
   'รอขึ้น': 'Scheduled',
@@ -16765,7 +16766,7 @@ function render(){
   const app = document.getElementById('app');
   app.innerHTML = renderHeader() + '<div id="ticker-slot"></div><div id="nav-container"></div><main id="main"></main>'
     // Said once, under everything: this is a fan's database, not the groups'.
-    + '<footer class="site-foot"><p>48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ</p></footer>';
+    + '<footer class="site-foot"><p><span>48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ</span> · <a href="/privacy">นโยบายความเป็นส่วนตัว</a></p></footer>';
   renderProfileSlot();
   const menu = app.querySelector('.lang-menu');
   if(menu && menu.getBoundingClientRect().left < 8) menu.classList.add('is-left');

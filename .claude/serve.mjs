@@ -53,6 +53,11 @@ createServer(async (req, res) => {
       res.writeHead(301, { location: url.pathname + '/' + url.search }).end();
       return;
     }
+    // /privacy is privacy.html, as the host serves it (html_handling = auto-trailing-slash)
+    if (!info && !/\.[a-z0-9]+$/i.test(path)) {
+      const page = await stat(full + '.html').catch(() => null);
+      if (page && page.isFile()) { file = full + '.html'; info = page; }
+    }
     // any other address a browser opens is the site's own page, which reads
     // the path itself (the host's not_found_handling = "single-page-application")
     if ((!info || !info.isFile()) && (req.headers['sec-fetch-mode'] === 'navigate' || /text\/html/.test(req.headers.accept || ''))) {
