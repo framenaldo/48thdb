@@ -342,7 +342,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .feed-main, .feed-side{ display:contents; }
   .today-hero-block{ order:1; } .is-fflive{ order:1; } .is-over-today{ order:1; } .is-periods{ order:2; } .is-bday-today{ order:3; }
   .is-bday-next{ order:4; } .is-schedule{ order:5; } .is-otd{ order:6; } .is-calendar{ order:6; } .is-past{ order:7; }
-  .is-gevote{ order:1; } .is-feedback{ order:8; }
+  .is-feedback{ order:8; }
+  /* the live vote leads, the results right under it; while a round is being
+     read out the results lead and the vote takes its old place among today's */
+  .feed-cols .is-gevote{ order:0; } .feed-cols .feed-ge{ order:1; }
+  .feed-cols.is-ge-live .feed-ge{ order:0; } .feed-cols.is-ge-live .is-gevote{ order:1; }
 
 
   /* Room to scroll past the end. Collapsing a stage plot makes the page
@@ -14079,7 +14083,7 @@ function renderFeed(){
       </div>
     </header>
 
-    <div class="feed-cols"><div class="feed-main">
+    <div class="feed-cols${geLiveRound() ? ' is-ge-live' : ''}"><div class="feed-main">
     ${renderHomeGE()}
 
     ${nowOn.length ? `
