@@ -547,6 +547,28 @@ DTSTART;TZID=Asia/Bangkok:20261011T120000
 DTEND;TZID=Asia/Bangkok:20261011T180000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-partner-1017-2026-10-17@48thdb
+DTSTAMP:20261017T000000Z
+SUMMARY:Lanna Expo 2026 · Japan–Thailand 140th Anniversary Countdown Eve
+ nt
+LOCATION:เวทีกลาง Hall 3\, Chiang Mai International Exhibit
+ ion and Convention Centre\, Chiang Mai
+DESCRIPTION:เมมเบอร์: Shenae\, Lewlew\, Nana\, Prae\, Lookk
+ ed\, Ginna\n• 14:30 การแสดงพิเศษจาก CGM48\
+ n• งานนับถอยหลังสู่ 140 ปีควา
+ มสัมพันธ์ทางการทูตญี่ปุ่
+ น-ไทยในปี 2570 จัดโดยสถานกงสุ
+ ลใหญ่ญี่ปุ่น ณ นครเชียงใหม
+ ่ ภายในงาน Lanna Expo 2026 (12–18 ต.ค.)\n• ห
+ น้าทางเข้า Exhibition Hall 3 มีร้านอา
+ หาร ขนม เครื่องดื่ม และสิน
+ ค้าญี่ปุ่น พร้อมกิจกรรมเว
+ ิร์กช็อปฟรี\n\nhttps://48thdb.com/?e=ev-partner-1017
+URL:https://48thdb.com/?e=ev-partner-1017
+DTSTART;TZID=Asia/Bangkok:20261017T143000
+DTEND;TZID=Asia/Bangkok:20261017T163000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-kimi-roadshow-t21@48thdb
 DTSTAMP:20261017T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
