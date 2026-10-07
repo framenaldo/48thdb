@@ -14110,6 +14110,9 @@ function feedSummary(nowOn, running, soon, iso){
     <span>${n(ahead, '7 วันข้างหน้า', 'in the next 7 days', 'in the next 7 days')}</span></p>`;
 }
 function renderFeed(){
+  // the live vote leads and the results sit right under it, on every screen;
+  // while a round is being read out the results lead instead
+  const geLive = geLiveRound();
   const today = todayStart();
   const iso = toYmd(today);
   const dayName = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'][today.getDay()];
@@ -14151,7 +14154,8 @@ function renderFeed(){
       </div>
     </header>
 
-    <div class="feed-cols${geLiveRound() ? ' is-ge-live' : ''}"><div class="feed-main">
+    <div class="feed-cols${geLive ? ' is-ge-live' : ''}"><div class="feed-main">
+    ${geLive ? '' : gecHomeCard(isEN())}
     ${renderHomeGE()}
 
     ${nowOn.length ? `
@@ -14160,7 +14164,7 @@ function renderFeed(){
       ${nowOn.map(e => renderTodayHero(e, iso)).join('')}
     </section>` : ''}
     ${renderFeedFanFest(mine)}
-    ${gecHomeCard(isEN())}
+    ${geLive ? gecHomeCard(isEN()) : ''}
 
     ${overToday.length ? `
     <section class="feed-block is-over-today">
