@@ -4,7 +4,7 @@
  *                          and what LINE, X and Facebook read for a link preview
  *   m/index.html           every member, by group, linking to each page
  *   photos/og/<id>.jpg     the 1200×630 preview image
- *   sitemap.xml            /, /m/ and every member page
+ *   sitemap.xml            /, the views (/music, /gallery …), /m/ and every member page
  * The site itself is one page drawn by script, which crawlers barely see, and
  * its canonical is the home page — so without these a member's name finds
  * nothing. A shared link carries ?go and sends people straight on to her sheet
@@ -188,9 +188,12 @@ ${groups.map(g => sect(`อดีตสมาชิก ${g}`, people.filter(p =>
 </div></body></html>
 `);
 
+// the page's own views at their clean addresses; each sets its own canonical (applyPageMeta)
+const VIEWS = ['members', 'music', 'stats', 'calendar', 'groups', 'gallery', 'ge2026', 'results', 'vote', 'gesongs'];
 put('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>${ORIGIN}/</loc></url>
+${VIEWS.map(v => `<url><loc>${ORIGIN}/${v}</loc></url>`).join('\n')}
 <url><loc>${ORIGIN}/m/</loc></url>
 ${people.map(p => `<url><loc>${ORIGIN}/m/${p.id}</loc></url>`).join('\n')}
 </urlset>

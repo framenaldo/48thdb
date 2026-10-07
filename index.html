@@ -10,7 +10,6 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
 <meta name="theme-color" content="#FFF3F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16111E" media="(prefers-color-scheme: dark)">
 <meta name="description" content="ฐานข้อมูลสมาชิก ตารางงาน และผลงานเพลงของ BNK48 และ CGM48">
-<link rel="canonical" href="https://48thdb.com/">
 <!-- What a shared link shows in LINE, Facebook, X and Discord: their
      crawlers read these tags without running the page's script. -->
 <meta property="og:type" content="website">
@@ -7733,8 +7732,47 @@ const META_DESC_TH = 'ฐานข้อมูลสมาชิก ตารา
     screen readers, the share sheet, and a browser offering to translate. */
 function applyDocumentLanguage(){
   document.documentElement.lang = isEN() ? 'en' : 'th';
-  const meta = document.querySelector('meta[name="description"]');
-  if(meta) meta.content = isEN() ? (EN[META_DESC_TH] || META_DESC_TH) : META_DESC_TH;
+  applyPageMeta();
+}
+
+/* Each address its own title, description and canonical, so a search engine
+   that runs the page sees /gallery, /music, /stats … as pages of their own
+   rather than copies of the home page. The HTML carries no canonical: one
+   there would contradict this. A member's sheet points at her own page, /m/<id>. */
+const PAGE_META = {
+  feed:     ['48thDb — ฐานข้อมูล BNK48 และ CGM48', '48thDb — BNK48 & CGM48 Database', null, null],
+  browse:   ['สมาชิก BNK48 และ CGM48 ทั้งหมด', 'All BNK48 & CGM48 members', 'รายชื่อสมาชิก BNK48 และ CGM48 พร้อมโปรไฟล์ วันเกิด ส่วนสูง ทีม และรุ่น', 'Every BNK48 and CGM48 member with profile, birthday, height, team and generation.'],
+  discography:['ผลงานเพลง BNK48 และ CGM48', 'BNK48 & CGM48 discography', 'ซิงเกิล อัลบั้ม และเพลงทั้งหมดของ BNK48 และ CGM48 พร้อมรายชื่อเมมเบอร์และเซ็นเตอร์', 'Every BNK48 and CGM48 single, album and song with its line-up and centre.'],
+  stats:    ['สถิติ BNK48 และ CGM48', 'BNK48 & CGM48 stats', 'สถิติสมาชิก เพลง ไลฟ์ และวันเกิดของ BNK48 และ CGM48', 'Numbers on BNK48 and CGM48 members, songs, lives and birthdays.'],
+  calendar: ['ปฏิทินงาน BNK48 และ CGM48', 'BNK48 & CGM48 event calendar', 'ตารางงาน อีเวนต์ ไลฟ์ และคอนเสิร์ตของ BNK48 และ CGM48', 'BNK48 and CGM48 events, lives and concerts by date.'],
+  shop:     ['ร้านค้า BNK48 และ CGM48', 'BNK48 & CGM48 shop', 'สินค้าและบัตรของ BNK48 และ CGM48 ที่เปิดขายอยู่', 'BNK48 and CGM48 goods and tickets on sale now.'],
+  groups:   ['ประวัติวง BNK48 และ CGM48', 'BNK48 & CGM48 history', 'ประวัติวง BNK48 และ CGM48 ทีม รุ่น และเหตุการณ์สำคัญ', 'The story of BNK48 and CGM48: teams, generations and milestones.'],
+  gallery:  ['แกลเลอรี', 'Gallery', null, null],
+  timeline: ['Senbatsu General Election 2026 (GE2026)', 'Senbatsu General Election 2026 (GE2026)', 'ข้อมูลการเลือกตั้ง GE2026 ของ BNK48 และ CGM48 ผู้สมัคร กำหนดการ และผลคะแนน', 'BNK48 and CGM48 GE2026: candidates, schedule and results.'],
+  results:  ['ผลเลือกตั้ง GE2026', 'GE2026 results', 'ผลการเลือกตั้ง Senbatsu General Election 2026 ทุกรอบ ผลด่วน 1 ผลด่วน 2 และผลสุดท้าย', 'Senbatsu General Election 2026 results, every round.'],
+  vote:     ['ยอดโหวต GE2026 สด จากบล็อกเชน', 'GE2026 live vote count from the blockchain', 'ยอดโหวต GE2026 นับสดจากบล็อกเชน จำนวนโทเคน ครั้ง และกระเป๋าที่โหวต', 'The GE2026 vote counted live from the blockchain: tokens, votes and wallets.'],
+  gesongs:  ['เพลงที่ผู้สมัคร GE2026 อยากได้', 'Songs the GE2026 candidates wished for', 'เพลงที่ผู้สมัคร GE2026 แต่ละคนอยากได้ถ้าได้เข้าเซ็มบัตสึ', 'The songs each GE2026 candidate wished for.'],
+};
+function applyPageMeta(){
+  const en = isEN();
+  let key = state.view;
+  if(key === 'timeline') key = { results:'results', chain:'vote', songs:'gesongs' }[state.geTab] || 'timeline';
+  if(!PAGE_META[key]) key = 'feed';
+  const row = PAGE_META[key];
+  let title = en ? row[1] : row[0], desc = (en ? row[3] : row[2]) || (en ? (EN[META_DESC_TH] || META_DESC_TH) : META_DESC_TH);
+  let path = urlForSnapshot({ view: state.view, geTab: state.geTab, galleryId: state.galleryId });
+  if(key === 'gallery'){ const g = galRoom(state.galleryId);
+    title = `${en ? 'Gallery' : 'แกลเลอรี'} ${g.title}`; desc = en ? g.note.en : g.note.th; }
+  const m = state.selectedId ? getMember(state.selectedId) : null;
+  const s = state.view === 'single' && state.selectedSingle ? findWork(state.selectedSingle) : null;
+  if(m){ title = nickName(m); path = '/m/' + m.id; }
+  else if(s){ title = s.title; path = `/?s=${s.id}`; }
+  else if(key === 'feed') path = '/';
+  document.title = key === 'feed' && !m && !s ? title : `${title} — 48thDb`;
+  const d = document.querySelector('meta[name="description"]'); if(d) d.content = desc;
+  let c = document.querySelector('link[rel="canonical"]');
+  if(!c){ c = document.createElement('link'); c.rel = 'canonical'; document.head.appendChild(c); }
+  c.href = 'https://48thdb.com' + path;
 }
 
 function toEn(s){
@@ -8097,7 +8135,7 @@ function renderHeader(){
     <button class="shop-btn cal-btn${state.view==='calendar' ? ' is-on' : ''}" data-action="nav-calendar" title="ปฏิทิน" aria-label="ปฏิทิน">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
     </button>
-    <button class="shop-btn${state.view==='gallery' ? ' is-on' : ''}" data-action="nav-gallery" title="แกลเลอรี" aria-label="แกลเลอรี">${ICONS.gallery}</button>
+    <button class="shop-btn gal-btn${state.view==='gallery' ? ' is-on' : ''}" data-action="nav-gallery" title="แกลเลอรี" aria-label="แกลเลอรี">${ICONS.gallery}</button>
     <button class="shop-btn${state.view==='shop' ? ' is-on' : ''}" data-action="nav-shop" title="ร้านค้า" aria-label="ร้านค้า">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>
       ${(() => { const n = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
@@ -16770,7 +16808,8 @@ function renderMain(){
   syncBodyScrollLock();
   // the header's page buttons show where you are, whichever way you got there
   const hb = (sel, on) => { const b = document.querySelector(sel); if(b) b.classList.toggle('is-on', on); };
-  hb('.cal-btn', state.view === 'calendar'); hb('.shop-btn:not(.cal-btn)', state.view === 'shop'); hb('.ge-btn', state.view === 'timeline');
+  hb('.cal-btn', state.view === 'calendar'); hb('.gal-btn', state.view === 'gallery');
+  hb('.shop-btn:not(.cal-btn):not(.gal-btn)', state.view === 'shop'); hb('.ge-btn', state.view === 'timeline');
   if(state.view === 'stats') addBoxShareButtons(main);
   if(state.view === 'gelive') bindGEAdmin();
   if(state.view === 'timeline' && state.geTab === 'chain') gecAddShare(main);
@@ -16783,6 +16822,7 @@ function renderMain(){
   bindPosterZoom();
   bindOrgZoom();
   bindReveal(arrived);
+  applyPageMeta();
   sendHit();
 }
 

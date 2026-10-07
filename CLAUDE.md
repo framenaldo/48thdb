@@ -27,6 +27,10 @@ the Firebase CLI from the owner's machine.
   index.html (`not_found_handling` in site.wrangler.toml); the older `?v=<view>`
   links still open and are rewritten. An event, member or song is still `?e=`,
   `?m=`, `?s=`. Don't name a folder after a view slug unless it has no index.html.
+  Each view sets its own title, description and canonical (`PAGE_META`,
+  `applyPageMeta`); index.html carries no static canonical. A new view needs
+  a `PAGE_META` row and a place in `VIEWS` in scripts/make-member-pages.mjs,
+  which writes sitemap.xml.
 
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
   handler, and views switched on `state.view`.
