@@ -306,6 +306,74 @@ async function hitsSummary(env) {
   };
 }
 
+/* Google Search: what people searched before they found the site, how often it
+ * showed in the results and how often they clicked. Read from the Search
+ * Console API with the owner's own read-only consent: scripts/gsc-auth.mjs
+ * runs the sign-in once and puts {client_id, client_secret, refresh_token} in
+ * the Worker secret GSC_OAUTH (service-account keys are blocked by the owner's
+ * Google Cloud organisation policy, so GSC_KEY, a service account's JSON key,
+ * is only the fallback). Never in this repo. Google's numbers trail by two or
+ * three days and change once a day, so they are kept half an hour. */
+const GSC_SITE = 'sc-domain:48thdb.com';
+const GSC_KEY_CACHE = 'https://live.state/gsc-v1';
+const GSC_TOKEN_CACHE = 'https://live.state/gsc-token-v1';
+const b64urlText = (bytes) => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+async function gscToken(env) {
+  const hit = await readCache(GSC_TOKEN_CACHE);
+  if (hit && hit.token) return hit.token;
+  if (env.GSC_OAUTH) {
+    const o = JSON.parse(env.GSC_OAUTH);
+    const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ grant_type: 'refresh_token', client_id: o.client_id, client_secret: o.client_secret, refresh_token: o.refresh_token }) });
+    const d = await r.json();
+    if (!d.access_token) throw new Error(`Google sign-in: ${d.error_description || d.error || r.status}`);
+    await writeCache(GSC_TOKEN_CACHE, { token: d.access_token }, Math.max(60, (d.expires_in || 3600) - 300));
+    return d.access_token;
+  }
+  const sa = JSON.parse(env.GSC_KEY);
+  const now = Math.floor(Date.now() / 1000);
+  const enc = (o) => b64urlText(new TextEncoder().encode(JSON.stringify(o)));
+  const unsigned = `${enc({ alg: 'RS256', typ: 'JWT' })}.${enc({ iss: sa.client_email, scope: 'https://www.googleapis.com/auth/webmasters.readonly',
+    aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600 })}`;
+  const pem = sa.private_key.replace(/-----[^-]+-----/g, '').replace(/\s+/g, '');
+  const key = await crypto.subtle.importKey('pkcs8', Uint8Array.from(atob(pem), (c) => c.charCodeAt(0)),
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned));
+  const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=${encodeURIComponent('urn:ietf:params:oauth:grant-type:jwt-bearer')}&assertion=${unsigned}.${b64urlText(sig)}` });
+  const d = await r.json();
+  if (!d.access_token) throw new Error(`Google sign-in: ${d.error_description || d.error || r.status}`);
+  await writeCache(GSC_TOKEN_CACHE, { token: d.access_token }, Math.max(60, (d.expires_in || 3600) - 300));
+  return d.access_token;
+}
+async function gscSummary(env) {
+  if (!env.GSC_KEY && !env.GSC_OAUTH) return { searchErr: 'no-key' };
+  const hit = await readCache(GSC_KEY_CACHE);
+  if (hit) return hit;
+  const token = await gscToken(env);
+  const day = (ms) => new Date(ms).toISOString().slice(0, 10);
+  const end = day(Date.now()), start = day(Date.now() - 27 * 86400000);
+  const ask = async (dimensions, rowLimit) => {
+    const r = await fetch(`https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(GSC_SITE)}/searchAnalytics/query`, {
+      method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ startDate: start, endDate: end, dimensions, rowLimit, dataState: 'all' }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(`Search Console ${r.status}: ${(d.error && d.error.message) || ''}`.slice(0, 200));
+    return d.rows || [];
+  };
+  const [tot, days, queries, pages] = await Promise.all([ask([], 1), ask(['date'], 60), ask(['query'], 15), ask(['page'], 10)]);
+  const t = tot[0] || { clicks: 0, impressions: 0, position: 0 };
+  const body = { search: {
+    from: start, to: end,
+    total: [t.clicks, t.impressions, Math.round((t.position || 0) * 10) / 10],
+    days: days.map((r) => [r.keys[0], r.clicks, r.impressions]),           // [date, clicks, times shown]
+    queries: queries.map((r) => [r.keys[0], r.clicks, r.impressions, Math.round(r.position * 10) / 10]),
+    pages: pages.map((r) => [r.keys[0].replace(/^https?:\/\/[^/]+/, '') || '/', r.clicks, r.impressions]),
+  } };
+  await writeCache(GSC_KEY_CACHE, body, 1800);
+  return body;
+}
+
 async function visits(env) {
   const hit = await readCache(VISITS_KEY);
   if (hit) return hit;
@@ -316,6 +384,7 @@ async function visits(env) {
   const week = new Date(end.getTime() - 7 * 24 * hour);
   const fortnight = new Date(end.getTime() - 15 * 24 * hour);
   const hitsP = env.HITS ? hitsSummary(env).catch((e) => ({ pagesErr: String((e && e.message) || e) })) : Promise.resolve({ pagesErr: 'no-binding' });
+  const searchP = gscSummary(env).catch((e) => ({ searchErr: String((e && e.message) || e) }));
   const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` },
@@ -336,6 +405,7 @@ async function visits(env) {
     // [hour (UTC), referring site, visits], only the hours someone arrived
     refDays: (acc.refDays || []).filter((r) => r.sum.visits > 0).map((r) => [r.dimensions.datetimeHour, r.dimensions.refererHost || '', r.sum.visits]),
     ...(await hitsP),
+    ...(await searchP),
   };
   await writeCache(VISITS_KEY, body, VISITS_TTL);
   return body;

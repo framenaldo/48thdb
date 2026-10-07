@@ -14878,6 +14878,43 @@ function visitsPages(D){
     ${since && Date.now() - since.getTime() < 7 * 86400000 ? `<p class="vis-note">เริ่มนับเมื่อ ${since.getDate()} ${M[since.getMonth()]} ยังไม่ครบ 7 วัน</p>` : ''}</div>
   ${items.length ? `<div><p class="vis-h">สมาชิกและงานที่เปิดดูบ่อย · 7 วัน</p>${items.map(r => row(`${r[0] === 'member' ? '👤' : '📅'} ${itemName(r)}`, r[2], iTop)).join('')}</div>` : ''}`;
 }
+/* From Google Search, through the Search Console API (the Worker's GSC_KEY):
+   what people typed before they found the site, how often it showed in the
+   results, and how often they clicked through. Google trails by 2–3 days. */
+function visitsSearch(D){
+  const h = '<p class="vis-h">จาก Google · 28 วัน</p>';
+  if(D.searchErr === 'no-key' || (!D.search && !D.searchErr)) return `<div>${h}<p class="vis-note">ยังไม่ได้ต่อกับ Google Search Console — ทำครั้งเดียว:</p>
+    <ol class="vis-setup">
+      <li>console.cloud.google.com → APIs &amp; Services → Library → <b>Google Search Console API</b> → Enable</li>
+      <li>Google Auth Platform → Branding: ตั้งชื่อแอป 48thDb กับอีเมลคุณ · Audience: External แล้วกด <b>Publish app</b> (ถ้าค้างไว้ที่ Testing สิทธิ์จะหมดใน 7 วัน)</li>
+      <li>Clients → Create client → ประเภท <b>Desktop app</b> → ดาวน์โหลด JSON</li>
+      <li>ในเทอร์มินัล: <code>cd ~/Downloads/48thdb-deploy-package && node scripts/gsc-auth.mjs ~/Downloads/ชื่อไฟล์.json</code> แล้วล็อกอิน Google ในหน้าที่เด้งขึ้นมา (ถ้าขึ้นว่า Google ยังไม่ได้ตรวจแอป กด Advanced → Go to 48thDb) เสร็จแล้วลบไฟล์ JSON ทิ้ง</li>
+    </ol></div>`;
+  if(!D.search) return `<div>${h}<p class="vis-note">อ่านตัวเลขจาก Google ไม่ได้: ${escapeHtml(D.searchErr)}</p></div>`;
+  const S = D.search, fmt = n => Number(n || 0).toLocaleString('en-US'), M = monthsShort();
+  const [clicks, shown, pos] = S.total;
+  const tile = (label, v, sub) => `<div class="vis-tile"><span>${label}</span><b>${v}</b><small>${sub}</small></div>`;
+  // every day of the window, the empty ones too
+  const byDay = new Map(S.days.map(([d, c, i]) => [d, [c, i]]));
+  const list = []; for(let t = parseYmd(S.from); toYmd(t) <= S.to; t = new Date(t.getTime() + 86400000)) list.push(toYmd(t));
+  const top = Math.max(1, ...list.map(d => (byDay.get(d) || [0, 0])[1]));
+  const bars = list.map((d, k) => { const [c, i] = byDay.get(d) || [0, 0], dt = parseYmd(d);
+    return `<i title="${dt.getDate()} ${M[dt.getMonth()]}: กด ${c} · ขึ้น ${i}"><u>${c || ''}</u><b style="height:${(i / top * 70).toFixed(1)}%;background:color-mix(in srgb, #2E8C82 ${i ? 35 + Math.round(c / Math.max(1, i) * 65) : 20}%, var(--paper-dim))"></b><em>${k % 7 ? '' : dt.getDate()}</em></i>`; }).join('');
+  const pageName = path => { const m = path.match(/^\/m\/([^/?#]+)/); if(m){ const mm = getMember(m[1]); return mm ? nickName(mm) : path; }
+    if(path === '/') return 'หน้าแรก'; if(path === '/m/') return 'รายชื่อสมาชิก (/m/)';
+    const v = SLUG_VIEW[path.slice(1)] || path.slice(1), row = PAGE_META[v]; return row ? row[0] : path; };
+  const row = (label, n, t, sub) => `<div class="vis-row"><span>${escapeHtml(label)}</span><em>${fmt(n)}${sub ? `<small style="font-weight:600;color:var(--ink-soft)"> ${sub}</small>` : ''}</em><i><b style="width:${(n / t * 100).toFixed(1)}%"></b></i></div>`;
+  const qTop = Math.max(1, ...S.queries.map(r => r[2])), pTop = Math.max(1, ...S.pages.map(r => r[2]));
+  return `<div><p class="vis-h">จาก Google · ${parseYmd(S.from).getDate()} ${M[parseYmd(S.from).getMonth()]} – ${parseYmd(S.to).getDate()} ${M[parseYmd(S.to).getMonth()]}</p>
+    <div class="vis-tiles">${tile('กดเข้าเว็บจาก Google', fmt(clicks), 'ครั้ง')}${tile('ขึ้นในผลค้นหา', fmt(shown), 'ครั้ง')}
+      ${tile('คนที่เห็นแล้วกด', shown ? (clicks / shown * 100).toFixed(1) + '%' : '–', 'ของครั้งที่ขึ้น')}${tile('อันดับเฉลี่ย', pos ? pos.toFixed(1) : '–', 'ในหน้าผลค้นหา')}</div></div>
+    ${shown ? `<div><p class="vis-h">รายวัน · ความสูงคือครั้งที่ขึ้นในผลค้นหา ตัวเลขคือครั้งที่กด</p><div class="vis-bars">${bars}</div></div>` : ''}
+    <div class="vis-lists">
+      <div><p class="vis-h">คำที่คนค้นแล้วเจอเว็บ</p>${S.queries.length ? S.queries.map(r => row(r[0], r[2], qTop, `ขึ้น · กด ${fmt(r[1])} · อันดับ ${r[3]}`)).join('') : '<p class="vis-note">ยังไม่มี</p>'}</div>
+      <div><p class="vis-h">หน้าที่ขึ้นใน Google</p>${S.pages.length ? S.pages.map(r => row(pageName(r[0]), r[2], pTop, `ขึ้น · กด ${fmt(r[1])}`)).join('') : '<p class="vis-note">ยังไม่มี</p>'}</div>
+    </div>
+    <p class="vis-note">จาก Google Search Console · ตัวเลขของ Google ช้ากว่าจริง 2–3 วัน · คำค้นที่มีคนค้นน้อยมาก Google ไม่บอก จึงรวมแล้วไม่ครบเท่าตัวเลขด้านบน</p>`;
+}
 function renderVisitsCard(){
   if(!state.isOwner) return '';
   if(!visitsState || (!visitsState.loading && Date.now() - visitsState.at > 120000)) setTimeout(loadVisits, 0);
@@ -14918,6 +14955,7 @@ function renderVisitsCard(){
     </div>
     ${visitsRefDays(D)}
     ${visitsPages(D)}
+    ${visitsSearch(D)}
     <p class="vis-note">ตัวเลขใหญ่คือจำนวนครั้งที่มีคนเข้าเว็บ ไม่ใช่จำนวนคนไม่ซ้ำ (Cloudflare ไม่นับคนเพื่อความเป็นส่วนตัว) · "หน้าที่เปิด" นับทุกครั้งที่เปลี่ยนหน้าในเว็บ · เป็นตัวเลขประมาณ Cloudflare สุ่มนับบางส่วนแล้วคูณกลับ จึงลงท้ายด้วย 0 บ่อย · ข้อมูลถึง ${String(at.getHours()).padStart(2,'0')}:${String(at.getMinutes()).padStart(2,'0')} น. ช้ากว่าจริงไม่กี่นาที · เห็นเฉพาะคุณ</p>
   </div>`;
 }

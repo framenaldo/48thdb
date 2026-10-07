@@ -73,6 +73,22 @@ Worker เก็บลง Workers Analytics Engine (binding `HITS`, dataset `hit
 แล้ว `/visits` อ่านกลับด้วย SQL API ใช้โทเค็น `CF_ANALYTICS_TOKEN` ตัวเดิม
 แผนฟรีเขียนได้วันละ 100,000 ครั้ง
 
+#### จาก Google Search
+
+`/visits` ยังอ่านตัวเลขจาก Google Search Console (property `sc-domain:48thdb.com`) ด้วยสิทธิ์อ่านอย่างเดียว
+ที่เจ้าของเว็บอนุญาตเองครั้งเดียว: สร้าง OAuth client แบบ Desktop app (Google Auth Platform, Publish app แล้ว
+ไม่งั้นสิทธิ์หมดใน 7 วัน) แล้วรัน
+
+```bash
+node scripts/gsc-auth.mjs ~/Downloads/<client_secret>.json
+```
+
+สคริปต์เปิดหน้าล็อกอิน Google เช็กว่าบัญชีนั้นเห็น 48thdb.com แล้วเก็บ client id/secret กับ refresh token
+เข้า secret `GSC_OAUTH` เองโดยไม่แสดงออกมา (คีย์ของ service account ใช้ไม่ได้ เพราะนโยบายองค์กรของ
+Google Cloud ปิดการสร้างคีย์ไว้ — `GSC_KEY` ยังรองรับไว้เผื่อ)
+
+ตัวเลขของ Google ช้ากว่าจริง 2–3 วัน จึงเก็บแคชไว้ 30 นาที ไม่มี secret นี้ การ์ดจะขึ้นขั้นตอนตั้งค่าแทน
+
 ## ตรวจว่าทำงานไหม
 
 ```bash
