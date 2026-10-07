@@ -2212,6 +2212,19 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     box-shadow:-6px 0 12px rgba(0,0,0,.6);
   }
   .ticker-close:active{ color:#fff; background:#2a0e09; }
+  .ticker-spd{
+    position:relative; z-index:3; flex:0 0 auto; margin:0; padding:0 10px; border:0; border-left:1px solid #3b120b;
+    background:#120605; color:#FFB23E; font:800 12.5px/1 'Noto Sans Thai',sans-serif; cursor:pointer;
+    text-shadow:0 0 5px rgba(255,170,50,.7); box-shadow:-6px 0 12px rgba(0,0,0,.6);
+  }
+  .ticker-spd.is-on, .ticker-spd:active{ background:#2a0e09; color:#fff; }
+  .ticker-ctl{
+    display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 12px;
+    background:#1c0a07; border-bottom:1px solid #3b120b; color:#e9cfa9; font-size:12.5px;
+  }
+  .ticker-ctl-k{ flex:1 1 100%; font-weight:700; color:#c9a27a; }
+  .ticker-ctl-v{ min-width:46px; text-align:center; font-size:15px; color:#FFB23E; text-shadow:0 0 5px rgba(255,170,50,.7); font-variant-numeric:tabular-nums; }
+  .ticker-ctl .chip[disabled]{ opacity:.45; pointer-events:none; }
   .ticker-close svg{ width:18px; height:18px; display:block; margin:auto; }
   .ticker.is-folded{ cursor:pointer; }
   .ticker.is-folded .ticker-badge{ padding-block:0; font-size:11px; }
@@ -10680,6 +10693,8 @@ function listenGE(){
       const next = {};
       snap.docs.forEach(d => { next[d.id] = d.data(); });
       state.geRounds = next;
+      if(tickerSpeedMine != null && +((next.ticker || {}).speed) === tickerSpeedMine) tickerSpeedMine = null;
+      syncTicker();
       if(!document.getElementById('main')) return;
       if(state.selectedId || state.selectedEvent || state.posterOf || state.editingId) return;
       // the owner mid-entry keeps their cursor; the page catches up after
@@ -16606,14 +16621,50 @@ function renderTicker(){
       it.parts.map(p => part(p, it.to)).join('<span class="ticker-dot-sep" aria-hidden="true">·</span>')}</span>`;
   }).join('<span class="ticker-sep" aria-hidden="true">✦</span>') + '<span class="ticker-sep" aria-hidden="true">✦</span>';
   const words = items.flatMap(it => it.parts.map(p => typeof p === 'string' ? p : p.text)).join(' ');
-  const secs = Math.max(10, Math.round(words.length * 0.22));   // about a third quicker than it was
+  const sp = tickerSpeed();
+  const secs = Math.max(3, Math.round(Math.max(10, words.length * 0.22) / sp * 10) / 10);
+  const spTxt = '×' + String(sp);
   return `<div class="ticker" role="region" aria-label="${en ? 'Updates' : 'อัปเดต'}">
     <span class="ticker-badge"><span class="ticker-dot"></span>48</span>
     <span class="ticker-window"><span class="ticker-track" style="--dur:${secs}s">
       <span class="ticker-run">${run}</span><span class="ticker-run" aria-hidden="true">${run}</span>
     </span></span>
+    ${state.isOwner ? `<button class="ticker-spd${tickerPanel ? ' is-on' : ''}" data-action="ticker-speed-panel" aria-expanded="${tickerPanel}" title="${en ? 'Sign speed' : 'ความเร็วป้าย'}">${spTxt}</button>` : ''}
     <button class="ticker-close" data-action="toggle-ticker" aria-expanded="true" title="${en ? 'Fold' : 'หุบ'}" aria-label="${en ? 'Fold updates' : 'หุบอัปเดต'}">${chevron(true)}</button>
-  </div>`;
+  </div>${state.isOwner && tickerPanel ? `<div class="ticker-ctl">
+    <span class="ticker-ctl-k">${en ? 'Sign speed · only you see this' : 'ความเร็วป้าย · เห็นเฉพาะคุณ'}</span>
+    <button class="chip" data-action="ticker-speed" data-id="-"${sp <= TICKER_STEPS[0] ? ' disabled' : ''}>${en ? 'Slower' : 'ช้าลง'}</button>
+    <b class="ticker-ctl-v">${spTxt}</b>
+    <button class="chip" data-action="ticker-speed" data-id="+"${sp >= TICKER_STEPS[TICKER_STEPS.length - 1] ? ' disabled' : ''}>${en ? 'Faster' : 'เร็วขึ้น'}</button>
+    <button class="chip chip-link" data-action="ticker-speed" data-id="1"${sp === 1 ? ' disabled' : ''}>${en ? 'Default' : 'ค่าเดิม'}</button>
+  </div>` : ''}`;
+}
+
+/* How fast the sign runs, set by the owner from the sign itself and kept in
+   Firestore (ge/ticker, beside the election rounds the owner already writes),
+   so every open page takes a change within a second, no deploy. */
+const TICKER_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+let tickerPanel = false, tickerSpeedMine = null, _tickerSave = null;
+function tickerSpeed(){
+  const v = tickerSpeedMine != null ? tickerSpeedMine : +(((state.geRounds || {}).ticker || {}).speed);
+  return v >= TICKER_STEPS[0] && v <= TICKER_STEPS[TICKER_STEPS.length - 1] ? v : 1;
+}
+function setTickerSpeed(dir){
+  const cur = tickerSpeed();
+  const next = dir === '1' ? 1 : dir === '+' ? (TICKER_STEPS.find(x => x > cur + 1e-9) || cur)
+    : ([...TICKER_STEPS].reverse().find(x => x < cur - 1e-9) || cur);
+  if(next === cur) return;
+  tickerSpeedMine = next;
+  syncTicker();
+  clearTimeout(_tickerSave);
+  _tickerSave = setTimeout(async () => {
+    try{
+      await fbDb.collection('ge').doc('ticker').set({ speed:next, at:firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+      toast(isEN() ? `Sign speed ×${next} — everyone sees it now` : `ตั้งความเร็วป้าย ×${next} แล้ว ทุกคนเห็นทันที`);
+    }catch(e){
+      toast(isEN() ? 'Could not save the speed (Firestore refused)' : 'บันทึกความเร็วไม่ได้ (Firestore ไม่ยอมให้เขียน)');
+    }
+  }, 600);
 }
 
 function syncTicker(){
@@ -19612,6 +19663,8 @@ function bindDelegatedEvents(){
       state.query = '';
       render(); pushHistory();
     }
+    else if(action==='ticker-speed-panel'){ tickerPanel = !tickerPanel; syncTicker(); }
+    else if(action==='ticker-speed'){ if(state.isOwner) setTickerSpeed(id); }
     else if(action==='toggle-ticker'){
       try{ localStorage.setItem('48thdb-ticker-folded', tickerFolded() ? '0' : '1'); }catch(err){}
       syncTicker();
