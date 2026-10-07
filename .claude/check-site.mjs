@@ -29,7 +29,7 @@ await send('Page.navigate', { url: BASE }); await sleep(3500);
 await run(`new Promise(r => { const w = () => (typeof state !== 'undefined' && document.readyState === 'complete') ? r() : setTimeout(w, 200); w(); })`);
 
 const problems = [];
-const views = await run(`JSON.stringify(['feed','browse','groups','org','discography','stats','calendar','shop','timeline'])`);
+const views = await run(`JSON.stringify(['feed','browse','groups','org','discography','stats','calendar','shop','timeline','gallery'])`);
 for(const lang of ['mix', 'th', 'en']){
   for(const v of JSON.parse(views)){
     const r = await run(`(async () => { state.lang = '${lang}'; state.view = '${v}'; state.selectedId = null; state.selectedEvent = null; state.posterOf = null;

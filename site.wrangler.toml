@@ -7,3 +7,7 @@ compatibility_date = "2026-09-21"
 
 [assets]
 directory = "./public"
+# An address that is not a file (48thdb.com/gallery, /vote, /stats) is handed
+# the site's own page, which reads the path and opens that view. Only for pages
+# a browser navigates to — a missing image is still a 404.
+not_found_handling = "single-page-application"

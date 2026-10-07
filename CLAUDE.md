@@ -12,12 +12,21 @@ takes about a minute. Check it landed with
 `curl -s https://48thdb.com/ | grep <something you changed>`.
 
 Other pieces: `worker/` holds the YouTube live checker at api.48thdb.com, which
-is deployed by hand with wrangler. Firebase holds the shared member list,
+is deployed by hand with wrangler. An event whose stream link is one YouTube video
+follows that video (`/stream`, `STREAMS` in the page): it closes when the stream
+ends and stays on while it runs late. Firebase holds the shared member list,
 sign-in, the review queue, flash announcements, election results and event-link
 corrections. The Firestore rules are **not in this repo** and are deployed with
 the Firebase CLI from the owner's machine.
 
 ## Shape of index.html
+
+- Every view has a clean address — 48thdb.com/gallery, /vote, /results,
+  /stats, /members, /music, /ge2026 … (`VIEW_SLUG`, `urlForSnapshot`,
+  `applyUrlToState`). The host hands any address that is not a file to
+  index.html (`not_found_handling` in site.wrangler.toml); the older `?v=<view>`
+  links still open and are rewritten. An event, member or song is still `?e=`,
+  `?m=`, `?s=`. Don't name a folder after a view slug unless it has no index.html.
 
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
   handler, and views switched on `state.view`.
@@ -25,7 +34,8 @@ the Firebase CLI from the owner's machine.
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.
 - An event poster (`poster.img`) shows on its card from a small copy,
-  `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one.
+  `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
+  then `node scripts/make-poster-grads.mjs` for its sheet colours.
   A line-up of every current member (or a whole group) prints as "All Members"
   / "All BNK48 Members" / "All CGM48 Members" by itself — still list the ids.
 - Three languages: `EN/TH` (mix, the default), TH and EN. New Thai UI strings
@@ -36,7 +46,7 @@ the Firebase CLI from the owner's machine.
 
 ## The GE vote on the chain
 
-Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`?v=vote`) and a
+Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`/vote`) and a
 teaser on its overview. (`?v=gechain`, the owner's old copy, now opens that tab;
 the baht figure is fixed at 68 a token — `gecPrice`.)
 A cold start reads `data/chain-ge2025.json` (final) and `data/chain-ge2026.json`
@@ -85,7 +95,11 @@ Senbatsu always on top.
 **Design.** Keep the framed look: cards, pill buttons and chips with a visible
 press effect. Flatter redesigns were previewed and rejected — don't propose them
 again. Keep the pink (#E4457E) and teal (#2E8C82) accents; the official orchid
-and mint appear only as a swatch on the group history card.
+and mint appear only as a swatch on the group history card. An event sheet with a
+poster is washed top to bottom in that poster's colours (`sheetGrad`), kept in
+`data/poster-grads.json` — run `node scripts/make-poster-grads.mjs` after
+adding a poster, because Safari on the iPhone will not let the page read a
+canvas back; `poster.scene` (MYO's meadow) is the hand-made exception.
 
 **Hidden on purpose.** Member-vs-member comparison stays reachable only by a
 `?vs=` link — no buttons, no links to it. The site is web only; native apps were
