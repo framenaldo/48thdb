@@ -85,7 +85,9 @@ fix the code too so the two agree.
 **Pop-ups.** A CGM48 Pop Up Live held on a Thursday is usually behind closed
 doors — no audience, only the YouTube stream — so it is an online event (`online:`,
 no venue); the ones on tour have a venue and an audience. Don't write on the page
-that it is closed-door — the missing venue says enough.
+that it is closed-door — the missing venue says enough. A Pop Up Live runs an hour unless it
+says `until:` (`eventUntil`); one that follows its YouTube video ends, on the
+home page and in the calendar's day sheet, when the stream does.
 
 **Language.** Member names in English; song titles exactly as the official MV
 titles them (`SONG_MIX`); venue names in whatever language the poster uses, never

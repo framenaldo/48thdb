@@ -9759,7 +9759,13 @@ function eventUntil(ev){
       if(!last || t > last) last = t;
     }
   }
-  return last && ev.time && last > ev.time ? last : null;
+  if(last && ev.time && last > ev.time) return last;
+  // a Pop Up Live is an hour on stage unless it says otherwise
+  if(/^\d{2}:\d{2}$/.test(ev.time || '') && /pop\s*up live/i.test(ev.title || '')){
+    const [h, m] = ev.time.split(':').map(Number);
+    return `${String(Math.min(23, h + 1)).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+  return null;
 }
 function endsAtToday(ev, iso){
   if(ev.slots){
@@ -12532,7 +12538,12 @@ function renderDayModal(){
     const head = `${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}${renderLiveChip(e)}`;
     const where = e.venue || e.online || '';
     if(!isHm(from)){ allDay.push(box({ id:e.id, k:accent(e), inner:chipInner(head, escapeHtml(where.split(',')[0])) }, 'dv-chip')); continue; }
-    const until = sl.length ? sl[sl.length - 1].until : eventUntil(e);
+    let until = sl.length ? sl[sl.length - 1].until : eventUntil(e);
+    // an event that follows its YouTube stream ends when the stream did, or
+    // runs on while it is still on air past its time
+    const st = !sl.length && streamOf(e), hm = t => { const d = new Date(t); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+    if(st && st.end && toYmd(new Date(st.end)) === iso) until = hm(st.end);
+    else if(st && st.live && st.start && toYmd(new Date(st.start)) === iso && (!isHm(until) || hm(Date.now()) > until)) until = hm(Date.now());
     const a = mins(from), b = isHm(until) && mins(until) > a ? mins(until) : a + 120;
     timed.push({ a, b, id:e.id, k:accent(e), head, s:sub([isHm(until) ? `${from}–${until}` : from + (en ? '' : ' น.'), e.part, where]) });
   }
