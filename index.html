@@ -3611,12 +3611,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-bg="peach"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(255,170,110,.32), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,160,.28), transparent 45%), linear-gradient(160deg, #FFF6EC 0%, #FFF1F2 55%, #FFF8EE 100%); }
   :root[data-bg="lilac"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(170,130,255,.30), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,200,.26), transparent 45%), linear-gradient(160deg, #F7F2FF 0%, #FCF1F8 55%, #F4F0FF 100%); }
   :root[data-bg="mint"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(60,210,160,.28), transparent 42%), radial-gradient(circle at 90% 90%, rgba(110,170,255,.26), transparent 45%), linear-gradient(160deg, #EEFCF6 0%, #F1F8FF 55%, #EFFDF8 100%); }
-  :root[data-bg="photo"]{ --bg-body:linear-gradient(rgba(255,248,250,.84), rgba(255,248,250,.9)), url(gallery/kimi/08-s.jpg) center/cover; }
+  /* A picture is a layer pinned to the screen, not body's background: Safari on
+     the iPhone ignores background-attachment:fixed and would stretch the
+     picture down the whole length of the page. */
+  :root[data-bg-photo]{ --bg-body:transparent; background:var(--paper); }
+  :root[data-bg-photo] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:linear-gradient(rgba(255,248,250,.6), rgba(255,248,250,.76)), var(--bg-photo) center/cover no-repeat; }
+  :root[data-theme="dark"][data-bg-photo] body::before{ background:linear-gradient(rgba(18,13,22,.66), rgba(18,13,22,.8)), var(--bg-photo) center/cover no-repeat; }
   :root[data-theme="dark"][data-bg="sky"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(120,170,255,.16), transparent 42%), radial-gradient(circle at 90% 90%, rgba(190,150,255,.13), transparent 45%), linear-gradient(160deg, #10141F 0%, #15122A 55%, #0F1620 100%); }
   :root[data-theme="dark"][data-bg="peach"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(255,170,110,.14), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,160,.13), transparent 45%), linear-gradient(160deg, #1D1410 0%, #1E1218 55%, #1B1510 100%); }
   :root[data-theme="dark"][data-bg="lilac"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(170,130,255,.16), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,200,.12), transparent 45%), linear-gradient(160deg, #16112A 0%, #1C1222 55%, #14102A 100%); }
   :root[data-theme="dark"][data-bg="mint"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(60,210,160,.14), transparent 42%), radial-gradient(circle at 90% 90%, rgba(110,170,255,.12), transparent 45%), linear-gradient(160deg, #0E1A17 0%, #10161F 55%, #0E1B18 100%); }
-  :root[data-theme="dark"][data-bg="photo"]{ --bg-body:linear-gradient(rgba(18,13,22,.84), rgba(18,13,22,.9)), url(gallery/kimi/08-s.jpg) center/cover; }
 
   .fb-drow{ display:grid; grid-template-columns:24px 1fr 30px; align-items:center; gap:8px; font-size:13px; }
   .fb-drow i{ height:10px; border-radius:99px; background:var(--paper-dim); overflow:hidden; }
@@ -15095,7 +15100,13 @@ const LAYOUT_BG = [
   { k:'peach', th:'พีช', en:'Peach', sw:'linear-gradient(135deg,#FFE7C2,#FFD1DC)' },
   { k:'lilac', th:'ม่วง', en:'Lilac', sw:'linear-gradient(135deg,#E6D9FF,#FBD9EF)' },
   { k:'mint', th:'มิ้นต์', en:'Mint', sw:'linear-gradient(135deg,#CFF5E7,#D9EEFF)' },
-  { k:'photo', th:'ภาพจากแกลเลอรี', en:'Gallery photo', sw:'center/cover url(gallery/kimi/08-s.jpg)' },
+  // gallery pictures; each is drawn in a layer pinned to the screen (below), as the iPhone ignores a fixed background
+  { k:'photo', th:'นาฬิกาสถานี', en:'Station clock', img:'gallery/kimi/08-s.jpg' },
+  { k:'photo-sunset', th:'แดดเย็น', en:'Sunset', img:'gallery/kimi/68-s.jpg' },
+  { k:'photo-field', th:'ทุ่งหญ้า', en:'The meadow', img:'gallery/kimi/65-s.jpg' },
+  { k:'photo-platform', th:'ชานชาลา', en:'The platform', img:'gallery/kimi/59-s.jpg' },
+  { k:'photo-window', th:'ริมหน้าต่าง', en:'By the window', img:'gallery/kimi/60-s.jpg' },
+  { k:'photo-bridge', th:'สะพานรถไฟ', en:'The railway bridge', img:'gallery/kimi/71-s.jpg' },
 ];
 const LAYOUT_ACC = [
   { k:'', th:'ค่าเดิม', c:'' }, { k:'pink', th:'ชมพู', c:'#E4457E' }, { k:'teal', th:'เขียว', c:'#2E8C82' },
@@ -15197,8 +15208,11 @@ function layoutChrome(){
   main && main.insertAdjacentHTML('beforeend', `<button class="lay-addzone" data-action="lay-sheet">＋ ${en ? 'Add a zone' : 'เพิ่มโซน'}${off ? ` · ${off} ${en ? 'available' : 'โซนที่ยังไม่ได้ใส่'}` : ''}</button>`);
 }
 function applyBackground(){
-  const bg = myLayout().bg || '';
-  if(bg) document.documentElement.dataset.bg = bg; else delete document.documentElement.dataset.bg;
+  const bg = myLayout().bg || '', b = LAYOUT_BG.find(x => x.k === bg);
+  const root = document.documentElement;
+  if(b && b.k) root.dataset.bg = b.k; else delete root.dataset.bg;
+  if(b && b.img){ root.dataset.bgPhoto = '1'; root.style.setProperty('--bg-photo', `url(${b.img})`); }
+  else { delete root.dataset.bgPhoto; root.style.removeProperty('--bg-photo'); }
 }
 function applyLayoutAll(){
   if(state.layoutEdit && state.view !== (state.layoutEdit === 'home' ? 'feed' : 'profile')){ state.layoutEdit = null; state.layoutDraft = null; }
@@ -15467,7 +15481,7 @@ function renderMyStyleCard(){
     <div class="lay-slots">${keys.map(slot).join('')}</div>
     ${pick != null ? `<div class="lay-pickrow">${NAV_CATALOG.filter(o => o.value !== 'profile').map(o => `<button class="chip${keys[pick] === o.value ? ' active' : ''}" data-action="lay-nav-pick" data-id="${o.value}">${escapeHtml(en ? o.en : o.th)}</button>`).join('')}</div>` : ''}
     <p class="vis-h">${en ? 'Background' : 'ธีมพื้นหลัง'}</p>
-    <div class="lay-sw">${LAYOUT_BG.map(b => `<button class="lay-swatch${(L.bg || '') === b.k ? ' is-on' : ''}" style="background:${b.sw}" data-action="lay-bg" data-id="${b.k}" aria-label="${escapeAttr(en ? b.en : b.th)}" title="${escapeAttr(en ? b.en : b.th)}"></button>`).join('')}</div>
+    <div class="lay-sw">${LAYOUT_BG.map(b => `<button class="lay-swatch${(L.bg || '') === b.k ? ' is-on' : ''}" style="background:${b.img ? `center/cover url(${b.img})` : b.sw}" data-action="lay-bg" data-id="${b.k}" aria-label="${escapeAttr(en ? b.en : b.th)}" title="${escapeAttr(en ? b.en : b.th)}"></button>`).join('')}</div>
     <p class="vis-h">${en ? 'Colour of this page' : 'สีหน้าโปรไฟล์'}</p>
     <div class="lay-sw">${LAYOUT_ACC.map(a => { const km = a.k === 'oshi' && state.kamiOshi ? getMember(state.kamiOshi) : null;
       const c = a.k === 'oshi' ? (km ? getGroup(km.groupId).color : '#B9AFC2') : (a.c || 'var(--paper-dim)');
