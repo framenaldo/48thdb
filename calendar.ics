@@ -711,6 +711,42 @@ DTEND;VALUE=DATE:20261019
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-bday-tee-ginna-2026@48thdb
+DTSTAMP:20261003T000000Z
+SUMMARY:Pre-Order: Ginna's Birthday T-Shirt
+DESCRIPTION:เมมเบอร์: Ginna\n• เสื้อวัน
+ เกิดที่ Ginna ออกแบบเอง สำหรับ
+ วันเกิดครบ 20 ปี 10 ธ.ค. 2026 (ชุดเด
+ ือนธันวาคม)\n• พรีออเดอร์เท
+ ่านั้น 3 ต.ค. 12:00 – 18 ต.ค. 2026 23:59 น. ทา
+ ง iAM48 Application\n• ส่งสินค้า 17 พ.ย. 2026 
+ เป็นต้นไป\n• ภาพสินค้าใช้เ
+ พื่อการโฆษณาเท่านั้น\n\nhttps://48
+ thdb.com/?e=ev-bday-tee-ginna-2026
+URL:https://48thdb.com/?e=ev-bday-tee-ginna-2026
+DTSTART;VALUE=DATE:20261003
+DTEND;VALUE=DATE:20261019
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-bday-tee-lewlew-2026@48thdb
+DTSTAMP:20261003T000000Z
+SUMMARY:Pre-Order: Lewlew's Birthday T-Shirt
+DESCRIPTION:เมมเบอร์: Lewlew\n• เสื้อวัน
+ เกิดที่ Lewlew ออกแบบเอง สำหรั
+ บวันเกิดครบ 20 ปี 24 ธ.ค. 2026 (ชุดเ
+ ดือนธันวาคม)\n• พรีออเดอร์เ
+ ท่านั้น 3 ต.ค. 12:00 – 18 ต.ค. 2026 23:59 น. ท
+ าง iAM48 Application\n• ส่งสินค้า 17 พ.ย. 2026
+  เป็นต้นไป\n• ภาพสินค้าใช้เ
+ พื่อการโฆษณาเท่านั้น\n\nhttps://48
+ thdb.com/?e=ev-bday-tee-lewlew-2026
+URL:https://48thdb.com/?e=ev-bday-tee-lewlew-2026
+DTSTART;VALUE=DATE:20261003
+DTEND;VALUE=DATE:20261019
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-ge6-bundle@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:Ticket Bundle: Journey of Dreams + Final Results
