@@ -230,25 +230,34 @@ DTEND;TZID=Asia/Bangkok:20260920T180000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-fame-fanmeet@48thdb
-DTSTAMP:20260927T000000Z
-SUMMARY:เลื่อน: Fame's Airline Fanmeet
-STATUS:CANCELLED
+DTSTAMP:20261025T000000Z
+SUMMARY:Fame's Airline Fanmeet
 LOCATION:The Theater Hall ชั้น C\, The Bazaar Hotel Bangkok
-DESCRIPTION:เลื่อนการแสดงออกไปก่อ
- น เนื่องจากสถานการณ์ฝนตกแ
- ละน้ำท่วมกรุงเทพในหลายพื
- ้นที่ วันจัดใหม่และการคืน
- เงินจะแจ้งอีกครั้งทาง BNK48 Offi
- cial SNS\nเมมเบอร์: Fame\n• แฟนมีตเดี
- ่ยวครั้งแรกของเฟม\n• ของที
- ่ได้ในบัตร: เซลฟีกับเฟม\, Boardi
- ng Pass\, Inhaler\, Postcard\n• บัตรเปิดขายแล
- ้ว ถึง 25 ก.ย. 2026 12:00\n• ซื้อได้ทา
- ง app.bnk48.com หรือ iAM48 Application\n• #FameFirstFanmeet #F
- ameBNK48\n\nhttps://48thdb.com/?e=ev-fame-fanmeet
+DESCRIPTION:เมมเบอร์: Fame\n• 13:00–15:00 ลงทะ
+ เบียนยืนยันตัวตน หน้า The Theater 
+ Hall ชั้น C\n• แฟนมีตเดี่ยวครั้
+ งแรกของเฟม เลื่อนมาจากวัน
+ ที่ 27 ก.ย. 2569 เพราะฝนตกและน้ำ
+ ท่วมในกรุงเทพฯ\n• บัตรของร
+ อบ 27 ก.ย. ที่ชำระเงินแล้วใช้
+ เข้างานวันนี้ได้ ยืนยันตั
+ วตนที่จุดลงทะเบียน\n• มาไม
+ ่ได้ ขอคืนเงินได้ที่ support.app@bnk
+ 48.com ภายใน 14 ต.ค. 2569 18:00 แนบชื่อ-นา
+ มสกุล เลขบัญชี ธนาคารและสา
+ ขา Booking No./Order No. สลิปการชำระเงิน
+  รูปหน้า Order สำเนาบัตรประชาช
+ น และหน้าสมุดบัญชี ได้เงิน
+ คืนภายใน 14 วันทำการหลังส่ง
+ ข้อมูลครบ\n• บัตรที่เหลือเ
+ ปิดขายอีกครั้ง 19 ต.ค. 2569 12:00 – 24 
+ ต.ค. 2569 18:00 ทาง iAM48 Application\n• ของที่ไ
+ ด้ในบัตร: เซลฟีกับเฟม\, Boarding Pas
+ s\, Inhaler\, Postcard\n• #FameFirstFanmeet #FameBNK48\n\nhttps://48thdb
+ .com/?e=ev-fame-fanmeet
 URL:https://48thdb.com/?e=ev-fame-fanmeet
-DTSTART;VALUE=DATE:20260927
-DTEND;VALUE=DATE:20260928
+DTSTART;VALUE=DATE:20261025
+DTEND;VALUE=DATE:20261026
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-nine-charity-2026-09-30@48thdb
