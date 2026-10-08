@@ -14938,6 +14938,60 @@ function visitsSearch(D){
     </div>
     <p class="vis-note">จาก Google Search Console · ตัวเลขของ Google ช้ากว่าจริง 2–3 วัน · คำค้นที่มีคนค้นน้อยมาก Google ไม่บอก จึงรวมแล้วไม่ครบเท่าตัวเลขด้านบน</p>`;
 }
+/* Who has an account. The page cannot list Firebase's accounts, so each
+   signed-in visit leaves a note of its own — when the account was made (from
+   Firebase itself, so an old account still counts from its real day), how it
+   signs in, and when it was last here — at most once a day per device, under
+   signups/<uid>. Only the owner can read them (Firestore rules). */
+function noteSignup(user){
+  if(!user || user.isAnonymous || typeof fbDb === 'undefined') return;
+  const k = '48thdb-seen-' + user.uid, day = toYmd(new Date());
+  try{ if(localStorage.getItem(k) === day) return; }catch(e){}
+  const joined = new Date(user.metadata && user.metadata.creationTime || Date.now());
+  const provider = String(((user.providerData || [])[0] || {}).providerId || 'password').slice(0, 20);
+  fbDb.collection('signups').doc(user.uid).set({ joined: firebase.firestore.Timestamp.fromDate(joined), provider,
+    seen: firebase.firestore.FieldValue.serverTimestamp() })
+    .then(() => { try{ localStorage.setItem(k, day); }catch(e){} }).catch(() => {});
+}
+let signupsState = null;
+async function loadSignups(){
+  signupsState = { ...(signupsState || {}), loading:true };
+  try{
+    const snap = await fbDb.collection('signups').get();
+    const ms = v => v && v.toMillis ? v.toMillis() : 0;
+    signupsState = { at:Date.now(), list:snap.docs.map(d => { const x = d.data(); return { joined:ms(x.joined), seen:ms(x.seen), provider:x.provider || '' }; }) };
+  }catch(e){
+    signupsState = { at:Date.now(), err: e && e.code === 'permission-denied' ? 'rules' : String((e && e.message) || e) };
+  }
+  if(state.view === 'profile') renderMain();
+}
+function renderSignupsCard(){
+  if(!state.isOwner) return '';
+  if(!signupsState || (!signupsState.loading && Date.now() - signupsState.at > 120000)) setTimeout(loadSignups, 0);
+  const head = `<div class="pd-head"><h3 class="section-label">สมาชิกเว็บ</h3><button class="chip chip-link" data-action="signups-refresh">รีเฟรช</button></div>`;
+  const S = signupsState || { loading:true };
+  if(S.err === 'rules') return head + `<div class="vis-card"><p class="vis-note">ยังอ่านไม่ได้ — ต้อง deploy กฎ Firestore ชุดใหม่ก่อน (ส่วน <code>signups</code> ใน firebase-rules/firestore.rules):</p>
+    <ol class="vis-setup"><li>ในเทอร์มินัล: <code>cd ~/Downloads/48thdb-deploy-package/firebase-rules && firebase deploy --only firestore:rules --project thdatabase</code></li></ol></div>`;
+  if(!S.list) return head + `<div class="vis-card"><p class="vis-note">${S.err ? 'โหลดไม่ได้: ' + escapeHtml(S.err) : 'กำลังโหลด…'}</p></div>`;
+  const L = S.list, now = Date.now(), DAY = 86400000, fmt = n => n.toLocaleString('en-US');
+  const within = (t, d) => t && now - t < d * DAY;
+  const tile = (label, v, sub, cls) => `<div class="vis-tile${cls ? ' ' + cls : ''}"><span>${label}</span><b>${fmt(v)}</b><small>${sub}</small></div>`;
+  const key = t => toYmd(new Date(t));
+  const by = {}; for(const u of L) if(within(u.joined, 30)){ const k = key(u.joined); by[k] = (by[k] || 0) + 1; }
+  const days = [...Array(30).keys()].reverse().map(k => key(now - k * DAY));
+  const top = Math.max(1, ...days.map(d => by[d] || 0));
+  const bars = days.map((d, i) => `<i class="${i === 29 ? 'is-today' : ''}"><u>${by[d] || ''}</u><b style="height:${((by[d] || 0) / top * 70).toFixed(1)}%"></b><em>${i % 7 ? '' : Number(d.slice(8))}</em></i>`).join('');
+  const PROV = { 'google.com':'บัญชี Google', password:'อีเมลและรหัสผ่าน' };
+  const prov = {}; for(const u of L) prov[u.provider] = (prov[u.provider] || 0) + 1;
+  const pTop = Math.max(1, ...Object.values(prov));
+  return head + `<div class="vis-card">
+    <div class="vis-tiles">${tile('ทั้งหมด', L.length, 'บัญชี', 'is-today')}${tile('สมัครใหม่ 7 วัน', L.filter(u => within(u.joined, 7)).length, 'บัญชี')}
+      ${tile('สมัครใหม่ 30 วัน', L.filter(u => within(u.joined, 30)).length, 'บัญชี')}${tile('เข้าเว็บใน 7 วัน', L.filter(u => within(u.seen, 7)).length, 'บัญชีที่ล็อกอินอยู่')}</div>
+    <div><p class="vis-h">สมัครใหม่รายวัน · 30 วัน</p><div class="vis-bars">${bars}</div></div>
+    <div><p class="vis-h">สมัครด้วย</p>${Object.entries(prov).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<div class="vis-row"><span>${escapeHtml(PROV[k] || k)}</span><em>${fmt(n)}</em><i><b style="width:${(n / pTop * 100).toFixed(1)}%"></b></i></div>`).join('') || '<p class="vis-note">—</p>'}</div>
+    <p class="vis-note">นับบัญชีที่ล็อกอินเปิดเว็บตั้งแต่วันที่ 8 ต.ค. 2569 — คนที่สมัครก่อนหน้านั้นจะถูกนับเมื่อกลับมาเปิดเว็บ (วันสมัครเป็นวันจริงจาก Firebase) · ไม่นับคนที่ส่งความคิดเห็นโดยไม่ล็อกอิน · รายชื่อครบทุกบัญชีดูได้ใน Firebase → Authentication · เห็นเฉพาะคุณ</p>
+  </div>`;
+}
 function renderVisitsCard(){
   if(!state.isOwner) return '';
   if(!visitsState || (!visitsState.loading && Date.now() - visitsState.at > 120000)) setTimeout(loadVisits, 0);
@@ -15013,6 +15067,7 @@ function renderProfile(){
   return `
   ${accountBlock}
   ${renderVisitsCard()}
+  ${renderSignupsCard()}
   ${renderFlashComposer()}
   ${renderPendingQueue()}
   ${renderFeedbackInbox()}
@@ -19719,6 +19774,7 @@ function bindDelegatedEvents(){
     else if(action==='fb-send'){ fbSend(el, el.dataset.value); }
     else if(action==='fb-refresh'){ loadFeedback().then(() => renderMain()); }
     else if(action==='visits-refresh'){ if(visitsState) visitsState.at = 0; el.textContent = 'กำลังโหลด…'; loadVisits(); }
+    else if(action==='signups-refresh'){ el.textContent = 'กำลังโหลด…'; loadSignups(); }
     else if(action==='fb-del'){
       if(!confirm('ลบฟีดแบ็กนี้?')) return;
       fbDb.collection('feedback').doc(id).delete().then(() => { state.feedback = (state.feedback || []).filter(f => f.id !== id); renderMain(); })
@@ -20264,6 +20320,7 @@ async function init(){
     if(user && !user.isAnonymous){
       state.account = { name: user.displayName || user.email || 'ผู้ใช้', email: user.email || '', loggedIn:true, uid:user.uid,
         photo: user.photoURL || null };
+      noteSignup(user);
     } else {
       state.account = null;
     }
