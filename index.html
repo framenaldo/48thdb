@@ -3507,7 +3507,25 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .feed-cols.has-layout .feed-main, .feed-cols.has-layout .feed-side{ display:flex; flex-direction:column; }
   @media (max-width:1023px){ .feed-cols.has-layout .feed-main, .feed-cols.has-layout .feed-side{ display:contents; } }
   .lay-zones{ display:flex; flex-direction:column; }
-  .feed-head-btns{ display:inline-flex; gap:8px; align-items:center; justify-content:flex-end; flex:none; }
+  .feed-head-btns{ position:relative; display:inline-flex; gap:8px; align-items:center; justify-content:flex-end; flex:none; }
+  .lay-tip{ position:absolute; top:calc(100% + 12px); right:0; z-index:30; width:min(250px, 78vw); display:flex; flex-direction:column; gap:4px;
+    padding:12px 14px 12px; border-radius:16px; background:#231B2B; color:#fff; text-align:left; box-shadow:0 4px 0 #000, 0 14px 30px rgba(0,0,0,.25);
+    animation:lay-tip-in .4s var(--ease-spring, ease-out) both .6s; }
+  .lay-tip::before{ content:''; position:absolute; top:-7px; right:16px; width:14px; height:14px; background:#231B2B; transform:rotate(45deg); border-radius:3px; }
+  .lay-tip-anchor{ position:relative; display:inline-flex; }
+  .lay-tip b{ font-size:14px; padding-right:18px; } .lay-tip > span{ font-size:12.5px; opacity:.82; line-height:1.45; }
+  @keyframes lay-tip-in{ from{ opacity:0; transform:translateY(-6px) scale(.96); } to{ opacity:1; transform:none; } }
+  .lay-tip-x{ position:absolute; top:6px; right:6px; width:26px; height:26px; padding:0; border:0; border-radius:50%; background:transparent; color:inherit; font:inherit; font-size:12px; opacity:.7; cursor:pointer; }
+  .lay-tip-go{ align-self:flex-start; margin-top:6px; padding:7px 14px; border:0; border-radius:99px; background:#E4457E; color:#fff; font:inherit; font-size:13px; font-weight:800;
+    cursor:pointer; box-shadow:0 3px 0 #B32F60; }
+  .lay-tip-go:active{ transform:translateY(2px); box-shadow:0 1px 0 #B32F60; }
+  .lay-invite{ position:relative; order:7; display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:18px 0 6px; padding:14px; border-radius:18px;
+    border:1px solid var(--line); background:var(--card); box-shadow:0 3px 0 var(--line); }
+  .lay-invite-ic{ display:grid; place-items:center; width:44px; height:44px; border-radius:14px; flex:none; background:color-mix(in srgb, #E4457E 14%, var(--card)); color:#E4457E; }
+  .lay-invite-ic svg{ width:24px; height:24px; }
+  .lay-invite-t{ flex:1 1 200px; min-width:0; } .lay-invite-t b{ display:block; font-size:15px; } .lay-invite-t span{ display:block; font-size:12.5px; color:var(--ink-soft); line-height:1.45; }
+  .lay-invite .lay-tip-x{ color:var(--ink-soft); }
+  .lay-invite .lay-tip-go{ margin-top:0; }
   body.lay-editing .feed-head-btns{ display:none; }
   @media (max-width:479px){ .feed-head-btns [data-action="lay-edit"] span{ display:none; } .feed-head-btns [data-action="lay-edit"]{ padding-inline:10px; } }
   body:not(.lay-editing) .lay-hidden{ display:none !important; }
@@ -3539,7 +3557,23 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .lay-tools svg{ width:18px; height:18px; }
   .lay-tools .lay-h{ background:#231B2B; color:#fff; border-color:#231B2B; box-shadow:0 3px 0 #000; touch-action:none; cursor:grab; }
   .lay-tools .lay-eye.is-off{ color:#A39CAB; }
-  .lay-lift{ z-index:40; animation:none !important; rotate:1.5deg; box-shadow:0 26px 44px rgba(var(--shadow-rgb),.35); transition:none; }
+  .lay-lift{ z-index:70; animation:none !important; rotate:1.2deg; scale:1.02; box-shadow:0 26px 44px rgba(var(--shadow-rgb),.35); transition:none; cursor:grabbing; }
+  .lay-lift > .lay-tag, .lay-lift > .lay-tools{ opacity:0; }
+  .lay-folded, .lay-opening{ overflow:hidden; }
+  .lay-folded > :not(.lay-mini){ opacity:0; transition:opacity .12s; }
+  .lay-opening > :not(.lay-mini){ animation:lay-fade-in .32s ease-out both .08s; }
+  @keyframes lay-fade-in{ from{ opacity:0; } to{ opacity:1; } }
+  .lay-mini{ position:absolute; inset:0; display:none; align-items:center; gap:10px; padding:0 16px; border-radius:16px;
+    background:var(--card); border:1px solid var(--line); color:var(--ink); font-size:15px; font-weight:800; pointer-events:none; }
+  .lay-mini svg{ width:20px; height:20px; color:#E4457E; flex:none; }
+  .lay-folded > .lay-mini{ display:flex; }
+  .lay-opening > .lay-mini{ display:flex; animation:lay-fade-out .25s ease-out both; }
+  @keyframes lay-fade-out{ to{ opacity:0; } }
+  .lay-ph{ border-radius:18px; border:2.5px dashed #2E8C82; background:color-mix(in srgb, #2E8C82 10%, transparent); box-sizing:border-box;
+    animation:lay-ph-in .18s ease-out both; }
+  @keyframes lay-ph-in{ from{ opacity:0; transform:scale(.97); } to{ opacity:1; transform:none; } }
+  .lay-editing [data-zone]{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; cursor:grab; transition:scale .2s ease; }
+  .lay-editing [data-zone].lay-press{ scale:.97; }
   .lay-addzone{ display:block; width:100%; margin:26px 0 8px; padding:14px; border-radius:18px; border:2px dashed #2E8C82; background:color-mix(in srgb, #2E8C82 8%, transparent);
     color:#2E8C82; font:inherit; font-weight:800; font-size:14px; cursor:pointer; order:9999; }
   .lay-sheet-note{ margin:0 0 12px; font-size:12.5px; color:var(--ink-soft); }
@@ -14262,7 +14296,7 @@ function renderFeed(){
     <header class="feed-head">
       <div class="feed-head-top">
         <p class="feed-today">วัน${dayName}ที่ ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()+543}</p>
-        <span class="feed-head-btns">${canLayout() ? `<button class="page-share-btn" data-action="lay-edit" data-id="home" title="จัดหน้า" aria-label="จัดหน้า">${ICONS.layout}<span>จัดหน้า</span></button>` : ''}
+        <span class="feed-head-btns">${canLayout() ? `<span class="lay-tip-anchor"><button class="page-share-btn" data-action="lay-edit" data-id="home" title="จัดหน้า" aria-label="จัดหน้า">${ICONS.layout}<span>จัดหน้า</span></button>${layoutTip('signed')}</span>` : ''}
         <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></span>
       </div>
       <div class="feed-title-row"><h1 class="feed-title">วันนี้ที่ 48</h1></div>
@@ -14323,6 +14357,7 @@ function renderFeed(){
       ${state.pastOpen ? `<div class="past-list">${past.map(e => renderEventCard(e, iso)).join('')}</div>` : ''}
     </section>` : ''}
     ${homeExtraZone('oshi')}
+    ${layoutTip('guest')}
     <section class="feed-block is-feedback">${renderFeedbackCard('feed')}</section>
     </div>
     <aside class="feed-side">
@@ -15155,7 +15190,7 @@ function layoutChrome(){
   const en = isEN();
   const off = LAYOUT_ZONES[edit].filter(z => zoneHidden(edit, z.k) || (z.extra && !zoneOn(edit, z.k))).length;
   document.body.insertAdjacentHTML('afterbegin', `<div class="lay-bar"><div class="lay-bar-t"><b>${edit === 'home' ? (en ? 'Arrange my home page' : 'จัดหน้าแรกของฉัน') : (en ? 'Arrange my profile' : 'จัดหน้าโปรไฟล์ของฉัน')}</b>
-    <span>${en ? 'Drag ⠿ to move · tap the eye to hide' : 'ลาก ⠿ เพื่อย้าย · แตะรูปตาเพื่อซ่อน'}</span></div>
+    <span>${en ? 'Press and drag a zone to move it · tap the eye to hide' : 'กดค้างที่โซนแล้วลากเพื่อย้าย · แตะรูปตาเพื่อซ่อน'}</span></div>
     <button class="lay-btn is-ghost" data-action="lay-reset">${en ? 'Reset' : 'ค่าเดิม'}</button><button class="lay-btn is-done" data-action="lay-done">${en ? 'Done' : 'เสร็จ'}</button></div>`);
   const main = document.getElementById('main');
   main && main.insertAdjacentHTML('beforeend', `<button class="lay-addzone" data-action="lay-sheet">＋ ${en ? 'Add a zone' : 'เพิ่มโซน'}${off ? ` · ${off} ${en ? 'available' : 'โซนที่ยังไม่ได้ใส่'}` : ''}</button>`);
@@ -15245,60 +15280,164 @@ function openZoneSheet(){
   });
 }
 
-/* Dragging a zone by its handle: it follows the finger, the others make room,
-   and the page scrolls when the finger nears its top or bottom edge. */
-function layDragStart(e){
-  const h = e.target.closest && e.target.closest('.lay-h');
-  if(!h || !state.layoutEdit) return;
-  const el = h.closest('[data-zone]');
-  if(!el) return;
-  e.preventDefault();
-  try{ h.setPointerCapture(e.pointerId); }catch(err){}
-  const page = state.layoutEdit;
-  const flow = () => getComputedStyle(el.parentElement).display === 'contents'
-    ? [...document.querySelectorAll('#main [data-zone]')].filter(x => getComputedStyle(x.parentElement).display === 'contents' || x.parentElement === el.parentElement)
-    : [...el.parentElement.querySelectorAll(':scope > [data-zone]')];
-  const docTop = x => x.getBoundingClientRect().top + window.scrollY;
-  let dy = 0, lastY = e.clientY, raf = 0;
-  const startPointer = e.clientY + window.scrollY, startTop = docTop(el);
-  el.classList.add('lay-lift');
-  const place = () => {
-    const want = startTop + (lastY + window.scrollY - startPointer);
-    const nat = docTop(el) - dy;
-    dy = want - nat;
-    el.style.transform = `translateY(${dy}px)`;
-    const mid = want + el.offsetHeight / 2;
-    const others = flow().filter(x => x !== el).sort((a, b) => (+a.style.order) - (+b.style.order));
-    const before = others.find(x => mid < docTop(x) + x.offsetHeight / 2);
-    const p = state.layoutDraft[page], k = el.dataset.zone;
-    const cur = p.order.filter(x => x !== k);
-    const at = before ? cur.indexOf(before.dataset.zone) : (others.length ? cur.indexOf(others[others.length - 1].dataset.zone) + 1 : cur.length);
-    cur.splice(at < 0 ? cur.length : at, 0, k);
-    if(cur.join() !== p.order.join()){
-      p.order = cur;
-      document.querySelectorAll('#main [data-zone]').forEach(x => { x.style.order = cur.indexOf(x.dataset.zone) + 1; });
-      const nat2 = docTop(el) - dy;
-      dy = want - nat2;
-      el.style.transform = `translateY(${dy}px)`;
-    }
-  };
-  const tick = () => {
-    const edge = 90, H = window.innerHeight;
-    const v = lastY < edge ? -Math.ceil((edge - lastY) / 6) : lastY > H - edge ? Math.ceil((lastY - (H - edge)) / 6) : 0;
-    if(v){ window.scrollBy(0, v); place(); }
-    raf = requestAnimationFrame(tick);
-  };
-  raf = requestAnimationFrame(tick);
-  const move = ev => { lastY = ev.clientY; place(); };
-  const up = () => {
-    cancelAnimationFrame(raf);
-    h.removeEventListener('pointermove', move); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up);
-    el.classList.remove('lay-lift');
-    el.style.transform = '';
-  };
-  h.addEventListener('pointermove', move); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up);
+/* Picking a zone up and moving it. Anywhere on a zone works: a mouse picks it
+   up as soon as it moves, a finger after a short press (a quick swipe still
+   scrolls the page), and the ⠿ handle at once. The zone then floats under the
+   finger, a dashed slot shows where it will land, the others slide out of the
+   way, and on release it settles into the slot. Near the top or bottom edge
+   the page scrolls along. */
+let _lay = null, _layPend = null;
+function layZones(page){ return [...document.querySelectorAll('#main [data-zone]')]; }
+function layPos(){
+  // where every zone sits, in page coordinates, once the slide is over
+  const L = _lay; L.pos = new Map();
+  for(const z of layZones()) if(z !== L.el && getComputedStyle(z).display !== 'none'){
+    const r = z.getBoundingClientRect(), t = z.getAnimations ? z.getAnimations() : [];
+    let shift = 0;
+    for(const a of t){ const k = a.effect && a.effect.getKeyframes && a.effect.getKeyframes(); if(k && k[0] && /translateY/.test(k[0].transform || '')){ const ct = a.currentTime || 0, d = a.effect.getTiming().duration || 1;
+      const from = parseFloat(String(k[0].transform).match(/-?[\d.]+/)[0]); shift += from * Math.max(0, 1 - ct / d); } }
+    L.pos.set(z, { top: r.top - shift + window.scrollY, h: r.height, parent: z.parentElement });
+  }
 }
-document.addEventListener('pointerdown', layDragStart);
+function layApplyOrder(order){
+  for(const z of layZones()) z.style.order = order.indexOf(z.dataset.zone) + 1;
+  if(_lay) _lay.ph.style.order = order.indexOf(_lay.el.dataset.zone) + 1;
+}
+const LAY_FOLD = 64;   // how tall a zone is while it is being carried
+function layStart(el, x, y){
+  const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+  const z = LAYOUT_ZONES[state.layoutEdit].find(q => q.k === el.dataset.zone);
+  const ph = document.createElement('div');
+  ph.className = 'lay-ph';
+  ph.style.height = LAY_FOLD + 'px'; ph.style.marginTop = cs.marginTop; ph.style.marginBottom = cs.marginBottom; ph.style.order = el.style.order;
+  el.parentElement.insertBefore(ph, el);
+  // fold: the zone becomes a short bar with its name, centred under the finger
+  const top = y - LAY_FOLD / 2;
+  if(!el.querySelector(':scope > .lay-mini')) el.insertAdjacentHTML('beforeend', `<span class="lay-mini">${ICONS.grip}<b>${escapeHtml(z ? zoneName(z) : '')}</b></span>`);
+  Object.assign(el.style, { position:'fixed', left:r.left + 'px', top:top + 'px', width:r.width + 'px', height:LAY_FOLD + 'px', margin:'0', zIndex:'70' });
+  el.classList.add('lay-lift', 'lay-folded');
+  const ease = 'cubic-bezier(.2,.8,.2,1)';
+  if(el.animate){
+    el.animate([{ height:r.height + 'px', transform:`translateY(${r.top - top}px)` }, { height:LAY_FOLD + 'px', transform:'translateY(0)' }], { duration:260, easing:ease });
+    ph.animate([{ height:r.height + 'px' }, { height:LAY_FOLD + 'px' }], { duration:260, easing:ease });
+  }
+  _lay = { el, ph, page: state.layoutEdit, offY: LAY_FOLD / 2, left: r.left, sx: x, x, y, raf: 0 };
+  try{ navigator.vibrate && navigator.vibrate(12); }catch(e){}
+  layPos();
+  setTimeout(() => { if(_lay && _lay.el === el) layPos(); }, 280);   // once the slot has shrunk, the others have moved up
+  const tick = () => {
+    if(!_lay) return;
+    const edge = 96, H = window.innerHeight, yy = _lay.y;
+    const v = yy < edge ? -Math.ceil((edge - yy) / 5) : yy > H - edge ? Math.ceil((yy - (H - edge)) / 5) : 0;
+    if(v){ const before = window.scrollY; window.scrollBy(0, v); if(window.scrollY !== before) layRetarget(); }
+    _lay.raf = requestAnimationFrame(tick);
+  };
+  _lay.raf = requestAnimationFrame(tick);
+}
+function layMove(x, y){
+  const L = _lay; L.x = x; L.y = y;
+  L.el.style.top = (y - L.offY) + 'px';
+  L.el.style.left = (L.left + (x - L.sx) * .18) + 'px';
+  layRetarget();
+}
+function layRetarget(){
+  const L = _lay, k = L.el.dataset.zone, p = state.layoutDraft[L.page];
+  const r = L.el.getBoundingClientRect(), mid = r.top + r.height / 2 + window.scrollY;
+  // the zones this one can trade places with: the same column, or every zone where the columns have melted into one
+  const contents = getComputedStyle(L.ph.parentElement).display === 'contents';
+  const peers = [...L.pos.entries()].filter(([z, v]) => contents ? getComputedStyle(v.parent).display === 'contents' : v.parent === L.ph.parentElement)
+    .sort((a, b) => a[1].top - b[1].top);
+  const before = peers.find(([, v]) => mid < v.top + v.h / 2);
+  const cur = p.order.filter(x => x !== k);
+  const at = before ? cur.indexOf(before[0].dataset.zone) : (peers.length ? cur.indexOf(peers[peers.length - 1][0].dataset.zone) + 1 : cur.length);
+  cur.splice(at < 0 ? cur.length : at, 0, k);
+  if(cur.join() === p.order.join()) return;
+  const first = new Map([...L.pos.keys()].map(z => [z, z.getBoundingClientRect().top]));
+  p.order = cur;
+  layApplyOrder(cur);
+  for(const [z, t] of first){
+    const d = t - z.getBoundingClientRect().top;
+    if(Math.abs(d) > .5 && z.animate) z.animate([{ transform:`translateY(${d}px)` }, { transform:'translateY(0)' }], { duration:220, easing:'cubic-bezier(.2,.8,.2,1)' });
+  }
+  layPos();
+}
+function layDrop(){
+  const L = _lay; if(!L) return;
+  cancelAnimationFrame(L.raf);
+  _lay = null;
+  const from = L.el.getBoundingClientRect(), to = L.ph.getBoundingClientRect();
+  const done = () => {
+    L.ph.remove();
+    Object.assign(L.el.style, { position:'', left:'', top:'', width:'', height:'', margin:'', zIndex:'' });
+    L.el.classList.remove('lay-lift');
+    // unfold back to full size, the zones below sliding down as it opens
+    const full = L.el.getBoundingClientRect().height;
+    L.el.classList.add('lay-opening'); L.el.classList.remove('lay-folded');
+    const end = () => { L.el.classList.remove('lay-opening'); L.el.querySelector(':scope > .lay-mini')?.remove(); };
+    if(L.el.animate && full > LAY_FOLD){
+      const a = L.el.animate([{ height:LAY_FOLD + 'px' }, { height:full + 'px' }], { duration:Math.min(520, 220 + full * .25), easing:'cubic-bezier(.2,.8,.2,1)' });
+      a.onfinish = end; a.oncancel = end;
+    } else end();
+  };
+  if(L.el.animate){
+    const a = L.el.animate([{ top:from.top + 'px', left:from.left + 'px' }, { top:to.top + 'px', left:to.left + 'px' }], { duration:200, easing:'cubic-bezier(.2,.8,.2,1)' });
+    a.onfinish = done; a.oncancel = done;
+  } else done();
+}
+function layDown(e){
+  if(!state.layoutEdit || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  const el = e.target.closest && e.target.closest('#main [data-zone]');
+  if(!el || e.target.closest('.lay-eye') || _lay) return;
+  const handle = !!e.target.closest('.lay-h');
+  if(e.pointerType === 'mouse' || handle) e.preventDefault();
+  if(handle){ layStart(el, e.clientX, e.clientY); return; }
+  _layPend = { el, x:e.clientX, y:e.clientY, mouse:e.pointerType === 'mouse',
+    timer: e.pointerType === 'mouse' ? 0 : setTimeout(() => { const p = _layPend; _layPend = null; if(p) layStart(p.el, p.lx ?? p.x, p.ly ?? p.y); }, 260) };
+  el.classList.add('lay-press');
+}
+function layCancelPend(){ if(_layPend){ clearTimeout(_layPend.timer); _layPend.el.classList.remove('lay-press'); _layPend = null; } }
+document.addEventListener('pointerdown', layDown);
+document.addEventListener('pointermove', e => {
+  if(_lay){ e.preventDefault(); layMove(e.clientX, e.clientY); return; }
+  const p = _layPend; if(!p) return;
+  const moved = Math.hypot(e.clientX - p.x, e.clientY - p.y);
+  p.lx = e.clientX; p.ly = e.clientY;
+  if(p.mouse && moved > 4){ const el = p.el; layCancelPend(); el.classList.remove('lay-press'); layStart(el, p.x, p.y); layMove(e.clientX, e.clientY); }
+  else if(!p.mouse && moved > 9) layCancelPend();          // a swipe: let the page scroll
+}, { passive:false });
+const layUp = () => { layCancelPend(); document.querySelectorAll('.lay-press').forEach(x => x.classList.remove('lay-press')); if(_lay) layDrop(); };
+document.addEventListener('pointerup', layUp);
+document.addEventListener('pointercancel', layUp);
+// once a zone is up, the finger moves it rather than the page
+document.addEventListener('touchmove', e => { if(_lay) e.preventDefault(); }, { passive:false });
+document.addEventListener('contextmenu', e => { if(state.layoutEdit && e.target.closest && e.target.closest('#main [data-zone]')) e.preventDefault(); });
+
+/* Telling people they can do it. A signed-in reader who has never arranged
+   anything gets a pointer at the button, once; a guest a small card asking
+   them to sign in. Each goes away for good when closed (or used). */
+const TIP_KEY = '48thdb-tip-layout';
+function tipSeen(k){ try{ return (localStorage.getItem(TIP_KEY) || '').split(',').includes(k); }catch(e){ return true; } }
+function tipDone(k){ try{ const v = (localStorage.getItem(TIP_KEY) || '').split(',').filter(Boolean); if(!v.includes(k)) localStorage.setItem(TIP_KEY, [...v, k].join(',')); }catch(e){} }
+function layoutTip(kind){
+  if(state.layoutEdit) return '';
+  const en = isEN();
+  if(kind === 'signed'){
+    if(!canLayout() || state.layout || tipSeen('signed')) return '';
+    return `<span class="lay-tip" role="note"><button class="lay-tip-x" data-action="tip-close" data-id="signed" aria-label="${en ? 'Close' : 'ปิด'}">✕</button>
+      <b>${en ? 'New! Make the site yours' : 'ใหม่! จัดหน้าเว็บเองได้'}</b>
+      <span>${en ? 'Move or hide zones, choose the bottom menu and a background.' : 'ย้าย ซ่อนโซน เลือกเมนูล่างและธีมพื้นหลังได้ตามใจ'}</span>
+      <button class="lay-tip-go" data-action="lay-edit" data-id="home">${en ? 'Try it' : 'ลองเลย'}</button></span>`;
+  }
+  if(kind === 'guest'){
+    if(canLayout() || tipSeen('guest') || !_authKnown) return '';
+    return `<section class="lay-invite"><button class="lay-tip-x" data-action="tip-close" data-id="guest" aria-label="${en ? 'Close' : 'ปิด'}">✕</button>
+      <span class="lay-invite-ic">${ICONS.layout}</span>
+      <span class="lay-invite-t"><b>${en ? 'Make this page your own' : 'แต่งหน้าเว็บเป็นของคุณเอง'}</b>
+      <span>${en ? 'Sign in to move or hide zones, pick the bottom menu, a background and your profile’s colour.' : 'ล็อกอินแล้วย้าย ซ่อนโซน เลือกเมนูล่าง ธีมพื้นหลัง และสีหน้าโปรไฟล์ได้เอง'}</span></span>
+      <button class="lay-tip-go" data-action="nav" data-view="auth">${en ? 'Sign in' : 'เข้าสู่ระบบ'}</button></section>`;
+  }
+  return '';
+}
 
 /* The card on the profile page where all of it is chosen. */
 function renderMyStyleCard(){
@@ -20214,7 +20353,8 @@ function bindDelegatedEvents(){
     else if(action==='visits-refresh'){ if(visitsState) visitsState.at = 0; el.textContent = 'กำลังโหลด…'; loadVisits(); }
     // the logo reloads the home page for real: fresh data, the newest version of the site
     else if(action==='logo-home'){ e.preventDefault(); window.scrollTo(0, 0); location.assign(location.origin + '/'); }
-    else if(action==='lay-edit') enterLayoutEdit(id);
+    else if(action==='lay-edit'){ tipDone('signed'); enterLayoutEdit(id); }
+    else if(action==='tip-close'){ tipDone(id); renderMain(); }
     else if(action==='lay-done') leaveLayoutEdit(true);
     else if(action==='lay-reset'){ const pg = state.layoutEdit; if(pg){ state.layoutDraft[pg] = { order:LAYOUT_ZONES[pg].map(z => z.k), hidden:[], added:[] }; renderMain(); } }
     else if(action==='lay-toggle'){
@@ -20815,6 +20955,8 @@ async function init(){
     // the reader's own arrangement; a guest or someone signed out gets the site as it comes
     const lay = state.account ? (oshiData.layout || null) : null;
     if(JSON.stringify(lay) !== JSON.stringify(_authKnown ? state.layout : _bootLayout)) changed = true;
+    // a guest's invitation waits for sign-in to settle, then needs drawing
+    if(!_authKnown && !state.account && !tipSeen('guest') && state.view === 'feed') changed = true;
     state.layout = lay; _authKnown = true;
     try{ if(state.account) localStorage.setItem(LAYOUT_KEY, JSON.stringify({ uid:state.account.uid, layout:lay })); else localStorage.removeItem(LAYOUT_KEY); }catch(e){}
 
