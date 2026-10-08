@@ -34,6 +34,14 @@ the Firebase CLI from the owner's machine.
 
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
   handler, and views switched on `state.view`.
+- **My layout.** A signed-in reader can move, hide or add zones on the home
+  page and their profile, pick the bottom menu's four tabs (profile is always
+  last), a background and their profile's colour (`LAYOUT_ZONES`,
+  `applyLayout`, `renderMyStyleCard`). It lives in `users/<uid>.layout` with a
+  copy in localStorage for the first paint; guests get the site as it comes.
+  Zones are matched by class (home) or `data-zone` (profile) and ordered with
+  CSS `order`, so a new home section needs a row in `LAYOUT_ZONES.home` or it
+  can't be moved.
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.

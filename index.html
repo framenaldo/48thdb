@@ -3503,6 +3503,86 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .vis-day-k em{ display:inline-flex; align-items:center; gap:4px; font-style:normal; }
   .vis-setup{ margin:0; padding-left:20px; font-size:13.5px; line-height:1.6; }
   .vis-setup code{ font-size:12px; word-break:break-all; }
+  /* ---- My layout: arranging the page, the menu and the background ---- */
+  .feed-cols.has-layout .feed-main, .feed-cols.has-layout .feed-side{ display:flex; flex-direction:column; }
+  @media (max-width:1023px){ .feed-cols.has-layout .feed-main, .feed-cols.has-layout .feed-side{ display:contents; } }
+  .lay-zones{ display:flex; flex-direction:column; }
+  .feed-head-btns{ display:inline-flex; gap:8px; align-items:center; justify-content:flex-end; flex:none; }
+  body.lay-editing .feed-head-btns{ display:none; }
+  @media (max-width:479px){ .feed-head-btns [data-action="lay-edit"] span{ display:none; } .feed-head-btns [data-action="lay-edit"]{ padding-inline:10px; } }
+  body:not(.lay-editing) .lay-hidden{ display:none !important; }
+  .lay-zones .section-label{ color:var(--pacc, var(--ink-soft)); }
+  .lay-zones[style*="--pacc"] .section-label{ font-weight:800; }
+  .lay-zones[style*="--pacc"] .kami-card, .lay-zones[style*="--pacc"] .backup-card, .lay-zones[style*="--pacc"] .iam-link{ border-color:color-mix(in srgb, var(--pacc) 45%, var(--line)); }
+  /* edit mode */
+  .lay-bar{ position:fixed; left:0; right:0; top:0; z-index:85; display:flex; align-items:center; gap:8px;
+    padding:calc(env(safe-area-inset-top) + 12px) 16px 12px; background:#231B2B; color:#fff; box-shadow:0 4px 0 rgba(0,0,0,.25); }
+  .lay-bar-t{ flex:1; min-width:0; } .lay-bar-t b{ display:block; font-size:15px; } .lay-bar-t span{ font-size:11.5px; opacity:.75; }
+  .lay-btn{ border:0; border-radius:99px; padding:8px 14px; font:inherit; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 3px 0 rgba(0,0,0,.35); }
+  .lay-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.35); }
+  .lay-btn.is-done{ background:#E4457E; color:#fff; } .lay-btn.is-ghost{ background:rgba(255,255,255,.16); color:#fff; }
+  body.lay-editing header.top, body.lay-editing #ticker-slot, body.lay-editing #nav-container, body.lay-editing .site-foot{ display:none; }
+  body.lay-editing main{ padding-top:calc(env(safe-area-inset-top) + 92px); }
+  .lay-editing [data-zone]{ position:relative; outline:2px dashed #E4457E; outline-offset:6px; border-radius:18px; margin-top:22px; animation:lay-wob .9s ease-in-out infinite alternate; }
+  .lay-editing [data-zone]:nth-child(2n){ animation-delay:-.45s; }
+  @keyframes lay-wob{ from{ rotate:-.3deg; } to{ rotate:.3deg; } }
+  @media (prefers-reduced-motion:reduce){ .lay-editing [data-zone]{ animation:none; } }
+  .lay-editing [data-zone] > :not(.lay-tools):not(.lay-tag){ pointer-events:none; }
+  .lay-editing .lay-hidden{ outline-color:#A39CAB; }
+  .lay-editing .lay-hidden > :not(.lay-tools):not(.lay-tag){ opacity:.35; filter:grayscale(1); }
+  .lay-tag{ position:absolute; top:-16px; left:6px; z-index:6; padding:3px 10px; border-radius:99px; background:#E4457E; color:#fff; font-size:11.5px; font-weight:800; box-shadow:0 3px 0 #B32F60; }
+  .lay-hidden > .lay-tag{ background:#8E8697; box-shadow:0 3px 0 #6A6372; }
+  .lay-tools{ position:absolute; top:-18px; right:6px; z-index:6; display:flex; gap:6px; }
+  .lay-tools button{ display:grid; place-items:center; width:36px; height:36px; padding:0; border-radius:50%; cursor:pointer; color:var(--ink);
+    background:var(--card); border:1px solid var(--line); box-shadow:0 3px 0 var(--line); }
+  .lay-tools button:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
+  .lay-tools svg{ width:18px; height:18px; }
+  .lay-tools .lay-h{ background:#231B2B; color:#fff; border-color:#231B2B; box-shadow:0 3px 0 #000; touch-action:none; cursor:grab; }
+  .lay-tools .lay-eye.is-off{ color:#A39CAB; }
+  .lay-lift{ z-index:40; animation:none !important; rotate:1.5deg; box-shadow:0 26px 44px rgba(var(--shadow-rgb),.35); transition:none; }
+  .lay-addzone{ display:block; width:100%; margin:26px 0 8px; padding:14px; border-radius:18px; border:2px dashed #2E8C82; background:color-mix(in srgb, #2E8C82 8%, transparent);
+    color:#2E8C82; font:inherit; font-weight:800; font-size:14px; cursor:pointer; order:9999; }
+  .lay-sheet-note{ margin:0 0 12px; font-size:12.5px; color:var(--ink-soft); }
+  .lay-row{ display:flex; align-items:center; gap:10px; width:100%; margin:0 0 8px; padding:11px 12px; border-radius:14px; border:1px solid var(--line); background:var(--card);
+    box-shadow:0 2px 0 var(--line); font:inherit; font-size:14px; font-weight:700; color:var(--ink); text-align:left; cursor:pointer; }
+  .lay-row:active{ transform:translateY(2px); box-shadow:none; }
+  .lay-row em{ margin-left:auto; font-style:normal; font-size:12px; font-weight:600; color:var(--ink-soft); }
+  .lay-row i{ font-style:normal; display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:#2E8C82; color:#fff; font-weight:800; box-shadow:0 2px 0 #1D6159; }
+  /* the profile card that chooses it all */
+  .lay-card{ display:flex; flex-direction:column; gap:8px; padding:14px; border-radius:18px; border:1px solid var(--line); background:var(--card); box-shadow:0 3px 0 var(--line); margin:0 0 6px; }
+  .lay-card .vis-h{ margin:8px 0 2px; }
+  .lay-go{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .lay-go-btn{ display:flex; align-items:center; justify-content:center; gap:7px; padding:11px 10px; border-radius:14px; border:1px solid var(--line); background:var(--paper-dim);
+    font:inherit; font-size:13.5px; font-weight:800; color:var(--ink); cursor:pointer; box-shadow:0 3px 0 var(--line); }
+  .lay-go-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
+  .lay-go-btn svg{ width:18px; height:18px; color:#E4457E; }
+  .lay-slots{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:6px; }
+  .lay-slot{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 2px 6px; border-radius:14px; border:2px dashed #E4457E; background:var(--card);
+    font:inherit; color:var(--ink); cursor:pointer; min-width:0; }
+  .lay-slot .gnav-icon svg{ width:22px; height:22px; }
+  .lay-slot small{ font-size:10.5px; font-weight:700; color:var(--ink-soft); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lay-slot.is-pick{ border-style:solid; background:color-mix(in srgb, #E4457E 12%, var(--card)); box-shadow:0 3px 0 #E4457E; }
+  .lay-slot.is-fixed{ border-color:var(--line); opacity:.6; cursor:default; }
+  .lay-pickrow{ display:flex; flex-wrap:wrap; gap:6px; }
+  .lay-sw{ display:flex; flex-wrap:wrap; gap:7px; }
+  .lay-swatch{ width:42px; height:42px; padding:0; border-radius:14px; border:3px solid var(--card); cursor:pointer; box-shadow:0 0 0 1px var(--line), 0 3px 0 var(--line);
+    font:inherit; font-weight:800; color:#fff; font-size:16px; }
+  .lay-swatch.is-dot{ width:35px; height:35px; border-radius:50%; font-size:14px; }
+  .lay-swatch.is-on{ box-shadow:0 0 0 3px #E4457E, 0 3px 0 var(--line); }
+  .lay-swatch:active{ transform:translateY(2px); }
+  .lay-resetall{ align-self:flex-start; margin-top:6px; font-size:12.5px; }
+  /* backgrounds — the framed look and the accents stay; only the ground changes */
+  :root[data-bg="sky"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(120,170,255,.32), transparent 42%), radial-gradient(circle at 90% 90%, rgba(190,150,255,.28), transparent 45%), linear-gradient(160deg, #F2F7FF 0%, #F6F1FF 55%, #EEF6FF 100%); }
+  :root[data-bg="peach"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(255,170,110,.32), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,160,.28), transparent 45%), linear-gradient(160deg, #FFF6EC 0%, #FFF1F2 55%, #FFF8EE 100%); }
+  :root[data-bg="lilac"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(170,130,255,.30), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,200,.26), transparent 45%), linear-gradient(160deg, #F7F2FF 0%, #FCF1F8 55%, #F4F0FF 100%); }
+  :root[data-bg="mint"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(60,210,160,.28), transparent 42%), radial-gradient(circle at 90% 90%, rgba(110,170,255,.26), transparent 45%), linear-gradient(160deg, #EEFCF6 0%, #F1F8FF 55%, #EFFDF8 100%); }
+  :root[data-bg="photo"]{ --bg-body:linear-gradient(rgba(255,248,250,.84), rgba(255,248,250,.9)), url(gallery/kimi/08-s.jpg) center/cover; }
+  :root[data-theme="dark"][data-bg="sky"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(120,170,255,.16), transparent 42%), radial-gradient(circle at 90% 90%, rgba(190,150,255,.13), transparent 45%), linear-gradient(160deg, #10141F 0%, #15122A 55%, #0F1620 100%); }
+  :root[data-theme="dark"][data-bg="peach"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(255,170,110,.14), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,160,.13), transparent 45%), linear-gradient(160deg, #1D1410 0%, #1E1218 55%, #1B1510 100%); }
+  :root[data-theme="dark"][data-bg="lilac"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(170,130,255,.16), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,200,.12), transparent 45%), linear-gradient(160deg, #16112A 0%, #1C1222 55%, #14102A 100%); }
+  :root[data-theme="dark"][data-bg="mint"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(60,210,160,.14), transparent 42%), radial-gradient(circle at 90% 90%, rgba(110,170,255,.12), transparent 45%), linear-gradient(160deg, #0E1A17 0%, #10161F 55%, #0E1B18 100%); }
+  :root[data-theme="dark"][data-bg="photo"]{ --bg-body:linear-gradient(rgba(18,13,22,.84), rgba(18,13,22,.9)), url(gallery/kimi/08-s.jpg) center/cover; }
+
   .fb-drow{ display:grid; grid-template-columns:24px 1fr 30px; align-items:center; gap:8px; font-size:13px; }
   .fb-drow i{ height:10px; border-radius:99px; background:var(--paper-dim); overflow:hidden; }
   .fb-drow i b{ display:block; height:100%; background:#F3C969; border-radius:99px; }
@@ -6534,12 +6614,19 @@ const ICONS = {
   sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6L17 17M7 7L5.4 5.4"/></svg>`,
   moon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 14.2A8.4 8.4 0 0 1 9.8 3.7a8.7 8.7 0 1 0 10.5 10.5z"/></svg>`,
   gallery: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`,
+  layout: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="9" rx="2"/><rect x="13.5" y="3.5" width="7" height="5" rx="2"/><rect x="13.5" y="11.5" width="7" height="9" rx="2"/><rect x="3.5" y="15.5" width="7" height="5" rx="2"/></svg>`,
+  grip: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.7"/><circle cx="15" cy="6" r="1.7"/><circle cx="9" cy="12" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="9" cy="18" r="1.7"/><circle cx="15" cy="18" r="1.7"/></svg>`,
+  eye: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  eyeOff: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 5.6A9.6 9.6 0 0 1 12 5.5C18 5.5 21.5 12 21.5 12a17 17 0 0 1-3 3.8M6.4 6.5C3.9 8.2 2.5 12 2.5 12S6 18.5 12 18.5c1.8 0 3.3-.5 4.6-1.2"/><path d="M3 3l18 18"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>`,
+  shop: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>`,
+  ballot: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10.5" rx="2"/><path d="M8 10V5.5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1V10"/><path d="m9.5 7.5 1.6 1.4 3-3"/><path d="M8 14.5h8"/></svg>`,
   transfer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h13"/><path d="M13.5 5l3.5 3.5-3.5 3.5"/><path d="M20 15.5H7"/><path d="M10.5 12L7 15.5l3.5 3.5"/></svg>`
 };
 
 // ============================= STATE =============================
 let state = {
-  isOwner:false, pending:[], flash:[], geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
+  isOwner:false, pending:[], flash:[], layout:null, layoutEdit:null, layoutDraft:null, navPick:null, geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
   ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOshi:false,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
@@ -8120,7 +8207,7 @@ async function loadOshiData(){
   try{
     const doc = await fbDb.collection('users').doc(fbAuth.currentUser.uid).get();
     const d = doc.exists ? doc.data() : {};
-    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null};
+    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null, layout:d.layout||null};
   }catch(e){ return {oshi:[], kamiOshi:null}; }
 }
 async function saveOshiData(){
@@ -8220,8 +8307,30 @@ const NAV_OPTIONS = [
   { value:'stats',       view:'stats', fav:false, icon:ICONS.stats, iconActive:ICONS.statsFilled, th:'สถิติ', en:'Stats' },
   { value:'profile',     view:'profile', fav:false, icon:ICONS.profile, iconActive:ICONS.profileFilled, th:'โปรไฟล์', en:'Profile' }
 ];
+/* Every tab the bottom menu can carry; the reader picks four, the profile
+   tab always sits last so the menu can always be changed back. */
+const NAV_CATALOG = [
+  ...NAV_OPTIONS,
+  { value:'oshi', view:'browse', fav:true, icon:ICONS.favorites, th:'โอชิ', en:'My oshi' },
+  { value:'calendar', view:'calendar', fav:false, icon:ICONS.calendar, th:'ปฏิทิน', en:'Calendar' },
+  { value:'gallery', view:'gallery', fav:false, icon:ICONS.gallery, th:'แกลเลอรี', en:'Gallery' },
+  { value:'ge', view:'timeline', fav:false, icon:ICONS.ballot, th:'GE2026', en:'GE2026' },
+  { value:'shop', view:'shop', fav:false, icon:ICONS.shop, th:'ร้านค้า', en:'Shop' },
+];
+const NAV_DEFAULT = ['feed','groups','discography','stats'];
+function navKeys(){
+  const n = myLayout().nav;
+  const ok = Array.isArray(n) && n.length === 4 && new Set(n).size === 4 && n.every(x => x !== 'profile' && NAV_CATALOG.some(o => o.value === x));
+  return [...(ok ? n : NAV_DEFAULT), 'profile'];
+}
 function currentNavValue(){
+  const has = k => navKeys().includes(k);
   if(state.view==='feed') return 'feed';
+  if(state.view==='browse' && state.favoritesOnly && has('oshi')) return 'oshi';
+  if(state.view==='calendar' && has('calendar')) return 'calendar';
+  if(state.view==='gallery' && has('gallery')) return 'gallery';
+  if(state.view==='timeline' && has('ge')) return 'ge';
+  if(state.view==='shop' && has('shop')) return 'shop';
   if(state.view==='browse') return state.favoritesOnly ? 'oshi' : 'groups';
   if(state.view==='groups' || state.view==='org') return 'groups';
   if(state.view==='discography' || state.view==='single' || state.view==='gallery') return 'discography';
@@ -8232,7 +8341,7 @@ function currentNavValue(){
 function renderNav(){
   const current = currentNavValue();
   const en = isEN();
-  return `<nav class="glass-nav" data-lang="${en ? 'en' : 'th'}"><span class="gnav-blob" aria-hidden="true"></span>${NAV_OPTIONS.map(o=>{
+  return `<nav class="glass-nav" data-lang="${en ? 'en' : 'th'}"><span class="gnav-blob" aria-hidden="true"></span>${navKeys().map(k => NAV_CATALOG.find(o => o.value === k)).map(o=>{
     const isActive = o.value===current;
     return `<button data-action="nav-select" data-value="${o.value}" class="${isActive?'active':''}" aria-label="${en ? o.en : o.th}">
       <span class="gnav-icon">${o.icon}</span>
@@ -14153,7 +14262,8 @@ function renderFeed(){
     <header class="feed-head">
       <div class="feed-head-top">
         <p class="feed-today">วัน${dayName}ที่ ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()+543}</p>
-        <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button>
+        <span class="feed-head-btns">${canLayout() ? `<button class="page-share-btn" data-action="lay-edit" data-id="home" title="จัดหน้า" aria-label="จัดหน้า">${ICONS.layout}<span>จัดหน้า</span></button>` : ''}
+        <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></span>
       </div>
       <div class="feed-title-row"><h1 class="feed-title">วันนี้ที่ 48</h1></div>
       <div class="feed-head-foot">
@@ -14212,6 +14322,7 @@ function renderFeed(){
       </button>
       ${state.pastOpen ? `<div class="past-list">${past.map(e => renderEventCard(e, iso)).join('')}</div>` : ''}
     </section>` : ''}
+    ${homeExtraZone('oshi')}
     <section class="feed-block is-feedback">${renderFeedbackCard('feed')}</section>
     </div>
     <aside class="feed-side">
@@ -14254,6 +14365,7 @@ function renderFeed(){
       <h2 class="section-label">${otd.ahead ? 'ครบรอบที่ใกล้ถึง' : 'วันนี้ในอดีต'}</h2>
       <div class="otd-list">${otd.rows.map(x => renderPastRow(x, today)).join('')}</div>
     </section>` : ''}
+    ${homeExtraZone('gallery')}
     <section class="feed-block is-calendar">
       <h2 class="section-label">ปฏิทิน</h2>
       ${renderCalendar()}
@@ -14901,6 +15013,320 @@ function visitsPages(D){
     ${since && Date.now() - since.getTime() < 7 * 86400000 ? `<p class="vis-note">เริ่มนับเมื่อ ${since.getDate()} ${M[since.getMonth()]} ยังไม่ครบ 7 วัน</p>` : ''}</div>
   ${items.length ? `<div><p class="vis-h">สมาชิกและงานที่เปิดดูบ่อย · 7 วัน</p>${items.map(r => row(`${r[0] === 'member' ? '👤' : '📅'} ${itemName(r)}`, r[2], iTop)).join('')}</div>` : ''}`;
 }
+/* ================= MY LAYOUT =================
+   Anyone signed in can arrange the site for themselves: move or hide the
+   zones of the home page and of their profile, add a few optional zones,
+   pick the bottom menu's four tabs, a background and their profile's colour.
+   It is kept with the account (users/<uid>.layout, beside the Oshi list) and
+   a copy in localStorage paints the first frame before sign-in catches up.
+   A zone moves only within its own page; the order is applied with CSS
+   `order`, so the page's own templates stay as they are and a zone that is
+   missing today (no birthday, no event) keeps its place for when it returns.
+   On a wide screen the two home columns each keep their own zones. */
+const LAYOUT_KEY = '48thdb-layout';
+let _bootLayout = null, _authKnown = false;
+try{ const s = JSON.parse(localStorage.getItem(LAYOUT_KEY) || 'null'); if(s && s.uid) _bootLayout = s.layout || null; }catch(e){}
+const LAYOUT_ZONES = {
+  home: [
+    { k:'vote', cls:'is-gevote', th:'โหวตสด', en:'Live vote' },
+    { k:'results', cls:'feed-ge', th:'ผลเลือกตั้ง', en:'Election results' },
+    { k:'fanfest', cls:'is-fflive', th:'Fan Festival', en:'Fan Festival' },
+    { k:'today', cls:'today-hero-block', th:'งานวันนี้', en:'Today' },
+    { k:'overtoday', cls:'is-over-today', th:'จบไปแล้ววันนี้', en:'Over today' },
+    { k:'periods', cls:'is-periods', th:'ช่วงที่เปิดอยู่', en:'Open now' },
+    { k:'oshi', cls:'is-myoshi', th:'งานของโอชิ', en:'My oshi', extra:true, icon:'⭐' },
+    { k:'bdaytoday', cls:'is-bday-today', th:'วันเกิดวันนี้', en:'Birthdays today' },
+    { k:'bdaynext', cls:'is-bday-next', th:'วันเกิดที่ใกล้ถึง', en:'Coming birthdays' },
+    { k:'schedule', cls:'is-schedule', th:'ตารางงาน', en:'Schedule' },
+    { k:'gallery', cls:'is-galzone', th:'แกลเลอรี', en:'Gallery', extra:true, icon:'🖼️' },
+    { k:'otd', cls:'is-otd', th:'วันนี้ในอดีต', en:'On this day' },
+    { k:'calendar', cls:'is-calendar', th:'ปฏิทิน', en:'Calendar' },
+    { k:'past', cls:'is-past', th:'งานที่ผ่านมา', en:'Past events' },
+    { k:'feedback', cls:'is-feedback', th:'ความคิดเห็น', en:'Feedback' },
+  ],
+  profile: [
+    { k:'kami', th:'Kami Oshi', en:'Kami Oshi' },
+    { k:'oshi', th:'Oshi ทั้งหมด', en:'All oshi' },
+    { k:'oshievents', th:'งานของโอชิ', en:'My oshi’s events', extra:true, icon:'⭐' },
+    { k:'feedback', th:'ความคิดเห็น', en:'Feedback' },
+    { k:'iam', th:'แอปของวง', en:'The group’s app' },
+    { k:'backup', th:'สำรองข้อมูล', en:'Backup' },
+  ],
+};
+const LAYOUT_BG = [
+  { k:'', th:'ชมพู-มิ้นต์', en:'Pink & mint', sw:'linear-gradient(135deg,#FBD9E7,#D3F1E6)' },
+  { k:'sky', th:'ฟ้า', en:'Sky', sw:'linear-gradient(135deg,#C9E4FF,#F3E8FF)' },
+  { k:'peach', th:'พีช', en:'Peach', sw:'linear-gradient(135deg,#FFE7C2,#FFD1DC)' },
+  { k:'lilac', th:'ม่วง', en:'Lilac', sw:'linear-gradient(135deg,#E6D9FF,#FBD9EF)' },
+  { k:'mint', th:'มิ้นต์', en:'Mint', sw:'linear-gradient(135deg,#CFF5E7,#D9EEFF)' },
+  { k:'photo', th:'ภาพจากแกลเลอรี', en:'Gallery photo', sw:'center/cover url(gallery/kimi/08-s.jpg)' },
+];
+const LAYOUT_ACC = [
+  { k:'', th:'ค่าเดิม', c:'' }, { k:'pink', th:'ชมพู', c:'#E4457E' }, { k:'teal', th:'เขียว', c:'#2E8C82' },
+  { k:'purple', th:'ม่วง', c:'#7A5CC9' }, { k:'blue', th:'ฟ้า', c:'#3D6FB6' }, { k:'gold', th:'ทอง', c:'#C8961E' },
+  { k:'oshi', th:'สีวงของ Kami Oshi', c:null },
+];
+const canLayout = () => !!(state.account && state.account.loggedIn);
+function myLayout(){
+  if(state.layoutEdit && state.layoutDraft) return state.layoutDraft;
+  if(canLayout()) return state.layout || {};
+  if(!_authKnown && _bootLayout) return _bootLayout;
+  return {};
+}
+const zoneName = z => isEN() ? z.en : z.th;
+function zoneOrder(page){
+  const reg = LAYOUT_ZONES[page], L = myLayout()[page] || {};
+  const out = (L.order || []).filter(k => reg.some(z => z.k === k));
+  reg.forEach((z, i) => {
+    if(out.includes(z.k)) return;
+    const prev = reg.slice(0, i).reverse().find(p => out.includes(p.k));
+    out.splice(prev ? out.indexOf(prev.k) + 1 : 0, 0, z.k);
+  });
+  return out;
+}
+const zoneHidden = (page, k) => ((myLayout()[page] || {}).hidden || []).includes(k);
+function zoneOn(page, k){
+  const z = LAYOUT_ZONES[page].find(x => x.k === k);
+  if(!z) return false;
+  if(zoneHidden(page, k)) return state.layoutEdit === page;
+  return !z.extra || ((myLayout()[page] || {}).added || []).includes(k);
+}
+/* Optional zones, drawn only for those who added them. */
+function homeExtraZone(k){
+  if(!zoneOn('home', k)) return '';
+  const en = isEN();
+  if(k === 'gallery') return `<section class="feed-block is-galzone"><h2 class="section-label">${en ? 'Gallery' : 'แกลเลอรี'}</h2>${renderGalleryTeaser(GALLERY[0].id)}</section>`;
+  if(k === 'oshi') return `<section class="feed-block is-myoshi"><h2 class="section-label">${en ? 'My oshi' : 'งานของโอชิ'}</h2>${oshiEventsList(4)}</section>`;
+  return '';
+}
+function oshiEventsList(n){
+  const en = isEN(), iso = toYmd(todayStart());
+  if(!state.oshi.length) return `<p class="muted-note">${en ? 'Star members to make them your oshi — their events gather here.' : 'กดดาวที่สมาชิกเพื่อเพิ่มเป็นโอชิ แล้วงานของโอชิจะมารวมอยู่ตรงนี้'}</p>`;
+  const list = SEED_SCHEDULE.filter(e => !e.shop && !e.cancelled && hasMyOshi(e) && eventLastDay(e) >= iso)
+    .sort((a, b) => (a.start + (a.time || '')).localeCompare(b.start + (b.time || ''))).slice(0, n);
+  const soonB = activeMembers().filter(m => m.birthday && isMyOshi(m))
+    .map(m => { const d = parseYmd(iso.slice(0, 4) + m.birthday.slice(4)); if(toYmd(d) < iso) d.setFullYear(d.getFullYear() + 1);
+      return { m, days: Math.round((d - parseYmd(iso)) / 86400000) }; })
+    .filter(x => x.days <= 30).sort((a, b) => a.days - b.days);
+  return `${soonB.length ? `<div class="bday-next" style="margin-bottom:10px">${soonB.map(({ m, days }) => {
+      const g = getGroup(m.groupId);
+      return `<button class="bday-chip" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">${renderAvatar(m, 'avatar-sm', g.color)}
+        <span><span class="when">🎂 ${days === 0 ? (en ? 'today' : 'วันนี้') : days === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : (en ? `in ${days} days` : `อีก ${days} วัน`)}</span><span class="who" style="display:block">${escapeHtml(nickName(m))}</span></span></button>`;
+    }).join('')}</div>` : ''}
+    ${list.length ? list.map(e => renderEventCard(e, iso)).join('') : `<p class="muted-note">${en ? 'No events with your oshi announced yet.' : 'ยังไม่มีงานที่โอชิของคุณไป'}</p>`}`;
+}
+
+/* Puts the zones of the page on screen in the reader's order, and in edit
+   mode gives each its name, an eye and a handle. */
+function applyLayout(page, root){
+  const reg = LAYOUT_ZONES[page], L = myLayout()[page], edit = state.layoutEdit === page;
+  const box = root.querySelector(page === 'home' ? '.feed-cols' : '.lay-zones');
+  if(!box) return;
+  box.classList.toggle('has-layout', !!(L || edit));
+  if(page === 'profile'){
+    const a = LAYOUT_ACC.find(x => x.k === (myLayout().acc || '')) || LAYOUT_ACC[0];
+    const km = a.k === 'oshi' && state.kamiOshi ? getMember(state.kamiOshi) : null;
+    const c = a.k === 'oshi' ? (km ? getGroup(km.groupId).color : '') : a.c;
+    if(c) box.style.setProperty('--pacc', c); else box.style.removeProperty('--pacc');
+  }
+  if(!L && !edit) return;
+  const order = zoneOrder(page);
+  root.querySelectorAll(page === 'home' ? '.feed-block' : '.lay-z').forEach(el => {
+    const z = el.dataset.zone ? reg.find(r => r.k === el.dataset.zone) : reg.find(r => r.cls && el.classList.contains(r.cls));
+    if(!z) return;
+    el.dataset.zone = z.k;
+    el.style.order = order.indexOf(z.k) + 1;
+    const hid = zoneHidden(page, z.k);
+    el.classList.toggle('lay-hidden', hid);
+    if(edit && !el.querySelector(':scope > .lay-tools')){
+      const en = isEN();
+      el.insertAdjacentHTML('afterbegin', `<span class="lay-tag">${escapeHtml(zoneName(z))}</span>
+        <span class="lay-tools"><button class="lay-eye${hid ? ' is-off' : ''}" data-action="lay-toggle" data-id="${z.k}" aria-label="${hid ? (en ? 'Show' : 'แสดง') : (en ? 'Hide' : 'ซ่อน')}">${hid ? ICONS.eyeOff : ICONS.eye}</button>
+        <button class="lay-h" aria-label="${en ? 'Drag to move' : 'ลากเพื่อย้าย'}">${ICONS.grip}</button></span>`);
+    }
+  });
+}
+function layoutChrome(){
+  const edit = state.layoutEdit;
+  document.body.classList.toggle('lay-editing', !!edit);
+  document.querySelector('.lay-bar')?.remove();
+  document.querySelector('.lay-addzone')?.remove();
+  if(!edit) return;
+  const en = isEN();
+  const off = LAYOUT_ZONES[edit].filter(z => zoneHidden(edit, z.k) || (z.extra && !zoneOn(edit, z.k))).length;
+  document.body.insertAdjacentHTML('afterbegin', `<div class="lay-bar"><div class="lay-bar-t"><b>${edit === 'home' ? (en ? 'Arrange my home page' : 'จัดหน้าแรกของฉัน') : (en ? 'Arrange my profile' : 'จัดหน้าโปรไฟล์ของฉัน')}</b>
+    <span>${en ? 'Drag ⠿ to move · tap the eye to hide' : 'ลาก ⠿ เพื่อย้าย · แตะรูปตาเพื่อซ่อน'}</span></div>
+    <button class="lay-btn is-ghost" data-action="lay-reset">${en ? 'Reset' : 'ค่าเดิม'}</button><button class="lay-btn is-done" data-action="lay-done">${en ? 'Done' : 'เสร็จ'}</button></div>`);
+  const main = document.getElementById('main');
+  main && main.insertAdjacentHTML('beforeend', `<button class="lay-addzone" data-action="lay-sheet">＋ ${en ? 'Add a zone' : 'เพิ่มโซน'}${off ? ` · ${off} ${en ? 'available' : 'โซนที่ยังไม่ได้ใส่'}` : ''}</button>`);
+}
+function applyBackground(){
+  const bg = myLayout().bg || '';
+  if(bg) document.documentElement.dataset.bg = bg; else delete document.documentElement.dataset.bg;
+}
+function applyLayoutAll(){
+  if(state.layoutEdit && state.view !== (state.layoutEdit === 'home' ? 'feed' : 'profile')){ state.layoutEdit = null; state.layoutDraft = null; }
+  applyBackground();
+  const main = document.getElementById('main');
+  if(main && state.view === 'feed') applyLayout('home', main);
+  if(main && state.view === 'profile') applyLayout('profile', main);
+  layoutChrome();
+}
+function cleanLayout(L){
+  const out = { ...(L || {}) };
+  for(const page of ['home', 'profile']){
+    const p = out[page];
+    if(!p) continue;
+    const def = LAYOUT_ZONES[page].map(z => z.k);
+    const same = JSON.stringify(p.order || def) === JSON.stringify(def) && !(p.hidden || []).length && !(p.added || []).length;
+    if(same) delete out[page];
+  }
+  if(!out.bg) delete out.bg;
+  if(!out.acc) delete out.acc;
+  if(!out.nav || JSON.stringify(out.nav) === JSON.stringify(NAV_DEFAULT)) delete out.nav;
+  return Object.keys(out).length ? out : null;
+}
+function saveLayout(){
+  state.layout = cleanLayout(state.layout);
+  try{ localStorage.setItem(LAYOUT_KEY, JSON.stringify({ uid: state.account && state.account.uid, layout: state.layout })); }catch(e){}
+  if(typeof fbAuth !== 'undefined' && fbAuth.currentUser && !fbAuth.currentUser.isAnonymous)
+    fbDb.collection('users').doc(fbAuth.currentUser.uid).set({ layout: state.layout ? JSON.parse(JSON.stringify(state.layout)) : null }, { mergeFields:['layout'] }).catch(() => {});
+}
+function setLayout(patch){
+  state.layout = { ...(state.layout || {}), ...patch };
+  saveLayout();
+  render();
+}
+function enterLayoutEdit(page){
+  if(!canLayout()){ state.view = 'auth'; render(); pushHistory(); return; }
+  state.layoutDraft = JSON.parse(JSON.stringify(state.layout || {}));
+  state.layoutEdit = page;
+  const p = state.layoutDraft[page] = state.layoutDraft[page] || {};
+  p.order = zoneOrder(page); p.hidden = p.hidden || []; p.added = p.added || [];
+  state.view = page === 'home' ? 'feed' : 'profile';
+  state.selectedEvent = null; state.selectedId = null; state.dayOf = null;
+  render(); pushHistory();
+  window.scrollTo(0, 0);
+}
+function leaveLayoutEdit(save){
+  if(save){ state.layout = { ...(state.layout || {}), [state.layoutEdit]: state.layoutDraft[state.layoutEdit] }; saveLayout(); }
+  state.layoutEdit = null; state.layoutDraft = null;
+  render();
+}
+function openZoneSheet(){
+  const page = state.layoutEdit;
+  if(!page) return;
+  const en = isEN();
+  const rows = LAYOUT_ZONES[page].filter(z => zoneHidden(page, z.k) || (z.extra && !zoneOn(page, z.k)));
+  closeShareSheet();
+  const el = document.createElement('div');
+  el.className = 'share-sheet';
+  el.innerHTML = `<div class="share-back" data-share="close"></div>
+    <div class="share-panel" role="dialog" aria-label="${en ? 'Add a zone' : 'เพิ่มโซน'}">
+      <div class="share-head"><b>${en ? 'Add a zone' : 'เพิ่มโซน'}</b><button class="share-x" data-share="close" aria-label="${en ? 'Close' : 'ปิด'}">✕</button></div>
+      <p class="lay-sheet-note">${en ? 'Tap + and the zone joins the page; drag it where you like.' : 'แตะ + แล้วโซนจะกลับมาในหน้า ลากไปวางที่ไหนก็ได้'}</p>
+      ${rows.length ? rows.map(z => `<button class="lay-row" data-zone-add="${z.k}"><span>${z.icon ? z.icon + ' ' : ''}${escapeHtml(zoneName(z))}</span>
+        <em>${zoneHidden(page, z.k) ? (en ? 'hidden' : 'ซ่อนอยู่') : (en ? 'new' : 'โซนใหม่')}</em><i>+</i></button>`).join('')
+        : `<p class="muted-note">${en ? 'Every zone is already on the page.' : 'ทุกโซนอยู่ในหน้าแล้ว'}</p>`}
+    </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  el.addEventListener('click', e => {
+    const add = e.target.closest('[data-zone-add]');
+    if(add){
+      const p = state.layoutDraft[page], k = add.dataset.zoneAdd;
+      p.hidden = (p.hidden || []).filter(x => x !== k);
+      if(LAYOUT_ZONES[page].find(z => z.k === k).extra && !(p.added || []).includes(k)) p.added = [...(p.added || []), k];
+      closeShareSheet(); renderMain();
+      requestAnimationFrame(() => { const z = document.querySelector(`#main [data-zone="${k}"]`); z && z.scrollIntoView({ block:'center', behavior:'smooth' }); });
+      return;
+    }
+    if(e.target.closest('[data-share="close"]')) closeShareSheet();
+  });
+}
+
+/* Dragging a zone by its handle: it follows the finger, the others make room,
+   and the page scrolls when the finger nears its top or bottom edge. */
+function layDragStart(e){
+  const h = e.target.closest && e.target.closest('.lay-h');
+  if(!h || !state.layoutEdit) return;
+  const el = h.closest('[data-zone]');
+  if(!el) return;
+  e.preventDefault();
+  try{ h.setPointerCapture(e.pointerId); }catch(err){}
+  const page = state.layoutEdit;
+  const flow = () => getComputedStyle(el.parentElement).display === 'contents'
+    ? [...document.querySelectorAll('#main [data-zone]')].filter(x => getComputedStyle(x.parentElement).display === 'contents' || x.parentElement === el.parentElement)
+    : [...el.parentElement.querySelectorAll(':scope > [data-zone]')];
+  const docTop = x => x.getBoundingClientRect().top + window.scrollY;
+  let dy = 0, lastY = e.clientY, raf = 0;
+  const startPointer = e.clientY + window.scrollY, startTop = docTop(el);
+  el.classList.add('lay-lift');
+  const place = () => {
+    const want = startTop + (lastY + window.scrollY - startPointer);
+    const nat = docTop(el) - dy;
+    dy = want - nat;
+    el.style.transform = `translateY(${dy}px)`;
+    const mid = want + el.offsetHeight / 2;
+    const others = flow().filter(x => x !== el).sort((a, b) => (+a.style.order) - (+b.style.order));
+    const before = others.find(x => mid < docTop(x) + x.offsetHeight / 2);
+    const p = state.layoutDraft[page], k = el.dataset.zone;
+    const cur = p.order.filter(x => x !== k);
+    const at = before ? cur.indexOf(before.dataset.zone) : (others.length ? cur.indexOf(others[others.length - 1].dataset.zone) + 1 : cur.length);
+    cur.splice(at < 0 ? cur.length : at, 0, k);
+    if(cur.join() !== p.order.join()){
+      p.order = cur;
+      document.querySelectorAll('#main [data-zone]').forEach(x => { x.style.order = cur.indexOf(x.dataset.zone) + 1; });
+      const nat2 = docTop(el) - dy;
+      dy = want - nat2;
+      el.style.transform = `translateY(${dy}px)`;
+    }
+  };
+  const tick = () => {
+    const edge = 90, H = window.innerHeight;
+    const v = lastY < edge ? -Math.ceil((edge - lastY) / 6) : lastY > H - edge ? Math.ceil((lastY - (H - edge)) / 6) : 0;
+    if(v){ window.scrollBy(0, v); place(); }
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+  const move = ev => { lastY = ev.clientY; place(); };
+  const up = () => {
+    cancelAnimationFrame(raf);
+    h.removeEventListener('pointermove', move); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up);
+    el.classList.remove('lay-lift');
+    el.style.transform = '';
+  };
+  h.addEventListener('pointermove', move); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up);
+}
+document.addEventListener('pointerdown', layDragStart);
+
+/* The card on the profile page where all of it is chosen. */
+function renderMyStyleCard(){
+  if(!canLayout()) return '';
+  const en = isEN(), L = myLayout(), keys = navKeys();
+  const pick = state.navPick ?? null;
+  const slot = (k, i) => { const o = NAV_CATALOG.find(x => x.value === k);
+    return `<button class="lay-slot${pick === i ? ' is-pick' : ''}${k === 'profile' ? ' is-fixed' : ''}" ${k === 'profile' ? 'disabled' : `data-action="lay-nav-slot" data-id="${i}"`}>
+      <span class="gnav-icon">${o.icon}</span><small>${escapeHtml(en ? o.en : o.th)}</small></button>`; };
+  return `<h3 class="section-label">${en ? 'Make it mine' : 'แต่งเว็บของฉัน'}</h3>
+  <div class="lay-card">
+    <div class="lay-go">
+      <button class="lay-go-btn" data-action="lay-edit" data-id="home">${ICONS.layout}<span>${en ? 'Arrange the home page' : 'จัดหน้าแรก'}</span></button>
+      <button class="lay-go-btn" data-action="lay-edit" data-id="profile">${ICONS.layout}<span>${en ? 'Arrange this page' : 'จัดหน้าโปรไฟล์'}</span></button>
+    </div>
+    <p class="vis-h">${en ? 'Bottom menu — tap a slot, then a tab' : 'เมนูล่าง · แตะช่อง แล้วเลือกเมนูที่จะใส่'}</p>
+    <div class="lay-slots">${keys.map(slot).join('')}</div>
+    ${pick != null ? `<div class="lay-pickrow">${NAV_CATALOG.filter(o => o.value !== 'profile').map(o => `<button class="chip${keys[pick] === o.value ? ' active' : ''}" data-action="lay-nav-pick" data-id="${o.value}">${escapeHtml(en ? o.en : o.th)}</button>`).join('')}</div>` : ''}
+    <p class="vis-h">${en ? 'Background' : 'ธีมพื้นหลัง'}</p>
+    <div class="lay-sw">${LAYOUT_BG.map(b => `<button class="lay-swatch${(L.bg || '') === b.k ? ' is-on' : ''}" style="background:${b.sw}" data-action="lay-bg" data-id="${b.k}" aria-label="${escapeAttr(en ? b.en : b.th)}" title="${escapeAttr(en ? b.en : b.th)}"></button>`).join('')}</div>
+    <p class="vis-h">${en ? 'Colour of this page' : 'สีหน้าโปรไฟล์'}</p>
+    <div class="lay-sw">${LAYOUT_ACC.map(a => { const km = a.k === 'oshi' && state.kamiOshi ? getMember(state.kamiOshi) : null;
+      const c = a.k === 'oshi' ? (km ? getGroup(km.groupId).color : '#B9AFC2') : (a.c || 'var(--paper-dim)');
+      return `<button class="lay-swatch is-dot${(L.acc || '') === a.k ? ' is-on' : ''}" style="background:${c}" data-action="lay-acc" data-id="${a.k}" aria-label="${escapeAttr(a.th)}" title="${escapeAttr(a.th)}">${a.k === 'oshi' ? '★' : a.k === '' ? '↺' : ''}</button>`; }).join('')}</div>
+    ${state.layout ? `<button class="link-inline lay-resetall" data-action="lay-reset-all">${en ? 'Put everything back as it was' : 'คืนค่าเดิมทั้งหมด'}</button>` : ''}
+  </div>`;
+}
+
 /* From Google Search, through the Search Console API (the Worker's GSC_KEY):
    what people typed before they found the site, how often it showed in the
    results, and how often they clicked through. Google trails by 2–3 days. */
@@ -15071,14 +15497,22 @@ function renderProfile(){
   ${renderFlashComposer()}
   ${renderPendingQueue()}
   ${renderFeedbackInbox()}
+  ${renderMyStyleCard()}
+  <div class="lay-zones" data-page="profile">
+  <section class="lay-z" data-zone="kami">
   <h3 class="section-label">Kami Oshi ของคุณ</h3>
   ${kamiMember ? renderKamiOshiFeatured(kamiMember) : `<p class="muted-note">ยังไม่ได้เลือก Kami Oshi — เปิดโปรไฟล์สมาชิกแล้วกดปุ่มมงกุฎเพื่อเลือก (เลือกได้คนเดียว)</p>`}
+  </section>
+  <section class="lay-z" data-zone="oshi">
   <h3 class="section-label">Oshi ทั้งหมด (${oshiMembers.length})</h3>
   ${oshiMembers.length ? `<div class="grid-mini grid-mini-oshi">${oshiMembers.map(m => renderMiniCard(m)).join('')}</div>` : `<p class="muted-note">ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม</p>`}
-
+  </section>
+  ${zoneOn('profile', 'oshievents') ? `<section class="lay-z" data-zone="oshievents"><h3 class="section-label">${isEN() ? 'My oshi’s events' : 'งานของโอชิที่จะถึง'}</h3>${oshiEventsList(5)}</section>` : ''}
+  <section class="lay-z" data-zone="feedback">
   <h3 class="section-label">ส่งความคิดเห็นถึง 48thDb</h3>
   ${renderFeedbackCard('profile')}
-
+  </section>
+  <section class="lay-z" data-zone="iam">
   <h3 class="section-label">แอปของวง</h3>
   <a class="iam-link" href="https://app.bnk48.com/" target="_blank" rel="noopener noreferrer">
     <img class="iam-icon" src="iam48-icon.png" alt="" width="34" height="34">
@@ -15088,7 +15522,8 @@ function renderProfile(){
     </span>
     <span class="iam-go" aria-hidden="true">↗</span>
   </a>
-
+  </section>
+  <section class="lay-z" data-zone="backup">
   <h3 class="section-label">สำรองข้อมูล</h3>
   <div class="backup-card">
     <p class="muted-note" style="margin:0 0 12px;">
@@ -15098,6 +15533,8 @@ function renderProfile(){
       <button class="btn-secondary" data-action="export-oshi">บันทึกเป็นไฟล์</button>
       <button class="btn-secondary" data-action="import-oshi">นำไฟล์เข้า</button>
     </div>
+  </div>
+  </section>
   </div>
   ${(()=>{
     // When the page was deployed, straight from the server's Last-Modified — so
@@ -16939,6 +17376,7 @@ function renderMain(){
   bindOrgZoom();
   bindReveal(arrived);
   applyPageMeta();
+  applyLayoutAll();
   sendHit();
 }
 
@@ -19774,6 +20212,24 @@ function bindDelegatedEvents(){
     else if(action==='fb-send'){ fbSend(el, el.dataset.value); }
     else if(action==='fb-refresh'){ loadFeedback().then(() => renderMain()); }
     else if(action==='visits-refresh'){ if(visitsState) visitsState.at = 0; el.textContent = 'กำลังโหลด…'; loadVisits(); }
+    else if(action==='lay-edit') enterLayoutEdit(id);
+    else if(action==='lay-done') leaveLayoutEdit(true);
+    else if(action==='lay-reset'){ const pg = state.layoutEdit; if(pg){ state.layoutDraft[pg] = { order:LAYOUT_ZONES[pg].map(z => z.k), hidden:[], added:[] }; renderMain(); } }
+    else if(action==='lay-toggle'){
+      const p = state.layoutEdit && state.layoutDraft[state.layoutEdit];
+      if(p){ p.hidden = p.hidden.includes(id) ? p.hidden.filter(x => x !== id) : [...p.hidden, id]; renderMain(); }
+    }
+    else if(action==='lay-sheet') openZoneSheet();
+    else if(action==='lay-nav-slot'){ state.navPick = state.navPick === +id ? null : +id; renderMain(); }
+    else if(action==='lay-nav-pick'){
+      const keys = navKeys().slice(0, 4), i = state.navPick ?? 0, was = keys.indexOf(id);
+      if(was >= 0) keys[was] = keys[i];
+      keys[i] = id; state.navPick = null;
+      setLayout({ nav:keys });
+    }
+    else if(action==='lay-bg') setLayout({ bg:id });
+    else if(action==='lay-acc') setLayout({ acc:id });
+    else if(action==='lay-reset-all'){ if(confirm(isEN() ? 'Put the whole site back as it comes?' : 'คืนค่าเดิมทั้งหมด ทั้งหน้าแรก หน้าโปรไฟล์ เมนูล่าง และธีม?')){ state.layout = null; state.navPick = null; saveLayout(); render(); } }
     else if(action==='signups-refresh'){ el.textContent = 'กำลังโหลด…'; loadSignups(); }
     else if(action==='fb-del'){
       if(!confirm('ลบฟีดแบ็กนี้?')) return;
@@ -20143,8 +20599,9 @@ function bindDelegatedEvents(){
       render(); pushHistory();
     }
     else if(action==='nav-select'){
-      const opt = NAV_OPTIONS.find(o=>o.value===el.dataset.value);
+      const opt = NAV_CATALOG.find(o=>o.value===el.dataset.value);
       if(opt){
+        if(opt.value === 'ge'){ state.timelineId = 'ge2026'; state.geTab = 'overview'; }
         state.view = opt.view;
         state.favoritesOnly = opt.fav;
         leaveOverlays();
@@ -20353,6 +20810,11 @@ async function init(){
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;
     if(state.account && oshiData.avatar) state.account.avatar = oshiData.avatar;
+    // the reader's own arrangement; a guest or someone signed out gets the site as it comes
+    const lay = state.account ? (oshiData.layout || null) : null;
+    if(JSON.stringify(lay) !== JSON.stringify(_authKnown ? state.layout : _bootLayout)) changed = true;
+    state.layout = lay; _authKnown = true;
+    try{ if(state.account) localStorage.setItem(LAYOUT_KEY, JSON.stringify({ uid:state.account.uid, layout:lay })); else localStorage.removeItem(LAYOUT_KEY); }catch(e){}
 
     // Who is signed in shows in the header, which is cheap to redraw on its own.
     renderProfileSlot();
