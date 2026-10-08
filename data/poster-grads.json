@@ -35,9 +35,9 @@
   "light": "linear-gradient(180deg, hsl(0 70% 78%) 0%, hsl(5 59% 78%) 17%, hsl(11 47% 78%) 33%, hsl(9 46% 80%) 50%, hsl(10 49% 80%) 67%, hsl(11 59% 79%) 83%, hsl(4 52% 78%) 100%)",
   "dark": "linear-gradient(180deg, hsl(0 35% 10%) 0%, hsl(5 35% 11%) 17%, hsl(11 33% 11%) 33%, hsl(9 32% 13%) 50%, hsl(10 34% 13%) 67%, hsl(11 35% 12%) 83%, hsl(4 35% 11%) 100%)"
  },
- "posters/fame-fanmeet.jpg": {
-  "light": "linear-gradient(180deg, hsl(248 32% 92%) 0%, hsl(233 37% 92%) 17%, hsl(224 20% 92%) 33%, hsl(215 26% 93%) 50%, hsl(208 45% 93%) 67%, hsl(356 10% 92%) 83%, hsl(17 9% 89%) 100%)",
-  "dark": "linear-gradient(180deg, hsl(248 22% 19%) 0%, hsl(233 26% 19%) 17%, hsl(224 14% 19%) 33%, hsl(215 18% 20%) 50%, hsl(208 32% 20%) 67%, hsl(356 7% 19%) 83%, hsl(17 6% 18%) 100%)"
+ "posters/fame-fanmeet-1025.jpg": {
+  "light": "linear-gradient(180deg, hsl(221 23% 93%) 0%, hsl(184 20% 93%) 17%, hsl(21 32% 92%) 33%, hsl(241 9% 92%) 50%, hsl(211 34% 92%) 67%, hsl(228 21% 90%) 83%, hsl(230 27% 93%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(221 16% 20%) 0%, hsl(184 14% 20%) 17%, hsl(21 22% 19%) 33%, hsl(241 6% 19%) 50%, hsl(211 24% 19%) 67%, hsl(228 15% 18%) 83%, hsl(230 19% 19%) 100%)"
  },
  "posters/ge2026-ticket-bundle.jpg": {
   "light": "linear-gradient(180deg, hsl(350 56% 79%) 0%, hsl(355 53% 79%) 17%, hsl(357 54% 79%) 33%, hsl(355 62% 79%) 50%, hsl(352 62% 78%) 67%, hsl(354 50% 78%) 83%, hsl(354 69% 78%) 100%)",
