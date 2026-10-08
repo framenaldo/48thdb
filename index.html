@@ -8223,7 +8223,7 @@ async function saveOshiData(){
 function renderHeader(){
   return `
   <header class="top">
-    <div class="wordmark" data-action="nav-select" data-value="feed" style="cursor:pointer;">${LOGO_SVG}</div>
+    <a class="wordmark" href="/" data-action="logo-home" aria-label="48thDb — หน้าแรก" style="cursor:pointer;text-decoration:none;">${LOGO_SVG}</a>
     <input class="search-box" id="search-input" type="text" placeholder="ค้นหาสมาชิก เพลง งาน..." value="${escapeAttr(state.query)}">
     <button class="ge-btn${state.view==='timeline' ? ' is-on' : ''}" data-action="open-ge" title="Senbatsu General Election 2026">
       <img src="posters/ge2026-logo-v2.webp" width="960" height="349" alt="" decoding="async"><span>GE2026</span></button>
@@ -20212,6 +20212,8 @@ function bindDelegatedEvents(){
     else if(action==='fb-send'){ fbSend(el, el.dataset.value); }
     else if(action==='fb-refresh'){ loadFeedback().then(() => renderMain()); }
     else if(action==='visits-refresh'){ if(visitsState) visitsState.at = 0; el.textContent = 'กำลังโหลด…'; loadVisits(); }
+    // the logo reloads the home page for real: fresh data, the newest version of the site
+    else if(action==='logo-home'){ e.preventDefault(); window.scrollTo(0, 0); location.assign(location.origin + '/'); }
     else if(action==='lay-edit') enterLayoutEdit(id);
     else if(action==='lay-done') leaveLayoutEdit(true);
     else if(action==='lay-reset'){ const pg = state.layoutEdit; if(pg){ state.layoutDraft[pg] = { order:LAYOUT_ZONES[pg].map(z => z.k), hidden:[], added:[] }; renderMain(); } }
