@@ -693,6 +693,24 @@ DTEND;VALUE=DATE:20261111
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-bday-tee-galeya-2026@48thdb
+DTSTAMP:20261003T000000Z
+SUMMARY:Pre-Order: Galeya's Birthday T-Shirt
+DESCRIPTION:เมมเบอร์: Galeya\n• เสื้อวัน
+ เกิดที่ Galeya ออกแบบเอง สำหรั
+ บวันเกิดครบ 18 ปี 24 ธ.ค. 2026 (ชุดเ
+ ดือนธันวาคม)\n• พรีออเดอร์เ
+ ท่านั้น 3 ต.ค. 12:00 – 18 ต.ค. 2026 23:59 น. ท
+ าง iAM48 Application\n• ส่งสินค้า 17 พ.ย. 2026
+  เป็นต้นไป\n• ภาพสินค้าใช้เ
+ พื่อการโฆษณาเท่านั้น\n\nhttps://48
+ thdb.com/?e=ev-bday-tee-galeya-2026
+URL:https://48thdb.com/?e=ev-bday-tee-galeya-2026
+DTSTART;VALUE=DATE:20261003
+DTEND;VALUE=DATE:20261019
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-ge6-bundle@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:Ticket Bundle: Journey of Dreams + Final Results
