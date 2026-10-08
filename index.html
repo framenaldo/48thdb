@@ -3541,7 +3541,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .lay-btn.is-done{ background:#E4457E; color:#fff; } .lay-btn.is-ghost{ background:rgba(255,255,255,.16); color:#fff; }
   body.lay-editing header.top, body.lay-editing #ticker-slot, body.lay-editing #nav-container, body.lay-editing .site-foot{ display:none; }
   body.lay-editing main{ padding-top:calc(env(safe-area-inset-top) + 92px); }
-  .lay-editing [data-zone]{ position:relative; outline:2px dashed #E4457E; outline-offset:6px; border-radius:18px; margin-top:22px; animation:lay-wob .9s ease-in-out infinite alternate; }
+  .lay-editing [data-zone]{ position:relative; outline:2px dashed #E4457E; outline-offset:6px; border-radius:18px; margin-top:22px; padding-top:16px; animation:lay-wob .9s ease-in-out infinite alternate; }
   .lay-editing [data-zone]:nth-child(2n){ animation-delay:-.45s; }
   @keyframes lay-wob{ from{ rotate:-.3deg; } to{ rotate:.3deg; } }
   @media (prefers-reduced-motion:reduce){ .lay-editing [data-zone]{ animation:none; } }
@@ -3566,6 +3566,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .lay-mini{ position:absolute; inset:0; display:none; align-items:center; gap:10px; padding:0 16px; border-radius:16px;
     background:var(--card); border:1px solid var(--line); color:var(--ink); font-size:15px; font-weight:800; pointer-events:none; }
   .lay-mini svg{ width:20px; height:20px; color:#E4457E; flex:none; }
+  .lay-more{ margin:8px 0 0; padding:10px 14px; border-radius:14px; border:1.5px dashed var(--line); text-align:center; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .lay-folded > .lay-mini{ display:flex; }
   .lay-opening > .lay-mini{ display:flex; animation:lay-fade-out .25s ease-out both; }
   @keyframes lay-fade-out{ to{ opacity:0; } }
@@ -14325,7 +14326,7 @@ function renderFeed(){
     ${overToday.length ? `
     <section class="feed-block is-over-today">
       <h2 class="section-label">จบไปแล้ววันนี้</h2>
-      ${overToday.map(e => renderEventCard(e, iso)).join('')}
+      ${layShort(overToday).map(e => renderEventCard(e, iso)).join('')}${layMore(overToday)}
     </section>` : ''}
 
     ${periods.length ? `
@@ -14338,7 +14339,7 @@ function renderFeed(){
 
     <section class="feed-block is-schedule">
       <h2 class="section-label">ตารางงานที่จะถึง</h2>
-      ${soon.length ? soon.map(e => renderEventCard(e, iso)).join('')
+      ${soon.length ? layShort(soon).map(e => renderEventCard(e, iso)).join('') + layMore(soon)
         : `<p class="muted-note">${mine
             ? 'ยังไม่มีงานที่โอชิของคุณไป — กด “ทั้งหมด” เพื่อดูทุกงาน'
             : 'ยังไม่มีงานที่ประกาศไว้ล่วงหน้า'}</p>`}
@@ -15148,7 +15149,7 @@ function oshiEventsList(n){
       return `<button class="bday-chip" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">${renderAvatar(m, 'avatar-sm', g.color)}
         <span><span class="when">🎂 ${days === 0 ? (en ? 'today' : 'วันนี้') : days === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : (en ? `in ${days} days` : `อีก ${days} วัน`)}</span><span class="who" style="display:block">${escapeHtml(nickName(m))}</span></span></button>`;
     }).join('')}</div>` : ''}
-    ${list.length ? list.map(e => renderEventCard(e, iso)).join('') : `<p class="muted-note">${en ? 'No events with your oshi announced yet.' : 'ยังไม่มีงานที่โอชิของคุณไป'}</p>`}`;
+    ${list.length ? layShort(list).map(e => renderEventCard(e, iso)).join('') + layMore(list) : `<p class="muted-note">${en ? 'No events with your oshi announced yet.' : 'ยังไม่มีงานที่โอชิของคุณไป'}</p>`}`;
 }
 
 /* Puts the zones of the page on screen in the reader's order, and in edit
@@ -15190,7 +15191,7 @@ function layoutChrome(){
   const en = isEN();
   const off = LAYOUT_ZONES[edit].filter(z => zoneHidden(edit, z.k) || (z.extra && !zoneOn(edit, z.k))).length;
   document.body.insertAdjacentHTML('afterbegin', `<div class="lay-bar"><div class="lay-bar-t"><b>${edit === 'home' ? (en ? 'Arrange my home page' : 'จัดหน้าแรกของฉัน') : (en ? 'Arrange my profile' : 'จัดหน้าโปรไฟล์ของฉัน')}</b>
-    <span>${en ? 'Press and drag a zone to move it · tap the eye to hide' : 'กดค้างที่โซนแล้วลากเพื่อย้าย · แตะรูปตาเพื่อซ่อน'}</span></div>
+    <span>${en ? 'Press, hold and drag · tap the eye to hide' : 'กดค้างแล้วลาก · แตะรูปตาเพื่อซ่อน'}</span></div>
     <button class="lay-btn is-ghost" data-action="lay-reset">${en ? 'Reset' : 'ค่าเดิม'}</button><button class="lay-btn is-done" data-action="lay-done">${en ? 'Done' : 'เสร็จ'}</button></div>`);
   const main = document.getElementById('main');
   main && main.insertAdjacentHTML('beforeend', `<button class="lay-addzone" data-action="lay-sheet">＋ ${en ? 'Add a zone' : 'เพิ่มโซน'}${off ? ` · ${off} ${en ? 'available' : 'โซนที่ยังไม่ได้ใส่'}` : ''}</button>`);
@@ -15411,6 +15412,15 @@ document.addEventListener('pointercancel', layUp);
 // once a zone is up, the finger moves it rather than the page
 document.addEventListener('touchmove', e => { if(_lay) e.preventDefault(); }, { passive:false });
 document.addEventListener('contextmenu', e => { if(state.layoutEdit && e.target.closest && e.target.closest('#main [data-zone]')) e.preventDefault(); });
+
+/* While the home page is being arranged, a long list of events shows only
+   its first, so the other zones need not be dragged past all of it. */
+const layShort = list => state.layoutEdit === 'home' ? list.slice(0, 1) : list;
+function layMore(list){
+  if(state.layoutEdit !== 'home' || list.length < 2) return '';
+  const en = isEN(), n = list.length - 1;
+  return `<p class="lay-more">${en ? `+ ${n} more — folded while you arrange` : `+ อีก ${n} งาน · ย่อไว้ระหว่างจัดหน้า`}</p>`;
+}
 
 /* Telling people they can do it. A signed-in reader who has never arranged
    anything gets a pointer at the button, once; a guest a small card asking
