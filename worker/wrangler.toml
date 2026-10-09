@@ -24,3 +24,8 @@ id = "6fa61537e8444dbba588454ec4323753"
 [[analytics_engine_datasets]]
 binding = "HITS"
 dataset = "hits_48thdb"
+
+# Workers AI, for /translate: a member's biography in the other language,
+# asked by the owner's page when one is saved or approved.
+[ai]
+binding = "AI"

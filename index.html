@@ -3624,6 +3624,111 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .lay-swatch.is-on{ box-shadow:0 0 0 3px #E4457E, 0 3px 0 var(--line); }
   .lay-swatch:active{ transform:translateY(2px); }
   .lay-resetall{ align-self:flex-start; margin-top:6px; font-size:12.5px; }
+
+  /* ---- Biography: on the member's sheet, read in full, written, and by tag ---- */
+  :root{ --bio-mn:#C8336B; --bio-ht:#2E8C82; }
+  :root[data-theme="dark"]{ --bio-mn:#FF84B2; --bio-ht:#63CDBF; }
+  h3.section-label.is-bio{ display:flex; align-items:center; gap:8px; color:var(--ink); font-weight:800; font-size:15.5px; text-transform:none; letter-spacing:0; }
+  h3.section-label.is-bio::before{ content:''; width:4px; height:19px; border-radius:2px; background:var(--gold); flex:none; }
+  .sec-bio h3.section-label.is-bio{ margin-top:4px; }
+  .bio-card{ padding:14px 14px 12px; border-radius:18px; background:var(--card); border:1px solid var(--line); box-shadow:0 3px 0 var(--line); margin:0 0 14px; }
+  .bio-card.is-empty{ display:flex; align-items:center; gap:10px; padding:12px 12px 12px 14px; }
+  .bio-card.is-empty p{ margin:0; flex:1; color:var(--ink-soft); font-size:14px; }
+  .bio-text{ font-size:15px; line-height:1.85; overflow-wrap:anywhere; }
+  .bio-text p{ margin:0 0 10px; } .bio-text p:last-child{ margin-bottom:0; }
+  .bio-text.is-clamp{ max-height:calc(1.85em * 4); overflow:hidden; position:relative; }
+  .bio-text.is-clamp:not(.is-short)::after{ content:''; position:absolute; left:0; right:0; bottom:0; height:2.4em; background:linear-gradient(transparent, var(--card)); pointer-events:none; }
+  .bio-text.is-short{ max-height:none; }
+  .bio-mn, .bio-ht{ font-weight:800; cursor:pointer; border-radius:4px; }
+  .bio-mn{ color:var(--bio-mn); } .bio-ht{ color:var(--bio-ht); }
+  .bio-mn:active, .bio-ht:active{ background:color-mix(in srgb, currentColor 14%, transparent); }
+  @media (hover:hover){ .bio-mn:hover, .bio-ht:hover{ text-decoration:underline; text-underline-offset:3px; } }
+  .bio-ln{ color:inherit; font-weight:700; text-decoration:underline; text-decoration-color:#E4457E; text-decoration-thickness:2px; text-underline-offset:3px; }
+  .bio-ln-go{ font-size:.72em; color:#E4457E; margin-left:1px; vertical-align:.35em; text-decoration:none; display:inline-block; }
+  .bio-more{ margin:4px 0 0; padding:4px 0; border:0; background:none; font:inherit; font-weight:800; font-size:13.5px; color:#E4457E; cursor:pointer; }
+  .bio-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .bio-tag{ padding:3px 11px; border-radius:99px; border:1px solid color-mix(in srgb, var(--bio-ht) 35%, var(--line)); background:color-mix(in srgb, var(--bio-ht) 10%, var(--card));
+    color:var(--bio-ht); font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; box-shadow:0 2px 0 color-mix(in srgb, var(--bio-ht) 30%, var(--line)); }
+  .bio-tag:active{ transform:translateY(2px); box-shadow:none; }
+  .bio-foot{ display:flex; align-items:center; gap:8px; margin-top:11px; padding-top:10px; border-top:1px dashed var(--line); font-size:12px; color:var(--ink-soft); }
+  .bio-foot span{ flex:1; min-width:0; }
+  .bio-pen{ flex:none; padding:5px 12px; border-radius:99px; border:1px solid var(--line); background:var(--card); font:inherit; font-size:12.5px; font-weight:700; color:var(--ink);
+    cursor:pointer; box-shadow:0 2px 0 var(--line); }
+  .bio-pen:active{ transform:translateY(2px); box-shadow:none; }
+  /* read in full: a sheet over the member's own */
+  .modal-backdrop.is-bio{ z-index:61; }
+  .modal-glass-card.is-bio-sheet{ max-width:560px; }
+  .bio-sheet-head{ display:flex; align-items:center; gap:11px; margin:0 44px 14px 0; }
+  .bio-sheet-head b{ display:block; font-size:17px; line-height:1.3; }
+  .bio-sheet-head small{ display:block; font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .bio-sheet-av{ width:44px; height:44px; flex:none; }
+  .bio-text.is-full{ font-size:15.5px; }
+  /* writing one: a sheet of its own that sits above the keyboard */
+  .modal-backdrop.is-bio-edit{ z-index:80; align-items:flex-end; padding:0; }
+  @media (min-width:640px){ .modal-backdrop.is-bio-edit{ align-items:center; padding:24px; } }
+  .bio-ed-card{ position:relative; display:flex; flex-direction:column; width:100%; max-width:620px; height:min(100%, 760px); background:var(--card); color:var(--ink);
+    border-radius:24px 24px 0 0; box-shadow:0 -10px 40px rgba(var(--shadow-rgb),.3); overflow:hidden; animation:modalPopIn .3s cubic-bezier(.22,1,.36,1); }
+  @media (min-width:640px){ .bio-ed-card{ border-radius:24px; height:min(100%, 680px); } }
+  .bio-ed-head{ display:flex; align-items:center; gap:10px; padding:14px 14px 10px; }
+  .bio-ed-x{ display:grid; place-items:center; width:36px; height:36px; flex:none; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; box-shadow:0 2px 0 var(--line); }
+  .bio-ed-x svg{ width:15px; height:15px; }
+  .bio-ed-t{ flex:1; min-width:0; } .bio-ed-t b{ display:block; font-size:16px; } .bio-ed-t small{ display:block; font-size:12px; color:var(--ink-soft); }
+  .bio-ed-save{ flex:none; padding:8px 16px; border:0; border-radius:99px; background:#E4457E; color:#fff; font:inherit; font-weight:800; font-size:14px; cursor:pointer; box-shadow:0 3px 0 #B32F60; }
+  .bio-ed-save:active{ transform:translateY(2px); box-shadow:0 1px 0 #B32F60; }
+  .bio-ed-save:disabled{ opacity:.6; }
+  .bio-ed-wrap{ position:relative; flex:1; min-height:0; margin:0 14px; display:flex; }
+  .bio-ed, .bio-ed-prev{ flex:1; min-height:0; overflow-y:auto; padding:12px 14px; border-radius:18px; font-size:16px; line-height:1.85; -webkit-overflow-scrolling:touch; }
+  .bio-ed{ position:relative; border:2px solid #E4457E; box-shadow:0 0 0 4px rgba(228,69,126,.12); outline:none; white-space:pre-wrap; overflow-wrap:anywhere; caret-color:#E4457E; }
+  .bio-ed.is-empty::before{ content:attr(data-placeholder); position:absolute; left:14px; right:14px; top:12px; color:var(--ink-soft); pointer-events:none; }
+  .bio-ed .bio-ln{ cursor:pointer; }
+  .bio-ed-prev{ border:1px dashed var(--line); }
+  .bio-ed-prev .bio-mn, .bio-ed-prev .bio-ht, .bio-ed-prev .bio-ln{ pointer-events:none; }
+  .bio-ed-note{ margin:8px 16px 0; font-size:12px; color:var(--ink-soft); }
+  .bio-ed-tools{ display:flex; gap:6px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); margin-top:8px; border-top:1px solid var(--line); background:var(--paper-dim, var(--card)); }
+  .bio-ed-tools button{ padding:7px 14px; border-radius:99px; border:1px solid var(--line); background:var(--card); color:var(--ink); font:inherit; font-weight:800; font-size:14px; cursor:pointer; box-shadow:0 2px 0 var(--line); }
+  .bio-ed-tools button:active{ transform:translateY(2px); box-shadow:none; }
+  .bio-ed-tools button.is-on{ background:#E4457E; border-color:#E4457E; color:#fff; box-shadow:0 2px 0 #B32F60; }
+  .bio-ed-tools .is-r{ margin-left:auto; }
+  .bio-pick{ position:absolute; left:8px; right:8px; z-index:3; max-height:min(300px, 70%); overflow-y:auto; padding:6px; border-radius:16px; background:var(--card);
+    border:1px solid var(--line); box-shadow:0 14px 34px rgba(var(--shadow-rgb),.25); }
+  .bio-pick h5{ margin:6px 8px 3px; font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .bio-pick button{ display:flex; align-items:center; gap:10px; width:100%; padding:9px 10px; border:0; border-radius:11px; background:none; font:inherit; font-size:14px; font-weight:700;
+    color:var(--ink); text-align:left; cursor:pointer; }
+  .bio-pick button.is-on{ background:color-mix(in srgb, #E4457E 13%, var(--card)); }
+  .bio-pick button span{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bio-pick button em{ flex:none; font-style:normal; font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+  .bio-pick mark{ background:none; color:#E4457E; }
+  .bio-pick p{ margin:8px 10px; font-size:13px; color:var(--ink-soft); }
+  .bio-link{ position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; justify-content:flex-end; background:var(--scrim); }
+  .bio-link[hidden]{ display:none; }
+  .bio-link-box{ padding:16px 16px calc(16px + env(safe-area-inset-bottom)); border-radius:22px 22px 0 0; background:var(--card); box-shadow:0 -10px 30px rgba(0,0,0,.18); }
+  .bio-link-box h4{ margin:0 0 2px; font-size:16px; } .bio-link-box > p{ margin:0 0 12px; font-size:12px; color:var(--ink-soft); }
+  .bio-link-box label{ display:block; margin:0 0 10px; font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .bio-link-box input{ display:block; width:100%; margin-top:4px; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--paper, var(--card)); color:var(--ink);
+    font:inherit; font-size:16px; font-weight:500; }
+  .bio-link-box input:focus{ outline:none; border:2px solid #E4457E; padding:9px 11px; }
+  .bio-link-site{ margin:-4px 0 10px; font-size:12.5px; color:var(--ink-soft); } .bio-link-site b{ color:var(--ink); }
+  .bio-link-site.is-bad b{ color:#D23B3B; }
+  .bio-link-prev{ margin:0 0 12px; padding:10px 12px; border-radius:14px; border:1px dashed #E4457E; font-size:15px; line-height:1.7; }
+  .bio-link-acts{ display:flex; gap:8px; }
+  .bio-link-acts button{ flex:1; padding:11px; border-radius:14px; border:1px solid var(--line); background:var(--card); color:var(--ink); font:inherit; font-weight:800; cursor:pointer; box-shadow:0 3px 0 var(--line); }
+  .bio-link-acts .is-go{ background:#E4457E; border-color:#E4457E; color:#fff; box-shadow:0 3px 0 #B32F60; }
+  .bio-link-acts button[hidden]{ display:none; }
+  .bio-link-acts button:active{ transform:translateY(2px); box-shadow:none; }
+  /* everyone whose biography carries a tag */
+  .tag-hero{ padding:18px; border-radius:22px; background:linear-gradient(135deg, #2E8C82, #1D6159); color:#fff; box-shadow:0 4px 0 #154A44; margin:6px 0 14px; }
+  .tag-hero b{ display:block; font-size:clamp(24px, 6vw, 34px); line-height:1.2; overflow-wrap:anywhere; } .tag-hero span{ font-size:13px; opacity:.88; }
+  .tag-list{ display:grid; gap:8px; }
+  @media (min-width:900px){ .tag-list{ grid-template-columns:1fr 1fr; } }
+  .tag-row{ display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:18px; border:1px solid var(--line); background:var(--card); box-shadow:0 3px 0 var(--line);
+    font:inherit; color:var(--ink); text-align:left; cursor:pointer; }
+  .tag-row:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
+  .tag-row b{ display:block; font-size:15px; } .tag-row small{ display:block; font-size:12.5px; line-height:1.55; color:var(--ink-soft); }
+  .tag-row small .bio-ht{ cursor:inherit; }
+  .tag-row-av{ width:46px; height:46px; flex:none; }
+  .pd-kind.is-bio{ background:var(--gold); }
+  .pd-bio{ padding:10px 12px; border-radius:14px; background:var(--card); border:1px solid var(--line); font-size:14px; }
+  .pd-bio.is-old{ opacity:.6; }
   /* backgrounds — the framed look and the accents stay; only the ground changes */
   :root[data-bg="sky"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(120,170,255,.32), transparent 42%), radial-gradient(circle at 90% 90%, rgba(190,150,255,.28), transparent 45%), linear-gradient(160deg, #F2F7FF 0%, #F6F1FF 55%, #EEF6FF 100%); }
   :root[data-bg="peach"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(255,170,110,.32), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,160,.28), transparent 45%), linear-gradient(160deg, #FFF6EC 0%, #FFF1F2 55%, #FFF8EE 100%); }
@@ -6728,6 +6833,7 @@ let state = {
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current', livesScope:'current', galleryId:null,
+  bioOf:null, tagOf:null,
   lang:'mix',
   query:'', groupFilter:'all', teamFilter:'all', sortBy:'name', sortDir:'asc',
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
@@ -7899,7 +8005,7 @@ function buildMix(){
 function mixLocalize(root){
   if(!MIX) buildMix();
   const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-    acceptNode: n => (n.parentElement && /^(SCRIPT|STYLE|INPUT|TEXTAREA)$/.test(n.parentElement.tagName))
+    acceptNode: n => (n.parentElement && (/^(SCRIPT|STYLE|INPUT|TEXTAREA)$/.test(n.parentElement.tagName) || n.parentElement.closest('[data-noloc]')))
       ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
   const seen = []; for(let n = walk.nextNode(); n; n = walk.nextNode()) seen.push(n);
   for(const n of seen){
@@ -7955,12 +8061,15 @@ function applyPageMeta(){
   let path = urlForSnapshot({ view: state.view, geTab: state.geTab, galleryId: state.galleryId });
   if(key === 'gallery'){ const g = galRoom(state.galleryId);
     title = `${en ? 'Gallery' : 'แกลเลอรี'} ${g.title}`; desc = en ? g.note.en : g.note.th; }
+  if(state.view === 'tag' && state.tagOf){ title = '#' + tagLabel(state.tagOf);
+    desc = en ? `BNK48 and CGM48 members whose biographies are tagged #${tagLabel(state.tagOf)}` : `สมาชิก BNK48 และ CGM48 ที่ประวัติย่อมีแท็ก #${tagLabel(state.tagOf)}`;
+    path = '/?t=' + encodeURIComponent(state.tagOf); }
   const m = state.selectedId ? getMember(state.selectedId) : null;
   const s = state.view === 'single' && state.selectedSingle ? findWork(state.selectedSingle) : null;
   if(m){ title = nickName(m); path = '/m/' + m.id; }
   else if(s){ title = s.title; path = `/?s=${s.id}`; }
-  else if(key === 'feed') path = '/';
-  document.title = key === 'feed' && !m && !s ? title : `${title} — 48thDb`;
+  else if(key === 'feed' && state.view !== 'tag') path = '/';
+  document.title = key === 'feed' && !m && !s && state.view !== 'tag' ? title : `${title} — 48thDb`;
   const d = document.querySelector('meta[name="description"]'); if(d) d.content = desc;
   let c = document.querySelector('link[rel="canonical"]');
   if(!c){ c = document.createElement('link'); c.rel = 'canonical'; document.head.appendChild(c); }
@@ -8043,7 +8152,7 @@ function localize(root){
   if(root && isMix()) return mixLocalize(root);
   if(!isEN() || !root) return;
   const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-    acceptNode: n => (n.parentElement && /^(SCRIPT|STYLE)$/.test(n.parentElement.tagName))
+    acceptNode: n => (n.parentElement && (/^(SCRIPT|STYLE)$/.test(n.parentElement.tagName) || n.parentElement.closest('[data-noloc]')))
       ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
   });
   const seen = [];
@@ -14665,7 +14774,7 @@ function renderDetailModal(){
 
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card is-wide is-member-sheet" data-stop-close="1">
+    <div class="modal-glass-card is-wide is-member-sheet" data-stop-close="1" data-mid="${m.id}">
       <button class="modal-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -14707,6 +14816,7 @@ function renderDetailModal(){
         </div>
         <div class="sheet-body">
         <div class="sheet-col sheet-col-a">
+        <div class="sec-bio">${renderBioBlock(m)}</div>
         <div class="stat-grid sec-stats">
           <div class="stat-cell"><div class="label">วันเกิด</div><div class="value">${formatDate(m.birthday)}</div></div>
           <div class="stat-cell"><div class="label">อายุ</div><div class="value">${age!==null?age+' ปี':'-'}</div></div>
@@ -15025,6 +15135,19 @@ function renderPendingQueue(){
   if(!state.isOwner) return '';
   const items = state.pending;
   const card = p => {
+    if(p.kind === 'bio'){
+      const m = getMember(p.memberId), when = p.at && p.at.seconds ? new Date(p.at.seconds * 1000) : null;
+      return `<article class="pd-card">
+        <p class="pd-meta"><span class="pd-kind is-bio">ประวัติย่อ</span><b>${escapeHtml(m ? nickName(m) : p.memberId)}</b></p>
+        <p class="pd-by">ส่งโดย ${escapeHtml((p.by && (p.by.name || p.by.email)) || '-')}${when ? ` · ${formatDateShort(toYmd(when))} ${String(when.getHours()).padStart(2,'0')}:${String(when.getMinutes()).padStart(2,'0')} น.` : ''}</p>
+        ${p.before ? `<div class="pd-bio is-old bio-text is-full" data-noloc>${bioHtml(p.before)}</div><div class="pd-arrow" style="text-align:center">↓</div>` : ''}
+        <div class="pd-bio bio-text is-full" data-noloc>${bioHtml(p.text)}</div>
+        <div class="pd-actions">
+          <button class="btn-add" data-action="approve-pending" data-id="${p.id}">อนุมัติ</button>
+          <button class="btn-danger" data-action="reject-pending" data-id="${p.id}">ไม่อนุมัติ</button>
+        </div>
+      </article>`;
+    }
     const before = p.before || {};
     const rows = PENDING_FIELDS.filter(([k]) => p.kind === 'add'
         ? !(p.data[k] === null || p.data[k] === undefined || p.data[k] === '' || (Array.isArray(p.data[k]) && !p.data[k].length))
@@ -15047,6 +15170,628 @@ function renderPendingQueue(){
   return `<div class="pd-head"><h3 class="section-label">รอตรวจ (${items.length})</h3>
       <button class="chip chip-link" data-action="refresh-pending">รีเฟรช</button></div>
     ${items.length ? `<div class="pd-list">${items.map(card).join('')}</div>` : `<p class="muted-note">ยังไม่มีข้อมูลที่รอตรวจ</p>`}`;
+}
+
+/* ===================== BIOGRAPHIES =====================
+   A short biography on each member's sheet, the way IMDb keeps one. Anyone
+   signed in may write or change it: the owner's goes up at once, everyone
+   else's waits in pending/ until the owner approves it. It lives in
+   Firestore bios/<member id> in two languages, the one it was written in
+   (`src`) and the other, which api.48thdb.com/translate makes when the owner
+   saves or approves; bios/_tags counts the tags. The text is a small markup:
+     @{m:bnk-music|Music}       a member (w: a single, album or special; e: an event).
+                                The name after | stands in only if the id has gone.
+     #{TeamNV}  #{สายเกม|Gamer}  a tag; after | is how it reads in this language
+     [the words](https://…)     a link that reads as the words
+   A blank line starts a paragraph. */
+const BIO_MAX = 4000;
+const BIO_API = 'https://api.48thdb.com/translate';
+const BIO_CACHE = '48thdb-bios';
+const BIO_RE = /@\{([mwe]):([\w.-]+)(?:\|([^{}\n]*))?\}|#\{([^{}|\n]+)(?:\|([^{}\n]*))?\}|\[([^\[\]\n]{1,300})\]\((https?:\/\/[^\s()<>"]+)\)/g;
+const _bios = {};             // member id → biography, or null for none; absent = not asked yet
+const _bioAsked = new Set();  // asked Firestore this visit
+let _bioTags = null;          // bios/_tags: { n:{key:count}, label:{key:{th,en}} }
+const _tagHits = {};          // tag key → member ids, or 'loading'
+const _tagSeen = {};          // tag key → how it last read on screen
+try{ const c = JSON.parse(localStorage.getItem(BIO_CACHE) || '{}'); for(const k in c) _bios[k] = c[k]; }catch(e){}
+function bioCacheSave(){
+  try{ const keep = {}; Object.keys(_bios).slice(-80).forEach(k => keep[k] = _bios[k]); localStorage.setItem(BIO_CACHE, JSON.stringify(keep)); }catch(e){}
+}
+const bioKey = t => String(t || '').trim().replace(/^#+/, '').toLowerCase();
+const bioFromDoc = x => ({ src:x.src || 'th', th:x.th || '', en:x.en || '', tags:x.tags || [],
+  at:x.at && x.at.toMillis ? x.at.toMillis() : (typeof x.at === 'number' ? x.at : Date.now()) });
+// what this reader sees: their language, else whatever there is
+const bioText = b => !b ? '' : (isEN() ? b.en : b.th) || b[b.src] || b.th || b.en || '';
+async function loadBio(id){
+  if(_bioAsked.has(id) || typeof fbDb === 'undefined') return;
+  _bioAsked.add(id);
+  const was = JSON.stringify(_bios[id] === undefined ? '?' : _bios[id]);
+  try{
+    const d = await fbDb.collection('bios').doc(id).get();
+    _bios[id] = d.exists ? bioFromDoc(d.data()) : null;
+    bioCacheSave();
+  }catch(e){ if(_bios[id] === undefined) _bios[id] = null; }
+  if(JSON.stringify(_bios[id]) !== was) bioRefresh(id);
+}
+// a biography arrived or changed: redraw just its part of the open sheet
+function bioRefresh(id){
+  if(state.selectedId !== id) return;
+  if(state.bioOf === id){ renderMain(); return; }
+  const box = document.querySelector('#main .is-member-sheet .sec-bio');
+  if(!box) return;
+  box.innerHTML = renderBioBlock(getMember(id));
+  localize(box); bioClamp(box);
+}
+function bioRef(kind, id, fallback){
+  const fb = fallback ? { label:fallback } : null;
+  if(kind === 'm'){ const m = getMember(id); return m ? { label:nickName(m), action:'open-member', id } : fb; }
+  if(kind === 'w'){ const w = findWork(id); return w ? { label:w.title, action:'open-single', id } : fb; }
+  if(kind === 'e'){ const e = SEED_SCHEDULE.find(x => x.id === id); return e ? { label:e.title, action:'open-event', id } : fb; }
+  return fb;
+}
+function bioLinkHtml(words, href){
+  let u; try{ u = new URL(href); }catch(e){ return escapeHtml(words); }
+  const own = /(^|\.)48thdb\.com$/.test(u.hostname);
+  return `<a class="bio-ln" href="${escapeAttr(u.href)}"${own ? '' : ' target="_blank" rel="noopener noreferrer nofollow ugc"'}>${escapeHtml(words)}${own ? '' : '<span class="bio-ln-go" aria-hidden="true">↗</span>'}</a>`;
+}
+function bioInline(text){
+  let out = '', last = 0;
+  BIO_RE.lastIndex = 0;
+  for(let m; (m = BIO_RE.exec(text)); ){
+    out += escapeHtml(text.slice(last, m.index)); last = BIO_RE.lastIndex;
+    if(m[1]){
+      const r = bioRef(m[1], m[2], m[3]);
+      if(r) out += r.action ? `<span class="bio-mn" role="link" tabindex="0" data-action="${r.action}" data-id="${escapeAttr(r.id)}">${escapeHtml(r.label)}</span>` : escapeHtml(r.label);
+    }
+    else if(m[4]){ const lab = (m[5] || m[4]).trim(); _tagSeen[bioKey(m[4])] = lab;
+      out += `<span class="bio-ht" role="link" tabindex="0" data-action="open-tag" data-id="${escapeAttr(bioKey(m[4]))}">#${escapeHtml(lab)}</span>`; }
+    else out += bioLinkHtml(m[6], m[7]);
+  }
+  return out + escapeHtml(text.slice(last));
+}
+const bioHtml = text => String(text || '').trim().split(/\n{2,}/).map(p => `<p>${p.split('\n').map(bioInline).join('<br>')}</p>`).join('');
+// as plain words: for snippets, the reading time and telling the language
+const bioPlain = text => String(text || '').replace(BIO_RE, (all, k, id, fb, tag, lab, words) =>
+  k ? ((bioRef(k, id, fb) || {}).label || '') : tag ? '#' + (lab || tag).trim() : words);
+// tag key → how it reads in this text, in order of first use
+function bioTagsOf(text){
+  const out = new Map();
+  String(text || '').replace(BIO_RE, (all, k, id, fb, tag, lab) => {
+    const key = tag && bioKey(tag);
+    if(key && !out.has(key)) out.set(key, (lab || tag).trim());
+    return all;
+  });
+  return out;
+}
+function bioLang(text){
+  const p = bioPlain(text);
+  const th = (p.match(/[฀-๿]/g) || []).length, la = (p.match(/[A-Za-z]/g) || []).length;
+  return th >= la * .25 && th > 0 ? 'th' : 'en';
+}
+function bioWhen(b){
+  const d = b && b.at ? new Date(b.at) : null;
+  return d ? `${isEN() ? 'Last edited' : 'แก้ไขล่าสุด'} ${d.getDate()} ${monthsShort()[d.getMonth()]} ${d.getFullYear()}` : '';
+}
+const bioTagChips = text => { const t = [...bioTagsOf(text)];
+  return t.length ? `<div class="bio-tags" data-noloc>${t.map(([k, l]) => `<button class="bio-tag" data-action="open-tag" data-id="${escapeAttr(k)}">#${escapeHtml(l)}</button>`).join('')}</div>` : ''; };
+const bioFoot = (b, id) => `<div class="bio-foot"><span>${bioWhen(b)}</span>
+  <button class="bio-pen" data-action="edit-bio" data-id="${id}">✎ ${isEN() ? 'Edit' : 'แก้ไข'}</button></div>`;
+
+/* On the member's sheet: four lines, the rest behind "Read more". */
+function renderBioBlock(m){
+  if(!m) return '';
+  const en = isEN(), b = _bios[m.id];
+  loadBio(m.id);                       // once a visit; a copy kept from before shows meanwhile
+  if(b === undefined) return '';
+  const head = `<h3 class="section-label is-bio">${en ? 'Biography' : 'ประวัติย่อ'}</h3>`;
+  if(!b) return head + `<div class="bio-card is-empty"><p>${en ? 'No biography yet.' : 'ยังไม่มีประวัติย่อ'}</p>
+    <button class="bio-pen" data-action="edit-bio" data-id="${m.id}">✎ ${en ? 'Write one' : 'เขียนประวัติ'}</button></div>`;
+  const text = bioText(b);
+  return head + `<div class="bio-card">
+    <div class="bio-text is-clamp" data-noloc>${bioHtml(text)}</div>
+    <button class="bio-more" data-action="open-bio" data-id="${m.id}">${en ? 'Read more' : 'อ่านต่อ'} ›</button>
+    ${bioTagChips(text)}${bioFoot(b, m.id)}</div>`;
+}
+// a biography short enough to show whole drops its fade and its "Read more"
+function bioClamp(root){
+  (root || document).querySelectorAll('.bio-text.is-clamp').forEach(t => {
+    t.classList.remove('is-short');
+    const short = t.scrollHeight <= t.clientHeight + 4;
+    t.classList.toggle('is-short', short);
+    const more = t.parentElement.querySelector('.bio-more'); if(more) more.hidden = short;
+  });
+}
+/* Read in full, over the member's sheet. */
+function renderBioSheet(){
+  const m = getMember(state.bioOf), b = m && _bios[m.id];
+  if(!m || !b) return '';
+  const en = isEN(), g = getGroup(m.groupId), text = bioText(b);
+  const mins = Math.max(1, Math.round(bioPlain(text).length / (en ? 1000 : 600)));
+  return `<div class="modal-backdrop is-bio" data-action="close-bio">
+    <div class="modal-glass-card is-bio-sheet" data-stop-close="1">
+      <button class="modal-close-btn" data-action="close-bio" title="${en ? 'Close' : 'ปิด'}" aria-label="${en ? 'Close' : 'ปิด'}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="modal-scroll">
+        <div class="bio-sheet-head">${renderAvatar(m, 'avatar-sm bio-sheet-av', g.color)}
+          <div><b>${en ? 'Biography' : 'ประวัติย่อ'} · ${escapeHtml(nickName(m))}</b>
+          <small>${g.name}${m.gen ? ` · ${en ? 'Gen' : 'รุ่น'} ${m.gen}` : ''} · ${en ? `${mins} min read` : `อ่าน ${mins} นาที`}</small></div></div>
+        <div class="bio-text is-full" data-noloc>${bioHtml(text)}</div>
+        ${bioTagChips(text)}${bioFoot(b, m.id)}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* Everyone whose biography carries a tag. */
+async function loadBioTags(){
+  if(_bioTags) return _bioTags;
+  try{ const d = await fbDb.collection('bios').doc('_tags').get(); _bioTags = d.exists ? d.data() : { n:{}, label:{} }; }
+  catch(e){ _bioTags = { n:{}, label:{} }; }
+  return _bioTags;
+}
+const tagLabel = key => { const l = _bioTags && _bioTags.label && _bioTags.label[key];
+  return (l && ((isEN() ? l.en : l.th) || l.th || l.en)) || _tagSeen[key] || key; };
+async function loadTag(key){
+  if(_tagHits[key] || typeof fbDb === 'undefined') return;
+  _tagHits[key] = 'loading';
+  try{
+    const [snap] = await Promise.all([fbDb.collection('bios').where('tags', 'array-contains', key).get(), loadBioTags()]);
+    _tagHits[key] = snap.docs.map(d => { _bios[d.id] = bioFromDoc(d.data()); return d.id; });
+  }catch(e){ _tagHits[key] = []; }
+  if(state.view === 'tag' && state.tagOf === key) renderMain();
+}
+function bioSnippet(text, key){
+  const label = bioTagsOf(text).get(key), plain = bioPlain(text).replace(/\s+/g, ' ').trim();
+  const at = label ? plain.indexOf('#' + label) : -1, from = Math.max(0, at - 40), cut = plain.slice(from, from + 120);
+  let html = escapeHtml(cut);
+  if(label) html = html.replace(escapeHtml('#' + label), `<span class="bio-ht">${escapeHtml('#' + label)}</span>`);
+  return (from > 0 ? '…' : '') + html + (from + 120 < plain.length ? '…' : '');
+}
+function renderTagPage(){
+  const key = state.tagOf || '', en = isEN(), hits = _tagHits[key];
+  if(!hits) loadTag(key);
+  const ids = Array.isArray(hits) ? hits.filter(id => getMember(id) && _bios[id]) : [];
+  let label = null;
+  for(const id of ids){ label = bioTagsOf(bioText(_bios[id])).get(key); if(label) break; }
+  label = label || tagLabel(key);
+  const top = _bioTags ? Object.entries(_bioTags.n || {}).filter(([k, n]) => n > 0 && k !== key).sort((a, b) => b[1] - a[1]).slice(0, 12) : [];
+  const rows = ids.map(id => { const m = getMember(id), g = getGroup(m.groupId);
+    return `<button class="tag-row" data-action="open-member" data-id="${id}">${renderAvatar(m, 'avatar-sm tag-row-av', g.color)}
+      <span><b>${escapeHtml(nickName(m))}</b><small data-noloc>${bioSnippet(bioText(_bios[id]), key)}</small></span></button>`; }).join('');
+  return `<div class="tag-page">
+    <div class="page-top-row"><button class="back-btn" data-action="go-back">← ${en ? 'Back' : 'กลับ'}</button></div>
+    <div class="tag-hero"><b data-noloc>#${escapeHtml(label)}</b><span>${!Array.isArray(hits) ? (en ? 'Looking…' : 'กำลังค้น…')
+      : en ? `In ${ids.length} ${ids.length === 1 ? 'biography' : 'biographies'}` : `อยู่ในประวัติของ ${ids.length} คน`}</span></div>
+    ${rows ? `<div class="tag-list">${rows}</div>` : Array.isArray(hits) ? `<p class="muted-note">${en ? 'No biography carries this tag yet.' : 'ยังไม่มีประวัติไหนใช้แท็กนี้'}</p>` : ''}
+    ${top.length ? `<h3 class="section-label is-bio">${en ? 'Popular tags' : 'แท็กที่ใช้บ่อย'}</h3>
+      <div class="bio-tags" data-noloc>${top.map(([k]) => `<button class="bio-tag" data-action="open-tag" data-id="${escapeAttr(k)}">#${escapeHtml(tagLabel(k))}</button>`).join('')}</div>` : ''}
+  </div>`;
+}
+
+/* Saving, by the owner (their own, or someone else's they approved): the
+   other language is asked for first; if that fails the biography still goes
+   up and every reader sees it as written. */
+async function bioTranslate(text, to){
+  const tok = await fbAuth.currentUser.getIdToken();
+  const res = await fetch(BIO_API, { method:'POST', cache:'no-store',
+    headers:{ authorization:`Bearer ${tok}`, 'content-type':'application/json' }, body:JSON.stringify({ text, to }) });
+  const d = await res.json().catch(() => ({}));
+  if(!res.ok || !d.text) throw new Error(d.error || `HTTP ${res.status}`);
+  return d.text;
+}
+async function saveBio(id, text){
+  const prev = _bios[id] || null, ref = fbDb.collection('bios').doc(id);
+  const before = prev ? bioTagsOf(prev[prev.src] || '') : new Map();
+  if(!text){
+    await ref.delete();
+    _bios[id] = null; bioCacheSave();
+    await bioCountTags(before, new Map(), {});
+    return { translated:false };
+  }
+  const src = bioLang(text), other = src === 'th' ? 'en' : 'th';
+  let tr = '';
+  try{ tr = await bioTranslate(text, other); }catch(e){ console.warn('bio translation', e); }
+  const tags = bioTagsOf(text);
+  const doc = { src, th:'', en:'', tags:[...tags.keys()], at:firebase.firestore.FieldValue.serverTimestamp() };
+  doc[src] = text; doc[other] = tr;
+  await ref.set(doc);
+  _bios[id] = { ...doc, at:Date.now() }; bioCacheSave();
+  const label = {};
+  for(const [k, l] of tags) label[k] = { [src]:l };
+  if(tr) for(const [k, l] of bioTagsOf(tr)) if(label[k]) label[k][other] = l;
+  await bioCountTags(before, tags, label);
+  return { translated:!!tr };
+}
+async function bioCountTags(before, after, label){
+  const inc = firebase.firestore.FieldValue.increment, n = {};
+  for(const k of before.keys()) if(!after.has(k)) n[k] = inc(-1);
+  for(const k of after.keys()) if(!before.has(k)) n[k] = inc(1);
+  if(!Object.keys(n).length && !Object.keys(label).length) return;
+  try{ await fbDb.collection('bios').doc('_tags').set({ n, label }, { merge:true }); }catch(e){ console.warn('bio tags', e); }
+  _bioTags = null;
+  for(const k of new Set([...before.keys(), ...after.keys()])) delete _tagHits[k];
+}
+
+/* ---- The writing sheet ----
+   Its own element on the body, so the page redrawing underneath (Firebase
+   catching up, the clock) never touches what is being typed. Mentions, tags
+   and links are single pieces in the text; @ and # bring up what can go
+   there, a pasted address or 🔗 asks for the words to show instead. */
+let _bioEd = null;
+const BIO_DRAFT = id => '48thdb-bio-draft-' + id;
+function bioAtom(kind, val, label){
+  const cls = kind === 'ref' ? 'bio-mn' : kind === 'tag' ? 'bio-ht' : 'bio-ln';
+  return `<span class="${cls}" contenteditable="false" data-${kind}="${escapeAttr(val)}">${escapeHtml(label)}</span>`;
+}
+function bioEdHtml(text){
+  let out = '', last = 0;
+  const esc = s => escapeHtml(s).replace(/\n/g, '<br>');
+  BIO_RE.lastIndex = 0;
+  for(let m; (m = BIO_RE.exec(text)); ){
+    out += esc(text.slice(last, m.index)); last = BIO_RE.lastIndex;
+    if(m[1]){ const r = bioRef(m[1], m[2], m[3]); out += bioAtom('ref', m[1] + ':' + m[2], r ? r.label : m[2]); }
+    else if(m[4]) out += bioAtom('tag', m[4].trim(), '#' + m[4].trim());
+    else out += bioAtom('href', m[7], m[6]);
+  }
+  return out + esc(text.slice(last));
+}
+// a #word typed straight into the text, with a letter in it, is a tag too
+const bioBareTags = s => s.replace(/(^|[\s(])#([^\s#@{}\[\]()<>,.!?;:"'“”‘’…]{1,40})/g,
+  (all, pre, w) => /[A-Za-z฀-๿]/.test(w) ? `${pre}#{${w}}` : all);
+function bioSerialize(ed){
+  const walk = node => {
+    let s = '';
+    for(const n of node.childNodes){
+      if(n.nodeType === 3){ s += bioBareTags(n.nodeValue.replace(/ /g, ' ')); continue; }
+      if(n.nodeType !== 1) continue;
+      const d = n.dataset || {};
+      if(d.ref) s += `@{${d.ref}|${n.textContent.replace(/[{}|\n]/g, '')}}`;
+      else if(d.tag) s += `#{${d.tag.replace(/[{}|\n]/g, '')}}`;
+      else if(d.href) s += `[${n.textContent.replace(/[\[\]\n]/g, '').trim() || d.href}](${d.href})`;
+      else if(n.tagName === 'BR') s += '\n';
+      else if(n.tagName === 'DIV' || n.tagName === 'P'){ if(s && !s.endsWith('\n')) s += '\n'; s += walk(n); if(!s.endsWith('\n')) s += '\n'; }
+      else s += walk(n);
+    }
+    return s;
+  };
+  return walk(ed).split('\n').map(l => l.replace(/[ \t]+$/, '')).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+function bioCaretAt(node, offset){
+  const s = getSelection(), r = document.createRange();
+  r.setStart(node, offset); r.collapse(true); s.removeAllRanges(); s.addRange(r);
+}
+function bioCaretEnd(ed){
+  const s = getSelection(), r = document.createRange();
+  r.selectNodeContents(ed); r.collapse(false); s.removeAllRanges(); s.addRange(r);
+}
+// where the next piece goes: the selection if it is in the text, else the end
+function bioRangeIn(){
+  const E = _bioEd, s = getSelection();
+  if(s.rangeCount && E.ed.contains(s.getRangeAt(0).commonAncestorContainer)) return s.getRangeAt(0).cloneRange();
+  const r = document.createRange(); r.selectNodeContents(E.ed); r.collapse(false); return r;
+}
+// put a piece where the range is, a space after it, and the caret after that
+function bioPlace(range, html){
+  const E = _bioEd, tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const atom = tmp.firstChild, sp = document.createTextNode(' ');
+  range.deleteContents(); range.insertNode(sp); range.insertNode(atom);
+  E.ed.focus({ preventScroll:true }); bioCaretAt(sp, 1); bioDirty();
+}
+function bioDirty(){
+  const E = _bioEd; if(!E) return;
+  E.ed.classList.toggle('is-empty', !E.ed.textContent.trim() && !E.ed.querySelector('[data-ref],[data-tag],[data-href]'));
+  clearTimeout(E.dt);
+  E.dt = setTimeout(() => {
+    if(_bioEd !== E) return;
+    try{ const t = bioSerialize(E.ed); if(t && t !== E.src) localStorage.setItem(BIO_DRAFT(E.id), t); else localStorage.removeItem(BIO_DRAFT(E.id)); }catch(e){}
+  }, 400);
+}
+function openBioEditor(id){
+  const m = getMember(id); if(!m) return;
+  const en = isEN();
+  if(!(state.account && state.account.loggedIn)){
+    toast(en ? 'Sign in to write a biography' : 'เข้าสู่ระบบก่อนเขียนประวัติ');
+    leaveOverlays(); state.view = 'auth'; render(); pushHistory(); return;
+  }
+  closeBioEditor(true);
+  const own = state.isOwner, b = _bios[id], src = b ? (b[b.src] || '') : '';
+  let draft = null; try{ draft = localStorage.getItem(BIO_DRAFT(id)); }catch(e){}
+  const start = draft && draft !== src ? draft : src;
+  const el = document.createElement('div');
+  el.className = 'modal-backdrop is-bio-edit';
+  el.innerHTML = `<div class="bio-ed-card" role="dialog" aria-modal="true">
+    <div class="bio-ed-head">
+      <button class="bio-ed-x" data-bio="close" aria-label="${en ? 'Close' : 'ปิด'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="bio-ed-t"><b>${b ? (en ? 'Edit biography' : 'แก้ไขประวัติย่อ') : (en ? 'Write a biography' : 'เขียนประวัติย่อ')}</b>
+        <small>${escapeHtml(nickName(m))} · ${getGroup(m.groupId).name}</small></div>
+      <button class="bio-ed-save" data-bio="save">${own ? (en ? 'Save' : 'บันทึก') : (en ? 'Send' : 'ส่งตรวจ')}</button>
+    </div>
+    <div class="bio-ed-wrap">
+      <div class="bio-ed" contenteditable="true" spellcheck="true" data-noloc
+        data-placeholder="${en ? 'Who she is, how she came to the group, what she loves… type @ for a member, song or event, # for a tag' : 'เล่าว่าเธอเป็นใคร เข้าวงมาอย่างไร ชอบอะไร… พิมพ์ @ เพื่อเมนชันเมมเบอร์ เพลง หรืองาน # เพื่อใส่แท็ก'}"></div>
+      <div class="bio-ed-prev bio-text is-full" data-noloc hidden></div>
+      <div class="bio-pick" hidden></div>
+    </div>
+    <p class="bio-ed-note">${draft && draft !== src ? (en ? 'Picked up where you left off. ' : 'ต่อจากที่เขียนค้างไว้ · ') : ''}${own
+      ? (en ? 'Goes up when saved, and the other language is made for you.' : 'บันทึกแล้วขึ้นเว็บทันที และแปลเป็นอีกภาษาให้อัตโนมัติ')
+      : (en ? 'The site owner reads it before it goes up.' : 'เจ้าของเว็บจะตรวจก่อนขึ้นเว็บ')}</p>
+    <div class="bio-ed-tools">
+      <button data-bio="at" aria-label="${en ? 'Mention' : 'เมนชัน'}">@</button>
+      <button data-bio="hash" aria-label="${en ? 'Tag' : 'แท็ก'}">#</button>
+      <button data-bio="link">🔗 ${en ? 'Link' : 'ลิงก์'}</button>
+      <button class="is-r" data-bio="prev">${en ? 'Preview' : 'ตัวอย่าง'}</button>
+    </div>
+    <div class="bio-link" hidden><div class="bio-link-box">
+      <h4>🔗 ${en ? 'Add a link' : 'ใส่ลิงก์'}</h4><p>${en ? 'Readers see the words; tapping them opens the link.' : 'คนอ่านจะเห็นเป็นประโยค แตะแล้วเปิดลิงก์'}</p>
+      <label>${en ? 'Link' : 'ลิงก์'}<input name="url" type="url" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://"></label>
+      <p class="bio-link-site"></p>
+      <label>${en ? 'Words to show' : 'ข้อความที่แสดง'}<input name="words" type="text" maxlength="200"></label>
+      <div class="bio-link-prev" data-noloc></div>
+      <div class="bio-link-acts">
+        <button data-bio="unlink" hidden>${en ? 'Remove link' : 'เอาลิงก์ออก'}</button>
+        <button data-bio="link-x">${en ? 'Cancel' : 'ยกเลิก'}</button>
+        <button class="is-go" data-bio="link-ok">${en ? 'Add link' : 'ใส่ลิงก์'}</button>
+      </div>
+    </div></div>
+  </div>`;
+  document.body.appendChild(el);
+  localize(el);
+  const ed = el.querySelector('.bio-ed');
+  ed.innerHTML = bioEdHtml(start);
+  _bioEd = { id, el, ed, src, start, pick:null, link:null };
+  bioDirty();
+  // the phone's back gesture closes this sheet, not the member's under it
+  history.pushState({ ...(history.state || {}), bioEdit:id }, '', location.href);
+  bindBioEditor(el, ed);
+  bioFitViewport();
+  ed.focus({ preventScroll:true }); bioCaretEnd(ed);    // still inside the tap, so a phone shows its keyboard
+}
+function closeBioEditor(fromHistory){
+  const E = _bioEd; if(!E) return;
+  _bioEd = null; clearTimeout(E.dt); E.el.remove();
+  if(!fromHistory && history.state && history.state.bioEdit) history.back();
+}
+function bioEdClose(){
+  const E = _bioEd; if(!E) return;
+  if(bioSerialize(E.ed) !== E.src && !confirm(isEN() ? 'Close without saving your changes?' : 'ปิดโดยไม่บันทึกที่แก้ไว้ใช่ไหม?')) return;
+  clearTimeout(E.dt);
+  try{ localStorage.removeItem(BIO_DRAFT(E.id)); }catch(e){}
+  closeBioEditor();
+}
+// the sheet sits on the part of the screen the keyboard leaves
+function bioFitViewport(){
+  const E = _bioEd, v = window.visualViewport;
+  if(!E || !v) return;
+  E.el.style.top = v.offsetTop + 'px'; E.el.style.height = v.height + 'px'; E.el.style.bottom = 'auto';
+}
+if(window.visualViewport){ visualViewport.addEventListener('resize', bioFitViewport); visualViewport.addEventListener('scroll', bioFitViewport); }
+
+/* @ and #: what has been typed since the sign, and what it could be. */
+function bioFindRefs(q){
+  const n = q.toLowerCase(), en = isEN();
+  if(!n) return [];
+  const score = (...names) => { let best = 9;
+    for(const x of names){ const v = String(x || '').toLowerCase(); if(!v) continue;
+      best = Math.min(best, v === n ? 0 : v.startsWith(n) ? 1 : v.includes(n) ? 2 : 9); }
+    return best; };
+  const pick = (list, f, max) => list.map(x => ({ x, s:f(x) })).filter(o => o.s < 9).sort((a, b) => a.s - b.s).slice(0, max).map(o => o.x);
+  // a nickname that fits comes before a real name that does; current members before those who have left
+  const mem = pick(state.members || [], m => Math.min(score(m.name, m.nameTh), score(m.realName, m.realNameTh) + 1.5) + (m.graduated ? .5 : 0), 5).map(m => {
+    const g = getGroup(m.groupId);
+    return { kind:'m', id:m.id, label:nickName(m), sub:`${g.name}${m.gen ? ` · ${en ? 'Gen' : 'รุ่น'} ${m.gen}` : ''}${m.graduated ? (en ? ' · graduated' : ' · จบแล้ว') : ''}` };
+  });
+  const works = pick([...ALL_WORKS(), ...SEED_SPECIALS], w => score(w.title, w.alt), 3).map(w => {
+    const k = WORK_KIND(w), g = getGroup(w.groupId);
+    return { kind:'w', id:w.id, label:w.title, sub:`${g ? g.name : ''} · ${k === 'album' ? (en ? 'Album' : 'อัลบั้ม') + ' ' + w.num : k === 'single' ? (en ? 'Single' : 'ซิงเกิล') + ' ' + w.num : (en ? 'Special' : 'เพลงพิเศษ')}` };
+  });
+  const evs = pick(SEED_SCHEDULE, e => score(e.title), 3).map(e => ({ kind:'e', id:e.id, label:e.title, sub:formatDate(e.start || e.date) }));
+  return [...mem, ...works, ...evs];
+}
+function bioFindTags(q){
+  const n = bioKey(q), T = _bioTags || { n:{} };
+  const have = Object.entries(T.n || {}).filter(([k, c]) => c > 0 && (!n || k.includes(n)))
+    .sort((a, b) => (b[0].startsWith(n) - a[0].startsWith(n)) || b[1] - a[1]).slice(0, 6)
+    .map(([k, c]) => ({ kind:'t', label:tagLabel(k), sub:`${c}` }));
+  if(n && !have.some(t => bioKey(t.label) === n)) have.push({ kind:'t', label:q, sub:isEN() ? 'new tag' : 'แท็กใหม่' });
+  return have;
+}
+function bioPickHide(){ const E = _bioEd; if(!E) return; E.pick = null; E.el.querySelector('.bio-pick').hidden = true; }
+function bioPickCheck(){
+  const E = _bioEd; if(!E) return;
+  const s = getSelection();
+  if(!s.rangeCount || !s.isCollapsed) return bioPickHide();
+  const r = s.getRangeAt(0), node = r.startContainer;
+  if(node.nodeType !== 3 || !E.ed.contains(node)) return bioPickHide();
+  const m = node.nodeValue.slice(0, r.startOffset).match(/(^|[\s (])([@#])([^\s @#{}\[\]()]{0,30})$/);
+  if(!m) return bioPickHide();
+  if(m[2] === '#' && !_bioTags) loadBioTags().then(() => { if(_bioEd === E) bioPickCheck(); });
+  const items = m[2] === '@' ? bioFindRefs(m[3]) : bioFindTags(m[3]);
+  E.pick = { node, start:r.startOffset - m[3].length - 1, end:r.startOffset, kind:m[2], q:m[3], items, on:0 };
+  bioPickDraw(r);
+}
+function bioPickDraw(range){
+  const E = _bioEd, P = E.pick, box = E.el.querySelector('.bio-pick'), en = isEN();
+  const mark = s => { const i = P.q ? s.toLowerCase().indexOf(P.q.toLowerCase()) : -1;
+    return i < 0 ? escapeHtml(s) : escapeHtml(s.slice(0, i)) + `<mark>${escapeHtml(s.slice(i, i + P.q.length))}</mark>` + escapeHtml(s.slice(i + P.q.length)); };
+  const heads = { m:en ? 'Members' : 'เมมเบอร์', w:en ? 'Songs & releases' : 'เพลง · ผลงาน', e:en ? 'Events' : 'งาน', t:en ? 'Tags' : 'แท็ก' };
+  let html = '', last = null;
+  P.items.forEach((it, i) => {
+    if(it.kind !== last){ html += `<h5>${heads[it.kind]}</h5>`; last = it.kind; }
+    html += `<button data-bio-pick="${i}"${i === P.on ? ' class="is-on"' : ''}><span>${it.kind === 't' ? '#' : ''}${mark(it.label)}</span><em>${escapeHtml(it.sub || '')}</em></button>`;
+  });
+  if(!html) html = `<p>${P.kind === '@' ? (P.q ? (en ? 'Nothing by that name' : 'ไม่พบชื่อนี้')
+    : (en ? 'Type a member, song or event' : 'พิมพ์ชื่อเมมเบอร์ เพลง หรืองาน')) : (en ? 'Type a tag' : 'พิมพ์แท็ก')}</p>`;
+  box.innerHTML = html; box.hidden = false;
+  // measured on the typed "@mu" itself: a collapsed caret often has no box to measure
+  const wrap = E.el.querySelector('.bio-ed-wrap').getBoundingClientRect(), typed = document.createRange();
+  typed.setStart(P.node, Math.min(P.start, P.node.nodeValue.length)); typed.setEnd(P.node, Math.min(P.end, P.node.nodeValue.length));
+  const rs = typed.getClientRects();
+  const rect = rs.length ? rs[rs.length - 1] : range.getBoundingClientRect().height ? range.getBoundingClientRect() : node0Rect(P.node);
+  const h = box.offsetHeight;
+  let top = rect.bottom - wrap.top + 6;
+  if(top + h > wrap.height && rect.top - wrap.top - h - 6 >= 0) top = rect.top - wrap.top - h - 6;
+  box.style.top = Math.max(0, Math.min(top, wrap.height - h)) + 'px';
+  const on = box.querySelector('.is-on'); if(on) on.scrollIntoView({ block:'nearest' });
+}
+const node0Rect = n => (n.parentElement || document.body).getBoundingClientRect();
+function bioPickApply(i){
+  const E = _bioEd, P = E && E.pick, it = P && P.items[i];
+  if(!it) return;
+  const r = document.createRange();
+  r.setStart(P.node, Math.min(P.start, P.node.nodeValue.length)); r.setEnd(P.node, Math.min(P.end, P.node.nodeValue.length));
+  bioPickHide();
+  bioPlace(r, it.kind === 't' ? bioAtom('tag', it.label, '#' + it.label) : bioAtom('ref', it.kind + ':' + it.id, it.label));
+}
+// "#word" followed by a space becomes a tag piece there and then
+function bioHashOnSpace(e){
+  if(!e || e.inputType !== 'insertText' || !/^[\s ]$/.test(e.data || '')) return;
+  const s = getSelection(); if(!s.rangeCount) return;
+  const r = s.getRangeAt(0), node = r.startContainer;
+  if(node.nodeType !== 3) return;
+  const m = node.nodeValue.slice(0, r.startOffset).match(/(^|[\s (])#([^\s #@{}\[\]()<>,.!?;:"'“”‘’…]{1,40})[\s ]$/);
+  if(!m || !/[A-Za-z฀-๿]/.test(m[2])) return;
+  const end = r.startOffset - 1, start = end - m[2].length - 1;
+  const rr = document.createRange(); rr.setStart(node, start); rr.setEnd(node, end); rr.deleteContents();
+  const tmp = document.createElement('div'); tmp.innerHTML = bioAtom('tag', m[2], '#' + m[2]);
+  const atom = tmp.firstChild; rr.insertNode(atom);
+  const after = atom.nextSibling;
+  if(after && after.nodeType === 3) bioCaretAt(after, 1);
+}
+
+/* 🔗: the address, the words to show, and how it will read. */
+const BIO_SITES = [[/(^|\.)(youtube\.com|youtu\.be)$/, 'YouTube'], [/(^|\.)(facebook\.com|fb\.watch)$/, 'Facebook'], [/(^|\.)instagram\.com$/, 'Instagram'],
+  [/(^|\.)tiktok\.com$/, 'TikTok'], [/(^|\.)(x\.com|twitter\.com)$/, 'X'], [/(^|\.)iam48\.net$/, 'iAM48'], [/(^|\.)bnk48\.com$/, 'BNK48'],
+  [/(^|\.)cgm48\.com$/, 'CGM48'], [/(^|\.)48thdb\.com$/, '48thDb'], [/(^|\.)wikipedia\.org$/, 'Wikipedia']];
+function bioUrl(raw){
+  let href = String(raw || '').trim();
+  if(!href) return null;
+  if(!/^https?:\/\//i.test(href)) href = 'https://' + href;
+  let u; try{ u = new URL(href); }catch(e){ return null; }
+  if(!/^https?:$/.test(u.protocol) || !u.hostname.includes('.') || /\s/.test(href)) return null;
+  return u;
+}
+const bioSite = u => { for(const [re, name] of BIO_SITES) if(re.test(u.hostname)) return name; return u.hostname.replace(/^www\./, ''); };
+function openBioLink(opt){
+  const E = _bioEd, L = E.el.querySelector('.bio-link');
+  bioPickHide();
+  E.link = opt;
+  L.querySelector('[name=url]').value = opt.el ? opt.el.dataset.href : (opt.href || '');
+  L.querySelector('[name=words]').value = opt.el ? opt.el.textContent : (opt.words || '').trim();
+  L.querySelector('[data-bio=unlink]').hidden = !opt.el;
+  L.hidden = false; bioLinkSync();
+  L.querySelector(opt.el || !opt.href ? '[name=url]' : '[name=words]').focus();
+}
+function bioLinkSync(){
+  const E = _bioEd, L = E.el.querySelector('.bio-link'), en = isEN();
+  const raw = L.querySelector('[name=url]').value, u = bioUrl(raw), words = L.querySelector('[name=words]').value.trim();
+  const site = L.querySelector('.bio-link-site');
+  site.classList.toggle('is-bad', !!raw.trim() && !u);
+  site.innerHTML = !raw.trim() ? '' : u ? `${en ? 'Goes to' : 'ไปที่'} <b>${escapeHtml(bioSite(u))}</b> · ${escapeHtml(u.hostname.replace(/^www\./, ''))}`
+    : `<b>${en ? 'That does not look like a web address' : 'ลิงก์นี้ดูไม่ถูกต้อง'}</b>`;
+  L.querySelector('.bio-link-prev').innerHTML = u ? bioLinkHtml(words || bioSite(u), u.href) : `<span style="color:var(--ink-soft)">${en ? 'Paste or type a link' : 'วางหรือพิมพ์ลิงก์'}</span>`;
+}
+function bioLinkApply(){
+  const E = _bioEd, L = E.el.querySelector('.bio-link');
+  const u = bioUrl(L.querySelector('[name=url]').value);
+  if(!u){ bioLinkSync(); L.querySelector('[name=url]').focus(); return; }
+  const href = u.href.replace(/\(/g, '%28').replace(/\)/g, '%29');
+  const words = L.querySelector('[name=words]').value.replace(/[\[\]\n]/g, '').trim() || bioSite(u);
+  const opt = E.link; E.link = null; L.hidden = true;
+  if(opt.el){ opt.el.dataset.href = href; opt.el.textContent = words; E.ed.focus({ preventScroll:true }); bioDirty(); return; }
+  bioPlace(opt.range, bioAtom('href', href, words));
+}
+function bioLinkClose(){ const E = _bioEd; E.link = null; E.el.querySelector('.bio-link').hidden = true; E.ed.focus({ preventScroll:true }); }
+
+async function bioSave(){
+  const E = _bioEd; if(!E || E.saving) return;
+  const en = isEN(), text = bioSerialize(E.ed), btn = E.el.querySelector('[data-bio=save]');
+  if(text.length > BIO_MAX){ toast(en ? `Too long — ${text.length.toLocaleString()} of ${BIO_MAX.toLocaleString()} characters` : `ยาวเกินไป ${text.length.toLocaleString()} จาก ${BIO_MAX.toLocaleString()} ตัวอักษร`); return; }
+  if(text === E.src){ try{ localStorage.removeItem(BIO_DRAFT(E.id)); }catch(e){} closeBioEditor(); return; }
+  if(!text && !state.isOwner){ toast(en ? 'Write something first' : 'ยังไม่ได้เขียนอะไร'); return; }
+  if(!text && !confirm(en ? 'Remove this biography?' : 'ลบประวัติย่อนี้?')) return;
+  E.saving = true; btn.disabled = true; btn.textContent = en ? 'Saving…' : 'กำลังบันทึก…';
+  try{
+    if(state.isOwner){
+      const r = await saveBio(E.id, text);
+      toast(!text ? (en ? 'Biography removed' : 'ลบประวัติย่อแล้ว')
+        : r.translated ? (en ? 'Saved, with the other language' : 'บันทึกแล้ว แปลอีกภาษาให้แล้ว')
+        : (en ? 'Saved — the translation did not come through' : 'บันทึกแล้ว แต่แปลอีกภาษาไม่สำเร็จ'));
+    } else {
+      await fbDb.collection('pending').add({ kind:'bio', memberId:E.id, text, before:E.src || '',
+        by:{ uid:state.account.uid, name:state.account.name || '', email:state.account.email || '' },
+        at:firebase.firestore.FieldValue.serverTimestamp(), status:'pending' });
+      toast(en ? 'Sent — it goes up once the owner approves it' : 'ส่งให้เจ้าของเว็บตรวจแล้ว จะขึ้นเว็บเมื่ออนุมัติ');
+    }
+    try{ localStorage.removeItem(BIO_DRAFT(E.id)); }catch(e){}
+    closeBioEditor();
+    if(state.isOwner){ if(!_bios[E.id] && state.bioOf === E.id) state.bioOf = null; bioRefresh(E.id); }
+  }catch(err){
+    console.warn('bio save', err);
+    E.saving = false; btn.disabled = false; btn.textContent = state.isOwner ? (en ? 'Save' : 'บันทึก') : (en ? 'Send' : 'ส่งตรวจ');
+    alert(en ? 'Could not save. Please try again.' : 'บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง');
+  }
+}
+function bindBioEditor(el, ed){
+  // taps on the sheet's own buttons keep the caret where it was in the text
+  el.addEventListener('pointerdown', e => {
+    if(e.target.closest('[data-bio-pick], .bio-ed-tools button')) e.preventDefault();
+  });
+  el.addEventListener('click', e => {
+    const p = e.target.closest('[data-bio-pick]');
+    if(p){ bioPickApply(+p.dataset.bioPick); return; }
+    const b = e.target.closest('[data-bio]'), what = b && b.dataset.bio;
+    if(!what){ if(e.target === el) bioEdClose(); return; }
+    const E = _bioEd; if(!E) return;
+    if(what === 'close') bioEdClose();
+    else if(what === 'save') bioSave();
+    else if(what === 'at' || what === 'hash'){
+      if(!E.ed.contains(getSelection().anchorNode)){ E.ed.focus({ preventScroll:true }); bioCaretEnd(E.ed); }
+      const s = getSelection(), r = s.rangeCount && s.getRangeAt(0), n = r && r.startContainer;
+      const before = n && n.nodeType === 3 ? n.nodeValue.slice(0, r.startOffset) : '';
+      document.execCommand('insertText', false, (before && !/[\s ]$/.test(before) ? ' ' : '') + (what === 'at' ? '@' : '#'));
+      bioPickCheck();
+    }
+    else if(what === 'link'){ const r = bioRangeIn(); openBioLink({ range:r, words:r.toString() }); }
+    else if(what === 'prev'){
+      const pv = el.querySelector('.bio-ed-prev'), on = pv.hidden;
+      if(on){ pv.innerHTML = bioHtml(bioSerialize(E.ed)) || `<p style="color:var(--ink-soft)">${isEN() ? 'Nothing written yet' : 'ยังไม่ได้เขียนอะไร'}</p>`; }
+      pv.hidden = !on; E.ed.hidden = on; b.classList.toggle('is-on', on); bioPickHide();
+      el.querySelectorAll('[data-bio=at],[data-bio=hash],[data-bio=link]').forEach(x => x.disabled = on);
+    }
+    else if(what === 'link-ok') bioLinkApply();
+    else if(what === 'link-x') bioLinkClose();
+    else if(what === 'unlink'){
+      const L = E.link; if(L && L.el){ const t = document.createTextNode(L.el.textContent); L.el.replaceWith(t); }
+      bioLinkClose(); bioDirty();
+    }
+  });
+  el.querySelector('.bio-link').addEventListener('input', bioLinkSync);
+  el.querySelector('.bio-link').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); bioLinkApply(); } });
+  ed.addEventListener('input', e => { bioHashOnSpace(e); bioPickCheck(); bioDirty(); });
+  ed.addEventListener('click', e => {
+    const a = e.target.closest('.bio-ln[data-href]');
+    if(a){ e.preventDefault(); openBioLink({ el:a }); return; }
+    bioPickCheck();
+  });
+  ed.addEventListener('keydown', e => {
+    const E = _bioEd, P = E && E.pick;
+    if(!P || !P.items.length) return;
+    if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+      e.preventDefault(); P.on = (P.on + (e.key === 'ArrowDown' ? 1 : -1) + P.items.length) % P.items.length;
+      bioPickDraw(getSelection().getRangeAt(0));
+    }
+    else if(e.key === 'Enter' || e.key === 'Tab'){ e.preventDefault(); bioPickApply(P.on); }
+    else if(e.key === 'Escape'){ e.preventDefault(); bioPickHide(); }
+  });
+  ed.addEventListener('paste', e => {
+    e.preventDefault();
+    const t = (e.clipboardData && e.clipboardData.getData('text/plain')) || '';
+    if(/^https?:\/\/\S+$/i.test(t.trim())){ const r = bioRangeIn(); openBioLink({ range:r, href:t.trim(), words:r.toString() }); return; }
+    document.execCommand('insertText', false, t);
+  });
+  ed.addEventListener('keyup', e => { if(/^Arrow|Home|End/.test(e.key)) bioPickCheck(); });
 }
 
 /* Feedback: five faces and a few words, sent to Firestore feedback/ — anyone
@@ -16298,7 +17043,7 @@ function groupTag(g){
 function leaveOverlays(){
   state.selectedId = null; state.selectedEvent = null; state.editingId = null;
   state.compareWith = null; state.comparePicking = false; state.posterOf = null;
-  state.dayOf = null;
+  state.dayOf = null; state.bioOf = null;
 }
 
 /* The events a member is booked for, split by where they sit in time. An event
@@ -17628,6 +18373,7 @@ function syncTicker(){
 
 function render(){
   const app = document.getElementById('app');
+  _sheetKeep = sheetKeepNow();
   app.innerHTML = renderHeader() + '<div id="ticker-slot"></div><div id="nav-container"></div><main id="main"></main>'
     // Said once, under everything: this is a fan's database, not the groups'.
     + '<footer class="site-foot"><p><span>48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ</span> · <a href="/privacy">นโยบายความเป็นส่วนตัว</a></p></footer>';
@@ -17652,6 +18398,11 @@ function syncBodyScrollLock(){
 }
 
 let _lastRenderedView = null;
+let _sheetKeep = null;
+function sheetKeepNow(){
+  const was = document.querySelector('#main .is-member-sheet'), sc = was && was.querySelector('.modal-scroll');
+  return sc && sc.scrollTop ? { id:was.dataset.mid, top:sc.scrollTop } : null;
+}
 function renderMain(){
   // selectedSingle only means anything on the single view. Clearing it here
   // rather than in each caller keeps it from lingering in a history snapshot
@@ -17675,6 +18426,7 @@ function renderMain(){
     state.view==='stats' ? renderStats() :
     state.view==='single' ? renderSingleDetail() :
     state.view==='gallery' ? renderGallery() :
+    state.view==='tag' ? renderTagPage() :
     state.view==='profile' ? renderProfile() :
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
@@ -17682,6 +18434,7 @@ function renderMain(){
     + (state.comparePicking ? renderComparePicker()
        : state.compareWith && state.selectedId ? renderCompareModal()
        : state.selectedId ? renderDetailModal() : '')
+    + (state.bioOf && state.selectedId && !state.comparePicking && !state.compareWith ? renderBioSheet() : '')
     + (state.selectedEvent ? renderEventModal() : '')
     + (state.dayOf && !state.selectedEvent ? renderDayModal() : '')
     // Last, because it opens over a sheet. Sharing z-index 60 with the sheets
@@ -17693,7 +18446,10 @@ function renderMain(){
     html = `<div class="empty-state render-failed"><p>${isEN() ? 'This page could not be shown.' : 'หน้านี้แสดงไม่ได้ชั่วคราว'}</p>
       <button class="chip chip-link" data-action="nav" data-view="feed">${isEN() ? 'Back to home' : 'กลับหน้าแรก'}</button></div>`;
   }
+  // a member's sheet drawn again for the same member stays where it was read to
+  const keep = _sheetKeep || sheetKeepNow(); _sheetKeep = null;
   main.innerHTML = html;
+  if(keep && keep.id === state.selectedId){ const ns = main.querySelector('.is-member-sheet .modal-scroll'); if(ns) ns.scrollTop = keep.top; }
   paintSheetGrads(main);
   document.body.classList.toggle('is-gallery', state.view === 'gallery');
   if(state.view === 'gallery') setupGallery(main);
@@ -17726,6 +18482,7 @@ function renderMain(){
   bindOrgZoom();
   applyPageMeta();
   applyLayoutAll();
+  bioClamp(main);
   bindReveal(arrived);   // after the reader's own order is in place, or it judges what is on screen from the default order
   sendHit();
 }
@@ -18068,7 +18825,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','geClip','timelineId','dayOf','geTab','bdayScope','livesScope','galleryId'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','geClip','timelineId','dayOf','geTab','bdayScope','livesScope','galleryId','bioOf','tagOf'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
@@ -18096,6 +18853,7 @@ function urlForSnapshot(snap){
   else if(snap.selectedId){    p.set('m', snap.selectedId);
                                if(snap.compareWith) p.set('vs', snap.compareWith); }
   else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
+  else if(snap.view === 'tag' && snap.tagOf) p.set('t', snap.tagOf);
   else if(snap.view === 'timeline' && snap.geTab === 'results') at('results');
   else if(snap.view === 'timeline' && snap.geTab === 'chain') at('vote');
   else if(snap.view === 'timeline' && snap.geTab === 'songs') at('gesongs');
@@ -18114,7 +18872,7 @@ function applyUrlToState(){
   const p = new URLSearchParams(BOOT_QUERY);
   const seg = BOOT_PATH.split('/').filter(Boolean).map(x => decodeURIComponent(x).toLowerCase());
   const view = p.get('v') || (seg[0] ? SLUG_VIEW[seg[0]] || seg[0] : null);
-  const ev = p.get('e'), mem = p.get('m'), sng = p.get('s'), pst = p.get('p');
+  const ev = p.get('e'), mem = p.get('m'), sng = p.get('s'), pst = p.get('p'), tg = p.get('t');
 
   if(pst && isGECandidate(pst)){
     state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'candidates';
@@ -18142,6 +18900,7 @@ function applyUrlToState(){
   if(sng && findWork(sng)){
     state.view='single'; state.selectedSingle=sng; return;
   }
+  if(tg && bioKey(tg)){ state.view = 'tag'; state.tagOf = bioKey(tg); return; }
   if(view === 'results'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results'; return; }
   if(view === 'vote'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; return; }
   if(view === 'gesongs'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'songs'; return; }
@@ -20231,7 +20990,8 @@ function isSameScreen(a, b){
     && a.compareWith===b.compareWith && a.comparePicking===b.comparePicking
     && a.posterOf===b.posterOf && a.dayOf===b.dayOf && a.geTab===b.geTab
     && a.editingId===b.editingId && a.favoritesOnly===b.favoritesOnly && a.oshiOnly===b.oshiOnly
-    && a.showGraduated===b.showGraduated && a.selectedSingle===b.selectedSingle;
+    && a.showGraduated===b.showGraduated && a.selectedSingle===b.selectedSingle
+    && (a.bioOf || null)===(b.bioOf || null) && (a.tagOf || null)===(b.tagOf || null);
 }
 
 let _navReady = false;
@@ -20283,7 +21043,7 @@ function initHistory(){
   history.replaceState({ snap:navSnapshot(), depth:0, scrollY:0 }, '');
   _navReady = true;
   window.addEventListener('popstate', (e)=>{
-    closeShareSheet();
+    closeShareSheet(); closeBioEditor(true);
     const snap = e.state && e.state.snap;
     if(!snap) return;
     _navDepth = (e.state && e.state.depth) || 0;
@@ -20435,8 +21195,18 @@ function bindDelegatedEvents(){
       // member opened from inside an event replaces it. Going back returns
       // to the event, since that is the entry underneath.
       state.selectedId=id; state.editingId=null; state.selectedEvent=null; state.dayOf=null;
-      state.compareWith=null; state.comparePicking=false;
+      state.compareWith=null; state.comparePicking=false; state.bioOf=null;
       renderMain(); pushHistory();
+    }
+    else if(action==='open-bio'){ state.bioOf = id; renderMain(); pushHistory(); }
+    else if(action==='close-bio'){
+      if(e.target.closest('.is-bio-sheet') && !e.target.closest('.modal-close-btn')) return;
+      goBack(() => { state.bioOf = null; });
+    }
+    else if(action==='edit-bio'){ openBioEditor(id); }
+    else if(action==='open-tag'){
+      leaveOverlays(); state.view = 'tag'; state.tagOf = id;
+      render(); pushHistory(); window.scrollTo(0, 0);
     }
     else if(action==='open-poster'){
       state.geClip = false; state.posterOf = id; renderMain(); pushHistory();
@@ -20817,7 +21587,12 @@ function bindDelegatedEvents(){
       if(!p || !state.isOwner) return;
       el.disabled = true;
       try{
-        if(action==='approve-pending'){
+        if(action==='approve-pending' && p.kind === 'bio'){
+          const r = await saveBio(p.memberId, p.text || '');
+          p.untranslated = !r.translated;
+          if(state.selectedId === p.memberId) bioRefresh(p.memberId);
+        }
+        else if(action==='approve-pending'){
           const cur = getMember(p.memberId);
           let next;
           if(p.kind === 'edit' && cur){
@@ -20833,7 +21608,7 @@ function bindDelegatedEvents(){
         }
         await fbDb.collection('pending').doc(p.id).delete();
         state.pending = state.pending.filter(x => x.id !== p.id);
-        toast(action==='approve-pending' ? 'อนุมัติแล้ว ขึ้นเว็บแล้ว' : 'ไม่อนุมัติ ลบคำขอแล้ว');
+        toast(action==='approve-pending' ? (p.untranslated ? 'อนุมัติแล้ว แต่แปลอีกภาษาไม่สำเร็จ' : 'อนุมัติแล้ว ขึ้นเว็บแล้ว') : 'ไม่อนุมัติ ลบคำขอแล้ว');
       }catch(err){ alert('ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง'); }
       render();
     }
@@ -20983,7 +21758,7 @@ function bindDelegatedEvents(){
     }
     else if(action==='open-event'){
       state.selectedEvent = el.dataset.id;
-      state.dayOf = null;           // the day sheet steps aside; back returns to it
+      state.dayOf = null; state.bioOf = null;           // the day sheet steps aside; back returns to it
       renderMain(); pushHistory();
     }
     else if(action==='open-day'){

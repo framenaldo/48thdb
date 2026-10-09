@@ -42,6 +42,18 @@ the Firebase CLI from the owner's machine.
   Zones are matched by class (home) or `data-zone` (profile) and ordered with
   CSS `order`, so a new home section needs a row in `LAYOUT_ZONES.home` or it
   can't be moved.
+- **Biographies.** Each member's sheet has a short biography (IMDb-style)
+  that anyone signed in can write: the owner's goes up at once, everyone
+  else's waits in `pending/` (kind `bio`). Stored in Firestore
+  `bios/<member id>` as `{src, th, en, tags, at}` — `src` is the language it
+  was written in, and the other is made by `api.48thdb.com/translate`
+  (Workers AI) when the owner saves or approves; `bios/_tags` counts tags.
+  The text is a small markup: `@{m:<id>|Name}` (or `w:` a release, `e:` an
+  event) for mentions, which print in pink with no picture; `#{tag}` or
+  `#{tag|label}` for tags; `[words](https://…)` for links. Nobody's name is
+  shown as the writer, and a bio shows nothing about who mentions whom.
+  Tag pages are `/?t=<tag>` (view `tag`). Bio text carries `data-noloc`, so
+  the language passes leave it as written.
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.

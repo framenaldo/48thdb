@@ -490,11 +490,92 @@ async function ytRecent(env) {
   return body;
 }
 
+/* Members' biographies in the other language. When the owner saves or
+ * approves one, the page sends it here and Workers AI writes it in the other
+ * of Thai and English — SEA-LION first, a model made for the languages of
+ * South-East Asia, Thai among them. The page's markup (@{…} mentions, #{…}
+ * tags, [words](links)) is swapped for numbered placeholders before and put
+ * back after, so names and addresses come through untouched and only words
+ * are translated; an answer that loses or invents a placeholder is refused.
+ * Owner only, like /visits. */
+const TR_MODELS = ['@cf/aisingapore/gemma-sea-lion-v4-27b-it', '@cf/meta/llama-3.3-70b-instruct-fp8-fast'];
+const TR_MAX = 6000;
+const BIO_RE = /@\{([mwe]):([\w.-]+)(?:\|([^{}\n]*))?\}|#\{([^{}|\n]+)(?:\|([^{}\n]*))?\}|\[([^\[\]\n]{1,300})\]\((https?:\/\/[^\s()<>"]+)\)/g;
+const trPrompt = (to) => `You translate short fan-written biographies of BNK48 and CGM48 members (Thai idol groups) into ${to === 'en' ? 'English' : 'Thai'}.
+Rules:
+- Translate the whole text naturally, in the neutral tone of an encyclopedia or a fan database.${to === 'th' ? '\n- Write Thai without polite particles (no ค่ะ, ครับ, นะคะ). A generation is รุ่น (รุ่นที่ 3), a team is ทีม, graduating is จบการศึกษา.' : '\n- A รุ่น is a generation ("3rd generation"), จบการศึกษา is graduating from the group.'}
+- Placeholders like <m1/> stand for names of members, songs or events. Keep each one exactly once, where it fits in the translated sentence. Never translate, change or drop them.
+- Paired tags like <t2>…</t2> (a hashtag) and <a3>…</a3> (a link) must stay, each exactly once. Translate only the words inside. Inside a <t…> tag write one short tag with no spaces and no # sign${to === 'en' ? ' (CamelCase)' : ''}; leave a name or a word that is already ${to === 'en' ? 'English' : 'Thai'} as it is.
+- Keep group names (BNK48, CGM48) and proper nouns as they are usually written in ${to === 'en' ? 'English' : 'Thai'}.
+- Keep every number, date and year exactly as written: never move a year to the Buddhist era (2026 stays 2026).
+- Keep the line breaks and blank lines.
+- Reply with the translation only.`;
+function bioToTagged(text) {
+  const slots = [null];
+  const tagged = text.replace(BIO_RE, (all, k, id, fb, tag, lab, words, href) => {
+    const i = slots.length;
+    if (k) { slots.push({ kind: 'm', raw: all }); return `<m${i}/>`; }
+    if (tag) { slots.push({ kind: 't', key: tag.trim() }); return `<t${i}>${(lab || tag).trim()}</t${i}>`; }
+    slots.push({ kind: 'a', href }); return `<a${i}>${words}</a${i}>`;
+  });
+  return { tagged, slots };
+}
+function taggedToBio(out, slots) {
+  for (let i = 1; i < slots.length; i++) {
+    const k = slots[i].kind;
+    const n = k === 'm' ? out.split(`<m${i}/>`).length - 1 : (out.match(new RegExp(`<${k}${i}>[\\s\\S]*?</${k}${i}>`, 'g')) || []).length;
+    if (n !== 1) return null;
+  }
+  const rest = out.replace(/<m(\d+)\/>|<([ta])(\d+)>[\s\S]*?<\/\2\3>/g, '');
+  if (/<\/?[mta]\d+\/?>/.test(rest)) return null;
+  return out
+    .replace(/<m(\d+)\/>/g, (a, i) => slots[i].raw)
+    .replace(/<t(\d+)>([\s\S]*?)<\/t\1>/g, (a, i, w) => {
+      const lab = w.replace(/[\s#{}|]+/g, '');
+      return lab && lab !== slots[i].key ? `#{${slots[i].key}|${lab}}` : `#{${slots[i].key}}`;
+    })
+    .replace(/<a(\d+)>([\s\S]*?)<\/a\1>/g, (a, i, w) => `[${w.replace(/[\[\]\n]/g, '').trim() || slots[i].href}](${slots[i].href})`);
+}
+async function translateBio(env, text, to) {
+  const { tagged, slots } = bioToTagged(text);
+  for (const model of TR_MODELS) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const r = await env.AI.run(model, {
+          messages: [{ role: 'system', content: trPrompt(to) }, { role: 'user', content: tagged }],
+          max_tokens: 3000, temperature: attempt ? 0 : 0.2,
+        });
+        let out = String((r && (r.response ?? r.choices?.[0]?.message?.content)) || '');
+        out = out.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/^```\w*\n?|\n?```$/g, '').trim();
+        const back = out && taggedToBio(out, slots);
+        if (back) return { text: back.replace(/\n{3,}/g, '\n\n'), model };
+      } catch (e) { /* the next try, or the next model */ }
+    }
+  }
+  return null;
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: { ...JSON_HEADERS, 'access-control-allow-headers': 'authorization',
-        'access-control-max-age': '86400' } });
+      return new Response(null, { headers: { ...JSON_HEADERS, 'access-control-allow-headers': 'authorization, content-type',
+        'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-max-age': '86400' } });
+    }
+    if (new URL(request.url).pathname === '/translate') {
+      const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
+      const say = (body, status) => new Response(JSON.stringify(body), { status, headers: own });
+      if (request.method !== 'POST') return say({ error: 'POST only' }, 405);
+      try {
+        if (!(await isOwner(request, env))) return say({ error: 'owner only' }, 403);
+        if (!env.AI) return say({ error: 'no-ai' }, 503);
+        const body = await request.json().catch(() => ({}));
+        const text = String(body.text || ''), to = body.to;
+        if (!text.trim() || text.length > TR_MAX || !['th', 'en'].includes(to)) return say({ error: 'bad request' }, 400);
+        const done = await translateBio(env, text, to);
+        return done ? say(done, 200) : say({ error: 'translation-failed' }, 502);
+      } catch (err) {
+        return say({ error: String((err && err.message) || err) }, 502);
+      }
     }
     if (request.method !== 'GET') {
       return new Response('Method not allowed', { status: 405, headers: JSON_HEADERS });
