@@ -15237,7 +15237,7 @@ function layoutChrome(){
   document.body.classList.toggle('lay-editing', !!edit);
   document.querySelector('.lay-bar')?.remove();
   document.querySelector('.lay-addzone')?.remove();
-  if(!edit) return;
+  if(!edit){ const m = document.getElementById('main'); if(m) m.style.minHeight = ''; return; }
   const en = isEN();
   const off = LAYOUT_ZONES[edit].filter(z => zoneHidden(edit, z.k) || (z.extra && !zoneOn(edit, z.k))).length;
   document.body.insertAdjacentHTML('afterbegin', `<div class="lay-bar"><div class="lay-bar-t"><b>${edit === 'home' ? (en ? 'Arrange my home page' : 'จัดหน้าแรกของฉัน') : (en ? 'Arrange my profile' : 'จัดหน้าโปรไฟล์ของฉัน')}</b>
@@ -15375,14 +15375,21 @@ function layStart(el, x, y){
     el.animate([{ height:r.height + 'px', transform:`translateY(${r.top - top}px)` }, { height:LAY_FOLD + 'px', transform:'translateY(0)' }], { duration:260, easing:ease });
     ph.animate([{ height:r.height + 'px' }, { height:LAY_FOLD + 'px' }], { duration:260, easing:ease });
   }
-  _lay = { el, ph, page: state.layoutEdit, offY: LAY_FOLD / 2, left: r.left, sx: x, x, y, raf: 0 };
+  _lay = { el, ph, page: state.layoutEdit, offY: LAY_FOLD / 2, left: r.left, sx: x, sy: y, x, y, raf: 0 };
+  // the fold makes the page shorter; held at its old height, a page scrolled to its end is not pulled up under the finger
+  const main = document.getElementById('main'); main.style.minHeight = main.offsetHeight + 'px';
   try{ navigator.vibrate && navigator.vibrate(12); }catch(e){}
   layPos();
   setTimeout(() => { if(_lay && _lay.el === el) layPos(); }, 280);   // once the slot has shrunk, the others have moved up
   const tick = () => {
     if(!_lay) return;
-    const edge = 96, H = window.innerHeight, yy = _lay.y;
-    const v = yy < edge ? -Math.ceil((edge - yy) / 5) : yy > H - edge ? Math.ceil((yy - (H - edge)) / 5) : 0;
+    // The page scrolls only when the finger is carried towards an edge. A zone picked up
+    // near the bottom of the screen used to set the page running to its end, and the
+    // zone with it, before the finger had moved at all. The top edge starts under the bar.
+    const edge = 96, H = window.innerHeight, yy = _lay.y, sy = _lay.sy;
+    const top = document.querySelector('.lay-bar')?.getBoundingClientRect().bottom || 0;
+    const v = yy < top + edge && yy < sy - 24 ? -Math.min(24, Math.ceil((top + edge - yy) / 5))
+      : yy > H - edge && yy > sy + 24 ? Math.min(24, Math.ceil((yy - (H - edge)) / 5)) : 0;
     if(v){ const before = window.scrollY; window.scrollBy(0, v); if(window.scrollY !== before) layRetarget(); }
     _lay.raf = requestAnimationFrame(tick);
   };
@@ -15427,7 +15434,7 @@ function layDrop(){
     // unfold back to full size, the zones below sliding down as it opens
     const full = L.el.getBoundingClientRect().height;
     L.el.classList.add('lay-opening'); L.el.classList.remove('lay-folded');
-    const end = () => { L.el.classList.remove('lay-opening'); L.el.querySelector(':scope > .lay-mini')?.remove(); };
+    const end = () => { L.el.classList.remove('lay-opening'); L.el.querySelector(':scope > .lay-mini')?.remove(); if(!_lay) document.getElementById('main').style.minHeight = ''; };
     if(L.el.animate && full > LAY_FOLD){
       const a = L.el.animate([{ height:LAY_FOLD + 'px' }, { height:full + 'px' }], { duration:Math.min(520, 220 + full * .25), easing:'cubic-bezier(.2,.8,.2,1)' });
       a.onfinish = end; a.oncancel = end;
@@ -17576,9 +17583,9 @@ function renderMain(){
   bindEdgeFades();
   bindPosterZoom();
   bindOrgZoom();
-  bindReveal(arrived);
   applyPageMeta();
   applyLayoutAll();
+  bindReveal(arrived);   // after the reader's own order is in place, or it judges what is on screen from the default order
   sendHit();
 }
 
