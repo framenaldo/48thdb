@@ -15789,6 +15789,9 @@ function bindBioEditor(el, ed){
     e.preventDefault();
     const t = (e.clipboardData && e.clipboardData.getData('text/plain')) || '';
     if(/^https?:\/\/\S+$/i.test(t.trim())){ const r = bioRangeIn(); openBioLink({ range:r, href:t.trim(), words:r.toString() }); return; }
+    // text copied from another biography (or handed over ready-made) keeps its mentions, tags and links as pieces
+    BIO_RE.lastIndex = 0;
+    if(BIO_RE.test(t)){ BIO_RE.lastIndex = 0; document.execCommand('insertHTML', false, bioEdHtml(t)); bioDirty(); return; }
     document.execCommand('insertText', false, t);
   });
   ed.addEventListener('keyup', e => { if(/^Arrow|Home|End/.test(e.key)) bioPickCheck(); });
