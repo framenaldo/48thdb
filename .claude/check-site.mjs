@@ -10,6 +10,9 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const BASE = process.argv[2] || 'http://localhost:8823/';
+// with no server the page never loads and the walk below waits forever
+try{ await fetch(BASE, { signal: AbortSignal.timeout(5000) }); }
+catch(e){ console.error(`No site at ${BASE} — start it first (.claude/launch.json).`); process.exit(1); }
 const PORT = 9611, sleep = ms => new Promise(r => setTimeout(r, ms));
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', '--disable-gpu',
   `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'cdp-'))}`, 'about:blank'], { stdio: 'ignore' });
