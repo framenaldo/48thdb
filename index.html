@@ -3123,6 +3123,25 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-mv.is-up{ color:#1E8E4E; background:#E3F6EA; } .gel-mv.is-dn{ color:#C62B2B; background:#FBE7E7; }
   .gel-mv.is-eq{ color:var(--ink-soft); background:var(--paper-dim); } .gel-mv.is-new{ color:#7A4BC4; background:#EFE6FB; }
   .gel-foot{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:12px; }
+  .gel-hist{ margin-top:30px; padding-top:18px; border-top:1px dashed var(--line); }
+  .gel-hist-head{ margin:10px 0 12px; }
+  .gel-hist-picks .sub-tab{ display:flex; flex-direction:column; align-items:center; line-height:1.2; }
+  .gel-hist-picks .sub-tab small{ font-size:10.5px; font-weight:700; opacity:.75; }
+  .gel-hist-head h2{ font-size:17px; }
+  .gel-hist-head small + small{ display:block; margin-top:2px; }
+  .gel-n.is-span{ font-size:11.5px; line-height:1.1; }
+  .ge-hist-chips{ display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 6px; }
+  .ge-hist-chip{
+    display:flex; flex-direction:column; align-items:center; gap:1px; min-width:72px; padding:7px 10px 8px;
+    font:inherit; color:var(--ink); cursor:pointer; border-radius:14px;
+    border:1px solid color-mix(in srgb, var(--t) 45%, var(--line)); background:color-mix(in srgb, var(--t) 10%, var(--card));
+    box-shadow:0 2px 0 color-mix(in srgb, var(--t) 35%, transparent); transition:transform .1s, box-shadow .1s;
+  }
+  .ge-hist-chip:active{ transform:translateY(2px); box-shadow:none; }
+  .ge-hist-chip.is-gold{ --t:#B8862E; } .ge-hist-chip.is-silver{ --t:#76828E; } .ge-hist-chip.is-bronze{ --t:#9A5733; }
+  .ge-hist-chip small{ font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .ge-hist-chip b{ font-size:17px; font-weight:800; color:var(--t); }
+  .ge-hist-chip span{ font-size:10.5px; font-weight:700; color:var(--ink-soft); }
   /* What changed since the round before */
   .gel-share{ display:inline-flex; align-items:center; gap:6px; margin:10px 0 2px; }
   .gel-share svg{ width:16px; height:16px; }
@@ -10925,6 +10944,59 @@ const GE_BANDS = [
   { name:'Next Girls',  from:25, to:36, tone:'bronze' },
 ];
 const GE_SEATS = 36;
+/* The five elections before GE2026, final results. Ranks and votes from the
+   AKB48 fan wiki and Wiki48 (the two agree), each name checked against the
+   line-up of the single it decided: Senbatsu = the A-side, then one band per
+   B-side. GE1–2 counted votes, GE3 onward Token. Where the order inside a stretch
+   is not confirmed (unsure), those seats are drawn as one block, A–Z. */
+const GE_HISTORY = [
+  { id:'ge1', n:1, title:'BNK48 6th Single Senbatsu General Election', date:'2019-01-26', venue:'IMPACT Arena, Muang Thong Thani', single:'bnk-s6', unit:'votes', bands:[16,16],
+    rows:[
+      ['bnk-cherprang',84195],['bnk-jennis',58362],['bnk-music',57987],['bnk-mobile',56028],['bnk-jane',47369],['bnk-orn',46126],
+      ['bnk-noey',44769],['bnk-kaew',44479],['bnk-pun',44140],['bnk-namneung',28134],['bnk-tarwaan',27978],['bnk-pupe',26267],
+      ['bnk-wee',23761],['bnk-natherine',17210],['bnk-kaimook',14018],['bnk-mind',13594],['bnk-satchan',13183],['bnk-bamboo',11517],
+      ['bnk-minmin',10517],['bnk-miori',9915],['cgm-izurina',9305],['bnk-khamin',8047],['bnk-mewnich',7374],['bnk-jaa',7270],
+      ['bnk-phukkhom',7246],['bnk-fond',7188],['bnk-oom',6551],['bnk-korn',6527],['bnk-nink',6448],['bnk-namsai',5898],
+      ['bnk-june',5872],['bnk-jib',5472] ] },
+  { id:'ge2', n:2, title:'BNK48 9th Single Senbatsu General Election', date:'2020-04-19', online:true, single:'bnk-s9', unit:'votes', bands:[16,16,16],
+    rows:[
+      ['bnk-jane',100489],['bnk-cherprang',71352],['bnk-music',48573],['bnk-pun',46510],['bnk-mobile',42335],['bnk-noey',38100],
+      ['bnk-jennis',34929],['bnk-wee',29478],['bnk-kaew',28576],['bnk-namneung',28116],['bnk-pupe',17921],['bnk-orn',14926],
+      ['bnk-tarwaan',13931],['bnk-minmin',12749],['bnk-june',12435],['bnk-fond',12221],['bnk-kaimook',10246],['bnk-satchan',9104],
+      ['bnk-stang',9035],['bnk-mewnich',8461],['bnk-mind',7993],['cgm-pim',6117],['bnk-gygee',6023],['bnk-korn',5607],
+      ['cgm-aom',4942],['bnk-phukkhom',4839],['bnk-miori',4151],['bnk-new',4116],['bnk-bamboo',4061],['cgm-izurina',3885],
+      ['bnk-ratah',3759],['bnk-jib',3664],['bnk-jaa',3143],['bnk-panda',3005],['bnk-khamin',2878],['bnk-namsai',2766],
+      ['cgm-fortune',2370],['bnk-niky',2305],['cgm-sita',2290],['cgm-kaning',2164],['bnk-view',1845],['cgm-marmink',1626],
+      ['bnk-kheng',1604],['bnk-pakwan',1491],['bnk-myyu',1401],['cgm-kaiwan',1334],['bnk-faii',1283],['bnk-nine',1272] ] },
+  { id:'ge3', n:3, title:'BNK48 12th Single Senbatsu General Election', date:'2022-04-09', venue:'Union Mall, Lat Phrao', single:'bnk-s12', unit:'tokens', bands:[16,16,16],
+    rows:[
+      ['bnk-mobile',124138.11],['bnk-music',120051.94],['bnk-noey',115306.45],['bnk-namneung',89341.03],['cgm-pim',59433.96],['cgm-kaning',53234.8],
+      ['bnk-tarwaan',51808.74],['bnk-pupe',40634.05],['bnk-fond',40341.86],['bnk-minmin',36102.21],['bnk-wee',22671.94],['bnk-gygee',19668.54],
+      ['cgm-marmink',19627.44],['bnk-kaimook',17155.48],['bnk-miori',16579.73],['cgm-aom',16431.19],['bnk-hoop',15384.97],['cgm-sita',13671.84],
+      ['bnk-phukkhom',13528.91],['bnk-stang',11785.22],['bnk-new',10789.39],['cgm-fortune',9877.98],['cgm-champoo',9778.2],['bnk-paeyah',9752.89],
+      ['bnk-pampam',9450.25],['bnk-mind',8606.84],['cgm-izurina',7392.29],['bnk-earn',7365.14],['bnk-popper',6983.23],['bnk-jaa',6760.64],
+      ['cgm-kaiwan',6487.48],['bnk-fame',6097.64],['cgm-mei',5765.03],['bnk-jib',5757.59],['bnk-grace',5574.87],['bnk-niky',5074.41],
+      ['cgm-angel',5008.46],['bnk-yoghurt',4868.21],['bnk-nine',4839.99],['cgm-jayda',4732.63],['bnk-ratah',4570.38],['bnk-myyu',3919.64],
+      ['bnk-pancake',3667.27],['cgm-nenie',3647.35],['cgm-ping',3608.23],['bnk-mean',3319.3],['cgm-punch',3205.98],['bnk-earth',3108.14] ] },
+  { id:'ge4', n:4, title:'BNK48 16th Single Senbatsu General Election', date:'2023-12-09', single:'bnk-s16', unit:'tokens', bands:[16,16,16],
+    rows:[
+      ['cgm-pim',133891.52],['bnk-paeyah',110223.63],['cgm-kaning',99316.87],['bnk-minmin',72812.56],['bnk-pancake',52589.72],['cgm-sita',45695.8],
+      ['cgm-punch',44281.07],['bnk-wee',41879.71],['cgm-marmink',40197.49],['cgm-champoo',30095.8],['bnk-stang',29787.79],['cgm-kaiwan',28193.9],
+      ['bnk-monet',27977.72],['bnk-hoop',27041.01],['bnk-grace',26962.29],['cgm-nenie',26590.43],['cgm-lookked',24050.53],['bnk-popper',23125.45],
+      ['bnk-l',22964.15],['cgm-fortune',22858.31],['bnk-jaokhem',21869.42],['bnk-yoghurt',19264.02],['cgm-nana',16277.75],['bnk-fame',15760.8],
+      ['bnk-kaofrang',15277.52],['cgm-aom',12838.78],['cgm-angel',12179.68],['bnk-khamin',11060.56],['bnk-new',10998.4],['cgm-jingjing',8827.39],
+      ['cgm-mei',8668.21],['bnk-peak',8506.73],['bnk-panda',8379.84],['cgm-jjae',8155.65],['bnk-marine',7973.5],['cgm-meen',7524.22],
+      ['bnk-janry',7240.46],['cgm-izurina',7122.2],['bnk-earn',7115.49],['cgm-ping',6670.5],['bnk-nine',6087.96],['cgm-nena',5974.46],
+      ['cgm-fahsai',5969.83],['bnk-emmy',5851.62],['cgm-latin',5697.39],['bnk-mean',5683.01],['bnk-satchan',5554.18],['bnk-palmmy',5386.84] ] },
+  { id:'ge5', n:5, title:'BNK48 & CGM48 Senbatsu General Election 2025', date:'2025-03-29', single:'bnk-s19', unit:'tokens', bands:[12,12,12], unsure:[21,24],
+    rows:[
+      ['bnk-pancake',277696.52],['cgm-kaning',205083.23],['cgm-nenie',81162.14],['bnk-hoop',54784.55],['cgm-champoo',39245.59],['bnk-popper',37273.12],
+      ['cgm-sita',35481.32],['bnk-yoghurt',26825.22],['bnk-l',26140.83],['bnk-jew',24511.25],['bnk-grace',24071.33],['bnk-neen',22683.42],
+      ['bnk-earn',21953.46],['cgm-nana',17854.3],['bnk-kaofrang',17385.19],['bnk-janry',16501.05],['cgm-mei',16073.06],['bnk-mean',15982.2],
+      ['bnk-arlee',14329.64],['bnk-emmy',13627.15],['bnk-micha',null],['bnk-niya',null],['bnk-saonoi',null],['bnk-wawa',null],
+      ['bnk-nammonn',10219.79],['cgm-jingjing',10084.99],['bnk-marine',9879.16],['bnk-nall',9702.67],['bnk-patt',9184.77],['cgm-lookked',8861.25],
+      ['bnk-palmmy',8758.81],['bnk-proud',7699.06],['bnk-sindy',7309.45],['bnk-galeya',6803.52],['cgm-ploen',5876.25],['bnk-khaimook',5807.6] ] },
+];
 let _geUnsub = null;
 function listenGE(){
   if(_geUnsub) return;
@@ -11294,10 +11366,85 @@ function renderGEResults(){
 </div>` : '';
   const shareBtn = told ? `<button class="chip chip-link gel-share" data-action="share-geres" data-value="${round.id}">${ICONS.share}<span>${en ? 'Share the results as a picture' : 'แชร์ภาพสรุปผล'}</span></button>` : '';
   const out = `<div class="gel">${strip}${now}${picks}${shareBtn}${owner}${geChanges(round.id)}<div class="gel-bands">${bands}</div>
-    ${prev ? `<p class="gel-foot">${en ? 'Arrows compare with' : 'ลูกศรเทียบกับ'} ${geRoundLabel(GE_ROUNDS[GE_ROUNDS.findIndex(r => r.id === round.id) - 1])}</p>` : ''}</div>`;
+    ${prev ? `<p class="gel-foot">${en ? 'Arrows compare with' : 'ลูกศรเทียบกับ'} ${geRoundLabel(GE_ROUNDS[GE_ROUNDS.findIndex(r => r.id === round.id) - 1])}</p>` : ''}
+    ${renderGEHistory(en)}</div>`;
   geRemember(round.id);
   geMarkDone(round.id);
   return out;
+}
+
+/* Past elections, below GE2026's own results: pick one, see its bands drawn
+   the way GE2026's are, each member with the group and team she was in on the
+   day (from her team history), and the song each band went on to sing. */
+const geHistOf = id => GE_HISTORY.find(e => e.id === id) || GE_HISTORY[GE_HISTORY.length - 1];
+function geTeamOn(m, iso){
+  const span = (SEED_TEAM_HISTORY[m.id] || []).find(s => s.from <= iso && (!s.to || s.to >= iso));
+  const t = getTeam(span ? span.team : m.teamId);
+  const g = (t ? t.groupId : m.groupId) === 'cgm48' ? 'CGM' : 'BNK';
+  const team = t ? (/Trainee/.test(t.name) ? 'Trainee' : t.name) : '';
+  return `<span class="gel-g is-${g.toLowerCase()}">${g}</span>${escapeHtml(team)}`;
+}
+function geHistBands(e){
+  const out = []; let from = 1;
+  e.bands.forEach((size, i) => { out.push({ ...GE_BANDS[i], from, to:from + size - 1, track:((SEED_SENBATSU[e.single] || [])[i] || {}).track }); from += size; });
+  return out;
+}
+function geHistDate(iso, en){
+  const d = parseYmd(iso);
+  return en ? `${d.getDate()} ${EN_MONTHS[d.getMonth()]} ${d.getFullYear()}` : `${d.getDate()} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear() + 543}`;
+}
+function renderGEHistory(en){
+  const e = geHistOf(state.geHist);
+  const top = Math.max(...e.rows.map(r => r[1] || 0));
+  const unit = e.unit === 'votes' ? (en ? 'votes' : 'โหวต') : 'Token';
+  const [u0, u1] = e.unsure || [0, -1];
+  const picks = `<div class="sub-tabs gel-rounds gel-hist-picks">${[...GE_HISTORY].reverse().map(x =>
+    `<button class="sub-tab${x.id === e.id ? ' active' : ''}" data-action="ge-hist" data-value="${x.id}">${x.date.slice(0, 4)}<small>${en ? `GE${x.n}` : `ครั้งที่ ${x.n}`}</small></button>`).join('')}</div>`;
+  const rowOf = n => {
+    const [id, v] = e.rows[n - 1], m = getMember(id);
+    if(!m) return '';
+    const unsure = n >= u0 && n <= u1;
+    const bar = v ? `<span class="gel-bar" style="width:${(v / top * 100).toFixed(1)}%"></span>` : '';
+    return `<button class="gel-row" data-action="open-member" data-id="${m.id}"><span class="gel-n${unsure ? ' is-span' : ''}">${unsure ? `${u0}–${u1}` : n}</span>${geFace(m, 'gel-face')}
+      <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamOn(m, e.date)}</small></span>
+      <span class="gel-v">${v != null ? geVotes(v) : '—'}</span>${bar}</button>`;
+  };
+  const bands = geHistBands(e).map(b => {
+    const ranks = []; for(let n = b.from; n <= b.to; n++) ranks.push(n);
+    const k7 = ranks.filter(n => n <= GE_KAMI7);
+    const rows = (k7.length ? geKami7(k7.map(rowOf).join(''), en, false) : '') + ranks.filter(n => n > GE_KAMI7).map(rowOf).join('');
+    return `<section class="gel-band is-${b.tone}">
+      <div class="gel-band-h">${b.name}<small>${en ? `Ranks ${b.from}–${b.to}` : `อันดับ ${b.from}–${b.to}`}</small></div>
+      ${b.track ? `<p class="gel-band-song">${en ? 'Sang' : 'ได้ร้อง'} · <b>${escapeHtml(b.track)}</b></p>` : ''}
+      <div class="gel-rows">${rows}</div>
+    </section>`;
+  }).join('');
+  const s = SEED_SINGLES.find(x => x.id === e.single);
+  const where = e.online ? (en ? 'announced online (postponed by COVID-19)' : 'ประกาศผลทางออนไลน์ (เลื่อนจากเดิมเพราะโควิด-19)') : (e.venue ? escapeHtml(e.venue) : '');
+  return `<div class="gel-hist">
+    <h2 class="section-label">${en ? 'Earlier elections' : 'ผลเลือกตั้งครั้งก่อน'}</h2>
+    ${picks}
+    <div class="gel-strip gel-hist-head">
+      <h2>${escapeHtml(e.title)}</h2>
+      <small>${geHistDate(e.date, en)}${where ? ' · ' + where : ''}</small>
+      <small>${en ? `Decided BNK48's ${s ? s.num : ''}th single · ${e.rows.length} ranks · counted in ${unit}` : `เลือกเซ็มบัตสึซิงเกิลที่ ${s ? s.num : ''} ของ BNK48 · ประกาศ ${e.rows.length} อันดับ · ${e.unit === 'votes' ? 'นับเป็นจำนวนโหวต' : 'นับเป็น Token'}`}</small>
+    </div>
+    <div class="gel-bands">${bands}</div>
+    ${e.unsure ? `<p class="gel-foot">${en ? `Ranks ${u0}–${u1}: who is in them is certain, the order is not, so they are listed A–Z.` : `อันดับ ${u0}–${u1}: รู้แน่ว่าใครอยู่ในช่วงนี้ แต่ยังยืนยันลำดับไม่ได้ จึงเรียงตามชื่อ`}</p>` : ''}
+    <p class="gel-foot">${en ? 'From the AKB48 fan wiki and Wiki48, checked against each single\'s line-up.' : 'ข้อมูลจากวิกิแฟนคลับ AKB48 และ Wiki48 ตรวจกับรายชื่อสมาชิกในซิงเกิลแล้ว'}</p>
+  </div>`;
+}
+/* Her own line of past ranks, on her sheet: each election she ranked in. */
+function renderGEHistoryOf(m){
+  const hits = GE_HISTORY.map(e => ({ e, n:e.rows.findIndex(r => r[0] === m.id) + 1 })).filter(x => x.n > 0);
+  if(!hits.length) return '';
+  const en = isEN();
+  return `<h3 class="section-label">${en ? 'General elections' : 'ผลเลือกตั้งที่ผ่านมา'}</h3>
+    <div class="ge-hist-chips">${hits.map(({ e, n }) => {
+      const b = geHistBands(e).find(x => n >= x.from && n <= x.to);
+      const [u0, u1] = e.unsure || [0, -1], unsure = n >= u0 && n <= u1;
+      return `<button class="ge-hist-chip is-${b.tone}" data-action="open-ge-hist" data-value="${e.id}"><small>${e.date.slice(0, 4)}</small><b>${unsure ? `${u0}–${u1}` : '#' + n}</b><span>${b.name}</span></button>`;
+    }).join('')}</div>`;
 }
 
 /* The owner's look at the GE vote on the chain. An iAM48 vote is GE tokens sent
@@ -14577,7 +14724,7 @@ function renderDetailModal(){
           <div class="stat-cell stat-wide"><div class="label">งานอดิเรก</div><div class="value">${escapeHtml(m.hobby||'-')}</div></div>
           <div class="stat-cell stat-wide"><div class="label">สิ่งที่ชอบ</div><div class="value">${escapeHtml(m.likes||'-')}</div></div>
         </div>
-        <div class="sec-history">${renderTeamHistory(m)}</div>
+        <div class="sec-history">${renderTeamHistory(m)}${renderGEHistoryOf(m)}</div>
         <div class="sec-facts">
         <h3 class="section-label">ข้อเท็จจริง</h3>
         ${m.facts && m.facts.length ? `<ul class="facts-list">${m.facts.map(f=>`<li>${f}</li>`).join('')}</ul>` : `<p class="muted-note">ยังไม่มีข้อมูลเพิ่มเติม — กด "แก้ไขข้อมูล" เพื่อเพิ่ม</p>`}
@@ -20398,6 +20545,19 @@ function bindDelegatedEvents(){
           delete _evLinks[id]; applyEventLinks(); state.linkEditFor = null; renderMain(); toast('กลับไปใช้ลิงก์เดิมแล้ว');
         }).catch(() => toast('บันทึกไม่ได้ ลองเช็กอินเทอร์เน็ต'));
       }
+    }
+    else if(action==='ge-hist'){
+      state.geHist = el.dataset.value;
+      renderMain();
+    }
+    else if(action==='open-ge-hist'){
+      state.geHist = el.dataset.value;
+      state.selectedId = null; state.selectedEvent = null; state.dayOf = null;
+      state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results';
+      render(); pushHistory();
+      requestAnimationFrame(() => { const h = document.querySelector('.gel-hist'); if(!h) return;
+        const top = document.querySelector('header.top'), off = top && getComputedStyle(top).position !== 'static' ? top.offsetHeight : 0;
+        scrollPageTo(h.getBoundingClientRect().top + scrollY - off - 8); });
     }
     else if(action==='ge-round'){
       state.geRound = el.dataset.value; _geSeen = null;
