@@ -3729,6 +3729,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .pd-kind.is-bio{ background:var(--gold); }
   .pd-bio{ padding:10px 12px; border-radius:14px; background:var(--card); border:1px solid var(--line); font-size:14px; }
   .pd-bio.is-old{ opacity:.6; }
+  .bio-import p{ margin:0 0 10px; font-size:14px; line-height:1.6; }
+  .bio-import .bio-import-done{ color:#1B8E52; font-weight:700; }
+  .bio-import .bio-import-err{ color:#D23B3B; font-weight:700; }
   /* backgrounds — the framed look and the accents stay; only the ground changes */
   :root[data-bg="sky"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(120,170,255,.32), transparent 42%), radial-gradient(circle at 90% 90%, rgba(190,150,255,.28), transparent 45%), linear-gradient(160deg, #F2F7FF 0%, #F6F1FF 55%, #EEF6FF 100%); }
   :root[data-bg="peach"]{ --bg-body:radial-gradient(circle at 10% 8%, rgba(255,170,110,.32), transparent 42%), radial-gradient(circle at 90% 90%, rgba(255,130,160,.28), transparent 45%), linear-gradient(160deg, #FFF6EC 0%, #FFF1F2 55%, #FFF8EE 100%); }
@@ -15413,6 +15416,62 @@ async function bioCountTags(before, after, label){
   for(const k of new Set([...before.keys(), ...after.keys()])) delete _tagHits[k];
 }
 
+/* The biographies written ahead for every member (data/bios-seed.json, both
+   languages already there): the owner brings them in with one tap. A member
+   who already has one keeps hers, and the tag counts are worked out again
+   from every biography there is afterwards. */
+let _bioImport = null;   // { busy } while it runs, then { done, skipped } or { err }
+function renderBioImport(){
+  if(!state.isOwner) return '';
+  const s = _bioImport || {};
+  return `<div class="pd-head"><h3 class="section-label">ประวัติย่อที่เตรียมไว้</h3></div>
+    <div class="bio-card bio-import">
+      <p>ประวัติย่อของเมมเบอร์ทุกคนในเว็บ เขียนไว้แล้วทั้งภาษาไทยและอังกฤษ กดนำเข้าครั้งเดียว คนที่มีประวัติอยู่แล้วจะไม่ถูกเขียนทับ</p>
+      ${s.done != null ? `<p class="bio-import-done">นำเข้าแล้ว ${s.done} คน${s.skipped ? ` · ข้าม ${s.skipped} คนที่มีประวัติอยู่แล้ว` : ''}</p>` : ''}
+      ${s.err ? `<p class="bio-import-err">${escapeHtml(s.err)}</p>` : ''}
+      <button class="btn-add" data-action="bio-import"${s.busy ? ' disabled' : ''}>${s.busy ? 'กำลังนำเข้า…' : s.done != null ? 'นำเข้าอีกครั้ง' : 'นำเข้าประวัติย่อ'}</button>
+    </div>`;
+}
+async function importBios(){
+  if(!state.isOwner || (_bioImport && _bioImport.busy)) return;
+  let seed;
+  try{ seed = (await (await fetch('data/bios-seed.json', { cache:'no-store' })).json()).bios || {}; }
+  catch(e){ alert('โหลดไฟล์ประวัติย่อไม่สำเร็จ'); return; }
+  const ids = Object.keys(seed).filter(id => getMember(id));
+  if(!confirm(`นำเข้าประวัติย่อ ${ids.length} คน? คนที่มีประวัติอยู่แล้วจะข้ามไป`)) return;
+  _bioImport = { busy:true }; renderMain();
+  try{
+    const col = fbDb.collection('bios'), snap = await col.get();
+    const have = new Map(snap.docs.filter(d => d.id !== '_tags').map(d => [d.id, bioFromDoc(d.data())]));
+    const batch = fbDb.batch();
+    let done = 0;
+    for(const id of ids){
+      if(have.has(id)) continue;
+      const b = seed[id];
+      batch.set(col.doc(id), { src:'th', th:b.th, en:b.en || '', tags:[...bioTagsOf(b.th).keys()], at:firebase.firestore.FieldValue.serverTimestamp() });
+      have.set(id, { src:'th', th:b.th, en:b.en || '' });
+      done++;
+    }
+    const n = {}, label = {};
+    for(const b of have.values()){
+      const src = b.src || 'th', other = src === 'th' ? 'en' : 'th', there = bioTagsOf(b[other] || '');
+      for(const [k, l] of bioTagsOf(b[src] || '')){
+        n[k] = (n[k] || 0) + 1;
+        const L = label[k] = label[k] || {};
+        if(!L[src]) L[src] = l;
+        if(!L[other] && there.has(k)) L[other] = there.get(k);
+      }
+    }
+    batch.set(col.doc('_tags'), { n, label });
+    await batch.commit();
+    _bioImport = { done, skipped:ids.length - done };
+    ids.forEach(id => { delete _bios[id]; });
+    _bioAsked.clear(); _bioTags = null; Object.keys(_tagHits).forEach(k => { delete _tagHits[k]; });
+    bioCacheSave();
+  }catch(e){ console.warn('bio import', e); _bioImport = { err:'นำเข้าไม่สำเร็จ ลองใหม่อีกครั้ง' }; }
+  renderMain();
+}
+
 /* ---- The writing sheet ----
    Its own element on the body, so the page redrawing underneath (Firebase
    catching up, the clock) never touches what is being typed. Mentions, tags
@@ -16594,6 +16653,7 @@ function renderProfile(){
   ${renderSignupsCard()}
   ${renderFlashComposer()}
   ${renderPendingQueue()}
+  ${renderBioImport()}
   ${renderFeedbackInbox()}
   ${renderMyStyleCard()}
   <div class="lay-zones" data-page="profile">
@@ -21207,6 +21267,7 @@ function bindDelegatedEvents(){
       goBack(() => { state.bioOf = null; });
     }
     else if(action==='edit-bio'){ openBioEditor(id); }
+    else if(action==='bio-import'){ importBios(); }
     else if(action==='open-tag'){
       leaveOverlays(); state.view = 'tag'; state.tagOf = id;
       render(); pushHistory(); window.scrollTo(0, 0);
