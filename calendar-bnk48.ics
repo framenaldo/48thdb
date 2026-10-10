@@ -521,16 +521,66 @@ DTSTART;TZID=Asia/Bangkok:20261011T120000
 DTEND;TZID=Asia/Bangkok:20261011T180000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-t21@48thdb
+UID:ev-kimi-roadshow-t21-2026-10-17@48thdb
 DTSTAMP:20261017T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:Terminal21 Rama 3\, Bangkok
-DESCRIPTION:รอประกาศรายชื่อ\n• รอบเ
- วลารอประกาศอีกครั้ง\n\nhttps://48thd
- b.com/?e=ev-kimi-roadshow-t21
+LOCATION:LG FLOOR - CARIBBEAN VILLAGE\, TERMINAL21 RAMA3\, Bangkok
+DESCRIPTION:เมมเบอร์: Arlee\, Emmy\, Hoop\, Jew\, Luksorn\,
+  Monet\, Praew\n• รอบเวลาเดียวกันทั้
+ งสองวัน 17 และ 18 ต.ค.\n• 12:00–13:00 Free Min
+ i Concert\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 พบส
+ มาชิกที่จุด Merchandise และ Hachi Cha\n• 17:
+ 00–18:00 Group Hi-Touch\n• Hoop ร่วมงานเฉพาะ
+ วันที่ 17 ต.ค. และ Jew เฉพาะวันท
+ ี่ 18 ต.ค.\n• บัตรเข้าร่วม Group Hi-Touc
+ h ได้จากการซื้อเข็มกลัดภาย
+ ในงาน\n• Zone 1 โซนนั่งชมด้านใน 
+ ถ่ายด้วยมือถือเท่านั้น ยก
+ ไม่เกินระดับศีรษะ\n• Zone 2 โซน
+ ช่างภาพ ใช้กล้องได้ทุกชนิ
+ ดและใช้อุปกรณ์เสริมได้\n• Zo
+ ne 3 โซนรอบนอก ใช้กล้องได้ทุ
+ กชนิด แต่ห้ามใช้ขาตั้ง บัน
+ ได เก้าอี้\n• Group Hi-Touch ห้ามสวมน
+ าฬิกาข้อมือ แหวน กำไล หรือ
+ ถือสิ่งของที่อาจเป็นอันต
+ รายต่อสมาชิก\n• กำหนดการอา
+ จเปลี่ยนแปลงตามความเหมาะ
+ สม\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-t21
 URL:https://48thdb.com/?e=ev-kimi-roadshow-t21
-DTSTART;VALUE=DATE:20261017
-DTEND;VALUE=DATE:20261019
+DTSTART;TZID=Asia/Bangkok:20261017T120000
+DTEND;TZID=Asia/Bangkok:20261017T180000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-t21-2026-10-18@48thdb
+DTSTAMP:20261017T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:LG FLOOR - CARIBBEAN VILLAGE\, TERMINAL21 RAMA3\, Bangkok
+DESCRIPTION:เมมเบอร์: Arlee\, Emmy\, Hoop\, Jew\, Luksorn\,
+  Monet\, Praew\n• รอบเวลาเดียวกันทั้
+ งสองวัน 17 และ 18 ต.ค.\n• 12:00–13:00 Free Min
+ i Concert\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 พบส
+ มาชิกที่จุด Merchandise และ Hachi Cha\n• 17:
+ 00–18:00 Group Hi-Touch\n• Hoop ร่วมงานเฉพาะ
+ วันที่ 17 ต.ค. และ Jew เฉพาะวันท
+ ี่ 18 ต.ค.\n• บัตรเข้าร่วม Group Hi-Touc
+ h ได้จากการซื้อเข็มกลัดภาย
+ ในงาน\n• Zone 1 โซนนั่งชมด้านใน 
+ ถ่ายด้วยมือถือเท่านั้น ยก
+ ไม่เกินระดับศีรษะ\n• Zone 2 โซน
+ ช่างภาพ ใช้กล้องได้ทุกชนิ
+ ดและใช้อุปกรณ์เสริมได้\n• Zo
+ ne 3 โซนรอบนอก ใช้กล้องได้ทุ
+ กชนิด แต่ห้ามใช้ขาตั้ง บัน
+ ได เก้าอี้\n• Group Hi-Touch ห้ามสวมน
+ าฬิกาข้อมือ แหวน กำไล หรือ
+ ถือสิ่งของที่อาจเป็นอันต
+ รายต่อสมาชิก\n• กำหนดการอา
+ จเปลี่ยนแปลงตามความเหมาะ
+ สม\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-t21
+URL:https://48thdb.com/?e=ev-kimi-roadshow-t21
+DTSTART;TZID=Asia/Bangkok:20261018T120000
+DTEND;TZID=Asia/Bangkok:20261018T180000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-kimi-roadshow-mbk@48thdb
