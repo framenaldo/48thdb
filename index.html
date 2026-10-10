@@ -3174,6 +3174,31 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-v b{ font-size:14px; font-variant-numeric:tabular-nums; }
   .gel-bar{ position:absolute; left:0; bottom:0; height:3px; background:var(--t); opacity:.45; }
   .gel-mv{ font-size:11.5px; font-weight:800; border-radius:99px; padding:1px 7px; white-space:nowrap; }
+  /* F1-style gaps: the spreads up top, and the switch for the number on each row */
+  .gel-sum{ display:grid; grid-template-columns:1fr 1fr; gap:1px; margin:12px 0 4px; background:var(--line);
+    border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .gel-sum > div{ display:flex; flex-direction:column; gap:1px; min-width:0; padding:10px 12px; background:var(--card); }
+  .gel-sum > .is-wide{ grid-column:1 / -1; flex-direction:row; align-items:center; gap:10px; }
+  .gel-sum > .is-wide > div{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .gel-sum small{ font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .gel-sum b{ font-size:17px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .gel-sum .is-wide > b{ margin-left:auto; font-size:20px; }
+  .gel-sum em{ font-style:normal; font-size:11px; color:var(--ink-soft); }
+  .gel-sum .is-gold b{ color:#B8862E; } .gel-sum .is-silver b{ color:#76828E; } .gel-sum .is-bronze b{ color:#9A5733; }
+  .gel-sum-who{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-size:12.5px; font-weight:700; }
+  .gel-sum-who i{ font-style:normal; font-weight:600; color:var(--ink-soft); }
+  .gel-sum-face{ width:22px !important; height:22px !important; border-radius:6px !important; font-size:8px; }
+  .gel-gapseg{ display:flex; gap:3px; padding:3px; margin:12px 0 2px; border-radius:12px; background:#1C1329; }
+  :root[data-theme="dark"] .gel-gapseg{ background:#0B0810; box-shadow:inset 0 0 0 1px var(--line); }
+  .gel-gapseg button{ flex:1; border:0; border-radius:9px; padding:8px 4px; background:none; cursor:pointer;
+    font:inherit; font-size:12.5px; font-weight:800; letter-spacing:.04em; color:rgba(255,255,255,.62); }
+  .gel-gapseg button small{ display:block; font-size:10px; font-weight:700; letter-spacing:0; opacity:.85; }
+  .gel-gapseg button.on{ background:#fff; color:#1C1329; box-shadow:0 2px 0 rgba(0,0,0,.25); }
+  .gel-gapseg button:active{ transform:translateY(1px); }
+  .gel-v .gel-gap{ font-size:15px; font-weight:800; color:var(--ink); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .gel-v .gel-gap.is-wait{ font-size:11.5px; color:var(--ink-soft); }
+  .gel-v.is-gap b{ font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+  .gel-close{ font-size:10.5px; font-weight:800; color:#fff; background:#E0245E; padding:1px 7px; border-radius:99px; }
   .gel-mv.is-up{ color:#1E8E4E; background:#E3F6EA; } .gel-mv.is-dn{ color:#C62B2B; background:#FBE7E7; }
   .gel-mv.is-eq{ color:var(--ink-soft); background:var(--paper-dim); } .gel-mv.is-new{ color:#7A4BC4; background:#EFE6FB; }
   .gel-foot{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:12px; }
@@ -11553,6 +11578,49 @@ function renderGEResults(){
     if(pm) now += `<div class="gel-before">${en ? 'Before' : 'ก่อนหน้า'} · <b>${p}</b> ${geFace(pm, 'gel-before-face')} ${escapeHtml(pm.name)} ${geVotes(slots[p].v)} ${geMove(prev, pm.id, p)}</div>`;
   }
 
+  /* F1-style gaps. The number on the right of each row is the score, the gap to
+     No. 1 (LEADER) or the gap to the rank just above (INTERVAL) — the score stays
+     under it, small — and a summary up top: No. 1 to the last rank in, the gap at
+     each line (Kami 7, Senbatsu, Under Girls) and the closest pair. Read out from
+     36 upward, LEADER waits for No. 1; until then the switch starts on INTERVAL. */
+  const sv = n => slots[n] && typeof slots[n].v === 'number' ? slots[n].v : null;
+  const gf = d => geVotes(Math.round(d * 100) / 100);
+  let gapPick = state.geGap;
+  if(gapPick == null){ try{ gapPick = localStorage.getItem('48thdb-ge-gap'); }catch(e){} }
+  const gapMode = ['score', 'leader', 'interval'].includes(gapPick) ? gapPick : (sv(1) != null ? 'leader' : 'interval');
+  const gapOf = n => {
+    if(gapMode === 'score' || n === 1 || sv(n) == null) return null;
+    const ref = gapMode === 'leader' ? sv(1) : sv(n - 1);
+    if(ref == null) return { wait: gapMode === 'leader' ? (en ? 'waiting for No. 1' : 'รอที่ 1') : '—' };
+    const d = ref - sv(n);
+    return { d, close: gapMode === 'interval' && d < sv(n) * 0.01 };
+  };
+  const gapCell = (mk, s, n) => {
+    const g = gapOf(n);
+    if(!g) return geCount(mk, s.v);
+    return (g.wait ? `<span class="gel-gap is-wait">${g.wait}</span>` : `<span class="gel-gap">−${gf(g.d)}</span>`)
+      + geCount(mk, s.v) + (g.close ? `<span class="gel-close">${en ? 'Close' : 'สูสี'}</span>` : '');
+  };
+  const gapSum = (() => {
+    const known = []; for(let n = 1; n <= GE_SEATS; n++) if(sv(n) != null) known.push(n);
+    if(known.length < 2) return '';
+    const lastN = known[known.length - 1];
+    const nm = n => { const m = slots[n].id && getMember(slots[n].id); return m ? `${geFace(m, 'gel-sum-face')}${escapeHtml(m.name)}` : `${en ? 'No.' : 'ที่'} ${n}`; };
+    const cell = (a, label, tone) => sv(a) != null && sv(a + 1) != null
+      ? `<div class="is-${tone}"><small>${label}</small><b>${gf(sv(a) - sv(a + 1))}</b><em>${en ? 'Ranks' : 'อันดับ'} ${a} ↔ ${a + 1}</em></div>` : '';
+    let best = null;
+    for(let i = 1; i < known.length; i++){ const a = known[i - 1]; if(known[i] === a + 1){ const d = sv(a) - sv(a + 1); if(!best || d < best.d) best = { a, d }; } }
+    const head = sv(1) != null ? `<div class="is-wide"><div><small>${en ? 'Leader → last' : 'หัวแถว → ท้ายแถว'}</small>
+      <span class="gel-sum-who">${nm(1)} <i>→</i> ${nm(lastN)} <i>(${en ? 'No.' : 'ที่'} ${lastN})</i></span></div><b>${gf(sv(1) - sv(lastN))}</b></div>` : '';
+    const cells = [cell(GE_KAMI7, en ? 'Kami 7 line' : 'เส้น Kami 7', 'gold'),
+      ...GE_BANDS.slice(0, -1).map(b => cell(b.to, en ? `${b.name} line` : `เส้น ${b.name}`, b.tone)),
+      best ? `<div><small>${en ? 'Closest' : 'สูสีที่สุด'}</small><b>${gf(best.d)}</b><em>${en ? 'Ranks' : 'อันดับ'} ${best.a} ↔ ${best.a + 1}</em></div>` : ''].filter(Boolean);
+    if(cells.length % 2) cells[cells.length - 1] = cells[cells.length - 1].replace('<div', '<div style="grid-column:1 / -1"');
+    return head || cells.length ? `<div class="gel-sum">${head}${cells.join('')}</div>` : '';
+  })();
+  const gapSeg = told ? `<div class="gel-gapseg">${[['score', en ? 'Score' : 'คะแนน', ''], ['leader', 'LEADER', en ? 'to No. 1' : 'ห่างที่ 1'], ['interval', 'INTERVAL', en ? 'to the one ahead' : 'ห่างคนข้างหน้า']]
+    .map(([v, l, sub]) => `<button class="${gapMode === v ? 'on' : ''}" data-action="ge-gap" data-value="${v}">${l}${sub ? `<small>${sub}</small>` : ''}</button>`).join('')}</div>` : '';
+
   const bandSongs = geBandSongs(round.id);
   const bands = GE_BANDS.map(b => {
     const ranks = []; for(let n = b.from; n <= b.to; n++) ranks.push(n);
@@ -11566,11 +11634,11 @@ function renderGEResults(){
       const bar = s.v ? `<span class="gel-bar" style="width:${Math.min(100, s.v / top * 100)}%"></span>` : '';
       if(!m) return `<div class="gel-row is-pending${fresh}"><span class="gel-n">${n}</span><span class="gel-q">?</span>
         <span class="gel-who"><b>${live ? (en ? 'Announcing…' : 'กำลังประกาศ…') : '—'}</b></span>
-        <span class="gel-v">${geCount(mk, s.v)}</span>${bar}</div>`;
+        <span class="gel-v${gapOf(n) ? ' is-gap' : ''}">${gapCell(mk, s, n)}</span>${bar}</div>`;
       const song = bandSongs[n];
       return `<button class="gel-row${fresh}" data-action="open-member" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
         <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small>${song ? `<small class="gel-song">${geSongLine(song, en)}</small>` : ''}</span>
-        <span class="gel-v">${geCount(mk, s.v)}${geMove(prev, m.id, n)}</span>${bar}</button>`;
+        <span class="gel-v${gapOf(n) ? ' is-gap' : ''}">${gapCell(mk, s, n)}${geMove(prev, m.id, n)}</span>${bar}</button>`;
     };
     const k7 = known.filter(n => n <= GE_KAMI7);
     const k7rows = k7.map(rowOf).join('');
@@ -11587,7 +11655,7 @@ function renderGEResults(){
   const owner = state.isOwner ? `<div class="gel-owner-row"><button class="chip chip-link gel-owner" data-action="nav" data-view="gelive">${en ? 'Enter results →' : 'กรอกผล →'}</button>
 </div>` : '';
   const shareBtn = told ? `<button class="chip chip-link gel-share" data-action="share-geres" data-value="${round.id}">${ICONS.share}<span>${en ? 'Share the results as a picture' : 'แชร์ภาพสรุปผล'}</span></button>` : '';
-  const out = `<div class="gel">${strip}${now}${picks}${shareBtn}${owner}${geChanges(round.id)}<div class="gel-bands">${bands}</div>
+  const out = `<div class="gel">${strip}${now}${picks}${shareBtn}${owner}${geChanges(round.id)}${gapSum}${gapSeg}<div class="gel-bands">${bands}</div>
     ${prev ? `<p class="gel-foot">${en ? 'Arrows compare with' : 'ลูกศรเทียบกับ'} ${geRoundLabel(GE_ROUNDS[GE_ROUNDS.findIndex(r => r.id === round.id) - 1])}</p>` : ''}
     ${renderGEHistory(en)}</div>`;
   geRemember(round.id);
@@ -21563,6 +21631,11 @@ function bindDelegatedEvents(){
     }
     else if(action==='ge-round'){
       state.geRound = el.dataset.value; _geSeen = null;
+      renderMain();
+    }
+    else if(action==='ge-gap'){
+      state.geGap = el.dataset.value;
+      try{ localStorage.setItem('48thdb-ge-gap', state.geGap); }catch(e){}
       renderMain();
     }
     else if(action==='ge-admin-round'){
