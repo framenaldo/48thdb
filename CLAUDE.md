@@ -59,6 +59,11 @@ the Firebase CLI from the owner's machine.
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.
+  Where room is tight (a member's card, the calendar's month cells and bars, a
+  day's timeline) an event goes by `eventShortName`: its `short:` if it has one,
+  else the title without the group names and the release in front ("Roadshow").
+  The home page, the election timeline, the ticker and the event's own sheet
+  keep the full title — the owner wants those read in full.
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
   then `node scripts/make-poster-grads.mjs` for its sheet colours.
