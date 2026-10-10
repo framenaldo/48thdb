@@ -64,6 +64,10 @@ the Firebase CLI from the owner's machine.
   else the title without the group names and the release in front ("Roadshow").
   The home page, the election timeline, the ticker and the event's own sheet
   keep the full title — the owner wants those read in full.
+- An event's `detail` (กำหนดการ) lines that start with a time — "12:00–13:00
+  Mini Concert", "15:00 …", "28 ส.ค. 10:00 …" — draw as a timetable that follows
+  the clock on the day (`renderSchedule`, `schedTick` in `tickClock`): over,
+  on now with time left, next. Keep writing them in that shape.
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
   then `node scripts/make-poster-grads.mjs` for its sheet colours.

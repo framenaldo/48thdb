@@ -2156,6 +2156,30 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .ev-detail{ margin:9px 0 0; padding-left:16px; }
   .ev-detail li{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; }
   .ev-mine{ margin:8px 0 0; font-size:11.5px; font-weight:700; color:var(--gold); }
+  /* an event's timetable: one frame, a row a session; on the day it follows the clock.
+     What is on now is lit in the live red, whatever the poster's colours. */
+  :root{ --es-live:#E0245E; } :root[data-theme="dark"]{ --es-live:#FF5C8A; }
+  .es-box{ display:flex; flex-direction:column; gap:1px; margin:9px 0 0; background:var(--line);
+    border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .es-box + .ev-detail{ margin-top:10px; }
+  .es-row{ position:relative; display:grid; grid-template-columns:auto minmax(0, 1fr); column-gap:14px; align-items:baseline;
+    padding:11px 13px; background:var(--card); transition:background-color .3s; }
+  .es-time{ font-size:14px; font-weight:800; color:var(--ink); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .es-time small{ display:block; font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .es-what{ min-width:0; font-size:14px; line-height:1.5; color:var(--ink); }
+  .es-st{ display:flex; align-items:center; gap:6px; margin-top:3px; font-size:12px; font-weight:800; color:color-mix(in srgb, var(--c) 72%, var(--ink)); }
+  .es-st:empty{ display:none; }
+  .es-row.is-done .es-time, .es-row.is-done .es-what{ opacity:.45; }
+  .es-row.is-done .es-st{ color:var(--ink-soft); }
+  .es-row.is-done .es-st::before{ content:'✓'; }
+  .es-row.is-now{ background:color-mix(in srgb, var(--es-live) 9%, var(--card)); box-shadow:inset 4px 0 0 var(--es-live); }
+  .es-row.is-now .es-st{ color:var(--es-live); }
+  .es-row.is-now .es-st::before{ content:''; width:8px; height:8px; border-radius:50%; background:var(--es-live); flex:none;
+    box-shadow:0 0 0 3px color-mix(in srgb, var(--es-live) 22%, transparent); animation:esPulse 1.6s ease-in-out infinite; }
+  .es-row.is-next .es-st::before{ content:''; width:8px; height:8px; border-radius:50%; border:2px solid currentColor; box-sizing:border-box; flex:none; }
+  .es-bar{ position:absolute; left:0; bottom:0; height:3px; width:0; background:var(--es-live); transition:width .8s ease; }
+  @keyframes esPulse{ 50%{ opacity:.35; } }
+  @media (prefers-reduced-motion:reduce){ .es-row.is-now .es-st::before{ animation:none; } }
 
   .today-hero{
     position:relative; overflow:hidden; margin:0 0 14px;
@@ -10187,6 +10211,7 @@ let _feedLiveKey = null;
 function tickClock(){
   syncTicker();
   ffLiveTick();
+  schedTick();
   document.querySelectorAll('[data-starts-at]').forEach(el=>{
     const end = Number(el.dataset.endsAt) || 0;
     el.textContent = startsLabel(Number(el.dataset.startsAt), end);
@@ -14215,6 +14240,65 @@ function paintSheetGrads(root){
     });
   });
 }
+/* An event's schedule. A line with a time — "12:00–13:00 Mini Concert",
+   "15:00 พิธีเปิด", "28 ส.ค. 10:00 Opening Ceremony" — is a row of a timetable;
+   anything else stays a note. On a day of the event the rows follow the clock:
+   the ones over are greyed, the one on now is lit with a bar filling as it runs
+   and how long is left, and the next says how soon. A line with a date only
+   counts on that date; one without counts every day of the run ("the same times
+   on both days"). A row with only a start runs to the next row's start, or an
+   hour. tickClock repaints them every 20 seconds without a redraw. */
+const SCHED_MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const SCHED_RE = new RegExp(`^(?:(\\d{1,2}) (${SCHED_MON.map(x => x.replace(/\./g, '\\.')).join('|')}) )?(\\d{1,2}):(\\d{2})(?:\\s*[–-]\\s*(\\d{1,2}):(\\d{2}))?\\s+(.+)$`);
+function renderSchedule(ev){
+  const en = isEN(), iso = toYmd(todayStart()), year = +ev.start.slice(0, 4);
+  const live = !ev.cancelled && !ev.postponed && ev.start <= iso && eventLastDay(ev) >= iso;
+  const at = hm => { const t = parseYmd(iso), [h, mi] = hm.split(':').map(Number); t.setHours(h, mi, 0, 0); return t.getTime(); };
+  const items = ev.detail.map(raw => {
+    const line = en ? (toEn(raw) ?? enFragments(raw) ?? raw) : raw, m = line.match(SCHED_RE);
+    if(!m) return { note: line };
+    const [, d, mon, h1, m1, h2, m2, what] = m;
+    const day = d ? toYmd(new Date(year, SCHED_MON.indexOf(mon) % 12, +d)) : null;
+    return { day, dayLabel: d ? `${d} ${mon}` : '', a: `${h1.padStart(2, '0')}:${m1}`, b: h2 ? `${h2.padStart(2, '0')}:${m2}` : '', what };
+  });
+  // today's rows get their start and end in milliseconds
+  const today = items.filter(r => !r.note && live && (!r.day || r.day === iso));
+  today.forEach((r, i) => {
+    r.from = at(r.a);
+    const later = today.slice(i + 1).map(x => at(x.a)).find(t => t > r.from);
+    r.to = r.b ? at(r.b) : (later || r.from + 3600000);
+  });
+  let out = '', box = '', notes = '';
+  const flushBox = () => { if(box){ out += `<div class="es-box">${box}</div>`; box = ''; } };
+  const flushNotes = () => { if(notes){ out += `<ul class="ev-detail">${notes}</ul>`; notes = ''; } };
+  for(const r of items){
+    if(r.note){ flushBox(); notes += `<li>${escapeHtml(r.note)}</li>`; continue; }
+    flushNotes();
+    const gone = !r.from && r.day && r.day < iso;   // a dated row whose day has passed
+    box += `<div class="es-row${gone ? ' is-done' : ''}"${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}>
+      <span class="es-time">${r.a}${r.b ? `–${r.b}` : ''}${r.dayLabel ? `<small>${escapeHtml(r.dayLabel)}</small>` : ''}</span>
+      <span class="es-what">${escapeHtml(r.what)}<span class="es-st">${gone ? (en ? 'Over' : 'จบแล้ว') : ''}</span></span>
+      <span class="es-bar"></span></div>`;
+  }
+  flushBox(); flushNotes();
+  return `<div class="es" data-noloc>${out}</div>`;
+}
+const schedSpan = ms => { const mins = Math.max(1, Math.ceil(ms / 60000)), h = Math.floor(mins / 60), m = mins % 60, en = isEN();
+  return h ? (en ? `${h} h${m ? ` ${m} min` : ''}` : `${h} ชม.${m ? ` ${m} นาที` : ''}`) : (en ? `${m} min` : `${m} นาที`); };
+function schedTick(){
+  const now = Date.now(), en = isEN();
+  document.querySelectorAll('.es-box').forEach(box => {
+    const rows = [...box.querySelectorAll('.es-row[data-es-from]')];
+    const next = rows.find(r => +r.dataset.esFrom > now);
+    rows.forEach(r => {
+      const a = +r.dataset.esFrom, b = +r.dataset.esTo, on = now >= a && now < b, done = now >= b, nx = r === next;
+      r.classList.toggle('is-now', on); r.classList.toggle('is-done', done); r.classList.toggle('is-next', nx);
+      r.querySelector('.es-st').textContent = on ? (en ? `On now · ${schedSpan(b - now)} left` : `กำลังจัดอยู่ · เหลือ ${schedSpan(b - now)}`)
+        : done ? (en ? 'Over' : 'จบแล้ว') : nx ? (en ? `Next · in ${schedSpan(a - now)}` : `ถัดไป · อีก ${schedSpan(a - now)}`) : '';
+      r.querySelector('.es-bar').style.width = on ? `${Math.min(100, (now - a) / (b - a) * 100).toFixed(1)}%` : '0';
+    });
+  });
+}
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
   if(!ev) return '';
@@ -14282,7 +14366,7 @@ function renderEventModal(){
 
         ${ev.detail ? `
         <h3 class="evm-head">กำหนดการ</h3>
-        <ul class="ev-detail">${ev.detail.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
+        ${renderSchedule(ev)}` : ''}
 
         ${ev.info ? `
         <h3 class="evm-head">รายละเอียด</h3>
@@ -18614,6 +18698,7 @@ function renderMain(){
   applyPageMeta();
   applyLayoutAll();
   bioClamp(main);
+  schedTick();
   bindReveal(arrived);   // after the reader's own order is in place, or it judges what is on screen from the default order
   sendHit();
 }
