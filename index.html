@@ -4289,6 +4289,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .sp-perk.is-none{ background:none; color:#B9ABB3; font-weight:500; padding-left:2px; }
   .sp-perk.is-none::before{ content:none; }
   .sp-sec.is-out{ opacity:.16; cursor:default; animation:none !important; }
+  /* chairs and the like: part of their zone, but quiet */
+  .sp-sec.is-prop{ animation:none !important; }
+  .sp-sec.is-prop polygon{ stroke:rgba(0,0,0,.45); stroke-width:.5; }
+  .sp-sec.is-prop.is-on .sp-top{ stroke:rgba(0,0,0,.45); stroke-width:.5; }
+  .sp-src{ margin:10px 2px 0; font-size:11.5px; line-height:1.55; color:#9C8E97; }
   .sp-bundle-card{ margin-top:12px; padding:12px 12px 12px 14px; border-radius:16px; display:flex; flex-wrap:wrap; align-items:center;
     justify-content:space-between; gap:10px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); }
   .sp-bundle-card p{ margin:0; font-size:13px; line-height:1.5; color:#EFE7EC; flex:1 1 180px; }
@@ -5970,6 +5975,12 @@ const SEED_SCHEDULE = [
     related:['ev-ge6-single'],
     poster:{ accent:'#5A5638', surface:'#EEF3F5', ink:'#34321F', img:'posters/kimi-roadshow-union.jpg', w:1200, h:1804 },
     members:['bnk-hoop','bnk-pancake','bnk-praew','cgm-chifa','cgm-lingling','cgm-prae'],
+    seatPlan:{ layout:'union-roadshow', head:'ผังพื้นที่จัดงาน (จำลอง)',
+      source:'ผังจำลองคร่าว ๆ จากผังโซนของผู้จัด ภาพ และคลิปในวันงาน ไม่ใช่ผังทางการ · เวทีสูงราว 50–60 ซม. · Zone 1 มีเก้าอี้ราว 80 ที่ 8 แถว แถวละ 10 ที่ แบ่งซ้าย–ขวา',
+      zones:[
+        { id:'Z1', label:'Zone 1', sections:['Z1'], color:'#5A5240', note:'โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ' },
+        { id:'Z2', label:'Zone 2', sections:['Z2'], color:'#72AB52', note:'โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้' },
+        { id:'Z3', label:'Zone 3', sections:['Z3L', 'Z3B', 'Z3R'], color:'#63A3D3', note:'โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้' }] },
     detail:[
       'รอบเวลาเดียวกันทั้งสองวัน 10 และ 11 ต.ค.',
       '12:00–13:00 Mini Concert',
@@ -7815,6 +7826,13 @@ const EN = {
   'รอบเวลาเดียวกันทั้งสองวัน 26 และ 27 ก.ย.': 'The same times on both days, 26 and 27 Sep',
   'รอบเวลาเดียวกันทั้งสองวัน 10 และ 11 ต.ค.': 'The same times on both days, 10 and 11 Oct',
   'รอบเวลาเดียวกันทั้งสองวัน 17 และ 18 ต.ค.': 'The same times on both days, 17 and 18 Oct',
+  'ผังพื้นที่จัดงาน (จำลอง)': 'Floor plan (a sketch)',
+  'ผังจำลองคร่าว ๆ จากผังโซนของผู้จัด ภาพ และคลิปในวันงาน ไม่ใช่ผังทางการ · เวทีสูงราว 50–60 ซม. · Zone 1 มีเก้าอี้ราว 80 ที่ 8 แถว แถวละ 10 ที่ แบ่งซ้าย–ขวา':
+    'A rough sketch from the organiser’s zone chart and photos and clips on the day, not an official plan · the stage is about 50–60 cm high · Zone 1 has some 80 chairs, eight rows of ten, split left and right',
+  'โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ': 'Seated, inside: phones only, held no higher than your head',
+  'โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้': 'Photographers: any camera, rigs allowed',
+  'โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้': 'Around the outside: any camera, but no tripods, ladders or chairs',
+  'ลำโพง': 'Speakers',
   'Hoop ร่วมงานเฉพาะวันที่ 17 ต.ค. และ Jew เฉพาะวันที่ 18 ต.ค.': 'Hoop is there on 17 Oct only, and Jew on 18 Oct only',
   'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก':
     'Group Hi-Touch: no wristwatches, rings or bracelets, and nothing in your hands that could hurt a member',
@@ -13434,6 +13452,44 @@ const SEAT_LAYOUTS = {
       ER:{ level:'stand', pts:SP_R(327.1, 536.5, 124.8, 25.4), at:[389.5,549.2], small:true, m:1.1 } },
   },
 };
+/* Union Mall's roadshow floor (CO-EVENT SPACE 4 FL.), drawn in metres — 40
+   units to the metre, the same scale as the heights, so it stands in true
+   proportion. The zones follow the organiser's chart; the rest is pieced
+   together from photos and clips on the day and is approximate: a stage about
+   0.55 m high with an LED wall behind it, speakers stacked either side and
+   monitors on its edge, two lighting towers, and some 80 chairs in Zone 1 —
+   eight rows of ten, five either side of an aisle. */
+const SP_M = 40, SP_RM = (x, y, w, h) => SP_R(x * SP_M, y * SP_M, w * SP_M, h * SP_M);
+SEAT_LAYOUTS['union-roadshow'] = (() => {
+  const props = [];
+  for(let r = 0; r < 8; r++) for(let c = 0; c < 10; c++){
+    const x = c < 5 ? 0.45 + c * 0.6 : 4.75 + (c - 5) * 0.6, y = 4.2 + r * 0.9;
+    props.push({ sec:'Z1', pts:SP_RM(x, y, 0.45, 0.42), h:0.45 * SP_M, top:'#EEE8DA', side:'#EEE8DA' });          // the seat
+    props.push({ sec:'Z1', pts:SP_RM(x, y + 0.42, 0.45, 0.07), h:0.86 * SP_M, top:'#EEE8DA', side:'#EEE8DA' });   // its back
+  }
+  const dark = { top:'#151116', side:'#3a3139' };
+  return {
+    cx:4 * SP_M, cy:7.5 * SP_M, w:14.4 * SP_M, tightZ:true,
+    levels:{ floor:{ th:'พื้น', en:'Floor', m:0, cap:{ th:['พื้น'], en:['Floor'] } } },
+    captions:[], rules:[],
+    floor:SP_RM(-3.2, -1, 14.4, 18),
+    blocks:[
+      { pts:SP_RM(0.4, -0.4, 7.2, 0.22), h:3 * SP_M, top:'#2B3A4A', side:'#5C7891' },                           // LED wall
+      { pts:SP_RM(0, 0, 8, 3.2), h:0.55 * SP_M, text:'STAGE', at:[4 * SP_M, 1.5 * SP_M], big:true },             // the stage
+      ...[1.0, 2.65, 4.85, 6.5].map(x => ({ pts:SP_RM(x, 2.65, 0.55, 0.42), z0:0.55 * SP_M, h:0.3 * SP_M, ...dark })),  // monitors on its edge
+      { pts:SP_RM(-1.35, 1.7, 0.7, 0.75), h:2 * SP_M, ...dark, text:'ลำโพง', at:[-1 * SP_M, 2.07 * SP_M] },          // speaker stacks
+      { pts:SP_RM(8.65, 1.7, 0.7, 0.75), h:2 * SP_M, ...dark, text:'ลำโพง', at:[9 * SP_M, 2.07 * SP_M] },
+      { pts:SP_RM(-0.45, 2.85, 0.3, 0.3), h:3 * SP_M, top:'#9AA0A8', side:'#9AA0A8' },                           // lighting towers
+      { pts:SP_RM(8.15, 2.85, 0.3, 0.3), h:3 * SP_M, top:'#9AA0A8', side:'#9AA0A8' } ],
+    sections:{
+      Z1:{ level:'floor', pts:SP_RM(0, 3.8, 8, 7.5), at:[4 * SP_M, 3.85 * SP_M], text:'ZONE 1', under:true, labelTop:true, small:true },
+      Z3L:{ level:'floor', pts:SP_RM(-2.2, 3.8, 1.9, 10), at:[-1.25 * SP_M, 8.8 * SP_M], text:'3', under:true },
+      Z3R:{ level:'floor', pts:SP_RM(8.3, 3.8, 1.9, 10), at:[9.25 * SP_M, 8.8 * SP_M], text:'3', under:true },
+      Z3B:{ level:'floor', pts:SP_RM(0, 11.6, 8, 2.2), at:[4 * SP_M, 12.7 * SP_M], text:'ZONE 3', under:true },
+      Z2:{ level:'floor', pts:SP_RM(-2.2, 14.1, 12.4, 2), at:[4 * SP_M, 15.1 * SP_M], text:'ZONE 2', under:true } },
+    props,
+  };
+})();
 const SP_PITCH = 46, SP_YAW = -12, SP_YAW_MAX = 26, SP_LIFT = 16, SP_PER_M = 40, SP_ZOOM = [.6, 4], SP_TILT = [12, 78];
 /* dark lettering on the pale zone colours, white on the deep ones */
 function spInk(hex){
@@ -13458,7 +13514,7 @@ function spScene(ev, st){
   const zoneOf = {};
   plan.zones.forEach(z => z.sections.forEach(n => { zoneOf[n] = z; }));
 
-  function prism(pts, h, top, side){
+  function prism(pts, h, top, side, z0 = 0){
     let area = 0;
     pts.forEach((p, i) => { const q = pts[(i + 1) % pts.length]; area += p[0] * q[1] - q[0] * p[1]; });
     const faces = [];
@@ -13467,13 +13523,13 @@ function spScene(ev, st){
       const [nx, ny] = area > 0 ? [ey, -ex] : [-ey, ex];
       if(nx * s + ny * c <= 0) return;             // faces away from us
       const len = Math.hypot(nx, ny) || 1, lit = (nx * c - ny * s) / len;
-      const quad = [P(p[0], p[1], 0), P(q[0], q[1], 0), P(q[0], q[1], h), P(p[0], p[1], h)];
+      const quad = [P(p[0], p[1], z0), P(q[0], q[1], z0), P(q[0], q[1], z0 + h), P(p[0], p[1], z0 + h)];
       faces.push({ d:(quad[0][2] + quad[1][2]) / 2,
         svg:`<polygon points="${poly(quad)}" fill="${spShade(side, .5 - .16 * lit)}"/>` });
     });
     faces.sort((a, b) => a.d - b.d);
     return faces.map(f => f.svg).join('') +
-      `<polygon class="sp-top" points="${poly(pts.map(p => P(p[0], p[1], h)))}" fill="${top}"/>`;
+      `<polygon class="sp-top" points="${poly(pts.map(p => P(p[0], p[1], z0 + h)))}" fill="${top}"/>`;
   }
   const depthOf = pts => pts.reduce((t, p) => t + P(p[0], p[1], 0)[2], 0) / pts.length;
   const label = (at, h, text, cls, fill) => {
@@ -13482,16 +13538,26 @@ function spScene(ev, st){
   };
   const items = [];
   for(const b of L.blocks)
-    items.push({ d:depthOf(b.pts), svg:`<g class="sp-block">${prism(b.pts, b.h, '#060406', '#3a3139')}${
-      label(b.at, b.h, b.text, b.big ? 'sp-dark-t sp-stage' : 'sp-dark-t')}</g>` });
+    items.push({ d:depthOf(b.pts), svg:`<g class="sp-block">${prism(b.pts, b.h, b.top || '#060406', b.side || '#3a3139', b.z0 || 0)}${
+      b.text ? label(b.at, (b.z0 || 0) + b.h, b.text, b.big ? 'sp-dark-t sp-stage' : 'sp-dark-t') : ''}</g>` });
+  const liftOf = z => z && st.pick === z.id ? SP_LIFT * st.lift : 0;
   for(const [name, sec] of Object.entries(L.sections)){
     const z = zoneOf[name];
     if(!z){ items.push({ d:depthOf(sec.pts), svg:`<g class="sp-block">${prism(sec.pts, spHeight(L, sec), '#060406', '#3a3139')}</g>` }); continue; }
-    const h = spHeight(L, sec) + (st.pick === z.id ? SP_LIFT * st.lift : 0);
+    const h = spHeight(L, sec) + liftOf(z);
     const out = z.off;                               // drawn for the hall's sake, not on sale here
-    items.push({ d:depthOf(sec.pts), svg:`<g class="sp-sec${st.pick === z.id ? ' is-on' : ''}${out ? ' is-out' : ''}"${out ? '' :
-      ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}"`} style="--z:${z.color}">${
-      prism(sec.pts, h, z.color, z.color)}${label(sec.at, h, name, sec.small ? 'is-small' : '', spInk(z.color))}</g>` });
+    const open = `<g class="sp-sec${st.pick === z.id ? ' is-on' : ''}${out ? ' is-out' : ''}"${out ? '' :
+      ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}"`} style="--z:${z.color}">`;
+    const text = label(sec.at, h, sec.text || name, sec.small ? 'is-small' : '', spInk(z.color));
+    // a floor zone lies under whatever stands on it (`under`); its name can sit on top of all (`labelTop`)
+    items.push({ d:sec.under ? -1e6 + depthOf(sec.pts) : depthOf(sec.pts), svg:`${open}${prism(sec.pts, h, z.color, z.color)}${sec.labelTop ? '' : text}</g>` });
+    if(sec.labelTop) items.push({ d:1e6, svg:`${open}${text}</g>` });
+  }
+  // things standing on a zone — chairs — rise with it and pick it
+  for(const pr of L.props || []){
+    const z = zoneOf[pr.sec], base = (L.sections[pr.sec] ? spHeight(L, L.sections[pr.sec]) : 0) + liftOf(z);
+    items.push({ d:depthOf(pr.pts), svg:`<g class="sp-sec is-prop${z && st.pick === z.id ? ' is-on' : ''}"${z ? ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" style="--z:${z.color}"` : ''}>${
+      prism(pr.pts, pr.h, pr.top, pr.side, base)}</g>` });
   }
   items.sort((a, b) => a.d - b.d);
   const flat = st.pitch < 1;
@@ -13510,9 +13576,14 @@ function spBounds(L, pitch, flat){
   const ph = pitch * Math.PI / 180, cp = Math.cos(ph), sp = Math.sin(ph);
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   const all = [...L.floor, ...L.blocks.flatMap(b => b.pts), ...(flat && L.ruleFrom ? [[L.ruleFrom, L.cy]] : [])];
+  const zTop = Math.max(44, ...L.blocks.map(b => (b.z0 || 0) + b.h));
+  // a hall with tall things in it (`tightZ`) is framed by each thing's own top, not the tallest one everywhere
+  const pts3 = L.tightZ
+    ? [...L.floor.map(([x, y]) => [x, y, 0]), ...L.blocks.flatMap(b => b.pts.map(([x, y]) => [x, y, (b.z0 || 0) + b.h]))]
+    : all.flatMap(([x, y]) => [[x, y, 0], [x, y, zTop]]);
   for(const yaw of flat ? [0] : [-SP_YAW_MAX, -SP_YAW_MAX / 2, 0, SP_YAW_MAX / 2, SP_YAW_MAX]){
     const t = yaw * Math.PI / 180, ct = Math.cos(t), stn = Math.sin(t);
-    for(const [x, y] of all) for(const z of [0, 44]){
+    for(const [x, y, z] of pts3){
       const dx = x - L.cx, dy = y - L.cy, X = dx * ct - dy * stn, Y = dx * stn + dy * ct, v = Y * cp - z * sp;
       x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0 = Math.min(y0, v); y1 = Math.max(y1, v);
     }
@@ -13575,8 +13646,8 @@ function spRows(ev, zones, notes){
   return `<div class="sp-list">${zones.map(z => `
         <button class="sp-row" data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" aria-pressed="false" style="--z:${z.color}; --zi:${spInk(z.color)}">
           <span class="sp-sw">${escapeHtml(z.label || z.id)}</span>
-          <span class="sp-secs">${z.sections.join(' · ')}${z.tokens ? `<span class="sp-tok">GE6 × ${z.tokens}</span>` : ''}</span>
-          <span class="sp-price">${escapeHtml(z.price)} บาท</span>
+          <span class="sp-secs">${z.note ? escapeHtml(z.note) : z.sections.join(' · ')}${z.tokens ? `<span class="sp-tok">GE6 × ${z.tokens}</span>` : ''}</span>
+          ${z.price ? `<span class="sp-price">${escapeHtml(z.price)} บาท</span>` : ''}
           ${notes ? `<span class="sp-perks">${z.tokens ? `<span class="sp-perk is-token">GE6 Token ${z.tokens} เหรียญ*</span>` : ''}${
             (z.perks || []).map(p => `<span class="sp-perk">${escapeHtml(p)}</span>`).join('')}${
             !z.tokens && !(z.perks || []).length ? `<span class="sp-perk is-none">บัตรโซนนี้ไม่มีของแถม</span>` : ''}</span>` : ''}
@@ -13613,6 +13684,7 @@ function renderSeatPlan(ev){
       ${spRows(ev, plan.zones.filter(z => !z.off), plan.notes)}
       <p class="sp-pick" aria-live="polite">${spIdle(plan)}</p>
       ${plan.notes ? spNotes(plan.notes) : ''}
+      ${plan.source ? `<p class="sp-src">${escapeHtml(plan.source)}</p>` : ''}
       ${host ? `<div class="sp-bundle-card">
         <p>${isEN() ? `<b>Also sold as a bundle</b> with ${escapeHtml(pair ? pair.title : '')}${plan.bundleNote ? ': ' + escapeHtml(plan.bundleNote.en) : ''}.`
           : `<b>มีบันเดิล</b> ขายคู่กับบัตร ${escapeHtml(pair ? pair.title : '')}${plan.bundleNote ? ' ' + escapeHtml(plan.bundleNote.th) : ''}`}</p>
@@ -13686,7 +13758,9 @@ function pickSeatZone(el){
   }).join('');
   const levels = [...new Set(z.sections.map(n => L.sections[n] && L.sections[n].level).filter(Boolean))]
     .map(lv => L.levels[lv][isEN() ? 'en' : 'th']);
-  read.innerHTML = isEN()
+  if(!z.price){
+    read.innerHTML = `<b>${escapeHtml(z.label || z.id)}</b> · ${escapeHtml(z.note || '')}`; localize(read);
+  } else read.innerHTML = isEN()
     ? `<b>Zone ${escapeHtml(z.label || z.id)}</b> · ${z.sections.join(', ')} · ${escapeHtml(levels.join(', '))} · <b>${escapeHtml(z.price)} THB</b>`
     : `<b>โซน ${escapeHtml(z.label || z.id)}</b> · ${z.sections.join(', ')} · ${escapeHtml(levels.join(', '))} · <b>${escapeHtml(z.price)} บาท</b>`;
   // picked from the list with the plan scrolled away: bring the plan back into sight
