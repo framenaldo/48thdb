@@ -20851,10 +20851,10 @@ async function drawMilestoneCard(g, sub){
   const lines = shareWrap(g, mixTitle(sub.track), SHARE_W - x0 * 2, 2);
   lines.forEach((l, k) => g.fillText(l, x0, 1000 + k * 70));
   let y = 1000 + (lines.length - 1) * 70 + 62;
-  const kind = (YT_KIND[sub.ytKind] || YT_KIND.video)[en ? 1 : 0];
-  const w1 = sharePill(g, grp.name, x0, y - 34, grp.color, '#fff', 26);
+  // the group alone under the song: naming the release (or the kind of video)
+  // there read, under a coupling song, as if the MV were another song's
+  sharePill(g, grp.name, x0, y - 34, grp.color, '#fff', 26);
   g.font = '600 29px "Noto Sans Thai", sans-serif'; g.fillStyle = 'rgba(255,255,255,.82)'; g.textBaseline = 'middle';
-  g.fillText(`${kind} · ${sub.work.title}`, x0 + w1 + 16, y - 34 + 23);
   g.fillText(`${en ? 'on YouTube, reached' : 'บน YouTube · ครบเมื่อ'} ${shareThaiDate(new Date(...sub.at.slice(0, 10).split('-').map((v, k) => k === 1 ? v - 1 : +v)))}`, x0, y + 40);
   g.textBaseline = 'alphabetic';
   await shareFooter(g, true, sub.url);
