@@ -11061,14 +11061,12 @@ function renderGEPosterViewer(id){
 }
 const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo-v2.webp', red:'#B3121E',
   vote:'ev-election-voting', results:'ev-election-results' };
-// "กำหนดการ" holds two views of the same dates: the timeline, and every event as a card
-const geSchedSwitch = (tab, en) => `<div class="gea-seg ge-sched-seg">
-  <button class="${tab === 'timeline' ? 'is-on' : ''}" data-action="ge-tab" data-value="timeline">${en ? 'Timeline' : 'ไทม์ไลน์'}</button>
-  <button class="${tab === 'events' ? 'is-on' : ''}" data-action="ge-tab" data-value="events">${en ? 'All events' : 'งานทั้งหมด'}</button></div>`;
 function renderGEPage(){
   const en = isEN();
   const iso = toYmd(todayStart());
-  const tab = state.geTab || 'overview';
+  // "กำหนดการ" is the timeline alone: its old "every event as a card" view repeated
+  // the timeline, the home page and the calendar, so it went (an old link lands here)
+  const tab = state.geTab === 'events' ? 'timeline' : (state.geTab || 'overview');
   const items = TIMELINES[GE_PAGE.key] || [];
   const events = SEED_SCHEDULE.filter(e => e.timeline === GE_PAGE.key)
     .sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'));
@@ -11107,7 +11105,7 @@ function renderGEPage(){
   const liveRound = geLiveRound();
   const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ['chain', en ? 'Live Voting' : 'โหวตสด'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []),
     ['timeline', en ? 'Schedule' : 'กำหนดการ']]
-    .map(([v, l]) => `<button class="sub-tab${tab === v || (v === 'timeline' && tab === 'events') || (v === 'candidates' && tab === 'songs') ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
+    .map(([v, l]) => `<button class="sub-tab${tab === v || (v === 'candidates' && tab === 'songs') ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
   const liveBanner = liveRound && tab !== 'results' ? `<button class="ge-live-banner" data-action="ge-tab" data-value="results">
     <span class="gel-live"><i></i>LIVE</span><span>${en ? 'Announcing' : 'กำลังประกาศ'} ${geRoundLabel(liveRound)}
     <small>· ${en ? `${geAnnounced(liveRound.id)} / ${GE_SEATS} so far` : `ประกาศแล้ว ${geAnnounced(liveRound.id)} / ${GE_SEATS}`}</small></span>→</button>` : '';
@@ -11117,12 +11115,8 @@ function renderGEPage(){
   else if(tab === 'chain') body = renderGEChain();
   else if(tab === 'candidates') body = geCandSwitch(tab, en) + renderGECandidates();
   else if(tab === 'songs') body = geCandSwitch(tab, en) + renderGESongs();
-  else if(tab === 'timeline') body = geSchedSwitch(tab, en) + renderTimelinePage(true);
-  else if(tab === 'events'){
-    const ahead = events.filter(e => eventLastDay(e) >= iso), past = events.filter(e => eventLastDay(e) < iso);
-    body = `${geSchedSwitch(tab, en)}${ahead.map(e => renderEventCard(e, iso)).join('')}
-      ${past.length ? `<h3 class="section-label">${en ? 'Over' : 'จบไปแล้ว'}</h3>${past.map(e => renderEventCard(e, iso)).join('')}` : ''}`;
-  } else {
+  else if(tab === 'timeline') body = renderTimelinePage(true);
+  else {
     const next = items.filter(it => (it.to || it.d) >= iso).slice(0, 4);
     const shop = events.filter(e => e.shop && shopStatus(e, Date.now()).state !== 'over');
     const nowOn = events.filter(e => e.start <= iso && eventLastDay(e) >= iso);
