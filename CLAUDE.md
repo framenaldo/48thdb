@@ -53,7 +53,9 @@ the Firebase CLI from the owner's machine.
   `#{tag|label}` for tags; `[words](https://…)` for links. Nobody's name is
   shown as the writer, and a bio shows nothing about who mentions whom.
   Tag pages are `/?t=<tag>` (view `tag`). Bio text carries `data-noloc`, so
-  the language passes leave it as written.
+  the language passes leave it as written. Search engines read the bio from
+  the static /m/<id> pages, so rerun `node scripts/make-member-pages.mjs`
+  after bios change.
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.

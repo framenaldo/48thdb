@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /* A page of her own for every member, at /m/<id>:
  *   m/<id>.html            her profile as plain HTML — what search engines index
- *                          and what LINE, X and Facebook read for a link preview
+ *                          and what LINE, X and Facebook read for a link preview —
+ *                          with her biography (bios/ in Firestore) in Thai and English
  *   m/index.html           every member, by group, linking to each page
  *   photos/og/<id>.jpg     the 1200×630 preview image
  *   sitemap.xml            /, the views (/music, /gallery …), /m/ and every member page
@@ -11,7 +12,7 @@
  * on the site; the bare /m/<id> stays a real page, for search.
  *
  * Reads the member list the site itself shows (seed + Firestore), so run it
- * after members change. Needs the site served locally (.claude/launch.json,
+ * after members or their biographies change. Needs the site served locally (.claude/launch.json,
  * port 8823) and Chrome. Files that come out the same are left untouched.
  *   node scripts/make-member-pages.mjs
  */
@@ -58,6 +59,32 @@ const people = JSON.parse(await run(`JSON.stringify(state.members.map(m => {
     ge:(typeof GE_CANDIDATES !== 'undefined' && GE_CANDIDATES.includes(m.id)) };
 }))`));
 
+// her biography (Firestore bios/), as plain HTML in both languages: mentions and
+// tags become ordinary links, names read as the site shows them by default
+const bios = JSON.parse(await run(`(async () => {
+  const snap = await fbDb.collection('bios').get(), out = {}, was = state.lang;
+  const href = (k, id) => k === 'm' ? '/m/' + id : k === 'w' ? '/?s=' + encodeURIComponent(id) : '/?e=' + encodeURIComponent(id);
+  const line = text => { let o = '', last = 0; BIO_RE.lastIndex = 0;
+    for(let m; (m = BIO_RE.exec(text)); ){
+      o += escapeHtml(text.slice(last, m.index)); last = BIO_RE.lastIndex;
+      if(m[1]){ const r = bioRef(m[1], m[2], m[3]); if(r) o += r.action ? '<a href="' + href(m[1], m[2]) + '">' + escapeHtml(r.label) + '</a>' : escapeHtml(r.label); }
+      else if(m[4]) o += '<a class="ht" href="/?t=' + encodeURIComponent(bioKey(m[4])) + '">#' + escapeHtml((m[5] || m[4]).trim()) + '</a>';
+      else { let u; try{ u = new URL(m[7]); }catch(e){}
+        o += u ? '<a href="' + escapeAttr(u.href) + '" rel="nofollow ugc noopener" target="_blank">' + escapeHtml(m[6]) + '</a>' : escapeHtml(m[6]); }
+    }
+    return o + escapeHtml(text.slice(last)); };
+  const html = t => String(t || '').trim().split(/\\n{2,}/).map(p => '<p>' + p.split('\\n').map(line).join('<br>') + '</p>').join('');
+  const plain = t => bioPlain(t).replace(/\\s+/g, ' ').trim();
+  snap.forEach(d => { if(d.id.startsWith('_')) return; const b = bioFromDoc(d.data()), r = {};
+    state.lang = 'mix'; const th = b.th || b[b.src]; if(th){ r.th = html(th); r.thPlain = plain(th); }
+    state.lang = 'en'; if(b.en){ r.en = html(b.en); r.enPlain = plain(b.en); }
+    if(r.th || r.en) out[d.id] = r; });
+  state.lang = was;
+  return JSON.stringify(out);
+})()`));
+// the start of her biography for a search result, cut where a phrase ends
+const clip = (s, max) => s.length <= max ? s : (s.slice(0, max).replace(/\s+\S*$/, '') || s.slice(0, max)) + '…';
+
 // preview images: her photo in a ring, her names, group and team
 for(const p of people){
   const jpg = await run(`(async () => {
@@ -92,8 +119,8 @@ for(const p of people){
   put(`photos/og/${p.id}.jpg`, Buffer.from(jpg.split(',')[1], 'base64'));
 }
 
-const CSS = `:root{--pink:#E4457E;--teal:#2E8C82;--ink:#231B2B;--soft:#6E6478;--line:#EADDE6;--card:#fff;--bg:#FBF5F8}
-@media (prefers-color-scheme:dark){:root{--ink:#F4EEF6;--soft:#B6AABD;--line:#3A2F42;--card:#1E1824;--bg:#141018}}
+const CSS = `:root{--pink:#E4457E;--teal:#2E8C82;--ink:#231B2B;--soft:#6E6478;--line:#EADDE6;--card:#fff;--bg:#FBF5F8;--mn:#C8336B;--ht:#2E8C82}
+@media (prefers-color-scheme:dark){:root{--ink:#F4EEF6;--soft:#B6AABD;--line:#3A2F42;--card:#1E1824;--bg:#141018;--mn:#FF84B2;--ht:#63CDBF}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 'Noto Sans Thai',system-ui,sans-serif}
 a{color:inherit}.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.top a{font-weight:800;text-decoration:none}
@@ -111,6 +138,8 @@ h2{font-size:18px;margin:22px 0 8px}ul{margin:0;padding-left:20px}
 .grp{margin-top:20px}.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .list a{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:14px;background:var(--card);text-decoration:none;box-shadow:0 2px 0 var(--line)}
 .list img,.list .ph{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--line);flex:none}.list b{display:block;line-height:1.2}.list small{color:var(--soft);font-size:12px}
+.bio p{margin:0 0 10px}.bio a{color:var(--mn);font-weight:700;text-decoration:none}.bio a.ht{color:var(--ht)}
+details.en{margin-top:4px}details.en summary{cursor:pointer;color:var(--soft);font-size:14px;font-weight:700;margin-bottom:8px}
 .foot{margin-top:28px;font-size:13px;color:var(--soft);text-align:center}`;
 const HEAD = (title, desc, url, img) => `<!doctype html>
 <html lang="th"><head><meta charset="utf-8">
@@ -142,7 +171,8 @@ for(const p of people){
   const url = `${ORIGIN}/m/${p.id}`, site = `/?m=${p.id}`;
   const who = `${p.name}${p.th ? ` (${p.th})` : ''}`;
   const unit = [p.group, p.team].filter(Boolean).join(' ');
-  const desc = [`${who} ${p.graduated ? 'อดีตสมาชิก' : 'สมาชิก'} ${unit}${p.gen ? ` รุ่น ${p.gen}` : ''}`,
+  const bio = bios[p.id] || {}, lead = `${who} ${p.graduated ? 'อดีตสมาชิก' : 'สมาชิก'} ${unit}${p.gen ? ` รุ่น ${p.gen}` : ''}`;
+  const desc = bio.thPlain ? `${lead} — ${clip(bio.thPlain, Math.max(80, 170 - lead.length))}` : [lead,
     p.realTh || p.real ? `ชื่อจริง ${[p.realTh, p.real && `(${p.real})`].filter(Boolean).join(' ')}` : '',
     p.birthday ? `เกิด ${day(p.birthday)}` : '', p.hometown ? `บ้านเกิด ${p.hometown}` : '',
     p.graduated ? `จบการศึกษา ${day(p.graduated)}` : ''].filter(Boolean).join(' · ');
@@ -151,6 +181,7 @@ for(const p of people){
     ['งานอดิเรก', p.hobby, 1], ['ชอบ', p.likes, 1], ['จบการศึกษา', day(p.graduated)]].filter(r => r[1]);
   const ld = { '@context':'https://schema.org', '@type':'Person', name:p.name, alternateName:[p.th, p.realTh, p.real].filter(Boolean),
     url, image: p.photo && !p.photo.startsWith('data:') ? ORIGIN + photoSrc(p) : `${ORIGIN}/photos/og/${p.id}.jpg`,
+    ...(bio.thPlain ? { description:bio.thPlain } : {}),
     ...(p.birthday ? { birthDate:p.birthday } : {}), ...(p.hometown ? { birthPlace:p.hometown } : {}),
     memberOf:{ '@type':'MusicGroup', name:p.group } };
   const img = photoSrc(p);
@@ -164,6 +195,8 @@ for(const p of people){
     <div><h1>${esc(p.name)}</h1><p class="sub">${esc([p.th, p.realTh].filter(Boolean).join(' · '))}</p>
     <div class="chips"><span class="chip g">${esc(p.group)}</span>${p.team ? `<span class="chip">${esc(p.team)}</span>` : ''}${p.gen ? `<span class="chip">รุ่น ${p.gen}</span>` : ''}${p.graduated ? '<span class="chip">จบการศึกษาแล้ว</span>' : ''}</div></div></div>
   <a class="go" href="${site}">ดูโปรไฟล์เต็ม งาน และสถิติบน 48thDb →</a>
+  ${bio.th ? `<h2>ประวัติย่อ</h2><div class="bio">${bio.th}</div>` : ''}
+  ${bio.en ? `<details class="en" lang="en"${bio.th ? '' : ' open'}><summary>Biography in English</summary><div class="bio">${bio.en}</div></details>` : ''}
   <dl>${rows.map(r => `<div${r[2] ? ' class="w"' : ''}><dt>${r[0]}</dt><dd>${esc(r[1])}</dd></div>`).join('')}</dl>
   ${p.facts.length ? `<h2>เกร็ดน่ารู้</h2><ul>${p.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}
   ${p.ge ? `<a class="go alt" href="/p/${p.id}">โปสเตอร์ Senbatsu General Election 2026 →</a>` : ''}
