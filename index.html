@@ -6009,6 +6009,12 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#5A5638', surface:'#EEF3F5', ink:'#34321F', img:'posters/kimi-roadshow-t21.jpg', w:1200, h:1803 },
     members:['bnk-arlee','bnk-emmy','bnk-hoop','bnk-jew','bnk-luksorn','bnk-monet','bnk-praew'],
     memberDays:{ 'bnk-hoop':'17 ต.ค.', 'bnk-jew':'18 ต.ค.' },
+    seatPlan:{ layout:'t21-roadshow', head:'ผังพื้นที่จัดงาน (จำลอง)',
+      source:'ผังจำลองคร่าว ๆ จากผังโซนของผู้จัดและภาพจากงานก่อนหน้าที่ลานเดียวกัน ไม่ใช่ผังทางการ · เวทีสูงราว 80–90 ซม. · Zone 1 มีเก้าอี้ราว 80 ที่ 8 แถว แถวละ 10 ที่ มีทางเดินตรงกลาง',
+      zones:[
+        { id:'Z1', label:'Zone 1', sections:['Z1'], color:'#5A5240', note:'โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ' },
+        { id:'Z2', label:'Zone 2', sections:['Z2'], color:'#72AB52', note:'โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้' },
+        { id:'Z3', label:'Zone 3', sections:['Z3L', 'Z3B', 'Z3R'], color:'#63A3D3', note:'โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้' }] },
     detail:[
       'รอบเวลาเดียวกันทั้งสองวัน 17 และ 18 ต.ค.',
       '12:00–13:00 Free Mini Concert',
@@ -6057,6 +6063,12 @@ const SEED_SCHEDULE = [
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'MBK Center, Bangkok', groups:['bnk48','cgm48'], lineupTba:true,
     related:['ev-ge6-single'],
+    seatPlan:{ layout:'mbk-roadshow', head:'ผังพื้นที่จัดงาน (จำลอง)',
+      source:'ผังจำลองคร่าว ๆ จากภาพโรดโชว์ครั้งก่อนที่ลานเดียวกัน (19–20 ก.ย.) ไม่ใช่ผังทางการ · ผู้จัดยังไม่ประกาศผังโซนของรอบนี้ จึงใช้โซนแบบโรดโชว์อื่นของซิงเกิลนี้ · เวทีสูงราว 70 ซม. · Zone 1 มีเก้าอี้ราว 80 ที่ 8 แถว แถวละ 10 ที่ มีทางเดินตรงกลาง',
+      zones:[
+        { id:'Z1', label:'Zone 1', sections:['Z1'], color:'#5A5240', note:'โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ' },
+        { id:'Z2', label:'Zone 2', sections:['Z2'], color:'#72AB52', note:'โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้' },
+        { id:'Z3', label:'Zone 3', sections:['Z3L', 'Z3B', 'Z3R'], color:'#63A3D3', note:'โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้' }] },
     info:['รอบเวลารอประกาศอีกครั้ง'] },
   { id:'ev-ge6-handshake', logo:'kimi', start:'2026-10-31', end:'2026-11-01',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Handshake Event',
@@ -7839,6 +7851,10 @@ const EN = {
   'โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้': 'Photographers: any camera, rigs allowed',
   'โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้': 'Around the outside: any camera, but no tripods, ladders or chairs',
   'ลำโพง': 'Speakers',
+  'ผังจำลองคร่าว ๆ จากภาพโรดโชว์ครั้งก่อนที่ลานเดียวกัน (19–20 ก.ย.) ไม่ใช่ผังทางการ · ผู้จัดยังไม่ประกาศผังโซนของรอบนี้ จึงใช้โซนแบบโรดโชว์อื่นของซิงเกิลนี้ · เวทีสูงราว 70 ซม. · Zone 1 มีเก้าอี้ราว 80 ที่ 8 แถว แถวละ 10 ที่ มีทางเดินตรงกลาง':
+    'A rough sketch from photos of the last roadshow on the same floor (19–20 Sep), not an official plan · the organiser has not put out this one’s zone chart, so the zones are those of the single’s other roadshows · the stage is about 70 cm high · Zone 1 has some 80 chairs, eight rows of ten, with an aisle down the middle',
+  'ผังจำลองคร่าว ๆ จากผังโซนของผู้จัดและภาพจากงานก่อนหน้าที่ลานเดียวกัน ไม่ใช่ผังทางการ · เวทีสูงราว 80–90 ซม. · Zone 1 มีเก้าอี้ราว 80 ที่ 8 แถว แถวละ 10 ที่ มีทางเดินตรงกลาง':
+    'A rough sketch from the organiser’s zone chart and a photo of an earlier show on the same floor, not an official plan · the stage is about 80–90 cm high · Zone 1 has some 80 chairs, eight rows of ten, with an aisle down the middle',
   'ผังจำลองคร่าว ๆ จากผังโซนของผู้จัดและภาพจากงานก่อนหน้าที่ลานเดียวกัน ไม่ใช่ผังทางการ · เวทีสูงราว 80 ซม. · Zone 1 มีเก้าอี้ราว 50 ที่ 5 แถว แถวละ 10 ที่ แบ่งซ้าย–ขวา':
     'A rough sketch from the organiser’s zone chart and photos of an earlier show on the same floor, not an official plan · the stage is about 80 cm high · Zone 1 has some 50 chairs, five rows of ten, split left and right',
   'Hoop ร่วมงานเฉพาะวันที่ 17 ต.ค. และ Jew เฉพาะวันที่ 18 ต.ค.': 'Hoop is there on 17 Oct only, and Jew on 18 Oct only',
@@ -13479,6 +13495,13 @@ function spChairs(sec, xs, y0, rows, pitch){
   return out;
 }
 const SP_FIVE = (from, step) => [0, 1, 2, 3, 4].map(c => from + c * step);
+const SP_WALL = { top:'#2B3A4A', side:'#5C7891' };   // the screen behind every roadshow stage, one colour for all
+/* speakers stacked on the floor beside a stage: a sub and two tops, some 2.1 m. One
+   footprint for all three, so they paint bottom to top and the name stays on top. */
+const SP_STACK = (x, y) => { const dark = { top:'#151116', side:'#3a3139' }; return [
+  { pts:SP_RM(x, y, 0.7, 0.6), h:0.6 * SP_M, ...dark },
+  { pts:SP_RM(x + 0.05, y, 0.6, 0.6), z0:0.6 * SP_M, h:0.75 * SP_M, ...dark },
+  { pts:SP_RM(x + 0.05, y, 0.6, 0.6), z0:1.35 * SP_M, h:0.75 * SP_M, ...dark, text:'ลำโพง', at:[(x + 0.35) * SP_M, (y + 0.3) * SP_M] } ]; };
 SEAT_LAYOUTS['union-roadshow'] = (() => {
   const props = spChairs('Z1', [...SP_FIVE(0.45, 0.6), ...SP_FIVE(4.75, 0.6)], 4.2, 8, 0.9);
   const dark = { top:'#151116', side:'#3a3139' };
@@ -13488,7 +13511,7 @@ SEAT_LAYOUTS['union-roadshow'] = (() => {
     captions:[], rules:[],
     floor:SP_RM(-3.2, -1, 14.4, 18),
     blocks:[
-      { pts:SP_RM(0.4, -0.4, 7.2, 0.22), h:3 * SP_M, top:'#2B3A4A', side:'#5C7891' },                           // LED wall
+      { pts:SP_RM(0.4, -0.4, 7.2, 0.22), h:3 * SP_M, ...SP_WALL },                                             // LED wall
       { pts:SP_RM(0, 0, 8, 3.2), h:0.55 * SP_M, text:'STAGE', at:[4 * SP_M, 1.5 * SP_M], big:true },             // the stage
       ...[1.0, 2.65, 4.85, 6.5].map(x => ({ pts:SP_RM(x, 2.65, 0.55, 0.42), z0:0.55 * SP_M, h:0.3 * SP_M, ...dark })),  // monitors on its edge
       { pts:SP_RM(-1.35, 1.7, 0.7, 0.75), h:2 * SP_M, ...dark, text:'ลำโพง', at:[-1 * SP_M, 2.07 * SP_M] },          // speaker stacks
@@ -13506,7 +13529,7 @@ SEAT_LAYOUTS['union-roadshow'] = (() => {
 })();
 /* Central Chiangmai Airport's Grand Hall (ลานกิจกรรม ชั้น 1), the same zones as
    Union's chart, measured off photos of an earlier show on the same floor: a
-   stage about 0.8 m high, a printed backdrop behind, a speaker on a pole either side
+   stage about 0.8 m high, a screen behind, a speaker on a pole either side
    over a sub, monitors on the edge, a walkway in front of the first row, and
    some 50 chairs — five rows of ten, five either side of an aisle. A sketch. */
 SEAT_LAYOUTS['cnx-roadshow'] = (() => {
@@ -13522,7 +13545,7 @@ SEAT_LAYOUTS['cnx-roadshow'] = (() => {
     captions:[], rules:[],
     floor:SP_RM(-2.7, -1, W + 5.4, 15.4),
     blocks:[
-      { pts:SP_RM(0.3, -0.35, W - 0.6, 0.2), h:3.2 * SP_M, top:'#2E5E63', side:'#5E9AA0' },                 // backdrop
+      { pts:SP_RM(0.3, -0.35, W - 0.6, 0.2), h:3.2 * SP_M, ...SP_WALL },                                    // the screen
       { pts:SP_RM(0, 0, W, 3.6), h:0.8 * SP_M, text:'STAGE', at:[W / 2 * SP_M, 1.7 * SP_M], big:true },   // the stage
       ...[1.0, 2.7, 4.75, 6.45].map(x => ({ pts:SP_RM(x, 3.1, 0.55, 0.42), z0:0.8 * SP_M, h:0.3 * SP_M, ...dark })),   // monitors
       ...speaker(-1.4), ...speaker(W + 0.8) ],
@@ -13534,6 +13557,65 @@ SEAT_LAYOUTS['cnx-roadshow'] = (() => {
       Z2:{ level:'floor', pts:SP_RM(-1.7, 11.6, W + 3.4, 1.8), at:[W / 2 * SP_M, 12.5 * SP_M], text:'ZONE 2', under:true } },
     // a metre's walkway in front of the first row, where the members come down
     props:spChairs('Z1', [...SP_FIVE(0.45, 0.65), ...SP_FIVE(4.5, 0.65)], 4.75, 5, 0.95),   // a 1 m aisle at the middle
+  };
+})();
+/* Terminal21 Rama 3, LG floor, Caribbean Village: the same zones again, from a
+   photo of an earlier show there — a stage about 0.85 m high and narrower than
+   the seats, a screen behind, a monitor or two on its edge, speakers stacked on
+   the floor either side (a sub and two tops, some 2.1 m), and some 80 chairs —
+   eight rows of ten, five either side of a wide aisle; the floor is tight. A sketch. */
+SEAT_LAYOUTS['t21-roadshow'] = (() => {
+  const W = 7.2, dark = { top:'#151116', side:'#3a3139' };
+  return {
+    cx:W / 2 * SP_M, cy:7.7 * SP_M, w:(W + 5.4) * SP_M, tightZ:true,
+    levels:{ floor:{ th:'พื้น', en:'Floor', m:0, cap:{ th:['พื้น'], en:['Floor'] } } },
+    captions:[], rules:[],
+    floor:SP_RM(-2.7, -1, W + 5.4, 17.4),
+    blocks:[
+      { pts:SP_RM(0.8, -0.3, W - 1.6, 0.2), h:2.8 * SP_M, ...SP_WALL },                                      // the screen
+      { pts:SP_RM(0.6, 0, W - 1.2, 3), h:0.85 * SP_M, text:'STAGE', at:[W / 2 * SP_M, 1.4 * SP_M], big:true },   // the stage
+      ...[2.9, 3.75].map(x => ({ pts:SP_RM(x, 2.5, 0.55, 0.42), z0:0.85 * SP_M, h:0.3 * SP_M, ...dark })),       // monitors
+      ...SP_STACK(-0.4, 2.0), ...SP_STACK(W - 0.3, 2.0) ],
+    sections:{
+      Z1:{ level:'floor', pts:SP_RM(0, 3.2, W, 8), at:[W / 2 * SP_M, 3.25 * SP_M], text:'ZONE 1', under:true, labelTop:true, small:true },
+      Z3L:{ level:'floor', pts:SP_RM(-1.7, 3.2, 1.6, 10.3), at:[-0.9 * SP_M, 8.3 * SP_M], text:'3', under:true },
+      Z3R:{ level:'floor', pts:SP_RM(W + 0.1, 3.2, 1.6, 10.3), at:[(W + 0.9) * SP_M, 8.3 * SP_M], text:'3', under:true },
+      Z3B:{ level:'floor', pts:SP_RM(0, 11.3, W, 2.2), at:[W / 2 * SP_M, 12.4 * SP_M], text:'ZONE 3', under:true },
+      Z2:{ level:'floor', pts:SP_RM(-1.7, 13.6, W + 3.4, 1.8), at:[W / 2 * SP_M, 14.5 * SP_M], text:'ZONE 2', under:true } },
+    // a metre's walkway in front, then eight rows; the aisle down the middle runs to the stage
+    props:spChairs('Z1', [...SP_FIVE(0.3, 0.55), ...SP_FIVE(4.25, 0.55)], 4.2, 8, 0.9),
+  };
+})();
+/* MBK Center, Avenue A on the ground floor, from photos of the roadshow there on
+   19–20 Sep 2026: a wide stage about 0.7 m high (a fan kneeling at its edge comes
+   to about his chest), a screen in the middle with a
+   printed panel either side, four monitors along its edge, speakers stacked on
+   the floor at its front corners, some 80 chairs — eight rows of ten either
+   side of an aisle — and room to stand either side and behind, cameras at the
+   back. The organiser has not put out a zone chart for this one, so the zones
+   are those of the single's other roadshows. A sketch. */
+SEAT_LAYOUTS['mbk-roadshow'] = (() => {
+  const W = 7.2, dark = { top:'#151116', side:'#3a3139' }, panel = { top:'#DCE6F2', side:'#B8C8DA' };
+  return {
+    cx:W / 2 * SP_M, cy:8.2 * SP_M, w:(W + 6.8) * SP_M, tightZ:true,
+    levels:{ floor:{ th:'พื้น', en:'Floor', m:0, cap:{ th:['พื้น'], en:['Floor'] } } },
+    captions:[], rules:[],
+    floor:SP_RM(-3.4, -1, W + 6.8, 18.4),
+    blocks:[
+      { pts:SP_RM(1.1, -0.35, 5, 0.2), h:3 * SP_M, ...SP_WALL },                                            // the screen
+      { pts:SP_RM(-0.9, -0.3, 1.5, 0.15), h:2.5 * SP_M, ...panel },                                         // printed panels
+      { pts:SP_RM(6.6, -0.3, 1.5, 0.15), h:2.5 * SP_M, ...panel },
+      { pts:SP_RM(-1.4, 0, 10, 4), h:0.7 * SP_M, text:'STAGE', at:[W / 2 * SP_M, 1.9 * SP_M], big:true },   // the stage
+      ...[-1.1, 1.75, 4.9, 7.75].map(x => ({ pts:SP_RM(x, 3.5, 0.55, 0.42), z0:0.7 * SP_M, h:0.3 * SP_M, ...dark })),   // monitors
+      ...SP_STACK(-2.3, 3.0), ...SP_STACK(W + 1.6, 3.0) ],
+    sections:{
+      Z1:{ level:'floor', pts:SP_RM(0, 4.2, W, 8), at:[W / 2 * SP_M, 4.25 * SP_M], text:'ZONE 1', under:true, labelTop:true, small:true },
+      Z3L:{ level:'floor', pts:SP_RM(-2.1, 4.2, 2, 10.3), at:[-1.1 * SP_M, 9.3 * SP_M], text:'3', under:true },
+      Z3R:{ level:'floor', pts:SP_RM(W + 0.1, 4.2, 2, 10.3), at:[(W + 1.1) * SP_M, 9.3 * SP_M], text:'3', under:true },
+      Z3B:{ level:'floor', pts:SP_RM(0, 12.3, W, 2.2), at:[W / 2 * SP_M, 13.4 * SP_M], text:'ZONE 3', under:true },
+      Z2:{ level:'floor', pts:SP_RM(-2.1, 14.6, W + 4.2, 1.8), at:[W / 2 * SP_M, 15.5 * SP_M], text:'ZONE 2', under:true } },
+    // a metre's walkway in front, then eight rows either side of the aisle
+    props:spChairs('Z1', [...SP_FIVE(0.3, 0.55), ...SP_FIVE(4.25, 0.55)], 5.2, 8, 0.9),
   };
 })();
 const SP_PITCH = 46, SP_YAW = -12, SP_YAW_MAX = 26, SP_LIFT = 16, SP_PER_M = 40, SP_ZOOM = [.6, 4], SP_TILT = [12, 78];
