@@ -64,6 +64,11 @@ the Firebase CLI from the owner's machine.
   else the title without the group names and the release in front ("Roadshow").
   The home page, the election timeline, the ticker and the event's own sheet
   keep the full title — the owner wants those read in full.
+- A venue plan is `seatPlan` on the event (zones, colours, and a price, or a
+  `note` for a free event) drawn from a hall in `SEAT_LAYOUTS` (3D SVG, turns
+  and lies flat). Union Mall's roadshow floor is a sketch in metres (`SP_RM`,
+  40 units to the metre) pieced together from the owner's photos and clips —
+  keep it marked as a sketch (`source`) unless the organiser publishes one.
 - An event's `detail` (กำหนดการ) lines that start with a time — "12:00–13:00
   Mini Concert", "15:00 …", "28 ส.ค. 10:00 …" — draw as a timetable that follows
   the clock on the day (`renderSchedule`, `schedTick` in `tickClock`): over,
