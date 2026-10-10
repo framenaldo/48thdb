@@ -4278,20 +4278,40 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .fav-btn-sm.is-oshi{ color:var(--gold); }
   /* Two buttons of the same size, side by side, whatever their labels say. */
   .oshi-actions{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin:16px 0 4px; }
-  .oshi-btn, .kami-btn{
-    display:flex; align-items:center; justify-content:center; gap:7px; min-width:0;
-    font-family:'Noto Sans Thai',sans-serif; font-weight:600; font-size:13.5px; white-space:nowrap;
-    padding:11px 12px; border-radius:14px; cursor:pointer;
-    background:var(--card); border:1px solid var(--line); color:var(--ink-soft);
-    box-shadow:0 2px 8px rgba(var(--shadow-rgb),.06);
-    transition:transform .18s var(--ease-out), background .18s ease, border-color .18s ease;
+  /* A member's sheet on a phone: thin lines part who she is, what you can do
+     and her election card from the rest (a computer lays these out in a row). */
+  @media (max-width:1023px){
+    .is-member-sheet .sheet-top{ display:block; border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:18px; }
+    .is-member-sheet .sheet-top > .oshi-actions{ border-top:1px solid var(--line); padding-top:16px; margin-top:14px; }
+    .is-member-sheet .sheet-top > .social-row{ margin-bottom:0; }
+    .is-member-sheet .sheet-top > .ge-cand{ position:relative; margin-top:33px; }
+    .is-member-sheet .sheet-top > .ge-cand::before{ content:''; position:absolute; left:-5px; right:-1.5px; top:-18px; border-top:1px solid var(--line); }
   }
-  .oshi-btn:active, .kami-btn:active{ transform:scale(.96); transition-duration:.08s; }
-  .oshi-btn span{ color:var(--gold); font-size:16px; }
-  .oshi-btn.active{ background:var(--bnk-soft); border-color:var(--bnk); color:var(--ink); }
-  /* The cream fill is mixed from the gold rather than fixed, so the text — which
-     turns light in dark mode — never lands on a light patch. */
-  .kami-btn.active{ background:color-mix(in srgb, var(--gold) 16%, var(--card)); border-color:var(--gold); color:var(--ink); }
+  /* Raised pills, each in its own colour — Oshi pink, Kami Oshi gold — that
+     fill solid once chosen. The text colours are a shade deeper than the
+     accents so they stay readable on white. */
+  :root{ --oshi-ink:#C8336B; --oshi-edge:#B32F60; --kami-ink:#94661A; --kami-edge:#8E6418; }
+  :root[data-theme="dark"]{ --oshi-ink:#FF84B2; --oshi-edge:#9C2752; --kami-ink:#E6BC66; --kami-edge:#6E4D12; }
+  /* The labels shrink a touch with the pair's width so "ตั้งเป็น Kami Oshi" fits
+     a 375px phone; narrower than that the two stack. */
+  .oshi-actions{ container-type:inline-size; }
+  .oshi-btn, .kami-btn{
+    display:flex; align-items:center; justify-content:center; gap:5px; min-width:0;
+    font-family:'Noto Sans Thai',sans-serif; font-weight:800; font-size:clamp(12px, 4.05cqi, 14px); white-space:nowrap;
+    padding:11px 6px; border-radius:99px; cursor:pointer; background:var(--card); border:1.5px solid;
+  }
+  @container (max-width:290px){
+    .oshi-actions .oshi-btn, .oshi-actions .kami-btn{ grid-column:1 / -1; font-size:14px; }
+  }
+  .oshi-btn{ color:var(--oshi-ink); border-color:color-mix(in srgb, var(--bnk) 45%, var(--line));
+    box-shadow:0 3px 0 color-mix(in srgb, var(--bnk) 32%, var(--line)); }
+  .kami-btn{ color:var(--kami-ink); border-color:color-mix(in srgb, var(--gold) 55%, var(--line));
+    box-shadow:0 3px 0 color-mix(in srgb, var(--gold) 40%, var(--line)); }
+  .oshi-btn.active{ background:var(--bnk); border-color:var(--bnk); color:#fff; box-shadow:0 3px 0 var(--oshi-edge); }
+  .kami-btn.active{ background:linear-gradient(180deg, #D7A446, #B98329); border-color:#B07A22; color:#fff; box-shadow:0 3px 0 var(--kami-edge); }
+  .oshi-ico{ display:inline-flex; width:17px; height:17px; flex:none; }
+  .oshi-ico svg{ width:100%; height:100%; display:block; }
+  .oshi-lbl{ min-width:0; overflow:hidden; text-overflow:ellipsis; }
   .kami-badge{ background:var(--gold)!important; display:inline-flex!important; align-items:center; gap:5px; }
   .kami-badge .crown-ico{ color:#fff; width:12px; height:12px; }
 
@@ -4418,7 +4438,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .signin-btn:hover{ background:rgba(255,255,255,calc(.75*var(--glass-k))); transform:translateY(-2px); box-shadow:0 7px 18px rgba(var(--shadow-rgb),.13); }
     .pill:hover{ border-color:var(--bnk); color:var(--bnk); transform:translateY(-1px); }
     .gen-filter-chip:hover{ filter:brightness(1.35); }
-    .oshi-btn:hover, .kami-btn:hover{ border-color:var(--gold); transform:translateY(-2px); box-shadow:0 7px 18px rgba(var(--shadow-rgb),.1); }
+    .oshi-btn:hover, .kami-btn:hover{ transform:translateY(-1px); }
     .team-row:hover{ background:var(--pink-soft); transform:translateX(4px); }
     .mini-card:hover{
       transform:translateY(-4px);
@@ -4456,10 +4476,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
 
   /* --- press: dips fast, springs back --- */
   .btn-add:active, .btn-secondary:active, .btn-danger:active, .signin-btn:active,
-  .pill:active, .gen-filter-chip:active, .oshi-btn:active, .kami-btn:active,
+  .pill:active, .gen-filter-chip:active,
   .modal-close-btn:active, .profile-dropdown button:active{
     transform:scale(.93); transition-duration:.09s;
   }
+  .oshi-btn:active, .kami-btn:active{ transform:translateY(3px); box-shadow:none; transition-duration:.08s; }
   .btn-add:active{ box-shadow:0 2px 6px rgba(192,138,46,.3); }
   body:not(.is-scrolling) :is(.team-row, .mini-card, .kami-feature):active{
     transform:scale(.977); transition-duration:.09s;
@@ -6797,6 +6818,8 @@ const SEED_SPECIALS = [
 ];
 SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 const ICONS = {
+  star:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></svg>`,
+  starOn:`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></svg>`,
   ticket:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5Z"/><path d="M14 6v2M14 11v2M14 16v2"/></svg>`,
   share:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7.5 7.5 4.5-4.5 4.5 4.5"/><path d="M8 10.5H6.5A1.5 1.5 0 0 0 5 12v7.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V12a1.5 1.5 0 0 0-1.5-1.5H16"/></svg>`,
   link:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>`,
@@ -7054,6 +7077,7 @@ const EN = {
   'ลบสมาชิก': 'Delete member',
   'เพิ่มเป็น Oshi': 'Add as oshi',
   'เป็น Oshi ของคุณ': 'Your oshi',
+  'Oshi ของคุณ': 'Your oshi',
   'ตั้งเป็น Kami Oshi': 'Set as kami oshi',
   'เป็น Kami Oshi': 'Your kami oshi',
   'เทียบกับคนอื่น': 'Compare',
@@ -14797,12 +14821,8 @@ function renderDetailModal(){
         ${m.transfer ? `<div class="grad-note transfer-note"><span class="grad-cap">${ICONS.transfer}</span>ย้ายวงจาก ${linkGroup(getGroup(m.transfer.fromGroupId))} (รุ่น ${m.transfer.fromGen}) เมื่อ ${formatDateShort(m.transfer.date)}</div>` : ''}
         ${m.graduated ? `<div class="grad-note"><span class="grad-cap">${ICONS.cap}</span>จบการศึกษาเมื่อ ${formatDateShort(m.graduated)}</div>` : ''}
         <div class="oshi-actions">
-          <button class="oshi-btn ${isOshi?'active':''}" data-action="toggle-oshi" data-id="${m.id}">
-            <span>${isOshi?'\u2605':'\u2606'}</span> ${isOshi?'เป็น Oshi ของคุณ':'เพิ่มเป็น Oshi'}
-          </button>
-          <button class="kami-btn ${isKami?'active':''}" data-action="toggle-kami-oshi" data-id="${m.id}">
-            <span class="crown-ico">${ICONS.crown}</span> ${isKami?'เป็น Kami Oshi':'ตั้งเป็น Kami Oshi'}
-          </button>
+          <button class="oshi-btn ${isOshi?'active':''}" data-action="toggle-oshi" data-id="${m.id}">${oshiBtnInner(isOshi)}</button>
+          <button class="kami-btn ${isKami?'active':''}" data-action="toggle-kami-oshi" data-id="${m.id}">${kamiBtnInner(isKami)}</button>
           <!-- The comparison stays in the code (and reachable by a ?vs= link) but has
                no button: the owner does not want visitors to see members compared. -->
         </div>
@@ -18616,6 +18636,9 @@ function countUp(root){
   });
 }
 
+// the Oshi / Kami Oshi pair on a member's sheet
+const oshiBtnInner = on => `<span class="oshi-ico">${on ? ICONS.starOn : ICONS.star}</span><span class="oshi-lbl">${on ? 'Oshi ของคุณ' : 'เพิ่มเป็น Oshi'}</span>`;
+const kamiBtnInner = on => `<span class="oshi-ico">${ICONS.crown}</span><span class="oshi-lbl">${on ? 'Kami Oshi ของคุณ' : 'ตั้งเป็น Kami Oshi'}</span>`;
 function updateOshiButtonsFor(id){
   const m = getMember(id);
   if(!m) return;
@@ -18629,13 +18652,13 @@ function updateOshiButtonsFor(id){
     btn.classList.remove('star-pop'); void btn.offsetWidth; btn.classList.add('star-pop');
   });
   document.querySelectorAll(`.oshi-btn[data-id="${id}"]`).forEach(btn=>{
-    btn.innerHTML = `<span>${isOshi?'\u2605':'\u2606'}</span> ${isOshi?'เป็น Oshi ของคุณ':'เพิ่มเป็น Oshi'}`;
+    btn.innerHTML = oshiBtnInner(isOshi);
     localize(btn);
     btn.classList.toggle('active', isOshi);
     btn.classList.remove('star-pop'); void btn.offsetWidth; btn.classList.add('star-pop');
   });
   document.querySelectorAll(`.kami-btn[data-id="${id}"]`).forEach(btn=>{
-    btn.innerHTML = `<span class="crown-ico">${ICONS.crown}</span> ${isKami?'เป็น Kami Oshi':'ตั้งเป็น Kami Oshi'}`;
+    btn.innerHTML = kamiBtnInner(isKami);
     localize(btn);
     btn.classList.toggle('active', isKami);
     btn.classList.remove('star-pop'); void btn.offsetWidth; btn.classList.add('star-pop');
