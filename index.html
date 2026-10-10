@@ -1171,6 +1171,36 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .lv-when{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
   .lv-text{ font-size:13px; line-height:1.45; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .lv-foot{ margin:8px 0 0; font-size:11px; color:var(--ink-soft); }
+  /* On a member's sheet the events, the lives and the songs each sit in one
+     frame, their parts joined by hairlines like the facts above them. */
+  .ev-box, .lv-box{ display:flex; flex-direction:column; gap:1px; background:var(--line);
+    border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .ev-box .cal-item{ margin:0; border:0; border-left:3px solid var(--c); border-radius:0; padding:11px 12px; }
+  .ev-box .cal-item.is-today{ border-width:0 0 0 4px; }
+  .ev-box .cal-item.is-past{ opacity:1; }
+  .ev-box .cal-item.is-past > *{ opacity:.62; }
+  .lv-box .lv-stats{ border:0; border-radius:0; }
+  .lv-part{ background:var(--card); padding:11px 13px 0; }
+  .lv-box .lv-chart-title{ margin:0 0 4px; }
+  .lv-box .lv-chart{ border:0; border-radius:0; padding:4px 0 0; }
+  .lv-box .lv-list{ gap:0; margin:0 -13px; }
+  /* a catch-up row: a play button in her group's colour, so the replays stand out from the counts */
+  .lv-box .lv-item{ display:grid; grid-template-columns:auto minmax(0, 1fr) auto; column-gap:11px; align-items:center;
+    border:0; border-top:1px solid var(--line); border-radius:0; padding:10px 13px; background:color-mix(in srgb, var(--c) 5%, var(--card)); }
+  .lv-box .lv-item:first-child{ border-top:0; }
+  .lv-box .lv-item:active{ background:color-mix(in srgb, var(--c) 12%, var(--card)); }
+  .lv-play{ display:none; }
+  .lv-box .lv-play{ display:grid; place-items:center; grid-column:1; grid-row:1 / span 2; width:34px; height:34px; border-radius:50%;
+    background:var(--c); color:#fff; box-shadow:0 2px 0 color-mix(in srgb, var(--c) 60%, #000); }
+  .lv-box .lv-play svg{ width:15px; height:15px; margin-left:2px; }
+  .lv-box .lv-when, .lv-box .lv-text{ grid-column:2; }
+  .lv-box .lv-when{ color:var(--c); }
+  .lv-box .lv-text{ font-weight:600; }
+  .lv-go{ display:none; }
+  .lv-box .lv-go{ display:block; grid-column:3; grid-row:1 / span 2; font-size:20px; font-weight:700; color:var(--ink-soft); }
+  .sec-works .work-list{ gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .sec-works .work-row{ border:0; border-radius:0; background:var(--card); padding:10px 13px; }
+  .sec-works .work-row.is-centre{ background:color-mix(in srgb, var(--gold) 10%, var(--card)); box-shadow:inset 3px 0 0 var(--gold); }
   /* a song's way to YouTube, beside its name */
   .yt-btn{
     display:inline-flex; align-items:center; gap:6px; margin-left:auto; flex:none;
@@ -3628,12 +3658,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* ---- Biography: on the member's sheet, read in full, written, and by tag ---- */
   :root{ --bio-mn:#C8336B; --bio-ht:#2E8C82; }
   :root[data-theme="dark"]{ --bio-mn:#FF84B2; --bio-ht:#63CDBF; }
-  h3.section-label.is-bio{ display:flex; align-items:center; gap:8px; color:var(--ink); font-weight:800; font-size:15.5px; text-transform:none; letter-spacing:0; }
-  h3.section-label.is-bio::before{ content:''; width:4px; height:19px; border-radius:2px; background:var(--gold); flex:none; }
-  .sec-bio h3.section-label.is-bio{ margin-top:4px; }
+  /* on her sheet: the first row of the facts grid, under the same small label */
+  .stat-cell.stat-bio:empty{ display:none; }
+  .stat-bio .bio-text{ margin-top:6px; font-size:14.5px; line-height:1.75; }
+  .stat-bio .bio-text.is-clamp{ max-height:calc(1.75em * 4); }
+  .stat-bio .bio-more{ margin-top:2px; }
+  .bio-none{ display:flex; align-items:center; gap:10px; margin-top:6px; }
+  .bio-none span{ flex:1; min-width:0; color:var(--ink-soft); font-size:14px; }
   .bio-card{ padding:14px 14px 12px; border-radius:18px; background:var(--card); border:1px solid var(--line); box-shadow:0 3px 0 var(--line); margin:0 0 14px; }
-  .bio-card.is-empty{ display:flex; align-items:center; gap:10px; padding:12px 12px 12px 14px; }
-  .bio-card.is-empty p{ margin:0; flex:1; color:var(--ink-soft); font-size:14px; }
   .bio-text{ font-size:15px; line-height:1.85; overflow-wrap:anywhere; }
   .bio-text p{ margin:0 0 10px; } .bio-text p:last-child{ margin-bottom:0; }
   .bio-text.is-clamp{ max-height:calc(1.85em * 4); overflow:hidden; position:relative; }
@@ -3650,8 +3682,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .bio-tag{ padding:3px 11px; border-radius:99px; border:1px solid color-mix(in srgb, var(--bio-ht) 35%, var(--line)); background:color-mix(in srgb, var(--bio-ht) 10%, var(--card));
     color:var(--bio-ht); font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; box-shadow:0 2px 0 color-mix(in srgb, var(--bio-ht) 30%, var(--line)); }
   .bio-tag:active{ transform:translateY(2px); box-shadow:none; }
-  .bio-foot{ display:flex; align-items:center; gap:8px; margin-top:11px; padding-top:10px; border-top:1px dashed var(--line); font-size:12px; color:var(--ink-soft); }
-  .bio-foot span{ flex:1; min-width:0; }
+  .bio-foot{ display:flex; justify-content:flex-end; margin-top:11px; padding-top:10px; border-top:1px dashed var(--line); }
   .bio-pen{ flex:none; padding:5px 12px; border-radius:99px; border:1px solid var(--line); background:var(--card); font:inherit; font-size:12.5px; font-weight:700; color:var(--ink);
     cursor:pointer; box-shadow:0 2px 0 var(--line); }
   .bio-pen:active{ transform:translateY(2px); box-shadow:none; }
@@ -5679,7 +5710,7 @@ const SEED_SCHEDULE = [
       'วันรับของรางวัลและรายละเอียดเพิ่มเติมรอประกาศอีกครั้ง'] }] },
   { id:'ev-concert-2026', start:'2026-11-14', time:'13:00',
     sales:{ from:'2026-10-15T12:00' },
-    title:'BNK48 & CGM48 Journey of Dreams 夢の旅',
+    title:'BNK48 & CGM48 Journey of Dreams 夢の旅', short:'Concert Journey of Dreams',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
     timeline:'ge2026', related:['ev-election-results','ev-ge6-bundle','ev-ge6-heart'],
     poster:{ accent:'#8E2352', surface:'#FBF0F3', ink:'#3E1428', img:'posters/journey-of-dreams.jpg', w:1366, h:2048 },
@@ -5700,7 +5731,7 @@ const SEED_SCHEDULE = [
     allMembers:true },
   { id:'ev-election-results', start:'2026-11-14', time:'18:00',
     sales:{ from:'2026-10-15T12:00' },
-    title:'BNK48 & CGM48 Senbatsu General Election 2026 · Final Results',
+    title:'BNK48 & CGM48 Senbatsu General Election 2026 · Final Results', short:'General Election 2026 Final Results',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
     related:['ev-election-voting','ev-election-fanfest','ev-concert-2026','ev-ge6-bundle','ev-ge6-heart'],
     timeline:'ge2026',
@@ -5727,7 +5758,7 @@ const SEED_SCHEDULE = [
       '#BNK48CGM48_GE2026'],
     allMembers:true },
   { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04', boothPlan:'fanfest',
-    title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival',
+    title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival', short:'General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
     related:['ev-kimi-first-performance','ev-election-voting','ev-election-results','ev-ge6-single'],
     timeline:'ge2026',
@@ -5990,7 +6021,7 @@ const SEED_SCHEDULE = [
         'bnk-l','bnk-khowjow','bnk-luksorn','cgm-chifa','cgm-emma']],
     ] },
   { id:'ev-ge6-heart', start:'2026-11-15', tba:true,
-    title:'BNK48 & CGM48 Senbatsu General Election 2026 : Heart to Heart',
+    title:'BNK48 & CGM48 Senbatsu General Election 2026 : Heart to Heart', short:'Heart to Heart',
     groups:['bnk48','cgm48'], timeline:'ge2026',
     related:['ev-election-results','ev-concert-2026'],
     info:['งานต่อเนื่องหลังประกาศผลการเลือกตั้ง',
@@ -9365,7 +9396,7 @@ function renderCalendarPage(){
     const bds = births[iso.slice(5)] || [];
     const items = [
       ...bds.map(m => `<span class="calp-item is-bday" style="--k:${getGroup(m.groupId).color}">🎂 ${escapeHtml(nickName(m))}</span>`),
-      ...evs.map(ev => `<span class="calp-item${ev.period ? ' is-period' : ''}" style="--k:${colourOf(ev)}">${mark(ev, iso)}${escapeHtml(ev.title)}</span>`),
+      ...evs.map(ev => `<span class="calp-item${ev.period ? ' is-period' : ''}" style="--k:${colourOf(ev)}">${mark(ev, iso)}${escapeHtml(eventShortName(ev))}</span>`),
     ];
     const MAX = 3;
     const dotColours = [...bds.map(() => 'var(--gold)'), ...evs.map(colourOf)].slice(0, 4);
@@ -9390,7 +9421,7 @@ function renderCalendarPage(){
   const spans = SEED_SCHEDULE.filter(ev => ev.period && ev.start <= monthLast && eventLastDay(ev) >= monthFirst)
     .filter(ev => !mine || hasMyOshi(ev))
     .sort((a, b) => a.start.localeCompare(b.start) || eventLastDay(b).localeCompare(eventLastDay(a)));
-  const spanLabel = ev => ev.bar || ev.title;
+  const spanLabel = ev => ev.bar || eventShortName(ev);
   const spanColour = ev => eventIconName(ev) === 'token' ? TL_TRACKS.vote.color : colourOf(ev);
   const laneEnds = [];
   const laneOf = new Map();
@@ -9769,13 +9800,16 @@ function renderMemberLives(m){
     return `${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()} · ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}${en ? '' : ' น.'}`; };
   const recent = (L.recent || []).slice(0, 3).map(r =>
     `<a class="lv-item" href="https://app.bnk48.com/member-playback/${r.id}" target="_blank" rel="noopener noreferrer">
+      <span class="lv-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg></span>
       <span class="lv-when">${fmt(r.at)}</span>
       <span class="lv-text">${escapeHtml(r.text || (en ? '(no caption)' : '(ไม่มีข้อความ)'))}</span>
+      <span class="lv-go" aria-hidden="true">›</span>
     </a>`).join('');
   const upd = LIVES.updated ? new Date(LIVES.updated) : null;
 
   return `<section class="lv" style="--c:${g ? g.color : 'var(--ink-soft)'}">
     <h3 class="section-label lv-head">${en ? 'Lives on iAM48' : 'ไลฟ์ใน iAM48'}</h3>
+    <div class="lv-box">
     <div class="lv-stats">
       <div class="lv-stat"><span class="lv-k">${en ? 'All lives' : 'ไลฟ์ทั้งหมด'}</span><span class="lv-v">${L.total.toLocaleString()}</span><span class="lv-s">${en ? 'since' : 'ตั้งแต่'} ${since}</span></div>
       ${grad
@@ -9785,9 +9819,10 @@ function renderMemberLives(m){
       <div class="lv-stat"><span class="lv-k">${en ? 'Latest live' : 'ไลฟ์ล่าสุด'}</span><span class="lv-v is-text">${agoText}</span><span class="lv-s">${last.getDate()} ${M[last.getMonth()]}</span></div>`}
       <div class="lv-stat"><span class="lv-k">${en ? 'Usually' : 'มักไลฟ์'}</span><span class="lv-v is-text">${peak}</span><span class="lv-s">${peakDay}</span></div>
     </div>
-    <p class="lv-chart-title">${grad ? (en ? 'Lives per year' : 'จำนวนไลฟ์รายปี') : (en ? 'Lives per month, last 12 months' : 'จำนวนไลฟ์รายเดือน ย้อนหลัง 12 เดือน')}</p>
-    <div class="lv-chart"${grad ? ` style="grid-template-columns:repeat(${months.length}, minmax(0, 1fr))"` : ''}>${bars}</div>
-    ${recent ? `<p class="lv-chart-title">${grad ? (en ? 'Her last lives' : 'ไลฟ์ท้าย ๆ ในแอป') : (en ? 'Catch up on the latest' : 'ดูย้อนหลังล่าสุด')}</p><div class="lv-list">${recent}</div>` : ''}
+    <div class="lv-part"><p class="lv-chart-title">${grad ? (en ? 'Lives per year' : 'จำนวนไลฟ์รายปี') : (en ? 'Lives per month, last 12 months' : 'จำนวนไลฟ์รายเดือน ย้อนหลัง 12 เดือน')}</p>
+    <div class="lv-chart"${grad ? ` style="grid-template-columns:repeat(${months.length}, minmax(0, 1fr))"` : ''}>${bars}</div></div>
+    ${recent ? `<div class="lv-part"><p class="lv-chart-title">${grad ? (en ? 'Her last lives' : 'ไลฟ์ท้าย ๆ ในแอป') : (en ? 'Catch up on the latest' : 'ดูย้อนหลังล่าสุด')}</p><div class="lv-list">${recent}</div></div>` : ''}
+    </div>
     <p class="lv-foot">${en ? 'From the iAM48 catch-up list' : 'ข้อมูลจากหน้า Catch-up ของ iAM48'}${upd ? ` · ${en ? 'updated' : 'อัปเดต'} ${upd.getDate()} ${M[upd.getMonth()]} ${String(upd.getHours()).padStart(2,'0')}:${String(upd.getMinutes()).padStart(2,'0')}${en ? '' : ' น.'}` : ''}</p>
   </section>`;
 }
@@ -10215,6 +10250,21 @@ function parseYmd(s){ const [y,m,d] = s.split('-').map(Number); return new Date(
    to find out whether and until when they can buy. */
 /* A called-off event keeps its place in the lists, marked, so nobody sets out for it.
    `cancelled` holds why it is off on its date; `postponed` says a new date is to come. */
+/* Where room is tight — a member's card, the calendar's month cells and bars, a
+   day's timeline — an event reads by what it is: "Roadshow", "Handshake Event";
+   opening it shows the full name. Wider lists (the home page, the election
+   timeline, the ticker) keep the full title. `short` on the event wins;
+   otherwise the group names and the release in front are dropped. */
+function eventShortName(e){
+  if(!e) return '';
+  if(e.short) return e.short;
+  const s = String(e.title || '').replace(/^(BNK48 & CGM48|BNK48|CGM48)\s+/, '')
+    .replace(/^(\d+(st|nd|rd|th)\s+)?(Special\s+)?(Single|Album)\s+["“][^"”]+["”]\s+/i, '');
+  return s || e.title || '';
+}
+// a step on an election timeline: its event's short name when it is that event
+const itemShortName = it => { const e = it.ev && SEED_SCHEDULE.find(x => x.id === it.ev);
+  return e && e.title === it.title ? eventShortName(e) : eventShortName({ title: it.title }); };
 const cancelTag = ev => ev.cancelled ? `<span class="ev-cancel-tag">${ev.postponed ? 'เลื่อนแล้ว' : 'ยกเลิกแล้ว'}</span>` : '';
 
 function renderSaleLine(ev){
@@ -10300,7 +10350,7 @@ function renderPeriodTile(ev, todayIso){
   return `<${tag} class="per-tile" style="--c:${accent}"${open ? ` data-action="open-event" data-id="${ev.id}"` : ''} title="${escapeAttr(ev.title)}" aria-label="${escapeAttr(ev.title)}">
     <span class="per-pic">${img
       ? `<img src="${escapeAttr(evThumb(img))}" width="${ev.poster.w || 1200}" height="${ev.poster.h || 1200}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeAttr(img)}'">`
-      : `<span class="per-noimg">${escapeHtml(ev.title)}</span>`}
+      : `<span class="per-noimg">${escapeHtml(eventShortName(ev))}</span>`}
       <span class="per-left">${eventWhenLabel(ev, todayIso)}</span></span>
     <span class="per-name">${escapeHtml(ev.short || ev.title.split(' · ').pop())}</span>
     <span class="per-sub">${isEN() ? 'Until' : 'ถึง'} ${d} ${M[m - 1]}</span>
@@ -13000,7 +13050,7 @@ function renderDayModal(){
   for(const e of outings){
     const sl = e.slots ? slotsOn(e, iso) : [];
     const from = sl.length ? sl[0].time : e.time;
-    const head = `${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}${renderLiveChip(e)}`;
+    const head = `${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(eventShortName(e))}${renderLiveChip(e)}`;
     const where = e.venue || e.online || '';
     if(!isHm(from)){ allDay.push(box({ id:e.id, k:accent(e), inner:chipInner(head, escapeHtml(where.split(',')[0])) }, 'dv-chip')); continue; }
     let until = sl.length ? sl[sl.length - 1].until : eventUntil(e);
@@ -13014,7 +13064,7 @@ function renderDayModal(){
   }
   for(const { it } of steps){
     const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
-    const head = `${trackIcon(it, 'ev-icon')}${escapeHtml(it.title)}`;
+    const head = `${trackIcon(it, 'ev-icon')}${escapeHtml(itemShortName(it))}`;
     if(!isHm(it.time)){ allDay.push(box({ id:it.ev, k:tr.color, inner:chipInner(head, '') }, 'dv-chip')); continue; }
     const linked = it.ev && SEED_SCHEDULE.find(e => e.id === it.ev), until = linked && eventUntil(linked);
     const a = mins(it.time);
@@ -13023,14 +13073,14 @@ function renderDayModal(){
   }
   for(const s of sales){
     const k = s.kind === 'open' ? '#1B8E52' : '#C8231A';
-    const head = `<span class="day-tag">${s.what}</span> ${escapeHtml(s.name || s.e.title)}`;
+    const head = `<span class="day-tag">${s.what}</span> ${escapeHtml(s.name || eventShortName(s.e))}`;
     if(!isHm(s.t)){ allDay.push(box({ id:s.e.id, k, inner:chipInner(head, '') }, 'dv-chip')); continue; }
     timed.push({ a:mins(s.t), b:mins(s.t) + 30, id:s.e.id, k, head, s:s.t + (en ? '' : ' น.') });
   }
   for(const e of open){
     const last = eventLastDay(e), ld = parseYmd(last);
     allDay.push(box({ id:e.id, k:e.period && eventIconName(e) === 'token' ? TL_TRACKS.vote.color : accent(e),
-      inner:chipInner(`${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.bar || e.title)}`,
+      inner:chipInner(`${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.bar || eventShortName(e))}`,
         last === iso ? (en ? 'last day' : 'วันสุดท้าย') : `${en ? 'until' : 'ถึง'} ${ld.getDate()} ${M[ld.getMonth()]}`) }, 'dv-chip'));
   }
 
@@ -14839,8 +14889,8 @@ function renderDetailModal(){
         </div>
         <div class="sheet-body">
         <div class="sheet-col sheet-col-a">
-        <div class="sec-bio">${renderBioBlock(m)}</div>
         <div class="stat-grid sec-stats">
+          <div class="stat-cell stat-wide stat-bio sec-bio">${renderBioBlock(m)}</div>
           <div class="stat-cell"><div class="label">วันเกิด</div><div class="value">${formatDate(m.birthday)}</div></div>
           <div class="stat-cell"><div class="label">อายุ</div><div class="value">${age!==null?age+' ปี':'-'}</div></div>
           <div class="stat-cell"><div class="label">ส่วนสูง</div><div class="value">${m.height?m.height+' ซม.':'-'}</div></div>
@@ -15291,29 +15341,25 @@ function bioLang(text){
   const th = (p.match(/[฀-๿]/g) || []).length, la = (p.match(/[A-Za-z]/g) || []).length;
   return th >= la * .25 && th > 0 ? 'th' : 'en';
 }
-function bioWhen(b){
-  const d = b && b.at ? new Date(b.at) : null;
-  return d ? `${isEN() ? 'Last edited' : 'แก้ไขล่าสุด'} ${d.getDate()} ${monthsShort()[d.getMonth()]} ${d.getFullYear()}` : '';
-}
 const bioTagChips = text => { const t = [...bioTagsOf(text)];
   return t.length ? `<div class="bio-tags" data-noloc>${t.map(([k, l]) => `<button class="bio-tag" data-action="open-tag" data-id="${escapeAttr(k)}">#${escapeHtml(l)}</button>`).join('')}</div>` : ''; };
-const bioFoot = (b, id) => `<div class="bio-foot"><span>${bioWhen(b)}</span>
+const bioFoot = id => `<div class="bio-foot">
   <button class="bio-pen" data-action="edit-bio" data-id="${id}">✎ ${isEN() ? 'Edit' : 'แก้ไข'}</button></div>`;
 
-/* On the member's sheet: four lines, the rest behind "Read more". */
+/* On the member's sheet: the first row of her facts — four lines under a small
+   label, the rest behind "Read more". Tags and editing live in the full sheet;
+   a biography short enough to need no "Read more" offers "Edit" in its place. */
 function renderBioBlock(m){
   if(!m) return '';
   const en = isEN(), b = _bios[m.id];
   loadBio(m.id);                       // once a visit; a copy kept from before shows meanwhile
   if(b === undefined) return '';
-  const head = `<h3 class="section-label is-bio">${en ? 'Biography' : 'ประวัติย่อ'}</h3>`;
-  if(!b) return head + `<div class="bio-card is-empty"><p>${en ? 'No biography yet.' : 'ยังไม่มีประวัติย่อ'}</p>
+  const label = `<div class="label">${en ? 'Biography' : 'ประวัติย่อ'}</div>`;
+  if(!b) return label + `<div class="bio-none"><span>${en ? 'No biography yet.' : 'ยังไม่มีประวัติย่อ'}</span>
     <button class="bio-pen" data-action="edit-bio" data-id="${m.id}">✎ ${en ? 'Write one' : 'เขียนประวัติ'}</button></div>`;
-  const text = bioText(b);
-  return head + `<div class="bio-card">
-    <div class="bio-text is-clamp" data-noloc>${bioHtml(text)}</div>
+  return label + `<div class="bio-text is-clamp" data-noloc>${bioHtml(bioText(b))}</div>
     <button class="bio-more" data-action="open-bio" data-id="${m.id}">${en ? 'Read more' : 'อ่านต่อ'} ›</button>
-    ${bioTagChips(text)}${bioFoot(b, m.id)}</div>`;
+    <button class="bio-more is-edit" data-action="edit-bio" data-id="${m.id}" hidden>✎ ${en ? 'Edit' : 'แก้ไข'}</button>`;
 }
 // a biography short enough to show whole drops its fade and its "Read more"
 function bioClamp(root){
@@ -15321,7 +15367,8 @@ function bioClamp(root){
     t.classList.remove('is-short');
     const short = t.scrollHeight <= t.clientHeight + 4;
     t.classList.toggle('is-short', short);
-    const more = t.parentElement.querySelector('.bio-more'); if(more) more.hidden = short;
+    const more = t.parentElement.querySelector('.bio-more:not(.is-edit)'); if(more) more.hidden = short;
+    const pen = t.parentElement.querySelector('.bio-more.is-edit'); if(pen) pen.hidden = !short;
   });
 }
 /* Read in full, over the member's sheet. */
@@ -15340,7 +15387,7 @@ function renderBioSheet(){
           <div><b>${en ? 'Biography' : 'ประวัติย่อ'} · ${escapeHtml(nickName(m))}</b>
           <small>${g.name}${m.gen ? ` · ${en ? 'Gen' : 'รุ่น'} ${m.gen}` : ''} · ${en ? `${mins} min read` : `อ่าน ${mins} นาที`}</small></div></div>
         <div class="bio-text is-full" data-noloc>${bioHtml(text)}</div>
-        ${bioTagChips(text)}${bioFoot(b, m.id)}
+        ${bioTagChips(text)}${bioFoot(m.id)}
       </div>
     </div>
   </div>`;
@@ -17177,15 +17224,15 @@ function renderMemberEvents(m){
       : `<span class="cal-item-tag">${personal || eventDateLabel(e)}</span>`;
     return `<button class="cal-item${kind === 'past' ? ' is-past' : ''}${kind === 'today' ? ' is-today' : ''}"
       style="--c:${colour(e)}" data-action="open-event" data-id="${e.id}">
-      ${tag}<span>${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(e.title)}</span>
+      ${tag}<span>${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(eventShortName(e))}</span>
     </button>`;
   };
 
   return `
-    ${today.length ? `<h3 class="section-label">วันนี้</h3>${today.map(e => row(e, 'today')).join('')}` : ''}
-    ${upcoming.length ? `<h3 class="section-label">งานที่จะถึง</h3>${upcoming.map(e => row(e, 'up')).join('')}`
+    ${today.length ? `<h3 class="section-label">วันนี้</h3><div class="ev-box">${today.map(e => row(e, 'today')).join('')}</div>` : ''}
+    ${upcoming.length ? `<h3 class="section-label">งานที่จะถึง</h3><div class="ev-box">${upcoming.map(e => row(e, 'up')).join('')}</div>`
       : today.length ? '' : `<h3 class="section-label">งานที่จะถึง</h3><p class="muted-note">ยังไม่มีงานที่จะถึง</p>`}
-    ${past.length ? `<h3 class="section-label">งานล่าสุด</h3>${past.map(e => row(e, 'past')).join('')}` : ''}`;
+    ${past.length ? `<h3 class="section-label">งานล่าสุด</h3><div class="ev-box">${past.map(e => row(e, 'past')).join('')}</div>` : ''}`;
 }
 
 function renderStatsTimeline(){
