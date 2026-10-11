@@ -69,6 +69,12 @@ the Firebase CLI from the owner's machine.
   and lies flat). Union Mall's roadshow floor is a sketch in metres (`SP_RM`,
   40 units to the metre) pieced together from the owner's photos and clips —
   keep it marked as a sketch (`source`) unless the organiser publishes one.
+- The Works page (/music, view `discography`) holds everything the groups made
+  or took part in: the songs, then films, series, shows, other artists' MVs and
+  ads from `SEED_MEDIA`, picked by category (`WORKS_CATS`). The same entries
+  fill "ผลงานอื่น" on a member's sheet, so a credit only counts while she was
+  in the group. `own` marks the group's own productions; `whole` a whole-group
+  work with no names on record (ads, channel shows).
 - A roadshow's mini concert setlist is `setlist` on the event, a day each
   (`renderSetlist`, under กำหนดการ): sessions, the MCs between, a song's
   release to open and a unit song's members. The owner's own setlist card for

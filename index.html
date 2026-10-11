@@ -1307,6 +1307,28 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .team-row:active{ background:var(--line); }
   .team-row span.mono{ font-family:'Noto Sans Thai',sans-serif; font-size:11.5px; color:var(--ink-soft); }
 
+  /* the Works page: a framed tile a category, the open one filled */
+  .wk-head{ margin:4px 0 10px; }
+  .wk-cats{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin:0 0 14px; }
+  @media (min-width:900px){ .wk-cats{ grid-template-columns:repeat(6, minmax(0, 1fr)); } }
+  .wk-cat{ display:flex; flex-direction:column; align-items:flex-start; gap:5px; text-align:left;
+    padding:11px 12px 10px; border-radius:16px; cursor:pointer; font:inherit; color:var(--ink); background:var(--card); border:1px solid var(--line);
+    box-shadow:0 3px 0 rgba(var(--shadow-rgb),.08); transition:transform .12s, box-shadow .12s; }
+  .wk-cat svg{ width:24px; height:24px; color:var(--pink); }
+  .wk-cat span{ display:flex; align-items:baseline; justify-content:space-between; gap:6px; width:100%; }
+  .wk-cat b{ font-size:14.5px; font-weight:800; line-height:1.2; white-space:nowrap; }
+  .wk-cat small{ font-size:12px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .wk-cat.is-on{ background:var(--ink); border-color:var(--ink); color:var(--paper); box-shadow:0 3px 0 rgba(0,0,0,.28); }
+  .wk-cat.is-on svg{ color:var(--paper); }
+  .wk-cat.is-on small{ color:var(--paper); opacity:.75; }
+  .wk-cat:active{ transform:translateY(2px); box-shadow:none; }
+  .mw-own{ display:inline-block; margin-left:4px; padding:1px 7px; border-radius:99px; font-size:10.5px; font-weight:800; color:#fff; background:var(--c); vertical-align:1px; }
+  .mw-cast{ display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:7px; }
+  .mw-face{ padding:0; border:0; background:none; cursor:pointer; border-radius:50%; line-height:0; }
+  .mw-face .avatar-sm{ width:28px !important; height:28px !important; border-radius:50% !important; font-size:10px; }
+  .mw-face:active{ transform:scale(.92); }
+  .mw-more{ font-size:12px; font-weight:700; color:var(--ink-soft); margin-left:3px; }
+  @media (min-width:900px){ .mw-list{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); column-gap:40px; } }
   /* discography */
   .timeline{ position:relative; padding-left:26px; margin-top:8px; }
   .disc-col{ display:none; }
@@ -7086,36 +7108,44 @@ SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
    filmography lists (akb48.fandom.com, tpop.fandom.com) and the AKB48 wiki's
    cast pages. Only work from her time in the group: anything that came out
    before she joined or after her last day is left out (One Take, the record
-   of those years, stays). `roles` names her part where the wiki does; `note` is doc (a documentary),
-   short (a short film), contestant, or guest-syr3n. No source lists the
-   members' ads yet, so there are none: kind 'ad' is ready for them. */
+   of those years, stays). `roles` names her part where the wiki does; `note`
+   is doc (a documentary), short (a short film), sitcom, contestant, guest,
+   guest-syr3n or song. The group's own works sit here too, on the Works page
+   (/music): `own` marks what the group or its studio made (BNK48 Film, iAM
+   Film, its shows), and `whole` a work of the whole group whose line-up is
+   not on record — an ad, or a channel's running show — so it names no one.
+   The ads are from the group's list of commercials and the trade press,
+   which stops in 2019. */
 const SEED_MEDIA = [
-  { kind:'film', title:'BNK48: Girls Don\'t Cry', year:2018, note:'doc', members:['bnk-can', 'bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'cgm-izurina'] },
+  { kind:'film', title:'BNK48: Girls Don\'t Cry', year:2018, by:'GDH', note:'doc', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'cgm-izurina'] },
   { kind:'film', title:'Homestay', year:2018, members:['bnk-cherprang'] },
   { kind:'film', title:'App War', year:2018, members:['bnk-orn'] },
-  { kind:'film', title:'Where We Belong', alt:'ที่ตรงนั้น มีฉันหรือเปล่า', year:2019, members:['bnk-jennis', 'bnk-music', 'bnk-orn', 'bnk-tarwaan', 'bnk-namneung', 'bnk-pupe', 'bnk-faii', 'bnk-panda'], roles:{ 'bnk-jennis':'Sue', 'bnk-music':'Bell', 'bnk-orn':'Mew', 'bnk-tarwaan':'Prae', 'bnk-namneung':'Pahn', 'bnk-pupe':'Pook', 'bnk-faii':'Yok', 'bnk-panda':'Ja-ea' } },
+  { kind:'film', title:'Where We Belong', alt:'ที่ตรงนั้น มีฉันหรือเปล่า', year:2019, by:'BNK48 Film', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-orn', 'bnk-tarwaan', 'bnk-namneung', 'bnk-pupe', 'bnk-faii', 'bnk-panda'], roles:{ 'bnk-jennis':'Sue', 'bnk-music':'Bell', 'bnk-orn':'Mew', 'bnk-tarwaan':'Prae', 'bnk-namneung':'Pahn', 'bnk-pupe':'Pook', 'bnk-faii':'Yok', 'bnk-panda':'Ja-ea' } },
   { kind:'film', title:'Stratosphere: The Documentary', year:2019, note:'doc', members:['bnk-jennis', 'bnk-music', 'bnk-faii'] },
-  { kind:'film', title:'Thi Baan X BNK48', alt:'ไทบ้าน x BNK48 จากใจผู้สาวคนนี้', year:2019, members:['bnk-kaew', 'bnk-mobile', 'bnk-namneung', 'bnk-namsai', 'bnk-noey', 'bnk-pupe', 'bnk-tarwaan'] },
-  { kind:'film', title:'Sisters', year:2019, members:['bnk-mewnich'] },
+  { kind:'film', title:'Thi Baan X BNK48', alt:'ไทบ้าน x BNK48 จากใจผู้สาวคนนี้', year:2020, by:'BNK48 Film', own:true, members:['bnk-kaew', 'bnk-kaimook', 'bnk-mobile', 'bnk-namneung', 'bnk-namsai', 'bnk-noey', 'bnk-pupe', 'bnk-tarwaan'] },
+  { kind:'film', title:'Sisters', alt:'กระสือสยาม', year:2019, by:'BNK48 Film', own:true, members:['bnk-mewnich'] },
   { kind:'film', title:'Bear in Mind', year:2019, members:['bnk-korn'] },
-  { kind:'film', title:'Me Before We', year:2019, members:['bnk-jennis', 'bnk-music'] },
-  { kind:'film', title:'One Take', year:2020, by:'Netflix', note:'doc', members:['bnk-bamboo', 'bnk-cake', 'bnk-cherprang', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-khamin', 'bnk-kheng', 'bnk-korn', 'bnk-maira', 'bnk-mewnich', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-myyu', 'bnk-namneung', 'bnk-namsai', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-oom', 'bnk-orn', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-ratah', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-view', 'bnk-wee', 'cgm-aom'] },
+  { kind:'film', title:'Me Before We', year:2019, by:'BNK48 Film', note:'short', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-faii', 'bnk-namneung', 'bnk-panda', 'bnk-tarwaan'] },
+  { kind:'film', title:'One Take', year:2020, by:'Netflix', note:'doc', own:true, members:['bnk-bamboo', 'bnk-cake', 'bnk-cherprang', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-khamin', 'bnk-kheng', 'bnk-korn', 'bnk-maira', 'bnk-mewnich', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-myyu', 'bnk-namneung', 'bnk-namsai', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-oom', 'bnk-orn', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-ratah', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-view', 'bnk-wee', 'cgm-aom'] },
   { kind:'film', title:'Mother Gamer', alt:'เกมเมอร์ เกมแม่', year:2020, members:['bnk-wee'] },
-  { kind:'film', title:'God Bless the Trainees Too!', alt:'ห้าวเป้งจ๋า อย่าแกงน้อง', year:2021, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
-  { kind:'film', title:'THE RA3BIT', year:2022, note:'short', members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-mean', 'bnk-monet', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-yayee'] },
-  { kind:'film', title:'The Cheese Sisters', year:2022, by:'Netflix', members:['bnk-namneung', 'bnk-noey', 'bnk-pun', 'bnk-jennis', 'bnk-wee', 'bnk-fond', 'cgm-marmink', 'cgm-kaning', 'cgm-angel', 'cgm-nenie'] },
+  { kind:'film', title:'God Bless the Trainees Too!', alt:'ห้าวเป้งจ๋า อย่าแกงน้อง', year:2021, by:'iAM Film', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+  { kind:'film', title:'THE RA3BIT', year:2022, by:'iAM', note:'short', own:true, members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-mean', 'bnk-monet', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-yayee'] },
+  { kind:'film', title:'The Cheese Sisters', year:2022, by:'iAM Film', own:true, members:['bnk-namneung', 'bnk-noey', 'bnk-pun', 'bnk-jennis', 'bnk-wee', 'bnk-fond', 'cgm-marmink', 'cgm-kaning', 'cgm-angel', 'cgm-nenie'] },
   { kind:'film', title:'Faces of Anne', alt:'แอน', year:2022, members:['bnk-jennis', 'bnk-music'] },
   { kind:'film', title:'Haunted Universities 2nd Semester', alt:'เทอมสองสยองขวัญ', year:2022, members:['bnk-music'] },
   { kind:'film', title:'Pha Phi Bok', alt:'ผ้าผีบอก', year:2022, members:['bnk-gygee', 'bnk-mobile', 'bnk-namneung', 'bnk-pupe', 'bnk-wee'] },
   { kind:'film', title:'SLR', year:2022, members:['bnk-cherprang'] },
   { kind:'film', title:'The Fabric', year:2022, members:['bnk-mobile', 'bnk-wee'] },
-  { kind:'film', title:'Self', year:2022, members:['cgm-ping'] },
+  { kind:'series', title:'Self', alt:'เราเห็นนาย', year:2022, by:'Studio Commuan', members:['cgm-ping'] },
   { kind:'film', title:'Taklee Genesis', year:2024, members:['bnk-peak'] },
-  { kind:'film', title:'To Do List', alt:'ไม่อยากให้เป็นครั้งสุดท้าย', year:2025, note:'short', members:['bnk-pancake', 'cgm-kaning', 'cgm-nenie', 'bnk-hoop', 'cgm-champoo', 'bnk-popper', 'cgm-sita', 'bnk-yoghurt', 'bnk-l', 'bnk-jew', 'bnk-grace', 'bnk-neen'], roles:{ 'bnk-pancake':'Takamiya Mika', 'cgm-kaning':'Eiike Hina', 'cgm-nenie':'Satoaki Hikari', 'bnk-hoop':'Katsushi Suzuka', 'cgm-champoo':'Maihara Renka', 'bnk-popper':'Kaneyoshi Aika', 'cgm-sita':'Masakazu Emi', 'bnk-yoghurt':'Fukune Miho', 'bnk-l':'Kurogane Eri', 'bnk-jew':'Tamaishi Tomomi', 'bnk-grace':'Toyosumi Arisa', 'bnk-neen':'Shirahana Nagisa' } },
+  { kind:'film', title:'To Do List', alt:'ไม่อยากให้เป็นครั้งสุดท้าย', year:2025, note:'short', own:true, members:['bnk-pancake', 'cgm-kaning', 'cgm-nenie', 'bnk-hoop', 'cgm-champoo', 'bnk-popper', 'cgm-sita', 'bnk-yoghurt', 'bnk-l', 'bnk-jew', 'bnk-grace', 'bnk-neen'], roles:{ 'bnk-pancake':'Takamiya Mika', 'cgm-kaning':'Eiike Hina', 'cgm-nenie':'Satoaki Hikari', 'bnk-hoop':'Katsushi Suzuka', 'cgm-champoo':'Maihara Renka', 'bnk-popper':'Kaneyoshi Aika', 'cgm-sita':'Masakazu Emi', 'bnk-yoghurt':'Fukune Miho', 'bnk-l':'Kurogane Eri', 'bnk-jew':'Tamaishi Tomomi', 'bnk-grace':'Toyosumi Arisa', 'bnk-neen':'Shirahana Nagisa' } },
   { kind:'voice', title:'Kamisama Minarai: Himitsu no Cocotama', year:2018, members:['bnk-music'], roles:{ 'bnk-music':'Kokoro Yotsuba' } },
   { kind:'voice', title:'Detective Conan: Fallen Angel of the Highway', year:2026, members:['bnk-hoop'], roles:{ 'bnk-hoop':'Minato Tateoki' } },
   { kind:'series', title:'Be My Boy The Series', alt:'รักแล้วไง...หยุดไม่ได้แล้วล่ะ', year:2018, by:'Channel 5', members:['bnk-jennis'] },
-  { kind:'series', title:'One Year', year:2019, members:['bnk-cherprang', 'bnk-fond', 'bnk-jane', 'bnk-june', 'bnk-mewnich', 'bnk-minmin', 'bnk-namsai', 'bnk-phukkhom', 'bnk-pun', 'bnk-wee'] },
+  { kind:'series', title:'Notification', year:2018, by:'Channel 3', members:['bnk-jennis', 'bnk-music', 'bnk-namneung', 'bnk-noey', 'bnk-orn'] },
+  { kind:'series', title:'Khao Wan Hai Nu Pen Sailap', alt:'เขาวานให้หนูเป็นสายลับ', year:2019, by:'Channel 3', members:['bnk-jaa'] },
+  { kind:'series', title:'BNK48 Story', year:2019, by:'TV5 Cambodia', own:true, members:['bnk-bamboo', 'bnk-cake', 'bnk-cherprang', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-khamin', 'bnk-kheng', 'bnk-korn', 'bnk-maira', 'bnk-mewnich', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-myyu', 'bnk-namneung', 'bnk-namsai', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-oom', 'bnk-orn', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-ratah', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-view', 'bnk-wee'] },
+  { kind:'series', title:'One Year', alt:'365 วัน บ้านฉัน บ้านเธอ', year:2019, by:'One 31', members:['bnk-cherprang', 'bnk-fond', 'bnk-jane', 'bnk-june', 'bnk-mewnich', 'bnk-minmin', 'bnk-namsai', 'bnk-phukkhom', 'bnk-pun', 'bnk-wee'] },
   { kind:'series', title:'The Weightlifter', alt:'ลูกเหล็กเด็กชอบยก', year:2019, by:'Thai PBS', members:['bnk-orn', 'bnk-khamin', 'bnk-minmin'] },
   { kind:'series', title:'Great Men Academy', alt:'สุภาพบุรุษสุดที่เลิฟ', year:2019, members:['bnk-new'] },
   { kind:'series', title:'The Underclass', alt:'ห้องนี้..ไม่มีห่วย', year:2020, members:['bnk-faii', 'bnk-fond', 'bnk-jaa', 'bnk-jib', 'bnk-korn', 'bnk-mewnich', 'bnk-miori', 'bnk-music', 'bnk-nink', 'bnk-pakwan', 'bnk-piam', 'bnk-stang', 'bnk-minmin', 'bnk-new', 'bnk-nine', 'bnk-noey'], roles:{ 'bnk-faii':'Tam', 'bnk-fond':'Meow', 'bnk-jaa':'Namkaeng', 'bnk-jib':'Email', 'bnk-korn':'Lucky', 'bnk-mewnich':'Prapang', 'bnk-miori':'Miichan', 'bnk-music':'Meen', 'bnk-nink':'Gaprao', 'bnk-pakwan':'Meringue', 'bnk-piam':'Cornflake', 'bnk-stang':'Kook', 'bnk-minmin':'Prapuen', 'bnk-new':'Rain', 'bnk-nine':'Foam' } },
@@ -7135,15 +7165,47 @@ const SEED_MEDIA = [
   { kind:'series', title:'Bussaba Lui Fai', alt:'บุษบาลุยไฟ', year:2023, by:'Thai PBS', members:['bnk-cherprang'], roles:{ 'bnk-cherprang':'Lamjuan' } },
   { kind:'series', title:'Club Friday the Series: Moments & Memories', year:2023, by:'One 31', members:['bnk-cherprang'] },
   { kind:'series', title:'Escape to Homestay', alt:'เพื่อนผมมีมรดกเป็นโฮมสเตย์ครับ', year:2023, members:['bnk-fond'] },
-  { kind:'series', title:'Shock Me Girls', alt:'รักช็อตใจ ยัยช็อตฟีล', year:2026, by:'TikTok', members:['bnk-janry', 'bnk-marine', 'bnk-monet', 'bnk-praew'], roles:{ 'bnk-janry':'Tawan', 'bnk-marine':'Sia', 'bnk-monet':'Georgie', 'bnk-praew':'Mintra' } },
-  { kind:'show', title:'BNK48 Senpai', year:2017, by:'Channel 3', members:['bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jib', 'bnk-kate', 'bnk-korn', 'bnk-mind', 'bnk-miori', 'bnk-music', 'bnk-namhom', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-pun'] },
-  { kind:'show', title:'BNK48 Show', year:2017, by:'Channel 3', members:['bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jib', 'bnk-kate', 'bnk-korn', 'bnk-mind', 'bnk-miori', 'bnk-music', 'bnk-namhom', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-pun'] },
-  { kind:'show', title:'Victory BNK48', year:2018, by:'Workpoint TV', members:['bnk-faii', 'bnk-fifa', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jib', 'bnk-kate', 'bnk-kheng', 'bnk-korn', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-music', 'bnk-natherine', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-panda', 'bnk-pun', 'bnk-view', 'bnk-wee', 'cgm-aom', 'cgm-izurina'] },
-  { kind:'show', title:'BNK48 Senpai: 2nd Generation', year:2018, by:'Workpoint TV', members:['bnk-faii', 'bnk-fifa', 'bnk-kheng', 'bnk-minmin', 'bnk-natherine', 'bnk-nine', 'bnk-panda', 'bnk-view', 'bnk-wee', 'cgm-aom'] },
-  { kind:'show', title:'Aniparade!', year:2018, by:'One 31', members:['bnk-music'] },
-  { kind:'show', title:'Fun x Fun Japan!', year:2019, by:'GMM 25', members:['bnk-music'] },
+  { kind:'series', title:'Shock Me Girls', alt:'รักช็อตใจ ยัยช็อตฟีล', year:2026, by:'TikTok', own:true, members:['bnk-janry', 'bnk-marine', 'bnk-monet', 'bnk-praew'], roles:{ 'bnk-janry':'Tawan', 'bnk-marine':'Sia', 'bnk-monet':'Georgie', 'bnk-praew':'Mintra' } },
+  { kind:'series', title:'CGM48 Dorm', alt:'CGM48 Dorm มหาสนุก', year:2021, by:'YouTube CGM48', note:'sitcom', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+  { kind:'show', title:'BNK48 Senpai', year:2017, by:'Channel 3', note:'doc', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+  { kind:'show', title:'BNK48 Show', year:2017, by:'Channel 3', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+  { kind:'show', title:'Victory BNK48', year:2018, by:'Workpoint TV', own:true, members:['bnk-bamboo', 'bnk-cake', 'bnk-can', 'bnk-cherprang', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-khamin', 'bnk-kheng', 'bnk-korn', 'bnk-maira', 'bnk-maysa', 'bnk-mewnich', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-myyu', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-oom', 'bnk-orn', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-ratah', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-view', 'bnk-wee', 'cgm-aom', 'cgm-izurina'] },
+  { kind:'show', title:'BNK48 Senpai: 2nd Generation', year:2018, by:'Workpoint TV', note:'doc', own:true, members:['bnk-bamboo', 'bnk-cake', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-june', 'bnk-khamin', 'bnk-kheng', 'bnk-maira', 'bnk-mewnich', 'bnk-minmin', 'bnk-myyu', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-oom', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-ratah', 'bnk-stang', 'bnk-view', 'bnk-wee', 'cgm-aom'] },
+  { kind:'show', title:'Phuean Ruam Thang the Journey', alt:'เพื่อนร่วมทางเดอะเจอร์นีย์', year:2018, by:'MCOT HD', members:['bnk-jan', 'bnk-kaew', 'bnk-pun', 'bnk-tarwaan'] },
+  { kind:'show', title:'Aitakatta! Nippon', alt:'อยากจะได้พบเธอ! ญี่ปุ่น', year:2018, by:'Amarin TV', members:['bnk-jane', 'bnk-jennis', 'bnk-kate', 'bnk-mobile', 'bnk-nink', 'bnk-pupe'] },
+  { kind:'show', title:'Aniparade!', year:2018, by:'One 31', members:['bnk-music', 'bnk-fond', 'bnk-june', 'bnk-jib', 'bnk-mewnich', 'bnk-panda', 'bnk-piam', 'bnk-pupe'] },
+  { kind:'show', title:'Catch Your Dream – Study in Japan', year:2019, by:'Channel 3', members:['bnk-mobile'] },
+  { kind:'show', title:'Beartai BNK48 it unit', year:2019, by:'YouTube', members:['bnk-jane', 'bnk-orn', 'bnk-natherine'] },
+  { kind:'show', title:'ii ne Japan', year:2019, by:'MCOT HD', members:['bnk-noey', 'bnk-namneung', 'bnk-miori', 'bnk-phukkhom', 'cgm-aom', 'bnk-cake'] },
+  { kind:'show', title:'The Ska X BNK48', year:2019, by:'YouTube', members:['bnk-bamboo', 'bnk-maira', 'bnk-gygee', 'bnk-kaimook', 'bnk-mobile', 'bnk-pupe'] },
+  { kind:'show', title:'Fun x Fun Japan!', year:2019, by:'GMM 25', members:['bnk-music', 'bnk-jane'] },
+  { kind:'show', title:'girls guide ไปโตยกั๋น', year:2019, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
+  { kind:'show', title:'BNK48 Senpai: 3rd Generation', year:2020, by:'AIS Play', note:'doc', own:true, members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-jaokhem', 'bnk-jeje', 'bnk-kaofrang', 'bnk-mean', 'bnk-monet', 'bnk-paeyah', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-popper', 'bnk-yayee', 'bnk-yoghurt'] },
+  { kind:'show', title:'CGM48 Senpai', year:2020, by:'AIS Play', note:'doc', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+  { kind:'show', title:'Speedy Quiz ถามไวตอบได้', year:2020, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
+  { kind:'show', title:'Daily Life From Home', year:2020, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
+  { kind:'show', title:'เที่ยวมั้ยครับ ประเทศไทย', year:2020, by:'Bie The Ska', note:'guest', members:['cgm-fortune', 'cgm-marmink', 'cgm-nena'] },
+  { kind:'show', title:'CGM48 Stand By Me', year:2021, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
+  { kind:'show', title:'CGM48 We Will...From Home', year:2021, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
+  { kind:'show', title:'INDY CAMP', year:2021, by:'YouTube BNK48', own:true, members:['cgm-fortune', 'cgm-marmink', 'cgm-pepo'] },
+  { kind:'show', title:'CGM48 Teach tips ซ.จ.อ.สอนทิพย์', year:2021, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
+  { kind:'show', title:'CGM48 2nd Generation The Journey', year:2023, by:'YouTube CGM48', note:'doc', own:true, members:['cgm-emma', 'cgm-ginna', 'cgm-jingjing', 'cgm-lookked', 'cgm-nana', 'cgm-papang', 'cgm-twobam'] },
+  { kind:'show', title:'GENERATION CHANGE', alt:'Documentary of CGM48 3rd Generation', year:2025, by:'YouTube CGM48', note:'doc', own:true, members:['cgm-kwan', 'cgm-lingling', 'cgm-ploen', 'cgm-prae', 'cgm-runma'] },
+  { kind:'show', title:'CGM48 โฮะ!!', year:2025, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
   { kind:'show', title:'LYRAlity Show', year:2020, by:'YouTube', members:['bnk-noey', 'bnk-pun'] },
   { kind:'show', title:'Shine Boys', year:2026, note:'guest-syr3n', members:['bnk-hoop', 'bnk-pancake'] },
+  { kind:'ad', title:'A.P. Honda Racing Thailand', year:2018, by:'A.P. Honda', whole:'bnk48', members:[] },
+  { kind:'ad', title:'Yayoi Japanese Restaurant', year:2018, by:'MK Restaurant Group', whole:'bnk48', members:[] },
+  { kind:'ad', title:'TruePoint × BNK48', year:2018, by:'True Corporation', whole:'bnk48', members:[] },
+  { kind:'ad', title:'Fujifilm X-A5', year:2018, by:'Fujifilm Thailand', whole:'bnk48', members:[] },
+  { kind:'ad', title:'BNK48 × Changsuek', year:2018, by:'Football Association of Thailand', whole:'bnk48', members:[] },
+  { kind:'ad', title:'Jele Beautie × BNK48', year:2018, by:'S.N.N.P. Intertrade', whole:'bnk48', members:[] },
+  { kind:'ad', title:'Lactasoy × BNK48', year:2018, by:'Lactasoy', whole:'bnk48', members:[] },
+  { kind:'ad', title:'Samsung Galaxy J8 × BNK48', year:2018, by:'Samsung Thailand', whole:'bnk48', members:[] },
+  { kind:'ad', title:'Toyota Yaris ATIV × BNK48', year:2018, by:'Toyota Motor Thailand', whole:'bnk48', members:[] },
+  { kind:'ad', title:'Lolane Z-Cool × BNK48', year:2018, by:'Lolane', whole:'bnk48', members:[] },
+  { kind:'ad', title:'Exit × BNK48', year:2019, by:'Exit', whole:'bnk48', members:[] },
+  { kind:'ad', title:'Nok Air × BNK48 & CGM48', year:2025, by:'Nok Air', note:'song', whole:'both', members:[] },
   { kind:'mv', title:'Tid Ta Lok', alt:'ติดตลก', year:2018, by:'Oat Pramote', members:['bnk-jane'] },
   { kind:'mv', title:'อยากมีแฟนแล้ว', year:2019, by:'Lipta', members:['bnk-june'] },
   { kind:'mv', title:'0%', alt:'รักเธอเท่าที่เธอไม่รัก', year:2019, by:'DoubleBam', members:['bnk-kaew'] },
@@ -7166,8 +7228,9 @@ const ICONS = {
   favoritesFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.5l2.72 5.83 6.28.62-4.7 4.36 1.34 6.19L12 17.3l-5.64 3.2 1.34-6.19-4.7-4.36 6.28-.62z"/></svg>`,
   groups: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.3"/><circle cx="16.5" cy="10.5" r="2.5"/><path d="M3.8 20c0-3 2.3-5.4 5.2-5.4s5.2 2.4 5.2 5.4"/><path d="M15.3 15c2.3.2 4.1 2.1 4.1 4.4"/></svg>`,
   groupsFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8.2" r="3.5"/><path d="M9 12.4c-3.6 0-6.3 2.4-6.3 6.1v1.3h9.6v-1.1c0-2.1.8-3.9 2.1-5.2-1.3-.7-3.1-1.1-5.4-1.1z"/><circle cx="16.7" cy="10.2" r="2.6"/><path d="M16.7 13.2c-.7 0-1.4.1-2.1.3 1.1 1.3 1.8 3.1 1.8 5.1v1.6h6v-1.3c0-3.1-2.5-5.7-5.7-5.7z"/></svg>`,
-  works: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="18" r="2.5"/><circle cx="17" cy="16" r="2.5"/><path d="M9 18V6L19.5 3.7V15.5"/></svg>`,
-  worksFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6.5" cy="18" r="2.8"/><circle cx="17" cy="16" r="2.8"/><path d="M8.7 18V6.7L19.3 3.9v11.3h-2V7.4l-8.6 2.3V18z"/></svg>`,
+  // the group's works: frames stacked as a collection, the songs at the front
+  works: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.5h10.5A2.5 2.5 0 0 1 21 6v10.5"/><rect x="3" y="7" width="14" height="14" rx="2.5"/><circle cx="8.3" cy="17" r="1.6"/><path d="M9.9 17v-5.2l3.6-.9v4.4"/><circle cx="11.9" cy="15.3" r="1.6"/></svg>`,
+  worksFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 3.5h10.5A2.5 2.5 0 0 1 21 6v10.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="3" y="7" width="14" height="14" rx="2.5"/><g fill="#fff" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.3" cy="17" r="1.35"/><circle cx="11.9" cy="15.3" r="1.35"/><path d="M9.7 17v-5.1l3.6-.9v4.3" fill="none"/></g></svg>`,
   profile: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-4.1 3.4-6.8 7.5-6.8s7.5 2.7 7.5 6.8"/></svg>`,
   profileFilled: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="3.9"/><path d="M4 20.3c0-4.3 3.6-7.1 8-7.1s8 2.8 8 7.1v.2H4v-.2z"/></svg>`,
   crown: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 8.2l3.9 2.7L12 4.5l4.6 6.4 3.9-2.7-1.7 9.3H5.2L3.5 8.2z"/></svg>`,
@@ -7200,7 +7263,7 @@ let state = {
   favoritesOnly:false, oshiOnly:false, selectedId:null, editingId:null,
   account:null, profileMenuOpen:false, langMenuOpen:false, _justToggledOshi:null, genFilter:'all', captainFilter:'all',
   showGraduated:false,
-  statsTab:'overview', advOpen:false, selectedSingle:null, discTab:'singles', stagesOpen:{},
+  statsTab:'overview', advOpen:false, selectedSingle:null, discTab:'singles', worksCat:'music', stagesOpen:{},
   ageMin:'', ageMax:'', heightMin:'', heightMax:'', birthMonth:'all',
   theme: document.documentElement.dataset.theme || 'light'
 };
@@ -8419,7 +8482,7 @@ function applyDocumentLanguage(){
 const PAGE_META = {
   feed:     ['48thDb — ฐานข้อมูล BNK48 และ CGM48', '48thDb — BNK48 & CGM48 Database', null, null],
   browse:   ['สมาชิก BNK48 และ CGM48 ทั้งหมด', 'All BNK48 & CGM48 members', 'รายชื่อสมาชิก BNK48 และ CGM48 พร้อมโปรไฟล์ วันเกิด ส่วนสูง ทีม และรุ่น', 'Every BNK48 and CGM48 member with profile, birthday, height, team and generation.'],
-  discography:['ผลงานเพลง BNK48 และ CGM48', 'BNK48 & CGM48 discography', 'ซิงเกิล อัลบั้ม และเพลงทั้งหมดของ BNK48 และ CGM48 พร้อมรายชื่อเมมเบอร์และเซ็นเตอร์', 'Every BNK48 and CGM48 single, album and song with its line-up and centre.'],
+  discography:['ผลงาน BNK48 และ CGM48', 'BNK48 & CGM48 works', 'เพลง ภาพยนตร์ ซีรีส์ รายการ และโฆษณาของ BNK48 และ CGM48 พร้อมรายชื่อเมมเบอร์', 'Every BNK48 and CGM48 song, film, series, show and ad, with who is in it.'],
   stats:    ['สถิติ BNK48 และ CGM48', 'BNK48 & CGM48 stats', 'สถิติสมาชิก เพลง ไลฟ์ และวันเกิดของ BNK48 และ CGM48', 'Numbers on BNK48 and CGM48 members, songs, lives and birthdays.'],
   calendar: ['ปฏิทินงาน BNK48 และ CGM48', 'BNK48 & CGM48 event calendar', 'ตารางงาน อีเวนต์ ไลฟ์ และคอนเสิร์ตของ BNK48 และ CGM48', 'BNK48 and CGM48 events, lives and concerts by date.'],
   shop:     ['ร้านค้า BNK48 และ CGM48', 'BNK48 & CGM48 shop', 'สินค้าและบัตรของ BNK48 และ CGM48 ที่เปิดขายอยู่', 'BNK48 and CGM48 goods and tickets on sale now.'],
@@ -8888,7 +8951,7 @@ const LOGO_SVG = `<svg class="logo-mark" viewBox="3.43 32.73 153.43 90.06" role=
 const NAV_OPTIONS = [
   { value:'feed',        view:'feed', fav:false, icon:ICONS.home, iconActive:ICONS.homeFilled, th:'หน้าแรก', en:'Home' },
   { value:'groups',      view:'browse', fav:false, icon:ICONS.groups, iconActive:ICONS.groupsFilled, th:'สมาชิก', en:'Members' },
-  { value:'discography', view:'discography', fav:false, icon:ICONS.works, iconActive:ICONS.worksFilled, th:'เพลง', en:'Music' },
+  { value:'discography', view:'discography', fav:false, icon:ICONS.works, iconActive:ICONS.worksFilled, th:'ผลงาน', en:'Works' },
   { value:'stats',       view:'stats', fav:false, icon:ICONS.stats, iconActive:ICONS.statsFilled, th:'สถิติ', en:'Stats' },
   { value:'profile',     view:'profile', fav:false, icon:ICONS.profile, iconActive:ICONS.profileFilled, th:'โปรไฟล์', en:'Profile' }
 ];
@@ -9226,7 +9289,8 @@ function renderMemberWorks(m){
 // a member's other work, newest first, read off SEED_MEDIA
 const MEDIA_KIND = { film:['ภาพยนตร์', 'Film', '#B3121E'], series:['ซีรีส์', 'Series', '#2E8C82'], show:['รายการ', 'Show', '#B8862E'],
   mv:['MV', 'Music video', '#E4457E'], voice:['พากย์เสียง', 'Voice role', '#5E6B3A'], ad:['โฆษณา', 'Ad', '#76828E'] };
-const MEDIA_NOTE = { doc:['สารคดี', 'documentary'], short:['หนังสั้น', 'short film'], contestant:['ผู้เข้าแข่งขัน', 'contestant'], 'guest-syr3n':['แขกรับเชิญกับ SYR3N', 'guest with SYR3N'] };
+const MEDIA_NOTE = { doc:['สารคดี', 'documentary'], short:['หนังสั้น', 'short film'], sitcom:['ซิทคอม', 'sitcom'], contestant:['ผู้เข้าแข่งขัน', 'contestant'],
+  guest:['แขกรับเชิญ', 'guest'], 'guest-syr3n':['แขกรับเชิญกับ SYR3N', 'guest with SYR3N'], song:['มากับเพลง โลกนี้ก็แค่ปากซอย', 'with the song Loke Nee Kau Khae Paak Soy'] };
 function renderMemberMedia(m){
   const list = SEED_MEDIA.filter(w => w.members.includes(m.id)).sort((a, b) => (b.year || 0) - (a.year || 0));
   if(!list.length) return '';
@@ -16733,7 +16797,7 @@ function sendHit(){
   try{ fetch(`${HIT_API}?p=${encodeURIComponent(p)}&i=${encodeURIComponent(i)}`, { mode:'no-cors', keepalive:true, cache:'no-store' }).catch(() => {}); }catch(e){}
 }
 const PAGE_NAMES = {
-  feed:'หน้าแรก', browse:'รายชื่อสมาชิก', groups:'วงและทีม', org:'ผังวง', discography:'ผลงานเพลง', single:'หน้าเพลง',
+  feed:'หน้าแรก', browse:'รายชื่อสมาชิก', groups:'วงและทีม', org:'ผังวง', discography:'ผลงาน', single:'หน้าเพลง',
   'stats:overview':'สถิติ · ภาพรวม', 'stats:songs':'สถิติ · เพลง', 'stats:birthdays':'สถิติ · วันเกิด', 'stats:timeline':'สถิติ · ไทม์ไลน์', 'stats:lives':'สถิติ · ไลฟ์',
   'ge:overview':'GE2026 · ภาพรวม', 'ge:candidates':'GE2026 · ผู้สมัคร', 'ge:songs':'GE2026 · เพลงที่อยากได้', 'ge:chain':'GE2026 · โหวตสด',
   'ge:results':'GE2026 · ผลเลือกตั้ง', 'ge:timeline':'GE2026 · กำหนดการ', 'ge:events':'GE2026 · งานทั้งหมด',
@@ -18880,7 +18944,63 @@ function renderWorkRow(w, kind){
   </button>`;
 }
 
+/* The Works page: everything the groups made or took part in, in one place —
+   the songs as before, then films, series, shows, other artists' music videos
+   and ads from SEED_MEDIA — picked by category at the top. */
+const WORKS_CATS = [
+  { id:'music', th:'เพลง', en:'Music', icon:'<circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2.3v11.8"/>' },
+  { id:'film', th:'ภาพยนตร์', en:'Films', icon:'<rect x="3" y="9" width="18" height="11.5" rx="2.2"/><path d="m3.4 8.6 16.4-3.3-.6-2.9L2.8 5.7z"/><path d="m7.6 4.6 1.6 3M12.6 3.6l1.6 3"/>' },
+  { id:'series', th:'ซีรีส์', en:'Series', icon:'<rect x="3" y="6.5" width="18" height="12" rx="2.2"/><path d="M8.5 21.5h7M9 2.8l3 3.5 3-3.5"/>' },
+  { id:'show', th:'รายการ', en:'Shows', icon:'<rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v4M8.5 21.5h7"/>' },
+  { id:'mv', th:'MV', en:'MVs', icon:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>' },
+  { id:'ad', th:'โฆษณา', en:'Ads', icon:'<path d="M4 10v4a1 1 0 0 0 1 1h2l6.5 4.5V4.5L7 9H5a1 1 0 0 0-1 1z"/><path d="M17.5 9a4 4 0 0 1 0 6"/>' },
+];
+const mediaCat = w => w.kind === 'voice' ? 'film' : w.kind;
+// the group she was in that year (Izurina and Aom moved from BNK48 to CGM48 in 2019)
+const groupInYear = (m, year) => { const iso = `${year || new Date().getFullYear()}-07-01`;
+  const span = (SEED_TEAM_HISTORY[m.id] || []).find(x => x.from <= iso && (!x.to || x.to >= iso)), t = span && getTeam(span.team);
+  return t ? t.groupId : m.groupId; };
+const mediaGroups = w => [...new Set([...w.members.map(getMember).filter(Boolean).map(m => groupInYear(m, w.year)),
+  ...(w.whole === 'both' ? ['bnk48', 'cgm48'] : w.whole ? [w.whole] : [])])];
+function renderMediaCat(cat){
+  const en = isEN(), inGroup = w => state.groupFilter === 'all' || mediaGroups(w).includes(state.groupFilter);
+  const list = SEED_MEDIA.filter(w => mediaCat(w) === cat && inGroup(w))
+    .sort((a, b) => (b.year || 0) - (a.year || 0) || a.title.localeCompare(b.title));
+  if(!list.length) return `<p class="muted-note" style="margin-top:14px;">${en ? 'Nothing here yet' : 'ยังไม่มีข้อมูลในหมวดนี้'}</p>`;
+  const card = w => {
+    const gs = mediaGroups(w), c = gs.length === 1 ? getGroup(gs[0]).color : 'var(--pink)';
+    const note = MEDIA_NOTE[w.note], ms = w.members.map(getMember).filter(Boolean);
+    const top = [w.year, w.kind === 'mv' && w.by ? (en ? `by ${w.by}` : `MV ของ ${w.by}`) : w.by,
+      w.kind === 'voice' ? (en ? 'Thai dub' : 'พากย์เสียงภาษาไทย') : '', note && note[en ? 1 : 0]].filter(Boolean)
+      .map(x => escapeHtml(String(x))).join(' · ');
+    const who = ms.length
+      ? `<div class="mw-cast">${ms.slice(0, 12).map(m => `<button class="mw-face" data-action="open-member" data-id="${m.id}" title="${escapeAttr(nickName(m))}">${renderAvatar(m, 'avatar-sm', getGroup(m.groupId).color)}</button>`).join('')}${ms.length > 12 ? `<span class="mw-more">+${ms.length - 12}</span>` : ''}</div>
+        <div class="single-meta" data-noloc>${ms.slice(0, 6).map(m => escapeHtml(nickName(m))).join(', ')}${ms.length > 6 ? (en ? ` and ${ms.length - 6} more` : ` และอีก ${ms.length - 6} คน`) : ''}</div>`
+      : `<div class="single-meta">${w.whole === 'both' ? (en ? 'BNK48 and CGM48' : 'BNK48 และ CGM48') : (en ? `The whole of ${getGroup(w.whole).name}` : `ทั้งวง ${getGroup(w.whole).name}`)}</div>`;
+    return `<div class="timeline-item mw-card" style="--c:${c}">
+      <div class="timeline-year" data-noloc>${top}${w.own ? ` <span class="mw-own">${en ? "Group's own" : 'ผลงานของวง'}</span>` : ''}</div>
+      <div class="timeline-title" data-noloc>${escapeHtml(w.title)}${w.alt ? ` <span class="title-alt">${escapeHtml(w.alt)}</span>` : ''}</div>
+      ${who}
+    </div>`;
+  };
+  return `<div class="timeline mw-list">${list.map(card).join('')}</div>`;
+}
+
 function renderDiscography(){
+  const en = isEN(), cat = WORKS_CATS.some(c => c.id === state.worksCat) ? state.worksCat : 'music';
+  const inGroupW = w => state.groupFilter === 'all' || mediaGroups(w).includes(state.groupFilter);
+  const inGroupS = x => state.groupFilter === 'all' || workGroups(x).includes(state.groupFilter);
+  const n = { music: [...SEED_SINGLES, ...SEED_ALBUMS, ...SEED_SPECIALS].filter(inGroupS).length };
+  SEED_MEDIA.forEach(w => { if(inGroupW(w)){ const k = mediaCat(w); n[k] = (n[k] || 0) + 1; } });
+  const cats = `<div class="wk-cats" role="tablist">${WORKS_CATS.map(c => `<button class="wk-cat${c.id === cat ? ' is-on' : ''}" data-action="works-cat" data-value="${c.id}" role="tab" aria-selected="${c.id === cat}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${c.icon}</svg>
+      <span><b>${en ? c.en : c.th}</b><small>${n[c.id] || 0}</small></span></button>`).join('')}</div>`;
+  const head = `<h2 class="section-label wk-head">${en ? 'Works' : 'ผลงาน'}</h2>${cats}`;
+  return cat === 'music' ? head + renderMusicWorks()
+    : head + `<div class="filter-bar">${renderGroupPills()}</div>${renderMediaCat(cat)}`;
+}
+
+function renderMusicWorks(){
   const inGroup = x => state.groupFilter==='all' || workGroups(x).includes(state.groupFilter);
   const tabBar = `
   <div class="filter-bar">
@@ -19652,7 +19772,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','posterOf','geClip','timelineId','dayOf','geTab','bdayScope','livesScope','galleryId','bioOf','tagOf'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','worksCat','posterOf','geClip','timelineId','dayOf','geTab','bdayScope','livesScope','galleryId','bioOf','tagOf'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
@@ -21089,7 +21209,7 @@ function shareSubject(){
     const n = parseInt((document.querySelector('.gal-room-count') || document.querySelector('.gal-count b') || {}).textContent, 10) || 1;
     return { kind:'gallery', room, at: Math.min(room.items.length, n) - 1, url, title:`แกลเลอรี ${room.title} — 48thDb`, file:`48thdb-gallery-${room.id}` };
   }
-  const names = { feed:'วันนี้ที่ 48', browse:'สมาชิกทั้งหมด', groups:'ประวัติวง', org:'ตำแหน่ง', discography:'ผลงานเพลง', stats:'สถิติ', shop:'ร้านค้า', calendar:'ปฏิทิน', gallery:`แกลเลอรี ${galRoom(state.galleryId).title}` };
+  const names = { feed:'วันนี้ที่ 48', browse:'สมาชิกทั้งหมด', groups:'ประวัติวง', org:'ตำแหน่ง', discography:'ผลงาน', stats:'สถิติ', shop:'ร้านค้า', calendar:'ปฏิทิน', gallery:`แกลเลอรี ${galRoom(state.galleryId).title}` };
   return { kind:'page', url, title:`${names[state.view] || '48thDb'} — 48thDb`, file:`48thdb-${state.view}` };
 }
 
@@ -22525,6 +22645,10 @@ function bindDelegatedEvents(){
     }
     else if(action==='disc-tab'){
       state.discTab = el.dataset.value;
+      renderMain(); replaceHistory();
+    }
+    else if(action==='works-cat'){
+      state.worksCat = el.dataset.value;
       renderMain(); replaceHistory();
     }
     else if(action==='toggle-stage'){
