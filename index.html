@@ -1331,7 +1331,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .mw-face{ padding:0; border:0; background:none; cursor:pointer; border-radius:50%; line-height:0; }
   .mw-face .avatar-sm{ width:28px !important; height:28px !important; border-radius:50% !important; font-size:10px; }
   .mw-face:active{ transform:scale(.92); }
-  .mw-more{ font-size:12px; font-weight:700; color:var(--ink-soft); margin-left:3px; }
+  .mw-more{ display:inline-flex; align-items:center; height:28px; padding:0 10px; margin-left:2px; border-radius:99px; cursor:pointer;
+    font:inherit; font-size:12px; font-weight:800; color:var(--ink); background:var(--card); border:1px solid var(--line);
+    box-shadow:0 2px 0 rgba(var(--shadow-rgb),.08); }
+  .mw-more:active{ transform:translateY(1px); box-shadow:none; }
+  .mw-card:not(.is-open) .mw-face.is-extra, .mw-card:not(.is-open) .mw-y, .mw-card.is-open .mw-x{ display:none; }
+  .mw-names.is-long .mw-names-all{ display:none; }
+  .mw-card.is-open .mw-names-all{ display:inline; } .mw-card.is-open .mw-names-short{ display:none; }
+  .mw-and{ font:inherit; color:var(--ink); font-weight:700; background:none; border:0; padding:0; cursor:pointer;
+    text-decoration:underline; text-underline-offset:3px; text-decoration-color:color-mix(in srgb, var(--ink-soft) 50%, transparent); }
   @media (min-width:900px){ .mw-list{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); column-gap:40px; } }
   /* discography */
   .timeline{ position:relative; padding-left:26px; margin-top:8px; }
@@ -19088,8 +19096,11 @@ function renderMediaCat(cat){
       w.kind === 'voice' ? (en ? 'Thai dub' : 'พากย์เสียงภาษาไทย') : '', note && note[en ? 1 : 0]].filter(Boolean)
       .map(x => escapeHtml(String(x))).join(' · ');
     const who = ms.length
-      ? `<div class="mw-cast">${ms.slice(0, 12).map(m => `<button class="mw-face" data-action="open-member" data-id="${m.id}" title="${escapeAttr(nickName(m))}">${renderAvatar(m, 'avatar-sm', getGroup(m.groupId).color)}</button>`).join('')}${ms.length > 12 ? `<span class="mw-more">+${ms.length - 12}</span>` : ''}</div>
-        <div class="single-meta" data-noloc>${ms.slice(0, 6).map(m => escapeHtml(nickName(m))).join(', ')}${ms.length > 6 ? (en ? ` and ${ms.length - 6} more` : ` และอีก ${ms.length - 6} คน`) : ''}</div>`
+      // a long line-up shows its first twelve faces and six names; the rest open in place
+      ? `<div class="mw-cast">${ms.map((m, i) => `<button class="mw-face${i >= 12 ? ' is-extra' : ''}" data-action="open-member" data-id="${m.id}" title="${escapeAttr(nickName(m))}">${renderAvatar(m, 'avatar-sm', getGroup(m.groupId).color)}</button>`).join('')}${ms.length > 12
+          ? `<button class="mw-more" data-action="mw-more" aria-expanded="false"><span class="mw-x">+${ms.length - 12}</span><span class="mw-y">${en ? 'Less' : 'ย่อ'}</span></button>` : ''}</div>
+        <div class="single-meta mw-names${ms.length > 6 ? ' is-long' : ''}" data-noloc><span class="mw-names-all">${ms.map(m => escapeHtml(nickName(m))).join(', ')}</span>${ms.length > 6
+          ? `<span class="mw-names-short">${ms.slice(0, 6).map(m => escapeHtml(nickName(m))).join(', ')} <button class="mw-and" data-action="mw-more" aria-expanded="false">${en ? `and ${ms.length - 6} more` : `และอีก ${ms.length - 6} คน`}</button></span>` : ''}</div>`
       : `<div class="single-meta">${w.whole === 'both' ? (en ? 'BNK48 and CGM48' : 'BNK48 และ CGM48') : (en ? `The whole of ${getGroup(w.whole).name}` : `ทั้งวง ${getGroup(w.whole).name}`)}</div>`;
     return `<div class="timeline-item mw-card" style="--c:${c}">
       <div class="timeline-year" data-noloc>${top}${soon ? ` <span class="mw-own is-soon">${en ? 'Coming up' : 'เร็ว ๆ นี้'}</span>` : w.own && w.kind !== 'concert' && w.kind !== 'event' ? ` <span class="mw-own">${en ? "Group's own" : 'ผลงานของวง'}</span>` : ''}</div>
@@ -22761,6 +22772,10 @@ function bindDelegatedEvents(){
     else if(action==='disc-tab'){
       state.discTab = el.dataset.value;
       renderMain(); replaceHistory();
+    }
+    else if(action==='mw-more'){
+      const card = el.closest('.mw-card'), open = card.classList.toggle('is-open');
+      card.querySelectorAll('[data-action="mw-more"]').forEach(b => b.setAttribute('aria-expanded', open));
     }
     else if(action==='works-cat'){
       state.worksCat = el.dataset.value;
