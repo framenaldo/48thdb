@@ -1309,8 +1309,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
 
   /* the Works page: a framed tile a category, the open one filled */
   .wk-head{ margin:4px 0 10px; }
-  .wk-cats{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin:0 0 14px; }
-  @media (min-width:900px){ .wk-cats{ grid-template-columns:repeat(6, minmax(0, 1fr)); } }
+  .wk-cats{ display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:8px; margin:0 0 14px; }
+  .wk-cat{ grid-column:span 2; }
+  .wk-cat:nth-child(-n+2){ grid-column:span 3; }
+  @media (min-width:900px){ .wk-cats{ grid-template-columns:repeat(8, minmax(0, 1fr)); } .wk-cat, .wk-cat:nth-child(-n+2){ grid-column:auto; } }
   .wk-cat{ display:flex; flex-direction:column; align-items:flex-start; gap:5px; text-align:left;
     padding:11px 12px 10px; border-radius:16px; cursor:pointer; font:inherit; color:var(--ink); background:var(--card); border:1px solid var(--line);
     box-shadow:0 3px 0 rgba(var(--shadow-rgb),.08); transition:transform .12s, box-shadow .12s; }
@@ -1322,6 +1324,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .wk-cat.is-on svg{ color:var(--paper); }
   .wk-cat.is-on small{ color:var(--paper); opacity:.75; }
   .wk-cat:active{ transform:translateY(2px); box-shadow:none; }
+  .mw-ev{ margin-top:9px; }
+  .mw-own.is-soon{ background:var(--pink); }
   .mw-own{ display:inline-block; margin-left:4px; padding:1px 7px; border-radius:99px; font-size:10.5px; font-weight:800; color:#fff; background:var(--c); vertical-align:1px; }
   .mw-cast{ display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:7px; }
   .mw-face{ padding:0; border:0; background:none; cursor:pointer; border-radius:50%; line-height:0; }
@@ -7115,7 +7119,11 @@ SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
    Film, its shows), and `whole` a work of the whole group whose line-up is
    not on record — an ad, or a channel's running show — so it names no one.
    The ads are from the group's list of commercials and the trade press,
-   which stops in 2019. */
+   which stops in 2019. A concert (kind 'concert') carries its `date` (and
+   `end`), its venue as `by`, and `ev` when the schedule has it; it names the
+   members only where they are known — a generation's show, a graduation.
+   An event (kind 'event': elections, sports days, festivals, fanmeets) is
+   kept the same way. */
 const SEED_MEDIA = [
   { kind:'film', title:'BNK48: Girls Don\'t Cry', year:2018, by:'GDH', note:'doc', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'cgm-izurina'] },
   { kind:'film', title:'Homestay', year:2018, members:['bnk-cherprang'] },
@@ -7194,6 +7202,96 @@ const SEED_MEDIA = [
   { kind:'show', title:'CGM48 โฮะ!!', year:2025, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
   { kind:'show', title:'LYRAlity Show', year:2020, by:'YouTube', members:['bnk-noey', 'bnk-pun'] },
   { kind:'show', title:'Shine Boys', year:2026, note:'guest-syr3n', members:['bnk-hoop', 'bnk-pancake'] },
+  { kind:'concert', title:'BNK48 We Love You', year:2017, by:'Quartier Water Garden, The EmQuartier, Bangkok', note:'kidcat', own:true, whole:'bnk48', date:'2017-09-23', members:[] },
+  { kind:'concert', title:'BNK48 Mini Live and Handshake', year:2017, by:'Kamphaeng Phet Auditorium, J.J Mall, Bangkok', note:'grad', own:true, date:'2017-11-18', members:['bnk-cincin'] },
+  { kind:'concert', title:'BNK48 1st Concert "STARTO"', year:2018, by:'BITEC Hall 106, Bangkok', own:true, whole:'bnk48', date:'2018-03-31', end:'2018-04-01', members:[] },
+  { kind:'concert', title:'AKB48 53rd Single World Senbatsu General Election Concert', year:2018, by:'Nagoya Dome, Nagoya', note:'akb', whole:'bnk48', date:'2018-06-16', members:[] },
+  { kind:'concert', title:'Thailand for Attapeu', year:2018, by:'KBank Siam Pic-Ganesha Theatre, Bangkok', note:'charity', own:true, whole:'bnk48', date:'2018-07-31', members:[] },
+  { kind:'concert', title:'BNK48 Concert "1st 2gether"', year:2018, by:'CentralWorld Square, Bangkok', note:'free', own:true, date:'2018-09-15', members:['bnk-bamboo', 'bnk-cake', 'bnk-can', 'bnk-cherprang', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-khamin', 'bnk-kheng', 'bnk-korn', 'bnk-maira', 'bnk-maysa', 'bnk-mewnich', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-myyu', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-oom', 'bnk-orn', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-ratah', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-view', 'bnk-wee'] },
+  { kind:'concert', title:'BNK48 D-DAY -Jiradapa Produced Concert-', year:2018, by:'KBank Siam Pic-Ganesha Theatre, Bangkok', note:'produced', own:true, date:'2018-10-23', members:['bnk-pupe'] },
+  { kind:'concert', title:'BNK48 Space Mission Concert', year:2019, by:'IMPACT Arena, Muang Thong Thani', note:'election', own:true, whole:'bnk48', date:'2019-01-26', members:[] },
+  { kind:'concert', title:'AKB48 Group Asia Festival 2019 in Bangkok', year:2019, by:'IMPACT Arena, Muang Thong Thani', note:'akb', whole:'bnk48', date:'2019-01-27', members:[] },
+  { kind:'concert', title:'BNK48 Thank You and The Beginner', year:2019, by:'Siam Square, Hatyai, Khonkaen, Rayong, Chiang Mai', note:'tour', own:true, whole:'bnk48', date:'2019-03-02', end:'2019-06-02', members:[] },
+  { kind:'concert', title:'A Passage to Fly – Kaew\'s Solo Concert', year:2019, by:'KBank Siam Pic-Ganesha Theatre, Bangkok', note:'solo', own:true, date:'2019-05-07', end:'2019-05-08', members:['bnk-kaew'] },
+  { kind:'concert', title:'Everybody Says Jabaja! at ICONSIAM', year:2019, by:'ICONSIAM, Bangkok', note:'first', own:true, whole:'bnk48', date:'2019-07-05', members:[] },
+  { kind:'concert', title:'BNK48 Say Jabaja Roadshow in Chiang Mai', year:2019, by:'Central Chiangmai Airport, Chiang Mai', note:'mini', own:true, whole:'bnk48', date:'2019-07-13', end:'2019-07-14', members:[] },
+  { kind:'concert', title:'AKB48 Group Asia Festival 2019 in Shanghai', year:2019, by:'National Exhibition and Convention Center, Shanghai', note:'akb', whole:'bnk48', date:'2019-08-24', members:[] },
+  { kind:'concert', title:'AKB48 in Taipei 2019 ～Are You Ready For It?～', year:2019, by:'Taipei Arena, Taipei', note:'akb-guest', date:'2019-10-19', members:['cgm-izurina'] },
+  { kind:'concert', title:'BNK48 The Journey to 7th Single "77 no Suteki na Machi e"', year:2019, by:'The Street Ratchada, Bangkok', note:'first', own:true, whole:'bnk48', date:'2019-10-30', members:[] },
+  { kind:'concert', title:'BNK48 2nd Generation Concert "Blooming Season"', year:2019, by:'BITEC Hall 106, Bangkok', note:'gen', own:true, date:'2019-11-02', members:['bnk-bamboo', 'bnk-cake', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-june', 'bnk-khamin', 'bnk-kheng', 'bnk-maira', 'bnk-mewnich', 'bnk-minmin', 'bnk-myyu', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-oom', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-ratah', 'bnk-stang', 'bnk-view', 'bnk-wee'] },
+  { kind:'concert', title:'BNK48 Welcome to High Tension Company', year:2020, by:'River Park, ICONSIAM, Bangkok', note:'first', own:true, whole:'bnk48', date:'2020-02-23', members:[] },
+  { kind:'concert', title:'BNK48 Wonderland', year:2020, by:'Ultra Arena Hall, Show DC, Bangkok', note:'election', own:true, whole:'bnk48', date:'2020-07-26', members:[] },
+  { kind:'concert', title:'Live GrabFood AGENTS OF S.A.L.E – FINAL MISSION', year:2021, by:'Grab Thailand Facebook and YouTube', note:'online', whole:'bnk48', date:'2021-06-22', members:[] },
+  { kind:'concert', title:'AKB48 Group Asia Festival 2021 ONLINE', year:2021, by:'Tokyo Dome City Hall, Tokyo', note:'akb-online', whole:'both', date:'2021-06-27', members:[] },
+  { kind:'concert', title:'BNK48 3rd Generation: THE DE3UT', year:2022, by:'Event Area, CentralWorld, Bangkok', note:'gen', own:true, date:'2022-02-07', members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-jaokhem', 'bnk-kaofrang', 'bnk-mean', 'bnk-monet', 'bnk-paeyah', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-popper', 'bnk-yayee', 'bnk-yoghurt'] },
+  { kind:'concert', title:'BNK48 11th Single "Sayonara Crawl" First Performance', year:2022, by:'Asiatique The Riverfront, Bangkok', note:'first', own:true, whole:'bnk48', date:'2022-03-20', members:[] },
+  { kind:'concert', title:'INDY CAMP Festival Concert 01', year:2022, by:'ChangChui Creative Park, Bangkok', own:true, whole:'both', date:'2022-08-21', members:[] },
+  { kind:'concert', title:'BNK48 & CGM48 Request Hour 2022', year:2022, by:'Union Hall, Union Mall, Bangkok', note:'request', own:true, whole:'both', date:'2022-10-30', members:[] },
+  { kind:'concert', title:'BNK48 1st Gen Special Single "Jiwaru DAYS" First Performance', year:2022, by:'Riverside, Terminal 21 Rama 3, Bangkok', note:'first', own:true, date:'2022-11-20', members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-korn', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+  { kind:'concert', title:'BNK48 1st Generation Graduation Concert "Dan D\'1ion"', year:2022, by:'BITEC Live, Bangkok', note:'gengrad', own:true, date:'2022-12-18', members:['bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-korn', 'bnk-mind', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-tarwaan'] },
+  { kind:'concert', title:'INDY CAMP Festival Concert 02', year:2022, by:'MORE SPACE, Chiang Mai', own:true, whole:'both', date:'2022-12-25', members:[] },
+  { kind:'concert', title:'AKB48 Group Circle Jam 2023', year:2023, by:'centralwOrld LIVE, Bangkok', note:'akb', whole:'both', date:'2023-02-04', members:[] },
+  { kind:'concert', title:'BNK48 3rd Generation Concert "Rabbit in Wonderland"', year:2023, by:'Union Hall, Union Mall, Bangkok', note:'gen', own:true, date:'2023-08-05', members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-jaokhem', 'bnk-kaofrang', 'bnk-mean', 'bnk-monet', 'bnk-paeyah', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-popper', 'bnk-yayee', 'bnk-yoghurt'] },
+  { kind:'concert', title:'CGM48 1st Concert "Magical ChuChuChu♡"', year:2023, by:'Union Hall, Union Mall, Bangkok', own:true, whole:'cgm48', date:'2023-08-05', members:[] },
+  { kind:'concert', title:'BNK48 vs CGM48 Concert "The Battle of Idols"', year:2023, by:'Union Hall, Union Mall, Bangkok', own:true, whole:'both', date:'2023-08-06', members:[] },
+  { kind:'concert', title:'I-Riginal Live 2023', year:2023, by:'Thunder Dome, Muang Thong Thani', own:true, whole:'both', date:'2023-10-28', members:[] },
+  { kind:'concert', title:'DEPART\'CHER – Cherprang BNK48\'s Graduation Concert', year:2023, by:'Thunder Dome, Muang Thong Thani', note:'grad', own:true, date:'2023-10-29', members:['bnk-cherprang'] },
+  { kind:'concert', title:'Miori BNK48\'s Graduation Ceremony & BNK48 ChristmaS Party', year:2023, by:'SF World Cinema, CentralWorld, Bangkok', note:'grad', own:true, date:'2023-12-25', members:['bnk-miori'] },
+  { kind:'concert', title:'CGM48 Concert "Memory of Flowers" & Aom\'s Graduation Ceremony', year:2024, by:'Centerpoint Studio, Bangkok', note:'grad', own:true, date:'2024-04-27', members:['cgm-aom'] },
+  { kind:'concert', title:'BNK48 2nd Generation Graduation Concert "Last Season"', year:2024, by:'Centerpoint Studio, Bangkok', note:'gengrad', own:true, date:'2024-04-28', members:['bnk-fond', 'bnk-gygee', 'bnk-khamin', 'bnk-minmin', 'bnk-myyu', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-ratah', 'bnk-stang', 'bnk-wee'] },
+  { kind:'concert', title:'Voices of BNK48 Showcase', year:2024, by:'Ultra Arena Bravo BKK, Bangkok', own:true, whole:'bnk48', date:'2024-06-23', members:[] },
+  { kind:'concert', title:'Paeyah BNK48\'s Graduation Ceremony', year:2024, by:'Ultra Arena Bravo BKK, Bangkok', note:'grad', own:true, date:'2024-06-23', members:['bnk-paeyah'] },
+  { kind:'concert', title:'BNK48 Music Box – First Live Concert "Journey of กล่องเสียงของฉัน"', year:2024, by:'Mr.FOX Live House, Bangkok', own:true, whole:'bnk48', date:'2024-08-31', members:[] },
+  { kind:'concert', title:'BNK48 17th Single "BORDERLESS" Special Performance', year:2024, by:'Siam Paragon, Bangkok', note:'first', own:true, whole:'bnk48', date:'2024-09-01', members:[] },
+  { kind:'concert', title:'BNK48 & CGM48 Request Hour 2024', year:2024, by:'Centerpoint Studio, Bangkok', note:'request', own:true, whole:'both', date:'2024-09-15', members:[] },
+  { kind:'concert', title:'Fortune CGM48\'s Graduation Ceremony', year:2024, by:'MUAN MORE SPACE, Chiang Mai', note:'grad', own:true, date:'2024-10-13', members:['cgm-fortune'] },
+  { kind:'concert', title:'Izurina CGM48\'s Graduation Concert ~Thuk Khon Arigatou~', year:2024, by:'Ultra Arena Bravo BKK, Bangkok', note:'grad', own:true, date:'2024-11-30', members:['cgm-izurina'] },
+  { kind:'concert', title:'Satchan BNK48\'s Graduation Ceremony', year:2024, by:'Major Cineplex Ratchayothin, Bangkok', note:'grad', own:true, date:'2024-12-25', members:['bnk-satchan'] },
+  { kind:'concert', title:'BNK48 & CGM48 Concert "BATTLE OF LEGACY"', year:2025, by:'Union Hall, Union Mall, Bangkok', own:true, whole:'both', date:'2025-03-29', members:[] },
+  { kind:'concert', title:'BNK48 "Rabbit in Borderland" The Musical', year:2025, by:'Ultra Arena Bravo BKK, Bangkok', note:'musical', own:true, date:'2025-08-09', members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-kaofrang', 'bnk-mean', 'bnk-monet', 'bnk-pancake', 'bnk-peak', 'bnk-popper', 'bnk-yayee', 'bnk-yoghurt'] },
+  { kind:'concert', title:'Popper BNK48\'s Graduation Ceremony "Last Flight"', year:2025, by:'Ultra Arena Bravo BKK, Bangkok', note:'grad', own:true, date:'2025-08-09', members:['bnk-popper'] },
+  { kind:'concert', title:'BNK48 & CGM48 Concert "CHAPTER: NEXT"', year:2025, by:'MCC Hall, The Mall Lifestore Bangkapi, Bangkok', own:true, whole:'both', date:'2025-08-23', members:[] },
+  { kind:'concert', title:'CGM48 1st Generation Graduation Concert "The Final Station...MINATO 39"', year:2025, by:'The Mall Lifestore Bangkapi, Bangkok', note:'gengrad', own:true, date:'2025-08-24', members:['cgm-angel', 'cgm-champoo', 'cgm-fahsai', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-nena', 'cgm-nenie', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+  { kind:'concert', title:'BNK48 3rd Generation Graduation Concert "Once Upon a Time... The Rabbits Were Born"', year:2026, by:'Island Hall, Fashion Island, Bangkok', note:'gengrad', own:true, date:'2026-03-01', members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-grace', 'bnk-kaofrang', 'bnk-mean', 'bnk-peak', 'bnk-yayee'] },
+  { kind:'concert', title:'Runma CGM48\'s Farewell & Graduation Ceremony', year:2026, by:'MUAN MORE SPACE, Chiang Mai', note:'grad', own:true, date:'2026-03-07', members:['cgm-runma'] },
+  { kind:'concert', title:'BNK48 & CGM48 Concert 2026 "JOURNEY OF DREAMS"', year:2026, by:'MCC Hall, The Mall Lifestore Bangkapi, Bangkok', own:true, whole:'both', date:'2026-11-14', ev:'ev-concert-2026', members:[] },
+  { kind:'concert', title:'BNK48 16th Single "Kiss Me!" First Performance', year:2024, by:'centralwOrld, Bangkok', note:'first', own:true, whole:'bnk48', date:'2024-02-22', members:[] },
+  { kind:'concert', title:'BNK48 5th Album "#SukiNanda" First Performance', year:2024, by:'The Street Ratchada, Bangkok', note:'first', own:true, whole:'bnk48', date:'2024-11-09', members:[] },
+  { kind:'concert', title:'CGM48 2nd Album "Hisashiburi no Lip Gloss" First Performance', year:2023, by:'Central Chiangmai Airport, Chiang Mai', note:'first', own:true, whole:'cgm48', date:'2023-09-23', end:'2023-09-24', members:[] },
+  { kind:'concert', title:'CGM48 7th Single "LOVE TRIP" First Performance', year:2024, by:'Chiang Mai Hall, Central Chiangmai Airport, Chiang Mai', note:'first', own:true, whole:'cgm48', date:'2024-05-18', members:[] },
+  { kind:'concert', title:'BNK48 & TSH48 Special Single "Sky Lantern Wish" First Performance', year:2026, by:'MBK Center, Bangkok', note:'first', own:true, whole:'bnk48', date:'2026-01-24', members:[] },
+  { kind:'concert', title:'TSH48 × BNK48 "Sky Lantern Wish" Special Performance in SHANGHAI', year:2026, by:'NSE COSMOS Theater, Shanghai', note:'abroad', own:true, whole:'bnk48', date:'2026-07-11', members:[] },
+  { kind:'concert', title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" First Performance & MV Premiere', year:2026, by:'MCC Hall, The Mall Lifestore Bangkapi', note:'first', own:true, whole:'both', date:'2026-10-03', ev:'ev-kimi-first-performance', members:[] },
+  { kind:'event', title:'BNK48 6th Single Senbatsu General Election', year:2019, by:'IMPACT Arena, Muang Thong Thani', note:'ge', own:true, whole:'bnk48', date:'2019-01-26', members:[] },
+  { kind:'event', title:'เทศกาลกีฬาบางกอก๔๘', alt:'BNK48 Sports Day', year:2019, by:'Indoor Stadium Huamark, Bangkok', note:'sports', own:true, whole:'bnk48', date:'2019-09-07', members:[] },
+  { kind:'event', title:'Mimigumo 1st Fanmeet "Secret of Mimigumo"', year:2019, by:'KBank Siam Pic-Ganesha Theatre, Bangkok', note:'fanmeet', own:true, date:'2019-12-21', end:'2019-12-22', members:['bnk-jaa', 'bnk-kaimook', 'bnk-music'] },
+  { kind:'event', title:'BNK48 9th Single Senbatsu General Election', year:2020, by:'BNK48 Digital Live Studio, MBK Center · online', note:'ge', own:true, whole:'both', date:'2020-04-19', members:[] },
+  { kind:'event', title:'BNK48 Janken Tournament 2020', year:2020, by:'Union Mall, Bangkok', note:'janken', own:true, whole:'bnk48', date:'2020-09-26', members:[] },
+  { kind:'event', title:'Pokémon UNITE AKB48 Group Invitational', year:2022, by:'online', note:'esports', whole:'both', date:'2022-01-08', members:[] },
+  { kind:'event', title:'Charaline 1st Fanmeet "Verb of Feeling"', year:2022, by:'Union Mall, Bangkok', note:'fanmeet', own:true, whole:'bnk48', date:'2022-02-12', end:'2022-02-13', members:[] },
+  { kind:'event', title:'BNK48 12th Single Senbatsu General Election', year:2022, by:'Union Mall, Bangkok', note:'ge', own:true, whole:'both', date:'2022-04-09', members:[] },
+  { kind:'event', title:'งานกีฬาสีอนุบาลหนูน้อย48 2022', year:2022, by:'Thunder Dome, Muang Thong Thani', note:'sports', own:true, whole:'both', date:'2022-09-10', members:[] },
+  { kind:'event', title:'BNK48 Janken Tournament 2023', year:2023, by:'Union Mall, Bangkok', note:'janken', own:true, whole:'bnk48', date:'2023-04-09', members:[] },
+  { kind:'event', title:'BNK48 & CGM48 Fan Festival 2023', year:2023, by:'Union Hall, Union Mall, Bangkok', note:'fanfest', own:true, whole:'both', date:'2023-12-02', end:'2023-12-03', members:[] },
+  { kind:'event', title:'BNK48 16th Single Senbatsu General Election', year:2023, by:'Union Hall, Union Mall, Bangkok', note:'ge', own:true, whole:'both', date:'2023-12-09', members:[] },
+  { kind:'event', title:'BNK48 7th Anniversary', year:2024, by:'Royal Park Plaza, Paradise Park, Bangkok', note:'anniv', own:true, whole:'bnk48', date:'2024-06-01', end:'2024-06-02', members:[] },
+  { kind:'event', title:'365 2024', year:2024, by:'Caribbean Village, Terminal 21 Rama 3, Bangkok', note:'poll', own:true, whole:'bnk48', date:'2024-07-02', members:[] },
+  { kind:'event', title:'BNK48 & CGM48 Sports Day 2024 NEKO WARS', year:2024, by:'Gymnasium 4, Thammasat University Rangsit', note:'sports', own:true, whole:'both', date:'2024-07-28', members:[] },
+  { kind:'event', title:'Japan Expo Thailand 2025', year:2025, by:'CentralWorld, Bangkok', note:'expo', whole:'both', date:'2025-02-07', end:'2025-02-09', members:[] },
+  { kind:'event', title:'BNK48 & CGM48 Senbatsu General Election 2025', year:2025, by:'Union Hall, Union Mall, Bangkok', note:'ge', own:true, whole:'both', date:'2025-03-29', members:[] },
+  { kind:'event', title:'48EXPO -8th Anniversary-', year:2025, by:'MCC Hall, The Mall Lifestore Bangkapi, Bangkok', note:'anniv', own:true, whole:'both', date:'2025-05-31', end:'2025-06-02', members:[] },
+  { kind:'event', title:'CGM48 TANABATA 2025', year:2025, by:'More Space, Chiang Mai', note:'festival', own:true, whole:'cgm48', date:'2025-07-05', end:'2025-07-06', members:[] },
+  { kind:'event', title:'BNK48 & CGM48 Moonlight & Monster 2025', year:2025, by:'MBK Center, Bangkok', note:'halloween', own:true, whole:'both', date:'2025-10-31', end:'2025-11-02', members:[] },
+  { kind:'event', title:'BNK48 & CGM48 Christmas Festival 2025 KANGAROO VILLAGE', year:2025, by:'MCC Hall, The Mall Lifestore Bangkae, Bangkok', note:'christmas', own:true, whole:'both', date:'2025-12-19', end:'2025-12-21', members:[] },
+  { kind:'event', title:'Japan Expo Thailand 2026', year:2026, by:'CentralWorld, Bangkok', note:'expo', whole:'both', date:'2026-02-06', end:'2026-02-08', members:[] },
+  { kind:'event', title:'BNK48 & CGM48 Sports Day 2026 WAR OF GODDESS', year:2026, by:'Island Hall, Fashion Island, Bangkok', note:'sports', own:true, whole:'both', date:'2026-02-15', members:[] },
+  { kind:'event', title:'On Cloud 9 Festival –9th Anniversary–', year:2026, by:'MCC Hall, The Mall Lifestore Bangkae, Bangkok', note:'anniv', own:true, whole:'both', date:'2026-05-30', end:'2026-06-01', members:[] },
+  { kind:'event', title:'CGM48 TANABATA 2026', year:2026, by:'MAYA Chiang Mai, Chiang Mai', note:'festival', own:true, whole:'cgm48', date:'2026-07-04', end:'2026-07-05', members:[] },
+  { kind:'event', title:'BNK48 & CGM48 Bon Odori 2026', year:2026, by:'Island Hall, Fashion Island, Bangkok', note:'festival', own:true, whole:'both', date:'2026-07-24', end:'2026-07-26', members:[] },
+  { kind:'event', title:'NIPPON HAKU BANGKOK 2026', year:2026, by:'Queen Sirikit National Convention Center, Bangkok', note:'expo', date:'2026-08-28', end:'2026-08-30', ev:'ev-nipponhaku-2026', members:['bnk-hoop', 'bnk-janry', 'bnk-l', 'cgm-lookked', 'cgm-nana', 'cgm-jingjing'] },
+  { kind:'event', title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival', year:2026, by:'MCC Hall, The Mall Lifestore Bangkapi', note:'fanfest', own:true, whole:'both', date:'2026-10-03', end:'2026-10-04', ev:'ev-election-fanfest', members:[] },
+  { kind:'event', title:'Fame\'s Airline Fanmeet', year:2026, by:'The Theater Hall, The Bazaar Hotel Bangkok', note:'fanmeet', own:true, date:'2026-10-25', ev:'ev-fame-fanmeet', members:['bnk-fame'] },
+  { kind:'event', title:'BNK48 & CGM48 Senbatsu General Election 2026 · Final Results', year:2026, by:'MCC Hall, The Mall Lifestore Bangkapi', note:'ge', own:true, whole:'both', date:'2026-11-14', ev:'ev-election-results', members:[] },
   { kind:'ad', title:'A.P. Honda Racing Thailand', year:2018, by:'A.P. Honda', whole:'bnk48', members:[] },
   { kind:'ad', title:'Yayoi Japanese Restaurant', year:2018, by:'MK Restaurant Group', whole:'bnk48', members:[] },
   { kind:'ad', title:'TruePoint × BNK48', year:2018, by:'True Corporation', whole:'bnk48', members:[] },
@@ -9288,9 +9386,20 @@ function renderMemberWorks(m){
 
 // a member's other work, newest first, read off SEED_MEDIA
 const MEDIA_KIND = { film:['ภาพยนตร์', 'Film', '#B3121E'], series:['ซีรีส์', 'Series', '#2E8C82'], show:['รายการ', 'Show', '#B8862E'],
-  mv:['MV', 'Music video', '#E4457E'], voice:['พากย์เสียง', 'Voice role', '#5E6B3A'], ad:['โฆษณา', 'Ad', '#76828E'] };
+  mv:['MV', 'Music video', '#E4457E'], voice:['พากย์เสียง', 'Voice role', '#5E6B3A'], ad:['โฆษณา', 'Ad', '#76828E'], concert:['คอนเสิร์ต', 'Concert', '#7C4DBE'],
+  event:['อีเวนต์', 'Event', '#C2671E'] };
 const MEDIA_NOTE = { doc:['สารคดี', 'documentary'], short:['หนังสั้น', 'short film'], sitcom:['ซิทคอม', 'sitcom'], contestant:['ผู้เข้าแข่งขัน', 'contestant'],
-  guest:['แขกรับเชิญ', 'guest'], 'guest-syr3n':['แขกรับเชิญกับ SYR3N', 'guest with SYR3N'], song:['มากับเพลง โลกนี้ก็แค่ปากซอย', 'with the song Loke Nee Kau Khae Paak Soy'] };
+  guest:['แขกรับเชิญ', 'guest'], 'guest-syr3n':['แขกรับเชิญกับ SYR3N', 'guest with SYR3N'], song:['มากับเพลง โลกนี้ก็แค่ปากซอย', 'with the song Loke Nee Kau Khae Paak Soy'],
+  grad:['พิธีจบการศึกษา', 'graduation'], gengrad:['คอนเสิร์ตจบการศึกษาของทั้งรุ่น', 'generation graduation concert'], gen:['คอนเสิร์ตประจำรุ่น', 'generation concert'],
+  kidcat:['พิธีจบการศึกษาของคิดแคท', "Kidcat's graduation"], solo:['คอนเสิร์ตเดี่ยว', 'solo concert'], first:['เปิดตัวซิงเกิล', 'first performance'],
+  tour:['มินิคอนเสิร์ตสัญจร 5 จังหวัด', 'mini concert tour, five cities'], mini:['มินิคอนเสิร์ต', 'mini concert'], free:['คอนเสิร์ตฟรี', 'free concert'],
+  charity:['คอนเสิร์ตการกุศล', 'charity concert'], produced:['ปูเป้เป็นโปรดิวเซอร์', 'produced by Pupe'], election:['คู่กับงานเลือกตั้ง', 'with the election'],
+  request:['Request Hour', 'Request Hour'], musical:['ละครเพลง', 'musical'], akb:['ร่วมกับวงตระกูล 48', 'with the 48 groups'],
+  'akb-guest':['แขกรับเชิญในคอนเสิร์ต AKB48', "guest at AKB48's concert"], 'akb-online':['ร่วมกับวงตระกูล 48 · ออนไลน์', 'with the 48 groups, online'], online:['ออนไลน์', 'online'],
+  abroad:['แสดงที่เซี่ยงไฮ้', 'in Shanghai'], ge:['ประกาศผลเลือกตั้งเซ็มบัตสึ', 'Senbatsu election results'], janken:['เป่ายิ้งฉุบชิงเซ็มบัตสึ', 'janken tournament'],
+  sports:['งานกีฬาสี', 'sports day'], fanmeet:['แฟนมีต', 'fan meeting'], fanfest:['แฟนเฟสติวัล', 'fan festival'], anniv:['ฉลองครบรอบวง', 'anniversary'],
+  poll:['ประกาศผลโหวต', 'poll results'], esports:['อีสปอร์ต · ออนไลน์', 'e-sports, online'], expo:['งานญี่ปุ่นที่วงขึ้นเวที', 'Japan fair on stage'],
+  festival:['เทศกาล', 'festival'], halloween:['ฮาโลวีน', 'Halloween'], christmas:['คริสต์มาส', 'Christmas'] };
 function renderMemberMedia(m){
   const list = SEED_MEDIA.filter(w => w.members.includes(m.id)).sort((a, b) => (b.year || 0) - (a.year || 0));
   if(!list.length) return '';
@@ -18949,6 +19058,8 @@ function renderWorkRow(w, kind){
    and ads from SEED_MEDIA — picked by category at the top. */
 const WORKS_CATS = [
   { id:'music', th:'เพลง', en:'Music', icon:'<circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2.3v11.8"/>' },
+  { id:'concert', th:'คอนเสิร์ต', en:'Concerts', icon:'<path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5Z"/><path d="M14 6v2M14 11v2M14 16v2"/>' },
+  { id:'event', th:'อีเวนต์', en:'Events', icon:'<path d="M12 3.2l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.1l-5.1 2.7 1-5.6-4.1-4 5.7-.8z"/>' },
   { id:'film', th:'ภาพยนตร์', en:'Films', icon:'<rect x="3" y="9" width="18" height="11.5" rx="2.2"/><path d="m3.4 8.6 16.4-3.3-.6-2.9L2.8 5.7z"/><path d="m7.6 4.6 1.6 3M12.6 3.6l1.6 3"/>' },
   { id:'series', th:'ซีรีส์', en:'Series', icon:'<rect x="3" y="6.5" width="18" height="12" rx="2.2"/><path d="M8.5 21.5h7M9 2.8l3 3.5 3-3.5"/>' },
   { id:'show', th:'รายการ', en:'Shows', icon:'<rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v4M8.5 21.5h7"/>' },
@@ -18965,12 +19076,15 @@ const mediaGroups = w => [...new Set([...w.members.map(getMember).filter(Boolean
 function renderMediaCat(cat){
   const en = isEN(), inGroup = w => state.groupFilter === 'all' || mediaGroups(w).includes(state.groupFilter);
   const list = SEED_MEDIA.filter(w => mediaCat(w) === cat && inGroup(w))
-    .sort((a, b) => (b.year || 0) - (a.year || 0) || a.title.localeCompare(b.title));
+    .sort((a, b) => (b.date || String(b.year || 0)).localeCompare(a.date || String(a.year || 0)) || a.title.localeCompare(b.title));
   if(!list.length) return `<p class="muted-note" style="margin-top:14px;">${en ? 'Nothing here yet' : 'ยังไม่มีข้อมูลในหมวดนี้'}</p>`;
   const card = w => {
     const gs = mediaGroups(w), c = gs.length === 1 ? getGroup(gs[0]).color : 'var(--pink)';
     const note = MEDIA_NOTE[w.note], ms = w.members.map(getMember).filter(Boolean);
-    const top = [w.year, w.kind === 'mv' && w.by ? (en ? `by ${w.by}` : `MV ของ ${w.by}`) : w.by,
+    const M = monthsShort(), day = iso => { const d = parseYmd(iso); return `${d.getDate()} ${M[d.getMonth()]}`; };
+    const when = w.date ? (w.end ? `${day(w.date)} – ${day(w.end)} ${w.year}` : `${day(w.date)} ${w.year}`) : w.year;
+    const soon = w.date && w.date > toYmd(todayStart());
+    const top = [when, w.kind === 'mv' && w.by ? (en ? `by ${w.by}` : `MV ของ ${w.by}`) : w.by,
       w.kind === 'voice' ? (en ? 'Thai dub' : 'พากย์เสียงภาษาไทย') : '', note && note[en ? 1 : 0]].filter(Boolean)
       .map(x => escapeHtml(String(x))).join(' · ');
     const who = ms.length
@@ -18978,9 +19092,10 @@ function renderMediaCat(cat){
         <div class="single-meta" data-noloc>${ms.slice(0, 6).map(m => escapeHtml(nickName(m))).join(', ')}${ms.length > 6 ? (en ? ` and ${ms.length - 6} more` : ` และอีก ${ms.length - 6} คน`) : ''}</div>`
       : `<div class="single-meta">${w.whole === 'both' ? (en ? 'BNK48 and CGM48' : 'BNK48 และ CGM48') : (en ? `The whole of ${getGroup(w.whole).name}` : `ทั้งวง ${getGroup(w.whole).name}`)}</div>`;
     return `<div class="timeline-item mw-card" style="--c:${c}">
-      <div class="timeline-year" data-noloc>${top}${w.own ? ` <span class="mw-own">${en ? "Group's own" : 'ผลงานของวง'}</span>` : ''}</div>
+      <div class="timeline-year" data-noloc>${top}${soon ? ` <span class="mw-own is-soon">${en ? 'Coming up' : 'เร็ว ๆ นี้'}</span>` : w.own && w.kind !== 'concert' && w.kind !== 'event' ? ` <span class="mw-own">${en ? "Group's own" : 'ผลงานของวง'}</span>` : ''}</div>
       <div class="timeline-title" data-noloc>${escapeHtml(w.title)}${w.alt ? ` <span class="title-alt">${escapeHtml(w.alt)}</span>` : ''}</div>
       ${who}
+      ${w.ev && SEED_SCHEDULE.some(e => e.id === w.ev) ? `<button class="chip chip-link mw-ev" data-action="open-event" data-id="${w.ev}">${en ? 'The event →' : 'ดูงานนี้ →'}</button>` : ''}
     </div>`;
   };
   return `<div class="timeline mw-list">${list.map(card).join('')}</div>`;

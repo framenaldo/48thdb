@@ -70,8 +70,10 @@ the Firebase CLI from the owner's machine.
   40 units to the metre) pieced together from the owner's photos and clips —
   keep it marked as a sketch (`source`) unless the organiser publishes one.
 - The Works page (/music, view `discography`) holds everything the groups made
-  or took part in: the songs, then films, series, shows, other artists' MVs and
-  ads from `SEED_MEDIA`, picked by category (`WORKS_CATS`). The same entries
+  or took part in: the songs, then concerts, events, films, series, shows, other
+  artists' MVs and ads from `SEED_MEDIA`, picked by category (`WORKS_CATS`). A
+  concert or event carries its `date` (and `end`), venue as `by`, and `ev` when
+  the schedule has it, so a new one in SEED_SCHEDULE can be linked from here. The same entries
   fill "ผลงานอื่น" on a member's sheet, so a credit only counts while she was
   in the group. `own` marks the group's own productions; `whole` a whole-group
   work with no names on record (ads, channel shows).
