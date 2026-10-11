@@ -2666,6 +2666,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .ge-hero::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(60,4,8,.25), rgba(40,2,6,.85)); }
   .ge-hero-in{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:14px; padding:26px 18px 20px; text-align:center; }
   .ge-logo{ width:min(440px, 86%); height:auto; filter:drop-shadow(0 4px 12px rgba(0,0,0,.55)); }
+  .ge-hero.is-slim{ margin-bottom:12px; }
+  .ge-hero.is-slim .ge-hero-in{ padding:12px 16px; }
+  .ge-hero.is-slim .ge-logo{ width:min(210px, 54%); }
   .ge-keys{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; }
   .ge-key{ display:flex; flex-direction:column; align-items:center; gap:1px; padding:7px 14px; border-radius:14px; cursor:pointer;
     background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.28); color:#fff; font:inherit; font-size:14px; font-weight:800; }
@@ -3140,10 +3143,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-row.is-reveal::after, .gel-now.is-reveal::after{ content:''; position:absolute; inset:0; pointer-events:none;
     background:linear-gradient(100deg, transparent 30%, rgba(243,201,105,.55) 50%, transparent 70%); transform:translateX(-100%);
     animation:ge-sweep 1.1s .25s ease-out forwards; }
+  /* the now card's LIVE tag sits over its top edge, so the card can't clip: its shine runs through the background */
+  .gel-now.is-reveal{ overflow:visible; }
+  .gel-now.is-reveal::after{ border-radius:inherit; transform:none;
+    background:linear-gradient(100deg, transparent 45%, rgba(243,201,105,.55) 50%, transparent 55%) 100% 0 / 400% 100%; animation:ge-sweep-bg 1.1s .25s ease-out forwards; }
   .is-reveal .gel-mv{ animation:ge-chip .45s .7s cubic-bezier(.2,.9,.3,1.4) both; }
   .ge-k7.is-lit{ animation:ge-k7-lit 1.8s ease-in-out 2; }
   @keyframes ge-flip{ 0%{ transform:perspective(400px) rotateY(90deg) scale(.8); opacity:0; } 100%{ transform:none; opacity:1; } }
   @keyframes ge-sweep{ to{ transform:translateX(100%); } }
+  @keyframes ge-sweep-bg{ to{ background-position:0 0; } }
   @keyframes ge-chip{ 0%{ transform:translateY(-6px) scale(.6); opacity:0; } 100%{ transform:none; opacity:1; } }
   @keyframes ge-k7-lit{ 50%{ box-shadow:0 0 0 3px #FFE29A, 0 0 30px rgba(243,201,105,.75); border-color:#F3C969; } }
   .ge-burst{ position:fixed; inset:0; pointer-events:none; z-index:90; }
@@ -3899,6 +3907,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .ge-btn{ padding:0 10px 0 7px; }
     .ge-btn img{ height:19px; }
     .ge-hero-in{ padding:20px 14px 16px; gap:12px; }
+    .ge-hero.is-slim .ge-hero-in{ padding:10px 14px; }
     .ge-count-num{ font-size:38px; }
   }
   .tlp-btn{
@@ -11163,15 +11172,18 @@ function renderGEPage(){
       <span class="ge-count-unit">${big === 0 ? sub : (en ? `days · ${sub}` : `วัน · ${sub}`)}</span></div>`
     : `<div class="ge-count"><span class="ge-count-label">${en ? 'The results are in' : 'ประกาศผลแล้ว'}</span></div>`;
 
-  const hero = `<div class="ge-hero" style="--ge:${GE_PAGE.red}">
+  // while a round is read out, the results tab puts them first: the hero shrinks to
+  // the logo, or on a phone the LIVE card would start below the bottom of the screen
+  const slim = tab === 'results' && !!geLiveRound();
+  const hero = `<div class="ge-hero${slim ? ' is-slim' : ''}" style="--ge:${GE_PAGE.red}">
     <img class="ge-hero-bg" src="posters/election-2026.jpg" alt="" aria-hidden="true" decoding="async">
     <div class="ge-hero-in">
       <img class="ge-logo" src="${GE_PAGE.logo}" width="960" height="349" alt="BNK48 & CGM48 Senbatsu General Election 2026">
-      <div class="ge-keys">
+      ${slim ? '' : `<div class="ge-keys">
         ${vote ? `<button class="ge-key" data-action="open-event" data-id="${vote.id}"><small>${en ? 'Voting' : 'ช่วงโหวต'}</small>${dm(vote.start)} – ${dm(eventLastDay(vote))}</button>` : ''}
         ${results ? `<button class="ge-key" data-action="open-event" data-id="${results.id}"><small>${en ? 'Final results' : 'ประกาศผล'}</small>${dm(results.start)}</button>` : ''}
       </div>
-      ${countdown}
+      ${countdown}`}
     </div>
   </div>`;
 
@@ -11221,7 +11233,7 @@ function renderGEPage(){
   }
 
   return `<section class="ge-page" style="--ge:${GE_PAGE.red}">${hero}
-    <div class="ge-share-row"><button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></div>
+    ${slim ? '' : `<div class="ge-share-row"><button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></div>`}
     ${liveBanner}${tabs}${body}</section>`;
 }
 
@@ -11308,9 +11320,24 @@ function listenGE(){
       if(state.selectedId || state.selectedEvent || state.posterOf || state.editingId) return;
       // the owner mid-entry keeps their cursor; the page catches up after
       if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
-      if(state.view === 'timeline' || state.view === 'gelive' || state.view === 'feed') renderMain();
+      if(state.view === 'timeline' || state.view === 'gelive' || state.view === 'feed'){ const hold = geHoldScroll(); renderMain(); hold(); }
     }, () => {});
   }catch(e){}
+}
+/* Read out from 36 upward, each new rank lands above where a reader may have
+   scrolled to. Keep the row in view where it is, as Chrome does by itself and
+   Safari on the iPhone does not: there the list would drop a row at every entry. */
+function geHoldScroll(){
+  const sc = document.scrollingElement, line = innerHeight * 0.45;
+  if(!sc || sc.scrollTop < 60) return () => {};
+  const el = [...document.querySelectorAll('#main [data-hold]')].find(x => x.getBoundingClientRect().bottom > line);
+  if(!el) return () => {};
+  const key = el.dataset.hold, top = el.getBoundingClientRect().top;
+  return () => {
+    const now = document.querySelector(`#main [data-hold="${key}"]`);
+    const d = now ? now.getBoundingClientRect().top - top : 0;
+    if(Math.abs(d) > 1) window.scrollBy(0, d);
+  };
 }
 const geRoundLabel = r => isEN() ? r.en : r.th;
 const geSlots = id => ((state.geRounds || {})[id] || {}).slots || {};
@@ -11682,11 +11709,11 @@ function renderGEResults(){
       if(mk.reveal && n <= GE_KAMI7) lit = true;
       const fresh = (geFresh(round.id, n, s) ? ' is-fresh' : '') + geRevealCls(mk);
       const bar = s.v ? `<span class="gel-bar" style="width:${Math.min(100, s.v / top * 100)}%"></span>` : '';
-      if(!m) return `<div class="gel-row is-pending${fresh}"><span class="gel-n">${n}</span><span class="gel-q">?</span>
-        <span class="gel-who"><b>${live ? (en ? 'Announcing…' : 'กำลังประกาศ…') : '—'}</b></span>
+      if(!m) return `<div class="gel-row is-pending${fresh}" data-hold="r${n}"><span class="gel-n">${n}</span><span class="gel-q">?</span>
+        <span class="gel-who"><b>${en ? 'Announcing…' : 'กำลังประกาศ…'}</b></span>
         <span class="gel-v${gapOf(n) ? ' is-gap' : ''}">${gapCell(mk, s, n)}</span>${bar}</div>`;
       const song = bandSongs[n];
-      return `<button class="gel-row${fresh}" data-action="open-member" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
+      return `<button class="gel-row${fresh}" data-action="open-member" data-id="${m.id}" data-hold="r${n}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
         <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small>${song ? `<small class="gel-song">${geSongLine(song, en)}</small>` : ''}</span>
         <span class="gel-v${gapOf(n) ? ' is-gap' : ''}">${gapCell(mk, s, n)}${geMove(prev, m.id, n)}</span>${bar}</button>`;
     };
@@ -11694,7 +11721,7 @@ function renderGEResults(){
     const k7rows = k7.map(rowOf).join('');
     const rows = (k7.length ? geKami7(k7rows, en, lit) : '') + known.filter(n => n > GE_KAMI7).map(rowOf).join('');
     return `<section class="gel-band is-${b.tone}">
-      <div class="gel-band-h">${b.name}<small>${en ? `Ranks ${b.from}–${b.to}` : `อันดับ ${b.from}–${b.to}`}</small></div>
+      <div class="gel-band-h" data-hold="b${b.from}">${b.name}<small>${en ? `Ranks ${b.from}–${b.to}` : `อันดับ ${b.from}–${b.to}`}</small></div>
       ${bandSongs[b.from] ? `<p class="gel-band-song"><span>${en ? `${b.name} song` : `เพลงของ ${b.name}`}</span><b>${geSongLine(bandSongs[b.from], en)}</b></p>` : ''}
       ${waiting.length ? `<div class="gel-seats">${waiting.map(n => `<span>${n}</span>`).join('')}</div>
         ${!known.length ? `<p class="gel-wait">${en ? 'Not announced yet' : 'ยังไม่ประกาศ'}</p>` : ''}` : ''}
@@ -11759,7 +11786,7 @@ function renderGEHistory(en){
   }).join('');
   const s = SEED_SINGLES.find(x => x.id === e.single);
   const where = e.online ? (en ? 'announced online (postponed by COVID-19)' : 'ประกาศผลทางออนไลน์ (เลื่อนจากเดิมเพราะโควิด-19)') : (e.venue ? escapeHtml(e.venue) : '');
-  return `<div class="gel-hist">
+  return `<div class="gel-hist" data-hold="hist">
     <h2 class="section-label">${en ? 'Earlier elections' : 'ผลเลือกตั้งครั้งก่อน'}</h2>
     ${picks}
     <div class="gel-strip gel-hist-head">
@@ -12818,6 +12845,18 @@ function bindGEAdmin(){
   root._bound = true;
   const round = () => state.geAdminRound;
   const markOk = (row) => { if(!row) return; row.classList.remove('is-ok'); void row.offsetWidth; row.classList.add('is-ok'); };
+  // the first entry of an empty round turns LIVE on, as the 36th name turns it off:
+  // the switch is easy to forget at the venue, and without it the page says "not announced yet"
+  const goLive = async () => {
+    const r = round();
+    if((state.geRounds[r] || {}).live || geHasData(r)) return;
+    GE_ROUNDS.forEach(x => { if(x.id !== r && (state.geRounds[x.id] || {}).live) geWrite(x.id, { live:false }); });
+    if(await geWrite(r, { live:true })){
+      const sw = document.querySelector('.gea-switch');
+      if(sw){ sw.classList.add('is-on'); sw.setAttribute('aria-pressed', 'true'); }
+      toast(isEN() ? 'First result in: LIVE switched on' : 'เริ่มกรอกผลแล้ว เปิด LIVE ให้อัตโนมัติ');
+    }
+  };
   const saveVotes = async (inp) => {
     // digits and one decimal point; thousands commas are dropped
     const n = +inp.dataset.rank, [whole, ...frac] = inp.value.replace(/[^\d.]/g, '').split('.');
@@ -12827,6 +12866,7 @@ function bindGEAdmin(){
     const v = Math.round(parseFloat(raw) * 100) / 100;
     inp.value = geVotes(v);
     if(cur.v === v) return true;
+    await goLive();
     if(await geWrite(round(), { v }, n)) markOk(inp.closest('.gea-row'));
     return true;
   };
@@ -12837,6 +12877,7 @@ function bindGEAdmin(){
     inp.value = m.name;
     const other = Object.entries(geSlots(round())).find(([k, s]) => s && s.id === m.id && +k !== n);
     if(other) toast(isEN() ? `${m.name} is also at ${other[0]}` : `${m.name} อยู่ที่อันดับ ${other[0]} ด้วย`);
+    await goLive();
     if(await geWrite(round(), { id:m.id }, n)){
       const row = inp.closest('.gea-row');
       const old = row.querySelector('.gea-face'); if(old) old.remove();
