@@ -14813,9 +14813,11 @@ const SCHED_RE = new RegExp(`^(?:(\\d{1,2}) (${SCHED_MON.map(x => x.replace(/\./
    songs in one frame, session by session with the talk between; a song the
    database knows opens its release, a unit song names who sang it. The owner's
    own setlist card for the day opens full size from the foot. */
+const _slDay = {};   // event id → the day last picked on its setlist
 function renderSetlist(ev){
   const en = isEN(), days = ev.setlist, M = monthsShort();
-  const on = Math.max(0, days.findIndex(d => d.date === toYmd(todayStart())));
+  const picked = _slDay[ev.id];
+  const on = picked != null && days[picked] ? picked : Math.max(0, days.findIndex(d => d.date === toYmd(todayStart())));
   const pill = (d, i) => { const t = parseYmd(d.date);
     return `<button class="sl-day${i === on ? ' is-on' : ''}" data-action="sl-day" data-value="${i}" role="tab" aria-selected="${i === on}">
       ${en ? `Day ${i + 1}` : `วันที่ ${i + 1}`}<small>${t.getDate()} ${M[t.getMonth()]}</small></button>`; };
@@ -21876,10 +21878,14 @@ function initHistory(){
     state.profileMenuOpen = false;
     render();
     restoreScroll((e.state && e.state.scrollY) || 0);
+    const sy = e.state && e.state.sheetY;
+    if(sy){ const put = () => { const m = document.querySelector('.modal-scroll'); if(m) m.scrollTop = sy; }; put(); requestAnimationFrame(put); }
   });
 }
 
 // Call after a state change that lands the user on a different screen.
+const sheetScrollTop = () => { const m = document.querySelector('.modal-scroll'); return m ? m.scrollTop : 0; };
+let _sheetY = 0;
 function pushHistory(){
   if(!_navReady) return;
   const snap = navSnapshot();
@@ -21888,7 +21894,8 @@ function pushHistory(){
     return;
   }
   // Record where this screen was before leaving it, so coming back lands there.
-  if(history.state) history.replaceState({ ...history.state, scrollY:_scrollY }, '');
+  // An open sheet scrolls on its own, so its place is kept too.
+  if(history.state) history.replaceState({ ...history.state, scrollY:_scrollY, sheetY:_sheetY }, '');
 
   // A modal is drawn over the screen rather than replacing it, so the page
   // behind it keeps its position; a new view starts at its own top.
@@ -21993,6 +22000,7 @@ function bindDelegatedEvents(){
     const anchor = e.target.closest('a[href]');
     if(anchor && anchor !== el && el.contains(anchor)) return;
     const action = el.dataset.action;
+    _sheetY = sheetScrollTop();   // where the open sheet stood, before this tap redraws it away
     const id = el.dataset.id;
 
     // Search results stand in for the current screen, so following one to
@@ -22046,7 +22054,8 @@ function bindDelegatedEvents(){
       renderMain(); replaceHistory();
     }
     else if(action==='sl-day'){
-      const box = el.closest('.sl');
+      const box = el.closest('.sl'), ev = state.selectedEvent;
+      if(ev) _slDay[typeof ev === 'string' ? ev : ev.id] = +el.dataset.value;
       box.querySelectorAll('.sl-day').forEach(b => { const on = b === el; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
       box.querySelectorAll('.sl-panel').forEach(p => { p.hidden = p.dataset.day !== el.dataset.value; });
     }
