@@ -69,6 +69,11 @@ the Firebase CLI from the owner's machine.
   and lies flat). Union Mall's roadshow floor is a sketch in metres (`SP_RM`,
   40 units to the metre) pieced together from the owner's photos and clips —
   keep it marked as a sketch (`source`) unless the organiser publishes one.
+- A roadshow's mini concert setlist is `setlist` on the event, a day each
+  (`renderSetlist`, under กำหนดการ): sessions, the MCs between, a song's
+  release to open and a unit song's members. The owner's own setlist card for
+  the day is `setlists/<event>-<day>.jpg`, kept as the original file, with a
+  small `-s.jpg` for the button.
 - An event's `detail` (กำหนดการ) lines that start with a time — "12:00–13:00
   Mini Concert", "15:00 …", "28 ส.ค. 10:00 …" — draw as a timetable that follows
   the clock on the day (`renderSchedule`, `schedTick` in `tickClock`): over,

@@ -1207,7 +1207,6 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .md-kind{ flex:none; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:99px; white-space:nowrap;
     color:var(--k); background:color-mix(in srgb, var(--k) 11%, var(--card)); border:1px solid color-mix(in srgb, var(--k) 30%, transparent); }
   :root[data-theme="dark"] .md-kind{ color:color-mix(in srgb, var(--k) 55%, #fff); }
-  .md-src{ font-size:11.5px; color:var(--ink-soft); margin:7px 2px 0; }
   .md-n{ white-space:nowrap; }
   /* a song's way to YouTube, beside its name */
   .yt-btn{
@@ -2188,6 +2187,56 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .es-bar{ position:absolute; left:0; bottom:0; height:3px; width:0; background:var(--es-live); transition:width .8s ease; }
   @keyframes esPulse{ 50%{ opacity:.35; } }
   @media (prefers-reduced-motion:reduce){ .es-row.is-now .es-st::before{ animation:none; } }
+  /* a mini concert's setlist: a pill a day, then the songs in the timetable's frame,
+     session by session with the talk between, in the poster's colour */
+  .sl-days{ display:flex; gap:8px; margin:9px 0 0; }
+  .sl-day{ flex:1; display:flex; flex-direction:column; align-items:center; gap:1px; padding:8px 10px; border-radius:14px; cursor:pointer;
+    font:inherit; font-size:14px; font-weight:800; color:var(--ink); background:var(--card); border:1px solid var(--line);
+    box-shadow:0 3px 0 rgba(var(--shadow-rgb),.08); transition:transform .12s, box-shadow .12s; }
+  .sl-day small{ font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+  .sl-day.is-on{ background:var(--c); border-color:var(--c); color:#fff; box-shadow:0 3px 0 color-mix(in srgb, var(--c) 55%, #000); }
+  .sl-day.is-on small{ color:rgba(255,255,255,.85); }
+  .sl-day:active{ transform:translateY(2px); box-shadow:none; }
+  .sl-box{ display:flex; flex-direction:column; gap:1px; margin:9px 0 0; background:var(--line);
+    border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .sl-sess{ display:contents; }
+  .sl-head{ margin:0; padding:7px 13px 6px; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    color:color-mix(in srgb, var(--c) 78%, var(--ink)); background:color-mix(in srgb, var(--c) 10%, var(--card)); }
+  .sl-row{ display:flex; align-items:center; gap:12px; width:100%; padding:10px 13px; border:0; background:var(--card);
+    text-align:left; font:inherit; color:var(--ink); }
+  button.sl-row{ cursor:pointer; }
+  button.sl-row:active{ background:color-mix(in srgb, var(--c) 9%, var(--card)); }
+  .sl-no{ flex:none; min-width:42px; padding:3px 0; border-radius:8px; text-align:center; font-size:12px; font-weight:800;
+    font-variant-numeric:tabular-nums; color:color-mix(in srgb, var(--c) 78%, var(--ink));
+    background:color-mix(in srgb, var(--c) 10%, var(--card)); border:1px solid color-mix(in srgb, var(--c) 28%, transparent); }
+  .sl-song{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+  .sl-song b{ font-size:15px; font-weight:700; line-height:1.35; }
+  .sl-song small{ font-size:12px; color:var(--ink-soft); }
+  .sl-row.is-overture .sl-song b{ font-weight:600; font-style:italic; color:var(--ink-soft); }
+  .sl-by{ display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
+  .sl-who{ display:inline-flex; align-items:center; gap:5px; padding:2px 9px 2px 2px; border-radius:99px; font-size:12px; font-weight:700;
+    background:var(--paper-dim); border:1px solid var(--line); }
+  .sl-face{ width:22px !important; height:22px !important; border-radius:50% !important; font-size:9px; }
+  .sl-go{ flex:none; font-size:20px; font-weight:700; color:var(--ink-soft); }
+  a.sl-row{ text-decoration:none; }
+  a.sl-row:active{ background:color-mix(in srgb, var(--c) 9%, var(--card)); }
+  .sl-yt{ flex:none; display:block; } .sl-yt svg{ width:24px; height:24px; display:block; }
+  .sl-link{ font:inherit; font-weight:700; color:inherit; background:none; border:0; padding:0; cursor:pointer;
+    text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px;
+    text-decoration-color:color-mix(in srgb, var(--c) 45%, transparent); }
+  .sl-song b i{ font-style:normal; font-weight:600; color:var(--ink-soft); margin:0 7px; }
+  .sl-note{ margin:7px 2px 0; font-size:11.5px; color:var(--ink-soft); }
+  .sl-mc{ margin:0; display:flex; align-items:center; gap:10px; padding:6px 13px; font-size:11.5px; font-weight:700; letter-spacing:.05em;
+    color:var(--ink-soft); background:var(--paper-dim); }
+  .sl-mc::before, .sl-mc::after{ content:''; flex:1; border-top:1px dashed color-mix(in srgb, var(--ink-soft) 45%, transparent); }
+  .sl-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px; }
+  .sl-count{ font-size:12.5px; color:var(--ink-soft); }
+  .sl-img{ display:inline-flex; align-items:center; gap:9px; padding:4px 13px 4px 4px; border-radius:12px; cursor:pointer;
+    font:inherit; font-size:13px; font-weight:700; color:var(--ink); background:var(--card); border:1px solid var(--line);
+    box-shadow:0 3px 0 rgba(var(--shadow-rgb),.08); transition:transform .12s, box-shadow .12s; }
+  .sl-img img{ width:32px; height:40px; object-fit:cover; border-radius:7px; display:block; }
+  .sl-img:active{ transform:translateY(2px); box-shadow:none; }
+  :root[data-theme="dark"] :is(.sl-no, .sl-head){ color:color-mix(in srgb, var(--c) 40%, #fff); }
 
   .today-hero{
     position:relative; overflow:hidden; margin:0 0 14px;
@@ -6012,6 +6061,39 @@ const SEED_SCHEDULE = [
       '14:00–15:00 Group Hi-Touch',
       '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
       '17:00–18:00 Group Hi-Touch'],
+    /* The mini concert, song by song, from the owner's setlist cards (opened
+       full size from setlists/). A part is a session (`s`, `unit` for the unit
+       songs) or the talk between (`mc`, with `game` or `end`); a song's `song`
+       is the release it opens, `yt` a video instead, `both` two songs sung as
+       one, verse by verse, and `by` the members of a unit song — every other
+       song is the whole line-up of the day. */
+    setlist:[
+      { date:'2026-10-10', img:'setlists/kimi-roadshow-union-1.jpg', parts:[
+        { s:1, songs:[{ no:'M00', title:'Overture', alt:'BNK48 × CGM48 ver.', yt:'ifai7vki9LM' },
+          { no:'M01', title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', song:'bnk-sp-kimitodoko' },
+          { no:'M02', title:'BNK48 + CGM48', both:[{ title:'BNK48', song:'bnk-s2' }, { title:'CGM48', song:'cgm-s1' }] }] },
+        { mc:1 },
+        { s:2, songs:[{ no:'M03', title:'Hisashiburi no Lip Gloss', alt:'Lip Gloss ที่คิดถึง', song:'cgm-a2' },
+          { no:'M04', title:'Reborn', song:'bnk-a2' }] },
+        { mc:2 },
+        { s:3, unit:true, songs:[{ no:'M05', title:'Temodemo no Namida', alt:'ถึงแม้จะมีน้ำตา', song:'bnk-s5', by:['cgm-prae', 'bnk-praew'] }] },
+        { mc:3, game:true },
+        { s:4, songs:[{ no:'M06', title:'Aitakatta', alt:'อยากจะได้พบเธอ', song:'bnk-s1' },
+          { no:'M07', title:'Kibouteki Refrain', alt:'แค่นี้ก็พอใจแล้ว', song:'bnk-s15' }] },
+        { mc:4, end:true }] },
+      { date:'2026-10-11', img:'setlists/kimi-roadshow-union-2.jpg', parts:[
+        { s:1, songs:[{ no:'M00', title:'Overture', alt:'BNK48 × CGM48 ver.', yt:'ifai7vki9LM' },
+          { no:'M01', title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', song:'bnk-sp-kimitodoko' },
+          { no:'M02', title:'Sansei Kawaii!', alt:'เธออะ Kawaii!', song:'cgm-s6' }] },
+        { mc:1 },
+        { s:2, songs:[{ no:'M03', title:'Baby! Baby! Baby!', song:'cgm-s10' },
+          { no:'M04', title:'BINGO!', song:'cgm-s11' }] },
+        { mc:2 },
+        { s:3, unit:true, songs:[{ no:'M05', title:'Candy', song:'bnk-sp-mimigumo', by:['bnk-hoop', 'cgm-lingling', 'cgm-chifa'] },
+          { no:'M06', title:'Yume de Kiss me!', song:'bnk-sp-yumedekissme', by:['bnk-pancake'] }] },
+        { mc:3, game:true },
+        { s:4, songs:[{ no:'M07', title:'Kibou Ressha', alt:'รถไฟแห่งความหวัง', song:'cgm-s11' }] },
+        { mc:4, end:true }] }],
     info:[
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
       'Zone 1 โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ',
@@ -6260,6 +6342,10 @@ const SEED_SENBATSU = {
   ],
   'bnk-s2': [
     { track:'Koisuru Fortune Cookie – คุกกี้เสี่ยงทาย', centers:['bnk-mobile'],
+      members:['bnk-cherprang', 'cgm-izurina', 'bnk-jan', 'bnk-jennis', 'bnk-kaew', 
+        'bnk-kaimook', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 
+        'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+    { track:'BNK48', centers:['bnk-cherprang'],
       members:['bnk-cherprang', 'cgm-izurina', 'bnk-jan', 'bnk-jennis', 'bnk-kaew', 
         'bnk-kaimook', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-noey', 
         'bnk-orn', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
@@ -6738,6 +6824,17 @@ const SEED_SENBATSU = {
    release sung by both groups lists both in `groups`; `groupId` is the first,
    for colour. */
 const SEED_SPECIALS = [
+  { id:'bnk-sp-mimigumo', groupId:'bnk48', groups:['bnk48'], kind:'special',
+    title:'Mimigumo', alt:'', date:'2019-10-10', year:2019,
+    note:'ซิงเกิลแรกของยูนิต Mimigumo',
+    tracks:[
+      { track:'Candy', centers:['bnk-kaimook'],
+        members:['bnk-jaa', 'bnk-kaimook', 'bnk-music'] },
+      { track:'Myujikkii', centers:[],
+        members:['bnk-music'] },
+      { track:'Heart Gata Virus – หัวใจไวรัส', centers:['bnk-jaa'],
+        members:['bnk-jaa', 'bnk-kaimook', 'bnk-music'] },
+    ] },
   { id:'bnk-sp-touchbyheart', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
     title:'Touch By Heart', alt:'หัวใจใกล้กัน', date:'2020-04-02', year:2020,
     note:'ออกเพื่อให้กำลังใจช่วงโควิด-19 อัดไว้หลายเวอร์ชันหลายภาษา',
@@ -7360,6 +7457,7 @@ const EN = {
   'เดือนก่อนหน้า': 'Previous month',
   'เดือนถัดไป': 'Next month',
   'กำหนดการ': 'Schedule',
+  'เซ็ตลิสต์': 'Setlist',
   'รายละเอียด': 'Details',
   'ปิด': 'Close',
   'คัดลอกลิงก์': 'Copy link',
@@ -7733,6 +7831,7 @@ const EN = {
   'ซิงเกิลพิเศษรุ่น 3 — ทุกคนเป็นเซ็นเตอร์': 'Generation 3 special single — everyone is centre',
   'เพลงเดี่ยวของแจนรี่': "Janry's solo song",
   'ซิงเกิลเดี่ยวของแพนเค้ก': "Pancake's solo single",
+  'ซิงเกิลแรกของยูนิต Mimigumo': "Mimigumo's first single",
   'โครงการพิเศษไทย-ญี่ปุ่น ร่วมกับ Tatsuya Ishii และลำไย ไหทองคำ': 'A Thai-Japanese project with Tatsuya Ishii and Lamyai Haithongkham',
   'โครงการพิเศษไทย-ญี่ปุ่น ร่วมกับ Tatsuya Ishii': 'A Thai-Japanese project with Tatsuya Ishii',
 
@@ -9145,8 +9244,7 @@ function renderMemberMedia(m){
   const kinds = Object.keys(MEDIA_KIND).filter(k => n[k]).map(k => `<span class="md-n">${MEDIA_KIND[k][en ? 1 : 0]} ${n[k]}</span>`).join(' · ');
   return `<h3 class="section-label">${en ? 'Other work' : 'ผลงานอื่น'}</h3>
     <p class="works-count" data-noloc>${en ? `${list.length} ${list.length === 1 ? 'work' : 'works'}` : `${list.length} ผลงาน`} · ${kinds}</p>
-    <div class="work-list">${list.map(row).join('')}</div>
-    <p class="md-src">${en ? 'From the AKB48 Wiki and T-pop Wiki' : 'ข้อมูลจาก AKB48 Wiki และ T-pop Wiki'}</p>`;
+    <div class="work-list">${list.map(row).join('')}</div>`;
 }
 
 /* The page is locked against zooming, which is what stops the app sliding
@@ -9487,6 +9585,17 @@ function closePoster(){ goBack(()=>{ state.posterOf = null; }); }
    here, so the sheet is not made to carry it just in case someone taps. */
 function renderPosterViewer(){
   if(String(state.posterOf).startsWith('ge:')) return renderGEPosterViewer(state.posterOf.slice(3));
+  if(String(state.posterOf).startsWith('sl:')){
+    const [, eid, i] = state.posterOf.split(':'), ev = SEED_SCHEDULE.find(e => e.id === eid), d = ev && ev.setlist && ev.setlist[+i];
+    if(!d) return '';
+    return `
+  <div class="poster-viewer">
+    <button class="poster-close" data-action="close-poster" title="ปิด" aria-label="ปิด">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <img class="poster-full" src="${escapeAttr(d.img)}" alt="เซ็ตลิสต์ ${escapeAttr(ev.title)} วันที่ ${+i + 1}" decoding="async">
+  </div>`;
+  }
   const ev = SEED_SCHEDULE.find(e => e.id === state.posterOf);
   if(!ev || !ev.poster || !ev.poster.img) return '';
   // One file for both: the poster as it was published, at its own size.
@@ -14700,6 +14809,49 @@ function paintSheetGrads(root){
    hour. tickClock repaints them every 20 seconds without a redraw. */
 const SCHED_MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const SCHED_RE = new RegExp(`^(?:(\\d{1,2}) (${SCHED_MON.map(x => x.replace(/\./g, '\\.')).join('|')}) )?(\\d{1,2}):(\\d{2})(?:\\s*[–-]\\s*(\\d{1,2}):(\\d{2}))?\\s+(.+)$`);
+/* A mini concert's setlist: a pill per day (today's open on the day), then the
+   songs in one frame, session by session with the talk between; a song the
+   database knows opens its release, a unit song names who sang it. The owner's
+   own setlist card for the day opens full size from the foot. */
+function renderSetlist(ev){
+  const en = isEN(), days = ev.setlist, M = monthsShort();
+  const on = Math.max(0, days.findIndex(d => d.date === toYmd(todayStart())));
+  const pill = (d, i) => { const t = parseYmd(d.date);
+    return `<button class="sl-day${i === on ? ' is-on' : ''}" data-action="sl-day" data-value="${i}" role="tab" aria-selected="${i === on}">
+      ${en ? `Day ${i + 1}` : `วันที่ ${i + 1}`}<small>${t.getDate()} ${M[t.getMonth()]}</small></button>`; };
+  const who = id => { const m = getMember(id); if(!m) return '';
+    return `<span class="sl-who">${renderAvatar(m, 'avatar-sm sl-face', getGroup(m.groupId).color)}${escapeHtml(nickName(m))}</span>`; };
+  const row = x => {
+    const name = x.both ? x.both.map(b => `<button class="sl-link" data-action="open-single" data-id="${b.song}">${escapeHtml(b.title)}</button>`).join('<i>+</i>')
+      : escapeHtml(x.title);
+    const sub = x.alt;
+    const end = x.yt ? `<span class="sl-yt" aria-hidden="true">${YT_ICON}</span>` : x.song ? '<span class="sl-go" aria-hidden="true">›</span>' : '';
+    const inner = `<span class="sl-no">${x.no}</span><span class="sl-song" data-noloc><b>${name}</b>${sub ? `<small>${escapeHtml(sub)}</small>` : ''}
+      ${x.by ? `<span class="sl-by">${x.by.map(who).join('')}</span>` : ''}</span>${end}`;
+    const cls = `sl-row${x.no === 'M00' ? ' is-overture' : ''}`;
+    return x.yt ? `<a class="${cls}" href="https://youtu.be/${x.yt}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+      : x.song ? `<button class="${cls}" data-action="open-single" data-id="${x.song}">${inner}</button>`
+      : `<div class="${cls}">${inner}</div>`;
+  };
+  const part = p => p.mc
+    ? `<p class="sl-mc">MC${p.mc}${p.game ? (en ? ' · Game' : ' · เกม') : p.end ? (en ? ' · End' : ' · ปิดท้าย') : ''}</p>`
+    : `<div class="sl-sess"><p class="sl-head">${en ? `Session ${p.s}` : `ช่วงที่ ${p.s}`}${p.unit ? (en ? ' · Units' : ' · ยูนิต') : ''}</p>${p.songs.map(row).join('')}</div>`;
+  const panel = (d, i) => {
+    const n = d.parts.reduce((k, p) => k + (p.songs || []).filter(x => x.no !== 'M00').length, 0);
+    return `<div class="sl-panel" data-day="${i}"${i === on ? '' : ' hidden'} role="tabpanel">
+      <div class="sl-box">${d.parts.map(part).join('')}</div>
+      <p class="sl-note">${en ? 'A song with no names is sung by the whole line-up' : 'เพลงที่ไม่ระบุชื่อ ขึ้นแสดงทุกคน'}</p>
+      <div class="sl-foot"><span class="sl-count">${en ? `${n} songs` : `${n} เพลง`}</span>
+        ${d.img ? `<button class="sl-img" data-action="open-poster" data-id="sl:${ev.id}:${i}"><img src="${escapeAttr(d.img.replace(/\.jpg$/, '-s.jpg'))}" alt="" loading="lazy" decoding="async">${en ? 'Setlist card' : 'ภาพเซ็ตลิสต์'}</button>` : ''}</div>
+    </div>`;
+  };
+  return `<h3 class="evm-head">เซ็ตลิสต์</h3>
+    <div class="sl" style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}">
+      ${days.length > 1 ? `<div class="sl-days" role="tablist">${days.map(pill).join('')}</div>` : ''}
+      ${days.map(panel).join('')}
+    </div>`;
+}
+
 function renderSchedule(ev){
   const en = isEN(), iso = toYmd(todayStart()), year = +ev.start.slice(0, 4);
   const live = !ev.cancelled && !ev.postponed && ev.start <= iso && eventLastDay(ev) >= iso;
@@ -14817,6 +14969,8 @@ function renderEventModal(){
         ${ev.detail ? `
         <h3 class="evm-head">กำหนดการ</h3>
         ${renderSchedule(ev)}` : ''}
+
+        ${ev.setlist ? renderSetlist(ev) : ''}
 
         ${ev.info ? `
         <h3 class="evm-head">รายละเอียด</h3>
@@ -18168,6 +18322,7 @@ const SEED_YOUTUBE = {
   'cgm-sp-daimairemix#0':['uqdjTzZw4Mc','video'],
   'bnk-sp-ramwong#0':['-dR3WbLrVPQ','video'],
   'bnk-sp-yumedekissme#0':['m3-axIKzbJE','mv'],
+  'bnk-sp-mimigumo#0':['wSpSQxReHw8','mv'],
 };
 const YT_KIND = { mv:['MV','MV'], live:['ดูการแสดง','Performance'], lyric:['Lyric Video','Lyric video'], video:['วิดีโอ','Video'] };
 const YT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FF0000" d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8C22 15.2 22 12 22 12s0-3.2-.4-4.8z"/><path fill="#fff" d="M10 15.5v-7l6 3.5z"/></svg>';
@@ -21889,6 +22044,11 @@ function bindDelegatedEvents(){
     else if(action==='ge-poster-profile'){
       state.posterOf = null; state.selectedId = id; state.editingId = null; state.selectedEvent = null; state.dayOf = null;
       renderMain(); replaceHistory();
+    }
+    else if(action==='sl-day'){
+      const box = el.closest('.sl');
+      box.querySelectorAll('.sl-day').forEach(b => { const on = b === el; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
+      box.querySelectorAll('.sl-panel').forEach(p => { p.hidden = p.dataset.day !== el.dataset.value; });
     }
     else if(action==='seat-zone'){ pickSeatZone(el); }
     else if(action==='seat-view'){ setSeatView(el); }
