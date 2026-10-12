@@ -7221,7 +7221,7 @@ const SEED_MEDIA = [
   { kind:'series', title:'Bussaba Lui Fai', alt:'บุษบาลุยไฟ', year:2023, by:'Thai PBS', members:['bnk-cherprang'], roles:{ 'bnk-cherprang':'Lamjuan' } },
   { kind:'series', title:'Club Friday the Series: Moments & Memories', year:2023, by:'One 31', members:['bnk-cherprang'] },
   { kind:'series', title:'Escape to Homestay', alt:'เพื่อนผมมีมรดกเป็นโฮมสเตย์ครับ', year:2023, members:['bnk-fond'] },
-  { kind:'series', title:'Shock Me Girls', alt:'รักช็อตใจ ยัยช็อตฟีล', year:2026, by:'TikTok', own:true, members:['bnk-janry', 'bnk-marine', 'bnk-monet', 'bnk-praew'], roles:{ 'bnk-janry':'Tawan', 'bnk-marine':'Sia', 'bnk-monet':'Georgie', 'bnk-praew':'Mintra' } },
+  { kind:'series', title:'Shock Me Girls', alt:'รักช็อตใจ ยัยช็อตฟีล', year:2026, by:'TikTok', own:true, members:['bnk-monet', 'bnk-praew', 'bnk-grape', 'bnk-marine', 'bnk-janry', 'bnk-niya', 'bnk-wawa', 'bnk-patt', 'bnk-mint', 'bnk-cartoon', 'bnk-mirin', 'bnk-khowjow', 'bnk-luksorn', 'bnk-galeya', 'bnk-blythe', 'bnk-inkcha', 'bnk-mail', 'bnk-micha', 'bnk-sindy', 'bnk-emmy', 'cgm-ploen', 'cgm-nisha', 'bnk-rose'], roles:{ 'bnk-monet':'Georgie', 'bnk-praew':'Mintra', 'bnk-grape':'Saimai', 'bnk-marine':'Sia', 'bnk-janry':'Tawan', 'bnk-niya':'Oil', 'bnk-wawa':'Gungun', 'bnk-patt':'Jubia', 'bnk-mint':'Lunla', 'bnk-cartoon':'Micha', 'bnk-mirin':'Ninja', 'bnk-khowjow':'Anna', 'bnk-luksorn':'Kae', 'bnk-galeya':'Future', 'bnk-blythe':'Bungorn', 'bnk-inkcha':'Jubjang', 'bnk-mail':'Bonus', 'bnk-micha':'Mei', 'bnk-sindy':'Mona', 'bnk-emmy':'Mew', 'cgm-ploen':'Kiwi', 'cgm-nisha':'Keawlin', 'bnk-rose':'Ally' } },
   { kind:'series', title:'CGM48 Dorm', alt:'CGM48 Dorm มหาสนุก', year:2021, by:'YouTube CGM48', note:'sitcom', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
   { kind:'show', title:'BNK48 Senpai', year:2017, by:'Channel 3', note:'doc', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
   { kind:'show', title:'BNK48 Show', year:2017, by:'Channel 3', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
@@ -15579,7 +15579,7 @@ function renderFeed(){
 
   // Things on sale have a shop of their own; the feed is for what happens.
   const events = SEED_SCHEDULE.filter(e => !e.shop && (!mine || hasMyOshi(e)))
-    .slice().sort((a,b) => a.start.localeCompare(b.start));
+    .slice().sort((a,b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'));
   const running = events.filter(e => !e.cancelled && e.start <= iso && eventLastDay(e) >= iso);
   const nowOn = running.filter(e => !e.period && !doneForToday(e, iso));
   const overToday = running.filter(e => !e.period && doneForToday(e, iso));
@@ -16096,7 +16096,7 @@ function renderFlashComposer(){
   const now = new Date(), day = toYmd(now), hm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   const iso = toYmd(todayStart());
   const soon = SEED_SCHEDULE.filter(e => !e.shop && eventLastDay(e) >= iso)
-    .sort((a, b) => a.start.localeCompare(b.start)).slice(0, 14);
+    .sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99')).slice(0, 14);
   return `<div class="pd-head"><h3 class="section-label">ประกาศบนป้ายไฟ</h3>
       <span class="muted-note">ขึ้นบนป้ายไฟ LED ทุกเครื่องทันที</span></div>
     <div class="flash-box">
@@ -18124,7 +18124,7 @@ function renderMemberEvents(m){
   });
   if(!evs.length) return '';
   const today = evs.filter(e => !e.cancelled && e.start <= iso && eventLastDay(e) >= iso);
-  const upcoming = evs.filter(e => e.start > iso || (e.cancelled && eventLastDay(e) >= iso)).sort((a,b) => a.start.localeCompare(b.start));
+  const upcoming = evs.filter(e => e.start > iso || (e.cancelled && eventLastDay(e) >= iso)).sort((a,b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'));
   // Only the most recent outing is worth keeping on a member's card, and only
   // while it is still recent; after a month it has nothing left to say.
   const PAST_DAYS = 30;
@@ -21062,7 +21062,7 @@ async function drawTodayCard(g, url){
 
   const todays = SEED_SCHEDULE.filter(e => !e.period && !e.shop && !e.cancelled && e.start <= iso && eventLastDay(e) >= iso)
     .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
-  const upcoming = SEED_SCHEDULE.filter(e => !e.period && !e.shop && e.start > iso).sort((a, b) => a.start.localeCompare(b.start));
+  const upcoming = SEED_SCHEDULE.filter(e => !e.period && !e.shop && e.start > iso).sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'));
   const list = todays.length ? todays : upcoming;
   const heading = todays.length ? (en ? `${todays.length} on today` : `งานวันนี้ ${todays.length} งาน`) : (en ? 'Nothing today — coming up' : 'วันนี้ไม่มีงาน · งานถัดไป');
   shareText(g, heading, P, 282, '800 32px "Noto Sans Thai", sans-serif', '#fff');
