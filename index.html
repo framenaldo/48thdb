@@ -2221,6 +2221,28 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .es-bar{ position:absolute; left:0; bottom:0; height:3px; width:0; background:var(--es-live); transition:width .8s ease; }
   @keyframes esPulse{ 50%{ opacity:.35; } }
   @media (prefers-reduced-motion:reduce){ .es-row.is-now .es-st::before{ animation:none; } }
+  /* the Mini Concert row folds its setlist under it: the whole row is the button,
+     its pill says so and turns over when open */
+  button.es-row{ width:100%; border:0; margin:0; font:inherit; text-align:left; color:inherit; cursor:pointer;
+    -webkit-tap-highlight-color:transparent; }
+  .es-row.has-sl{ grid-template-columns:auto minmax(0, 1fr) auto; }
+  .es-row.has-sl > .es-st{ grid-column:2 / -1; }   /* the clock's line runs under the pill too */
+  .es-row.has-sl.is-done > .es-st{ opacity:.45; }
+  .es-row.has-sl:active{ background:color-mix(in srgb, var(--c) 9%, var(--card)); }
+  .es-sl-pill{ display:inline-flex; align-items:center; gap:3px; padding:4px 8px 4px 11px; border-radius:99px; white-space:nowrap;
+    font-size:12.5px; font-weight:800; color:color-mix(in srgb, var(--c) 78%, var(--ink));
+    background:color-mix(in srgb, var(--c) 10%, var(--card)); border:1px solid color-mix(in srgb, var(--c) 30%, transparent);
+    box-shadow:0 2px 0 color-mix(in srgb, var(--c) 22%, transparent); transition:transform .12s, box-shadow .12s, background-color .2s, color .2s; }
+  .es-sl-pill svg{ width:15px; height:15px; display:block; transition:transform .26s cubic-bezier(.34,1.3,.64,1); }
+  .es-row.has-sl:active .es-sl-pill{ transform:translateY(2px); box-shadow:none; }
+  .es-row.has-sl[aria-expanded="true"] .es-sl-pill{ background:var(--c); border-color:var(--c); color:#fff;
+    box-shadow:0 2px 0 color-mix(in srgb, var(--c) 55%, #000); }
+  .es-row.has-sl[aria-expanded="true"] .es-sl-pill svg{ transform:rotate(180deg); }
+  .es-sl{ padding:2px 10px 12px; background:color-mix(in srgb, var(--c) 6%, var(--card)); }
+  .es-sl[hidden]{ display:none; }
+  .es-sl.is-in{ animation:esSlIn .24s var(--ease-out); }
+  @keyframes esSlIn{ from{ opacity:0; transform:translateY(-6px); } }
+  @media (prefers-reduced-motion:reduce){ .es-sl.is-in{ animation:none; } .es-sl-pill svg{ transition:none; } }
   /* a mini concert's setlist: a pill a day, then the songs in the timetable's frame,
      session by session with the talk between, in the poster's colour */
   .sl-days{ display:flex; gap:8px; margin:9px 0 0; }
@@ -2270,7 +2292,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     box-shadow:0 3px 0 rgba(var(--shadow-rgb),.08); transition:transform .12s, box-shadow .12s; }
   .sl-img img{ width:32px; height:40px; object-fit:cover; border-radius:7px; display:block; }
   .sl-img:active{ transform:translateY(2px); box-shadow:none; }
-  :root[data-theme="dark"] :is(.sl-no, .sl-head){ color:color-mix(in srgb, var(--c) 40%, #fff); }
+  :root[data-theme="dark"] :is(.sl-no, .sl-head, .es-sl-pill){ color:color-mix(in srgb, var(--c) 40%, #fff); }
+  :root[data-theme="dark"] .es-row.has-sl[aria-expanded="true"] .es-sl-pill{ color:#fff; }
 
   .today-hero{
     position:relative; overflow:hidden; margin:0 0 14px;
@@ -14993,9 +15016,14 @@ const SCHED_RE = new RegExp(`^(?:(\\d{1,2}) (${SCHED_MON.map(x => x.replace(/\./
 /* A mini concert's setlist: a pill per day (today's open on the day), then the
    songs in one frame, session by session with the talk between; a song the
    database knows opens its release, a unit song names who sang it. The owner's
-   own setlist card for the day opens full size from the foot. */
+   own setlist card for the day opens full size from the foot. It folds under
+   the timetable's Mini Concert row (`slAnchor`, opened from the row's pill);
+   an event with no such row keeps it as a section of its own, `head`. */
 const _slDay = {};   // event id → the day last picked on its setlist
-function renderSetlist(ev){
+const _slOpen = {};  // event id → its setlist is unfolded under the timetable
+const SL_AT_RE = /mini\s*concert|มินิคอนเสิร์ต/i;
+const slAnchor = ev => ev.setlist && ev.detail ? ev.detail.findIndex(l => SL_AT_RE.test(l) && SCHED_RE.test(l)) : -1;
+function renderSetlist(ev, head){
   const en = isEN(), days = ev.setlist, M = monthsShort();
   const picked = _slDay[ev.id];
   const on = picked != null && days[picked] ? picked : Math.max(0, days.findIndex(d => d.date === toYmd(todayStart())));
@@ -15028,7 +15056,7 @@ function renderSetlist(ev){
         ${d.img ? `<button class="sl-img" data-action="open-poster" data-id="sl:${ev.id}:${i}"><img src="${escapeAttr(d.img.replace(/\.jpg$/, '-s.jpg'))}" alt="" loading="lazy" decoding="async">${en ? 'Setlist card' : 'ภาพเซ็ตลิสต์'}</button>` : ''}</div>
     </div>`;
   };
-  return `<h3 class="evm-head">เซ็ตลิสต์</h3>
+  return `${head ? '<h3 class="evm-head">เซ็ตลิสต์</h3>' : ''}
     <div class="sl" style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}">
       ${days.length > 1 ? `<div class="sl-days" role="tablist">${days.map(pill).join('')}</div>` : ''}
       ${days.map(panel).join('')}
@@ -15039,12 +15067,13 @@ function renderSchedule(ev){
   const en = isEN(), iso = toYmd(todayStart()), year = +ev.start.slice(0, 4);
   const live = !ev.cancelled && !ev.postponed && ev.start <= iso && eventLastDay(ev) >= iso;
   const at = hm => { const t = parseYmd(iso), [h, mi] = hm.split(':').map(Number); t.setHours(h, mi, 0, 0); return t.getTime(); };
-  const items = ev.detail.map(raw => {
+  const slAt = slAnchor(ev);
+  const items = ev.detail.map((raw, i) => {
     const line = en ? (toEn(raw) ?? enFragments(raw) ?? raw) : raw, m = line.match(SCHED_RE);
     if(!m) return { note: line };
     const [, d, mon, h1, m1, h2, m2, what] = m;
     const day = d ? toYmd(new Date(year, SCHED_MON.indexOf(mon) % 12, +d)) : null;
-    return { day, dayLabel: d ? `${d} ${mon}` : '', a: `${h1.padStart(2, '0')}:${m1}`, b: h2 ? `${h2.padStart(2, '0')}:${m2}` : '', what };
+    return { day, dayLabel: d ? `${d} ${mon}` : '', a: `${h1.padStart(2, '0')}:${m1}`, b: h2 ? `${h2.padStart(2, '0')}:${m2}` : '', what, sl: i === slAt };
   });
   // today's rows get their start and end in milliseconds
   const today = items.filter(r => !r.note && live && (!r.day || r.day === iso));
@@ -15060,10 +15089,15 @@ function renderSchedule(ev){
     if(r.note){ flushBox(); notes += `<li>${escapeHtml(r.note)}</li>`; continue; }
     flushNotes();
     const gone = !r.from && r.day && r.day < iso;   // a dated row whose day has passed
-    box += `<div class="es-row${gone ? ' is-done' : ''}"${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}>
+    const open = r.sl && !!_slOpen[ev.id], tag = r.sl ? 'button' : 'div', st = gone ? (en ? 'Over' : 'จบแล้ว') : '';
+    box += `<${tag} class="es-row${gone ? ' is-done' : ''}${r.sl ? ' has-sl' : ''}"${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}${r.sl
+        ? ` data-action="sl-open" data-id="${ev.id}" aria-expanded="${open}" aria-controls="sl-${ev.id}"` : ''}>
       <span class="es-time">${r.a}${r.b ? `–${r.b}` : ''}${r.dayLabel ? `<small>${escapeHtml(r.dayLabel)}</small>` : ''}</span>
-      <span class="es-what">${escapeHtml(r.what)}<span class="es-st">${gone ? (en ? 'Over' : 'จบแล้ว') : ''}</span></span>
-      <span class="es-bar"></span></div>`;
+      ${r.sl ? `<span class="es-what">${escapeHtml(r.what)}</span>
+      <span class="es-sl-pill">${en ? 'Setlist' : 'เซ็ตลิสต์'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+      <span class="es-st">${st}</span>` : `<span class="es-what">${escapeHtml(r.what)}<span class="es-st">${st}</span></span>`}
+      <span class="es-bar"></span></${tag}>`;
+    if(r.sl) box += `<div class="es-sl" id="sl-${ev.id}"${open ? '' : ' hidden'}>${renderSetlist(ev)}</div>`;
   }
   flushBox(); flushNotes();
   return `<div class="es" data-noloc>${out}</div>`;
@@ -15153,7 +15187,7 @@ function renderEventModal(){
         <h3 class="evm-head">กำหนดการ</h3>
         ${renderSchedule(ev)}` : ''}
 
-        ${ev.setlist ? renderSetlist(ev) : ''}
+        ${ev.setlist && slAnchor(ev) < 0 ? renderSetlist(ev, true) : ''}
 
         ${ev.info ? `
         <h3 class="evm-head">รายละเอียด</h3>
@@ -22298,6 +22332,11 @@ function bindDelegatedEvents(){
     else if(action==='ge-poster-profile'){
       state.posterOf = null; state.selectedId = id; state.editingId = null; state.selectedEvent = null; state.dayOf = null;
       renderMain(); replaceHistory();
+    }
+    else if(action==='sl-open'){
+      const panel = el.nextElementSibling, open = el.getAttribute('aria-expanded') !== 'true';
+      _slOpen[id] = open; el.setAttribute('aria-expanded', open);
+      if(panel && panel.classList.contains('es-sl')){ panel.hidden = !open; panel.classList.toggle('is-in', open); }
     }
     else if(action==='sl-day'){
       const box = el.closest('.sl'), ev = state.selectedEvent;

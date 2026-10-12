@@ -78,8 +78,10 @@ the Firebase CLI from the owner's machine.
   in the group. `own` marks the group's own productions; `whole` a whole-group
   work with no names on record (ads, channel shows).
 - A roadshow's mini concert setlist is `setlist` on the event, a day each
-  (`renderSetlist`, under กำหนดการ): sessions, the MCs between, a song's
-  release to open and a unit song's members. The owner's own setlist card for
+  (`renderSetlist`): sessions, the MCs between, a song's release to open and a
+  unit song's members. It folds under the "Mini Concert" row of กำหนดการ
+  (`slAnchor`) — the row's เซ็ตลิสต์ pill opens it; an event with no such row
+  shows it as its own section. The owner's own setlist card for
   the day is `setlists/<event>-<day>.jpg`, kept as the original file, with a
   small `-s.jpg` for the button.
 - An event's `detail` (กำหนดการ) lines that start with a time — "12:00–13:00
