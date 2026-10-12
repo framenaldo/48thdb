@@ -18632,7 +18632,7 @@ function ytMilestones(){
     const [workId, i] = key.split('#'), work = findWork(workId);
     if(!work) continue;
     const t = (SEED_SENBATSU[workId] || [])[+i];
-    out.push({ vid, ytKind:kind, mark:m.mark, at:m.at, cover:!!m.cover, workId, i:+i, work, track: t ? t.track : work.title });
+    out.push({ vid, ytKind:kind, mark:m.mark, at:m.at, cover:!!m.cover, sign:m.sign !== false, workId, i:+i, work, track: t ? t.track : work.title });
   }
   return out.sort((a, b) => ytAt(b.at) - ytAt(a.at));
 }
@@ -19320,8 +19320,9 @@ function tickerItems(){
       en ? 'On air now' : 'กำลังไลฟ์อยู่', l.title || (e && e.title) || l.channel ] });
   }
 
-  // 0c. a song video that has just passed a round number of views (two days on the sign)
-  for(const x of (YT_STATS ? ytMilestones() : []).filter(x => Date.now() - ytAt(x.at) < 2 * 86400000).slice(0, 2)){
+  // 0c. a song video that has just passed a round number of views (a day on the sign;
+  // `sign:false` on a milestone in data/youtube.json takes it down sooner)
+  for(const x of (YT_STATS ? ytMilestones() : []).filter(x => x.sign && Date.now() - ytAt(x.at) < 86400000).slice(0, 2)){
     items.push({ kind:'views', to:{ action:'open-single', id:x.workId }, parts:[
       `${x.track} ${en ? `passed ${milestoneWords(x.mark)}` : `ครบ ${milestoneWords(x.mark)}`} 🎉` ] });
   }
