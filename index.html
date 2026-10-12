@@ -18615,9 +18615,9 @@ function shortViews(n){
   return n >= 1e6 ? f(n,1e6)+' ล้าน' : n >= 1e5 ? f(n,1e5)+' แสน' : n >= 1e4 ? f(n,1e4)+' หมื่น' : n >= 1e3 ? f(n,1e3)+' พัน' : String(n);
 }
 /* A video that has just passed a round number of views — every 100,000 to a
-   million, then every million — is celebrated for a week. The hourly job
+   million, then every million — is celebrated for two days (a day on the sign). The hourly job
    notes when it passed (data/youtube.json → milestones). */
-const MILESTONE_DAYS = 7;
+const MILESTONE_DAYS = 2;
 const ytAt = s => Date.parse(String(s).replace(/T(\d\d:\d\d)([+-])/, 'T$1:00$2'));   // Safari wants the seconds
 function ytMilestone(vid){
   const m = YT_STATS && YT_STATS.milestones && YT_STATS.milestones[vid];
