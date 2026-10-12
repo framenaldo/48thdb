@@ -5837,6 +5837,21 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#5E6B3A', surface:'#F2F5EC', ink:'#3A3828', img:'posters/cgm48-popup-live-1008.jpg', w:1500, h:1500 },
     info:['ครั้งนี้เป็นเทปที่บันทึกไว้ล่วงหน้า'],
     stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://youtu.be/Ni1nDw57xDU' } },
+  /* A day at Bangkapi between the roadshows: no mini concert, the members at
+     the stands and two Hi-Touch rounds, then a live talk in the evening. */
+  { id:'ev-kimi-special-event-bangkapi', logo:'kimi', start:'2026-10-13', time:'12:30',
+    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Special Event & Live Talk',
+    venue:'PRE-FUNCTION MCC HALL, THE MALL LIFESTORE BANGKAPI, Bangkok', groups:['bnk48','cgm48'],
+    related:['ev-ge6-single','ev-kimi-roadshow-union'],
+    poster:{ accent:'#57523F', surface:'#EEF3F7', ink:'#34321F', img:'posters/kimi-special-event-bangkapi.jpg', w:1200, h:1600 },
+    members:['bnk-arlee','bnk-emmy','bnk-l','bnk-luksorn','bnk-praew','cgm-prae'],
+    detail:[
+      '12:30–13:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
+      '14:00–15:00 Group Hi-Touch',
+      '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
+      '17:00–18:00 Group Hi-Touch',
+      '19:00–20:00 Special Live Talk'],
+    info:['บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน'] },
   { id:'ev-cgm48-popup-live-1013', logo:'kimi', start:'2026-10-13', time:'18:00',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Pop Up Live',
     online:'YouTube CGM48 OFFICIAL', groups:['cgm48'],
@@ -6160,21 +6175,6 @@ const SEED_SCHEDULE = [
       'Zone 3 โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้',
       'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก',
       'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
-  /* A day at Bangkapi between the roadshows: no mini concert, the members at
-     the stands and two Hi-Touch rounds, then a live talk in the evening. */
-  { id:'ev-kimi-special-event-bangkapi', logo:'kimi', start:'2026-10-13', time:'12:30',
-    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Special Event & Live Talk',
-    venue:'PRE-FUNCTION MCC HALL, THE MALL LIFESTORE BANGKAPI, Bangkok', groups:['bnk48','cgm48'],
-    related:['ev-ge6-single','ev-kimi-roadshow-union'],
-    poster:{ accent:'#57523F', surface:'#EEF3F7', ink:'#34321F', img:'posters/kimi-special-event-bangkapi.jpg', w:1200, h:1600 },
-    members:['bnk-arlee','bnk-emmy','bnk-l','bnk-luksorn','bnk-praew','cgm-prae'],
-    detail:[
-      '12:30–13:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
-      '14:00–15:00 Group Hi-Touch',
-      '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
-      '17:00–18:00 Group Hi-Touch',
-      '19:00–20:00 Special Live Talk'],
-    info:['บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน'] },
   { id:'ev-partner-1017', start:'2026-10-17', time:'14:30', until:'15:30',
     title:'Lanna Expo 2026 · Japan–Thailand 140th Anniversary Countdown Event', tag:'partner',
     venue:'เวทีกลาง Hall 3, Chiang Mai International Exhibition and Convention Centre, Chiang Mai', groups:['cgm48'],
@@ -8273,6 +8273,7 @@ const EN = {
   'Hoop ร่วมงานเฉพาะวันที่ 17 ต.ค. และ Jew เฉพาะวันที่ 18 ต.ค.': 'Hoop is there on 17 Oct only, and Jew on 18 Oct only',
   'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก':
     'Group Hi-Touch: no wristwatches, rings or bracelets, and nothing in your hands that could hurt a member',
+  '12:30–13:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha': '12:30–13:30 Meet the members at the Merchandise and Hachi Cha stands',
   '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha': '15:30–16:30 Meet the members at the Merchandise and Hachi Cha stands',
   'รอบเวลาเดียวกันทั้งสองวัน 19 และ 20 ก.ย.':
     'The same times on both days, 19 and 20 Sep',
