@@ -229,6 +229,24 @@ DTSTART;TZID=Asia/Bangkok:20260920T120000
 DTEND;TZID=Asia/Bangkok:20260920T180000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-kimi-special-event-bangkapi-2026-10-13@48thdb
+DTSTAMP:20261013T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Special Eve
+ nt & Live Talk
+LOCATION:PRE-FUNCTION MCC HALL\, THE MALL LIFESTORE BANGKAPI\, Bangkok
+DESCRIPTION:เมมเบอร์: Arlee\, Emmy\, L\, Luksorn\, Praew\, 
+ Prae\n• 12:30–13:30 พบสมาชิกที่จุด Merchan
+ dise และ Hachi Cha\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16
+ :30 พบสมาชิกที่จุด Merchandise และ Hachi
+  Cha\n• 17:00–18:00 Group Hi-Touch\n• 19:00–20:00 Special Live Tal
+ k\n• บัตรเข้าร่วม Group Hi-Touch ได้จา
+ กการซื้อเข็มกลัดภายในงาน\n
+ \nhttps://48thdb.com/?e=ev-kimi-special-event-bangkapi
+URL:https://48thdb.com/?e=ev-kimi-special-event-bangkapi
+DTSTART;TZID=Asia/Bangkok:20261013T123000
+DTEND;TZID=Asia/Bangkok:20261013T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-fame-fanmeet@48thdb
 DTSTAMP:20261025T000000Z
 SUMMARY:Fame's Airline Fanmeet
