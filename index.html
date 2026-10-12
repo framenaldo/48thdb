@@ -2225,10 +2225,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      its pill says so and turns over when open */
   button.es-row{ width:100%; border:0; margin:0; font:inherit; text-align:left; color:inherit; cursor:pointer;
     -webkit-tap-highlight-color:transparent; }
-  .es-row.has-sl{ grid-template-columns:auto minmax(0, 1fr) auto; }
-  .es-row.has-sl > .es-st{ grid-column:2 / -1; }   /* the clock's line runs under the pill too */
-  .es-row.has-sl.is-done > .es-st{ opacity:.45; }
+  .es-row.has-sl .es-what{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:5px 10px; }
+  .es-row.has-sl .es-st{ flex-basis:100%; margin-top:-2px; }   /* the clock's line runs under the pill too */
+  .es-row.has-sl.is-done .es-what{ opacity:1; }
+  .es-row.has-sl.is-done :is(.es-name, .es-st){ opacity:.45; }
   .es-row.has-sl:active{ background:color-mix(in srgb, var(--c) 9%, var(--card)); }
+  .es-row.has-sl.is-now:active{ background:color-mix(in srgb, var(--es-live) 15%, var(--card)); }
   .es-sl-pill{ display:inline-flex; align-items:center; gap:3px; padding:4px 8px 4px 11px; border-radius:99px; white-space:nowrap;
     font-size:12.5px; font-weight:800; color:color-mix(in srgb, var(--c) 78%, var(--ink));
     background:color-mix(in srgb, var(--c) 10%, var(--card)); border:1px solid color-mix(in srgb, var(--c) 30%, transparent);
@@ -15017,12 +15019,13 @@ const SCHED_RE = new RegExp(`^(?:(\\d{1,2}) (${SCHED_MON.map(x => x.replace(/\./
    songs in one frame, session by session with the talk between; a song the
    database knows opens its release, a unit song names who sang it. The owner's
    own setlist card for the day opens full size from the foot. It folds under
-   the timetable's Mini Concert row (`slAnchor`, opened from the row's pill);
-   an event with no such row keeps it as a section of its own, `head`. */
+   the timetable's Mini Concert row (`slFolds`, opened from the row's pill) —
+   today's row when each day has its own — in the sheet's colour; an event
+   with no such row keeps it as a section of its own, `head`. */
 const _slDay = {};   // event id → the day last picked on its setlist
 const _slOpen = {};  // event id → its setlist is unfolded under the timetable
 const SL_AT_RE = /mini\s*concert|มินิคอนเสิร์ต/i;
-const slAnchor = ev => ev.setlist && ev.detail ? ev.detail.findIndex(l => SL_AT_RE.test(l) && SCHED_RE.test(l)) : -1;
+const slFolds = ev => !!(ev.setlist && ev.detail && ev.detail.some(l => SL_AT_RE.test(l) && SCHED_RE.test(l)));
 function renderSetlist(ev, head){
   const en = isEN(), days = ev.setlist, M = monthsShort();
   const picked = _slDay[ev.id];
@@ -15057,7 +15060,7 @@ function renderSetlist(ev, head){
     </div>`;
   };
   return `${head ? '<h3 class="evm-head">เซ็ตลิสต์</h3>' : ''}
-    <div class="sl" style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}">
+    <div class="sl"${head ? ` style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}"` : ''}>
       ${days.length > 1 ? `<div class="sl-days" role="tablist">${days.map(pill).join('')}</div>` : ''}
       ${days.map(panel).join('')}
     </div>`;
@@ -15067,14 +15070,17 @@ function renderSchedule(ev){
   const en = isEN(), iso = toYmd(todayStart()), year = +ev.start.slice(0, 4);
   const live = !ev.cancelled && !ev.postponed && ev.start <= iso && eventLastDay(ev) >= iso;
   const at = hm => { const t = parseYmd(iso), [h, mi] = hm.split(':').map(Number); t.setHours(h, mi, 0, 0); return t.getTime(); };
-  const slAt = slAnchor(ev);
-  const items = ev.detail.map((raw, i) => {
+  const items = ev.detail.map(raw => {
     const line = en ? (toEn(raw) ?? enFragments(raw) ?? raw) : raw, m = line.match(SCHED_RE);
     if(!m) return { note: line };
     const [, d, mon, h1, m1, h2, m2, what] = m;
     const day = d ? toYmd(new Date(year, SCHED_MON.indexOf(mon) % 12, +d)) : null;
-    return { day, dayLabel: d ? `${d} ${mon}` : '', a: `${h1.padStart(2, '0')}:${m1}`, b: h2 ? `${h2.padStart(2, '0')}:${m2}` : '', what, sl: i === slAt };
+    return { day, dayLabel: d ? `${d} ${mon}` : '', a: `${h1.padStart(2, '0')}:${m1}`, b: h2 ? `${h2.padStart(2, '0')}:${m2}` : '', what, mc: SL_AT_RE.test(raw) };
   });
+  // the setlist folds under today's Mini Concert row, else the undated one, else the next
+  if(ev.setlist){ const mc = items.filter(r => r.mc);
+    const at = mc.find(r => r.day === iso) || mc.find(r => !r.day) || mc.find(r => r.day > iso) || mc[0];
+    if(at) at.sl = true; }
   // today's rows get their start and end in milliseconds
   const today = items.filter(r => !r.note && live && (!r.day || r.day === iso));
   today.forEach((r, i) => {
@@ -15093,9 +15099,8 @@ function renderSchedule(ev){
     box += `<${tag} class="es-row${gone ? ' is-done' : ''}${r.sl ? ' has-sl' : ''}"${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}${r.sl
         ? ` data-action="sl-open" data-id="${ev.id}" aria-expanded="${open}" aria-controls="sl-${ev.id}"` : ''}>
       <span class="es-time">${r.a}${r.b ? `–${r.b}` : ''}${r.dayLabel ? `<small>${escapeHtml(r.dayLabel)}</small>` : ''}</span>
-      ${r.sl ? `<span class="es-what">${escapeHtml(r.what)}</span>
-      <span class="es-sl-pill">${en ? 'Setlist' : 'เซ็ตลิสต์'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
-      <span class="es-st">${st}</span>` : `<span class="es-what">${escapeHtml(r.what)}<span class="es-st">${st}</span></span>`}
+      <span class="es-what">${r.sl ? `<span class="es-name">${escapeHtml(r.what)}</span><span class="es-sl-pill">${en ? 'Setlist' : 'เซ็ตลิสต์'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>`
+        : escapeHtml(r.what)}<span class="es-st">${st}</span></span>
       <span class="es-bar"></span></${tag}>`;
     if(r.sl) box += `<div class="es-sl" id="sl-${ev.id}"${open ? '' : ' hidden'}>${renderSetlist(ev)}</div>`;
   }
@@ -15187,7 +15192,7 @@ function renderEventModal(){
         <h3 class="evm-head">กำหนดการ</h3>
         ${renderSchedule(ev)}` : ''}
 
-        ${ev.setlist && slAnchor(ev) < 0 ? renderSetlist(ev, true) : ''}
+        ${ev.setlist && !slFolds(ev) ? renderSetlist(ev, true) : ''}
 
         ${ev.info ? `
         <h3 class="evm-head">รายละเอียด</h3>
