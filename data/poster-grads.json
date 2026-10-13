@@ -75,6 +75,10 @@
   "light": "linear-gradient(180deg, hsl(143 53% 90%) 0%, hsl(137 42% 90%) 17%, hsl(140 30% 89%) 33%, hsl(71 7% 89%) 50%, hsl(130 10% 87%) 67%, hsl(134 14% 87%) 83%, hsl(117 11% 87%) 100%)",
   "dark": "linear-gradient(180deg, hsl(143 35% 18%) 0%, hsl(137 30% 18%) 17%, hsl(140 21% 18%) 33%, hsl(71 5% 17%) 50%, hsl(130 7% 17%) 67%, hsl(134 10% 16%) 83%, hsl(117 8% 17%) 100%)"
  },
+ "posters/jew-palmmy-bday-1024.jpg": {
+  "light": "linear-gradient(180deg, hsl(324 30% 90%) 0%, hsl(320 24% 89%) 17%, hsl(337 29% 90%) 33%, hsl(314 22% 88%) 50%, hsl(251 18% 87%) 67%, hsl(282 23% 87%) 83%, hsl(302 23% 88%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(324 21% 18%) 0%, hsl(320 17% 18%) 17%, hsl(337 20% 18%) 33%, hsl(314 15% 17%) 50%, hsl(251 13% 16%) 67%, hsl(282 16% 17%) 83%, hsl(302 16% 17%) 100%)"
+ },
  "posters/journey-of-dreams.jpg": {
   "light": "linear-gradient(180deg, hsl(328 42% 81%) 0%, hsl(348 38% 79%) 17%, hsl(346 62% 78%) 33%, hsl(348 48% 78%) 50%, hsl(346 63% 78%) 67%, hsl(348 60% 79%) 83%, hsl(349 50% 82%) 100%)",
   "dark": "linear-gradient(180deg, hsl(328 29% 13%) 0%, hsl(348 26% 13%) 17%, hsl(346 35% 11%) 33%, hsl(348 34% 11%) 50%, hsl(346 35% 11%) 67%, hsl(348 35% 13%) 83%, hsl(349 35% 14%) 100%)"
@@ -106,6 +110,10 @@
  "posters/nine-charity.jpg": {
   "light": "linear-gradient(180deg, hsl(335 56% 91%) 0%, hsl(318 45% 91%) 17%, hsl(335 64% 91%) 33%, hsl(328 60% 91%) 50%, hsl(326 63% 91%) 67%, hsl(331 43% 88%) 83%, hsl(348 40% 87%) 100%)",
   "dark": "linear-gradient(180deg, hsl(335 35% 18%) 0%, hsl(318 31% 18%) 17%, hsl(335 35% 19%) 33%, hsl(328 35% 18%) 50%, hsl(326 35% 18%) 67%, hsl(331 30% 17%) 83%, hsl(348 28% 17%) 100%)"
+ },
+ "posters/proud-saonoi-bday-1024.jpg": {
+  "light": "linear-gradient(180deg, hsl(324 30% 90%) 0%, hsl(320 25% 89%) 17%, hsl(335 26% 90%) 33%, hsl(320 24% 89%) 50%, hsl(281 14% 88%) 67%, hsl(290 23% 87%) 83%, hsl(302 23% 88%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(324 21% 18%) 0%, hsl(320 18% 18%) 17%, hsl(335 18% 18%) 33%, hsl(320 17% 17%) 50%, hsl(281 10% 17%) 67%, hsl(290 16% 17%) 83%, hsl(302 16% 17%) 100%)"
  },
  "posters/roadshow-fashionisland-main.jpg": {
   "light": "linear-gradient(180deg, hsl(180 13% 78%) 0%, hsl(180 41% 78%) 17%, hsl(180 34% 78%) 33%, hsl(200 4% 78%) 50%, hsl(7 22% 78%) 67%, hsl(355 42% 78%) 83%, hsl(356 11% 81%) 100%)",
