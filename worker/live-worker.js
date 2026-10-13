@@ -555,8 +555,69 @@ async function translateBio(env, text, to) {
   return null;
 }
 
+/* The GE vote on the chain, read for the page (POST /chain). TokenX's explorer
+   turned visitors from Thailand away on 13 Oct 2026 (410 Gone, every page),
+   while it still answers from abroad — so the page asks here and the Worker
+   asks the explorer. Only the two calls the page makes, eth_blockNumber and
+   eth_getLogs, and only for the GE polls and the GE6 token. The tip is kept two
+   seconds; a range of logs that ended well before the tip never changes and is
+   kept a day, so many viewers reading the same history cost one look. */
+const CHAIN_RPC = 'https://scan.tokenx.finance/api/eth-rpc';
+const CHAIN_ADDRS = new Set([
+  '0x86a1f49e1b1cbd69971e99b66123264c75ac2c8f',   // GE2026 poll
+  '0x674ab311c94780207a1357de9bcdd357d23f459e',   // GE2025 poll
+  '0x2f5c60bde7a5ebd2b116bb03cb5232fa1ea55f1c',   // the GE6 token
+]);
+const CHAIN_HEADERS = { ...JSON_HEADERS, 'access-control-allow-methods': 'POST, OPTIONS', 'cache-control': 'no-store' };
+const chainHex = (v) => typeof v === 'string' && /^0x[0-9a-f]{1,16}$/i.test(v);
+async function chainUp(method, params) {
+  const r = await fetch(CHAIN_RPC, { method: 'POST', headers: { 'content-type': 'application/json', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) });
+  if (!r.ok) throw new Error(`explorer ${r.status}`);
+  const j = await r.json();
+  if (j.error) throw new Error(j.error.message || 'rpc');
+  return j.result;
+}
+async function chainCached(key, ttl, get, ctx) {
+  const cache = caches.default, req = new Request('https://api.48thdb.com/__chain/' + key);
+  const hit = await cache.match(req);
+  if (hit) return hit.json();
+  const val = await get();
+  ctx.waitUntil(cache.put(req, new Response(JSON.stringify(val), { headers: { 'cache-control': `public, max-age=${ttl}` } })));
+  return val;
+}
+const chainHead = (ctx) => chainCached('head', 2, () => chainUp('eth_blockNumber', []), ctx);
+async function chainCall(body, ctx) {
+  const { method, params } = body || {};
+  if (method === 'eth_blockNumber') return chainHead(ctx);
+  if (method !== 'eth_getLogs' || !Array.isArray(params) || params.length !== 1) throw Object.assign(new Error('not allowed'), { status: 400 });
+  const f = params[0] || {};
+  const addr = String(f.address || '').toLowerCase();
+  if (!CHAIN_ADDRS.has(addr) || !chainHex(f.fromBlock) || !chainHex(f.toBlock)) throw Object.assign(new Error('not allowed'), { status: 400 });
+  const topics = Array.isArray(f.topics) ? f.topics.slice(0, 4).map((t) => (t == null ? null : String(t).toLowerCase())) : [];
+  if (topics.some((t) => t != null && !/^0x[0-9a-f]{64}$/.test(t))) throw Object.assign(new Error('not allowed'), { status: 400 });
+  const from = parseInt(f.fromBlock, 16), to = parseInt(f.toBlock, 16);
+  if (!(to >= from) || to - from > 250000) throw Object.assign(new Error('range'), { status: 400 });
+  const head = parseInt(await chainHead(ctx), 16);
+  // more than ten minutes behind the tip: indexed for good
+  const ttl = to < head - 200 ? 86400 : 2;
+  const filter = { address: addr, fromBlock: '0x' + from.toString(16), toBlock: '0x' + to.toString(16), topics };
+  return chainCached(`logs/${addr}/${from}-${to}/${topics.map((t) => t || '-').join(',')}`, ttl, () => chainUp('eth_getLogs', [filter]), ctx);
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
+    if (new URL(request.url).pathname === '/chain') {
+      if (request.method === 'OPTIONS') return new Response(null, { headers: { ...CHAIN_HEADERS, 'access-control-allow-headers': 'content-type', 'access-control-max-age': '86400' } });
+      if (request.method !== 'POST') return new Response(JSON.stringify({ error: 'POST only' }), { status: 405, headers: CHAIN_HEADERS });
+      try {
+        const result = await chainCall(await request.json().catch(() => null), ctx);
+        return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result }), { headers: CHAIN_HEADERS });
+      } catch (err) {
+        return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, error: { message: String((err && err.message) || err) } }),
+          { status: err && err.status || 502, headers: CHAIN_HEADERS });
+      }
+    }
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: { ...JSON_HEADERS, 'access-control-allow-headers': 'authorization, content-type',
         'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-max-age': '86400' } });

@@ -12783,15 +12783,28 @@ function gecLoad(id){
   return null;
 }
 function gecSave(id, d){ try{ localStorage.setItem(GEC_KEEP + id, JSON.stringify(d)); }catch(e){} }
+/* Since 13 Oct 2026 the explorer turns away visitors from Thailand (410 Gone),
+   so a browser asks our Worker (api.48thdb.com/chain), which asks it from
+   abroad and caches; straight to the explorer is the fallback, and the first
+   choice for the nightly job, which runs abroad. Whichever answers is kept. */
+const GEC_PROXY = 'https://api.48thdb.com/chain';
+let gecVia = typeof window === 'undefined' ? 'direct' : 'proxy';
 async function gecRpc(method, params){
+  const body = JSON.stringify({ jsonrpc:'2.0', id:1, method, params });
+  const ask = async via => {
+    const r = await fetch(via === 'proxy' ? GEC_PROXY : GEC_API + '/api/eth-rpc', { method:'POST', headers:{ 'content-type':'application/json' }, body });
+    const j = await r.json();
+    if(j.error) throw new Error(j.error.message || 'rpc');
+    return j.result;
+  };
   for(let k = 0; ; k++){
-    try{
-      const r = await fetch(GEC_API + '/api/eth-rpc', { method:'POST', headers:{ 'content-type':'application/json' },
-        body:JSON.stringify({ jsonrpc:'2.0', id:1, method, params }) });
-      const j = await r.json();
-      if(j.error) throw new Error(j.error.message || 'rpc');
-      return j.result;
-    }catch(e){ if(k >= 3) throw e; await new Promise(r => setTimeout(r, 1000 * (k + 1))); }
+    try{ return await ask(gecVia); }
+    catch(e){
+      const other = gecVia === 'proxy' ? 'direct' : 'proxy';
+      try{ const v = await ask(other); gecVia = other; return v; }catch(e2){}
+      if(k >= 2) throw e;
+      await new Promise(r => setTimeout(r, 1000 * (k + 1)));
+    }
   }
 }
 // Voted logs between two blocks, in windows that shrink when the explorer's
@@ -12979,7 +12992,8 @@ function renderGECWallet(en, N, hm){
 const gecOnScreen = () => (state.view === 'timeline' && ['chain', 'overview', undefined, null, ''].includes(state.geTab));
 function gecKick(force){
   if(gecBusy || !gecOnScreen()) return;
-  if(!force && Date.now() - gecAt < 2500 && gecLoad('ge2026')) return;
+  // through the Worker, a look every 6 seconds rather than 3, to keep within its free allowance
+  if(!force && Date.now() - gecAt < (gecVia === 'proxy' ? 5500 : 2500) && gecLoad('ge2026')) return;
   const mark = () => { const d = gecLoad('ge2026'), t = gecLoad('tok'); return (d ? d.n : -1) + ':' + (t ? t.n : -1); };
   const m0 = mark(), had25 = !!gecLoad('ge2025'), err0 = gecErr;
   gecErr = null;
@@ -13406,7 +13420,7 @@ function gecHomeCard(en){
   if(!gecLiteTimer) gecLiteTimer = setInterval(() => {
     if(state.view !== 'feed'){ clearInterval(gecLiteTimer); gecLiteTimer = null; return; }
     gecSocket();
-    if(!document.hidden) gecLiteSync();
+    if(!document.hidden && (gecVia !== 'proxy' || Date.now() - gecLiteAt > 28000)) gecLiteSync();
   }, 15000);
   setTimeout(gecSocket, 0);
   return `<section class="feed-block is-gevote"><h2 class="section-label">${en ? 'GE2026 · Live Voting' : 'GE2026 · โหวตสด'}</h2>${gecHomeTeaser(en)}</section>`;
