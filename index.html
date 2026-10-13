@@ -4319,6 +4319,24 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .evm-fest-deco .cfi{
     position:absolute; display:block; width:9px; height:13px; border-radius:2px; opacity:.75;
   }
+  /* the other kinds' scatter: little shapes in the confetti's colours */
+  .evm-fest-deco .cfs{ position:absolute; display:block; width:var(--s); height:var(--s); opacity:.7; transform:rotate(var(--r)); fill:currentColor; }
+  .cfs.cfi0{ color:#E4457E; background:none; } .cfs.cfi1{ color:#7C4D9B; background:none; } .cfs.cfi2{ color:#F0B840; background:none; }
+  .cfs.cfi3{ color:#2FD8A9; background:none; width:var(--s); height:var(--s); border-radius:0; } .cfs.cfi4{ color:#FFFFFF; background:none; width:var(--s); height:var(--s); border-radius:0; }
+  /* a concert's two stage lights, a premiere's too */
+  .evm-fest-beams{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .evm-fest-beams i{ position:absolute; top:-10%; width:46%; height:130%; opacity:.5;
+    background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,0) 78%);
+    clip-path:polygon(46% 0, 54% 0, 100% 100%, 0 100%); }
+  .evm-fest-beams i:first-child{ left:-6%; transform:rotate(-24deg); transform-origin:50% 0; }
+  .evm-fest-beams i:last-child{ right:-6%; transform:rotate(24deg); transform-origin:50% 0; }
+  /* the election's rays of gold behind its word */
+  .evm-fest-rays{ position:absolute; left:50%; top:46px; width:520px; height:520px; margin:-260px 0 0 -260px; pointer-events:none; opacity:.55;
+    background:repeating-conic-gradient(from 0deg, rgba(240,184,64,.55) 0 5deg, transparent 5deg 15deg);
+    -webkit-mask:radial-gradient(closest-side, #000 18%, transparent 72%); mask:radial-gradient(closest-side, #000 18%, transparent 72%); }
+  .evm-fest-bunting{ position:absolute; left:0; right:0; top:0; width:100%; height:44px; pointer-events:none; color:var(--fest-ink); }
+  .evm-fest-bunting .cfi0{ fill:#E4457E; } .evm-fest-bunting .cfi1{ fill:#7C4D9B; } .evm-fest-bunting .cfi2{ fill:#F0B840; }
+  .evm-fest-bunting .cfi3{ fill:#2FD8A9; } .evm-fest-bunting .cfi4{ fill:#FFFFFF; }
   .cfi0{ background:#E4457E; }
   .cfi1{ background:#7C4D9B; }
   .cfi2{ background:#F0B840; }
@@ -4336,6 +4354,38 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     font-size:13px; font-weight:800; letter-spacing:.42em; text-indent:.42em;
     color:var(--fest-ink); opacity:.72;
   }
+  .evm-fest-sub.is-long{ font-size:11.5px; letter-spacing:.16em; text-indent:.16em; padding:0 8px; line-height:1.5; }
+  .evm-fest.is-bare{ padding-bottom:20px; }
+  /* the script's tails (p, y, g) would dip into the line under it; the birthday one keeps its tuck */
+  .evm-fest:not(.is-birthday) .evm-fest-sub{ margin-top:7px; }
+  .evm-fest.is-roadshow{ padding-top:34px; }
+  /* four to eight on the bill: smaller faces, still named */
+  .evm-fest-faces.is-mid{ flex-wrap:wrap; gap:10px 8px; padding-left:6px; padding-right:6px; }
+  .evm-fest-face.is-mid{ gap:5px; width:62px; }
+  .evm-fest-face.is-mid .evm-face-img{ width:54px; height:54px; font-size:17px; box-shadow:0 0 0 2.5px #fff, 0 6px 14px rgba(var(--shadow-rgb),.2); }
+  .evm-fest-face.is-mid .evm-fest-name{ font-size:10.5px; padding:1px 7px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* more than that: a row of faces overlapping, the rest counted */
+  .evm-fest-faces.is-stack{ gap:0; padding-bottom:8px; align-items:center; }
+  .evm-fest-face.is-stack{ margin-left:-11px; }
+  .evm-fest-face.is-stack:first-child{ margin-left:0; }
+  .evm-fest-face.is-stack .evm-face-img{ width:40px; height:40px; font-size:14px; box-shadow:0 0 0 2.5px #fff, 0 4px 10px rgba(var(--shadow-rgb),.22); }
+  .evm-fest-more{ position:relative; margin-left:-8px; min-width:40px; height:40px; padding:0 8px; border-radius:999px; display:grid; place-items:center;
+    font-size:13px; font-weight:900; color:#fff; background:var(--fest-ink); box-shadow:0 0 0 2.5px #fff; }
+  .evm-fest-count{ position:relative; display:inline-block; margin:4px 0 18px; padding:2px 12px; border-radius:999px;
+    font-size:12px; font-weight:800; color:var(--fest-ink); background:rgba(255,255,255,.72); }
+  /* the kinds' own colours, for an event with no poster to take them from */
+  .evm-fest.pal-rose{ --fest-a:#FBE3EC; --fest-b:#F6D3E2; --fest-ink:#A3245A; }
+  .evm-fest.pal-mint{ --fest-a:#DDF3EE; --fest-b:#CBEBE4; --fest-ink:#1F6B62; }
+  .evm-fest.pal-night{ --fest-a:#2B2350; --fest-b:#17142E; --fest-ink:#F2E9FF; }
+  .evm-fest.pal-sun{ --fest-a:#FFF1D6; --fest-b:#FCE2C2; --fest-ink:#9A4A12; }
+  .evm-fest.pal-gold{ --fest-a:#3A2410; --fest-b:#22140A; --fest-ink:#F6D58A; }
+  .evm-fest.pal-sky{ --fest-a:#DCEEFC; --fest-b:#C9E2F8; --fest-ink:#1F4E7A; }
+  /* with a poster, its own colours: its paper, washed towards its accent, in its ink */
+  .evm-fest.is-postered{ --fest-a:color-mix(in srgb, var(--pc) 10%, var(--sheet-bg)); --fest-b:color-mix(in srgb, var(--pc) 26%, var(--sheet-bg)); --fest-ink:var(--sheet-ink); }
+  .evm-fest.pal-night .evm-fest-word, .evm-fest.pal-gold .evm-fest-word{ text-shadow:0 2px 0 rgba(0,0,0,.35); }
+  .evm-fest.pal-night .evm-fest-name, .evm-fest.pal-gold .evm-fest-name,
+  .evm-fest.pal-night .evm-fest-count, .evm-fest.pal-gold .evm-fest-count{ background:rgba(0,0,0,.4); }
+  .evm-fest.pal-night .evm-fest-more, .evm-fest.pal-gold .evm-fest-more{ color:#1A1419; }
   .evm-fest-faces{
     position:relative; display:flex; justify-content:center; gap:16px;
     margin-top:16px; padding-bottom:18px;
@@ -4374,6 +4424,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .evm-online svg{ flex:none; width:15px; height:15px; margin-top:1px; color:var(--c); }
   @media (max-width:560px){
     .evm-fest-word{ font-size:35px; }
+    /* a long word would run under the sheet's share and close buttons: it starts below them */
+    .evm-fest.is-wide{ padding-top:58px; }
     .evm-face-img{ width:76px; height:76px; font-size:24px; }
     .evm-fest-faces{ gap:12px; }
   }
@@ -5161,6 +5213,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-theme="dark"] .tl-icon:not(.is-yt):not(.is-img){ color:color-mix(in srgb, var(--k) 45%, #fff); }
   /* light words on a white-ish pill vanished; the pill turns dark instead */
   :root[data-theme="dark"] .evm-fest-name{ background:rgba(18,12,26,.66); }
+  :root[data-theme="dark"] .evm-fest-count{ background:rgba(18,12,26,.66); }
+  :root[data-theme="dark"] .evm-fest.pal-rose{ --fest-a:#4A2236; --fest-b:#331726; --fest-ink:#FFD3E4; }
+  :root[data-theme="dark"] .evm-fest.pal-mint{ --fest-a:#183F3A; --fest-b:#102B28; --fest-ink:#C8F3E8; }
+  :root[data-theme="dark"] .evm-fest.pal-sun{ --fest-a:#4A3016; --fest-b:#33210F; --fest-ink:#FFE1B8; }
+  :root[data-theme="dark"] .evm-fest.pal-sky{ --fest-a:#1C3550; --fest-b:#132538; --fest-ink:#D2E8FB; }
+  :root[data-theme="dark"] .evm-fest.is-postered{ --fest-a:color-mix(in srgb, var(--pc) 42%, #15111b); --fest-b:color-mix(in srgb, var(--pc) 22%, #110d16);
+    --fest-ink:color-mix(in srgb, var(--sheet-bg) 90%, #fff); }
+  :root[data-theme="dark"] .evm-fest-word{ text-shadow:0 2px 0 rgba(0,0,0,.3); }
+  :root[data-theme="dark"] .evm-fest-more{ color:#1A1419; }
   /* the starts-in pill: a pale wash of the accent with dark words, since the
      poster accents were all chosen for light cards */
   :root[data-theme="dark"] :is(.evm-starts, .ev-when){ background:color-mix(in srgb, var(--c) 32%, #fff); color:var(--on-fill); }
@@ -11317,7 +11378,7 @@ function renderTodayHero(ev, todayIso){
     </div>
     ${img ? `<div class="today-hero-art" style="--art:url('${escapeAttr(img)}')">
       <img src="${escapeAttr(img)}"${ev.poster.w ? ` width="${ev.poster.w}" height="${ev.poster.h}"` : ''} alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" decoding="async">
-    </div>` : (ev.theme === 'birthday' ? `<div class="today-hero-band">${renderBirthdayBanner(ev)}</div>` : '')}
+    </div>` : `<div class="today-hero-band">${renderEventBanner(ev)}</div>`}
     <div class="today-hero-body today-hero-foot">
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g => groupTag(g)).join('')}</div>` : ''}
       ${renderEventPeople(people, 8)}
@@ -11337,27 +11398,139 @@ function eventHasMore(ev){
 /* A birthday fanmeet gets a party header rather than the plain sheet: the
    celebrants' own portraits under hand-lettering, with the confetti drawn in
    CSS so it costs nothing to ship. */
-function renderBirthdayBanner(ev){
-  const faces = (ev.celebrants || []).map(getMember).filter(Boolean);
-  if(!faces.length) return '';
-  const confetti = [
-    [6,14,-18],[17,52,24],[29,9,42],[41,64,-9],[52,20,15],
-    [63,58,-33],[74,12,8],[85,46,29],[93,24,-14],[36,34,50],[58,38,-22],[81,66,12]
-  ].map(([x,y,r],i)=>
-    `<i class="cfi cfi${i%5}" style="left:${x}%;top:${y}%;transform:rotate(${r}deg)"></i>`).join('');
+/* Every event's sheet opens on a banner of its own, made the way the birthday
+   one was: a word in script, a line in spaced capitals, a scatter of things
+   that belong to that kind of outing, and the faces of who is on. The word is
+   the kind of event; the line under it is the release named in the title when
+   there is one, so nothing on it is made up. With a poster, the banner takes
+   the poster's colours; without, the kind's own. `fest:{ word, sub, motif }`
+   on an event overrides any of it. */
+const FEST_KINDS = {
+  birthday: { word:'Birthday', sub:'FANMEET', motif:'confetti', pal:'grape' },
+  tee:      { word:'Birthday Tee', sub:'PRE-ORDER', motif:'confetti', pal:'rose' },
+  fanmeet:  { word:'Fanmeet', sub:'MEET & GREET', motif:'hearts', pal:'rose' },
+  handshake:{ word:'Handshake', sub:'EVENT', motif:'hearts', pal:'rose' },
+  online:   { word:'Meeting You', sub:'ONLINE', motif:'bubbles', pal:'mint' },
+  concert:  { word:'Concert', sub:'LIVE ON STAGE', motif:'stars', fx:'beams', pal:'night' },
+  roadshow: { word:'Roadshow', sub:'MINI LIVE', motif:'notes', fx:'bunting', pal:'sun' },
+  popup:    { word:'Pop Up Live', sub:'LIVE', motif:'notes', pal:'mint' },
+  premiere: { word:'Premiere', sub:'FIRST PERFORMANCE · MV', motif:'sparkles', fx:'beams', pal:'night' },
+  special:  { word:'Special Event', sub:'LIVE TALK', motif:'sparkles', pal:'grape' },
+  election: { word:'Election', sub:'SENBATSU GENERAL ELECTION 2026', motif:'stars', fx:'rays', pal:'gold' },
+  results:  { word:'Final Results', sub:'SENBATSU GENERAL ELECTION 2026', motif:'stars', fx:'rays', pal:'gold' },
+  fanfest:  { word:'Fan Festival', sub:'SENBATSU GENERAL ELECTION 2026', motif:'confetti', fx:'rays', pal:'gold' },
+  heart:    { word:'Heart to Heart', sub:'SENBATSU GENERAL ELECTION 2026', motif:'hearts', pal:'rose' },
+  photoset: { word:'Photoset', sub:'SENBATSU GENERAL ELECTION 2026', motif:'sparkles', pal:'gold' },
+  bundle:   { word:'Ticket Bundle', sub:'2 SHOWS · 1 TICKET', motif:'stars', pal:'gold' },
+  release:  { word:'Pre-Order', sub:'SPECIAL SINGLE', motif:'discs', pal:'night' },
+  trip:     { word:'Fan Trip', sub:'GET AWAY', motif:'clouds', pal:'sky' },
+  match:    { word:'Charity Match', sub:'FOOTBALL', motif:'balls', pal:'mint' },
+  workshop: { word:'Workshop', sub:'', motif:'sparkles', pal:'rose' },
+  exhibit:  { word:'Exhibition', sub:'', motif:'sparkles', pal:'grape' },
+  guest:    { word:'Special Guest', sub:'', motif:'sparkles', pal:'sun' },
+  media:    { word:'On Air', sub:'MEDIA', motif:'sparkles', pal:'night' },
+  event:    { word:'Event', sub:'', motif:'sparkles', pal:'grape' },
+};
+/* where the title alone would not say, or an event has its own way of putting it */
+const FEST_EVENT = {
+  'ev-concert-2026':   { kind:'concert' },
+  'ev-fame-fanmeet':   { word:'Airline', sub:'FANMEET', motif:'clouds' },
+  'ev-hoop-bday-said': { sub:'THEATER SHOW' },
+};
+function festKind(ev){
+  const t = ev.title || '';
+  if(FEST_EVENT[ev.id] && FEST_EVENT[ev.id].kind) return FEST_EVENT[ev.id].kind;
+  if(ev.theme === 'birthday') return 'birthday';
+  if(/^ev-bday-tee-/.test(ev.id)) return 'tee';
+  if(/Final Results/.test(t)) return 'results';
+  if(/· Voting/.test(t)) return 'election';
+  if(/Fan Festival/.test(t)) return 'fanfest';
+  if(/Heart to Heart/.test(t)) return 'heart';
+  if(/Photoset/i.test(t)) return 'photoset';
+  if(/Ticket Bundle/.test(t)) return 'bundle';
+  if(/Pre-Order/.test(t)) return 'release';
+  if(/Handshake/i.test(t)) return 'handshake';
+  if(/Meeting You Online/i.test(t)) return 'online';
+  if(/Pop Up Live/i.test(t)) return 'popup';
+  if(/Roadshow/i.test(t)) return 'roadshow';
+  if(/First Performance|Premiere/i.test(t)) return 'premiere';
+  if(/Special Event|Live Talk/i.test(t)) return 'special';
+  if(/Concert/i.test(t)) return 'concert';
+  if(/Fanmeet|Fan Meeting/i.test(t)) return 'fanmeet';
+  if(/Get Away|Trip/i.test(t)) return 'trip';
+  if(/Football/i.test(t)) return 'match';
+  if(/Workshop/i.test(t)) return 'workshop';
+  if(/Captured|Exhibition/i.test(t)) return 'exhibit';
+  if(ev.tag === 'media') return 'media';
+  if(/Booth|Fest|Expo|HAKU/i.test(t)) return 'guest';
+  return 'event';
+}
+/* the release in the title, "…" or “…”, up to any Thai after a dash */
+function festRelease(ev){
+  const m = /["“]([^"”]+)["”]/.exec(ev.title || '');
+  return m ? m[1].split(/\s+[–-]\s+(?=[^\x00-\x7F])/)[0].trim().toUpperCase() : '';
+}
+/* the scattered things, one shape a kind; their colours are the confetti's */
+const FEST_SHAPES = {
+  hearts:  '<path d="M12 21 4.5 13.6C3.1 12.2 2 10.7 2 8.6A4.8 4.8 0 0 1 6.8 4c1.6 0 2.9.8 5.2 3 2.3-2.2 3.6-3 5.2-3A4.8 4.8 0 0 1 22 8.6c0 2.1-1.1 3.6-2.5 5Z"/>',
+  notes:   '<path d="M9 18.2a3.2 3.2 0 1 1-2.2-3V4.6l12-2.6v12.7a3.2 3.2 0 1 1-2.2-3V6.4L9 8.1Z"/>',
+  stars:   '<path d="m12 2 2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 16.9l-6.1 3.5 1.5-6.8L2.2 9l6.9-.7Z"/>',
+  sparkles:'<path d="M12 1.5c.6 5.6 2.9 8.6 9.5 10.5-6.6 1.9-8.9 4.9-9.5 10.5-.6-5.6-2.9-8.6-9.5-10.5C9.1 10.1 11.4 7.1 12 1.5Z"/>',
+  discs:   '<path fill-rule="evenodd" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 7.4a2.6 2.6 0 1 0 0 5.2 2.6 2.6 0 0 0 0-5.2Z"/>',
+  bubbles: '<path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H10l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/>',
+  clouds:  '<path d="M7 19a5 5 0 0 1-.6-10A6.5 6.5 0 0 1 18.8 10 4.5 4.5 0 0 1 18 19Z"/>',
+  balls:   '<path fill-rule="evenodd" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 5.6-3.7 2.7 1.4 4.4h4.6l1.4-4.4Z"/>',
+};
+/* the other shapes keep to the sides, clear of the word and the faces */
+const FEST_EDGE = [[4,12,-18],[12,46,24],[6,74,-30],[16,22,12],[3,92,20],[17,86,-8],[93,30,8],[85,46,-24],[96,62,30],[87,74,-12],[92,90,14],[82,86,-20]];
+const FEST_SPOTS = [[6,14,-18],[17,52,24],[29,9,42],[41,64,-9],[52,20,15],[63,58,-33],[74,12,8],[85,46,29],[93,24,-14],[36,34,50],[58,38,-22],[81,66,12]];
+function renderFestDeco(motif){
+  if(motif === 'confetti' || !FEST_SHAPES[motif])
+    return FEST_SPOTS.map(([x, y, r], i) => `<i class="cfi cfi${i % 5}" style="left:${x}%;top:${y}%;transform:rotate(${r}deg)"></i>`).join('');
+  return FEST_EDGE.map(([x, y, r], i) => `<svg class="cfs cfi${i % 5}" viewBox="0 0 24 24" style="left:${x}%;top:${y}%;--r:${r}deg;--s:${[15, 11, 18, 12, 14][i % 5]}px" aria-hidden="true">${FEST_SHAPES[motif]}</svg>`).join('');
+}
+/* the bunting over a roadshow: a string of little flags dipping across the top */
+function renderFestBunting(){
+  const n = 15, flags = Array.from({ length: n }, (_, i) => {
+    const x = 4 + i * (92 / (n - 1)), y = 8 + 10 * Math.sin(Math.PI * i / (n - 1));
+    return `<path class="cfi${i % 5}" d="M${(x - 2.6).toFixed(1)} ${y.toFixed(1)}h5.2l-2.6 6.4Z"/>`; }).join('');
+  return `<svg class="evm-fest-bunting" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M2 7.6Q50 26 98 7.6" fill="none" stroke="currentColor" stroke-width=".5" opacity=".5"/>${flags}</svg>`;
+}
+function renderEventBanner(ev){
+  const own = { ...(FEST_EVENT[ev.id] || {}), ...(ev.fest || {}) };
+  const k = festKind(ev), K = { ...FEST_KINDS[k], ...own }, en = isEN();
+  const sub = own.sub != null ? own.sub : (k === 'birthday' || k === 'tee' ? K.sub : festRelease(ev) || K.sub);
+  // who is on: the birthday girls; else the line-up, the viewer's oshi first
+  const ids = k === 'birthday' && (ev.celebrants || []).length ? ev.celebrants : (ev.members || []);
+  const all = ids.map(getMember).filter(Boolean);
+  const people = k === 'birthday' ? all : [...all.filter(m => state.oshi.includes(m.id)), ...all.filter(m => !state.oshi.includes(m.id))];
+  const face = (m, cls) => { const g = getGroup(m.groupId);
+    return `<button class="evm-fest-face${cls}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}" title="${escapeAttr(nickName(m))}">${
+      renderAvatar(m, 'evm-face-img', g.color)}${cls === ' is-stack' ? '' : `<span class="evm-fest-name" data-noloc>${escapeHtml(nickName(m))}</span>`}</button>`; };
+  let faces = '';
+  if(people.length && people.length <= 3) faces = `<span class="evm-fest-faces">${people.map(m => face(m, '')).join('')}</span>`;
+  else if(people.length <= 8) faces = `<span class="evm-fest-faces is-mid">${people.map(m => face(m, ' is-mid')).join('')}</span>`;
+  else if(people.length){
+    const lg = lineupGroups(people.map(m => m.id)), shown = people.slice(0, 8), more = people.length - shown.length;
+    const label = lg.all ? 'All Members' : lg.whole.length === 1 && !lg.rest.length ? `All ${lg.whole[0].name} Members`
+      : en ? `${people.length} members` : `${people.length} คน`;
+    faces = `<span class="evm-fest-faces is-stack">${shown.map(m => face(m, ' is-stack')).join('')}${more ? `<span class="evm-fest-more">+${more}</span>` : ''}</span>
+      <span class="evm-fest-count" data-noloc>${escapeHtml(label)}</span>`;
+  }
+  const long = sub.length > 18;
   return `
-  <div class="evm-fest" aria-hidden="false">
-    <span class="evm-fest-deco" aria-hidden="true">${confetti}</span>
-    <span class="evm-fest-word">Birthday</span>
-    <span class="evm-fest-sub">FANMEET</span>
-    <span class="evm-fest-faces">${faces.map(m=>{
-      const g = getGroup(m.groupId);
-      return `<button class="evm-fest-face" style="--c:${g.color}" data-action="open-member" data-id="${m.id}"
-        title="${escapeAttr(m.name)}">${renderAvatar(m,'evm-face-img',g.color)}
-        <span class="evm-fest-name">${escapeHtml(nickName(m))}</span></button>`;
-    }).join('')}</span>
+  <div class="evm-fest is-${k}${ev.poster ? ' is-postered' : ` pal-${K.pal}`}${faces ? '' : ' is-bare'}${K.word.length > 8 ? ' is-wide' : ''}" aria-hidden="false">
+    ${K.fx === 'beams' ? '<span class="evm-fest-beams" aria-hidden="true"><i></i><i></i></span>' : ''}
+    ${K.fx === 'rays' ? '<span class="evm-fest-rays" aria-hidden="true"></span>' : ''}
+    ${K.fx === 'bunting' ? renderFestBunting() : ''}
+    <span class="evm-fest-deco" aria-hidden="true">${renderFestDeco(K.motif)}</span>
+    <span class="evm-fest-word" data-noloc>${escapeHtml(K.word)}</span>
+    ${sub ? `<span class="evm-fest-sub${long ? ' is-long' : ''}" data-noloc>${escapeHtml(sub)}</span>` : ''}
+    ${faces}
   </div>`;
 }
+const renderBirthdayBanner = renderEventBanner;
 
 /** Who is at the booth when: one row per slot, today's picked out, finished
     ones dimmed. Tapping a name opens that member. */
@@ -15886,9 +16059,9 @@ function renderEventModal(){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
       <div class="modal-scroll">
-        <div class="evm-layout${(ev.poster && ev.poster.img) || ev.theme==='birthday' ? ' has-media' : ''}">
+        <div class="evm-layout has-media">
         <div class="evm-media">
-        ${ev.theme==='birthday' ? renderBirthdayBanner(ev) : ''}
+        ${renderEventBanner(ev)}
         ${ev.poster && ev.poster.img ? `<button class="evm-poster-btn" data-action="open-poster" data-id="${ev.id}"
           title="ดูโปสเตอร์เต็ม" aria-label="ดูโปสเตอร์เต็ม">
           <img class="evm-poster" src="${escapeAttr(ev.poster.img)}"${ev.poster.w ? ` width="${ev.poster.w}" height="${ev.poster.h}"` : ''}

@@ -92,6 +92,11 @@ the Firebase CLI from the owner's machine.
   Mini Concert", "15:00 …", "28 ส.ค. 10:00 …" — draw as a timetable that follows
   the clock on the day (`renderSchedule`, `schedTick` in `tickClock`): over,
   on now with time left, next. Keep writing them in that shape.
+- Every event sheet opens on a banner (`renderEventBanner`), made like the
+  birthday one: a script word for the kind of event (`festKind`, `FEST_KINDS`),
+  the release named in the title underneath, a scatter that suits the kind,
+  and the faces of who is on. A poster lends it its colours. An event the title
+  does not explain, or with its own wording, goes in `FEST_EVENT`.
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
   then `node scripts/make-poster-grads.mjs` for its sheet colours.
