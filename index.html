@@ -1312,12 +1312,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .wk-cats{ display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:8px; margin:0 0 14px; }
   .wk-cat{ grid-column:span 2; }
   .wk-cat:nth-child(-n+2){ grid-column:span 3; }
-  @media (min-width:900px){ .wk-cats{ grid-template-columns:repeat(8, minmax(0, 1fr)); } .wk-cat, .wk-cat:nth-child(-n+2){ grid-column:auto; } }
+  @media (min-width:1100px){ .wk-cats{ grid-template-columns:repeat(8, minmax(0, 1fr)); } .wk-cat, .wk-cat:nth-child(-n+2){ grid-column:auto; } }
   .wk-cat{ display:flex; flex-direction:column; align-items:flex-start; gap:5px; text-align:left;
     padding:11px 12px 10px; border-radius:16px; cursor:pointer; font:inherit; color:var(--ink); background:var(--card); border:1px solid var(--line);
     box-shadow:0 3px 0 rgba(var(--shadow-rgb),.08); transition:transform .12s, box-shadow .12s; }
   .wk-cat svg{ width:24px; height:24px; color:var(--pink); }
-  .wk-cat span{ display:flex; align-items:baseline; justify-content:space-between; gap:6px; width:100%; }
+  .wk-cat span{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; column-gap:6px; width:100%; }
   .wk-cat b{ font-size:14.5px; font-weight:800; line-height:1.2; white-space:nowrap; }
   .wk-cat small{ font-size:12px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
   .wk-cat.is-on{ background:var(--ink); border-color:var(--ink); color:var(--paper); box-shadow:0 3px 0 rgba(0,0,0,.28); }
@@ -1325,6 +1325,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .wk-cat.is-on small{ color:var(--paper); opacity:.75; }
   .wk-cat:active{ transform:translateY(2px); box-shadow:none; }
   .mw-ev{ margin-top:9px; }
+  .mw-sort{ margin:22px 0 4px; padding:6px 12px; border-radius:12px; background:var(--card); border:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
+  .mw-sort small{ font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .filter-bar + .mw-sort{ margin-top:12px; }
   .mw-own.is-soon{ background:var(--pink); }
   .mw-own{ display:inline-block; margin-left:4px; padding:1px 7px; border-radius:99px; font-size:10.5px; font-weight:800; color:#fff; background:var(--c); vertical-align:1px; }
   .mw-cast{ display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:7px; }
@@ -7203,9 +7206,9 @@ const SEED_MEDIA = [
   { kind:'film', title:'Homestay', year:2018, members:['bnk-cherprang'] },
   { kind:'film', title:'App War', year:2018, members:['bnk-orn'] },
   { kind:'film', title:'Where We Belong', alt:'ที่ตรงนั้น มีฉันหรือเปล่า', year:2019, by:'BNK48 Film', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-orn', 'bnk-tarwaan', 'bnk-namneung', 'bnk-pupe', 'bnk-faii', 'bnk-panda'], roles:{ 'bnk-jennis':'Sue', 'bnk-music':'Bell', 'bnk-orn':'Mew', 'bnk-tarwaan':'Prae', 'bnk-namneung':'Pahn', 'bnk-pupe':'Pook', 'bnk-faii':'Yok', 'bnk-panda':'Ja-ea' } },
-  { kind:'film', title:'Stratosphere: The Documentary', year:2019, note:'doc', members:['bnk-jennis', 'bnk-music', 'bnk-faii'] },
+  { kind:'film', title:'Stratosphere: The Documentary', year:2019, note:'doc', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-faii'] },
   { kind:'film', title:'Thi Baan X BNK48', alt:'ไทบ้าน x BNK48 จากใจผู้สาวคนนี้', year:2020, by:'BNK48 Film', own:true, members:['bnk-kaew', 'bnk-kaimook', 'bnk-mobile', 'bnk-namneung', 'bnk-namsai', 'bnk-noey', 'bnk-pupe', 'bnk-tarwaan'] },
-  { kind:'film', title:'Sisters', alt:'กระสือสยาม', year:2019, by:'BNK48 Film', own:true, members:['bnk-mewnich'] },
+  { kind:'film', title:'Sisters', alt:'กระสือสยาม', year:2019, members:['bnk-mewnich'] },
   { kind:'film', title:'Bear in Mind', year:2019, members:['bnk-korn'] },
   { kind:'film', title:'Me Before We', year:2019, by:'BNK48 Film', note:'short', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-faii', 'bnk-namneung', 'bnk-panda', 'bnk-tarwaan'] },
   { kind:'film', title:'One Take', year:2020, by:'Netflix', note:'doc', own:true, members:['bnk-bamboo', 'bnk-cake', 'bnk-cherprang', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-khamin', 'bnk-kheng', 'bnk-korn', 'bnk-maira', 'bnk-mewnich', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-myyu', 'bnk-namneung', 'bnk-namsai', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-oom', 'bnk-orn', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-ratah', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-view', 'bnk-wee', 'cgm-aom'] },
@@ -7215,9 +7218,8 @@ const SEED_MEDIA = [
   { kind:'film', title:'The Cheese Sisters', year:2022, by:'iAM Film', own:true, members:['bnk-namneung', 'bnk-noey', 'bnk-pun', 'bnk-jennis', 'bnk-wee', 'bnk-fond', 'cgm-marmink', 'cgm-kaning', 'cgm-angel', 'cgm-nenie'] },
   { kind:'film', title:'Faces of Anne', alt:'แอน', year:2022, members:['bnk-jennis', 'bnk-music'] },
   { kind:'film', title:'Haunted Universities 2nd Semester', alt:'เทอมสองสยองขวัญ', year:2022, members:['bnk-music'] },
-  { kind:'film', title:'Pha Phi Bok', alt:'ผ้าผีบอก', year:2022, members:['bnk-gygee', 'bnk-mobile', 'bnk-namneung', 'bnk-pupe', 'bnk-wee'] },
+  { kind:'film', title:'The Fabric', alt:'ผ้าผีบอก', year:2022, members:['bnk-gygee', 'bnk-mobile', 'bnk-namneung', 'bnk-pupe', 'bnk-wee'] },
   { kind:'film', title:'SLR', year:2022, members:['bnk-cherprang'] },
-  { kind:'film', title:'The Fabric', year:2022, members:['bnk-mobile', 'bnk-wee'] },
   { kind:'series', title:'Self', alt:'เราเห็นนาย', year:2022, by:'Studio Commuan', members:['cgm-ping'] },
   { kind:'film', title:'Taklee Genesis', year:2024, members:['bnk-peak'] },
   { kind:'film', title:'To Do List', alt:'ไม่อยากให้เป็นครั้งสุดท้าย', year:2025, note:'short', own:true, members:['bnk-pancake', 'cgm-kaning', 'cgm-nenie', 'bnk-hoop', 'cgm-champoo', 'bnk-popper', 'cgm-sita', 'bnk-yoghurt', 'bnk-l', 'bnk-jew', 'bnk-grace', 'bnk-neen'], roles:{ 'bnk-pancake':'Takamiya Mika', 'cgm-kaning':'Eiike Hina', 'cgm-nenie':'Satoaki Hikari', 'bnk-hoop':'Katsushi Suzuka', 'cgm-champoo':'Maihara Renka', 'bnk-popper':'Kaneyoshi Aika', 'cgm-sita':'Masakazu Emi', 'bnk-yoghurt':'Fukune Miho', 'bnk-l':'Kurogane Eri', 'bnk-jew':'Tamaishi Tomomi', 'bnk-grace':'Toyosumi Arisa', 'bnk-neen':'Shirahana Nagisa' } },
@@ -19181,11 +19183,12 @@ const WORKS_CATS = [
   { id:'event', th:'อีเวนต์', en:'Events', icon:'<path d="M12 3.2l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.1l-5.1 2.7 1-5.6-4.1-4 5.7-.8z"/>' },
   { id:'film', th:'ภาพยนตร์', en:'Films', icon:'<rect x="3" y="9" width="18" height="11.5" rx="2.2"/><path d="m3.4 8.6 16.4-3.3-.6-2.9L2.8 5.7z"/><path d="m7.6 4.6 1.6 3M12.6 3.6l1.6 3"/>' },
   { id:'series', th:'ซีรีส์', en:'Series', icon:'<rect x="3" y="6.5" width="18" height="12" rx="2.2"/><path d="M8.5 21.5h7M9 2.8l3 3.5 3-3.5"/>' },
-  { id:'show', th:'รายการ', en:'Shows', icon:'<rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v4M8.5 21.5h7"/>' },
+  { id:'special', th:'รายการพิเศษ', en:'Specials', icon:'<rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/>' },
   { id:'mv', th:'MV', en:'MVs', icon:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>' },
   { id:'ad', th:'โฆษณา', en:'Ads', icon:'<path d="M4 10v4a1 1 0 0 0 1 1h2l6.5 4.5V4.5L7 9H5a1 1 0 0 0-1 1z"/><path d="M17.5 9a4 4 0 0 1 0 6"/>' },
 ];
-const mediaCat = w => w.kind === 'voice' ? 'film' : w.kind;
+// a film is a feature; documentaries, short films and voice roles are the specials
+const mediaCat = w => w.kind === 'voice' || w.kind === 'show' || (w.kind === 'film' && (w.note === 'doc' || w.note === 'short')) ? 'special' : w.kind;
 // the group she was in that year (Izurina and Aom moved from BNK48 to CGM48 in 2019)
 const groupInYear = (m, year) => { const iso = `${year || new Date().getFullYear()}-07-01`;
   const span = (SEED_TEAM_HISTORY[m.id] || []).find(x => x.from <= iso && (!x.to || x.to >= iso)), t = span && getTeam(span.team);
@@ -19220,8 +19223,27 @@ function renderMediaCat(cat){
       ${w.ev && SEED_SCHEDULE.some(e => e.id === w.ev) ? `<button class="chip chip-link mw-ev" data-action="open-event" data-id="${w.ev}">${en ? 'The event →' : 'ดูงานนี้ →'}</button>` : ''}
     </div>`;
   };
-  return `<div class="timeline mw-list">${list.map(card).join('')}</div>`;
+  const parts = MEDIA_SORTS[cat] || [['', '', () => true]], used = new Set();
+  return parts.map(([th, enl, test]) => {
+    const rows = list.filter(w => !used.has(w) && test(w));
+    rows.forEach(w => used.add(w));
+    return rows.length ? `${th ? `<h3 class="section-label mw-sort">${en ? enl : th} <small>${rows.length}</small></h3>` : ''}<div class="timeline mw-list">${rows.map(card).join('')}</div>` : '';
+  }).join('');
 }
+/* Within a category, its kinds apart — a feature film is not a documentary or a
+   short — in this order; each test takes what is left. */
+const MEDIA_SORTS = {
+  special:[['รายการของวง', "The group's shows", w => w.kind === 'show' && w.own], ['สารคดี', 'Documentaries', w => w.kind === 'film' && w.note === 'doc'],
+    ['หนังสั้น', 'Short films', w => w.note === 'short'], ['รายการแข่งขัน', 'Competitions', w => w.note === 'contestant'],
+    ['รายการอื่น', 'Other shows', w => w.kind === 'show'], ['พากย์เสียง', 'Voice roles', () => true]],
+  series:[['ซีรีส์และละคร', 'Series and dramas', w => w.note !== 'sitcom'], ['ซิทคอม', 'Sitcoms', () => true]],
+  concert:[['คอนเสิร์ต', 'Concerts', w => !w.note || ['free', 'charity', 'election', 'request', 'solo', 'produced', 'musical', 'online', 'kidcat'].includes(w.note)],
+    ['คอนเสิร์ตประจำรุ่นและจบการศึกษา', 'Generation and graduation concerts', w => ['gen', 'gengrad', 'grad'].includes(w.note)],
+    ['เปิดตัวซิงเกิลและมินิคอนเสิร์ต', 'First performances and mini concerts', w => ['first', 'mini', 'tour', 'abroad'].includes(w.note)],
+    ['ร่วมกับวงตระกูล 48', 'With the 48 groups', () => true]],
+  event:[['เลือกตั้งและโหวต', 'Elections and polls', w => ['ge', 'janken', 'poll'].includes(w.note)], ['กีฬาสี', 'Sports days', w => w.note === 'sports'],
+    ['แฟนมีตและแฟนเฟสติวัล', 'Fanmeets and fan festivals', w => ['fanmeet', 'fanfest'].includes(w.note)], ['เทศกาลและงานพิเศษ', 'Festivals and special events', () => true]],
+};
 
 function renderDiscography(){
   const en = isEN(), cat = WORKS_CATS.some(c => c.id === state.worksCat) ? state.worksCat : 'music';
