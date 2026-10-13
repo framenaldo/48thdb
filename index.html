@@ -7365,6 +7365,8 @@ const SEED_MEDIA = [
   { kind:'event', title:'On Cloud 9 Festival –9th Anniversary–', year:2026, by:'MCC Hall, The Mall Lifestore Bangkae, Bangkok', note:'anniv', own:true, whole:'both', date:'2026-05-30', end:'2026-06-01', members:[] },
   { kind:'event', title:'CGM48 TANABATA 2026', year:2026, by:'MAYA Chiang Mai, Chiang Mai', note:'festival', own:true, whole:'cgm48', date:'2026-07-04', end:'2026-07-05', members:[] },
   { kind:'event', title:'BNK48 & CGM48 Bon Odori 2026', year:2026, by:'Island Hall, Fashion Island, Bangkok', note:'festival', own:true, whole:'both', date:'2026-07-24', end:'2026-07-26', members:[] },
+  { kind:'event', title:'"My Birthday is ... Next Week" Hoop Said', year:2026, by:'The Theater Hall, The Bazaar Hotel Bangkok', note:'bday', own:true, date:'2026-09-13', ev:'ev-hoop-bday-said', members:['bnk-hoop'] },
+  { kind:'event', title:'Get Away with Pudthailee', year:2026, by:'Hua Hin, Prachuap Khiri Khan', note:'trip', own:true, date:'2026-09-18', end:'2026-09-20', ev:'ev-getaway-pudthailee', members:['bnk-hoop'] },
   { kind:'event', title:'NIPPON HAKU BANGKOK 2026', year:2026, by:'Queen Sirikit National Convention Center, Bangkok', note:'expo', date:'2026-08-28', end:'2026-08-30', ev:'ev-nipponhaku-2026', members:['bnk-hoop', 'bnk-janry', 'bnk-l', 'cgm-lookked', 'cgm-nana', 'cgm-jingjing'] },
   { kind:'event', title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival', year:2026, by:'MCC Hall, The Mall Lifestore Bangkapi', note:'fanfest', own:true, whole:'both', date:'2026-10-03', end:'2026-10-04', ev:'ev-election-fanfest', members:[] },
   { kind:'event', title:'Fame\'s Airline Fanmeet', year:2026, by:'The Theater Hall, The Bazaar Hotel Bangkok', note:'fanmeet', own:true, date:'2026-10-25', ev:'ev-fame-fanmeet', members:['bnk-fame'] },
@@ -9477,7 +9479,7 @@ const MEDIA_NOTE = { doc:['สารคดี', 'documentary'], short:['หน�
   abroad:['แสดงที่เซี่ยงไฮ้', 'in Shanghai'], ge:['ประกาศผลเลือกตั้งเซ็มบัตสึ', 'Senbatsu election results'], janken:['เป่ายิ้งฉุบชิงเซ็มบัตสึ', 'janken tournament'],
   sports:['งานกีฬาสี', 'sports day'], fanmeet:['แฟนมีต', 'fan meeting'], fanfest:['แฟนเฟสติวัล', 'fan festival'], anniv:['ฉลองครบรอบวง', 'anniversary'],
   poll:['ประกาศผลโหวต', 'poll results'], esports:['อีสปอร์ต · ออนไลน์', 'e-sports, online'], expo:['งานญี่ปุ่นที่วงขึ้นเวที', 'Japan fair on stage'],
-  festival:['เทศกาล', 'festival'], halloween:['ฮาโลวีน', 'Halloween'], christmas:['คริสต์มาส', 'Christmas'] };
+  festival:['เทศกาล', 'festival'], trip:['ทริปแฟนมีต 3 วัน 2 คืน', 'three-day fan trip'], bday:['แฟนมีตวันเกิด', 'birthday fanmeet'], halloween:['ฮาโลวีน', 'Halloween'], christmas:['คริสต์มาส', 'Christmas'] };
 function renderMemberMedia(m){
   const list = SEED_MEDIA.filter(w => w.members.includes(m.id)).sort((a, b) => (b.year || 0) - (a.year || 0));
   if(!list.length) return '';
@@ -19243,7 +19245,7 @@ const MEDIA_SORTS = {
     ['เปิดตัวซิงเกิลและมินิคอนเสิร์ต', 'First performances and mini concerts', w => ['first', 'mini', 'tour', 'abroad'].includes(w.note)],
     ['ร่วมกับวงตระกูล 48', 'With the 48 groups', () => true]],
   event:[['เลือกตั้งและโหวต', 'Elections and polls', w => ['ge', 'janken', 'poll'].includes(w.note)], ['กีฬาสี', 'Sports days', w => w.note === 'sports'],
-    ['แฟนมีตและแฟนเฟสติวัล', 'Fanmeets and fan festivals', w => ['fanmeet', 'fanfest'].includes(w.note)], ['เทศกาลและงานพิเศษ', 'Festivals and special events', () => true]],
+    ['แฟนมีตและแฟนเฟสติวัล', 'Fanmeets and fan festivals', w => ['fanmeet', 'fanfest', 'trip', 'bday'].includes(w.note)], ['เทศกาลและงานพิเศษ', 'Festivals and special events', () => true]],
 };
 
 function renderDiscography(){
