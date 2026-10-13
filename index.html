@@ -3187,6 +3187,187 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .ff-nm{ display:block; }
     .ff-stage{ left:25%; width:50%; }
   }
+  /* ===== handshake lanes: the organiser's long lanes on a dark board, turned
+     to run across the phone. A round picked: each lane in use lights in her
+     group's colour from the walkway end, her name joins LANE n, and her face
+     drops onto the lane — standing up in 3D, lying flat in 2D. ===== */
+  .hs{ --pitch:38deg; --ty:-75px; --sc:.88; --fy:.14; }
+  .hs.is-flat{ --pitch:0deg; --ty:0px; --sc:1; --fy:.5; }
+  .hs-board{ container-type:inline-size; padding:12px; border-radius:18px; background:#1A1419; color:#EFE7EC; overflow:hidden;
+    border:1px solid rgba(255,255,255,.1); box-shadow:0 8px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06); }
+  .hs-top{ display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .hs-board .ff-days{ padding:3px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); }
+  .hs-board .ff-days button{ border-radius:999px; color:#B9ABB3; font-weight:800; font-size:12.5px; padding:5px 12px; white-space:nowrap; transition:transform .12s; }
+  .hs-board .ff-days button:active{ transform:scale(.94); }
+  .hs-board .ff-days button.on{ background:#F4ECF1; color:#1A1419; box-shadow:0 2px 0 rgba(0,0,0,.45); }
+  .hs-count{ font-size:11.5px; font-weight:700; color:#9C8E97; white-space:nowrap; }
+  .hs-spacer{ flex:1; min-width:74px; }   /* keeps clear of the sheet's share and close buttons */
+  /* the day along the top: the rounds in proportion, from 11:00 to 21:00 */
+  .hs-track{ position:relative; height:44px; }
+  .hs-seg{ position:absolute; top:0; bottom:0; padding:0; overflow:hidden; cursor:pointer; font:inherit; color:#F4ECF1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+    border:1px solid rgba(255,255,255,.14); border-radius:9px; background:rgba(255,255,255,.08); box-shadow:0 2px 0 rgba(0,0,0,.45);
+    -webkit-tap-highlight-color:transparent; transition:transform .12s, box-shadow .12s, background .2s, opacity .2s; }
+  .hs-seg b{ position:relative; z-index:1; font-size:11px; font-weight:800; line-height:1.15; white-space:nowrap; }
+  .hs-seg small{ position:relative; z-index:1; font-size:9.5px; font-weight:700; color:#9C8E97; line-height:1.1; }
+  /* the last quarter hour, when the lanes have closed */
+  .hs-seg::after{ content:''; position:absolute; top:0; bottom:0; right:0; width:var(--shut);
+    background:repeating-linear-gradient(135deg, rgba(255,255,255,.16) 0 2px, transparent 2px 5px); }
+  .hs-seg:active{ transform:translateY(2px); box-shadow:none; }
+  .hs-seg.on{ background:#F4ECF1; border-color:#F4ECF1; color:#1A1419; }
+  .hs-seg.on small{ color:#6B5E66; }
+  .hs-seg.on::after{ background:repeating-linear-gradient(135deg, rgba(26,20,25,.18) 0 2px, transparent 2px 5px); }
+  .hs-seg.is-sp{ border-color:rgba(240,108,155,.5); background:rgba(240,108,155,.14); }
+  .hs-seg.is-sp.on{ background:#F06C9B; border-color:#F06C9B; color:#fff; }
+  .hs-seg.is-sp.on small{ color:#FFE3EE; }
+  .hs-seg.is-past:not(.on){ opacity:.45; }
+  .hs-seg.is-now{ border-color:#E02118; }
+  .hs-seg.is-dim:not(.on){ opacity:.38; }
+  .hs-seg.has-oshi::before{ content:''; position:absolute; top:4px; right:4px; width:6px; height:6px; border-radius:50%;
+    background:#F06C9B; box-shadow:0 0 6px rgba(240,108,155,.8); z-index:1; }
+  /* a first look: the rounds light up in turn, once, to say they can be tapped */
+  .hs:not(.is-round) .hs-seg{ animation:hs-hint 1.2s ease-in-out calc(.5s + var(--k) * .12s) 1; }
+  @keyframes hs-hint{ 45%{ background:rgba(255,255,255,.24); border-color:rgba(255,255,255,.45); } }
+  .hs-needle{ position:absolute; top:-4px; bottom:-4px; width:2px; margin-left:-1px; border-radius:2px; z-index:2; pointer-events:none;
+    background:#E02118; box-shadow:0 0 8px rgba(224,33,24,.8); }
+  .hs-ticks{ position:relative; height:13px; margin-top:3px; }
+  .hs-ticks span{ position:absolute; top:0; transform:translateX(-50%); font-size:9px; font-weight:700; color:#7E7178; }
+  .hs-ticks span:first-child{ transform:none; }
+  .hs-ticks span:last-child{ transform:translateX(-100%); }
+  .hs-sel{ margin:6px 2px 8px; font-size:12px; line-height:1.45; color:#B9ABB3; }
+  .hs-sel b{ color:#F4ECF1; font-weight:800; margin-right:2px; }
+  .hs-sel.is-hint{ text-align:center; color:#9C8E97; }
+  .hs-tools{ display:flex; align-items:center; gap:10px; margin:0 0 4px; }
+  .hs-tools .sp-seg button{ min-width:40px; min-height:28px; padding:0 10px; font-size:12px; }
+  .hs-hint{ font-size:11.5px; color:#9C8E97; }
+  .hs .hs-hint .is-2d, .hs.is-flat .hs-hint .is-3d{ display:none; }
+  .hs.is-flat .hs-hint .is-2d{ display:inline; }
+  /* the hall, in perspective; in 3D it lies tipped back and can be turned */
+  .hs-view{ position:relative; height:430px; perspective:1300px; perspective-origin:50% 20%; touch-action:pan-y;
+    user-select:none; -webkit-user-select:none; transition:height .8s cubic-bezier(.22,1,.36,1); }
+  .hs.is-flat .hs-view{ height:542px; }
+  .hs-floor{ position:absolute; left:0; right:0; top:0; transform-style:preserve-3d; transform-origin:50% 50%;
+    transform:translateY(var(--ty)) scale(var(--sc)) rotateX(var(--pitch)) rotateZ(var(--yaw)); transition:transform .8s cubic-bezier(.22,1,.36,1);
+    border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)); border:1px solid rgba(255,255,255,.1); }
+  .hs-hall{ display:grid; gap:4px; padding:10px 8px 10px 34px; transform-style:preserve-3d; }
+  /* in 3D the hall and its lanes lie in one plane, and a tap would land on the hall: only a lane in use and her face take it */
+  .hs-floor, .hs-hall, .hs-lane, .hs-lobby{ pointer-events:none; }
+  .hs-lane.is-on, .hs-lane.is-on .hs-face{ pointer-events:auto; }
+  .hs-lane{ position:relative; height:17px; margin:0; padding:0 6px; border:0; border-radius:3px; display:flex; align-items:center; gap:6px;
+    background:#3F3930; color:#A69C88; font:inherit; text-align:left; transform-style:preserve-3d; -webkit-tap-highlight-color:transparent; }
+  .hs-lane::before{ content:''; position:absolute; inset:0; border-radius:inherit; display:none; transform-origin:0 50%;
+    background:linear-gradient(90deg, color-mix(in srgb, var(--c) 70%, #000), var(--c) 55%, color-mix(in srgb, var(--c) 78%, #fff)); }
+  .hs-lane.is-on{ cursor:pointer; color:#fff; }
+  .hs-lane.is-on::before{ display:block; }
+  .hs-tag{ position:relative; font-size:8.5px; font-weight:900; letter-spacing:.08em; white-space:nowrap; }
+  .hs-lane.is-on .hs-tag{ padding:1px 5px; border-radius:4px; background:rgba(0,0,0,.28); }
+  .hs-nm{ position:relative; font-size:11px; font-weight:800; white-space:nowrap; text-shadow:0 1px 2px rgba(0,0,0,.35); }
+  .hs-lane.is-on:active::before{ filter:brightness(.85); }
+  /* her face: a photo card standing on the lane, facing you however the hall is turned */
+  .hs-face{ --s:30px; position:absolute; top:50%; width:var(--s); height:var(--s); margin:calc(var(--s) * -1) 0 0 calc(var(--s) / -2);
+    transform-origin:50% 100%; transform-style:preserve-3d;
+    transform:translateY(calc(var(--s) * var(--fy))) rotateZ(calc(var(--yaw) * -1)) rotateX(calc(var(--pitch) * -1));
+    transition:transform .8s cubic-bezier(.22,1,.36,1), width .25s, height .25s, margin .25s; }
+  .hs-pic{ display:block; width:100%; height:100%; border-radius:9px; overflow:hidden; background:#2A2126;
+    border:2px solid #fff; box-shadow:0 4px 10px rgba(0,0,0,.5); }
+  .hs-face-img{ width:100% !important; height:100% !important; border-radius:0 !important; font-size:9px; }
+  .hs-shadow{ position:absolute; top:50%; width:26px; height:9px; margin:-2px 0 0 -13px; border-radius:50%; pointer-events:none;
+    background:radial-gradient(rgba(0,0,0,.55), transparent 70%); transition:opacity .5s; }
+  .hs.is-flat .hs-shadow{ opacity:0; }
+  .hs.is-turning .hs-floor, .hs.is-turning .hs-face{ transition:none; }
+  /* a member tapped: her lane glows, her face grows, the rest step back */
+  .hs-lane.is-pick{ box-shadow:0 0 0 2px #F3D9B1, 0 0 14px var(--c); z-index:3; }
+  .hs-lane.is-pick .hs-face{ --s:40px; }
+  .hs-lane.is-pick .hs-pic, .hs-spec-p.is-pick .hs-pic{ border-color:#F3D9B1; box-shadow:0 0 14px rgba(243,217,177,.85); }
+  .hs.has-pick .hs-lane.is-on:not(.is-pick)::before{ opacity:.35; }
+  .hs.has-pick .hs-lane.is-on:not(.is-pick){ color:rgba(255,255,255,.6); }
+  .hs.has-pick .hs-lane.is-on:not(.is-pick) .hs-pic{ opacity:.45; }
+  .hs-ring{ position:absolute; left:50%; top:50%; width:44px; height:44px; margin:-22px 0 0 -22px; border-radius:50%;
+    border:2.5px solid #fff; pointer-events:none; animation:ff-ring 1.1s ease-out 2; }
+  /* the reveal: lanes light from the walkway end, one after another, and the faces drop in */
+  .hs.is-reveal .hs-lane.is-on::before{ animation:hs-sweep .55s cubic-bezier(.2,.8,.2,1) calc(var(--i) * 24ms) both; }
+  @keyframes hs-sweep{ from{ transform:scaleX(0); } }
+  .hs.is-reveal .hs-lane.is-on .hs-nm{ animation:hs-in .4s ease-out calc(var(--i) * 24ms + .2s) both; }
+  @keyframes hs-in{ from{ opacity:0; transform:translateX(-6px); } }
+  .hs.is-reveal .hs-lane .hs-pic{ animation:hs-drop .6s cubic-bezier(.3,1.45,.55,1) calc(var(--i) * 24ms + .25s) both; }
+  @keyframes hs-drop{ 0%{ opacity:0; transform:translateY(-34px) scale(.5); } 50%{ opacity:1; } }
+  .hs.is-reveal .hs-shadow{ animation:hs-fade .4s ease-out calc(var(--i) * 24ms + .45s) both; }
+  @keyframes hs-fade{ from{ opacity:0; } }
+  /* the doors along the bottom wall, the desks in the lobby beyond */
+  /* the lettering keeps in proportion to the board, so the four along the wall never meet on a small phone */
+  .hs-lobby{ position:relative; height:60px; font-size:min(9.5px, calc(100cqw * .0328));
+    background:linear-gradient(90deg, rgba(255,255,255,.32) 0 2%, transparent 2% 12%, rgba(255,255,255,.32) 12% 58%,
+      transparent 58% 71%, rgba(255,255,255,.32) 71%) 0 0 / 100% 3px no-repeat; }
+  .hs-door{ position:absolute; top:8px; left:64.5%; transform:translateX(-50%); display:flex; align-items:center; gap:.3em; --d:63,181,165;
+    padding:.2em .7em .2em .5em; border-radius:99px; background:rgba(var(--d),.14); border:1px solid rgba(var(--d),.45); color:#BFE9E2;
+    font-size:1em; font-weight:800; white-space:nowrap; }
+  .hs-door.is-out{ left:2%; transform:none; --d:240,138,93; color:#FAD2BF; }
+  .hs-door svg{ width:1.15em; height:1.15em; flex:none; }
+  .hs-desk{ position:absolute; padding:.4em .65em; border-radius:4px; font-size:.76em; font-weight:800; letter-spacing:.05em; white-space:nowrap;
+    color:#CFC4CA; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); }
+  .hs-desk.is-info{ left:24%; top:9px; }
+  .hs-desk.is-aid{ right:2%; top:9px; }
+  .hs-desk.is-lift{ left:2%; bottom:6px; }
+  .hs-desk.is-shop{ left:calc(2% + 7.6em); bottom:6px; }
+  /* the special round: its lanes come on the day, so its members gather over the hall */
+  .hs-spec{ position:absolute; left:5%; right:5%; top:50%; transform:translateY(-50%); z-index:5; padding:14px 10px 12px; border-radius:16px;
+    max-height:calc(100% - 12px); overflow-y:auto; overscroll-behavior:contain;
+    text-align:center; background:rgba(26,20,25,.9); border:1px solid rgba(240,108,155,.45);
+    box-shadow:0 10px 30px rgba(0,0,0,.5), 0 0 24px rgba(240,108,155,.2); }
+  .hs-spec > b{ display:block; font-size:14px; }
+  .hs-spec > small{ display:block; margin-top:2px; font-size:11.5px; color:#B9ABB3; }
+  .hs-spec-ppl{ display:grid; grid-template-columns:repeat(auto-fill, minmax(42px, 1fr)); gap:7px 3px; margin-top:10px; }
+  .hs-spec-p{ min-width:0; padding:0; border:0; background:none; color:#F4ECF1; font:inherit; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:3px; -webkit-tap-highlight-color:transparent; }
+  .hs-spec-p .hs-pic{ width:32px; height:32px; }
+  .hs-spec-p span{ max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:9px; font-weight:700; }
+  .hs-spec-p:active .hs-pic{ transform:scale(.92); }
+  .hs.is-special .hs-lane{ opacity:.5; }
+  .hs.is-reveal .hs-spec{ animation:hs-up .45s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes hs-up{ from{ opacity:0; transform:translateY(-44%); } }
+  .hs.is-reveal .hs-spec-p .hs-pic{ animation:hs-drop .6s cubic-bezier(.3,1.45,.55,1) calc(var(--i) * 28ms + .2s) both; }
+  /* under the hall: the member tapped, then everyone in the round by name */
+  .hs-pick{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; margin-top:10px; padding:9px 10px;
+    border-radius:16px; background:rgba(255,255,255,.07); border:1px solid var(--c); box-shadow:0 3px 0 rgba(0,0,0,.45); color:#F4ECF1; }
+  .hs-pick-face{ width:44px !important; height:44px !important; border-radius:12px !important; font-size:11px; }
+  .hs-pick-who{ min-width:0; }
+  .hs-pick-who b{ display:block; font-size:15.5px; line-height:1.2; }
+  .hs-pick-who small{ font-size:11.5px; color:#B9ABB3; }
+  .hs-pick-no{ font-size:11px; font-weight:900; letter-spacing:.06em; color:#fff; background:var(--c); padding:3px 10px; border-radius:99px; white-space:nowrap; }
+  .hs-pick-day{ grid-column:1/-1; display:flex; flex-wrap:wrap; gap:6px; }
+  .hs-when{ display:flex; flex-direction:column; align-items:flex-start; gap:1px; padding:4px 9px; cursor:pointer; font:inherit; font-size:11px;
+    font-weight:700; line-height:1.3; color:#B9ABB3; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14);
+    border-left:4px solid var(--c); border-radius:10px; box-shadow:0 2px 0 rgba(0,0,0,.45); transition:transform .12s, box-shadow .12s; }
+  .hs-when b{ color:#F4ECF1; font-size:11.5px; }
+  .hs-when.is-sp{ border-left-color:#F06C9B; }
+  .hs-when.on{ background:color-mix(in srgb, var(--c) 30%, #1A1419); color:#F4ECF1; }
+  .hs-when:active{ transform:translateY(2px); box-shadow:none; }
+  .hs-pick-none{ grid-column:1/-1; margin:0; font-size:12px; color:#B9ABB3; }
+  .hs-list{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px; margin-top:10px; }
+  .hs-chip{ display:flex; align-items:center; gap:6px; min-width:0; padding:3px 4px 3px 3px; cursor:pointer; font:inherit; font-size:12px;
+    font-weight:700; color:#F4ECF1; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:99px;
+    box-shadow:0 2px 0 rgba(0,0,0,.45); transition:transform .12s, box-shadow .12s; }
+  .hs-chip span{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
+  .hs-chip b{ flex:none; min-width:22px; padding:1px 6px; border-radius:99px; background:var(--c); color:#fff; font-size:10.5px; font-weight:900; text-align:center; }
+  .hs-chip.on{ border-color:#F3D9B1; background:rgba(243,217,177,.16); }
+  .hs-chip:active{ transform:translateY(2px); box-shadow:none; }
+  .hs-chip-face{ width:22px !important; height:22px !important; font-size:8px; }
+  .hs-note{ margin:10px 2px 0; font-size:11.5px; line-height:1.5; color:#9C8E97; text-align:center; }
+  .hs-none{ margin:10px 0 0; padding:10px; border-radius:14px; text-align:center; font-size:12.5px; background:rgba(255,255,255,.06); color:#B9ABB3; }
+  @container (min-width:430px){ .hs-list{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+  /* a small phone: the walkway narrows and the lettering steps down, so a long name clears the faces */
+  @container (max-width:280px){
+    .hs-hall{ padding-left:16px; }
+    .hs-lane{ gap:4px; padding:0 4px; }
+    .hs-tag{ font-size:7.5px; letter-spacing:.04em; }
+    .hs-nm{ font-size:9.5px; }
+    .hs-seg b{ font-size:10px; }
+    .hs-seg small{ font-size:8.5px; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .hs-floor, .hs-face, .hs-view{ transition:none; }
+    .hs.is-reveal *, .hs.is-reveal *::before, .hs .hs-seg, .hs-ring{ animation:none !important; }
+  }
   /* the owner's link editor in an event sheet */
   .evl-open{ margin-top:14px; }
   .evl{ margin-top:14px; padding:12px; border-radius:16px; border:1.5px dashed var(--line); background:color-mix(in srgb, var(--card) 70%, transparent); }
@@ -6280,12 +6461,17 @@ const SEED_SCHEDULE = [
         { id:'Z2', label:'Zone 2', sections:['Z2'], color:'#72AB52', note:'โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้' },
         { id:'Z3', label:'Zone 3', sections:['Z3L', 'Z3B', 'Z3R'], color:'#63A3D3', note:'โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้' }] },
     info:['รอบเวลารอประกาศอีกครั้ง'] },
-  { id:'ev-ge6-handshake', logo:'kimi', start:'2026-10-31', end:'2026-11-01',
+  { id:'ev-ge6-handshake', logo:'kimi', start:'2026-10-31', end:'2026-11-01', lanePlan:'kimi',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Handshake Event',
     venue:'MCC Hall, The Mall Lifestore Ngamwongwan', groups:['bnk48','cgm48'],
     timeline:'ge2026', related:['ev-ge6-single','ev-election-voting'],
     info:['ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Handshake Event',
-      'รอบเวลารอประกาศอีกครั้ง'],
+      'สั่งจองทาง iAM48 Application ได้ถึง 30 ต.ค. 2026 23:00 น.',
+      'วันละ 5 รอบ 11:00–18:30 รอบละชั่วโมงครึ่ง ปิดเลนก่อนจบรอบ 15 นาที ต่อด้วยรอบพิเศษ 19:00–21:00',
+      'รอบปกติใช้บัตรจับมือได้ 1–5 ใบ หรือใช้ 3 ใบถ่าย 1-Shot Video กับเมมเบอร์',
+      'รอบพิเศษใช้บัตรได้ 1–100 ใบ จับมืออย่างเดียว ร่วมได้วันละ 1 เมมเบอร์ เลนประกาศที่หน้างาน',
+      'มาด้วยรถยนต์ แสดง iAM Application ที่จุด Information รับชั่วโมงจอดรถ 6 ชั่วโมง · รถจักรยานยนต์จอดฟรีตลอดวัน',
+      'รอบจับมืออาจเปลี่ยนแปลงภายหลัง'],
     allMembers:true },
   { id:'ev-ge6-myo1', logo:'kimi', start:'2026-11-05', end:'2026-11-08', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 1]',
@@ -7430,6 +7616,7 @@ const ICONS = {
 let state = {
   isOwner:false, pending:[], flash:[], layout:null, layoutEdit:null, layoutDraft:null, navPick:null, geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
   ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOshi:false,
+  hsDay:0, hsRound:null, hsPick:null, hsOshi:false, hsFlat:false, hsYaw:0,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current', livesScope:'current', galleryId:null,
@@ -8001,6 +8188,12 @@ const EN = {
   'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online':
     'Enter with the digital ticket from the Meeting You Online CD Edition or Mini Photobook Edition',
   'รอบเวลารอประกาศอีกครั้ง': 'Session times are still to be announced',
+  'สั่งจองทาง iAM48 Application ได้ถึง 30 ต.ค. 2026 23:00 น.': 'Pre-order in the iAM48 Application until 30 Oct 2026, 23:00',
+  'วันละ 5 รอบ 11:00–18:30 รอบละชั่วโมงครึ่ง ปิดเลนก่อนจบรอบ 15 นาที ต่อด้วยรอบพิเศษ 19:00–21:00': 'Five rounds a day, 11:00–18:30, an hour and a half each; lanes close 15 minutes before a round ends. Then a special round, 19:00–21:00',
+  'รอบปกติใช้บัตรจับมือได้ 1–5 ใบ หรือใช้ 3 ใบถ่าย 1-Shot Video กับเมมเบอร์': 'In a regular round, use 1–5 handshake tickets, or 3 for a 1-Shot Video with the member',
+  'รอบพิเศษใช้บัตรได้ 1–100 ใบ จับมืออย่างเดียว ร่วมได้วันละ 1 เมมเบอร์ เลนประกาศที่หน้างาน': 'In the special round, use 1–100 tickets, handshake only, one member a day; its lanes are announced at the venue',
+  'มาด้วยรถยนต์ แสดง iAM Application ที่จุด Information รับชั่วโมงจอดรถ 6 ชั่วโมง · รถจักรยานยนต์จอดฟรีตลอดวัน': 'Coming by car: show the iAM Application at Information for 6 hours of parking · motorbikes park free all day',
+  'รอบจับมืออาจเปลี่ยนแปลงภายหลัง': 'Rounds may change later',
   'แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี':
     'Redeem tickets 7 Oct 12:00 – 3 Nov 2026 23:00. Tickets not redeemed by then cannot be used',
   'แลกบัตรได้ 7 ต.ค. 12:00 – 24 พ.ย. 2026 23:00 น. ถ้าไม่ได้แลกภายในเวลานี้ จะเข้าร่วมกิจกรรมไม่ได้ทุกกรณี':
@@ -10793,6 +10986,7 @@ let _feedLiveKey = null;
 function tickClock(){
   syncTicker();
   ffLiveTick();
+  hsLiveTick();
   schedTick();
   document.querySelectorAll('[data-starts-at]').forEach(el=>{
     const end = Number(el.dataset.endsAt) || 0;
@@ -14988,6 +15182,285 @@ function ffPaint(){
   ffFit();
 }
 
+/* ===== The handshake event's lanes =====
+   Kimi to Doko ka e Ikitai, 31 Oct – 1 Nov 2026, MCC Hall, The Mall Lifestore
+   Ngamwongwan. The organiser's plan sets twenty-two long lanes side by side
+   with the doors on the right; here it is turned a quarter so the lanes run
+   across a phone — lane 1 at the back, the doors at the bottom, the hall as it
+   looks walking in. The organiser's tables (one per team a day) give each
+   member a lane in rounds 1–5 and a tick for the special round, whose lanes
+   are handed out on the day. A member's row below: her lane in rounds 1–5
+   (0, none), then 1 if she is in the special round. */
+const HS_LANES = 22;
+const HS_ROUNDS = [
+  { t:'11:00', to:'12:30', close:'12:15' },
+  { t:'12:30', to:'14:00', close:'13:45' },
+  { t:'14:00', to:'15:30', close:'15:15' },
+  { t:'15:30', to:'17:00', close:'16:45' },
+  { t:'17:00', to:'18:30', close:'18:15' },
+  { t:'19:00', to:'21:00', close:'19:00', special:true },
+];
+const HS_DAYS = [
+  { date:'2026-10-31', lanes:{
+    // BIII
+    'bnk-fame':[0,0,0,0,4,1], 'bnk-hoop':[0,1,0,1,0,1], 'bnk-janry':[5,0,0,5,0,0], 'bnk-luksorn':[8,0,0,8,0,1],
+    'bnk-mail':[0,0,0,0,17,1], 'bnk-marine':[0,6,0,6,0,0], 'bnk-micha':[0,0,0,3,0,1], 'bnk-monet':[18,0,0,0,19,1],
+    'bnk-patt':[10,0,0,0,0,0], 'bnk-praew':[9,0,9,0,0,1], 'bnk-wawa':[0,0,10,0,9,0],
+    // NV
+    'bnk-arlee':[0,7,0,7,0,1], 'bnk-berry':[0,0,5,0,0,1], 'bnk-emmy':[4,0,4,0,0,0], 'bnk-jew':[0,0,8,0,8,1],
+    'bnk-l':[3,0,3,0,0,0], 'bnk-palmmy':[0,9,0,9,0,0], 'bnk-pancake':[0,4,0,4,0,1], 'bnk-proud':[0,14,0,0,14,0],
+    'bnk-saonoi':[0,0,15,0,0,1], 'bnk-sindy':[0,8,0,0,10,1], 'bnk-yoghurt':[2,2,0,2,2,1],
+    // BNK48 Trainee
+    'bnk-blythe':[16,11,0,0,0,0], 'bnk-cartoon':[0,16,0,0,16,0], 'bnk-galeya':[7,0,0,0,6,0], 'bnk-grape':[0,0,0,16,0,1],
+    'bnk-inkcha':[0,17,0,17,0,0], 'bnk-khaimook':[0,0,0,11,0,1], 'bnk-khowjow':[15,0,17,0,0,0], 'bnk-mayji':[0,0,0,0,0,0],
+    'bnk-mint':[0,0,0,0,15,1], 'bnk-mirin':[0,0,0,0,13,1], 'bnk-nall':[0,0,12,0,12,0], 'bnk-nammonn':[0,0,16,0,11,0],
+    'bnk-neen':[13,0,13,0,0,0], 'bnk-niya':[0,0,0,14,0,1], 'bnk-rose':[0,0,0,18,0,1],
+    // Team C
+    'cgm-else':[0,18,0,0,0,1], 'cgm-ginna':[0,3,0,0,3,0], 'cgm-jingjing':[0,10,0,10,0,0], 'cgm-kwan':[0,0,2,0,1,0],
+    'cgm-lingling':[0,12,0,12,0,0], 'cgm-lookked':[11,0,11,0,0,1], 'cgm-nana':[6,0,6,0,0,0], 'cgm-nisha':[19,0,19,0,0,0],
+    'cgm-ploen':[0,0,18,0,20,0], 'cgm-prae':[0,13,0,13,0,1],
+    // CGM48 Trainee
+    'cgm-chifa':[0,15,0,15,0,1], 'cgm-emma':[1,0,1,0,0,0], 'cgm-hongyok':[0,0,0,0,18,1], 'cgm-lewlew':[14,0,14,0,0,1],
+    'cgm-namphet':[0,20,0,0,0,0], 'cgm-praifa':[0,19,0,0,0,1], 'cgm-punpon':[0,0,20,0,0,1], 'cgm-satangpound':[0,5,0,0,5,1],
+    'cgm-shenae':[0,0,7,0,7,0], 'cgm-tara':[20,0,0,20,0,1], 'cgm-valentine':[17,0,0,19,0,0],
+  } },
+  { date:'2026-11-01', lanes:{
+    // BIII
+    'bnk-fame':[2,0,2,0,0,0], 'bnk-hoop':[1,0,1,0,0,0], 'bnk-janry':[0,5,0,5,0,1], 'bnk-luksorn':[0,7,0,0,6,0],
+    'bnk-mail':[7,0,0,7,0,0], 'bnk-marine':[0,6,0,6,0,1], 'bnk-micha':[0,3,0,3,0,0], 'bnk-monet':[0,2,0,2,0,0],
+    'bnk-patt':[0,0,4,0,5,1], 'bnk-praew':[0,11,0,0,11,0], 'bnk-wawa':[0,0,0,0,7,1],
+    // NV
+    'bnk-arlee':[6,0,6,0,0,0], 'bnk-berry':[5,0,5,0,0,0], 'bnk-emmy':[0,4,0,4,0,1], 'bnk-jew':[8,0,8,0,0,0],
+    'bnk-l':[0,1,0,1,0,1], 'bnk-palmmy':[0,0,7,0,0,1], 'bnk-pancake':[0,0,3,0,3,0], 'bnk-proud':[0,0,0,0,1,1],
+    'bnk-saonoi':[0,9,0,0,9,0], 'bnk-sindy':[0,0,0,0,4,0], 'bnk-yoghurt':[0,0,0,0,0,0],
+    // BNK48 Trainee
+    'bnk-blythe':[0,0,0,12,0,1], 'bnk-cartoon':[0,0,0,13,0,1], 'bnk-galeya':[0,0,0,8,0,1], 'bnk-grape':[0,10,0,0,10,0],
+    'bnk-inkcha':[0,0,0,14,0,1], 'bnk-khaimook':[0,8,0,0,8,0], 'bnk-khowjow':[0,0,0,15,0,1], 'bnk-mayji':[20,0,20,0,20,1],
+    'bnk-mint':[10,0,10,0,0,0], 'bnk-mirin':[11,0,11,0,0,0], 'bnk-nall':[0,0,0,9,0,1], 'bnk-nammonn':[0,0,0,10,0,1],
+    'bnk-neen':[0,0,0,11,0,1], 'bnk-niya':[9,0,9,0,0,0], 'bnk-rose':[12,0,12,0,0,0],
+    // Team C
+    'cgm-else':[0,15,0,0,15,0], 'cgm-ginna':[0,13,0,0,13,1], 'cgm-jingjing':[13,0,13,0,0,1], 'cgm-kwan':[14,0,14,0,0,1],
+    'cgm-lingling':[4,0,0,20,0,1], 'cgm-lookked':[0,14,0,0,14,0], 'cgm-nana':[0,16,0,16,0,1], 'cgm-nisha':[0,20,0,0,0,1],
+    'cgm-ploen':[0,0,0,18,0,1], 'cgm-prae':[15,0,15,0,0,0],
+    // CGM48 Trainee
+    'cgm-chifa':[18,0,18,0,0,0], 'cgm-emma':[0,12,0,0,12,1], 'cgm-hongyok':[16,0,16,0,0,0], 'cgm-lewlew':[0,19,0,19,0,0],
+    'cgm-namphet':[19,0,19,0,0,1], 'cgm-praifa':[0,17,0,0,17,0], 'cgm-punpon':[0,18,0,0,2,0], 'cgm-satangpound':[0,0,17,0,16,0],
+    'cgm-shenae':[17,0,0,17,0,1], 'cgm-tara':[0,0,0,0,19,0], 'cgm-valentine':[0,0,0,0,18,1],
+  } },
+];
+/* where a face stands along her lane: three places in turn, so the faces of
+   neighbouring lanes never sit on top of each other */
+const HS_TIER = [66, 81, 95];
+const HS_YAW = 28;   // how far a finger may turn the hall, either way
+const hsDay = () => HS_DAYS[state.hsDay] || HS_DAYS[0];
+const hsRoundName = (i, en) => HS_ROUNDS[i].special ? (en ? 'Special round' : 'รอบพิเศษ') : `${en ? 'Round' : 'รอบ'} ${i + 1}`;
+/* who is in round ri of a day, by lane — the special round has no lanes yet */
+function hsWho(day, ri){
+  const sp = HS_ROUNDS[ri].special;
+  return Object.entries(day.lanes).filter(([id, r]) => r[ri] && getMember(id))
+    .map(([id, r]) => ({ id, lane: sp ? 0 : r[ri] }))
+    .sort((a, b) => a.lane - b.lane || getMember(a.id).name.localeCompare(getMember(b.id).name));
+}
+/* every round a member has over the two days */
+function hsRoundsOf(id){
+  const out = [];
+  HS_DAYS.forEach((d, di) => (d.lanes[id] || []).forEach((v, ri) => { if(v) out.push({ di, ri, lane: HS_ROUNDS[ri].special ? 0 : v }); }));
+  return out;
+}
+const hsMin = s => +s.slice(0, 2) * 60 + +s.slice(3, 5);
+const HS_FROM = hsMin(HS_ROUNDS[0].t), HS_SPAN = hsMin(HS_ROUNDS[HS_ROUNDS.length - 1].to) - HS_FROM;
+const hsAt = s => (hsMin(s) - HS_FROM) / HS_SPAN * 100;   // a time's place along the day's bar, in %
+/* Where the event is right now, in Thai time: which day, which round (ri),
+   the next one, or after the last. (__hsNow lets a test pretend it is the day.) */
+function hsNow(){
+  const th = new Date((window.__hsNow ? new Date(window.__hsNow) : new Date()).getTime() + 7 * 3600000).toISOString();
+  const iso = th.slice(0, 10), hm = th.slice(11, 16);
+  const di = HS_DAYS.findIndex(d => d.date === iso);
+  if(di < 0) return null;
+  return { di, hm, ri: HS_ROUNDS.findIndex(r => hm >= r.t && hm < r.to), next: HS_ROUNDS.findIndex(r => r.t > hm),
+    after: hm >= HS_ROUNDS[HS_ROUNDS.length - 1].to };
+}
+let _hsLiveKey = '';
+function renderLanePlan(ev){
+  const en = isEN(), now = hsNow();
+  // On the day the plan follows the clock — today, this round — until someone
+  // picks another; a sheet just opened starts following again.
+  if(!document.querySelector('.modal-scroll .hs')) state.hsFollow = true;
+  if(now && state.hsFollow){ state.hsDay = now.di; state.hsRound = now.ri >= 0 ? now.ri : null; }
+  _hsLiveKey = now ? `${now.di}.${now.ri}.${now.after}` : '';
+  const day = hsDay(), ri = state.hsRound, rd = ri == null ? null : HS_ROUNDS[ri];
+  const today = now && now.di === state.hsDay ? now : null;
+  const osh = state.hsOshi, mine = new Set(state.oshi), keep = id => !osh || mine.has(id);
+  const who = rd ? hsWho(day, ri).filter(w => keep(w.id)) : [];
+  const byLane = {}; who.forEach(w => { if(w.lane) byLane[w.lane] = w.id; });
+  const reveal = state.hsReveal; state.hsReveal = false;
+  const pick = state.hsPick && getMember(state.hsPick) ? state.hsPick : null;
+  const flat = !!state.hsFlat;
+  const dayLabel = d => { const x = parseYmd(d.date); return `${x.getDate()} ${monthsShort()[x.getMonth()]}`; };
+  const face = (m, g, cls) => `<span class="hs-pic${cls ? ' ' + cls : ''}">${renderAvatar(m, 'avatar-sm hs-face-img', g.color)}</span>`;
+
+  // "my oshi only": everyone else steps back
+  const scope = `<div class="feed-scope ff-scope" role="group" aria-label="${en ? 'Who to show' : 'ขอบเขตที่แสดง'}">
+    <button class="scope-btn${osh ? '' : ' is-on'}" data-action="hs-oshi" data-value="0">${en ? 'Everyone' : 'ทั้งหมด'}</button>
+    <button class="scope-btn${osh ? ' is-on' : ''}" data-action="hs-oshi" data-value="1">${en ? 'My oshi only' : 'เฉพาะโอชิของฉัน'}</button>
+  </div>`;
+  const noOshi = osh && !mine.size ? `<p class="hs-none">${en ? 'No oshi yet — tap the ☆ on a member to add one' : 'ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม'}</p>` : '';
+
+  // ---- the day along the top: the rounds in proportion, the last quarter
+  // hour of each hatched (the lanes close then), and a needle for now ----
+  const segs = HS_ROUNDS.map((r, i) => {
+    const a = hsAt(r.t), w = hsAt(r.to) - a;
+    const shut = r.special ? 0 : (hsMin(r.to) - hsMin(r.close)) / (hsMin(r.to) - hsMin(r.t)) * 100;
+    const past = today && (today.after || hsMin(today.hm) >= hsMin(r.to));
+    const has = osh && hsWho(day, i).some(x => mine.has(x.id));
+    return `<button class="hs-seg${i === ri ? ' on' : ''}${r.special ? ' is-sp' : ''}${past ? ' is-past' : ''}${today && today.ri === i ? ' is-now' : ''}${
+      osh ? (has ? ' has-oshi' : ' is-dim') : ''}" style="left:calc(${a.toFixed(2)}% + 1.5px);width:calc(${w.toFixed(2)}% - 3px);--shut:${shut.toFixed(1)}%;--k:${i}"
+      data-action="hs-round" data-value="${i}" aria-pressed="${i === ri}"><b>${r.special ? (en ? 'Special' : 'พิเศษ') : (en ? 'R' : 'รอบ ') + (i + 1)}</b><small>${r.t}</small></button>`;
+  }).join('');
+  const ticks = Array.from({ length: (HS_SPAN / 60) + 1 }, (_, h) => `<span style="left:${(h * 60 / HS_SPAN * 100).toFixed(2)}%">${HS_FROM / 60 + h}</span>`).join('');
+  const needle = today && !today.after && hsMin(today.hm) >= HS_FROM ? `<i class="hs-needle" style="left:${hsAt(today.hm).toFixed(2)}%"></i>` : '';
+  const sel = rd ? `<p class="hs-sel"><b>${hsRoundName(ri, en)}</b> ${rd.t}–${rd.to} · ${rd.special
+      ? (en ? `queue closes ${rd.close} · 1–100 tickets, handshake only, one member a day` : `ปิดรับคิว ${rd.close} น. · ใช้บัตรได้ 1–100 ใบ จับมืออย่างเดียว วันละ 1 เมมเบอร์`)
+      : (en ? `lanes close ${rd.close} · 1–5 tickets, or a 1-Shot Video` : `ปิดเลน ${rd.close} น. · ใช้บัตรได้ 1–5 ใบ หรือถ่าย 1-Shot Video`)}</p>`
+    : `<p class="hs-sel is-hint">${en ? 'Tap a round to see who is in which lane' : 'แตะรอบด้านบน เพื่อดูว่าน้อง ๆ อยู่เลนไหน'}</p>`;
+
+  // ---- the hall: every lane a long bar, LANE n on it; in a round, the member's
+  // name joins the number and her face stands on the lane ----
+  const lanes = Array.from({ length: HS_LANES }, (_, k) => {
+    const n = k + 1, id = byLane[n], m = id && getMember(id), g = m && (getGroup(m.groupId) || {});
+    if(!m) return `<div class="hs-lane" style="--i:${k}"><span class="hs-tag">LANE ${n}</span></div>`;
+    const on = pick === id;
+    return `<button class="hs-lane is-on${on ? ' is-pick' : ''}" style="--i:${k};--c:${g.color}" data-action="hs-lane" data-id="${id}"
+      title="${escapeAttr(`${m.name} · LANE ${n}`)}"><span class="hs-tag">LANE ${n}</span><span class="hs-nm">${escapeHtml(m.name)}</span>
+      <i class="hs-shadow" style="left:${HS_TIER[k % 3]}%"></i><span class="hs-face" style="left:${HS_TIER[k % 3]}%">${face(m, g)}${on ? '<span class="hs-ring" aria-hidden="true"></span>' : ''}</span></button>`;
+  }).join('');
+  const arrow = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+  const lobby = `<div class="hs-lobby">
+      <span class="hs-door is-out">${arrow('M12 5v14M6 13l6 6 6-6')}${en ? 'Exit' : 'ทางออก'}</span>
+      <span class="hs-desk is-info">INFORMATION</span>
+      <span class="hs-door">${arrow('M12 19V5M6 11l6-6 6 6')}${en ? 'Entrance' : 'ทางเข้า'}</span>
+      <span class="hs-desk is-aid">FIRST AID</span>
+      <span class="hs-desk is-lift">ELEVATOR</span>
+      <span class="hs-desk is-shop">MERCHANDISE &amp; HACHICHA</span>
+    </div>`;
+  // the special round's lanes are given out on the day: its members gather over the hall instead
+  const spec = rd && rd.special ? `<div class="hs-spec">
+      <b>${en ? 'Special round' : 'รอบพิเศษ'} ${rd.t}–${rd.to}</b>
+      <small>${en ? 'Lanes are announced at the venue' : 'เลนรอบพิเศษประกาศที่หน้างาน'}</small>
+      ${who.length ? `<div class="hs-spec-ppl">${who.map((w, k) => { const m = getMember(w.id), g = getGroup(m.groupId) || {};
+        return `<button class="hs-spec-p${pick === w.id ? ' is-pick' : ''}" style="--i:${k};--c:${g.color}" data-action="hs-lane" data-id="${w.id}">${face(m, g)}<span>${escapeHtml(m.name)}</span></button>`; }).join('')}</div>`
+        : `<small>${en ? 'None of your oshi is in it' : 'โอชิของคุณไม่ได้อยู่ในรอบนี้'}</small>`}
+    </div>` : '';
+
+  // a member tapped: her rounds over both days, each a way back to it
+  let pickCard = '';
+  if(pick){
+    const m = getMember(pick), g = getGroup(m.groupId) || {}, mine2 = hsRoundsOf(pick);
+    const here = rd && who.find(w => w.id === pick);
+    pickCard = `<div class="hs-pick" style="--c:${g.color}">
+      ${renderAvatar(m, 'avatar-sm hs-pick-face', g.color)}
+      <span class="hs-pick-who"><b>${escapeHtml(m.name)}</b><small>${escapeHtml(g.name || '')}</small></span>
+      ${here ? `<span class="hs-pick-no">${here.lane ? `LANE ${here.lane}` : (en ? 'Special' : 'รอบพิเศษ')}</span>` : ''}
+      ${mine2.length ? `<div class="hs-pick-day">${mine2.map(h => `<button class="hs-when${h.di === state.hsDay && h.ri === ri ? ' on' : ''}${HS_ROUNDS[h.ri].special ? ' is-sp' : ''}"
+        data-action="hs-when" data-value="${h.di}.${h.ri}"><b>${dayLabel(HS_DAYS[h.di])} · ${hsRoundName(h.ri, en)}</b>${h.lane ? `LANE ${h.lane}` : HS_ROUNDS[h.ri].t}</button>`).join('')}</div>`
+        : `<p class="hs-pick-none">${en ? 'No rounds at this event' : 'ไม่มีรอบในงานนี้'}</p>`}
+    </div>`;
+  }
+  // everyone in the round by name, for finding one quickly
+  const list = who.length ? `<div class="hs-list">${who.slice().sort((a, b) => getMember(a.id).name.localeCompare(getMember(b.id).name)).map(w => {
+    const m = getMember(w.id), g = getGroup(m.groupId) || {};
+    return `<button class="hs-chip${pick === w.id ? ' on' : ''}" style="--c:${g.color}" data-action="hs-lane" data-id="${w.id}">${renderAvatar(m, 'avatar-sm hs-chip-face', g.color)}<span>${escapeHtml(m.name)}</span>${w.lane ? `<b>${w.lane}</b>` : ''}</button>`; }).join('')}</div>`
+    : rd && osh && mine.size ? `<p class="hs-none">${en ? 'None of your oshi is in this round' : 'รอบนี้ไม่มีโอชิของคุณ'}</p>` : '';
+  const back = now && !state.hsFollow ? `<button class="ff-live-back" data-action="hs-live">${en ? 'Back to now' : 'กลับไปตอนนี้'}</button>` : '';
+
+  return `<div class="hs${flat ? ' is-flat' : ''}${rd ? ' is-round' : ''}${rd && rd.special ? ' is-special' : ''}${pick ? ' has-pick' : ''}${reveal ? ' is-reveal' : ''}"
+    style="--yaw:${flat ? 0 : state.hsYaw || 0}deg">
+    ${scope}
+    <div class="hs-board">
+      <div class="hs-top">
+        <div class="ff-days">${HS_DAYS.map((d, i) => `<button class="${i === state.hsDay ? 'on' : ''}${now && now.di === i ? ' is-today' : ''}" data-action="hs-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
+        <span class="hs-count">${rd ? `${who.length} ${en ? (who.length === 1 ? 'member' : 'members') : 'คน'}` : `${HS_LANES} ${en ? 'lanes' : 'เลน'}`}</span>
+        <span class="hs-spacer"></span>${back}
+      </div>
+      <div class="hs-clock"><div class="hs-track">${segs}${needle}</div><div class="hs-ticks">${ticks}</div></div>
+      ${sel}
+      ${noOshi}
+      <div class="hs-tools">
+        <span class="sp-seg"><button data-action="hs-view" data-id="3d" aria-pressed="${!flat}" class="${flat ? '' : 'is-on'}">3D</button><button data-action="hs-view" data-id="2d" aria-pressed="${flat}" class="${flat ? 'is-on' : ''}">2D</button></span>
+        <span class="hs-hint"><span class="is-3d">${en ? 'Drag sideways to turn the hall' : 'ลากซ้ายขวาเพื่อหมุนผัง'}</span><span class="is-2d">${en ? 'Laid flat, as the organiser’s plan' : 'วางราบแบบผังของผู้จัด'}</span></span>
+      </div>
+      <div class="hs-view">
+        <div class="hs-floor">
+          <div class="hs-hall">${lanes}</div>
+          ${lobby}
+        </div>
+        ${spec}
+      </div>
+      ${pickCard}
+      ${list}
+      <p class="hs-note">${en ? 'A sketch from the organiser’s plan: lane 1 at the back, the doors at the bottom. Rounds may change.'
+        : 'ผังจำลองจากผังของผู้จัด เลน 1 อยู่ด้านใน ประตูอยู่ด้านล่าง · รอบจับมืออาจเปลี่ยนแปลงภายหลัง'}</p>
+    </div>
+  </div>`;
+}
+/* A tap redraws only the plan, holding the sheet where it was. */
+function hsPaint(){
+  const ev = SEED_SCHEDULE.find(e => e.lanePlan);
+  if(!ev) return;
+  document.querySelectorAll('.hs').forEach(old => {
+    const sc = old.closest('.modal-scroll'), top = sc ? sc.scrollTop : 0;
+    const box = document.createElement('div');
+    box.innerHTML = renderLanePlan(ev);
+    const fresh = box.firstElementChild;
+    old.replaceWith(fresh);
+    localize(fresh);
+    if(sc) sc.scrollTop = top;
+  });
+}
+/* 3D or the flat plan: the hall tips over, the faces lie down with it — no redraw */
+function hsSetView(el){
+  const box = el.closest('.hs');
+  if(!box) return;
+  state.hsFlat = el.dataset.id === '2d';
+  box.classList.toggle('is-flat', state.hsFlat);
+  box.style.setProperty('--yaw', `${state.hsFlat ? 0 : state.hsYaw || 0}deg`);
+  spSegPick(el);
+}
+/* the clock: the needle moves every tick, the plan redraws when the round turns */
+function hsLiveTick(){
+  if(!document.querySelector('.hs')) return;
+  const n = hsNow();
+  document.querySelectorAll('.hs-needle').forEach(e => { if(n) e.style.left = hsAt(n.hm).toFixed(2) + '%'; });
+  const key = n ? `${n.di}.${n.ri}.${n.after}` : '';
+  if(key !== _hsLiveKey){ if(state.hsFollow) state.hsReveal = true; hsPaint(); }
+}
+/* One finger dragged sideways turns the hall a little, as a turntable; up and
+   down still scrolls the sheet. The click that ends a turn is swallowed. */
+let hsG = null;
+document.addEventListener('pointerdown', e => {
+  const v = e.target.closest && e.target.closest('.hs-view'), box = v && v.closest('.hs');
+  if(!box || box.classList.contains('is-flat') || !e.isPrimary) return;
+  hsG = { box, id:e.pointerId, x0:e.clientX, yaw0:state.hsYaw || 0, moved:false };
+});
+document.addEventListener('pointermove', e => {
+  const g = hsG;
+  if(!g || e.pointerId !== g.id) return;
+  const dx = e.clientX - g.x0;
+  if(!g.moved && Math.abs(dx) < 8) return;
+  if(!g.moved){ g.moved = true; g.box.classList.add('is-turning'); }
+  state.hsYaw = Math.max(-HS_YAW, Math.min(HS_YAW, g.yaw0 - dx * .22));
+  g.box.style.setProperty('--yaw', `${state.hsYaw.toFixed(1)}deg`);
+});
+const hsLift = e => {
+  const g = hsG;
+  if(!g || e.pointerId !== g.id) return;
+  hsG = null;
+  g.box.classList.remove('is-turning');
+  if(g.moved && e.type === 'pointerup'){ spSwallowClick = true; setTimeout(() => { spSwallowClick = false; }, 0); }
+};
+document.addEventListener('pointerup', hsLift);
+document.addEventListener('pointercancel', hsLift);
+
 /* A sheet's wash from its poster. The small copy is read into a canvas a few
    pixels wide, averaged into seven bands from top to bottom, and each band is
    kept to its hue but lifted to a pale tint (a deep one in dark mode), so the
@@ -15274,6 +15747,7 @@ function renderEventModal(){
         ${(ev.links || []).length ? `<div class="evm-related">${ev.links.map(l =>
           `<a class="chip chip-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)} ↗</a>`).join('')}</div>` : ''}
         ${ev.boothPlan === 'fanfest' ? renderBoothPlan(ev) : ''}
+        ${ev.lanePlan ? `<h3 class="evm-head">${isEN() ? 'Handshake lanes' : 'ผังเลนจับมือ'}</h3>${renderLanePlan(ev)}` : ''}
         ${renderEventLinkEditor(ev)}
 
         ${(ev.related || []).map(id => SEED_SCHEDULE.find(e => e.id === id)).filter(Boolean).length ? `
@@ -22500,6 +22974,26 @@ function bindDelegatedEvents(){
       box.querySelectorAll('.slot-days .scope-btn').forEach(b => b.classList.toggle('is-on', b === el));
       box.querySelectorAll('[data-slot-day]').forEach(t => { t.hidden = t.dataset.slotDay !== state.slotDay; });
     }
+    else if(action==='hs-day'){
+      state.hsDay = +el.dataset.value; state.hsFollow = false; state.hsReveal = state.hsRound != null; hsPaint();
+    }
+    else if(action==='hs-round'){
+      const i = +el.dataset.value;
+      state.hsRound = state.hsRound === i ? null : i; state.hsFollow = false; state.hsReveal = state.hsRound != null;
+      hsPaint();
+    }
+    else if(action==='hs-lane'){ state.hsPick = state.hsPick === id ? null : id; hsPaint(); }
+    else if(action==='hs-oshi'){
+      state.hsOshi = el.dataset.value === '1'; state.hsPick = null; state.hsReveal = state.hsRound != null; hsPaint();
+    }
+    else if(action==='hs-view'){ hsSetView(el); }
+    else if(action==='hs-when'){
+      const [d, r] = el.dataset.value.split('.').map(Number);
+      state.hsReveal = state.hsDay !== d || state.hsRound !== r;
+      state.hsDay = d; state.hsRound = r; state.hsFollow = false;
+      hsPaint();
+    }
+    else if(action==='hs-live'){ state.hsFollow = true; state.hsReveal = true; hsPaint(); }
     else if(action==='ff-day'){
       state.ffDay = +el.dataset.value; state.ffSlot = null; state.ffFollow = false; state.ffHold = false; state.ffScrollUntil = 0; ffPaint();
     }
