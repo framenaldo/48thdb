@@ -6365,7 +6365,7 @@ const TIMELINES = {
       venue:'MCC Hall, The Mall Lifestore Bangkapi (Bangkok)', ev:'ev-kimi-first-performance' },
     { d:'2026-10-07', time:'12:00', kind:'start', track:'myo', title:'เปิดให้แลกบัตร Meeting You Online' },
     { d:'2026-10-10', time:'21:00', kind:'end', track:'event', title:'ปิดขายบันเดิล', ev:'ev-ge6-bundle' },
-    { d:'2026-10-13', to:'2026-10-14', time:'10:00', kind:'start', track:'event', title:'เลือกที่นั่งบันเดิล',
+    { d:'2026-10-13', to:'2026-10-14', time:'10:00', until:'23:59', kind:'start', track:'event', title:'เลือกที่นั่งบันเดิล',
       note:'ใช้ Ticket Reference Code ถึง 14 ต.ค. 23:59 เท่านั้น ถ้าไม่ได้เลือก ระบบจะเลือกให้ในโซนที่ซื้อไว้', ev:'ev-ge6-bundle' },
     { d:'2026-10-15', time:'12:00', kind:'start', track:'event', title:'เปิดขายบัตร Journey of Dreams 夢の旅 และงานประกาศผล',
       note:'ทาง eventpop.me', ev:'ev-concert-2026' },
@@ -13737,6 +13737,15 @@ function renderDayModal(){
   for(const { it } of steps){
     const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
     const head = `${trackIcon(it, 'ev-icon')}${escapeHtml(itemShortName(it))}`;
+    // a step that runs over several days sits in the all-day row, like a
+    // pre-order, with when it closes
+    if(it.to && it.to !== it.d){
+      const ld = parseYmd(it.to), by = it.until ? ` ${it.until}` : '';
+      const close = it.to === iso ? (it.until ? `${en ? 'until' : 'ถึง'}${by}${en ? '' : ' น.'}` : (en ? 'last day' : 'วันสุดท้าย'))
+        : `${en ? 'until' : 'ถึง'} ${ld.getDate()} ${M[ld.getMonth()]}${by}`;
+      allDay.push(box({ id:it.ev, k:tr.color, inner:chipInner(head, close) }, 'dv-chip'));
+      continue;
+    }
     if(!isHm(it.time)){ allDay.push(box({ id:it.ev, k:tr.color, inner:chipInner(head, '') }, 'dv-chip')); continue; }
     const linked = it.ev && SEED_SCHEDULE.find(e => e.id === it.ev), until = linked && eventUntil(linked);
     const a = mins(it.time);
