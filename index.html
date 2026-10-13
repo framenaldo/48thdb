@@ -4431,6 +4431,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .evm-fest-word{ font-size:35px; }
     /* a long word would run under the sheet's share and close buttons: it starts below them */
     .evm-fest.is-wide{ padding-top:58px; }
+    .evm-fest.is-longword .evm-fest-word{ font-size:30px; }
     .evm-face-img{ width:76px; height:76px; font-size:24px; }
     .evm-fest-faces{ gap:12px; }
   }
@@ -11443,8 +11444,8 @@ const FEST_KINDS = {
 };
 /* where the title alone would not say, or an event has its own way of putting it */
 const FEST_EVENT = {
-  'ev-concert-2026':   { kind:'concert' },
-  'ev-fame-fanmeet':   { word:'Airline', sub:'FANMEET', motif:'clouds' },
+  'ev-concert-2026':   { kind:'concert', word:'Journey of Dreams', sub:'夢の旅 · CONCERT' },
+  'ev-fame-fanmeet':   { word:"Fame's Airline", sub:'FANMEET', motif:'clouds' },
   'ev-hoop-bday-said': { sub:'THEATER SHOW' },
 };
 function festKind(ev){
@@ -11524,7 +11525,7 @@ function renderEventBanner(ev){
   // more than fit: none at all — the line-up is listed further down the sheet
   const long = sub.length > 18;
   return `
-  <div class="evm-fest is-${k}${ev.poster ? ' is-postered' : ` pal-${K.pal}`}${faces ? '' : ' is-bare'}${K.word.length > 8 ? ' is-wide' : ''}" aria-hidden="false">
+  <div class="evm-fest is-${k}${ev.poster ? ' is-postered' : ` pal-${K.pal}`}${faces ? '' : ' is-bare'}${K.word.length > 8 ? ' is-wide' : ''}${K.word.length > 13 ? ' is-longword' : ''}" aria-hidden="false">
     ${K.fx === 'beams' ? '<span class="evm-fest-beams" aria-hidden="true"><i></i><i></i></span>' : ''}
     ${K.fx === 'rays' ? '<span class="evm-fest-rays" aria-hidden="true"></span>' : ''}
     ${K.fx === 'bunting' ? renderFestBunting() : ''}
