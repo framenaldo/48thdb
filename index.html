@@ -11520,14 +11520,8 @@ function renderEventBanner(ev){
       renderAvatar(m, 'evm-face-img', g.color)}${cls === ' is-stack' ? '' : `<span class="evm-fest-name" data-noloc>${escapeHtml(nickName(m))}</span>`}</button>`; };
   let faces = '';
   if(people.length && people.length <= 3) faces = `<span class="evm-fest-faces">${people.map(m => face(m, '')).join('')}</span>`;
-  else if(people.length <= 8) faces = `<span class="evm-fest-faces is-mid">${people.map(m => face(m, ' is-mid')).join('')}</span>`;
-  else if(people.length){
-    const lg = lineupGroups(people.map(m => m.id)), shown = people.slice(0, 8), more = people.length - shown.length;
-    const label = lg.all ? 'All Members' : lg.whole.length === 1 && !lg.rest.length ? `All ${lg.whole[0].name} Members`
-      : en ? `${people.length} members` : `${people.length} คน`;
-    faces = `<span class="evm-fest-faces is-stack">${shown.map(m => face(m, ' is-stack')).join('')}${more ? `<span class="evm-fest-more">+${more}</span>` : ''}</span>
-      <span class="evm-fest-count" data-noloc>${escapeHtml(label)}</span>`;
-  }
+  else if(people.length && people.length <= 8) faces = `<span class="evm-fest-faces is-mid">${people.map(m => face(m, ' is-mid')).join('')}</span>`;
+  // more than fit: none at all — the line-up is listed further down the sheet
   const long = sub.length > 18;
   return `
   <div class="evm-fest is-${k}${ev.poster ? ' is-postered' : ` pal-${K.pal}`}${faces ? '' : ' is-bare'}${K.word.length > 8 ? ' is-wide' : ''}" aria-hidden="false">
