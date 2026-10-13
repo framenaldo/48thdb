@@ -4587,6 +4587,31 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .mini-name{ font-size:12px; }
   }
 
+  /* a song's line-up: even columns, centres on their own row */
+  .track-grid{ display:flex; flex-direction:column; gap:6px; }
+  .track-row{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:6px; }
+  .track-grid .mini-card{ display:flex; width:100%; }
+  .track-grid .mini-names{ overflow:hidden; }
+  .track-grid .mini-name{ overflow:hidden; text-overflow:ellipsis; }
+  .track-grid .mini-name-th{ display:none; }
+  .track-more{ padding:6px 14px; font-size:12.5px; }
+  /* wide screens have room for everyone */
+  @media (min-width:561px){
+    .track-grid.is-folded .mini-card.is-extra{ display:flex; }
+    .track-grid .track-more{ display:none; }
+  }
+  .track-grid.is-folded .is-extra{ display:none; }
+  .track-more{ align-self:center; margin-top:2px; }
+  .track-more .tm-open, .track-grid.is-folded .track-more .tm-close{ display:none; }
+  .track-grid.is-folded .track-more .tm-open{ display:inline; }
+  @media (max-width:560px){
+    .track-row{ grid-template-columns:repeat(3, minmax(0, 1fr)); gap:5px; }
+    .track-grid{ gap:5px; }
+    .track-grid .mini-card{ padding-right:6px; gap:5px; }
+    .track-grid .mini-card.is-long .mini-name{ font-size:10px; letter-spacing:-.25px; }
+    .track-grid .mini-card .avatar-sm{ width:22px; height:22px; }
+  }
+
   /* auth */
   .auth-card{ max-width:420px; }
   .resume-card{
@@ -16041,6 +16066,25 @@ function bindOrgZoom(){
   });
 }
 
+/* A song's line-up as an even grid: the centre(s) on a row of their own, then
+   the rest by group (the song's own first) and name, so the eye can run down
+   the columns. A long line-up shows four rows and folds the rest away. */
+const TRACK_FOLD = 12;
+function renderTrackGrid(s, t, card){
+  const centres = t.centers.filter(id => getMember(id));
+  const groupRank = id => { const m = getMember(id); return m && m.groupId === s.groupId ? 0 : 1; };
+  const rest = t.members.filter(id => !t.centers.includes(id) && getMember(id))
+    .sort((a, b) => groupRank(a) - groupRank(b) || getMember(a).name.localeCompare(getMember(b).name));
+  const fold = rest.length > TRACK_FOLD + 3, en = isEN();
+  return `<div class="track-grid${fold ? ' is-folded' : ''}">
+    ${centres.length ? `<div class="track-row track-centres">${centres.map(id => card(id, true).replace('class="mini-card', `class="mini-card${getMember(id).name.length >= 10 ? ' is-long' : ''}`)).join('')}</div>` : ''}
+    <div class="track-row">${rest.map((id, k) => card(id, false).replace('class="mini-card', `class="mini-card${k >= TRACK_FOLD ? ' is-extra' : ''}${getMember(id).name.length >= 10 ? ' is-long' : ''}`)).join('')}</div>
+    ${fold ? `<button class="track-more chip" data-action="track-more" aria-expanded="false">
+      <span class="tm-open">${en ? `Show all (+${rest.length - TRACK_FOLD})` : `ดูทั้งหมด (+${rest.length - TRACK_FOLD})`}</span>
+      <span class="tm-close">${en ? 'Show less' : 'ย่อ'}</span></button>` : ''}
+  </div>`;
+}
+
 function renderMiniCard(m, isCentre, action){
   const g = getGroup(m.groupId);
   const isKami = state.kamiOshi === m.id;
@@ -18691,10 +18735,7 @@ function renderSingleDetail(){
       <div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}${t.members.length} คน${t.centers.length
         ? ` · ${isMix() ? 'Center' : 'เซ็นเตอร์'} ` + t.centers.map(id=>linkMember(getMember(id))).join(', ')
         : ''}</div>
-      <div class="grid-mini">
-        ${t.centers.map(id=>card(id, true)).join('')}
-        ${rest.map(id=>card(id, false)).join('')}
-      </div>
+      ${renderTrackGrid(s, t, card)}
       ${renderStage(s, i, t)}
     </div>`;
   };
@@ -22837,6 +22878,10 @@ function bindDelegatedEvents(){
     else if(action==='mw-more'){
       const card = el.closest('.mw-card'), open = card.classList.toggle('is-open');
       card.querySelectorAll('[data-action="mw-more"]').forEach(b => b.setAttribute('aria-expanded', open));
+    }
+    else if(action==='track-more'){
+      const grid = el.closest('.track-grid'), folded = grid.classList.toggle('is-folded');
+      el.setAttribute('aria-expanded', !folded);
     }
     else if(action==='works-cat'){
       state.worksCat = el.dataset.value;
