@@ -3191,7 +3191,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      to run across the phone. A round picked: each lane in use lights in her
      group's colour from the walkway end, her name joins LANE n, and her face
      drops onto the lane — standing up in 3D, lying flat in 2D. ===== */
-  .hs{ --pitch:38deg; --ty:-75px; --sc:.88; --fy:.14; --z:1; --fit:1; --px:0px; --py:0px; }
+  .hs{ --pitch:38deg; --ty:-75px; --sc:.88; --fy:.14; --z:1; --px:0px; --py:0px; }
   .hs.is-flat{ --pitch:0deg; --ty:0px; --sc:1; --fy:.5; }
   .hs-board{ container-type:inline-size; padding:12px; border-radius:18px; background:#1A1419; color:#EFE7EC; overflow:hidden;
     border:1px solid rgba(255,255,255,.1); box-shadow:0 8px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06); }
@@ -3248,7 +3248,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; transition:height .8s cubic-bezier(.22,1,.36,1); }
   .hs.is-flat .hs-view{ height:542px; }
   .hs-floor{ position:absolute; left:0; right:0; top:0; transform-style:preserve-3d; transform-origin:50% 50%;
-    transform:translate(var(--px), var(--py)) translateY(var(--ty)) scale(calc(var(--sc) * var(--z) * var(--fit))) rotateX(var(--pitch)) rotateZ(var(--yaw));
+    transform:translate(var(--px), var(--py)) translateY(var(--ty)) scale(calc(var(--sc) * var(--z))) rotateX(var(--pitch)) rotateZ(var(--yaw));
     transition:transform .8s cubic-bezier(.22,1,.36,1);
     border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)); border:1px solid rgba(255,255,255,.1); }
   .hs-hall{ --fx:89%; display:grid; gap:4px; padding:10px 8px 10px 34px; transform-style:preserve-3d; }
@@ -3388,6 +3388,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .hs-zoomed{ position:absolute; left:4px; top:120px; z-index:6; padding:2px 8px; border-radius:99px; font-size:10.5px; font-weight:800;
     color:#F4ECF1; background:rgba(36,28,34,.85); border:1px solid rgba(255,255,255,.16); pointer-events:none; opacity:0; transition:opacity .25s; }
   .hs.is-zoom .hs-zoomed{ opacity:1; }
+  .hs.is-zoom .hs-view{ touch-action:none; }
+  .hs .hs-hint .is-pan, .hs.is-zoom .hs-hint .is-rot{ display:none; }
+  .hs.is-zoom .hs-hint .is-pan{ display:inline; }
   .hs-share{ margin-left:auto; display:inline-flex; align-items:center; gap:5px; min-height:28px; padding:0 11px; cursor:pointer; font:inherit;
     font-size:12px; font-weight:800; color:#fff; background:#E4457E; border:0; border-radius:99px; box-shadow:0 2px 0 rgba(0,0,0,.45);
     white-space:nowrap; -webkit-tap-highlight-color:transparent; transition:transform .12s, box-shadow .12s; }
@@ -7706,7 +7709,7 @@ const ICONS = {
 let state = {
   isOwner:false, pending:[], flash:[], layout:null, layoutEdit:null, layoutDraft:null, navPick:null, geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
   ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOshi:false,
-  hsDay:0, hsRound:null, hsPick:null, hsOshi:false, hsFlat:false, hsYaw:0, hsZoom:1, hsFit:1, hsPx:0, hsPy:0, hsHold:false,
+  hsDay:0, hsRound:null, hsPick:null, hsOshi:false, hsFlat:false, hsYaw:0, hsZoom:1, hsPx:0, hsPy:0, hsHold:false,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current', livesScope:'current', galleryId:null,
@@ -15344,7 +15347,8 @@ const HS_DAYS = [
     'cgm-shenae':[17,0,0,17,0,1], 'cgm-tara':[0,0,0,0,19,0], 'cgm-valentine':[0,0,0,0,18,1],
   } },
 ];
-const HS_ZMAX = 4;   // how far in the hall may be zoomed
+const HS_ZMAX = 2;   // how far in the + button takes the hall
+const HS_YAW = 45;   // how far a finger may turn the hall, either way
 const hsDay = () => HS_DAYS[state.hsDay] || HS_DAYS[0];
 const hsRoundName = (i, en) => HS_ROUNDS[i].special ? (en ? 'Special round' : 'รอบพิเศษ') : `${en ? 'Round' : 'รอบ'} ${i + 1}`;
 /* who is in round ri of a day, by lane — the special round has no lanes yet */
@@ -15526,7 +15530,7 @@ function renderLanePlan(ev){
       <button class="hs-compass" data-action="hs-straight" aria-label="${en ? 'Set the hall straight' : 'หมุนกลับตรง'}">${svg('<circle cx="12" cy="12" r="9.5" stroke-width="1.6"/><path d="M12 5 9.6 12h4.8z" fill="#F06C9B" stroke="#F06C9B" stroke-width="1.4"/><path d="M12 19l2.4-7H9.6z" stroke-width="1.4"/>')}</button>
     </div><span class="hs-zoomed">${Math.round(z * 100)}%</span>`;
   return `<div class="hs${flat ? ' is-flat' : ''}${rd ? ' is-round' : ''}${rd && rd.special ? ' is-special' : ''}${pick ? ' has-pick' : ''}${reveal ? ' is-reveal' : ''}${z > 1 ? ' is-zoom' : ''}"
-    style="--yaw:${(state.hsYaw || 0).toFixed(1)}deg;--z:${z};--fit:${state.hsFit || 1};--px:${state.hsPx || 0}px;--py:${state.hsPy || 0}px">
+    style="--yaw:${(state.hsYaw || 0).toFixed(1)}deg;--z:${z};--px:${state.hsPx || 0}px;--py:${state.hsPy || 0}px">
     ${scope}
     <div class="hs-board">
       <div class="hs-top">
@@ -15540,7 +15544,7 @@ function renderLanePlan(ev){
       ${noOshi}
       <div class="hs-tools">
         <span class="sp-seg"><button data-action="hs-view" data-id="3d" aria-pressed="${!flat}" class="${flat ? '' : 'is-on'}">3D</button><button data-action="hs-view" data-id="2d" aria-pressed="${flat}" class="${flat ? 'is-on' : ''}">2D</button></span>
-        ${back || `<span class="hs-hint">${en ? 'Drag to turn · pinch to zoom' : 'ลากหมุน · จีบนิ้วซูม'}</span>`}
+        ${back || `<span class="hs-hint"><span class="is-rot">${en ? 'Drag sideways to turn' : 'ลากซ้ายขวาเพื่อหมุนผัง'}</span><span class="is-pan">${en ? 'Drag to move around' : 'ลากเพื่อเลื่อนดูผัง'}</span></span>`}
         <button class="hs-share" data-action="hs-share">${ICONS.share}${en ? 'Share' : 'แชร์ผัง'}</button>
       </div>
       <div class="hs-view">
@@ -15581,43 +15585,30 @@ function hsSetView(el){
   box.classList.toggle('is-flat', state.hsFlat);
   spSegPick(el);
 }
-/* Turned, the hall's corners would leave the board: it shrinks to fit the way
-   it faces, so the whole of it stays in view at any angle. */
-function hsFit(box){
-  const f = box.querySelector('.hs-floor');
-  if(!f || !f.offsetWidth) return state.hsFit || 1;
-  const w = f.offsetWidth, h = f.offsetHeight, a = (state.hsYaw || 0) * Math.PI / 180;
-  return Math.min(1, w / (Math.abs(w * Math.cos(a)) + Math.abs(h * Math.sin(a))));
-}
 /* the turn, the zoom and the pan, written straight onto the plan — no redraw */
 function hsApply(box){
   const z = state.hsZoom || 1;
-  state.hsFit = +hsFit(box).toFixed(3);
   // panning stops where the hall's edge would leave the middle of the board
   const v = box.querySelector('.hs-view'), lx = v ? v.offsetWidth * (z - 1) / 2 + 20 : 0, ly = v ? v.offsetHeight * (z - 1) / 2 + 20 : 0;
   state.hsPx = z > 1 ? Math.max(-lx, Math.min(lx, state.hsPx || 0)) : 0;
   state.hsPy = z > 1 ? Math.max(-ly, Math.min(ly, state.hsPy || 0)) : 0;
   const st = box.style;
   st.setProperty('--yaw', `${(state.hsYaw || 0).toFixed(1)}deg`); st.setProperty('--z', z);
-  st.setProperty('--fit', state.hsFit); st.setProperty('--px', `${state.hsPx.toFixed(1)}px`); st.setProperty('--py', `${state.hsPy.toFixed(1)}px`);
+  st.setProperty('--px', `${state.hsPx.toFixed(1)}px`); st.setProperty('--py', `${state.hsPy.toFixed(1)}px`);
   box.classList.toggle('is-zoom', z > 1);
   const lab = box.querySelector('.hs-zoomed'); if(lab) lab.textContent = Math.round(z * 100) + '%';
   const [zi, zo] = box.querySelectorAll('[data-action="hs-zoom"]');
   if(zi) zi.disabled = z >= HS_ZMAX; if(zo) zo.disabled = z <= 1;
 }
 function hsZoomBy(box, k){
-  const z0 = state.hsZoom || 1, z = Math.max(1, Math.min(HS_ZMAX, z0 * k));
+  const z0 = state.hsZoom || 1, z = Math.max(1, Math.min(HS_ZMAX, z0 + (k > 1 ? .25 : -.25)));   // 100% to 200% a quarter at a time
   state.hsPx = (state.hsPx || 0) * z / z0; state.hsPy = (state.hsPy || 0) * z / z0;
   state.hsZoom = +z.toFixed(3); hsApply(box);
 }
-/* the compass: straight back the short way round, all of it in view */
+/* the compass: the hall straight again and back to its size */
 function hsStraight(box){
-  const y = state.hsYaw || 0;
-  state.hsYaw = Math.round(y / 360) * 360; state.hsZoom = 1; state.hsPx = 0; state.hsPy = 0;
+  state.hsYaw = 0; state.hsZoom = 1; state.hsPx = 0; state.hsPy = 0;
   hsApply(box);
-  if(state.hsYaw) setTimeout(() => { if(Math.round((state.hsYaw || 0) / 360) * 360 !== state.hsYaw) return;
-    box.classList.add('is-turning'); state.hsYaw = 0; hsApply(box);
-    requestAnimationFrame(() => requestAnimationFrame(() => box.classList.remove('is-turning'))); }, 850);
 }
 /* the clock: the needle moves every tick, the plan redraws when the round turns */
 function hsLiveTick(){
@@ -15634,64 +15625,35 @@ function hsLiveTick(){
     if(tt && tt._h !== b){ tt.innerHTML = b; tt._h = b; localize(tt); }
   });
 }
-/* One finger dragged sideways turns the hall right round, as a turntable; up
-   and down still scrolls the sheet. Two fingers pinch to zoom, twist to turn
-   and move together to pan, as on a map. The click that ends a turn is swallowed. */
-let hsG = null, hsT = null;
+/* One finger dragged sideways turns the hall a way either side, as a
+   turntable; up and down still scrolls the sheet. Zoomed in with +, the same
+   finger moves the hall about instead. The click that ends a drag is swallowed. */
+let hsG = null;
 document.addEventListener('pointerdown', e => {
   const v = e.target.closest && e.target.closest('.hs-view'), box = v && v.closest('.hs');
   if(!box || !e.isPrimary || e.target.closest('.hs-ctl, .hs-spec')) return;
-  hsG = { box, id:e.pointerId, x0:e.clientX, yaw0:state.hsYaw || 0, moved:false };
+  hsG = { box, id:e.pointerId, x0:e.clientX, y0:e.clientY, yaw0:state.hsYaw || 0, px0:state.hsPx || 0, py0:state.hsPy || 0,
+    pan:(state.hsZoom || 1) > 1, moved:false };
 });
 document.addEventListener('pointermove', e => {
   const g = hsG;
-  if(!g || e.pointerId !== g.id || hsT) return;
-  const dx = e.clientX - g.x0;
-  if(!g.moved && Math.abs(dx) < 8) return;
+  if(!g || e.pointerId !== g.id) return;
+  const dx = e.clientX - g.x0, dy = e.clientY - g.y0;
+  if(!g.moved && Math.hypot(g.pan ? dx : 0, g.pan ? dy : 0) < 8 && Math.abs(dx) < 8) return;
   if(!g.moved){ g.moved = true; g.box.classList.add('is-turning'); }
-  state.hsYaw = g.yaw0 - dx * .5;
+  if(g.pan){ state.hsPx = g.px0 + dx; state.hsPy = g.py0 + dy; }
+  else state.hsYaw = Math.max(-HS_YAW, Math.min(HS_YAW, g.yaw0 - dx * .3));
   hsApply(g.box);
 });
 const hsLift = e => {
   const g = hsG;
   if(!g || e.pointerId !== g.id) return;
   hsG = null;
-  if(!hsT) g.box.classList.remove('is-turning');
+  g.box.classList.remove('is-turning');
   if(g.moved && e.type === 'pointerup'){ spSwallowClick = true; setTimeout(() => { spSwallowClick = false; }, 0); }
 };
 document.addEventListener('pointerup', hsLift);
 document.addEventListener('pointercancel', hsLift);
-const hsPair = t => { const [a, b] = [t[0], t[1]];
-  return { d: Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY) || 1, ang: Math.atan2(b.clientY - a.clientY, b.clientX - a.clientX) * 180 / Math.PI,
-    x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 }; };
-document.addEventListener('touchstart', e => {
-  const v = e.target.closest && e.target.closest('.hs-view'), box = v && v.closest('.hs');
-  if(!box || e.touches.length !== 2) return;
-  hsG = null;
-  hsT = { box, p0: hsPair(e.touches), z0: state.hsZoom || 1, yaw0: state.hsYaw || 0, px0: state.hsPx || 0, py0: state.hsPy || 0 };
-  box.classList.add('is-turning');
-}, { passive:true });
-document.addEventListener('touchmove', e => {
-  const t = hsT;
-  if(!t) return;
-  if(e.touches.length !== 2) return;
-  e.preventDefault();   // the page itself must not zoom
-  const p = hsPair(e.touches);
-  let da = p.ang - t.p0.ang; if(da > 180) da -= 360; if(da < -180) da += 360;
-  state.hsZoom = +Math.max(1, Math.min(HS_ZMAX, t.z0 * p.d / t.p0.d)).toFixed(3);
-  state.hsYaw = t.yaw0 + da;
-  state.hsPx = t.px0 + (p.x - t.p0.x); state.hsPy = t.py0 + (p.y - t.p0.y);
-  hsApply(t.box);
-}, { passive:false });
-const hsTouchEnd = e => {
-  if(!hsT || e.touches.length >= 2) return;
-  hsT.box.classList.remove('is-turning'); hsT = null;
-  spSwallowClick = true; setTimeout(() => { spSwallowClick = false; }, 0);
-};
-document.addEventListener('touchend', hsTouchEnd);
-document.addEventListener('touchcancel', hsTouchEnd);
-// Safari's own pinch would zoom the whole page
-document.addEventListener('gesturestart', e => { if(e.target.closest && e.target.closest('.hs-view')) e.preventDefault(); });
 
 /* A sheet's wash from its poster. The small copy is read into a canvas a few
    pixels wide, averaged into seven bands from top to bottom, and each band is
