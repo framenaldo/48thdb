@@ -21356,9 +21356,132 @@ function hsShareSubject(){
   const pick = state.hsPick && getMember(state.hsPick) ? state.hsPick : null;
   const link = `${location.origin}/?e=${ev.id}&hs=${d}${r != null ? '.' + r : ''}${pick ? '.' + pick : ''}`;
   const pm = pick && getMember(pick);
-  return { kind:'hsplan', ev, day:d, round:r, pick, osh: !!state.hsOshi, url:link, link,
+  return { kind:'hsplan', ev, day:d, round:r, pick, osh: !!state.hsOshi, flat: !!state.hsFlat, yaw: state.hsFlat ? 0 : state.hsYaw || 0, url:link, link,
     title:`${pm ? pm.name + ' · ' : ''}ผังเลนจับมือ ${ev.title} — 48thDb`,
     file:`48thdb-handshake-${HS_DAYS[d].date}${r != null ? '-r' + (r + 1) : ''}${pick ? '-' + pick : ''}` };
+}
+/* The page's hall drawn into a share card. The plan is laid out flat in its
+   own canvas just as the page lays it out (a floor 340 wide), then carried
+   onto the card through the page's own 3D — rotateZ(yaw), rotateX(38°),
+   scale .88, up 75px, seen from 1300px — a mesh of small triangles, each an
+   affine piece of the perspective. The faces stand up on top, back to front. */
+const HS_CARD_FLOOR = 340;
+function hsFlatHall(o, S){
+  const W0 = HS_CARD_FLOOR, LH = 17, GAP = 4, PT = 10, PL = 34, PR = 8, H0 = PT * 2 + HS_LANES * LH + (HS_LANES - 1) * GAP + 60;
+  const c = document.createElement('canvas'); c.width = W0 * S; c.height = H0 * S;
+  const g = c.getContext('2d'); g.scale(S, S);
+  const F = (w, px) => `${w} ${px}px "Noto Sans Thai", sans-serif`;
+  // the floor
+  const fg = g.createLinearGradient(0, 0, 0, H0); fg.addColorStop(0, '#2B2429'); fg.addColorStop(1, '#231D22');
+  g.fillStyle = fg; shareRound(g, 0, 0, W0, H0, 12); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,.1)'; g.lineWidth = 1; g.stroke();
+  const byLane = {}; o.who.forEach(w => { if(w.lane) byLane[w.lane] = w.id; });
+  const lw = W0 - PL - PR, spots = [];
+  for(let k = 0; k < HS_LANES; k++){
+    const n = k + 1, id = byLane[n], m = id && getMember(id), x = PL, y = PT + k * (LH + GAP);
+    g.letterSpacing = '.7px';
+    if(!m){ g.fillStyle = '#3F3930'; shareRound(g, x, y, lw, LH, 3); g.fill();
+      g.letterSpacing = '.7px'; shareText(g, `LANE ${n}`, x + 6, y + 12, F(900, 8.5), '#A69C88'); g.letterSpacing = '0px'; continue; }
+    const col = (getGroup(m.groupId) || {}).color || '#888', dim = o.pick && o.pick !== id;
+    g.save();
+    if(id === o.pick){ g.shadowColor = col; g.shadowBlur = 14; g.fillStyle = '#F3D9B1'; shareRound(g, x - 2, y - 2, lw + 4, LH + 4, 5); g.fill(); }
+    g.restore();
+    g.globalAlpha = dim ? .35 : 1;
+    const gr = g.createLinearGradient(x, 0, x + lw, 0);
+    gr.addColorStop(0, shareMix(col, .3, '#000000')); gr.addColorStop(.55, col); gr.addColorStop(1, shareMix(col, .22));
+    g.fillStyle = gr; shareRound(g, x, y, lw, LH, 3); g.fill();
+    g.globalAlpha = 1;
+    g.font = F(900, 8.5); const tw = g.measureText(`LANE ${n}`).width + 10 + 6 * .7;
+    g.fillStyle = 'rgba(0,0,0,.28)'; shareRound(g, x + 6, y + 2.5, tw, 12, 4); g.fill();
+    shareText(g, `LANE ${n}`, x + 11, y + 12, F(900, 8.5), dim ? 'rgba(255,255,255,.6)' : '#fff');
+    g.letterSpacing = '0px';
+    shareText(g, m.name, x + 12 + tw, y + 12.5, F(800, 11), dim ? 'rgba(255,255,255,.6)' : '#fff');
+    spots.push({ id, m, col, dim, x: x + lw * .89, y: y + LH / 2 });
+  }
+  g.letterSpacing = '0px';
+  // the doors along the bottom wall, the desks in the lobby beyond
+  const ly = PT * 2 + HS_LANES * LH + (HS_LANES - 1) * GAP, fs = 9.5;
+  g.fillStyle = 'rgba(255,255,255,.32)';
+  [[0, .02], [.12, .58], [.71, 1]].forEach(([a, b]) => g.fillRect(a * W0, ly, (b - a) * W0, 3));
+  const pill = (t, x, yy, rgb, ink, arrow, mid) => {
+    g.font = F(800, fs); const w = g.measureText(t).width + fs * 1.2 + fs * 1.15 + 3, h = fs * 1.75, x0 = mid ? x - w / 2 : x;
+    g.fillStyle = `rgba(${rgb},.14)`; shareRound(g, x0, yy, w, h, h / 2); g.fill();
+    g.strokeStyle = `rgba(${rgb},.45)`; g.lineWidth = 1; g.stroke();
+    shareText(g, `${arrow}`, x0 + fs * .5 + fs * .55, yy + h * .72, F(900, fs * 1.1), ink, 'center');
+    shareText(g, t, x0 + fs * .5 + fs * 1.15 + 3, yy + h * .7, F(800, fs), ink);
+  };
+  pill(o.en ? 'Exit' : 'ทางออก', W0 * .02, ly + 8, '240,138,93', '#FAD2BF', '↓', false);
+  pill(o.en ? 'Entrance' : 'ทางเข้า', W0 * .645, ly + 8, '63,181,165', '#BFE9E2', '↑', true);
+  const desk = (t, x, yy, right) => { const f = fs * .76; g.font = F(800, f); g.letterSpacing = '.4px';
+    const w = g.measureText(t).width + f * 1.3, h = f * 2.1, x0 = right ? x - w : x;
+    g.fillStyle = 'rgba(255,255,255,.1)'; shareRound(g, x0, yy, w, h, 4); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.18)'; g.stroke();
+    shareText(g, t, x0 + f * .65, yy + h * .7, F(800, f), '#CFC4CA'); g.letterSpacing = '0px'; return w; };
+  desk('INFORMATION', W0 * .24, ly + 9);
+  desk('FIRST AID', W0 * .98, ly + 9, true);
+  desk('ELEVATOR', W0 * .02, ly + 60 - 6 - fs * .76 * 2.1);
+  desk('MERCHANDISE & HACHICHA', W0 * .02 + 7.6 * fs, ly + 60 - 6 - fs * .76 * 2.1);
+  return { c, W0, H0, spots };
+}
+/* one affine piece of the picture: triangle (s0 s1 s2) of the flat hall onto (d0 d1 d2) of the card */
+function hsTri(g, img, S, s0, s1, s2, d0, d1, d2){
+  const [x0, y0] = s0.map(v => v * S), [x1, y1] = s1.map(v => v * S), [x2, y2] = s2.map(v => v * S);
+  const den = x0 * (y2 - y1) - x1 * y2 + x2 * y1 + (x1 - x2) * y0;
+  if(!den) return;
+  const a = -(y0 * (d2[0] - d1[0]) - y1 * d2[0] + y2 * d1[0] + (y1 - y2) * d0[0]) / den;
+  const b = (y1 * d2[1] + y0 * (d1[1] - d2[1]) - y2 * d1[1] + (y2 - y1) * d0[1]) / den;
+  const c = (x0 * (d2[0] - d1[0]) - x1 * d2[0] + x2 * d1[0] + (x1 - x2) * d0[0]) / den;
+  const d = -(x1 * d2[1] + x0 * (d1[1] - d2[1]) - x2 * d1[1] + (x2 - x1) * d0[1]) / den;
+  const e = (x0 * (y2 * d1[0] - y1 * d2[0]) + y0 * (x1 * d2[0] - x2 * d1[0]) + (x2 * y1 - x1 * y2) * d0[0]) / den;
+  const f = (x0 * (y2 * d1[1] - y1 * d2[1]) + y0 * (x1 * d2[1] - x2 * d1[1]) + (x2 * y1 - x1 * y2) * d0[1]) / den;
+  // the clip reaches a hair past each edge, so the pieces meet without seams
+  const cx = (d0[0] + d1[0] + d2[0]) / 3, cy = (d0[1] + d1[1] + d2[1]) / 3, out = p => { const dx = p[0] - cx, dy = p[1] - cy, l = Math.hypot(dx, dy) || 1; return [p[0] + dx / l * .7, p[1] + dy / l * .7]; };
+  const [e0, e1, e2] = [out(d0), out(d1), out(d2)];
+  g.save(); g.beginPath(); g.moveTo(...e0); g.lineTo(...e1); g.lineTo(...e2); g.closePath(); g.clip();
+  g.transform(a, b, c, d, e, f); g.drawImage(img, 0, 0); g.restore();
+}
+async function hsDrawHall(g, o, bx, by, bw, bh){
+  const S = 3, hall = hsFlatHall(o, S), { W0, H0 } = hall;
+  const flat = !!o.flat, pitch = (flat ? 0 : 38) * Math.PI / 180, ty = flat ? 0 : -75, sc = flat ? 1 : .88, yaw = (o.yaw || 0) * Math.PI / 180;
+  const D = 1300, VW = W0, ox = W0 / 2, oy = H0 / 2, px = VW / 2, py = (flat ? 542 : 430) * .2;
+  // a point of the floor to the page's view, the way the browser draws it
+  const P = (x, y) => {
+    const lx = x - ox, ly = y - oy;
+    const x1 = lx * Math.cos(yaw) - ly * Math.sin(yaw), y1 = lx * Math.sin(yaw) + ly * Math.cos(yaw);
+    const y2 = y1 * Math.cos(pitch), z2 = y1 * Math.sin(pitch);
+    const X = ox + x1 * sc, Y = oy + y2 * sc + ty, Z = z2 * sc, k = D / (D - Z);
+    return [px + (X - px) * k, py + (Y - py) * k, k];
+  };
+  // fit the turned hall to the space on the card
+  const corners = [[0, 0], [W0, 0], [0, H0], [W0, H0]].map(([x, y]) => P(x, y));
+  const xs = corners.map(p => p[0]), ys = corners.map(p => p[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys) - 40, maxY = Math.max(...ys);
+  const k = Math.min(bw / (maxX - minX), bh / (maxY - minY)), offX = bx + (bw - (maxX - minX) * k) / 2 - minX * k, offY = by - minY * k;
+  const Q = (x, y) => { const p = P(x, y); return [offX + p[0] * k, offY + p[1] * k, p[2]]; };
+  // the floor, piece by piece
+  const nx = 14, ny = 26;
+  for(let j = 0; j < ny; j++) for(let i = 0; i < nx; i++){
+    const xa = W0 * i / nx, xb = W0 * (i + 1) / nx, ya = H0 * j / ny, yb = H0 * (j + 1) / ny;
+    const A = Q(xa, ya), B = Q(xb, ya), C = Q(xb, yb), Dd = Q(xa, yb);
+    hsTri(g, hall.c, S, [xa, ya], [xb, ya], [xb, yb], A, B, C);
+    hsTri(g, hall.c, S, [xa, ya], [xb, yb], [xa, yb], A, C, Dd);
+  }
+  // the faces: standing in 3D (bottom on the lane), lying centred on it in 2D
+  for(const sp of hall.spots){
+    const big = sp.id === o.pick, s = big ? (flat ? 30 : 34) : (flat ? 19 : 22), fy = flat ? .5 : .14;
+    const [X, Y, kk] = Q(sp.x, sp.y + s * fy), w = s * (flat ? 1 : sc) * kk * k;
+    if(!flat){ const [sx, sy] = Q(sp.x, sp.y); const r = 10 * sc * kk * k;
+      const rg = g.createRadialGradient(sx, sy, 0, sx, sy, r); rg.addColorStop(0, 'rgba(0,0,0,.55)'); rg.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = rg; g.beginPath(); g.ellipse(sx, sy, r, r * .35, 0, 0, Math.PI * 2); g.fill(); }
+    const x = X - w / 2, y = Y - w, rr = 6 / 22 * w, bd = Math.max(2, w * .07);
+    g.save(); g.globalAlpha = sp.dim ? .45 : 1;
+    g.shadowColor = big ? 'rgba(243,217,177,.85)' : 'rgba(0,0,0,.5)'; g.shadowBlur = big ? w * .4 : w * .3; g.shadowOffsetY = big ? 0 : w * .1;
+    g.fillStyle = big ? '#F3D9B1' : '#fff'; shareRound(g, x - bd, y - bd, w + bd * 2, w + bd * 2, rr + bd); g.fill();
+    g.restore(); g.save(); g.globalAlpha = sp.dim ? .45 : 1;
+    shareRound(g, x, y, w, w, rr); g.clip();
+    if(o.faces[sp.id]) shareCover(g, o.faces[sp.id], x, y, w, w); else { g.fillStyle = sp.col; g.fillRect(x, y, w, w); }
+    g.restore();
+  }
 }
 async function drawHSPlanCard(g, sub){
   const en = isEN(), day = HS_DAYS[sub.day], ri = sub.round, rd = ri != null ? HS_ROUNDS[ri] : null;
@@ -21418,34 +21541,8 @@ async function drawHSPlanCard(g, sub){
       g.save(); shareRound(g, x, yy, f, f, 14); g.clip(); if(faces[w.id]) shareCover(g, faces[w.id], x, yy, f, f); else { g.fillStyle = c; g.fillRect(x, yy, f, f); } g.restore();
       shareText(g, m.name, x + f / 2, yy + f + 28, F(700, 20), '#fff', 'center'); });
   } else {
-    // the hall: twenty-two lanes, lane 1 at the back, each in use lit in her group's colour with her face
-    const byLane = {}; who.forEach(w => { if(w.lane) byLane[w.lane] = w.id; });
-    const gap = 6, lh = (bottom - y - 40 - gap * (HS_LANES - 1)) / HS_LANES, x0 = 60, lw = W - 120;
-    for(let k = 0; k < HS_LANES; k++){
-      const n = k + 1, id = byLane[n], m = id && getMember(id), yy = y + k * (lh + gap);
-      const dim = pick && id !== pick;
-      if(!m){ g.fillStyle = '#3F3930'; shareRound(g, x0, yy, lw, lh, 6); g.fill();
-        shareText(g, `LANE ${n}`, x0 + 14, yy + lh / 2 + 7, F(900, 18), '#A69C88'); continue; }
-      const c = (getGroup(m.groupId) || {}).color || '#888';
-      g.globalAlpha = dim ? .4 : 1;
-      const gr = g.createLinearGradient(x0, 0, x0 + lw, 0); gr.addColorStop(0, shareMix(c, .3, '#000000')); gr.addColorStop(.55, c); gr.addColorStop(1, shareMix(c, .22));
-      g.fillStyle = gr; shareRound(g, x0, yy, lw, lh, 6); g.fill();
-      g.fillStyle = 'rgba(0,0,0,.28)'; g.font = F(900, 18); const tw = g.measureText(`LANE ${n}`).width + 16;
-      shareRound(g, x0 + 8, yy + (lh - 28) / 2, tw, 28, 6); g.fill();
-      shareText(g, `LANE ${n}`, x0 + 16, yy + lh / 2 + 7, F(900, 18), '#fff');
-      shareText(g, m.name, x0 + 22 + tw, yy + lh / 2 + 9, F(800, Math.min(26, lh - 10)), '#fff');
-      const f = id === pick ? lh + 22 : lh - 4, fx = x0 + lw * .86 - f / 2, fy = yy + lh / 2 - f / 2;
-      if(id === pick){ g.globalAlpha = 1; g.strokeStyle = '#F3D9B1'; g.lineWidth = 4; shareRound(g, x0 - 3, yy - 3, lw + 6, lh + 6, 8); g.stroke();
-        g.fillStyle = '#F3D9B1'; shareRound(g, fx - 4, fy - 4, f + 8, f + 8, 10); g.fill(); }
-      else { g.fillStyle = '#fff'; shareRound(g, fx - 2, fy - 2, f + 4, f + 4, 7); g.fill(); }
-      g.save(); shareRound(g, fx, fy, f, f, 6); g.clip(); if(faces[id]) shareCover(g, faces[id], fx, fy, f, f); else { g.fillStyle = c; g.fillRect(fx, fy, f, f); } g.restore();
-      g.globalAlpha = 1;
-    }
-    // the doors along the bottom wall
-    const dy = y + HS_LANES * (lh + gap) + 24;
-    shareText(g, `↓ ${en ? 'Exit' : 'ทางออก'}`, x0 + 6, dy, F(800, 20), '#FAD2BF');
-    shareText(g, `↑ ${en ? 'Entrance' : 'ทางเข้า'}`, x0 + lw * .645, dy, F(800, 20), '#BFE9E2', 'center');
-    shareText(g, en ? 'A sketch from the organiser’s plan' : 'ผังจำลองจากผังของผู้จัด', x0 + lw, dy, F(600, 18), '#7E7178', 'right');
+    // the hall as it is on screen: in 3D, tipped back and turned as it was left, the faces standing on their lanes
+    await hsDrawHall(g, { who, pick, faces, flat: sub.flat, yaw: sub.yaw, en }, 40, y + 6, W - 80, bottom - y + 40);
   }
   await shareFooter(g, true, sub.url);
 }
