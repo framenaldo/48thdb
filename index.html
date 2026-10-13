@@ -13737,13 +13737,18 @@ function renderDayModal(){
   for(const { it } of steps){
     const tr = TL_TRACKS[it.track] || TL_TRACKS.event;
     const head = `${trackIcon(it, 'ev-icon')}${escapeHtml(itemShortName(it))}`;
-    // a step that runs over several days sits in the all-day row, like a
-    // pre-order, with when it closes
+    // A step that runs over several days goes on the hours where it opens and
+    // where it closes (an `until`), and in the all-day row on the days between.
     if(it.to && it.to !== it.d){
-      const ld = parseYmd(it.to), by = it.until ? ` ${it.until}` : '';
-      const close = it.to === iso ? (it.until ? `${en ? 'until' : 'ถึง'}${by}${en ? '' : ' น.'}` : (en ? 'last day' : 'วันสุดท้าย'))
-        : `${en ? 'until' : 'ถึง'} ${ld.getDate()} ${M[ld.getMonth()]}${by}`;
-      allDay.push(box({ id:it.ev, k:tr.color, inner:chipInner(head, close) }, 'dv-chip'));
+      const ld = parseYmd(it.to), by = it.until ? ` ${it.until}` : '', nt = en ? '' : ' น.';
+      const toWhen = `${en ? 'until' : 'ถึง'} ${ld.getDate()} ${M[ld.getMonth()]}${by}`;
+      if(it.d === iso && isHm(it.time)){
+        const a = mins(it.time);
+        timed.push({ a, b:a + 30, id:it.ev, k:tr.color, head, s:sub([toWhen, it.venue]) });
+      } else if(it.to === iso && isHm(it.until)){
+        const b = mins(it.until) + 1;
+        timed.push({ a:b - 30, b, id:it.ev, k:tr.color, head, s:sub([`${en ? 'closes' : 'ปิด'} ${it.until}${nt}`]) });
+      } else allDay.push(box({ id:it.ev, k:tr.color, inner:chipInner(head, it.to === iso ? (en ? 'last day' : 'วันสุดท้าย') : toWhen) }, 'dv-chip'));
       continue;
     }
     if(!isHm(it.time)){ allDay.push(box({ id:it.ev, k:tr.color, inner:chipInner(head, '') }, 'dv-chip')); continue; }
