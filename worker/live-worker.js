@@ -568,7 +568,7 @@ const CHAIN_ADDRS = new Set([
   '0x674ab311c94780207a1357de9bcdd357d23f459e',   // GE2025 poll
   '0x2f5c60bde7a5ebd2b116bb03cb5232fa1ea55f1c',   // the GE6 token
 ]);
-const CHAIN_HEADERS = { ...JSON_HEADERS, 'access-control-allow-methods': 'POST, OPTIONS', 'cache-control': 'no-store' };
+const CHAIN_HEADERS = { ...JSON_HEADERS, 'access-control-allow-methods': 'GET, POST, OPTIONS', 'cache-control': 'no-store' };
 const chainHex = (v) => typeof v === 'string' && /^0x[0-9a-f]{1,16}$/i.test(v);
 async function chainUp(method, params) {
   const r = await fetch(CHAIN_RPC, { method: 'POST', headers: { 'content-type': 'application/json', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36' },
@@ -597,7 +597,7 @@ async function chainCall(body, ctx) {
   const topics = Array.isArray(f.topics) ? f.topics.slice(0, 4).map((t) => (t == null ? null : String(t).toLowerCase())) : [];
   if (topics.some((t) => t != null && !/^0x[0-9a-f]{64}$/.test(t))) throw Object.assign(new Error('not allowed'), { status: 400 });
   const from = parseInt(f.fromBlock, 16), to = parseInt(f.toBlock, 16);
-  if (!(to >= from) || to - from > 250000) throw Object.assign(new Error('range'), { status: 400 });
+  if (!(to >= from) || to - from > 1500000) throw Object.assign(new Error('range'), { status: 400 });
   const head = parseInt(await chainHead(ctx), 16);
   // more than ten minutes behind the tip: indexed for good
   const ttl = to < head - 200 ? 86400 : 2;
@@ -605,8 +605,33 @@ async function chainCall(body, ctx) {
   return chainCached(`logs/${addr}/${from}-${to}/${topics.map((t) => t || '-').join(',')}`, ttl, () => chainUp('eth_getLogs', [filter]), ctx);
 }
 
+/* GET /chain/tail: everything a look needs in one answer — the tip, and the
+   last twenty minutes of the GE2026 poll's logs and the GE6 token's transfers —
+   so a page following the vote every three seconds costs one request a look.
+   Worked out once per block for everyone. */
+const CHAIN_TAIL = 400;
+async function chainTail(ctx) {
+  const headHex = await chainHead(ctx), head = parseInt(headHex, 16), from = head - CHAIN_TAIL;
+  return chainCached(`tail/${head}`, 3, async () => {
+    const range = { fromBlock: '0x' + from.toString(16), toBlock: headHex };
+    const [poll, token] = await Promise.all([
+      chainUp('eth_getLogs', [{ address: '0x86a1f49e1b1cbd69971e99b66123264c75ac2c8f', ...range }]),
+      chainUp('eth_getLogs', [{ address: '0x2f5c60bde7a5ebd2b116bb03cb5232fa1ea55f1c', ...range,
+        topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'] }]),
+    ]);
+    return { head: headHex, from, poll, token };
+  }, ctx);
+}
+
 export default {
   async fetch(request, env, ctx) {
+    if (new URL(request.url).pathname === '/chain/tail') {
+      try {
+        return new Response(JSON.stringify(await chainTail(ctx)), { headers: CHAIN_HEADERS });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: String((err && err.message) || err) }), { status: 502, headers: CHAIN_HEADERS });
+      }
+    }
     if (new URL(request.url).pathname === '/chain') {
       if (request.method === 'OPTIONS') return new Response(null, { headers: { ...CHAIN_HEADERS, 'access-control-allow-headers': 'content-type', 'access-control-max-age': '86400' } });
       if (request.method !== 'POST') return new Response(JSON.stringify({ error: 'POST only' }), { status: 405, headers: CHAIN_HEADERS });
