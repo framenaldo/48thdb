@@ -3191,7 +3191,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      to run across the phone. A round picked: each lane in use lights in her
      group's colour from the walkway end, her name joins LANE n, and her face
      drops onto the lane — standing up in 3D, lying flat in 2D. ===== */
-  .hs{ --pitch:38deg; --ty:-75px; --sc:.88; --fy:.14; --z:1; --px:0px; --py:0px; }
+  .hs{ --pitch:38deg; --ty:-75px; --sc:.88; --fy:.14; }
   .hs.is-flat{ --pitch:0deg; --ty:0px; --sc:1; --fy:.5; }
   .hs-board{ container-type:inline-size; padding:12px; border-radius:18px; background:#1A1419; color:#EFE7EC; overflow:hidden;
     border:1px solid rgba(255,255,255,.1); box-shadow:0 8px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06); }
@@ -3244,12 +3244,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .hs .hs-hint .is-2d, .hs.is-flat .hs-hint .is-3d{ display:none; }
   .hs.is-flat .hs-hint .is-2d{ display:inline; }
   /* the hall, in perspective; in 3D it lies tipped back and can be turned */
-  .hs-view{ position:relative; height:430px; perspective:1300px; perspective-origin:50% 20%; touch-action:pan-y; overflow:hidden; border-radius:12px;
-    user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; transition:height .8s cubic-bezier(.22,1,.36,1); }
+  .hs-view{ position:relative; height:430px; perspective:1300px; perspective-origin:50% 20%; touch-action:pan-y;
+    user-select:none; -webkit-user-select:none; transition:height .8s cubic-bezier(.22,1,.36,1); }
   .hs.is-flat .hs-view{ height:542px; }
   .hs-floor{ position:absolute; left:0; right:0; top:0; transform-style:preserve-3d; transform-origin:50% 50%;
-    transform:translate(var(--px), var(--py)) translateY(var(--ty)) scale(calc(var(--sc) * var(--z))) rotateX(var(--pitch)) rotateZ(var(--yaw));
-    transition:transform .8s cubic-bezier(.22,1,.36,1);
+    transform:translateY(var(--ty)) scale(var(--sc)) rotateX(var(--pitch)) rotateZ(var(--yaw)); transition:transform .8s cubic-bezier(.22,1,.36,1);
     border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)); border:1px solid rgba(255,255,255,.1); }
   .hs-hall{ --fx:89%; display:grid; gap:4px; padding:10px 8px 10px 34px; transform-style:preserve-3d; }
   /* in 3D the hall and its lanes lie in one plane, and a tap would land on the hall: only a lane in use and her face take it */
@@ -3269,9 +3268,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      every lane's at the same place along it, so the faces make one straight line down the hall */
   .hs-face{ --s:22px; position:absolute; left:var(--fx); top:50%; width:var(--s); height:var(--s); margin:calc(var(--s) * -1) 0 0 calc(var(--s) / -2);
     transform-origin:50% 100%; transform-style:preserve-3d;
-    transform:translateZ(3px) translateY(calc(var(--s) * var(--fy))) rotateZ(calc(var(--yaw) * -1)) rotateX(calc(var(--pitch) * -1));
+    transform:translateY(calc(var(--s) * var(--fy))) rotateZ(calc(var(--yaw) * -1)) rotateX(calc(var(--pitch) * -1));
     transition:transform .8s cubic-bezier(.22,1,.36,1), width .25s, height .25s, margin .25s; }
-  .hs.is-flat .hs-face{ --s:19px; transform-origin:50% 50%; }   /* lying flat, she turns about her middle and stays on her lane */
+  .hs.is-flat .hs-face{ --s:19px; }
   .hs-pic{ display:block; width:100%; height:100%; border-radius:6px; overflow:hidden; background:#2A2126;
     border:1.5px solid #fff; box-shadow:0 3px 7px rgba(0,0,0,.5); transform-origin:50% 100%; }
   .hs.is-flat .hs-pic{ transform-origin:50% 50%; }
@@ -3375,22 +3374,6 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .hs-seg b{ font-size:10px; }
     .hs-seg small{ font-size:8.5px; }
   }
-  /* turn and zoom: a framed column over the hall's corner; the compass shows which way the hall faces, a tap sets it straight */
-  .hs-ctl{ position:absolute; left:4px; top:6px; z-index:6; display:flex; flex-direction:column; gap:6px; }
-  .hs-ctl button{ width:30px; height:30px; padding:0; display:grid; place-items:center; cursor:pointer; color:#F4ECF1; font:inherit;
-    background:rgba(36,28,34,.92); border:1px solid rgba(255,255,255,.2); border-radius:11px; box-shadow:0 3px 0 rgba(0,0,0,.5);
-    -webkit-tap-highlight-color:transparent; transition:transform .12s, box-shadow .12s, opacity .2s; }
-  .hs-ctl button:active{ transform:translateY(2px); box-shadow:none; }
-  .hs-ctl button:disabled{ opacity:.4; }
-  .hs-ctl svg{ width:17px; height:17px; }
-  .hs-ctl .hs-compass svg{ transform:rotate(var(--yaw)); transition:transform .8s cubic-bezier(.22,1,.36,1); }
-  .hs.is-turning .hs-ctl .hs-compass svg{ transition:none; }
-  .hs-zoomed{ position:absolute; left:4px; top:120px; z-index:6; padding:2px 8px; border-radius:99px; font-size:10.5px; font-weight:800;
-    color:#F4ECF1; background:rgba(36,28,34,.85); border:1px solid rgba(255,255,255,.16); pointer-events:none; opacity:0; transition:opacity .25s; }
-  .hs.is-zoom .hs-zoomed{ opacity:1; }
-  .hs.is-zoom .hs-view{ touch-action:none; }
-  .hs .hs-hint .is-pan, .hs.is-zoom .hs-hint .is-rot{ display:none; }
-  .hs.is-zoom .hs-hint .is-pan{ display:inline; }
   .hs-share{ margin-left:auto; display:inline-flex; align-items:center; gap:5px; min-height:28px; padding:0 11px; cursor:pointer; font:inherit;
     font-size:12px; font-weight:800; color:#fff; background:#E4457E; border:0; border-radius:99px; box-shadow:0 2px 0 rgba(0,0,0,.45);
     white-space:nowrap; -webkit-tap-highlight-color:transparent; transition:transform .12s, box-shadow .12s; }
@@ -7709,7 +7692,7 @@ const ICONS = {
 let state = {
   isOwner:false, pending:[], flash:[], layout:null, layoutEdit:null, layoutDraft:null, navPick:null, geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
   ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOshi:false,
-  hsDay:0, hsRound:null, hsPick:null, hsOshi:false, hsFlat:false, hsYaw:0, hsZoom:1, hsPx:0, hsPy:0, hsHold:false,
+  hsDay:0, hsRound:null, hsPick:null, hsOshi:false, hsFlat:false, hsYaw:0, hsHold:false,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current', livesScope:'current', galleryId:null,
@@ -15347,8 +15330,7 @@ const HS_DAYS = [
     'cgm-shenae':[17,0,0,17,0,1], 'cgm-tara':[0,0,0,0,19,0], 'cgm-valentine':[0,0,0,0,18,1],
   } },
 ];
-const HS_ZMAX = 2;   // how far in the + button takes the hall
-const HS_YAW = 45;   // how far a finger may turn the hall, either way
+const HS_YAW = 28;   // how far a finger may turn the hall, either way
 const hsDay = () => HS_DAYS[state.hsDay] || HS_DAYS[0];
 const hsRoundName = (i, en) => HS_ROUNDS[i].special ? (en ? 'Special round' : 'รอบพิเศษ') : `${en ? 'Round' : 'รอบ'} ${i + 1}`;
 /* who is in round ri of a day, by lane — the special round has no lanes yet */
@@ -15522,15 +15504,8 @@ function renderLanePlan(ev){
     : rd && osh && mine.size ? `<p class="hs-none">${en ? 'None of your oshi is in this round' : 'รอบนี้ไม่มีโอชิของคุณ'}</p>` : '';
   const back = now && !state.hsFollow ? `<button class="ff-live-back" data-action="hs-live">${en ? 'Back to now' : 'กลับไปตอนนี้'}</button>` : '';
 
-  const z = state.hsZoom || 1;
-  const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-  const ctl = `<div class="hs-ctl">
-      <button data-action="hs-zoom" data-value="1" aria-label="${en ? 'Zoom in' : 'ซูมเข้า'}"${z >= HS_ZMAX ? ' disabled' : ''}>${svg('<path d="M12 5v14M5 12h14"/>')}</button>
-      <button data-action="hs-zoom" data-value="-1" aria-label="${en ? 'Zoom out' : 'ซูมออก'}"${z <= 1 ? ' disabled' : ''}>${svg('<path d="M5 12h14"/>')}</button>
-      <button class="hs-compass" data-action="hs-straight" aria-label="${en ? 'Set the hall straight' : 'หมุนกลับตรง'}">${svg('<circle cx="12" cy="12" r="9.5" stroke-width="1.6"/><path d="M12 5 9.6 12h4.8z" fill="#F06C9B" stroke="#F06C9B" stroke-width="1.4"/><path d="M12 19l2.4-7H9.6z" stroke-width="1.4"/>')}</button>
-    </div><span class="hs-zoomed">${Math.round(z * 100)}%</span>`;
-  return `<div class="hs${flat ? ' is-flat' : ''}${rd ? ' is-round' : ''}${rd && rd.special ? ' is-special' : ''}${pick ? ' has-pick' : ''}${reveal ? ' is-reveal' : ''}${z > 1 ? ' is-zoom' : ''}"
-    style="--yaw:${(state.hsYaw || 0).toFixed(1)}deg;--z:${z};--px:${state.hsPx || 0}px;--py:${state.hsPy || 0}px">
+  return `<div class="hs${flat ? ' is-flat' : ''}${rd ? ' is-round' : ''}${rd && rd.special ? ' is-special' : ''}${pick ? ' has-pick' : ''}${reveal ? ' is-reveal' : ''}"
+    style="--yaw:${flat ? 0 : state.hsYaw || 0}deg">
     ${scope}
     <div class="hs-board">
       <div class="hs-top">
@@ -15544,7 +15519,7 @@ function renderLanePlan(ev){
       ${noOshi}
       <div class="hs-tools">
         <span class="sp-seg"><button data-action="hs-view" data-id="3d" aria-pressed="${!flat}" class="${flat ? '' : 'is-on'}">3D</button><button data-action="hs-view" data-id="2d" aria-pressed="${flat}" class="${flat ? 'is-on' : ''}">2D</button></span>
-        ${back || `<span class="hs-hint"><span class="is-rot">${en ? 'Drag sideways to turn' : 'ลากซ้ายขวาเพื่อหมุนผัง'}</span><span class="is-pan">${en ? 'Drag to move around' : 'ลากเพื่อเลื่อนดูผัง'}</span></span>`}
+        ${back || `<span class="hs-hint"><span class="is-3d">${en ? 'Drag sideways to turn the hall' : 'ลากซ้ายขวาเพื่อหมุนผัง'}</span><span class="is-2d">${en ? 'Laid flat, as the organiser’s plan' : 'วางราบแบบผังของผู้จัด'}</span></span>`}
         <button class="hs-share" data-action="hs-share">${ICONS.share}${en ? 'Share' : 'แชร์ผัง'}</button>
       </div>
       <div class="hs-view">
@@ -15553,7 +15528,6 @@ function renderLanePlan(ev){
           ${lobby}
         </div>
         ${spec}
-        ${ctl}
       </div>
       ${pickCard}
       ${list}
@@ -15583,32 +15557,8 @@ function hsSetView(el){
   if(!box) return;
   state.hsFlat = el.dataset.id === '2d';
   box.classList.toggle('is-flat', state.hsFlat);
+  box.style.setProperty('--yaw', `${state.hsFlat ? 0 : state.hsYaw || 0}deg`);
   spSegPick(el);
-}
-/* the turn, the zoom and the pan, written straight onto the plan — no redraw */
-function hsApply(box){
-  const z = state.hsZoom || 1;
-  // panning stops where the hall's edge would leave the middle of the board
-  const v = box.querySelector('.hs-view'), lx = v ? v.offsetWidth * (z - 1) / 2 + 20 : 0, ly = v ? v.offsetHeight * (z - 1) / 2 + 20 : 0;
-  state.hsPx = z > 1 ? Math.max(-lx, Math.min(lx, state.hsPx || 0)) : 0;
-  state.hsPy = z > 1 ? Math.max(-ly, Math.min(ly, state.hsPy || 0)) : 0;
-  const st = box.style;
-  st.setProperty('--yaw', `${(state.hsYaw || 0).toFixed(1)}deg`); st.setProperty('--z', z);
-  st.setProperty('--px', `${state.hsPx.toFixed(1)}px`); st.setProperty('--py', `${state.hsPy.toFixed(1)}px`);
-  box.classList.toggle('is-zoom', z > 1);
-  const lab = box.querySelector('.hs-zoomed'); if(lab) lab.textContent = Math.round(z * 100) + '%';
-  const [zi, zo] = box.querySelectorAll('[data-action="hs-zoom"]');
-  if(zi) zi.disabled = z >= HS_ZMAX; if(zo) zo.disabled = z <= 1;
-}
-function hsZoomBy(box, k){
-  const z0 = state.hsZoom || 1, z = Math.max(1, Math.min(HS_ZMAX, z0 + (k > 1 ? .25 : -.25)));   // 100% to 200% a quarter at a time
-  state.hsPx = (state.hsPx || 0) * z / z0; state.hsPy = (state.hsPy || 0) * z / z0;
-  state.hsZoom = +z.toFixed(3); hsApply(box);
-}
-/* the compass: the hall straight again and back to its size */
-function hsStraight(box){
-  state.hsYaw = 0; state.hsZoom = 1; state.hsPx = 0; state.hsPy = 0;
-  hsApply(box);
 }
 /* the clock: the needle moves every tick, the plan redraws when the round turns */
 function hsLiveTick(){
@@ -15625,25 +15575,22 @@ function hsLiveTick(){
     if(tt && tt._h !== b){ tt.innerHTML = b; tt._h = b; localize(tt); }
   });
 }
-/* One finger dragged sideways turns the hall a way either side, as a
-   turntable; up and down still scrolls the sheet. Zoomed in with +, the same
-   finger moves the hall about instead. The click that ends a drag is swallowed. */
+/* One finger dragged sideways turns the hall a little, as a turntable; up and
+   down still scrolls the sheet. The click that ends a turn is swallowed. */
 let hsG = null;
 document.addEventListener('pointerdown', e => {
   const v = e.target.closest && e.target.closest('.hs-view'), box = v && v.closest('.hs');
-  if(!box || !e.isPrimary || e.target.closest('.hs-ctl, .hs-spec')) return;
-  hsG = { box, id:e.pointerId, x0:e.clientX, y0:e.clientY, yaw0:state.hsYaw || 0, px0:state.hsPx || 0, py0:state.hsPy || 0,
-    pan:(state.hsZoom || 1) > 1, moved:false };
+  if(!box || box.classList.contains('is-flat') || !e.isPrimary) return;
+  hsG = { box, id:e.pointerId, x0:e.clientX, yaw0:state.hsYaw || 0, moved:false };
 });
 document.addEventListener('pointermove', e => {
   const g = hsG;
   if(!g || e.pointerId !== g.id) return;
-  const dx = e.clientX - g.x0, dy = e.clientY - g.y0;
-  if(!g.moved && Math.hypot(g.pan ? dx : 0, g.pan ? dy : 0) < 8 && Math.abs(dx) < 8) return;
+  const dx = e.clientX - g.x0;
+  if(!g.moved && Math.abs(dx) < 8) return;
   if(!g.moved){ g.moved = true; g.box.classList.add('is-turning'); }
-  if(g.pan){ state.hsPx = g.px0 + dx; state.hsPy = g.py0 + dy; }
-  else state.hsYaw = Math.max(-HS_YAW, Math.min(HS_YAW, g.yaw0 - dx * .3));
-  hsApply(g.box);
+  state.hsYaw = Math.max(-HS_YAW, Math.min(HS_YAW, g.yaw0 - dx * .22));
+  g.box.style.setProperty('--yaw', `${state.hsYaw.toFixed(1)}deg`);
 });
 const hsLift = e => {
   const g = hsG;
@@ -23299,8 +23246,6 @@ function bindDelegatedEvents(){
       hsPaint();
     }
     else if(action==='hs-live'){ state.hsFollow = true; state.hsHold = false; state.hsReveal = true; hsPaint(); }
-    else if(action==='hs-zoom'){ const box = el.closest('.hs'); if(box) hsZoomBy(box, +el.dataset.value > 0 ? 1.5 : 1 / 1.5); }
-    else if(action==='hs-straight'){ const box = el.closest('.hs'); if(box) hsStraight(box); }
     else if(action==='hs-share'){ const sub = hsShareSubject(); if(sub) openShareSheet(sub); }
     else if(action==='ff-day'){
       state.ffDay = +el.dataset.value; state.ffSlot = null; state.ffFollow = false; state.ffHold = false; state.ffScrollUntil = 0; ffPaint();
