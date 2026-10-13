@@ -69,6 +69,10 @@ the Firebase CLI from the owner's machine.
   and lies flat). Union Mall's roadshow floor is a sketch in metres (`SP_RM`,
   40 units to the metre) pieced together from the owner's photos and clips —
   keep it marked as a sketch (`source`) unless the organiser publishes one.
+  A hall can carry its chairs (`seats` on the layout: a grid of x's a section,
+  counted off the organiser's chart): drawn as little chairs in 3D, rings in
+  2D, and counted on each zone's row. Chairs only, never what is sold. MCC
+  Hall's are 2,350.
 - The Works page (/music, view `discography`) holds everything the groups made
   or took part in: the songs, then concerts, events, films, series, shows, other
   artists' MVs and ads from `SEED_MEDIA`, picked by category (`WORKS_CATS`). A

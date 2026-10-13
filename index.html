@@ -4578,6 +4578,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .sp-sec polygon{ stroke:rgba(0,0,0,.35); stroke-width:.8; stroke-linejoin:round; }
   .sp-sec text{ font-size:28px; font-weight:900; letter-spacing:1px; text-anchor:middle; pointer-events:none; }
   .sp-sec text.is-small{ font-size:19px; }
+  /* chairs: a few paths a section; its name stands over them with a rim of its colour */
+  .sp-chairs{ pointer-events:none; }
+  .sp-sec .sp-chairs path{ stroke:none; }
+  .sp-sec .sp-chairs .sp-chair-top{ stroke:rgba(0,0,0,.45); stroke-width:.4; stroke-linejoin:round; }
+  .sp-sec .sp-chairs.is-flat .sp-chair-top{ stroke:rgba(20,14,18,.75); stroke-width:.7; }
+  .sp-sec text.on-seats{ paint-order:stroke; stroke:var(--z); stroke-width:6px; stroke-linejoin:round; }
   @media (hover:hover){ .sp-sec:hover{ filter:brightness(1.15); } }
   .sp-sec:active{ filter:brightness(.82); }
   .sp.has-pick .sp-sec:not(.is-on){ opacity:.24; }
@@ -4635,6 +4641,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .sp-row:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
   /* a picked zone opens to show what its ticket brings */
   .sp-row:has(.sp-perks){ border-radius:22px; }
+  .sp-n{ display:inline-block; margin-left:6px; font-size:11px; font-weight:800; color:#B9ABB3; white-space:nowrap; }
   .sp-tok{ display:inline-block; padding:1px 7px; border-radius:999px;
     background:rgba(255,255,255,.12); color:#F4ECF1; font-size:11px; font-weight:800; letter-spacing:.3px; white-space:nowrap; }
   .sp-perks{ grid-column:1 / -1; display:none; flex-wrap:wrap; gap:6px; margin:2px 0 4px 4px; }
@@ -14286,6 +14293,25 @@ const SEAT_LAYOUTS = {
       DR:{ level:'stand', pts:[[451.9,478],[351.8,478],[351.8,494.2],[327.1,494.2],[327.1,528],[451.9,528]], at:[389.5,507.6] },
       EL:{ level:'stand', pts:SP_R(0, 536.5, 124.8, 25.4), at:[62.4,549.2], small:true, m:1.1 },
       ER:{ level:'stand', pts:SP_R(327.1, 536.5, 124.8, 25.4), at:[389.5,549.2], small:true, m:1.1 } },
+    /* Every chair, counted one by one off the organiser's seat chart (the
+       Journey of Dreams / GE2026 plan): x marks a chair. A section's grid
+       starts at o (its first chair's middle) and steps p across and back.
+       Chairs only — not which are sold. 2,350 in all: A 1,112 (AL 398, AC 316,
+       AR 398), B 630 (BL 198, BC 234, BR 198), C 264, D 224, E 120. */
+    seats:{
+      AL:{ o:[4.2,146], p:[5.753,6.832], g:['....xxxxxxxxxxxx......','...xxxxxxxxxxx........','..xxxxxxxxxx..........','.xxxxxxxxxx...........','xxxxxxxxxxx...........','xxxxxxxxxxxx..........','xxxxxxxxxxxxxx........','xxxxxxxxxxxxxxxx......','xxxxxxxxxxxxxxxxxx....','xxxxxxxxxxxxxxxxxxxx..','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx'] },
+      AC:{ o:[153.1,209], p:[5.814,6.305], g:['..........xxxxxx..........','........xxxxxxxxxx........','......xxxxxxxxxxxxxx......','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx'] },
+      AR:{ o:[325.7,146], p:[5.753,6.832], g:['......xxxxxxxxxxxx....','........xxxxxxxxxxx...','..........xxxxxxxxxx..','...........xxxxxxxxxx.','...........xxxxxxxxxxx','..........xxxxxxxxxxxx','........xxxxxxxxxxxxxx','......xxxxxxxxxxxxxxxx','....xxxxxxxxxxxxxxxxxx','..xxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx'] },
+      BL:{ o:[6.5,336.2], p:[5.536,5.778], g:['xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx'] },
+      BC:{ o:[153.1,337.7], p:[5.814,5.578], g:['xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxxxxxx'] },
+      BR:{ o:[327.9,336.9], p:[5.51,5.778], g:['xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx'] },
+      CL:{ o:[11,425], p:[5.193,5.576], g:['xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx'] },
+      CR:{ o:[332.7,425], p:[5.286,5.576], g:['xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx','xxxxxxxxxxxxxxxxxxxxxx'] },
+      DL:{ o:[7,489], p:[5.506,5.488], g:['xxxxxxxxxx.xxxxxx....','xxxxxxxxxx.xxxxxx....','xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx'] },
+      DR:{ o:[333.5,489], p:[5.506,5.488], g:['....xxxxxx.xxxxxxxxxx','....xxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx'] },
+      EL:{ o:[6.4,544.1], p:[5.506,4.396], g:['xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx'] },
+      ER:{ o:[334.1,544.6], p:[5.506,4.396], g:['xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx','xxxxxxxxxx.xxxxxxxxxx'] },
+    },
   },
 };
 /* Union Mall's roadshow floor (CO-EVENT SPACE 4 FL.), drawn in metres — 40
@@ -14430,6 +14456,9 @@ SEAT_LAYOUTS['mbk-roadshow'] = (() => {
     props:spChairs('Z1', [...SP_FIVE(0.3, 0.55), ...SP_FIVE(4.25, 0.55)], 5.2, 8, 0.9),
   };
 })();
+/* how many chairs a section has, and a zone (0 when the hall has no chairs drawn) */
+const spSeatsIn = (L, name) => { const g = L.seats && L.seats[name]; return g ? g.g.join('').split('x').length - 1 : 0; };
+const spZoneSeats = (L, z) => z.sections.reduce((n, name) => n + spSeatsIn(L, name), 0);
 const SP_PITCH = 46, SP_YAW = -12, SP_YAW_MAX = 26, SP_LIFT = 16, SP_PER_M = 40, SP_ZOOM = [.6, 4], SP_TILT = [12, 78];
 /* dark lettering on the pale zone colours, white on the deep ones */
 function spInk(hex){
@@ -14440,6 +14469,42 @@ function spInk(hex){
 function spShade(hex, f){
   const c = [1, 3, 5].map(i => Math.round(Math.min(255, parseInt(hex.slice(i, i + 2), 16) * f)));
   return `rgb(${c.join(',')})`;
+}
+/* A section's chairs, all in a few paths so a hall of two thousand redraws
+   quickly as it turns: each chair a seat and a back, facing the stage (the
+   back on the far side from it). The sides that face us are drawn, then the
+   tops; seats first, then backs, so a nearer back hides the seat behind it. */
+function spChairsSvg(S, base, colour, P, sp, s, c){
+  const [px, py] = S.p, w = px * .74, f = n => Math.round(n * 10) / 10;
+  // laid flat, as the organiser prints it: a ring a chair
+  if(sp <= .01){
+    const r = Math.min(px, py) * .4;
+    let d = '';
+    S.g.forEach((row, k) => { for(let j = 0; j < row.length; j++){ if(row[j] !== 'x') continue;
+      const [x, y] = P(S.o[0] + j * px, S.o[1] + k * py, base);
+      d += `M${f(x - r)},${f(y)}a${f(r)},${f(r)} 0 1,0 ${f(2 * r)},0a${f(r)},${f(r)} 0 1,0 ${f(-2 * r)},0Z`; } });
+    return `<g class="sp-chairs is-flat"><path class="sp-chair-top" d="${d}" fill="#FBF8F4"/></g>`;
+  }
+  const q = pts => 'M' + pts.map(([x, y, z]) => { const r = P(x, y, z); return f(r[0]) + ',' + f(r[1]); }).join('L') + 'Z';
+  // the four sides of a box, by outward normal: the ones turned to us, and how lit
+  const sides = [[0, -1], [0, 1], [-1, 0], [1, 0]].filter(([nx, ny]) => sp > .01 && nx * s + ny * c > 0)
+    .map(([nx, ny]) => ({ nx, ny, fill: spShade(colour, .5 - .16 * (nx * c - ny * s)), seat:'', back:'' }));
+  let seatTop = '', backTop = '';
+  const box = (x0, y0, x1, y1, z1, key) => {
+    for(const sd of sides){
+      const e = sd.ny === -1 ? [[x0, y0], [x1, y0]] : sd.ny === 1 ? [[x1, y1], [x0, y1]] : sd.nx === -1 ? [[x0, y1], [x0, y0]] : [[x1, y0], [x1, y1]];
+      sd[key] += q([[...e[0], base], [...e[1], base], [...e[1], base + z1], [...e[0], base + z1]]);
+    }
+    return q([[x0, y0, base + z1], [x1, y0, base + z1], [x1, y1, base + z1], [x0, y1, base + z1]]);
+  };
+  S.g.forEach((row, r) => { for(let k = 0; k < row.length; k++){ if(row[k] !== 'x') continue;
+    const cx = S.o[0] + k * px, cy = S.o[1] + r * py, x0 = cx - w / 2, x1 = cx + w / 2;
+    seatTop += box(x0, cy - py * .34, x1, cy + py * .12, 3, 'seat');
+    backTop += box(x0, cy + py * .12, x1, cy + py * .3, 7, 'back');
+  } });
+  const top = '#F7F3EF';
+  return `<g class="sp-chairs">${sides.map(sd => `<path d="${sd.seat}" fill="${sd.fill}"/>`).join('')}<path class="sp-chair-top" d="${seatTop}" fill="${top}"/>${
+    sides.map(sd => `<path d="${sd.back}" fill="${sd.fill}"/>`).join('')}<path class="sp-chair-top" d="${backTop}" fill="${top}"/></g>`;
 }
 /* The scene for one view: yaw turns the hall, pitch tips it back from the flat
    plan (0°); a picked zone rises by `lift`. Painted back to front. */
@@ -14488,9 +14553,10 @@ function spScene(ev, st){
     const out = z.off;                               // drawn for the hall's sake, not on sale here
     const open = `<g class="sp-sec${st.pick === z.id ? ' is-on' : ''}${out ? ' is-out' : ''}"${out ? '' :
       ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}"`} style="--z:${z.color}">`;
-    const text = label(sec.at, h, sec.text || name, sec.small ? 'is-small' : '', spInk(z.color));
+    const chairs = L.seats && L.seats[name] ? spChairsSvg(L.seats[name], h, z.color, P, sp, s, c) : '';
+    const text = label(sec.at, h + (chairs ? 7 : 0), sec.text || name, (sec.small ? 'is-small' : '') + (chairs ? ' on-seats' : ''), spInk(z.color));
     // a floor zone lies under whatever stands on it (`under`); its name can sit on top of all (`labelTop`)
-    items.push({ d:sec.under ? -1e6 + depthOf(sec.pts) : depthOf(sec.pts), svg:`${open}${prism(sec.pts, h, z.color, z.color)}${sec.labelTop ? '' : text}</g>` });
+    items.push({ d:sec.under ? -1e6 + depthOf(sec.pts) : depthOf(sec.pts), svg:`${open}${prism(sec.pts, h, z.color, z.color)}${chairs}${sec.labelTop ? '' : text}</g>` });
     if(sec.labelTop) items.push({ d:1e6, svg:`${open}${text}</g>` });
   }
   // things standing on a zone — chairs — rise with it and pick it
@@ -14586,7 +14652,8 @@ function spRows(ev, zones, notes){
   return `<div class="sp-list">${zones.map(z => `
         <button class="sp-row" data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" aria-pressed="false" style="--z:${z.color}; --zi:${spInk(z.color)}">
           <span class="sp-sw">${escapeHtml(z.label || z.id)}</span>
-          <span class="sp-secs">${z.note ? escapeHtml(z.note) : z.sections.join(' · ')}${z.tokens ? `<span class="sp-tok">GE6 × ${z.tokens}</span>` : ''}</span>
+          <span class="sp-secs">${z.note ? escapeHtml(z.note) : z.sections.join(' · ')}${spZoneSeats(SEAT_LAYOUTS[ev.seatPlan.layout], z) ? `<span class="sp-n" data-noloc>${
+            spZoneSeats(SEAT_LAYOUTS[ev.seatPlan.layout], z).toLocaleString('en-US')} ${isEN() ? 'seats' : 'ที่นั่ง'}</span>` : ''}${z.tokens ? `<span class="sp-tok">GE6 × ${z.tokens}</span>` : ''}</span>
           ${z.price ? `<span class="sp-price">${escapeHtml(z.price)} บาท</span>` : ''}
           ${notes ? `<span class="sp-perks">${z.tokens ? `<span class="sp-perk is-token">GE6 Token ${z.tokens} เหรียญ*</span>` : ''}${
             (z.perks || []).map(p => `<span class="sp-perk">${escapeHtml(p)}</span>`).join('')}${
