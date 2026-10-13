@@ -2206,6 +2206,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .es-box{ display:flex; flex-direction:column; gap:1px; margin:9px 0 0; background:var(--line);
     border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
   .es-box + .ev-detail{ margin-top:10px; }
+  /* who is on in a part: their faces under its row */
+  .es-who{ display:flex; flex-wrap:wrap; gap:6px; padding:0 13px 11px; margin-top:-1px; background:var(--card); }
+  .es-who[hidden]{ display:none; }
+  .es-row.is-done + .es-who{ opacity:.55; }
   .es-row{ position:relative; display:grid; grid-template-columns:auto minmax(0, 1fr); column-gap:14px; align-items:baseline;
     padding:11px 13px; background:var(--card); transition:background-color .3s; }
   .es-time{ font-size:14px; font-weight:800; color:var(--ink); white-space:nowrap; font-variant-numeric:tabular-nums; }
@@ -6592,11 +6596,13 @@ const SEED_SCHEDULE = [
       '12:00–13:00 Free Mini Concert',
       '14:00–15:00 Group Hi-Touch',
       '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
-      '17:00–18:00 Group Hi-Touch',
-      'Mini Concert 17 ต.ค. — Prae, Nana, Lookked, Lewlew, Ginna, Shenae',
-      'Mini Concert 18 ต.ค. — Prae, Lingling, Jingjing, Chifa, Kwan, Emma, Satangpound',
-      'Group Hi-Touch 17 ต.ค. — Lingling, Jingjing, Chifa, Kwan, Emma, Satangpound',
-      'Group Hi-Touch 18 ต.ค. — Prae, Nana, Lookked, Lewlew, Ginna, Shenae'],
+      '17:00–18:00 Group Hi-Touch'],
+    // who is on in each part, a day at a time — shown under its rows in กำหนดการ
+    lineup:{
+      '2026-10-17':{ 'Mini Concert':['cgm-prae','cgm-nana','cgm-lookked','cgm-lewlew','cgm-ginna','cgm-shenae'],
+        'Group Hi-Touch':['cgm-lingling','cgm-jingjing','cgm-chifa','cgm-kwan','cgm-emma','cgm-satangpound'] },
+      '2026-10-18':{ 'Mini Concert':['cgm-prae','cgm-lingling','cgm-jingjing','cgm-chifa','cgm-kwan','cgm-emma','cgm-satangpound'],
+        'Group Hi-Touch':['cgm-prae','cgm-nana','cgm-lookked','cgm-lewlew','cgm-ginna','cgm-shenae'] } },
     info:[
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
       'Zone 1 โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ',
@@ -16046,7 +16052,22 @@ function renderSchedule(ev){
     r.to = r.b ? at(r.b) : (later || r.from + 3600000);
   });
   let out = '', box = '', notes = '';
-  const flushBox = () => { if(box){ out += `<div class="es-box">${box}</div>`; box = ''; } };
+  /* `lineup` names who is on in each part, day by day: the day pills sit over
+     the timetable (today's picked on the day), and each part's row has its
+     faces under it, one line a day with only the picked day's showing */
+  const LU = ev.lineup, luDays = LU ? Object.keys(LU).sort() : [];
+  const luOn = luDays.includes(iso) ? iso : luDays.find(d => d > iso) || luDays[0];
+  const M = monthsShort(), luLabel = d => { const x = parseYmd(d); return `${x.getDate()} ${M[x.getMonth()]}`; };
+  const luWho = what => luDays.map(d => {
+    const key = Object.keys(LU[d]).find(k => what.toLowerCase().includes(k.toLowerCase()));
+    const ms = key ? LU[d][key].map(getMember).filter(Boolean) : [];
+    return ms.length ? `<div class="es-who" data-day="${d}"${d === luOn ? '' : ' hidden'}>${ms.map(m => { const g = getGroup(m.groupId);
+      return `<button class="ev-person${state.oshi.includes(m.id) ? ' is-oshi' : ''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(nickName(m))}</span></button>`; }).join('')}</div>` : '';
+  }).join('');
+  const luPills = luDays.length > 1 ? `<div class="sl-days es-days" role="tablist">${luDays.map(d => { const x = parseYmd(d);
+    return `<button class="sl-day${d === luOn ? ' is-on' : ''}" data-action="es-day" data-value="${d}" role="tab" aria-selected="${d === luOn}">${luLabel(d)}<small>${
+      d === iso ? (en ? 'Today' : 'วันนี้') : (en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'])[x.getDay()]}</small></button>`; }).join('')}</div>` : '';
+  const flushBox = () => { if(box){ out += `${luPills}<div class="es-box">${box}</div>`; box = ''; } };
   const flushNotes = () => { if(notes){ out += `<ul class="ev-detail">${notes}</ul>`; notes = ''; } };
   for(const r of items){
     if(r.note){ flushBox(); notes += `<li>${escapeHtml(r.note)}</li>`; continue; }
@@ -16059,6 +16080,7 @@ function renderSchedule(ev){
       <span class="es-what">${r.sl ? `<span class="es-name">${escapeHtml(r.what)}</span><span class="es-sl-pill">${en ? 'Setlist' : 'เซ็ตลิสต์'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>`
         : escapeHtml(r.what)}<span class="es-st">${st}</span></span>
       <span class="es-bar"></span></${tag}>`;
+    if(LU && !r.day) box += luWho(r.what);
     if(r.sl) box += `<div class="es-sl" id="sl-${ev.id}"${open ? '' : ' hidden'}>${renderSetlist(ev)}</div>`;
   }
   flushBox(); flushNotes();
@@ -23546,6 +23568,11 @@ function bindDelegatedEvents(){
       const panel = el.nextElementSibling, open = el.getAttribute('aria-expanded') !== 'true';
       _slOpen[id] = open; el.setAttribute('aria-expanded', open);
       if(panel && panel.classList.contains('es-sl')){ panel.hidden = !open; panel.classList.toggle('is-in', open); }
+    }
+    else if(action==='es-day'){
+      const es = el.closest('.es'), d = el.dataset.value;
+      if(es){ es.querySelectorAll('.es-days .sl-day').forEach(b => { const on = b === el; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
+        es.querySelectorAll('.es-who').forEach(w => { w.hidden = w.dataset.day !== d; }); }
     }
     else if(action==='sl-day'){
       const box = el.closest('.sl'), ev = state.selectedEvent;

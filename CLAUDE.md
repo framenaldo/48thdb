@@ -92,6 +92,9 @@ the Firebase CLI from the owner's machine.
   Mini Concert", "15:00 …", "28 ส.ค. 10:00 …" — draw as a timetable that follows
   the clock on the day (`renderSchedule`, `schedTick` in `tickClock`): over,
   on now with time left, next. Keep writing them in that shape.
+  Who is on in each part goes in `lineup` on the event, `{ day: { 'Mini Concert':[ids],
+  'Group Hi-Touch':[ids] } }`: day pills over the timetable and faces under the
+  rows whose name contains the key — not as text lines in `detail`.
 - Every event sheet opens on a banner (`renderEventBanner`), made like the
   birthday one: a script word for the kind of event (`festKind`, `FEST_KINDS`),
   the release named in the title underneath, a scatter that suits the kind,
