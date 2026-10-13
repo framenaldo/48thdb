@@ -118,7 +118,10 @@ A cold start reads `data/chain-ge2025.json` (final) and `data/chain-ge2026.json`
 GEC-CORE block), then follows the chain. The home page shows a light card
 (`data/chain-summary.json`, then votes since, every 15 s). Share cards draw on
 the owner's art, `posters/ge2026/share-bg.jpg` (1080×1350); it then follows the chain: near the tip, one read of GE6
-transfers a look updates both the votes and the token tally. It reads the iAM48 vote straight off TokenX in the browser
+transfers a look updates both the votes and the token tally. Since 13 Oct 2026 TokenX's explorer answers visitors from Thailand with 410,
+so the browser reads it through the Worker (`POST api.48thdb.com/chain`,
+`gecRpc` tries it first, the explorer straight second; the nightly job, abroad,
+goes straight). It reads the iAM48 vote off TokenX
 (`GEC_POLLS`, POST `eth_getLogs` to scan.tokenx.finance — its paged GET lists
 are cached by its CDN and repeat page 1) and keeps running sums in
 localStorage. The explorer's websocket (`GEC_WS`, Phoenix: `blocks:new_block` and the
