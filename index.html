@@ -3191,7 +3191,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      to run across the phone. A round picked: each lane in use lights in her
      group's colour from the walkway end, her name joins LANE n, and her face
      drops onto the lane — standing up in 3D, lying flat in 2D. ===== */
-  .hs{ --pitch:38deg; --ty:-75px; --sc:.88; --fy:.14; }
+  .hs{ --pitch:38deg; --ty:-75px; --sc:.88; --fy:.14; --z:1; --fit:1; --px:0px; --py:0px; }
   .hs.is-flat{ --pitch:0deg; --ty:0px; --sc:1; --fy:.5; }
   .hs-board{ container-type:inline-size; padding:12px; border-radius:18px; background:#1A1419; color:#EFE7EC; overflow:hidden;
     border:1px solid rgba(255,255,255,.1); box-shadow:0 8px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06); }
@@ -3244,11 +3244,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .hs .hs-hint .is-2d, .hs.is-flat .hs-hint .is-3d{ display:none; }
   .hs.is-flat .hs-hint .is-2d{ display:inline; }
   /* the hall, in perspective; in 3D it lies tipped back and can be turned */
-  .hs-view{ position:relative; height:430px; perspective:1300px; perspective-origin:50% 20%; touch-action:pan-y;
-    user-select:none; -webkit-user-select:none; transition:height .8s cubic-bezier(.22,1,.36,1); }
+  .hs-view{ position:relative; height:430px; perspective:1300px; perspective-origin:50% 20%; touch-action:pan-y; overflow:hidden; border-radius:12px;
+    user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; transition:height .8s cubic-bezier(.22,1,.36,1); }
   .hs.is-flat .hs-view{ height:542px; }
   .hs-floor{ position:absolute; left:0; right:0; top:0; transform-style:preserve-3d; transform-origin:50% 50%;
-    transform:translateY(var(--ty)) scale(var(--sc)) rotateX(var(--pitch)) rotateZ(var(--yaw)); transition:transform .8s cubic-bezier(.22,1,.36,1);
+    transform:translate(var(--px), var(--py)) translateY(var(--ty)) scale(calc(var(--sc) * var(--z) * var(--fit))) rotateX(var(--pitch)) rotateZ(var(--yaw));
+    transition:transform .8s cubic-bezier(.22,1,.36,1);
     border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)); border:1px solid rgba(255,255,255,.1); }
   .hs-hall{ --fx:89%; display:grid; gap:4px; padding:10px 8px 10px 34px; transform-style:preserve-3d; }
   /* in 3D the hall and its lanes lie in one plane, and a tap would land on the hall: only a lane in use and her face take it */
@@ -3268,9 +3269,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      every lane's at the same place along it, so the faces make one straight line down the hall */
   .hs-face{ --s:22px; position:absolute; left:var(--fx); top:50%; width:var(--s); height:var(--s); margin:calc(var(--s) * -1) 0 0 calc(var(--s) / -2);
     transform-origin:50% 100%; transform-style:preserve-3d;
-    transform:translateY(calc(var(--s) * var(--fy))) rotateZ(calc(var(--yaw) * -1)) rotateX(calc(var(--pitch) * -1));
+    transform:translateZ(3px) translateY(calc(var(--s) * var(--fy))) rotateZ(calc(var(--yaw) * -1)) rotateX(calc(var(--pitch) * -1));
     transition:transform .8s cubic-bezier(.22,1,.36,1), width .25s, height .25s, margin .25s; }
-  .hs.is-flat .hs-face{ --s:19px; }
+  .hs.is-flat .hs-face{ --s:19px; transform-origin:50% 50%; }   /* lying flat, she turns about her middle and stays on her lane */
   .hs-pic{ display:block; width:100%; height:100%; border-radius:6px; overflow:hidden; background:#2A2126;
     border:1.5px solid #fff; box-shadow:0 3px 7px rgba(0,0,0,.5); transform-origin:50% 100%; }
   .hs.is-flat .hs-pic{ transform-origin:50% 50%; }
@@ -3374,7 +3375,59 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .hs-seg b{ font-size:10px; }
     .hs-seg small{ font-size:8.5px; }
   }
+  /* turn and zoom: a framed column over the hall's corner; the compass shows which way the hall faces, a tap sets it straight */
+  .hs-ctl{ position:absolute; left:4px; top:6px; z-index:6; display:flex; flex-direction:column; gap:6px; }
+  .hs-ctl button{ width:30px; height:30px; padding:0; display:grid; place-items:center; cursor:pointer; color:#F4ECF1; font:inherit;
+    background:rgba(36,28,34,.92); border:1px solid rgba(255,255,255,.2); border-radius:11px; box-shadow:0 3px 0 rgba(0,0,0,.5);
+    -webkit-tap-highlight-color:transparent; transition:transform .12s, box-shadow .12s, opacity .2s; }
+  .hs-ctl button:active{ transform:translateY(2px); box-shadow:none; }
+  .hs-ctl button:disabled{ opacity:.4; }
+  .hs-ctl svg{ width:17px; height:17px; }
+  .hs-ctl .hs-compass svg{ transform:rotate(var(--yaw)); transition:transform .8s cubic-bezier(.22,1,.36,1); }
+  .hs.is-turning .hs-ctl .hs-compass svg{ transition:none; }
+  .hs-zoomed{ position:absolute; left:4px; top:120px; z-index:6; padding:2px 8px; border-radius:99px; font-size:10.5px; font-weight:800;
+    color:#F4ECF1; background:rgba(36,28,34,.85); border:1px solid rgba(255,255,255,.16); pointer-events:none; opacity:0; transition:opacity .25s; }
+  .hs.is-zoom .hs-zoomed{ opacity:1; }
+  .hs-share{ margin-left:auto; display:inline-flex; align-items:center; gap:5px; min-height:28px; padding:0 11px; cursor:pointer; font:inherit;
+    font-size:12px; font-weight:800; color:#fff; background:#E4457E; border:0; border-radius:99px; box-shadow:0 2px 0 rgba(0,0,0,.45);
+    white-space:nowrap; -webkit-tap-highlight-color:transparent; transition:transform .12s, box-shadow .12s; }
+  .hs-share svg{ width:14px; height:14px; }
+  .hs-share:active{ transform:translateY(2px); box-shadow:none; }
+  /* on the day: where the event is now, in one line over the plan */
+  .hs-now{ display:block; margin:8px 0 2px; line-height:1.45; padding:7px 10px; border-radius:12px; font-size:12px; font-weight:700;
+    color:#F4ECF1; background:rgba(224,33,24,.14); border:1px solid rgba(224,33,24,.45); }
+  .hs-now i{ display:inline-block; margin-right:7px; vertical-align:1px; width:8px; height:8px; border-radius:50%; background:#E02118; box-shadow:0 0 8px rgba(224,33,24,.9); animation:hs-blink 1.6s ease-in-out infinite; }
+  .hs-now.is-calm{ background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:#B9ABB3; }
+  .hs-now.is-calm i{ background:#9C8E97; box-shadow:none; animation:none; }
+  @keyframes hs-blink{ 50%{ opacity:.35; } }
+  /* the rounds as a timetable: when, when the lanes close, and how each stands right now */
+  .hs-tt{ margin-top:12px; padding:10px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); }
+  .hs-tt-head{ display:flex; align-items:baseline; gap:8px; margin:0 2px 8px; }
+  .hs-tt-head b{ font-size:13.5px; }
+  .hs-tt-head small{ margin-left:auto; font-size:11px; font-weight:700; color:#9C8E97; white-space:nowrap; }
+  .hs-tt-rows{ display:grid; gap:5px; }
+  .hs-tt-row{ display:grid; grid-template-columns:62px 1fr; align-items:center; gap:4px 8px; padding:7px 10px; cursor:pointer; text-align:left;
+    font:inherit; color:#F4ECF1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px;
+    box-shadow:0 2px 0 rgba(0,0,0,.45); -webkit-tap-highlight-color:transparent; transition:transform .12s, box-shadow .12s, opacity .2s; }
+  .hs-tt-row:active{ transform:translateY(2px); box-shadow:none; }
+  .hs-tt-row > b{ font-size:12.5px; font-weight:800; white-space:nowrap; }
+  .hs-tt-row.is-sp > b{ color:#F9A8C6; }
+  .hs-tt-when{ min-width:0; white-space:nowrap; font-size:12.5px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .hs-tt-when small{ display:block; font-size:10.5px; font-weight:700; color:#9C8E97; }
+  .hs-tt-st{ grid-column:2; justify-self:start; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:99px; white-space:nowrap; color:#B9ABB3; background:rgba(255,255,255,.08); }
+  .hs-tt-st:empty{ display:none; }
+  .hs-tt-st.is-live{ color:#fff; background:#E02118; }
+  .hs-tt-st.is-shut{ color:#2A1E08; background:#F2B84B; }
+  .hs-tt-st.is-next{ color:#BFE9E2; background:rgba(63,181,165,.2); }
+  .hs-tt-row.is-done{ opacity:.5; }
+  .hs-tt-row.is-now{ border-color:#E02118; box-shadow:0 2px 0 rgba(0,0,0,.45), 0 0 12px rgba(224,33,24,.35); }
+  .hs-tt-row.on{ background:#F4ECF1; border-color:#F4ECF1; color:#1A1419; opacity:1; }
+  .hs-tt-row.on .hs-tt-when small{ color:#6B5E66; }
+  .hs-tt-row.on.is-sp > b{ color:#C2185B; }
+  .hs-tt-row.has-oshi > b::after{ content:''; display:inline-block; width:6px; height:6px; margin-left:5px; border-radius:50%; vertical-align:2px;
+    background:#F06C9B; box-shadow:0 0 6px rgba(240,108,155,.8); }
   @media (prefers-reduced-motion:reduce){
+    .hs-now i{ animation:none; }
     .hs-floor, .hs-face, .hs-view{ transition:none; }
     .hs.is-reveal *, .hs.is-reveal *::before, .hs .hs-seg, .hs-ring{ animation:none !important; }
   }
@@ -7653,7 +7706,7 @@ const ICONS = {
 let state = {
   isOwner:false, pending:[], flash:[], layout:null, layoutEdit:null, layoutDraft:null, navPick:null, geRounds:{}, geRound:null, geAdminRound:null, linkEditFor:null,
   ffDay:0, ffSlot:null, ffPick:null, ffWho:null, ffTab:'plan', ffOshi:false,
-  hsDay:0, hsRound:null, hsPick:null, hsOshi:false, hsFlat:false, hsYaw:0,
+  hsDay:0, hsRound:null, hsPick:null, hsOshi:false, hsFlat:false, hsYaw:0, hsZoom:1, hsFit:1, hsPx:0, hsPy:0, hsHold:false,
   view:'feed', pastOpen:false, selectedEvent:null, membersTab:'about', members:[], oshi:[], kamiOshi:null,
   compareWith:null, comparePicking:false, compareQuery:'',
   calMonth:null, calDay:null, posterOf:null, geClip:false, timelineId:null, dayOf:null, geTab:'overview', bdayScope:'current', livesScope:'current', galleryId:null,
@@ -15291,7 +15344,7 @@ const HS_DAYS = [
     'cgm-shenae':[17,0,0,17,0,1], 'cgm-tara':[0,0,0,0,19,0], 'cgm-valentine':[0,0,0,0,18,1],
   } },
 ];
-const HS_YAW = 28;   // how far a finger may turn the hall, either way
+const HS_ZMAX = 4;   // how far in the hall may be zoomed
 const hsDay = () => HS_DAYS[state.hsDay] || HS_DAYS[0];
 const hsRoundName = (i, en) => HS_ROUNDS[i].special ? (en ? 'Special round' : 'รอบพิเศษ') : `${en ? 'Round' : 'รอบ'} ${i + 1}`;
 /* who is in round ri of a day, by lane — the special round has no lanes yet */
@@ -15312,13 +15365,64 @@ const HS_FROM = hsMin(HS_ROUNDS[0].t), HS_SPAN = hsMin(HS_ROUNDS[HS_ROUNDS.lengt
 const hsAt = s => (hsMin(s) - HS_FROM) / HS_SPAN * 100;   // a time's place along the day's bar, in %
 /* Where the event is right now, in Thai time: which day, which round (ri),
    the next one, or after the last. (__hsNow lets a test pretend it is the day.) */
-function hsNow(){
+function hsClock(){
   const th = new Date((window.__hsNow ? new Date(window.__hsNow) : new Date()).getTime() + 7 * 3600000).toISOString();
-  const iso = th.slice(0, 10), hm = th.slice(11, 16);
+  return { iso: th.slice(0, 10), hm: th.slice(11, 16) };
+}
+function hsNow(){
+  const { iso, hm } = hsClock();
   const di = HS_DAYS.findIndex(d => d.date === iso);
   if(di < 0) return null;
   return { di, hm, ri: HS_ROUNDS.findIndex(r => hm >= r.t && hm < r.to), next: HS_ROUNDS.findIndex(r => r.t > hm),
     after: hm >= HS_ROUNDS[HS_ROUNDS.length - 1].to };
+}
+/* "1 ชม. 5 นาที" / "1 h 5 min" */
+const hsLeft = (mins, en) => { const h = Math.floor(mins / 60), m = mins % 60;
+  return en ? [h ? `${h} h` : '', m || !h ? `${m} min` : ''].filter(Boolean).join(' ') : [h ? `${h} ชม.` : '', m || !h ? `${m} นาที` : ''].filter(Boolean).join(' '); };
+/* how round i of day di stands right now: over, on (lanes open or shut), next, or nothing to say yet */
+function hsState(di, i){
+  const { iso, hm } = hsClock(), d = HS_DAYS[di].date, r = HS_ROUNDS[i], en = isEN();
+  if(iso > d) return { k:'done', t: en ? 'Over' : 'จบแล้ว' };
+  if(iso < d) return { k:'', t:'' };
+  const n = hsMin(hm), a = hsMin(r.t), z = hsMin(r.to), c = hsMin(r.close);
+  if(n >= z) return { k:'done', t: en ? 'Over' : 'จบแล้ว' };
+  if(n >= a){
+    if(r.special || n < c) return { k:'live', t: r.special ? (en ? `On · ends in ${hsLeft(z - n, en)}` : `กำลังจับมือ · จบในอีก ${hsLeft(z - n, en)}`)
+      : (en ? `On · lanes close in ${hsLeft(c - n, en)}` : `กำลังจับมือ · ปิดเลนในอีก ${hsLeft(c - n, en)}`) };
+    return { k:'shut', t: en ? `Lanes closed · ends in ${hsLeft(z - n, en)}` : `ปิดเลนแล้ว · จบในอีก ${hsLeft(z - n, en)}` };
+  }
+  const next = HS_ROUNDS.findIndex(x => hsMin(x.t) > n);
+  return next === i ? { k:'next', t: en ? `Next · in ${hsLeft(a - n, en)}` : `ถัดไป · อีก ${hsLeft(a - n, en)}` } : { k:'', t:'' };
+}
+/* the line over the plan on the day; before the event, how long to wait */
+function hsNowLine(){
+  const en = isEN(), { iso, hm } = hsClock(), di = HS_DAYS.findIndex(d => d.date === iso);
+  if(di < 0){
+    if(iso > HS_DAYS[HS_DAYS.length - 1].date) return '';
+    const days = Math.round((parseYmd(HS_DAYS[0].date) - parseYmd(iso)) / 864e5);
+    const d0 = parseYmd(HS_DAYS[0].date), on = `${d0.getDate()} ${monthsShort()[d0.getMonth()]}`;
+    return `<p class="hs-now is-calm"><i></i>${en ? `Starts ${on} at ${HS_ROUNDS[0].t} · ${days === 1 ? 'tomorrow' : `in ${days} days`}`
+      : `เริ่ม ${on} ${HS_ROUNDS[0].t} น. · ${days === 1 ? 'พรุ่งนี้' : `อีก ${days} วัน`}`}</p>`;
+  }
+  const i = HS_ROUNDS.findIndex((r, k) => hsState(di, k).k === 'live' || hsState(di, k).k === 'shut');
+  if(i >= 0) return `<p class="hs-now"><i></i><b>${en ? 'Now' : 'ตอนนี้'} ${hm}</b> · ${hsRoundName(i, en)} · ${hsState(di, i).t}</p>`;
+  const nx = HS_ROUNDS.findIndex((r, k) => hsState(di, k).k === 'next');
+  if(nx >= 0) return `<p class="hs-now is-calm"><i></i><b>${en ? 'Now' : 'ตอนนี้'} ${hm}</b> · ${hsRoundName(nx, en)} ${HS_ROUNDS[nx].t} · ${hsState(di, nx).t}</p>`;
+  return `<p class="hs-now is-calm"><i></i>${en ? 'Every round today is over' : 'วันนี้จบครบทุกรอบแล้ว'}</p>`;
+}
+/* the day's rounds as a timetable; a row is a way to the round, like the bar above */
+function hsTimetable(){
+  const en = isEN(), di = state.hsDay, day = hsDay(), ri = state.hsRound, mine = new Set(state.oshi), osh = state.hsOshi;
+  const x = parseYmd(day.date), today = hsClock().iso === day.date;
+  const rows = HS_ROUNDS.map((r, i) => { const st = hsState(di, i), has = osh && hsWho(day, i).some(w => mine.has(w.id));
+    return `<button class="hs-tt-row${i === ri ? ' on' : ''}${r.special ? ' is-sp' : ''}${st.k === 'done' ? ' is-done' : ''}${st.k === 'live' || st.k === 'shut' ? ' is-now' : ''}${has ? ' has-oshi' : ''}"
+      data-action="hs-round" data-value="${i}" aria-pressed="${i === ri}">
+      <b>${hsRoundName(i, en)}</b>
+      <span class="hs-tt-when">${r.t}–${r.to}<small>${r.special ? (en ? `queue closes ${r.close}` : `ปิดรับคิว ${r.close} น.`) : (en ? `lanes close ${r.close}` : `ปิดเลน ${r.close} น.`)}</small></span>
+      <span class="hs-tt-st${st.k ? ' is-' + st.k : ''}">${st.t}</span></button>`; }).join('');
+  return `<div class="hs-tt-head"><b>${en ? 'Rounds' : 'ตารางรอบ'} · ${x.getDate()} ${monthsShort()[x.getMonth()]}</b>
+      <small>${today ? (en ? 'live · follows the clock' : 'เรียลไทม์ตามเวลาจริง') : (en ? 'Thai time' : 'เวลาประเทศไทย')}</small></div>
+    <div class="hs-tt-rows">${rows}</div>`;
 }
 let _hsLiveKey = '', _hsShown = false;   // _hsShown: the plan was on screen after the last renderMain
 function renderLanePlan(ev){
@@ -15326,7 +15430,7 @@ function renderLanePlan(ev){
   // On the day the plan follows the clock — today, this round — until someone
   // picks another; a sheet just opened starts following again. Asked of a
   // flag, not the page: render() empties #app before it draws the sheet again.
-  if(!_hsShown) state.hsFollow = true;
+  if(!_hsShown) state.hsFollow = !state.hsHold;   // a shared link holds its day and round
   if(now && state.hsFollow){ state.hsDay = now.di; state.hsRound = now.ri >= 0 ? now.ri : null; }
   _hsLiveKey = now ? `${now.di}.${now.ri}.${now.after}` : '';
   const day = hsDay(), ri = state.hsRound, rd = ri == null ? null : HS_ROUNDS[ri];
@@ -15414,8 +15518,15 @@ function renderLanePlan(ev){
     : rd && osh && mine.size ? `<p class="hs-none">${en ? 'None of your oshi is in this round' : 'รอบนี้ไม่มีโอชิของคุณ'}</p>` : '';
   const back = now && !state.hsFollow ? `<button class="ff-live-back" data-action="hs-live">${en ? 'Back to now' : 'กลับไปตอนนี้'}</button>` : '';
 
-  return `<div class="hs${flat ? ' is-flat' : ''}${rd ? ' is-round' : ''}${rd && rd.special ? ' is-special' : ''}${pick ? ' has-pick' : ''}${reveal ? ' is-reveal' : ''}"
-    style="--yaw:${flat ? 0 : state.hsYaw || 0}deg">
+  const z = state.hsZoom || 1;
+  const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const ctl = `<div class="hs-ctl">
+      <button data-action="hs-zoom" data-value="1" aria-label="${en ? 'Zoom in' : 'ซูมเข้า'}"${z >= HS_ZMAX ? ' disabled' : ''}>${svg('<path d="M12 5v14M5 12h14"/>')}</button>
+      <button data-action="hs-zoom" data-value="-1" aria-label="${en ? 'Zoom out' : 'ซูมออก'}"${z <= 1 ? ' disabled' : ''}>${svg('<path d="M5 12h14"/>')}</button>
+      <button class="hs-compass" data-action="hs-straight" aria-label="${en ? 'Set the hall straight' : 'หมุนกลับตรง'}">${svg('<circle cx="12" cy="12" r="9.5" stroke-width="1.6"/><path d="M12 5 9.6 12h4.8z" fill="#F06C9B" stroke="#F06C9B" stroke-width="1.4"/><path d="M12 19l2.4-7H9.6z" stroke-width="1.4"/>')}</button>
+    </div><span class="hs-zoomed">${Math.round(z * 100)}%</span>`;
+  return `<div class="hs${flat ? ' is-flat' : ''}${rd ? ' is-round' : ''}${rd && rd.special ? ' is-special' : ''}${pick ? ' has-pick' : ''}${reveal ? ' is-reveal' : ''}${z > 1 ? ' is-zoom' : ''}"
+    style="--yaw:${(state.hsYaw || 0).toFixed(1)}deg;--z:${z};--fit:${state.hsFit || 1};--px:${state.hsPx || 0}px;--py:${state.hsPy || 0}px">
     ${scope}
     <div class="hs-board">
       <div class="hs-top">
@@ -15424,11 +15535,13 @@ function renderLanePlan(ev){
         <span class="hs-spacer"></span>
       </div>
       <div class="hs-clock"><div class="hs-track">${segs}${needle}</div><div class="hs-ticks">${ticks}</div></div>
+      <div class="hs-nowbox">${hsNowLine()}</div>
       ${sel}
       ${noOshi}
       <div class="hs-tools">
         <span class="sp-seg"><button data-action="hs-view" data-id="3d" aria-pressed="${!flat}" class="${flat ? '' : 'is-on'}">3D</button><button data-action="hs-view" data-id="2d" aria-pressed="${flat}" class="${flat ? 'is-on' : ''}">2D</button></span>
-        ${back || `<span class="hs-hint"><span class="is-3d">${en ? 'Drag sideways to turn the hall' : 'ลากซ้ายขวาเพื่อหมุนผัง'}</span><span class="is-2d">${en ? 'Laid flat, as the organiser’s plan' : 'วางราบแบบผังของผู้จัด'}</span></span>`}
+        ${back || `<span class="hs-hint">${en ? 'Drag to turn · pinch to zoom' : 'ลากหมุน · จีบนิ้วซูม'}</span>`}
+        <button class="hs-share" data-action="hs-share">${ICONS.share}${en ? 'Share' : 'แชร์ผัง'}</button>
       </div>
       <div class="hs-view">
         <div class="hs-floor">
@@ -15436,9 +15549,11 @@ function renderLanePlan(ev){
           ${lobby}
         </div>
         ${spec}
+        ${ctl}
       </div>
       ${pickCard}
       ${list}
+      <div class="hs-tt">${hsTimetable()}</div>
       <p class="hs-note">${en ? 'A sketch from the organiser’s plan: lane 1 at the back, the doors at the bottom. Rounds may change.'
         : 'ผังจำลองจากผังของผู้จัด เลน 1 อยู่ด้านใน ประตูอยู่ด้านล่าง · รอบจับมืออาจเปลี่ยนแปลงภายหลัง'}</p>
     </div>
@@ -15464,8 +15579,45 @@ function hsSetView(el){
   if(!box) return;
   state.hsFlat = el.dataset.id === '2d';
   box.classList.toggle('is-flat', state.hsFlat);
-  box.style.setProperty('--yaw', `${state.hsFlat ? 0 : state.hsYaw || 0}deg`);
   spSegPick(el);
+}
+/* Turned, the hall's corners would leave the board: it shrinks to fit the way
+   it faces, so the whole of it stays in view at any angle. */
+function hsFit(box){
+  const f = box.querySelector('.hs-floor');
+  if(!f || !f.offsetWidth) return state.hsFit || 1;
+  const w = f.offsetWidth, h = f.offsetHeight, a = (state.hsYaw || 0) * Math.PI / 180;
+  return Math.min(1, w / (Math.abs(w * Math.cos(a)) + Math.abs(h * Math.sin(a))));
+}
+/* the turn, the zoom and the pan, written straight onto the plan — no redraw */
+function hsApply(box){
+  const z = state.hsZoom || 1;
+  state.hsFit = +hsFit(box).toFixed(3);
+  // panning stops where the hall's edge would leave the middle of the board
+  const v = box.querySelector('.hs-view'), lx = v ? v.offsetWidth * (z - 1) / 2 + 20 : 0, ly = v ? v.offsetHeight * (z - 1) / 2 + 20 : 0;
+  state.hsPx = z > 1 ? Math.max(-lx, Math.min(lx, state.hsPx || 0)) : 0;
+  state.hsPy = z > 1 ? Math.max(-ly, Math.min(ly, state.hsPy || 0)) : 0;
+  const st = box.style;
+  st.setProperty('--yaw', `${(state.hsYaw || 0).toFixed(1)}deg`); st.setProperty('--z', z);
+  st.setProperty('--fit', state.hsFit); st.setProperty('--px', `${state.hsPx.toFixed(1)}px`); st.setProperty('--py', `${state.hsPy.toFixed(1)}px`);
+  box.classList.toggle('is-zoom', z > 1);
+  const lab = box.querySelector('.hs-zoomed'); if(lab) lab.textContent = Math.round(z * 100) + '%';
+  const [zi, zo] = box.querySelectorAll('[data-action="hs-zoom"]');
+  if(zi) zi.disabled = z >= HS_ZMAX; if(zo) zo.disabled = z <= 1;
+}
+function hsZoomBy(box, k){
+  const z0 = state.hsZoom || 1, z = Math.max(1, Math.min(HS_ZMAX, z0 * k));
+  state.hsPx = (state.hsPx || 0) * z / z0; state.hsPy = (state.hsPy || 0) * z / z0;
+  state.hsZoom = +z.toFixed(3); hsApply(box);
+}
+/* the compass: straight back the short way round, all of it in view */
+function hsStraight(box){
+  const y = state.hsYaw || 0;
+  state.hsYaw = Math.round(y / 360) * 360; state.hsZoom = 1; state.hsPx = 0; state.hsPy = 0;
+  hsApply(box);
+  if(state.hsYaw) setTimeout(() => { if(Math.round((state.hsYaw || 0) / 360) * 360 !== state.hsYaw) return;
+    box.classList.add('is-turning'); state.hsYaw = 0; hsApply(box);
+    requestAnimationFrame(() => requestAnimationFrame(() => box.classList.remove('is-turning'))); }, 850);
 }
 /* the clock: the needle moves every tick, the plan redraws when the round turns */
 function hsLiveTick(){
@@ -15473,34 +15625,73 @@ function hsLiveTick(){
   const n = hsNow();
   document.querySelectorAll('.hs-needle').forEach(e => { if(n) e.style.left = hsAt(n.hm).toFixed(2) + '%'; });
   const key = n ? `${n.di}.${n.ri}.${n.after}` : '';
-  if(key !== _hsLiveKey){ if(state.hsFollow) state.hsReveal = true; hsPaint(); }
+  if(key !== _hsLiveKey){ if(state.hsFollow) state.hsReveal = true; hsPaint(); return; }
+  // the line over the plan and the timetable keep time by the minute
+  document.querySelectorAll('.hs').forEach(box => {
+    const nb = box.querySelector('.hs-nowbox'), tt = box.querySelector('.hs-tt');
+    const a = hsNowLine(), b = hsTimetable();
+    if(nb && nb._h !== a){ nb.innerHTML = a; nb._h = a; localize(nb); }
+    if(tt && tt._h !== b){ tt.innerHTML = b; tt._h = b; localize(tt); }
+  });
 }
-/* One finger dragged sideways turns the hall a little, as a turntable; up and
-   down still scrolls the sheet. The click that ends a turn is swallowed. */
-let hsG = null;
+/* One finger dragged sideways turns the hall right round, as a turntable; up
+   and down still scrolls the sheet. Two fingers pinch to zoom, twist to turn
+   and move together to pan, as on a map. The click that ends a turn is swallowed. */
+let hsG = null, hsT = null;
 document.addEventListener('pointerdown', e => {
   const v = e.target.closest && e.target.closest('.hs-view'), box = v && v.closest('.hs');
-  if(!box || box.classList.contains('is-flat') || !e.isPrimary) return;
+  if(!box || !e.isPrimary || e.target.closest('.hs-ctl, .hs-spec')) return;
   hsG = { box, id:e.pointerId, x0:e.clientX, yaw0:state.hsYaw || 0, moved:false };
 });
 document.addEventListener('pointermove', e => {
   const g = hsG;
-  if(!g || e.pointerId !== g.id) return;
+  if(!g || e.pointerId !== g.id || hsT) return;
   const dx = e.clientX - g.x0;
   if(!g.moved && Math.abs(dx) < 8) return;
   if(!g.moved){ g.moved = true; g.box.classList.add('is-turning'); }
-  state.hsYaw = Math.max(-HS_YAW, Math.min(HS_YAW, g.yaw0 - dx * .22));
-  g.box.style.setProperty('--yaw', `${state.hsYaw.toFixed(1)}deg`);
+  state.hsYaw = g.yaw0 - dx * .5;
+  hsApply(g.box);
 });
 const hsLift = e => {
   const g = hsG;
   if(!g || e.pointerId !== g.id) return;
   hsG = null;
-  g.box.classList.remove('is-turning');
+  if(!hsT) g.box.classList.remove('is-turning');
   if(g.moved && e.type === 'pointerup'){ spSwallowClick = true; setTimeout(() => { spSwallowClick = false; }, 0); }
 };
 document.addEventListener('pointerup', hsLift);
 document.addEventListener('pointercancel', hsLift);
+const hsPair = t => { const [a, b] = [t[0], t[1]];
+  return { d: Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY) || 1, ang: Math.atan2(b.clientY - a.clientY, b.clientX - a.clientX) * 180 / Math.PI,
+    x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 }; };
+document.addEventListener('touchstart', e => {
+  const v = e.target.closest && e.target.closest('.hs-view'), box = v && v.closest('.hs');
+  if(!box || e.touches.length !== 2) return;
+  hsG = null;
+  hsT = { box, p0: hsPair(e.touches), z0: state.hsZoom || 1, yaw0: state.hsYaw || 0, px0: state.hsPx || 0, py0: state.hsPy || 0 };
+  box.classList.add('is-turning');
+}, { passive:true });
+document.addEventListener('touchmove', e => {
+  const t = hsT;
+  if(!t) return;
+  if(e.touches.length !== 2) return;
+  e.preventDefault();   // the page itself must not zoom
+  const p = hsPair(e.touches);
+  let da = p.ang - t.p0.ang; if(da > 180) da -= 360; if(da < -180) da += 360;
+  state.hsZoom = +Math.max(1, Math.min(HS_ZMAX, t.z0 * p.d / t.p0.d)).toFixed(3);
+  state.hsYaw = t.yaw0 + da;
+  state.hsPx = t.px0 + (p.x - t.p0.x); state.hsPy = t.py0 + (p.y - t.p0.y);
+  hsApply(t.box);
+}, { passive:false });
+const hsTouchEnd = e => {
+  if(!hsT || e.touches.length >= 2) return;
+  hsT.box.classList.remove('is-turning'); hsT = null;
+  spSwallowClick = true; setTimeout(() => { spSwallowClick = false; }, 0);
+};
+document.addEventListener('touchend', hsTouchEnd);
+document.addEventListener('touchcancel', hsTouchEnd);
+// Safari's own pinch would zoom the whole page
+document.addEventListener('gesturestart', e => { if(e.target.closest && e.target.closest('.hs-view')) e.preventDefault(); });
 
 /* A sheet's wash from its poster. The small copy is read into a canvas a few
    pixels wide, averaged into seven bands from top to bottom, and each band is
@@ -20612,6 +20803,10 @@ function applyUrlToState(){
     if(ff && FF_DAYS[+ff[1]]){ state.ffTab = 'plan'; state.ffDay = +ff[1];
       state.ffSlot = ff[2] != null && FF_DAYS[+ff[1]].slots[+ff[2]] ? +ff[2] : null;
       state.ffHold = true; state.ffScrollUntil = Date.now() + 6000; }
+    // a shared lane plan: that day, round and member, held there rather than following the clock
+    const hs = /^(\d)(?:\.(\d))?(?:\.((?:bnk|cgm)-[\w-]+))?$/.exec(p.get('hs') || '');
+    if(hs && HS_DAYS[+hs[1]]){ state.hsDay = +hs[1]; state.hsRound = hs[2] != null && HS_ROUNDS[+hs[2]] ? +hs[2] : null;
+      state.hsPick = hs[3] || null; state.hsOshi = false; state.hsHold = true; state.hsFollow = false; }
     return;
   }
   if(mem && (state.members||[]).some(x => x.id === mem)){
@@ -21239,6 +21434,109 @@ async function drawFFPlanCard(g, sub){
       const x = cx + col * colW, yy = y + r * rowH + 18;
       shareText(g, String(i + 1), x + 26, yy, '800 16px "Noto Sans Thai", sans-serif', '#F2B84B', 'right');
       shareText(g, m.name, x + 34, yy, '600 16px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.88)'); });
+  }
+  await shareFooter(g, true, sub.url);
+}
+
+/* The handshake lane plan as it is on screen: the day, the round, the member
+   tapped and "my oshi only" — and a link that opens the same view. */
+function hsShareSubject(){
+  const ev = SEED_SCHEDULE.find(e => e.lanePlan);
+  if(!ev) return null;
+  const d = HS_DAYS[state.hsDay] ? state.hsDay : 0, r = HS_ROUNDS[state.hsRound] ? state.hsRound : null;
+  const pick = state.hsPick && getMember(state.hsPick) ? state.hsPick : null;
+  const link = `${location.origin}/?e=${ev.id}&hs=${d}${r != null ? '.' + r : ''}${pick ? '.' + pick : ''}`;
+  const pm = pick && getMember(pick);
+  return { kind:'hsplan', ev, day:d, round:r, pick, osh: !!state.hsOshi, url:link, link,
+    title:`${pm ? pm.name + ' · ' : ''}ผังเลนจับมือ ${ev.title} — 48thDb`,
+    file:`48thdb-handshake-${HS_DAYS[d].date}${r != null ? '-r' + (r + 1) : ''}${pick ? '-' + pick : ''}` };
+}
+async function drawHSPlanCard(g, sub){
+  const en = isEN(), day = HS_DAYS[sub.day], ri = sub.round, rd = ri != null ? HS_ROUNDS[ri] : null;
+  const W = SHARE_W, H = SHARE_H, D = parseYmd(day.date), M = monthsShort();
+  const dayWords = en ? `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][D.getDay()]} ${D.getDate()} ${M[D.getMonth()]}`
+    : `วัน${['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'][D.getDay()]} ${D.getDate()} ${M[D.getMonth()]}`;
+  const F = (w, px) => `${w} ${px}px "Noto Sans Thai", sans-serif`;
+  const mine = new Set(state.oshi), keep = id => !sub.osh || mine.has(id);
+  const who = rd ? hsWho(day, ri).filter(w => keep(w.id)) : [];
+  const pick = sub.pick && getMember(sub.pick) ? sub.pick : null;
+  g.fillStyle = '#1A1419'; g.fillRect(0, 0, W, H);
+  shareGlow(g, 900, 120, 520, '#E4457E', .22);
+  { const t = sub.ev.title.toUpperCase(); let px = 24; g.font = F(800, px); while(px > 15 && g.measureText(t).width > W - 120){ px--; g.font = F(800, px); }
+    shareText(g, t, 60, 86, F(800, px), '#F9A8C6'); }
+  shareText(g, `${en ? 'Handshake lanes' : 'ผังเลนจับมือ'} · ${dayWords}`, 60, 140, F(800, 44), '#ffffff');
+  shareText(g, rd ? `${hsRoundName(ri, en)} · ${rd.t}–${rd.to} · ${rd.special ? (en ? `queue closes ${rd.close}` : `ปิดรับคิว ${rd.close} น.`) : (en ? `lanes close ${rd.close}` : `ปิดเลน ${rd.close} น.`)}`
+    : (en ? 'Every round of the day' : 'ทุกรอบของวัน'), 60, 190, F(700, 28), '#CFC4CA');
+  const faces = {};
+  const want = [...new Set([...who.map(w => w.id), ...(pick ? [pick] : [])])];
+  await Promise.all(want.map(async id => { const m = getMember(id); if(m) faces[id] = await shareLoad(m.photo); }));
+  const top = 226, bottom = H - 160;
+
+  // the member tapped: her face, name and lane, then her rounds over both days
+  let y = top;
+  if(pick){
+    const m = getMember(pick), c = (getGroup(m.groupId) || {}).color || '#E4457E', here = who.find(w => w.id === pick);
+    g.fillStyle = 'rgba(255,255,255,.07)'; shareRound(g, 60, y, W - 120, 112, 22); g.fill();
+    g.strokeStyle = c; g.lineWidth = 3; g.stroke();
+    g.save(); shareRound(g, 76, y + 14, 84, 84, 16); g.clip();
+    if(faces[pick]) shareCover(g, faces[pick], 76, y + 14, 84, 84); else { g.fillStyle = c; g.fillRect(76, y + 14, 84, 84); }
+    g.restore();
+    shareText(g, m.name, 180, y + 54, F(800, 38), '#fff');
+    const hers = hsRoundsOf(pick).map(h => `${HS_DAYS[h.di].date === day.date ? '' : (() => { const x = parseYmd(HS_DAYS[h.di].date); return `${x.getDate()} ${M[x.getMonth()]} `; })()}${HS_ROUNDS[h.ri].special ? (en ? 'Sp' : 'พิเศษ') : (en ? 'R' : 'รอบ ') + (h.ri + 1)}${h.lane ? ` L${h.lane}` : ''}`);
+    shareText(g, hers.length ? hers.join(' · ') : (en ? 'No rounds' : 'ไม่มีรอบ'), 180, y + 92, F(700, 21), '#B9ABB3');
+    if(here){ const t = here.lane ? `LANE ${here.lane}` : (en ? 'Special' : 'รอบพิเศษ'); g.font = F(900, 30);
+      const tw = g.measureText(t).width + 40; g.fillStyle = c; shareRound(g, W - 76 - tw, y + 34, tw, 46, 23); g.fill();
+      shareText(g, t, W - 76 - tw / 2, y + 68, F(900, 30), '#fff', 'center'); }
+    y += 132;
+  }
+
+  if(!rd){
+    // no round picked: the day's timetable
+    const rh = Math.min(120, (bottom - y) / HS_ROUNDS.length);
+    HS_ROUNDS.forEach((r, i) => { const yy = y + i * rh, n = hsWho(day, i).filter(w => keep(w.id)).length;
+      g.fillStyle = r.special ? 'rgba(240,108,155,.16)' : 'rgba(255,255,255,.07)'; shareRound(g, 60, yy, W - 120, rh - 14, 20); g.fill();
+      shareText(g, hsRoundName(i, en), 92, yy + rh / 2 + 4, F(800, 34), r.special ? '#F9A8C6' : '#fff');
+      shareText(g, `${r.t}–${r.to}`, 380, yy + rh / 2 - 6, F(800, 34), '#fff');
+      shareText(g, r.special ? (en ? `queue closes ${r.close}` : `ปิดรับคิว ${r.close} น.`) : (en ? `lanes close ${r.close}` : `ปิดเลน ${r.close} น.`), 380, yy + rh / 2 + 30, F(700, 22), '#B9ABB3');
+      shareText(g, `${n} ${en ? 'members' : 'คน'}`, W - 92, yy + rh / 2 + 4, F(800, 26), '#F2B84B', 'right'); });
+  } else if(rd.special){
+    // the special round: lanes on the day, so its members in a grid
+    shareText(g, en ? 'Lanes are announced at the venue' : 'เลนรอบพิเศษประกาศที่หน้างาน', W / 2, y + 36, F(700, 26), '#CFC4CA', 'center');
+    const cols = 6, cw = (W - 120) / cols, rows = Math.ceil(who.length / cols), ch = Math.min(170, (bottom - y - 70) / Math.max(1, rows)), f = Math.min(110, ch - 44);
+    who.forEach((w, k) => { const m = getMember(w.id), c = (getGroup(m.groupId) || {}).color || '#888';
+      const x = 60 + (k % cols) * cw + (cw - f) / 2, yy = y + 70 + Math.floor(k / cols) * ch;
+      if(w.id === pick){ g.fillStyle = '#F3D9B1'; shareRound(g, x - 5, yy - 5, f + 10, f + 10, 18); g.fill(); }
+      g.save(); shareRound(g, x, yy, f, f, 14); g.clip(); if(faces[w.id]) shareCover(g, faces[w.id], x, yy, f, f); else { g.fillStyle = c; g.fillRect(x, yy, f, f); } g.restore();
+      shareText(g, m.name, x + f / 2, yy + f + 28, F(700, 20), '#fff', 'center'); });
+  } else {
+    // the hall: twenty-two lanes, lane 1 at the back, each in use lit in her group's colour with her face
+    const byLane = {}; who.forEach(w => { if(w.lane) byLane[w.lane] = w.id; });
+    const gap = 6, lh = (bottom - y - 40 - gap * (HS_LANES - 1)) / HS_LANES, x0 = 60, lw = W - 120;
+    for(let k = 0; k < HS_LANES; k++){
+      const n = k + 1, id = byLane[n], m = id && getMember(id), yy = y + k * (lh + gap);
+      const dim = pick && id !== pick;
+      if(!m){ g.fillStyle = '#3F3930'; shareRound(g, x0, yy, lw, lh, 6); g.fill();
+        shareText(g, `LANE ${n}`, x0 + 14, yy + lh / 2 + 7, F(900, 18), '#A69C88'); continue; }
+      const c = (getGroup(m.groupId) || {}).color || '#888';
+      g.globalAlpha = dim ? .4 : 1;
+      const gr = g.createLinearGradient(x0, 0, x0 + lw, 0); gr.addColorStop(0, shareMix(c, .3, '#000000')); gr.addColorStop(.55, c); gr.addColorStop(1, shareMix(c, .22));
+      g.fillStyle = gr; shareRound(g, x0, yy, lw, lh, 6); g.fill();
+      g.fillStyle = 'rgba(0,0,0,.28)'; g.font = F(900, 18); const tw = g.measureText(`LANE ${n}`).width + 16;
+      shareRound(g, x0 + 8, yy + (lh - 28) / 2, tw, 28, 6); g.fill();
+      shareText(g, `LANE ${n}`, x0 + 16, yy + lh / 2 + 7, F(900, 18), '#fff');
+      shareText(g, m.name, x0 + 22 + tw, yy + lh / 2 + 9, F(800, Math.min(26, lh - 10)), '#fff');
+      const f = id === pick ? lh + 22 : lh - 4, fx = x0 + lw * .86 - f / 2, fy = yy + lh / 2 - f / 2;
+      if(id === pick){ g.globalAlpha = 1; g.strokeStyle = '#F3D9B1'; g.lineWidth = 4; shareRound(g, x0 - 3, yy - 3, lw + 6, lh + 6, 8); g.stroke();
+        g.fillStyle = '#F3D9B1'; shareRound(g, fx - 4, fy - 4, f + 8, f + 8, 10); g.fill(); }
+      else { g.fillStyle = '#fff'; shareRound(g, fx - 2, fy - 2, f + 4, f + 4, 7); g.fill(); }
+      g.save(); shareRound(g, fx, fy, f, f, 6); g.clip(); if(faces[id]) shareCover(g, faces[id], fx, fy, f, f); else { g.fillStyle = c; g.fillRect(fx, fy, f, f); } g.restore();
+      g.globalAlpha = 1;
+    }
+    // the doors along the bottom wall
+    const dy = y + HS_LANES * (lh + gap) + 24;
+    shareText(g, `↓ ${en ? 'Exit' : 'ทางออก'}`, x0 + 6, dy, F(800, 20), '#FAD2BF');
+    shareText(g, `↑ ${en ? 'Entrance' : 'ทางเข้า'}`, x0 + lw * .645, dy, F(800, 20), '#BFE9E2', 'center');
+    shareText(g, en ? 'A sketch from the organiser’s plan' : 'ผังจำลองจากผังของผู้จัด', x0 + lw, dy, F(600, 18), '#7E7178', 'right');
   }
   await shareFooter(g, true, sub.url);
 }
@@ -21972,6 +22270,8 @@ function shareSubject(){
     return { kind:'ffplan', ev, day:d, slot:sl, url:link, link, title:`ผังบูธ Fan Festival — 48thDb`,
       file:`48thdb-fanfest-${FF_DAYS[d].date}${sl != null ? '-' + FF_DAYS[d].slots[sl].t.replace(':', '') : ''}` };
   }
+  // the handshake sheet with its lane plan shares the plan, as it is on screen
+  if(ev && ev.lanePlan && document.querySelector('.modal-scroll .hs')) return hsShareSubject();
   if(ev) return { kind:'event', ev, url, title:`${ev.title} — 48thDb`, file:`48thdb-${ev.id}` };
   if(state.view === 'single' && state.selectedSingle){ const s = findWork(state.selectedSingle);
     if(s) return { kind:'single', s, url, title:`${s.title} — 48thDb`, file:`48thdb-${s.id}` }; }
@@ -22543,6 +22843,7 @@ async function buildShareCard(sub){
   else if(sub.kind === 'geres') await drawGEResCard(g, sub);
   else if(sub.kind === 'poster') await drawPosterCard(g, sub);
   else if(sub.kind === 'ffplan') await drawFFPlanCard(g, sub);
+  else if(sub.kind === 'hsplan') await drawHSPlanCard(g, sub);
   else if(sub.kind === 'stats') await ({ lives: drawStatsLivesCard, songs: drawStatsSongsCard, birthdays: drawStatsBirthdaysCard,
       timeline: drawStatsTimelineCard }[sub.cat] || drawStatsCard)(g, sub.url);
   else if(sub.kind === 'today') await drawTodayCard(g, sub.url);
@@ -23017,11 +23318,11 @@ function bindDelegatedEvents(){
       box.querySelectorAll('[data-slot-day]').forEach(t => { t.hidden = t.dataset.slotDay !== state.slotDay; });
     }
     else if(action==='hs-day'){
-      state.hsDay = +el.dataset.value; state.hsFollow = false; state.hsReveal = state.hsRound != null; hsPaint();
+      state.hsDay = +el.dataset.value; state.hsFollow = false; state.hsHold = false; state.hsReveal = state.hsRound != null; hsPaint();
     }
     else if(action==='hs-round'){
       const i = +el.dataset.value;
-      state.hsRound = state.hsRound === i ? null : i; state.hsFollow = false; state.hsReveal = state.hsRound != null;
+      state.hsRound = state.hsRound === i ? null : i; state.hsFollow = false; state.hsHold = false; state.hsReveal = state.hsRound != null;
       hsPaint();
     }
     else if(action==='hs-lane'){ state.hsPick = state.hsPick === id ? null : id; hsPaint(); }
@@ -23032,10 +23333,13 @@ function bindDelegatedEvents(){
     else if(action==='hs-when'){
       const [d, r] = el.dataset.value.split('.').map(Number);
       state.hsReveal = state.hsDay !== d || state.hsRound !== r;
-      state.hsDay = d; state.hsRound = r; state.hsFollow = false;
+      state.hsDay = d; state.hsRound = r; state.hsFollow = false; state.hsHold = false;
       hsPaint();
     }
-    else if(action==='hs-live'){ state.hsFollow = true; state.hsReveal = true; hsPaint(); }
+    else if(action==='hs-live'){ state.hsFollow = true; state.hsHold = false; state.hsReveal = true; hsPaint(); }
+    else if(action==='hs-zoom'){ const box = el.closest('.hs'); if(box) hsZoomBy(box, +el.dataset.value > 0 ? 1.5 : 1 / 1.5); }
+    else if(action==='hs-straight'){ const box = el.closest('.hs'); if(box) hsStraight(box); }
+    else if(action==='hs-share'){ const sub = hsShareSubject(); if(sub) openShareSheet(sub); }
     else if(action==='ff-day'){
       state.ffDay = +el.dataset.value; state.ffSlot = null; state.ffFollow = false; state.ffHold = false; state.ffScrollUntil = 0; ffPaint();
     }
@@ -23242,7 +23546,7 @@ function bindDelegatedEvents(){
       const insideCard = e.target.closest('.modal-glass-card');
       const onCloseBtn = e.target.closest('.modal-close-btn');
       if(insideCard && !onCloseBtn) return;
-      state.ffHold = false; state.ffScrollUntil = 0;
+      state.ffHold = false; state.ffScrollUntil = 0; state.hsHold = false;
       goBack(()=>{ state.selectedId = null; state.selectedEvent = null; state.dayOf = null; });
     }
     else if(action==='filter-to'){
