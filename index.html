@@ -3240,6 +3240,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .hs-tools{ display:flex; align-items:center; gap:10px; margin:0 0 4px; }
   .hs-tools .sp-seg button{ min-width:40px; min-height:28px; padding:0 10px; font-size:12px; }
   .hs-hint{ font-size:11.5px; color:#9C8E97; }
+  .hs-tools .ff-live-back{ margin-left:0; flex:none; white-space:nowrap; }   /* in the hint's place: the top row is under the sheet's buttons */
   .hs .hs-hint .is-2d, .hs.is-flat .hs-hint .is-3d{ display:none; }
   .hs.is-flat .hs-hint .is-2d{ display:inline; }
   /* the hall, in perspective; in 3D it lies tipped back and can be turned */
@@ -15280,12 +15281,13 @@ function hsNow(){
   return { di, hm, ri: HS_ROUNDS.findIndex(r => hm >= r.t && hm < r.to), next: HS_ROUNDS.findIndex(r => r.t > hm),
     after: hm >= HS_ROUNDS[HS_ROUNDS.length - 1].to };
 }
-let _hsLiveKey = '';
+let _hsLiveKey = '', _hsShown = false;   // _hsShown: the plan was on screen after the last renderMain
 function renderLanePlan(ev){
   const en = isEN(), now = hsNow();
   // On the day the plan follows the clock — today, this round — until someone
-  // picks another; a sheet just opened starts following again.
-  if(!document.querySelector('.modal-scroll .hs')) state.hsFollow = true;
+  // picks another; a sheet just opened starts following again. Asked of a
+  // flag, not the page: render() empties #app before it draws the sheet again.
+  if(!_hsShown) state.hsFollow = true;
   if(now && state.hsFollow){ state.hsDay = now.di; state.hsRound = now.ri >= 0 ? now.ri : null; }
   _hsLiveKey = now ? `${now.di}.${now.ri}.${now.after}` : '';
   const day = hsDay(), ri = state.hsRound, rd = ri == null ? null : HS_ROUNDS[ri];
@@ -15320,7 +15322,7 @@ function renderLanePlan(ev){
   const ticks = Array.from({ length: (HS_SPAN / 60) + 1 }, (_, h) => `<span style="left:${(h * 60 / HS_SPAN * 100).toFixed(2)}%">${HS_FROM / 60 + h}</span>`).join('');
   const needle = today && !today.after && hsMin(today.hm) >= HS_FROM ? `<i class="hs-needle" style="left:${hsAt(today.hm).toFixed(2)}%"></i>` : '';
   const sel = rd ? `<p class="hs-sel"><b>${hsRoundName(ri, en)}</b> ${rd.t}–${rd.to} · ${rd.special
-      ? (en ? `queue closes ${rd.close} · 1–100 tickets, handshake only, one member a day` : `ปิดรับคิว ${rd.close} น. · ใช้บัตรได้ 1–100 ใบ จับมืออย่างเดียว วันละ 1 เมมเบอร์`)
+      ? (en ? `lanes close ${rd.close} · 1–100 tickets, handshake only, one member a day` : `ปิดเลน ${rd.close} น. · ใช้บัตรได้ 1–100 ใบ จับมืออย่างเดียว วันละ 1 เมมเบอร์`)
       : (en ? `lanes close ${rd.close} · 1–5 tickets, or a 1-Shot Video` : `ปิดเลน ${rd.close} น. · ใช้บัตรได้ 1–5 ใบ หรือถ่าย 1-Shot Video`)}</p>`
     : `<p class="hs-sel is-hint">${en ? 'Tap a round to see who is in which lane' : 'แตะรอบด้านบน เพื่อดูว่าน้อง ๆ อยู่เลนไหน'}</p>`;
 
@@ -15380,14 +15382,14 @@ function renderLanePlan(ev){
       <div class="hs-top">
         <div class="ff-days">${HS_DAYS.map((d, i) => `<button class="${i === state.hsDay ? 'on' : ''}${now && now.di === i ? ' is-today' : ''}" data-action="hs-day" data-value="${i}">${dayLabel(d)}</button>`).join('')}</div>
         <span class="hs-count">${rd ? `${who.length} ${en ? (who.length === 1 ? 'member' : 'members') : 'คน'}` : `${HS_LANES} ${en ? 'lanes' : 'เลน'}`}</span>
-        <span class="hs-spacer"></span>${back}
+        <span class="hs-spacer"></span>
       </div>
       <div class="hs-clock"><div class="hs-track">${segs}${needle}</div><div class="hs-ticks">${ticks}</div></div>
       ${sel}
       ${noOshi}
       <div class="hs-tools">
         <span class="sp-seg"><button data-action="hs-view" data-id="3d" aria-pressed="${!flat}" class="${flat ? '' : 'is-on'}">3D</button><button data-action="hs-view" data-id="2d" aria-pressed="${flat}" class="${flat ? 'is-on' : ''}">2D</button></span>
-        <span class="hs-hint"><span class="is-3d">${en ? 'Drag sideways to turn the hall' : 'ลากซ้ายขวาเพื่อหมุนผัง'}</span><span class="is-2d">${en ? 'Laid flat, as the organiser’s plan' : 'วางราบแบบผังของผู้จัด'}</span></span>
+        ${back || `<span class="hs-hint"><span class="is-3d">${en ? 'Drag sideways to turn the hall' : 'ลากซ้ายขวาเพื่อหมุนผัง'}</span><span class="is-2d">${en ? 'Laid flat, as the organiser’s plan' : 'วางราบแบบผังของผู้จัด'}</span></span>`}
       </div>
       <div class="hs-view">
         <div class="hs-floor">
@@ -20129,6 +20131,7 @@ function renderMain(){
   // a member's sheet drawn again for the same member stays where it was read to
   const keep = _sheetKeep || sheetKeepNow(); _sheetKeep = null;
   main.innerHTML = html;
+  _hsShown = !!main.querySelector('.modal-scroll .hs');
   if(keep && keep.id === state.selectedId){ const ns = main.querySelector('.is-member-sheet .modal-scroll'); if(ns) ns.scrollTop = keep.top; }
   paintSheetGrads(main);
   document.body.classList.toggle('is-gallery', state.view === 'gallery');
