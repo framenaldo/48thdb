@@ -56,6 +56,18 @@ the Firebase CLI from the owner's machine.
   the language passes leave it as written. Search engines read the bio from
   the static /m/<id> pages, so rerun `node scripts/make-member-pages.mjs`
   after bios change.
+- **Seasons on the home page** (`FEST`): by the Thai date the home page wears a
+  theme — Kimi to Doko ka e Ikitai to 23 Oct, Halloween 24 Oct – 1 Nov, the GE
+  results night 2–15 Nov, Yi Peng 16–30 Nov (Loy Krathong 24 Nov 2026), winter in
+  December, and the birthday theme on any current member's birthday (but 14 Nov,
+  results night, stays GE: `FIRM`). A theme sets `data-fest` on the root, its own
+  colours over light or dark, and forces the site's `data-theme` to match its sky.
+  Things on `.today-hero` and `.ev-card` move with the scroll. Readers can turn it
+  off ("ปิดธีม", localStorage `48thdb-fest-off`). Keep it smooth on the iPhone:
+  only the two canvases redraw (the sky one at 1×), the sky, stars, moon, beams and
+  fog are CSS or drawn once, nothing blurs over the sky while a theme is on, and a
+  height-only resize (Safari's toolbar) restarts nothing. `window.__festDay`
+  pretends another day for testing. Next year's dated themes need new dates.
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.

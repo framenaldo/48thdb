@@ -52,7 +52,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Pacifico&family=Charm:wght@700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
 <!-- The owner's Adobe Fonts project: Aktiv Grotesk for Latin letters and
      numbers (Thai falls through to Noto Sans Thai), and the gallery's serif.
      Loaded without holding up the first paint. -->
@@ -5369,6 +5369,69 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* the starts-in pill: a pale wash of the accent with dark words, since the
      poster accents were all chosen for light cards */
   :root[data-theme="dark"] :is(.evm-starts, .ev-when){ background:color-mix(in srgb, var(--c) 32%, #fff); color:var(--on-fill); }
+
+  /* ===== Seasons on the home page (FEST in the script) =====
+     Layers behind the page: the sky (a gradient), the stars (drawn once), the
+     moon, stage lights and fog (CSS), the sky canvas, the water line; in front
+     of the cards, one canvas. Each theme also lends the page its colours, and
+     nothing blurs over the moving sky while it is on. */
+  .fest-layer{ position:fixed; left:0; top:0; width:100vw; pointer-events:none; z-index:-1; display:none; }
+  .fest-layer.is-front{ z-index:10; }
+  #fest-sky{ height:100vh; height:100lvh; background:var(--fest-sky, none); }
+  :root[data-fest] #fest-sky, :root[data-fest] #fest-stars, :root[data-fest] #fest-bg, :root[data-fest] #fest-fx{ display:block; }
+  #fest-moon{ width:0; height:0; background-repeat:no-repeat; background-size:contain; will-change:transform; }
+  #fest-beams{ height:100vh; height:100lvh; overflow:hidden; }
+  #fest-beams i{ position:absolute; bottom:-20px; width:70vh; height:120vh; margin-left:-35vh; transform-origin:50% 100%;
+    background:linear-gradient(to top, rgba(255,214,150,.3), rgba(255,214,150,0) 85%); clip-path:polygon(48% 100%, 52% 100%, 100% 0, 0 0);
+    animation:fest-sweep 7s ease-in-out infinite alternate; }
+  #fest-beams i:first-child{ left:22%; --a:-28deg; --z:-6deg; }
+  #fest-beams i:last-child{ left:78%; --a:28deg; --z:6deg; animation-delay:-3.5s; }
+  @keyframes fest-sweep{ from{ transform:rotate(var(--a)); } to{ transform:rotate(var(--z)); } }
+  #fest-water{ top:auto; bottom:0; height:72px; background:linear-gradient(to bottom, rgba(10,20,52,0), rgba(10,20,52,.88) 30%, rgba(4,8,22,.96)); }
+  #fest-fog{ top:auto; bottom:-40px; left:0; width:100vw; height:220px; opacity:.7;
+    background:radial-gradient(40% 60% at 25% 70%, rgba(120,52,84,.22), transparent 70%), radial-gradient(35% 55% at 70% 80%, rgba(120,52,84,.18), transparent 70%); }
+  :root[data-fest="ge"] #fest-beams, :root[data-fest="yipeng"] #fest-water, :root[data-fest="halloween"] #fest-fog{ display:block; }
+  :root[data-fest] :is(header.top, .glass-nav, .feed-page, .feed-page *){ -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  @media (prefers-reduced-motion:reduce){ #fest-beams i{ animation:none; } }
+  /* each theme's colours, over either light or dark */
+  :root[data-fest="meadow"]{ --fest-sky:radial-gradient(60vmax 40vmax at 18% 6%, rgba(255,250,225,.75), transparent 60%), linear-gradient(#8EC2E8, #CFE6F5 55%, #EEF4E4);
+    --bg-body:#EEF4E4; --ink:#2C3626; --ink-soft:#56634F; --paper:#EEF4E8; --paper-dim:#E3EDDC; --card:#FFFFFF; --line:rgba(60,80,50,.16);
+    --glass-card:rgba(255,255,255,.76); --glass-edge:rgba(60,80,50,.16); --glass-k:1; --shadow-rgb:40,60,40;
+    --bg-header:rgba(236,244,250,.95); --bg-nav:rgba(255,255,255,.92); --fest-acc:#4E5A3C; color-scheme:light; }
+  :root[data-fest="halloween"]{ --fest-sky:linear-gradient(#0B0610, #170914 62%, #2A0E1C);
+    --bg-body:#2A0E1C; --ink:#F2E8DD; --ink-soft:#BBA9B2; --paper:#140A12; --paper-dim:#22121E; --card:#1C0F1C; --line:rgba(255,232,214,.14);
+    --glass-card:rgba(24,12,26,.78); --glass-edge:rgba(255,232,214,.14); --glass-k:.14; --shadow-rgb:0,0,0;
+    --bg-header:rgba(14,7,14,.95); --bg-nav:rgba(22,10,22,.94); --fest-acc:#E8333C; color-scheme:dark; }
+  :root[data-fest="ge"]{ --fest-sky:linear-gradient(#160404, #3A0808 55%, #6B1208);
+    --bg-body:#3A0808; --ink:#F8EEDC; --ink-soft:#D2BDA4; --paper:#1A0606; --paper-dim:#2A0A0A; --card:#240909; --line:rgba(246,213,138,.18);
+    --glass-card:rgba(34,8,8,.78); --glass-edge:rgba(246,213,138,.2); --glass-k:.14; --shadow-rgb:0,0,0;
+    --bg-header:rgba(24,6,6,.95); --bg-nav:rgba(30,8,8,.94); --fest-acc:#F2C14E; color-scheme:dark; }
+  :root[data-fest="yipeng"]{ --fest-sky:linear-gradient(#060A1E, #0E1638 60%, #2A1A38);
+    --bg-body:#0E1638; --ink:#FFF3DF; --ink-soft:#CDBDA4; --paper:#0A1028; --paper-dim:#121A3A; --card:#111836; --line:rgba(255,190,110,.18);
+    --glass-card:rgba(14,18,46,.76); --glass-edge:rgba(255,190,110,.22); --glass-k:.14; --shadow-rgb:0,0,0;
+    --bg-header:rgba(8,12,32,.95); --bg-nav:rgba(12,16,40,.94); --fest-acc:#FFB347; color-scheme:dark; }
+  :root[data-fest="winter"]{ --fest-sky:linear-gradient(#081428, #13284A 60%, #2A3E62);
+    --bg-body:#13284A; --ink:#EEF5FF; --ink-soft:#A9BCD6; --paper:#0E1B33; --paper-dim:#16264A; --card:#13223F; --line:rgba(210,230,255,.16);
+    --glass-card:rgba(16,30,58,.76); --glass-edge:rgba(210,230,255,.2); --glass-k:.14; --shadow-rgb:0,0,0;
+    --bg-header:rgba(10,20,40,.95); --bg-nav:rgba(14,26,50,.94); --fest-acc:#E8434A; color-scheme:dark; }
+  :root[data-fest="birthday"]{ --fest-sky:linear-gradient(#FFD6E6, #FBE3EE 60%, #FFF2F7);
+    --bg-body:#FBE3EE; --ink:#4A1F3A; --ink-soft:#86566F; --paper:#FDEFF5; --paper-dim:#F9E1EC; --card:#FFFFFF; --line:rgba(180,60,120,.16);
+    --glass-card:rgba(255,255,255,.78); --glass-edge:rgba(180,60,120,.16); --glass-k:1; --shadow-rgb:150,40,90;
+    --bg-header:rgba(253,236,244,.96); --bg-nav:rgba(255,255,255,.93); --fest-acc:#E4457E; color-scheme:light; }
+  /* the theme's word under the home page's title, and the switch */
+  .fest-row{ display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; margin-top:6px; }
+  .fest-word{ font-size:24px; line-height:1.2; color:var(--fest-acc, var(--bnk)); }
+  .fw-meadow{ font-family:'tt-ricordi-allegria', 'Pacifico', serif; font-weight:500; font-size:26px; }
+  .fw-halloween{ font-family:'FC Jong Pen Suk', 'Noto Sans Thai', serif; font-size:36px; text-shadow:0 0 14px rgba(232,51,60,.45), 0 2px 0 #2A0004; }
+  .fw-ge{ flex:1 1 0; min-width:0; font-family:'Cinzel', serif; font-weight:700; font-size:15px; letter-spacing:.07em; text-wrap:balance; }
+  .fw-yipeng{ font-family:'Charm', 'Noto Sans Thai', serif; font-weight:700; font-size:36px; text-shadow:0 0 18px rgba(255,170,70,.45); }
+  .fw-winter, .fw-birthday{ font-family:'Pacifico', cursive; font-size:24px; }
+  .fest-who{ font-size:13px; font-weight:800; color:var(--ink-soft); }
+  .fest-btn{ margin-left:auto; font:inherit; font-size:12px; font-weight:800; padding:4px 12px; border-radius:99px; cursor:pointer; color:var(--ink);
+    background:color-mix(in srgb, var(--ink) 7%, transparent); border:1px solid var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.14); transition:transform .12s, box-shadow .12s; }
+  .fest-btn:active{ transform:translateY(2px); box-shadow:none; }
+  .fest-row.is-off{ margin-top:4px; }
+  .fest-row.is-off .fest-btn{ margin-left:0; color:var(--ink-soft); }
 </style>
 <script>
   /* Runs before first paint: a stored choice wins, otherwise follow the OS. */
@@ -7934,6 +7997,7 @@ function applyTheme(theme){
   try{ localStorage.setItem('48thdb-theme', theme); }catch(e){}
   const btn = document.querySelector('.theme-btn');
   if(btn) btn.innerHTML = theme==='dark' ? ICONS.sun : ICONS.moon;
+  if(typeof FEST !== 'undefined') FEST.sync();   // a themed home page keeps its theme's light or dark
 }
 
 // ============================= HELPERS =============================
@@ -16726,6 +16790,7 @@ function renderFeed(){
         <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></span>
       </div>
       <div class="feed-title-row"><h1 class="feed-title">วันนี้ที่ 48</h1></div>
+      ${FEST.row()}
       <div class="feed-head-foot">
         ${state.oshi.length ? `
         <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
@@ -20711,6 +20776,442 @@ function sheetKeepNow(){
   const was = document.querySelector('#main .is-member-sheet'), sc = was && was.querySelector('.modal-scroll');
   return sc && sc.scrollTop ? { id:was.dataset.mid, top:sc.scrollTop } : null;
 }
+/* ===================== Seasons on the home page =====================
+   The home page wears a theme by the calendar (Thai time): Kimi to Doko ka e
+   Ikitai until 23 Oct, Halloween 24 Oct – 1 Nov, the GE results night 2–15 Nov,
+   Yi Peng around Loy Krathong (24 Nov 2026) 16–30 Nov, winter in December, and
+   on a member's birthday the birthday theme for that one day. Each paints a sky
+   behind the page and puts things on the home cards that the scroll moves:
+   cobwebs and spiders, dandelion seeds, confetti, marigold petals, snow that
+   piles up, strings of lights. A reader can turn themes off (kept on the
+   device). Drawn for the iPhone: the sky's gradient, stars, moon, stage lights
+   and fog are CSS or drawn once; only two canvases are redrawn, the sky one at
+   1×; nothing blurs over them; Safari's toolbar sliding in and out restarts
+   nothing. Prototyped and measured in claude.ai/artifact/JaRPzJGLSDtT775UhnvZHm. */
+const FEST = (() => {
+  const $ = s => document.querySelector(s);
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const rnd = (a, z) => a + Math.random() * (z - a), pick = a => a[Math.floor(Math.random() * a.length)];
+  const DT = 1 / 60, DT2 = DT * DT;
+  let W = 0, H = 0, DPR = 1, T = 0, vel = 0, acc = 0, lastY = 0, theme = null, running = false, held = false;
+  const sf = () => Math.max(-5200, Math.min(5200, vel * 2.4 + acc * .06));
+  let cards = [], R = new Map(), Rp = new Map();
+  const ptr = { x: -999, y: -999, on: false };
+  const mk = (tag, id, cls) => { const e = document.createElement(tag); e.id = id; e.className = cls; e.setAttribute('aria-hidden', 'true'); document.body.appendChild(e); return e; };
+  mk('div', 'fest-sky', 'fest-layer'); const starsEl = mk('canvas', 'fest-stars', 'fest-layer'), moonEl = mk('div', 'fest-moon', 'fest-layer');
+  const beamsEl = mk('div', 'fest-beams', 'fest-layer'); beamsEl.innerHTML = '<i></i><i></i>';
+  mk('div', 'fest-fog', 'fest-layer');
+  const bg = mk('canvas', 'fest-bg', 'fest-layer'); mk('div', 'fest-water', 'fest-layer');
+  const fx = mk('canvas', 'fest-fx', 'fest-layer is-front');
+  const b = bg.getContext('2d'), f = fx.getContext('2d');
+  addEventListener('pointermove', e => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.on = true; }, { passive: true });
+  addEventListener('pointerdown', e => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.on = true; }, { passive: true });
+  addEventListener('touchmove', e => { const t = e.touches[0]; if(t){ ptr.x = t.clientX; ptr.y = t.clientY; ptr.on = true; } }, { passive: true });
+  addEventListener('touchend', () => { ptr.on = false; });
+  addEventListener('pointerleave', () => { ptr.on = false; });
+  const visible = r => r && r.bottom > -120 && r.top < H + 120;
+  /* ===================== sprites ===================== */
+  const sprite = (w, h, draw) => { const c = document.createElement('canvas'); c.width = Math.ceil(w * DPR); c.height = Math.ceil(h * DPR);
+    const g = c.getContext('2d'); g.scale(DPR, DPR); draw(g); c.w = w; c.h = h; return c; };
+  let SP = {};
+  function makeSprites(){
+    SP.moon = (R0 => sprite(R0 * 7, R0 * 7, g => {
+      const cx = R0 * 3.5, halo = g.createRadialGradient(cx, cx, R0 * .8, cx, cx, R0 * 3.4); halo.addColorStop(0, 'rgba(255,214,184,.26)'); halo.addColorStop(1, 'rgba(255,214,184,0)');
+      g.fillStyle = halo; g.fillRect(0, 0, R0 * 7, R0 * 7);
+      const gr = g.createRadialGradient(cx - R0 * .3, cx - R0 * .3, R0 * .1, cx, cx, R0);
+      gr.addColorStop(0, '#FFF6E6'); gr.addColorStop(.7, '#EAD5BA'); gr.addColorStop(1, '#C2A68A'); g.fillStyle = gr; g.beginPath(); g.arc(cx, cx, R0, 0, 7); g.fill();
+      [[-.3,-.2,.18],[.25,.1,.13],[-.05,.35,.1],[.35,-.35,.08],[-.42,.25,.07]].forEach(([x, y, r]) => { g.fillStyle = 'rgba(150,118,92,.28)'; g.beginPath(); g.arc(cx + x * R0, cx + y * R0, r * R0, 0, 7); g.fill(); });
+    }))(Math.max(38, Math.min(80, Math.min(W, H) * .11)));
+    const cloud = rgb => sprite(340, 120, g => [[90,70,70],[160,55,80],[230,72,62],[130,85,55],[280,82,40],[50,85,40]].forEach(([x, y, r]) => {
+      const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},.9)`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }));
+    SP.cloudNight = cloud('46,22,48'); SP.cloudDay = cloud('255,255,255'); SP.cloudPink = cloud('255,255,255');
+    const glow = (rgb, a, r) => sprite(r * 2, r * 2, g => { const gr = g.createRadialGradient(r, r, 0, r, r, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(0, 0, r * 2, r * 2); });
+    SP.warm = glow('255,170,80', .22, 64); SP.kglow = glow('255,190,100', .35, 40);
+    SP.bulb = Object.fromEntries(BULB.map(c => [c, glow(c, .55, 11)]));
+    SP.balloon = Object.fromEntries(BAL.map(c => [c, sprite(40, 48, g => { const gr = g.createRadialGradient(15, 16, 2, 20, 22, 24); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.25, c); gr.addColorStop(1, c);
+      g.fillStyle = gr; g.beginPath(); g.ellipse(20, 22, 18, 22, 0, 0, 7); g.fill(); g.beginPath(); g.moveTo(17, 46); g.lineTo(23, 46); g.lineTo(20, 42); g.fill(); })]));
+    SP.snow = sprite(16, 16, g => { const gr = g.createRadialGradient(8, 8, 0, 8, 8, 8); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.45, 'rgba(255,255,255,.85)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 16, 16); });
+    SP.lantern = sprite(80, 100, g => {
+      const glow = g.createRadialGradient(40, 50, 4, 40, 50, 40); glow.addColorStop(0, 'rgba(255,170,70,.55)'); glow.addColorStop(1, 'rgba(255,170,70,0)');
+      g.fillStyle = glow; g.fillRect(0, 0, 80, 100);
+      const body = g.createLinearGradient(26, 0, 54, 0); body.addColorStop(0, '#D9662A'); body.addColorStop(.5, '#FFD58C'); body.addColorStop(1, '#D9662A');
+      g.fillStyle = body; g.beginPath(); g.moveTo(30, 28); g.quadraticCurveTo(40, 24, 50, 28); g.lineTo(54, 66); g.quadraticCurveTo(40, 72, 26, 66); g.closePath(); g.fill();
+      g.fillStyle = 'rgba(255,250,220,.9)'; g.beginPath(); g.ellipse(40, 67, 12, 3, 0, 0, 7); g.fill();
+      g.strokeStyle = 'rgba(140,60,20,.35)'; g.lineWidth = 1; g.beginPath(); g.moveTo(40, 26); g.lineTo(40, 70); g.stroke();
+    });
+  }
+
+  /* ===================== shared sky pieces ===================== */
+  let stars = [], clouds = [];
+  function seedSky(){
+    stars = Array.from({ length: Math.round(W * H / 2600) }, () => ({ x: rnd(0, W), y: rnd(0, H * .85), r: rnd(.4, 1.3), p: rnd(0, 6.3), s: rnd(.6, 2) }));
+    clouds = Array.from({ length: 4 }, (_, i) => ({ x: rnd(-200, W), y: rnd(30, H * .45), s: rnd(.7, 1.5), v: rnd(6, 16), a: rnd(.45, .85) }));
+  }
+  /* the stars are drawn once a theme, on a canvas of their own; CSS makes them breathe */
+  function paintStars(k){ const g = starsEl.getContext('2d'); starsEl.width = Math.round(W * DPR); starsEl.height = Math.round(H * DPR);
+    starsEl.style.height = H + 'px'; g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H); if(!k) return;
+    for(const s of stars){ g.globalAlpha = (.35 + .45 * Math.sin(s.p)) * k; g.fillStyle = '#FFF4E8'; g.fillRect(s.x, s.y, s.r, s.r); } }
+  function placeMoon(m){ if(!m){ moonEl.style.display = 'none'; return; } const S = SP.moon.w; moonEl.style.display = 'block';
+    moonEl.style.backgroundImage = `url(${SP.moon.toDataURL()})`; moonEl.style.width = S + 'px'; moonEl.style.height = S + 'px';
+    moonEl.style.left = (W * m.x - S / 2) + 'px'; moonEl.style.top = (m.y - S / 2) + 'px'; }
+  function drawClouds(spr, dt, sy, k = 1, speed = 1){ for(const c of clouds){ c.x += c.v * speed * dt; if(c.x > W + 40){ c.x = -340 * c.s - rnd(0, 200); c.y = rnd(30, H * .45); }
+    b.globalAlpha = c.a * k; b.drawImage(spr, c.x, c.y - sy * .08, 340 * c.s, 120 * c.s); } b.globalAlpha = 1; }
+
+  /* ---- bats ---- */
+  let bats = [], nextFlock = .8, nextFront = 6;
+  function spawnBats(front){
+    const dir = Math.random() < .5 ? 1 : -1, n = front ? 1 : 1 + Math.floor(rnd(0, 4)), y0 = rnd(H * .06, H * .5);
+    for(let i = 0; i < n; i++){ const d = front ? 1.5 : rnd(.45, 1);
+      bats.push({ front, dir, x: dir > 0 ? -60 - i * rnd(30, 70) : W + 60 + i * rnd(30, 70), y0: y0 + rnd(-40, 40), amp: rnd(10, 34), ph: rnd(0, 6.3),
+        size: (front ? 54 : rnd(20, 34)) * d, speed: (front ? 230 : rnd(70, 140)) * d, flap: rnd(11, 15), d }); }
+  }
+  function drawBat(g, x, y, s, flap, alpha, dir){
+    const tip = Math.sin(flap), u = s / 2;
+    g.save(); g.translate(x, y); g.scale(dir, 1); g.globalAlpha = alpha; g.fillStyle = '#060207';
+    for(const side of [1, -1]){ g.save(); g.scale(side, 1); g.beginPath(); g.moveTo(u * .06, -u * .1);
+      g.quadraticCurveTo(u * .45, -u * (.55 + tip * .5), u, -u * (.1 + tip * .75));
+      let px = 1, py = -(.1 + tip * .75);
+      for(const [ex, ey0] of [[.82, .05], [.6, .12], [.38, .16], [.14, .2]]){ const ey = ey0 - tip * .55 * ex; g.quadraticCurveTo(u * (px + ex) / 2, u * ((py + ey) / 2 - .1), u * ex, u * ey); px = ex; py = ey; }
+      g.lineTo(0, u * .22); g.closePath(); g.fill(); g.restore(); }
+    g.beginPath(); g.ellipse(0, u * .05, u * .1, u * .22, 0, 0, 7); g.fill();
+    g.beginPath(); g.moveTo(-u * .08, -u * .12); g.lineTo(-u * .1, -u * .3); g.lineTo(-u * .02, -u * .17); g.lineTo(u * .02, -u * .17); g.lineTo(u * .1, -u * .3); g.lineTo(u * .08, -u * .12); g.fill();
+    g.fillStyle = 'rgba(255,60,60,.9)'; g.beginPath(); g.arc(-u * .04, -u * .1, u * .022, 0, 7); g.arc(u * .04, -u * .1, u * .022, 0, 7); g.fill(); g.restore();
+  }
+  function stepBats(dt){ nextFlock -= dt; nextFront -= dt;
+    if(nextFlock <= 0){ spawnBats(false); nextFlock = rnd(2.2, 5); } if(nextFront <= 0){ spawnBats(true); nextFront = rnd(9, 16); }
+    for(let i = bats.length - 1; i >= 0; i--){ const t = bats[i]; t.x += t.dir * t.speed * dt; t.ph += t.flap * dt; if(t.x < -200 || t.x > W + 200) bats.splice(i, 1); } }
+  function drawBats(g, front){ for(const t of bats){ if(t.front !== front) continue;
+    drawBat(g, t.x, t.y0 + Math.sin(t.ph * .12) * t.amp + Math.sin(t.ph) * t.size * .05, t.size, t.ph, front ? .95 : .55 + t.d * .4, t.dir); } }
+
+  /* ---- fireworks and stage lights ---- */
+  let rockets = [], sparks = [], nextRocket = .3;
+  const FW = [[255, 210, 122], [255, 90, 78], [255, 255, 255], [247, 183, 51]];
+  function stepFireworks(dt){
+    nextRocket -= dt; if(nextRocket <= 0){ rockets.push({ x: rnd(W * .12, W * .88), y: H + 10, vy: -rnd(420, 560), ty: rnd(H * .1, H * .4), c: pick(FW) }); nextRocket = rnd(.8, 2); }
+    for(let i = rockets.length - 1; i >= 0; i--){ const r = rockets[i]; r.y += r.vy * dt; r.vy += 150 * dt;
+      if(r.y <= r.ty || r.vy > -80){ const n = 60, c2 = pick(FW); for(let k = 0; k < n; k++){ const a = k / n * 6.283 + rnd(-.05, .05), s = rnd(110, 210);
+          sparks.push({ x: r.x, y: r.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rnd(1.1, 1.7), m: 1.7, c: Math.random() < .5 ? r.c : c2 }); } rockets.splice(i, 1); } }
+    for(let i = sparks.length - 1; i >= 0; i--){ const p = sparks[i]; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 80 * dt; p.vx *= .985; p.vy *= .985; p.life -= dt; if(p.life <= 0) sparks.splice(i, 1); }
+  }
+  function drawFireworks(){ b.globalCompositeOperation = 'lighter';
+    for(const r of rockets){ b.fillStyle = `rgba(${r.c},.9)`; b.fillRect(r.x - 1, r.y, 2, 10); }
+    for(const p of sparks){ const a = Math.max(0, p.life / p.m); b.fillStyle = `rgba(${p.c},${(a * .95).toFixed(3)})`; b.fillRect(p.x - 1.2, p.y - 1.2, 2.4, 2.4);
+      b.fillStyle = `rgba(${p.c},${(a * .25).toFixed(3)})`; b.fillRect(p.x - p.vx * .03, p.y - p.vy * .03, 2, 2); }
+    b.globalCompositeOperation = 'source-over'; }
+
+  /* ---- lanterns, water and krathong ---- */
+  let lanterns = [], krathongs = [];
+  function seedLanterns(){ lanterns = Array.from({ length: 26 }, () => ({ x: rnd(0, W), y: rnd(0, H + 60), d: rnd(.35, 1.15), vy: rnd(14, 28), ph: rnd(0, 6.3) })).sort((a, z) => a.d - z.d);
+    krathongs = Array.from({ length: 3 }, (_, i) => ({ x: W * (.15 + i * .33), v: rnd(6, 12) * (i % 2 ? 1 : -1), ph: rnd(0, 6.3) })); }
+  function stepLanterns(dt){ for(const l of lanterns){ l.y -= l.vy * l.d * dt; l.x += (Math.sin(T * .4 + l.ph) * 8 + vel * .03) * l.d * dt; if(l.y < -70){ l.y = H + 50; l.x = rnd(0, W); } if(l.x < -40) l.x = W + 30; if(l.x > W + 40) l.x = -30; }
+    for(const k of krathongs){ k.x += k.v * dt; if(k.x < -50) k.x = W + 40; if(k.x > W + 50) k.x = -40; } }
+  function drawLanterns(){
+    for(const l of lanterns){ if(l.d < .9) continue; const z = 95 * l.d; b.globalAlpha = .75; b.drawImage(SP.warm, l.x - z, l.y - z, z * 2, z * 2); }
+    for(const l of lanterns){ const s = 46 * l.d, fl = .82 + .18 * Math.sin(T * 9 + l.ph) * Math.sin(T * 3.3 + l.ph);
+    b.globalAlpha = Math.min(1, (.35 + .65 * l.d) * fl); b.drawImage(SP.lantern, l.x - s * .4, l.y - s * .5, s * .8, s); } b.globalAlpha = 1; }
+  function drawWater(){ const top = innerHeight - 70;
+    b.strokeStyle = 'rgba(255,190,110,.22)'; b.lineWidth = 1; b.beginPath();
+    for(let i = 0; i < 18; i++){ const y = top + 24 + (i % 6) * 7, x = ((i * 97 + T * (10 + i % 4 * 6)) % (W + 80)) - 40; b.moveTo(x, y); b.lineTo(x + 18 + (i % 3) * 10, y); } b.stroke();
+    for(const k of krathongs){ const y = innerHeight - 30 + Math.sin(T * 1.6 + k.ph) * 2;
+      b.drawImage(SP.kglow, k.x - 40, y - 58, 80, 80);
+      b.fillStyle = '#2E5B2A'; b.beginPath(); b.ellipse(k.x, y, 22, 6, 0, 0, 7); b.fill();
+      for(let p = -3; p <= 3; p++){ b.fillStyle = p % 2 ? '#F6C2D6' : '#FFFFFF'; b.beginPath(); b.moveTo(k.x + p * 5 - 4, y - 2); b.lineTo(k.x + p * 4, y - 12 + Math.abs(p) * 1.5); b.lineTo(k.x + p * 5 + 4, y - 2); b.fill(); }
+      b.fillStyle = '#F4E6C8'; b.fillRect(k.x - 1, y - 20, 2, 9);
+      const fl = 1 + .25 * Math.sin(T * 14 + k.ph); b.fillStyle = 'rgba(255,200,90,.95)'; b.beginPath(); b.ellipse(k.x, y - 23, 2 * fl, 4 * fl, 0, 0, 7); b.fill(); } }
+
+  /* ---- balloons ---- */
+  let balloons = [];
+  const BAL = ['#E4457E', '#F59BBE', '#FFD1E3', '#C9A7F0', '#FFE08A', '#FFFFFF'];
+  function seedBalloons(){ balloons = Array.from({ length: 12 }, () => ({ x: rnd(0, W), y: rnd(0, H + 80), d: rnd(.5, 1.1), vy: rnd(18, 34), ph: rnd(0, 6.3), c: pick(BAL) })).sort((a, z) => a.d - z.d); }
+  function stepBalloons(dt){ for(const l of balloons){ l.y -= l.vy * l.d * dt; l.x += Math.sin(T * .6 + l.ph) * 10 * l.d * dt; if(l.y < -90){ l.y = H + 60; l.x = rnd(0, W); } } }
+  function drawBalloons(){ b.strokeStyle = 'rgba(120,70,100,.45)'; b.lineWidth = 1; b.beginPath();
+    for(const l of balloons){ const s = 34 * l.d, x = l.x + Math.sin(T * 1.2 + l.ph) * 3, y = l.y; b.moveTo(x, y + s * .62); b.quadraticCurveTo(x + Math.sin(T * 2 + l.ph) * 8, y + s * 1.3, x - 2, y + s * 2); }
+    b.stroke();
+    for(const l of balloons){ const s = 34 * l.d, x = l.x + Math.sin(T * 1.2 + l.ph) * 3; b.globalAlpha = .45 + .5 * l.d; b.drawImage(SP.balloon[l.c], x - s * .5, l.y - s * .6, s, s * 1.2); }
+    b.globalAlpha = 1; }
+
+  /* ---- grass ---- */
+  let blades = []; const GRASS = ['#6E9A4C', '#83AE5C', '#5C8A3E', '#9BC26E'];
+  function seedGrass(){ blades = Array.from({ length: Math.round(W / 4.4) }, (_, i) => ({ x: i * 4.4 + rnd(-2, 2), h: rnd(34, 86), ph: rnd(0, 6.3), c: pick(GRASS), fl: Math.random() < .07 })); }
+  function drawGrass(){ const base = innerHeight + 4, wind = Math.max(-30, Math.min(30, vel * .01));
+    b.lineCap = 'round'; b.lineWidth = 2.2; const tips = [];
+    for(const col of GRASS){ b.strokeStyle = col; b.beginPath();
+      for(const g of blades){ if(g.c !== col) continue; const sway = Math.sin(T * 1.3 + g.ph + g.x * .01) * g.h * .12 + wind * g.h / 60;
+        b.moveTo(g.x, base); b.quadraticCurveTo(g.x + sway * .3, base - g.h * .55, g.x + sway, base - g.h); if(g.fl) tips.push(g.x + sway, base - g.h); }
+      b.stroke(); }
+    b.fillStyle = '#FFFFFF'; b.beginPath(); for(let i = 0; i < tips.length; i += 2){ b.moveTo(tips[i] + 3.2, tips[i + 1]); b.arc(tips[i], tips[i + 1], 3.2, 0, 7); } b.fill();
+    b.fillStyle = '#F4C84A'; b.beginPath(); for(let i = 0; i < tips.length; i += 2){ b.moveTo(tips[i] + 1.3, tips[i + 1]); b.arc(tips[i], tips[i + 1], 1.3, 0, 7); } b.fill(); }
+
+
+  /* ---- snow in the air ---- */
+  let flakes = [];
+  function seedSnow(){ flakes = Array.from({ length: 80 }, () => ({ x: rnd(0, W), y: rnd(0, H), d: rnd(.3, 1), ph: rnd(0, 6.3) })); }
+  function stepSnow(dt){ for(const s of flakes){ s.y += (18 + 40 * s.d) * dt; s.x += Math.sin(T * .7 + s.ph) * 14 * s.d * dt; if(s.y > H + 8){ s.y = -8; s.x = rnd(0, W); } } }
+  function drawSnow(sy){ for(const s of flakes){ const z = 3 + 6 * s.d; b.globalAlpha = .35 + .5 * s.d; b.drawImage(SP.snow, s.x - z / 2, ((s.y - sy * .05 * s.d) % (H + 16) + H + 16) % (H + 16) - 8 - z / 2, z, z); } b.globalAlpha = 1; }
+
+  /* ===================== what clings to the cards ===================== */
+  /* -- Verlet bits: webs, a spider's silk, a string of lights -- */
+  let ropes = [];
+  function link(N, a, z, k, s){ return { a, b: z, r: Math.hypot(N[z].x - N[a].x, N[z].y - N[a].y) * k, s }; }
+  function makeWeb(card, corner, S){
+    const sx = corner[1] === 'l' ? 1 : -1, sy = corner[0] === 't' ? 1 : -1, N = [], C = [];
+    const add = (x, y, pin) => { N.push({ x, y, px: x, py: y, pin }); return N.length - 1; };
+    const hub = add(sx * S * .36, sy * S * .36, false), ends = [], ds = [1, .64, .3];
+    ds.forEach(d => ends.push([sx * S * d, 0])); ends.push([0, 0]); [...ds].reverse().forEach(d => ends.push([0, sy * S * d]));
+    const spokes = [];
+    for(const [ax, ay] of ends){ const ids = [hub]; for(let k = 1; k <= 5; k++){ const t = k / 5; ids.push(add(N[hub].x + (ax - N[hub].x) * t, N[hub].y + (ay - N[hub].y) * t, k === 5)); }
+      for(let k = 0; k < 5; k++) C.push(link(N, ids[k], ids[k + 1], 1, 1)); spokes.push(ids); }
+    for(let i = 0; i < spokes.length - 1; i++) for(let k = 1; k < 5; k++) C.push(link(N, spokes[i][k], spokes[i + 1][k], 1.05, .55));
+    const dew = N.map((n, i) => i).filter(i => !N[i].pin && Math.random() < .3).map(i => ({ i, r: rnd(1, 2.1) }));
+    return { type: 'web', card, sx, sy, nodes: N, cons: C, dew, ph: rnd(0, 6.3), cx: 0, cy: 0, on: false, g: 140, iters: 5 };
+  }
+  function makeSilk(card, at){ const n = 14, L = rnd(70, 110), N = [];
+    for(let k = 0; k <= n; k++) N.push({ x: 0, y: L * k / n, px: 0, py: L * k / n, pin: k === 0 });
+    return { type: 'silk', card, at, nodes: N, cons: N.slice(1).map((_, k) => ({ a: k, b: k + 1, r: L / n, s: 1 })), L, ph: rnd(0, 6.3), cx: 0, cy: 0, on: false, g: 420, iters: 8 }; }
+  function makeLights(card){ const w = card.offsetWidth - 28, n = 22, N = [];
+    for(let k = 0; k <= n; k++) N.push({ x: w * k / n, y: 0, px: w * k / n, py: 0, pin: k === 0 || k === n });
+    return { type: 'lights', card, nodes: N, cons: N.slice(1).map((_, k) => ({ a: k, b: k + 1, r: w / n * 1.012, s: 1 })), ph: rnd(0, 6.3), cx: 0, cy: 0, on: false, g: 360, iters: 10 }; }
+  function placeRope(o, r){
+    if(o.type === 'web'){ o.cx = o.sx > 0 ? r.left + 1 : r.right - 1; o.cy = o.sy > 0 ? r.top + 1 : r.bottom - 1; }
+    else if(o.type === 'silk'){ o.cx = r.left + r.width * o.at; o.cy = r.bottom - 1; }
+    else { o.cx = r.left + 14; o.cy = r.bottom - 1; }
+    o.on = visible(r);
+  }
+  function stepRopes(){ const F = sf();
+    for(const o of ropes){ placeRope(o, R.get(o.card)); if(!o.on) continue;
+      if(o.type === 'silk'){ const len = o.L * (.72 + .28 * Math.sin(T * .35 + o.ph)); for(const c of o.cons) c.r = len / o.cons.length; }
+      const fx_ = Math.sin(T * .8 + o.ph) * (o.type === 'web' ? 60 : 30), fy_ = o.g + F * (o.type === 'silk' ? 1.2 : 1);
+      for(const n of o.nodes){ if(n.pin) continue; const vx = (n.x - n.px) * .962, vy = (n.y - n.py) * .962; n.px = n.x; n.py = n.y; n.x += vx + fx_ * DT2; n.y += vy + fy_ * DT2;
+        if(ptr.on){ const dx = o.cx + n.x - ptr.x, dy = o.cy + n.y - ptr.y, d = Math.hypot(dx, dy); if(d < 30 && d > .1){ const p = (30 - d) * .35; n.x += dx / d * p; n.y += dy / d * p; } } }
+      for(let it = 0; it < o.iters; it++) for(const c of o.cons){ const A = o.nodes[c.a], B = o.nodes[c.b], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || .001;
+        if(d < c.r && c.s < 1) continue; const diff = (d - c.r) / d * c.s, wa = A.pin ? 0 : (B.pin ? 1 : .5), wb = B.pin ? 0 : (A.pin ? 1 : .5);
+        A.x += dx * diff * wa; A.y += dy * diff * wa; B.x -= dx * diff * wb; B.y -= dy * diff * wb; } }
+  }
+  const BULB = ['255,70,70', '80,220,120', '255,210,90', '255,255,255', '110,170,255'];
+  function drawRopes(){
+    f.lineCap = 'round';
+    for(const pass of [1]){ f.lineWidth = .85; f.strokeStyle = 'rgba(238,230,242,.62)'; f.beginPath();
+      for(const o of ropes){ if(!o.on || o.type === 'lights') continue; const N = o.nodes;
+        if(o.type === 'web') for(const c of o.cons){ f.moveTo(o.cx + N[c.a].x, o.cy + N[c.a].y); f.lineTo(o.cx + N[c.b].x, o.cy + N[c.b].y); }
+        else { f.moveTo(o.cx + N[0].x, o.cy + N[0].y); for(let k = 1; k < N.length; k++) f.lineTo(o.cx + N[k].x, o.cy + N[k].y); } }
+      f.stroke(); }
+    for(const o of ropes){ if(!o.on) continue; const N = o.nodes;
+      if(o.type === 'web') for(const d of o.dew){ const n = N[d.i], x = o.cx + n.x, y = o.cy + n.y;
+        f.fillStyle = 'rgba(190,210,255,.22)'; f.beginPath(); f.arc(x, y, d.r * 1.9, 0, 7); f.fill(); f.fillStyle = 'rgba(255,255,255,.85)'; f.beginPath(); f.arc(x - d.r * .2, y - d.r * .25, d.r * .55, 0, 7); f.fill(); }
+      if(o.type === 'silk'){ const e = N[N.length - 1], p = N[N.length - 2]; drawSpider(o.cx + e.x, o.cy + e.y, Math.atan2(e.x - p.x, e.y - p.y), o.ph); }
+      if(o.type === 'lights'){ f.strokeStyle = 'rgba(30,60,40,.9)'; f.lineWidth = 1.2; f.beginPath(); N.forEach((n, k) => k ? f.lineTo(o.cx + n.x, o.cy + n.y) : f.moveTo(o.cx + n.x, o.cy + n.y)); f.stroke();
+        f.globalCompositeOperation = 'lighter';
+        for(let k = 1; k < N.length - 1; k += 2){ const n = N[k], c = BULB[(k >> 1) % BULB.length], tw = .55 + .45 * Math.sin(T * 3 + k * 1.7 + o.ph), x = o.cx + n.x, y = o.cy + n.y + 4;
+          f.globalAlpha = tw; f.drawImage(SP.bulb[c], x - 11, y - 11, 22, 22); f.globalAlpha = .6 + .4 * tw;
+          f.fillStyle = `rgb(${c})`; f.beginPath(); f.ellipse(x, y, 2.4, 3.6, 0, 0, 7); f.fill(); } f.globalAlpha = 1;
+        f.globalCompositeOperation = 'source-over'; } }
+  }
+  function drawSpider(x, y, ang, ph){ f.save(); f.translate(x, y); f.rotate(-ang); f.strokeStyle = '#0A0406'; f.fillStyle = '#0A0406'; f.lineWidth = 1.3;
+    for(const side of [1, -1]) for(let k = 0; k < 4; k++){ const a0 = (-.9 + k * .55 + Math.sin(T * 6 + k + ph) * .12) * side, kx = Math.sin(a0) * 8, ky = 2 - Math.cos(a0) * 5;
+      f.beginPath(); f.moveTo(0, 2); f.quadraticCurveTo(kx, ky - 4, kx * 1.5, ky + 6); f.stroke(); }
+    f.beginPath(); f.ellipse(0, 5, 4.4, 5.6, 0, 0, 7); f.fill(); f.beginPath(); f.arc(0, -1, 2.8, 0, 7); f.fill();
+    f.fillStyle = 'rgba(232,51,60,.9)'; f.beginPath(); f.arc(-1, -1.6, .7, 0, 7); f.arc(1, -1.6, .7, 0, 7); f.fill(); f.restore(); }
+
+  /* -- settlers: seeds, confetti, petals, snow that fall, land on the cards' top
+        edges (snow piles up), stick to the glass now and then, and are shaken
+        off when the scroll is quick or a finger passes -- */
+  const ST = { cfg: null, free: [], att: new Map(), acc: 0 };
+  const stItem = (cfg, x, y) => ({ k: pick(cfg.kinds), c: pick(cfg.colors), s: rnd(cfg.size[0], cfg.size[1]), x, y, vx: rnd(-14, 14), vy: rnd(cfg.fall * .6, cfg.fall),
+    rot: rnd(0, 6.3), vr: rnd(-2.4, 2.4), ph: rnd(0, 6.3), th: rnd(cfg.th[0], cfg.th[1]) });
+  const binOf = (rec, r, x) => Math.min(rec.bins.length - 1, Math.max(0, Math.floor((x - r.left - 12) / 6)));
+  function stInit(cfg){ ST.cfg = cfg; ST.free = []; ST.att = new Map(); ST.acc = 0; if(!cfg) return;
+    for(const c of cards){ const w = c.offsetWidth, h = c.offsetHeight, rec = { items: [], bins: cfg.pile ? new Float32Array(Math.max(2, Math.floor((w - 24) / 6))) : null };
+      ST.att.set(c, rec);
+      if(rec.bins) for(let i = 0; i < rec.bins.length; i++) rec.bins[i] = 4 + 4 * Math.sin(i * .5) * Math.sin(i * .17 + 1) + rnd(0, 2);
+      else for(let i = 0; i < Math.round(w / 70); i++){ const it = stItem(cfg, 0, 0); it.lx = rnd(16, w - 16); it.ly = 0; it.top = true; rec.items.push(it); }
+      for(let i = 0; i < (cfg.face ? Math.round(w * h / 26000) : 0); i++){ const it = stItem(cfg, 0, 0); it.lx = rnd(16, w - 16); it.ly = rnd(16, h - 16); it.top = false; rec.items.push(it); } }
+    for(let i = 0; i < cfg.rate * 5; i++) ST.free.push(stItem(cfg, rnd(0, W), rnd(-20, H)));
+  }
+  function attach(it, c, r, rec, top, h){
+    if(rec.bins && top){ const k = binOf(rec, r, it.x); rec.bins[k] = Math.min(16, rec.bins[k] + it.s * .3);
+      if(k > 0) rec.bins[k - 1] = Math.min(16, rec.bins[k - 1] + it.s * .1); if(k < rec.bins.length - 1) rec.bins[k + 1] = Math.min(16, rec.bins[k + 1] + it.s * .1); return; }
+    it.lx = it.x - r.left; it.ly = top ? -h : it.y - r.top; it.top = top; rec.items.push(it); if(rec.items.length > ST.cfg.cap) rec.items.shift(); }
+  function stStep(){
+    const cfg = ST.cfg; if(!cfg) return; const A = Math.abs(sf());
+    ST.acc += cfg.rate * DT; while(ST.acc >= 1){ ST.acc--; if(ST.free.length < cfg.max) ST.free.push(stItem(cfg, rnd(-20, W + 20), -16)); }
+    for(let i = ST.free.length - 1; i >= 0; i--){ const it = ST.free[i], py = it.y;
+      it.vy += ((it.heavy ? 320 : cfg.fall) - it.vy) * Math.min(1, DT * (it.heavy ? 3 : cfg.k)); it.vx -= it.vx * Math.min(1, DT * 1.4);
+      it.x += (it.vx + (it.heavy ? 0 : Math.sin(T * 1.1 + it.ph) * cfg.sway)) * DT; it.y += it.vy * DT; it.rot += it.vr * DT;
+      if(it.y > H + 30 || it.x < -60 || it.x > W + 60){ ST.free.splice(i, 1); continue; }
+      if(it.vy <= 0 || it.heavy) continue;
+      for(const c of cards){ const r = R.get(c), r0 = Rp.get(c) || r; if(!r || it.x < r.left + 14 || it.x > r.right - 14) continue;
+        const rec = ST.att.get(c), h = rec.bins ? rec.bins[binOf(rec, r, it.x)] : 0;
+        if(py - r0.top < -h && it.y - r.top >= -h){ attach(it, c, r, rec, true, h); ST.free.splice(i, 1); break; }
+        if(cfg.face && it.y > r.top + 14 && it.y < r.bottom - 14 && Math.random() < cfg.face){ attach(it, c, r, rec, false); ST.free.splice(i, 1); break; } }
+    }
+    for(const c of cards){ const r = R.get(c); if(!visible(r)) continue; const rec = ST.att.get(c);
+      for(let j = rec.items.length - 1; j >= 0; j--){ const it = rec.items[j], x = r.left + it.lx, y = r.top + it.ly, hit = ptr.on && Math.hypot(x - ptr.x, y - ptr.y) < 22;
+        if(A > it.th || hit){ rec.items.splice(j, 1); it.x = x; it.y = y; it.vx = rnd(-80, 80) + (hit ? (x - ptr.x) * 4 : 0); it.vy = -vel * .5 + rnd(-70, 10); it.vr = rnd(-7, 7); it.th = 1e9; ST.free.push(it); } }
+      if(rec.bins){ for(let k = 0; k < rec.bins.length; k++){ const x = r.left + 12 + k * 6 + 3, hit = ptr.on && Math.abs(x - ptr.x) < 18 && Math.abs(r.top - rec.bins[k] - ptr.y) < 22;
+        if(rec.bins[k] > 2 && (hit || (A > 900 && Math.random() < (A - 900) / 16000))){ const take = rec.bins[k] * rnd(.45, .9); rec.bins[k] -= take;
+          if(k % 3 === 0 || hit){ const it = stItem(cfg, x + rnd(-3, 3), r.top - rec.bins[k] - 2); it.s *= 1.5; it.heavy = true; it.vy = -vel * .2 + rnd(-30, 0); it.vx = rnd(-30, 30); it.th = 1e9; ST.free.push(it); } } } }
+    }
+  }
+  function drawItem(x, y, it, landed){
+    const s = it.s;
+    switch(it.k){
+      case 'seed': { f.save(); f.translate(x, y); f.rotate(landed ? Math.sin(T * 1.5 + it.ph) * .12 : Math.sin(it.rot) * .5);
+        f.strokeStyle = 'rgba(255,255,255,.9)'; f.lineWidth = .7; f.beginPath(); f.moveTo(0, 0); f.lineTo(0, -s);
+        for(let i = 0; i < 9; i++){ const a = -Math.PI / 2 + (i - 4) * .3; f.moveTo(0, -s); f.lineTo(Math.cos(a) * s * .55, -s + Math.sin(a) * s * .55); } f.stroke();
+        f.fillStyle = '#9C8A62'; f.beginPath(); f.ellipse(0, -1, 1.1, 2.2, 0, 0, 7); f.fill(); f.restore(); break; }
+      case 'confetti': { f.save(); f.translate(x, y - (landed ? 1.5 : 0)); f.rotate(landed ? it.rot : it.rot); f.scale(1, landed ? .35 : Math.cos(it.rot * 2.2)); f.fillStyle = it.c; f.fillRect(-s * .3, -s * .5, s * .6, s); f.restore(); break; }
+      case 'ribbon': { f.save(); f.translate(x, y - (landed ? 2 : 0)); f.rotate(landed ? 0 : it.rot * .4); f.strokeStyle = it.c; f.lineWidth = 2; f.beginPath();
+        for(let i = 0; i <= 8; i++){ const px = (i / 8 - .5) * s * 1.8, py = Math.sin(i * 1.3 + it.ph + (landed ? 0 : T * 4)) * s * .22; i ? f.lineTo(px, py) : f.moveTo(px, py); } f.stroke(); f.restore(); break; }
+      case 'petal': { f.save(); f.translate(x, y - (landed ? 1.5 : 0)); f.rotate(it.rot); f.scale(1, landed ? .55 : Math.cos(it.rot * 1.6) * .5 + .5);
+        f.fillStyle = it.c; f.beginPath(); f.ellipse(0, 0, s * .55, s * .3, 0, 0, 7); f.fill(); f.restore(); break; }
+      case 'snow': { const z = s; f.drawImage(SP.snow, x - z / 2, y - z / 2, z, z); break; }
+    }
+  }
+  function drawSettlers(){
+    if(!ST.cfg) return;
+    for(const c of cards){ const r = R.get(c); if(!visible(r)) continue; const rec = ST.att.get(c);
+      if(rec.bins){ const x0 = r.left + 12; f.beginPath(); f.moveTo(x0 - 6, r.top + 1);
+        for(let k = 0; k < rec.bins.length; k++){ const x = x0 + k * 6 + 3, y = r.top + 1 - rec.bins[k], nx = x + 6, ny = r.top + 1 - (rec.bins[k + 1] ?? 0);
+          f.quadraticCurveTo(x, y, (x + nx) / 2, (y + ny) / 2); }
+        f.lineTo(x0 + rec.bins.length * 6 + 6, r.top + 1); f.closePath();
+        const g = f.createLinearGradient(0, r.top - 16, 0, r.top + 2); g.addColorStop(0, '#FFFFFF'); g.addColorStop(1, '#CFE0F2');
+        f.save(); f.translate(0, 1.5); f.fillStyle = 'rgba(0,0,0,.18)'; f.fill(); f.restore(); f.fillStyle = g; f.fill(); }
+      for(const it of rec.items) drawItem(r.left + it.lx, r.top + it.ly, it, true); }
+    for(const it of ST.free) drawItem(it.x, it.y, it, false);
+  }
+
+
+
+
+  /* ===================== the seasons ===================== */
+  const THEMES = {
+    meadow: { name: 'อยากจะไปกับเธอ', en: 'Kimi to Doko ka e Ikitai', word: 'Kimi to Doko ka e Ikitai',
+      settle: { kinds: ['seed'], colors: ['#fff'], size: [10, 16], rate: 1.6, max: 60, fall: 30, k: 1.2, sway: 30, face: .004, cap: 22, th: [700, 2400] },
+      sky(dt, sy){ drawClouds(SP.cloudDay, dt, sy, .9, .7); drawGrass(); } },
+    halloween: { name: 'ฮาโลวีน', en: 'Halloween', word: 'ฮาโลวีนที่ 48', stars: 1, moon: { x: .8, y: 96 },
+      ropes(){ const P = [['tr'], ['bl', .8], ['br'], ['tr'], ['br', .3], ['br', .55], ['tr,br']];
+        cards.forEach((c, i) => { const [cs, sp] = c.classList.contains('today-hero') ? ['tl,tr', .62] : P[i % P.length];
+          cs.split(',').forEach((k, j) => ropes.push(makeWeb(c, k, 62 + ((i * 37 + j * 53) % 34)))); if(sp) ropes.push(makeSilk(c, sp)); }); },
+      sky(dt, sy){ drawClouds(SP.cloudNight, dt, sy); stepBats(dt); drawBats(b, false); },
+      front(){ drawBats(f, true); } },
+    ge: { name: 'คืนประกาศผล', en: 'Results night', word: 'Senbatsu General Election 2026',
+      settle: { kinds: ['confetti', 'confetti', 'ribbon'], colors: ['#F2C14E', '#FFE6A0', '#E8333C', '#FFFFFF', '#C8902A'], size: [7, 12], rate: 5, max: 110, fall: 75, k: 2, sway: 34, face: .005, cap: 30, th: [800, 2600] },
+      sky(dt){ stepFireworks(dt); drawFireworks(); } },
+    yipeng: { name: 'ยี่เป็ง', en: 'Yi Peng', word: 'ยี่เป็ง', stars: .7, moon: { x: .18, y: 80 },
+      settle: { kinds: ['petal'], colors: ['#F5A623', '#FFC93C', '#F08A24', '#FFE08A'], size: [7, 11], rate: 1.4, max: 50, fall: 42, k: 1.6, sway: 24, face: .003, cap: 18, th: [700, 2400] },
+      sky(dt){ stepLanterns(dt); drawLanterns(); drawWater(); } },
+    winter: { name: 'ฤดูหนาว', en: 'Winter', word: 'Merry Christmas', stars: .6,
+      settle: { kinds: ['snow'], colors: ['#fff'], size: [5, 9], rate: 9, max: 140, fall: 48, k: 1.5, sway: 18, face: 0, pile: true, cap: 0, th: [1e9, 1e9] },
+      ropes(){ cards.forEach((c, i) => { if(i % 2 === 0 && i < 8) ropes.push(makeLights(c)); }); },
+      sky(dt, sy){ stepSnow(dt); drawSnow(sy); } },
+    birthday: { name: 'วันเกิด', en: 'Birthday', word: 'Happy Birthday',
+      settle: { kinds: ['confetti', 'confetti', 'ribbon'], colors: ['#E4457E', '#F59BBE', '#FFFFFF', '#FFD34E', '#C9A7F0'], size: [7, 12], rate: 4, max: 90, fall: 70, k: 2, sway: 30, face: .005, cap: 26, th: [800, 2600] },
+      sky(dt, sy){ drawClouds(SP.cloudPink, dt, sy, .8, .6); stepBalloons(dt); drawBalloons(); } },
+  };
+  for(const k in THEMES) THEMES[k].id = k;
+  const DARK = new Set(['halloween', 'ge', 'yipeng', 'winter']);
+  /* days are Thai dates; MM-DD ones come back every year */
+  const SCHEDULE = [['meadow', '2026-10-01', '2026-10-23'], ['halloween', '10-24', '11-01'], ['ge', '2026-11-02', '2026-11-15'],
+    ['yipeng', '2026-11-16', '2026-11-30'], ['winter', '12-01', '12-31']];
+  // (__festDay lets a test pretend it is another day)
+  const thaiToday = () => window.__festDay || new Date(Date.now() + 7 * 3600000).toISOString().slice(0, 10);
+  /* days no birthday takes: the GE results are read out on 14 Nov, Proud's birthday */
+  const FIRM = { '2026-11-14': 'ge' };
+  /* today's theme: a member's birthday first, then the calendar; null outside them all */
+  function today(){
+    const iso = thaiToday(), md = iso.slice(5);
+    if(FIRM[iso]) return { id: FIRM[iso] };
+    const bd = activeMembers().filter(m => m.birthday && m.birthday.slice(5) === md);
+    if(bd.length) return { id: 'birthday', who: bd };
+    const s = SCHEDULE.find(([, a, z]) => (a.length === 5 ? md : iso) >= a && (z.length === 5 ? md : iso) <= z);
+    return s ? { id: s[0] } : null;
+  }
+  const isOff = () => { try{ return localStorage.getItem('48thdb-fest-off') === '1'; }catch(e){ return false; } };
+  function setOff(v){ try{ if(v) localStorage.setItem('48thdb-fest-off', '1'); else localStorage.removeItem('48thdb-fest-off'); }catch(e){} }
+
+  /* ---- sizes: the canvases are sized once to the tallest the screen gets ---- */
+  let shownW = 0;
+  function resize(){
+    const w = innerWidth, h = Math.max(innerHeight, Math.min(1400, (screen && screen.height) || 0), H);
+    if(w === shownW && h <= H) return false;
+    shownW = w; W = w; H = h; DPR = Math.min(2, window.devicePixelRatio || 1);
+    bg.width = W; bg.height = H; bg.style.height = H + 'px';
+    fx.width = Math.round(W * DPR); fx.height = Math.round(H * DPR); fx.style.height = H + 'px';
+    b.setTransform(1, 0, 0, 1, 0, 0); f.setTransform(DPR, 0, 0, DPR, 0, 0); makeSprites(); seedSky(); seedGrass(); return true;
+  }
+  addEventListener('resize', () => { if(resize() && theme) restart(); });
+
+  function measure(){ Rp = R; R = new Map(); for(const c of cards) R.set(c, c.getBoundingClientRect()); }
+  function restart(){
+    bats = []; rockets = []; sparks = []; ropes = [];
+    seedSky(); seedLanterns(); seedBalloons(); seedSnow();
+    paintStars(theme.stars || 0); placeMoon(theme.moon); b.clearRect(0, 0, W, H); f.clearRect(0, 0, W, H);
+    if(theme.ropes) theme.ropes(); stInit(theme.settle || null);
+    if(theme.id === 'halloween'){ spawnBats(false); bats.forEach((t, i) => t.x = W * (.2 + i * .15)); }
+    for(let i = 0; i < 200; i++) stepRopes();
+  }
+  function render(dt){
+    const y = scrollY;
+    if(theme.moon) moonEl.style.transform = `translate3d(0,${(-y * .14).toFixed(1)}px,0)`;
+    b.clearRect(0, 0, W, H); theme.sky(dt, y); f.clearRect(0, 0, W, H);
+    drawSettlers(); drawRopes(); if(theme.front) theme.front();
+  }
+  let last = 0, accT = 0;
+  function frame(now){
+    if(!theme || held || calm || document.hidden){ running = false; return; }
+    const dt = Math.min(.05, (now - last) / 1000 || 0); last = now; T += dt;
+    const y = scrollY, v = (y - lastY) / Math.max(dt, 1 / 240); lastY = y;
+    const v2 = vel * .55 + v * .45; acc = (v2 - vel) / Math.max(dt, 1 / 240); vel = v2;
+    measure(); accT += dt; let n = 0; while(accT >= DT && n++ < 3){ stepRopes(); stStep(); accT -= DT; } if(accT > DT) accT = 0;
+    render(dt);
+    requestAnimationFrame(frame);
+  }
+  function go(){ if(running || !theme || held || calm || document.hidden) return; running = true; last = performance.now(); lastY = scrollY; requestAnimationFrame(frame); }
+  function still(){ if(!theme) return; measure(); vel = 0; acc = 0; render(0); }
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) go(); });
+  addEventListener('scroll', () => { if(theme && (calm || held)) still(); }, { passive: true });
+
+  /* After every render: on the home page, today's theme (unless turned off) on
+     today's cards; anywhere else, none. A redraw of the same cards keeps what
+     has gathered on them; a sheet open over the page holds it still. */
+  let cardsKey = '';
+  function sync(){
+    const t = state.view === 'feed' && !state.query && !isOff() ? today() : null;
+    const root = document.documentElement;
+    if(!t){ if(theme){ theme = null; delete root.dataset.fest; moonEl.style.display = 'none'; f.clearRect(0, 0, W, H); b.clearRect(0, 0, W, H);
+      root.dataset.theme = state.theme; } return; }
+    held = !!(state.selectedEvent || state.selectedId || state.posterOf || state.dayOf);
+    const next = THEMES[t.id], fresh = !theme || theme.id !== t.id;
+    root.dataset.fest = t.id; root.dataset.theme = DARK.has(t.id) ? 'dark' : 'light';   // the site's own dark or light rules follow the theme's sky
+    if(t.id === 'meadow') festTypekit();
+    if(t.id === 'birthday'){ const cs = [...new Set(t.who.map(m => (getGroup(m.groupId) || {}).color).filter(Boolean))];
+      next.settle.colors = [...cs, ...cs, '#FFFFFF', '#FFD34E']; }
+    theme = next;
+    const list = [...document.querySelectorAll('#main .feed-page .today-hero, #main .feed-page .ev-card')];
+    const key = list.map((c, i) => c.dataset.id || 'i' + i).join('|');
+    if(!W) resize();
+    if(fresh || key !== cardsKey){ cards = list; cardsKey = key; measure(); restart(); }
+    else {   // the same cards drawn again: carry what is on them across
+      const swap = new Map(cards.map((c, i) => [c, list[i]]));
+      for(const o of ropes) o.card = swap.get(o.card) || o.card;
+      const att = new Map(); for(const [c, rec] of ST.att) att.set(swap.get(c) || c, rec); ST.att = att;
+      cards = list; measure();
+    }
+    if(held || calm) still(); else go();
+  }
+  /* the line under the home page's title: the theme's word, and the switch */
+  function row(){
+    const t = state.view === 'feed' ? today() : null;
+    if(!t) return '';
+    const th = THEMES[t.id], en = isEN();
+    if(isOff()) return `<div class="fest-row is-off"><button class="fest-btn" data-action="fest-on">${en ? `Turn on the ${th.en} theme` : `เปิดธีม${th.name}`}</button></div>`;
+    const who = t.id === 'birthday' ? `<span class="fest-who" data-noloc>${t.who.map(m => escapeHtml(nickName(m))).join(' · ')}</span>` : '';
+    return `<div class="fest-row"><span class="fest-word fw-${t.id}" data-noloc>${escapeHtml(th.word)}</span>${who}
+      <button class="fest-btn" data-action="fest-off" title="${en ? 'Back to the usual look' : 'กลับเป็นหน้าตาปกติ'}">${en ? 'Theme off' : 'ปิดธีม'}</button></div>`;
+  }
+  return { sync, row, setOff, today };
+})();
+
 function renderMain(){
   // selectedSingle only means anything on the single view. Clearing it here
   // rather than in each caller keeps it from lingering in a history snapshot
@@ -20791,6 +21292,7 @@ function renderMain(){
   bindOrgZoom();
   applyPageMeta();
   applyLayoutAll();
+  FEST.sync();
   bioClamp(main);
   schedTick();
   bindReveal(arrived);   // after the reader's own order is in place, or it judges what is on screen from the default order
@@ -23834,6 +24336,7 @@ function bindDelegatedEvents(){
       state.hsDay = d; state.hsRound = r; state.hsFollow = false; state.hsHold = false;
       hsPaint();
     }
+    else if(action==='fest-off' || action==='fest-on'){ FEST.setOff(action === 'fest-off'); renderMain(); }
     else if(action==='hs-live'){ state.hsFollow = true; state.hsHold = false; state.hsReveal = true; hsPaint(); }
     else if(action==='hs-share'){ const sub = hsShareSubject(); if(sub) openShareSheet(sub); }
     else if(action==='ff-day'){
