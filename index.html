@@ -5179,6 +5179,22 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .glass-nav{ padding:6px; gap:2px; }
     .glass-nav button{ padding:8px 10px; }
     main{ padding-top:12px; }
+
+    /* A member's sheet takes the screen and stands in two: who she is on the
+       left, held in place, and the rest scrolling beside it. */
+    .modal-backdrop:has(.is-member-sheet){ padding:8px calc(8px + env(safe-area-inset-right)) 8px calc(8px + env(safe-area-inset-left)); }
+    .modal-glass-card.is-member-sheet{ max-width:none; height:100%; max-height:none; }
+    .is-member-sheet .modal-scroll{ display:grid; grid-template-columns:minmax(0, 36fr) minmax(0, 64fr); gap:0 22px;
+      align-items:start; padding:16px 18px 20px; flex:1 1 auto; }
+    .is-member-sheet .sheet-top{ display:block; position:sticky; top:0; max-height:calc(100vh - 52px); overflow-y:auto;
+      scrollbar-width:none; border-bottom:0; margin:0; padding:0 4px 4px 0; }
+    .is-member-sheet .sheet-top > .detail-head{ gap:12px; }
+    .is-member-sheet .sheet-top .detail-avatar{ width:72px; height:72px; }
+    .is-member-sheet .sheet-top .detail-head > div{ min-width:0 !important; }
+    .is-member-sheet .detail-name-th{ font-size:22px; }
+    .is-member-sheet .detail-name-en{ font-size:13px; }
+    .is-member-sheet .sheet-top > .oshi-actions{ grid-template-columns:1fr; gap:8px; margin-top:12px; padding-top:12px; }
+    .is-member-sheet .sheet-body{ padding-top:44px; border-left:1px solid var(--line); padding-left:22px; margin-left:-22px; min-width:0; }
   }
 
   /* ---- Wide screens (last, so they win over the rules above) ---- */
