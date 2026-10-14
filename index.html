@@ -358,7 +358,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      shorter, and without slack the browser clamps the scroll and drags the
      reader up the page; with it, the panel they pressed stays put. */
   .thead-sticky-outer{
-    position:sticky; top:120px; z-index:15;
+    position:sticky; top:var(--head-h, 120px); z-index:15;
     margin:0 -16px; width:calc(100% + 32px);
     overflow:hidden;
     border-top:1px solid var(--line);
@@ -965,7 +965,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .toast.show{ opacity:1; transform:translate(-50%, 0); }
 
   .back-btn-sticky{
-    position:sticky; top:132px; z-index:20;
+    position:sticky; top:calc(var(--head-h, 120px) + 12px); z-index:20;
     display:inline-flex; align-items:center; justify-content:center;
     width:36px; height:36px; border-radius:50%;
     background:var(--card); border:1px solid var(--line);
@@ -20572,12 +20572,17 @@ function setTickerSpeed(dir){
 }
 
 // How tall the header and the LED line stand together, so the rail down the
-// left (a screen on its side) can start under them.
+// left (a screen on its side) can start under them, and the header alone.
 let _topRO = null;
 function watchTopH(){
   const head = document.querySelector('header.top'), slot = document.getElementById('ticker-slot');
   if(!head || !slot || typeof ResizeObserver === 'undefined') return;
-  const set = () => document.documentElement.style.setProperty('--top-h', (head.offsetHeight + slot.offsetHeight) + 'px');
+  // --head-h is the header alone: it stays at the top while the LED line
+  // scrolls away, so whatever sticks under it (the member table's column
+  // names) starts there.
+  const set = () => { const st = document.documentElement.style;
+    st.setProperty('--top-h', (head.offsetHeight + slot.offsetHeight) + 'px');
+    st.setProperty('--head-h', head.offsetHeight + 'px'); };
   if(_topRO) _topRO.disconnect();
   _topRO = new ResizeObserver(set);
   _topRO.observe(head); _topRO.observe(slot);
