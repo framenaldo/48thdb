@@ -306,6 +306,18 @@ DTSTART;TZID=Asia/Bangkok:20261013T180000
 DTEND;TZID=Asia/Bangkok:20261013T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-halloween-1015-2026-10-15@48thdb
+DTSTAMP:20261015T000000Z
+SUMMARY:CGM48 Pop Up หลอน
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Satangpound\, Jingjing\, Prae\, Praif
+ a\n• ประสบการณ์หลอน กุ๊กกุ๊\n\
+ nhttps://48thdb.com/?e=ev-cgm48-popup-halloween-1015
+URL:https://48thdb.com/?e=ev-cgm48-popup-halloween-1015
+DTSTART;TZID=Asia/Bangkok:20261015T180000
+DTEND;TZID=Asia/Bangkok:20261015T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:ยกเลิก: CGM48 11th Single "Koi Tsunjatta – Let me kno
