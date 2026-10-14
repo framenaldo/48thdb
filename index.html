@@ -4430,6 +4430,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* the script's tails (p, y, g) would dip into the line under it; the birthday one keeps its tuck */
   .evm-fest:not(.is-birthday) .evm-fest-sub{ margin-top:7px; }
   .evm-fest.is-roadshow{ padding-top:34px; }
+  .evm-fest.is-roadshow .evm-fest-word{ font-family:'tt-ricordi-allegria', 'Pacifico', 'Noto Sans Thai', cursive; font-weight:500;
+    font-size:46px; letter-spacing:.01em; line-height:1.2; text-shadow:0 2px 0 rgba(255,255,255,.4); }
+  :root[data-theme="dark"] .evm-fest.is-roadshow .evm-fest-word{ text-shadow:0 2px 0 rgba(0,0,0,.35); }
   /* four to eight on the bill: smaller faces, still named */
   .evm-fest-faces.is-mid{ flex-wrap:wrap; gap:10px 8px; padding-left:6px; padding-right:6px; }
   .evm-fest-face.is-mid{ gap:5px; width:70px; }
@@ -11665,9 +11668,16 @@ function renderFestBunting(){
   return `<svg class="evm-fest-bunting" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true">
     <path d="M2 7.6Q50 26 98 7.6" fill="none" stroke="currentColor" stroke-width=".5" opacity=".5"/>${flags}</svg>`;
 }
+/* A roadshow's banner word is set in TT Ricordi Allegria, from Adobe Fonts (kit
+   pfh5mcj): its stylesheet is fetched the first time such a banner is drawn,
+   and until it arrives — or if it never does — the word stays in the script. */
+let _festTk = false;
+const festTypekit = () => { if(_festTk || typeof document === 'undefined') return; _festTk = true;
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://use.typekit.net/pfh5mcj.css'; document.head.appendChild(l); };
 function renderEventBanner(ev){
   const own = { ...(FEST_EVENT[ev.id] || {}), ...(ev.fest || {}) };
   const k = festKind(ev), K = { ...FEST_KINDS[k], ...own }, en = isEN();
+  if(k === 'roadshow') festTypekit();
   const sub = own.sub != null ? own.sub : (k === 'birthday' || k === 'tee' ? K.sub : festRelease(ev) || K.sub);
   // who is on: the birthday girls; else the line-up, the viewer's oshi first
   const ids = k === 'birthday' && (ev.celebrants || []).length ? ev.celebrants : (ev.members || []);

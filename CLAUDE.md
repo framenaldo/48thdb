@@ -104,6 +104,9 @@ the Firebase CLI from the owner's machine.
   in either mode (the Halloween pop-up); its banner word is set in FC Jong Pen
   Suk (Fontcraft, free for non-commercial use), cut down to Thai and Latin in
   `fonts/fc-jong-pen-suk.woff2`.
+  A roadshow's banner word is TT Ricordi Allegria from Adobe Fonts (kit
+  `pfh5mcj`, its stylesheet fetched only when a roadshow banner is drawn; the
+  script stays as the fallback).
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
   then `node scripts/make-poster-grads.mjs` for its sheet colours.
