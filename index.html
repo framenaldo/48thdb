@@ -5157,8 +5157,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @media (orientation:landscape) and (max-height:540px), (min-width:1024px) and (orientation:landscape){
     :root{ --rail:calc(76px + env(safe-area-inset-left)); }
     #app{ padding-left:var(--rail); }
-    .glass-nav{ left:calc(12px + env(safe-area-inset-left)); right:auto; top:50%; bottom:auto; transform:translateY(-50%);
-      flex-direction:column; padding:8px; gap:4px; max-width:none; max-height:calc(100vh - 24px); }
+    /* the header and the LED line still run edge to edge; the rail starts under them */
+    header.top, #ticker-slot{ margin-left:calc(-1 * var(--rail)); }
+    header.top{ padding-left:calc(20px + env(safe-area-inset-left)); }
+    .glass-nav{ left:calc(12px + env(safe-area-inset-left)); right:auto; bottom:auto;
+      top:calc(var(--top-h, 110px) + (100vh - var(--top-h, 110px)) / 2); transform:translateY(-50%);
+      flex-direction:column; padding:8px; gap:4px; max-width:none; max-height:calc(100vh - var(--top-h, 110px) - 16px); }
     .glass-nav button{ padding:12px 10px; }
     .gnav-blob{ left:4px; right:4px; top:0; margin-top:0; width:auto; }
     main{ padding-bottom:calc(28px + env(safe-area-inset-bottom)); }
@@ -5172,6 +5176,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     header.top > :not(.search-box){ flex-shrink:0; }
     header.top #profile-slot button{ white-space:nowrap; }
     header.top .btn-add{ padding:8px 12px; font-size:13px; }
+    .glass-nav{ padding:6px; gap:2px; }
+    .glass-nav button{ padding:8px 10px; }
     main{ padding-top:12px; }
   }
 
@@ -20549,6 +20555,19 @@ function setTickerSpeed(dir){
   }, 600);
 }
 
+// How tall the header and the LED line stand together, so the rail down the
+// left (a screen on its side) can start under them.
+let _topRO = null;
+function watchTopH(){
+  const head = document.querySelector('header.top'), slot = document.getElementById('ticker-slot');
+  if(!head || !slot || typeof ResizeObserver === 'undefined') return;
+  const set = () => document.documentElement.style.setProperty('--top-h', (head.offsetHeight + slot.offsetHeight) + 'px');
+  if(_topRO) _topRO.disconnect();
+  _topRO = new ResizeObserver(set);
+  _topRO.observe(head); _topRO.observe(slot);
+  set();
+}
+
 function syncTicker(){
   const slot = document.getElementById('ticker-slot');
   if(!slot) return;
@@ -20573,6 +20592,7 @@ function render(){
   app.innerHTML = renderHeader() + '<div id="ticker-slot"></div><div id="nav-container"></div><main id="main"></main>'
     // Said once, under everything: this is a fan's database, not the groups'.
     + '<footer class="site-foot"><p><span>48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ</span> · <a href="/privacy">นโยบายความเป็นส่วนตัว</a></p></footer>';
+  watchTopH();
   renderProfileSlot();
   const menu = app.querySelector('.lang-menu');
   if(menu && menu.getBoundingClientRect().left < 8) menu.classList.add('is-left');
