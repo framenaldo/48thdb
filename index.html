@@ -11669,11 +11669,11 @@ function renderFestBunting(){
     <path d="M2 7.6Q50 26 98 7.6" fill="none" stroke="currentColor" stroke-width=".5" opacity=".5"/>${flags}</svg>`;
 }
 /* A roadshow's banner word is set in TT Ricordi Allegria, from Adobe Fonts (kit
-   pfh5mcj): its stylesheet is fetched the first time such a banner is drawn,
+   umx5wsc): its stylesheet is fetched the first time such a banner is drawn,
    and until it arrives — or if it never does — the word stays in the script. */
 let _festTk = false;
 const festTypekit = () => { if(_festTk || typeof document === 'undefined') return; _festTk = true;
-  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://use.typekit.net/pfh5mcj.css'; document.head.appendChild(l); };
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://use.typekit.net/umx5wsc.css'; document.head.appendChild(l); };
 function renderEventBanner(ev){
   const own = { ...(FEST_EVENT[ev.id] || {}), ...(ev.fest || {}) };
   const k = festKind(ev), K = { ...FEST_KINDS[k], ...own }, en = isEN();
