@@ -3261,7 +3261,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     user-select:none; -webkit-user-select:none; transition:height .8s cubic-bezier(.22,1,.36,1); }
   .hs.is-flat .hs-view{ height:542px; }
   .hs-floor{ position:absolute; left:0; right:0; top:0; transform-style:preserve-3d; transform-origin:50% 50%;
-    transform:translateY(var(--ty)) scale(var(--sc)) rotateX(var(--pitch)) rotateZ(calc(var(--yaw) + var(--rot, 0deg))); transition:transform .8s cubic-bezier(.22,1,.36,1);
+    transform:translateY(var(--ty)) scale(calc(var(--sc) * var(--zoom, 1))) rotateX(var(--pitch)) rotateZ(calc(var(--yaw) + var(--rot, 0deg))); transition:transform .8s cubic-bezier(.22,1,.36,1);
     border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)); border:1px solid rgba(255,255,255,.1); }
   .hs-hall{ --fx:89%; display:grid; gap:4px; padding:10px 8px 10px 34px; transform-style:preserve-3d; }
   /* in 3D the hall and its lanes lie in one plane, and a tap would land on the hall: only a lane in use and her face take it */
@@ -3389,11 +3389,18 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .hs.is-flat .hs-view{ height:480px; }
     .hs-floor{ left:50%; right:auto; width:var(--fw); margin-left:calc(var(--fw) / -2); top:calc(50% - 200px); }
     .hs.is-flat .hs-floor{ top:calc(50% - 270px); }
-    /* turned, a face is set on her lane after it stands, so it sits square on the lane's end */
-    .hs-face{ transform:rotateZ(calc((var(--yaw) + var(--rot, 0deg)) * -1)) rotateX(calc(var(--pitch) * -1)) translateY(calc(var(--s) * var(--fy))); }
+    /* turned, a face is set on her lane after it stands, so it sits square on the lane's end;
+       lifted off the floor by as much as that drops it, or Safari lets the lane cut through it */
+    .hs-face{ transform:translateZ(calc(var(--s) * var(--fy) * sin(var(--pitch)) + 1px)) rotateZ(calc((var(--yaw) + var(--rot, 0deg)) * -1)) rotateX(calc(var(--pitch) * -1)) translateY(calc(var(--s) * var(--fy))); }
     .hs-tall{ display:none; }
     .hs-wide{ display:inline; }
     .hs-side .hs-list{ grid-template-columns:repeat(4, minmax(0, 1fr)); }
+  }
+  /* a computer's wide sheet: the same hall, drawn bigger */
+  @container (min-width:900px){
+    .hs-view{ --zoom:1.32; height:528px; }
+    .hs.is-flat .hs-view{ height:634px; }
+    .hs-side .hs-list{ grid-template-columns:repeat(5, minmax(0, 1fr)); }
   }
   /* a phone on its side is short: shorter lanes, so the whole hall is on screen at once */
   @media (max-height:520px){
@@ -3410,6 +3417,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   }
   @media (min-width:1024px){
     .has-lanes .evm-layout.has-media{ grid-template-columns:minmax(0, 30fr) minmax(0, 70fr); }
+  }
+  /* a computer: wider still, so the hall can be drawn bigger */
+  @media (min-width:1280px){
+    .modal-glass-card.is-event-sheet.has-lanes{ max-width:min(1640px, calc(100vw - 48px)); }
+    .has-lanes .evm-layout.has-media{ grid-template-columns:minmax(0, 24fr) minmax(0, 76fr); }
   }
   /* a small phone: the walkway narrows and the lettering steps down, so a long name clears the faces */
   @container (max-width:280px){
