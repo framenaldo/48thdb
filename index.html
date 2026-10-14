@@ -593,7 +593,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* Meeting You Online's poster is sky over a meadow; its sheet is too — the
      sky stays at the top and the grass at the foot while the content scrolls */
   /* the Halloween pop-up: the whole sheet night black into blood red, in either mode */
-  .modal-glass-card.is-postered.is-scene-night, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-night{
+  .modal-glass-card.is-postered.is-scene-night, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-night,
+  .ev-card.is-themed.is-scene-night, :root[data-theme="dark"] .ev-card.is-themed.is-scene-night,
+  .today-hero.is-themed.is-scene-night, :root[data-theme="dark"] .today-hero.is-themed.is-scene-night{
     --ink:#F6E6E6; --ink-soft:#C9A9AB; --paper:#150709; --paper-dim:#240A0D; --card:#1F0A0D; --glass-card:#22090C;
     --glass-edge:rgba(255,60,60,.28); --line:rgba(255,255,255,.12); --c-text:#FF6B6B;
     background:linear-gradient(180deg, #0B0708 0%, #1A0608 40%, #3A050A 100%); color:var(--ink); border-color:rgba(200,20,27,.6); }
@@ -4370,6 +4372,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   }
   .sr-row:active{ transform:scale(.992); transition-duration:.09s; }
 
+  @font-face{ font-family:'FC Jong Pen Suk'; src:url('fonts/fc-jong-pen-suk.woff2') format('woff2'); font-weight:400; font-display:swap; }
   /* ---- birthday sheet ---- */
   .evm-fest{
     position:relative; overflow:hidden; isolation:isolate;
@@ -4449,12 +4452,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .evm-fest.pal-gold{ --fest-a:#3A2410; --fest-b:#22140A; --fest-ink:#F6D58A; }
   /* Halloween: night black into blood red, the word in red with a glow, bats and ghosts, a moon */
   .evm-fest.pal-blood, :root[data-theme="dark"] .evm-fest.pal-blood{ --fest-a:#0B0708; --fest-b:#4A060B; --fest-ink:#FF2A2A; }
-  .evm-fest.pal-blood .evm-fest-word{ font-family:'Noto Sans Thai', sans-serif; font-weight:900; letter-spacing:.02em;
-    text-shadow:0 0 14px rgba(255,30,30,.55), 0 3px 0 #2A0004; }
+  /* FC Jong Pen Suk by Fontcraft (free for non-commercial use), cut down to Thai and Latin: fonts/ */
+  .evm-fest.pal-blood .evm-fest-word{ font-family:'FC Jong Pen Suk', 'Noto Sans Thai', sans-serif; font-weight:400; font-size:54px; line-height:1.15;
+    letter-spacing:.01em; text-shadow:0 0 16px rgba(255,30,30,.5), 0 3px 0 #2A0004; }
   .evm-fest.pal-blood .evm-fest-sub{ color:#F2D6D6; opacity:.85; }
   .evm-fest.pal-blood .evm-fest-name{ background:rgba(0,0,0,.55); color:#FFDADA; }
   .evm-fest.pal-blood .evm-face-img{ box-shadow:0 0 0 3px #C8141B, 0 0 18px rgba(255,30,30,.45); }
   .evm-fest-deco .cfs.is-spook{ color:#1A0204; opacity:.9; filter:drop-shadow(0 0 3px rgba(255,40,40,.5)); }
+  .evm-fest-deco .cfs.is-bat{ color:#050203; height:calc(var(--s) / 2); opacity:.95; filter:drop-shadow(0 0 2px rgba(255,50,50,.75)); }
   .evm-fest-deco .cfs.is-spook.is-ghost{ color:#EADCDC; opacity:.55; filter:none; }
   .evm-fest-moon{ position:absolute; left:9%; top:18px; width:46px; height:46px; border-radius:50%; pointer-events:none;
     background:radial-gradient(circle at 38% 36%, #FFF4E8, #E9D6C2 60%, #B8A08C); box-shadow:0 0 28px 8px rgba(255,214,190,.28); opacity:.85; }
@@ -11415,7 +11420,7 @@ function renderEventCard(ev, todayIso){
         width="${ev.poster.w || 1200}" height="${ev.poster.h || 1200}" onerror="this.onerror=null;this.src='${escapeAttr(img)}'">
     </div>` : '';
   return `
-  <article class="ev-card${isNow?' is-now':''}${done?' is-done':''}${ev.cancelled?' is-cancelled':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}${img?' has-poster':''}" style="--c:${accent}${theme}"
+  <article class="ev-card${isNow?' is-now':''}${done?' is-done':''}${ev.cancelled?' is-cancelled':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}${ev.poster&&ev.poster.scene?` is-scene-${ev.poster.scene}`:''}${img?' has-poster':''}" style="--c:${accent}${theme}"
     ${hasMore ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     ${poster}
     <div class="ev-date">
@@ -11522,7 +11527,7 @@ function renderTodayHero(ev, todayIso){
   if(rota && rota.current) people.sort((a, b) => rota.current.members.includes(b.id) - rota.current.members.includes(a.id));
   const open = eventHasMore(ev);
   return `
-  <article class="today-hero${open ? ' is-openable' : ''}${ev.poster ? ' is-themed' : ''}" style="--c:${accent}${ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : ''}"
+  <article class="today-hero${open ? ' is-openable' : ''}${ev.poster ? ' is-themed' : ''}${ev.poster && ev.poster.scene ? ` is-scene-${ev.poster.scene}` : ''}" style="--c:${accent}${ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : ''}"
     ${open ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="today-hero-body">
       <p class="today-hero-status${live ? ' is-live' : ''}"><span class="today-live" aria-hidden="true"></span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</p>
@@ -11638,11 +11643,15 @@ const FEST_SHAPES = {
 /* the other shapes keep to the sides, clear of the word and the faces */
 const FEST_EDGE = [[4,12,-18],[12,46,24],[6,74,-30],[16,22,12],[3,92,20],[17,86,-8],[93,30,8],[85,46,-24],[96,62,30],[87,74,-12],[92,90,14],[82,86,-20]];
 const FEST_SPOTS = [[6,14,-18],[17,52,24],[29,9,42],[41,64,-9],[52,20,15],[63,58,-33],[74,12,8],[85,46,29],[93,24,-14],[36,34,50],[58,38,-22],[81,66,12]];
-const FEST_SPOOKY = ['<path d="M12 7.2c-.9-1.6-2.5-2.4-4.3-2.1 1 .8 1.4 1.8 1.2 3-1.6-.9-3.6-.9-5.4 0 1.5.6 2.5 1.8 2.8 3.5C4.6 11 3 11.4 2 12.4c2.7-.2 4.9.8 6.6 3 .8-1.1 2-1.7 3.4-1.7s2.6.6 3.4 1.7c1.7-2.2 3.9-3.2 6.6-3-1-1-2.6-1.4-4.3-.8.3-1.7 1.3-2.9 2.8-3.5-1.8-.9-3.8-.9-5.4 0-.2-1.2.2-2.2 1.2-3-1.8-.3-3.4.5-4.3 2.1Z"/>',
+// a bat (wings spread, scalloped, two ears) on a 32 × 16 box, then a ghost on 24 × 24
+const FEST_BAT = '<path d="M16 5.4 17.1 3.2l.6 2.4c1.7-.8 3.9-1.7 6.5-2 2.6-.3 5.2.4 7.2 2.2-1.5.4-2.6 1.3-3 2.9-1.2-.9-3-.9-4.2.2-1-.9-2.7-.8-3.6.4-1.2-.2-2.3.6-2.9 2.1-.4 1-1.1 1.7-1.7 2.2-.6-.5-1.3-1.2-1.7-2.2-.6-1.5-1.7-2.3-2.9-2.1-.9-1.2-2.6-1.3-3.6-.4-1.2-1.1-3-1.1-4.2-.2-.4-1.6-1.5-2.5-3-2.9 2-1.8 4.6-2.5 7.2-2.2 2.6.3 4.8 1.2 6.5 2l.6-2.4Z"/>';
+const FEST_SPOOKY = [FEST_BAT,
   '<path fill-rule="evenodd" d="M12 2.5a7 7 0 0 1 7 7v11.3l-2.3-1.6-2.4 1.6-2.3-1.6-2.3 1.6-2.4-1.6L5 20.8V9.5a7 7 0 0 1 7-7Zm-2.6 6.2a1.3 1.6 0 1 0 0 3.2 1.3 1.6 0 0 0 0-3.2Zm5.2 0a1.3 1.6 0 1 0 0 3.2 1.3 1.6 0 0 0 0-3.2Z"/>'];
 function renderFestDeco(motif){
   if(motif === 'spooky')
-    return FEST_EDGE.map(([x, y, r], i) => `<svg class="cfs is-spook${i % 2 ? ' is-ghost' : ''}" viewBox="0 0 24 24" style="left:${x}%;top:${y}%;--r:${i % 2 ? r / 3 : r}deg;--s:${[20, 15, 24, 14, 18][i % 5]}px" aria-hidden="true">${FEST_SPOOKY[i % 2]}</svg>`).join('');
+    return FEST_EDGE.map(([x, y, r], i) => i % 2
+      ? `<svg class="cfs is-spook is-ghost" viewBox="0 0 24 24" style="left:${x}%;top:${y}%;--r:${r / 3}deg;--s:${[16, 13, 19, 12, 15][i % 5]}px" aria-hidden="true">${FEST_SPOOKY[1]}</svg>`
+      : `<svg class="cfs is-spook is-bat" viewBox="0 0 32 16" style="left:${x}%;top:${y}%;--r:${r / 2}deg;--s:${[30, 24, 36, 22, 28][i % 5]}px" aria-hidden="true">${FEST_BAT}</svg>`).join('');
   if(motif === 'confetti' || !FEST_SHAPES[motif])
     return FEST_SPOTS.map(([x, y, r], i) => `<i class="cfi cfi${i % 5}" style="left:${x}%;top:${y}%;transform:rotate(${r}deg)"></i>`).join('');
   return FEST_EDGE.map(([x, y, r], i) => `<svg class="cfs cfi${i % 5}" viewBox="0 0 24 24" style="left:${x}%;top:${y}%;--r:${r}deg;--s:${[15, 11, 18, 12, 14][i % 5]}px" aria-hidden="true">${FEST_SHAPES[motif]}</svg>`).join('');

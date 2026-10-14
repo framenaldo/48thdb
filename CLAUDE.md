@@ -100,6 +100,10 @@ the Firebase CLI from the owner's machine.
   the release named in the title underneath, a scatter that suits the kind,
   and the faces of who is on. A poster lends it its colours. An event the title
   does not explain, or with its own wording, goes in `FEST_EVENT`.
+  `poster.scene:'night'` makes the sheet and its home cards night black into red
+  in either mode (the Halloween pop-up); its banner word is set in FC Jong Pen
+  Suk (Fontcraft, free for non-commercial use), cut down to Thai and Latin in
+  `fonts/fc-jong-pen-suk.woff2`.
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
   then `node scripts/make-poster-grads.mjs` for its sheet colours.
