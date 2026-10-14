@@ -3252,7 +3252,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     user-select:none; -webkit-user-select:none; transition:height .8s cubic-bezier(.22,1,.36,1); }
   .hs.is-flat .hs-view{ height:542px; }
   .hs-floor{ position:absolute; left:0; right:0; top:0; transform-style:preserve-3d; transform-origin:50% 50%;
-    transform:translateY(var(--ty)) scale(var(--sc)) rotateX(var(--pitch)) rotateZ(var(--yaw)); transition:transform .8s cubic-bezier(.22,1,.36,1);
+    transform:translateY(var(--ty)) scale(var(--sc)) rotateX(var(--pitch)) rotateZ(calc(var(--yaw) + var(--rot, 0deg))); transition:transform .8s cubic-bezier(.22,1,.36,1);
     border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)); border:1px solid rgba(255,255,255,.1); }
   .hs-hall{ --fx:89%; display:grid; gap:4px; padding:10px 8px 10px 34px; transform-style:preserve-3d; }
   /* in 3D the hall and its lanes lie in one plane, and a tap would land on the hall: only a lane in use and her face take it */
@@ -3272,7 +3272,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      every lane's at the same place along it, so the faces make one straight line down the hall */
   .hs-face{ --s:22px; position:absolute; left:var(--fx); top:50%; width:var(--s); height:var(--s); margin:calc(var(--s) * -1) 0 0 calc(var(--s) / -2);
     transform-origin:50% 100%; transform-style:preserve-3d;
-    transform:translateY(calc(var(--s) * var(--fy))) rotateZ(calc(var(--yaw) * -1)) rotateX(calc(var(--pitch) * -1));
+    transform:translateY(calc(var(--s) * var(--fy))) rotateZ(calc((var(--yaw) + var(--rot, 0deg)) * -1)) rotateX(calc(var(--pitch) * -1));
     transition:transform .8s cubic-bezier(.22,1,.36,1), width .25s, height .25s, margin .25s; }
   .hs.is-flat .hs-face{ --s:19px; }
   .hs-pic{ display:block; width:100%; height:100%; border-radius:6px; overflow:hidden; background:#2A2126;
@@ -3366,17 +3366,34 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .hs-chip.on{ border-color:#F3D9B1; background:rgba(243,217,177,.16); }
   .hs-chip:active{ transform:translateY(2px); box-shadow:none; }
   .hs-chip-face{ width:22px !important; height:22px !important; font-size:8px; }
+  .hs-wide{ display:none; }
   .hs-note{ margin:10px 2px 0; font-size:11.5px; line-height:1.5; color:#9C8E97; text-align:center; }
   .hs-none{ margin:10px 0 0; padding:10px; border-radius:14px; text-align:center; font-size:12.5px; background:rgba(255,255,255,.06); color:#B9ABB3; }
   @container (min-width:430px){ .hs-list{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
   /* a wide board (a phone on its side, a tablet, a computer): the hall on the
      left, who is where beside it */
+  /* a wide board (a phone on its side, a tablet, a computer): the hall turned
+     a quarter, as the organiser draws it — the lanes stand up side by side,
+     lane 1 on the left, the doors and the desks down the right */
   @container (min-width:600px){
-    .hs-stage{ display:grid; grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr); gap:16px; align-items:start; }
-    .hs-side > :first-child{ margin-top:0; }
-    .hs-side .hs-list{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .hs-view{ --rot:-90deg; --fw:440px; height:400px; }
+    .hs.is-flat .hs-view{ height:480px; }
+    .hs-floor{ left:50%; right:auto; width:var(--fw); margin-left:calc(var(--fw) / -2); top:calc(50% - 200px); }
+    .hs.is-flat .hs-floor{ top:calc(50% - 270px); }
+    /* turned, a face is set on her lane after it stands, so it sits square on the lane's end */
+    .hs-face{ transform:rotateZ(calc((var(--yaw) + var(--rot, 0deg)) * -1)) rotateX(calc(var(--pitch) * -1)) translateY(calc(var(--s) * var(--fy))); }
+    .hs-tall{ display:none; }
+    .hs-wide{ display:inline; }
+    .hs-side .hs-list{ grid-template-columns:repeat(4, minmax(0, 1fr)); }
   }
-  @container (min-width:860px){ .hs-side .hs-list{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+  /* a phone on its side is short: shorter lanes, so the whole hall is on screen at once */
+  @media (max-height:520px){
+    @container (min-width:600px){
+      .hs-view{ --fw:300px; height:262px; }
+      .hs.is-flat .hs-view{ height:320px; }
+      .hs-floor{ top:calc(50% - 212px); }
+    }
+  }
   /* the sheet holding the lane plan opens wide as soon as there is room, not
      only on a computer */
   @media (min-width:620px){
@@ -15836,8 +15853,8 @@ function renderLanePlan(ev){
       </div>
       <div class="hs-side">${pickCard}${list}</div></div>
       <div class="hs-tt">${hsTimetable()}</div>
-      <p class="hs-note">${en ? 'A sketch from the organiser’s plan: lane 1 at the back, the doors at the bottom. Rounds may change.'
-        : 'ผังจำลองจากผังของผู้จัด เลน 1 อยู่ด้านใน ประตูอยู่ด้านล่าง · รอบจับมืออาจเปลี่ยนแปลงภายหลัง'}</p>
+      <p class="hs-note">${en ? 'A sketch from the organiser’s plan: <span class="hs-tall">lane 1 at the back, the doors at the bottom</span><span class="hs-wide">lane 1 on the left, the doors on the right</span>. Rounds may change.'
+        : 'ผังจำลองจากผังของผู้จัด <span class="hs-tall">เลน 1 อยู่ด้านใน ประตูอยู่ด้านล่าง</span><span class="hs-wide">เลน 1 อยู่ซ้ายสุด ประตูอยู่ด้านขวา</span> · รอบจับมืออาจเปลี่ยนแปลงภายหลัง'}</p>
     </div>
   </div>`;
 }
