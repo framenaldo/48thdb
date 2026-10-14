@@ -592,6 +592,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .modal-glass-card.is-postered .evm-head::before{ background:var(--ink); }
   /* Meeting You Online's poster is sky over a meadow; its sheet is too — the
      sky stays at the top and the grass at the foot while the content scrolls */
+  /* the Halloween pop-up: the whole sheet night black into blood red, in either mode */
+  .modal-glass-card.is-postered.is-scene-night, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-night{
+    --ink:#F6E6E6; --ink-soft:#C9A9AB; --paper:#150709; --paper-dim:#240A0D; --card:#1F0A0D; --glass-card:#22090C;
+    --glass-edge:rgba(255,60,60,.28); --line:rgba(255,255,255,.12); --c-text:#FF6B6B;
+    background:linear-gradient(180deg, #0B0708 0%, #1A0608 40%, #3A050A 100%); color:var(--ink); border-color:rgba(200,20,27,.6); }
   .modal-glass-card.is-postered.is-scene-meadow{
     background:linear-gradient(180deg, #86B5DA 0%, #B9D5EB 14%, #E6EFF5 32%, #F6F4EC 56%, #EFEBCB 76%, #D3DB9D 90%, #B3C07A 100%);
   }
@@ -4424,7 +4429,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .evm-fest.is-roadshow{ padding-top:34px; }
   /* four to eight on the bill: smaller faces, still named */
   .evm-fest-faces.is-mid{ flex-wrap:wrap; gap:10px 8px; padding-left:6px; padding-right:6px; }
-  .evm-fest-face.is-mid{ gap:5px; width:62px; }
+  .evm-fest-face.is-mid{ gap:5px; width:70px; }
   .evm-fest-face.is-mid .evm-face-img{ width:54px; height:54px; font-size:17px; box-shadow:0 0 0 2.5px #fff, 0 6px 14px rgba(var(--shadow-rgb),.2); }
   .evm-fest-face.is-mid .evm-fest-name{ font-size:10.5px; padding:1px 7px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   /* more than that: a row of faces overlapping, the rest counted */
@@ -4442,6 +4447,21 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .evm-fest.pal-night{ --fest-a:#2B2350; --fest-b:#17142E; --fest-ink:#F2E9FF; }
   .evm-fest.pal-sun{ --fest-a:#FFF1D6; --fest-b:#FCE2C2; --fest-ink:#9A4A12; }
   .evm-fest.pal-gold{ --fest-a:#3A2410; --fest-b:#22140A; --fest-ink:#F6D58A; }
+  /* Halloween: night black into blood red, the word in red with a glow, bats and ghosts, a moon */
+  .evm-fest.pal-blood, :root[data-theme="dark"] .evm-fest.pal-blood{ --fest-a:#0B0708; --fest-b:#4A060B; --fest-ink:#FF2A2A; }
+  .evm-fest.pal-blood .evm-fest-word{ font-family:'Noto Sans Thai', sans-serif; font-weight:900; letter-spacing:.02em;
+    text-shadow:0 0 14px rgba(255,30,30,.55), 0 3px 0 #2A0004; }
+  .evm-fest.pal-blood .evm-fest-sub{ color:#F2D6D6; opacity:.85; }
+  .evm-fest.pal-blood .evm-fest-name{ background:rgba(0,0,0,.55); color:#FFDADA; }
+  .evm-fest.pal-blood .evm-face-img{ box-shadow:0 0 0 3px #C8141B, 0 0 18px rgba(255,30,30,.45); }
+  .evm-fest-deco .cfs.is-spook{ color:#1A0204; opacity:.9; filter:drop-shadow(0 0 3px rgba(255,40,40,.5)); }
+  .evm-fest-deco .cfs.is-spook.is-ghost{ color:#EADCDC; opacity:.55; filter:none; }
+  .evm-fest-moon{ position:absolute; left:9%; top:18px; width:46px; height:46px; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle at 38% 36%, #FFF4E8, #E9D6C2 60%, #B8A08C); box-shadow:0 0 28px 8px rgba(255,214,190,.28); opacity:.85; }
+  .evm-fest-drip{ position:absolute; left:0; right:0; top:0; height:18px; pointer-events:none; opacity:.9;
+    background:radial-gradient(5px 9px at 8% 0, #8E0A10 98%, transparent) , radial-gradient(4px 13px at 23% 0, #8E0A10 98%, transparent),
+      radial-gradient(6px 8px at 41% 0, #8E0A10 98%, transparent), radial-gradient(4px 15px at 63% 0, #8E0A10 98%, transparent),
+      radial-gradient(5px 10px at 79% 0, #8E0A10 98%, transparent), radial-gradient(4px 12px at 94% 0, #8E0A10 98%, transparent); }
   .evm-fest.pal-sky{ --fest-a:#DCEEFC; --fest-b:#C9E2F8; --fest-ink:#1F4E7A; }
   /* with a poster, its own colours: its paper, washed towards its accent, in its ink */
   .evm-fest.is-postered{ --fest-a:color-mix(in srgb, var(--pc) 10%, var(--sheet-bg)); --fest-b:color-mix(in srgb, var(--pc) 26%, var(--sheet-bg)); --fest-ink:var(--sheet-ink); }
@@ -6303,6 +6323,13 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#5E6B3A', surface:'#F2F5EC', ink:'#3A3828', img:'posters/cgm48-popup-live-1013.jpg', w:2250, h:2250 },
     info:['ครั้งนี้เป็นเทปที่บันทึกไว้ล่วงหน้า'],
     stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://youtu.be/VYdfiNX0Rww' } },
+  { id:'ev-cgm48-popup-halloween-1015', start:'2026-10-15', time:'18:00',
+    title:'CGM48 Pop Up หลอน', online:'YouTube CGM48 OFFICIAL', groups:['cgm48'],
+    members:['cgm-satangpound','cgm-jingjing','cgm-prae','cgm-praifa'],
+    related:['ev-cgm48-popup-live-1013'],
+    poster:{ accent:'#C8141B', surface:'#F6ECEC', ink:'#3A0A0D', img:'posters/cgm48-popup-halloween-1015.jpg', w:2000, h:2000, scene:'night' },
+    info:['ประสบการณ์หลอน กุ๊กกุ๊'],
+    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL/live' } },
   { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27', time:'12:00',
     cancelled:'ยกเลิกการจัดงาน เนื่องจากศูนย์การค้าแฟชั่นไอส์แลนด์ปิดให้บริการชั่วคราว (สถานการณ์น้ำท่วม)',
     title:'CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow',
@@ -8810,6 +8837,7 @@ const EN = {
   'ของที่ระลึก: รูปถ่ายการแสดง 1 ภาพ': 'Keepsake: one photo from the show',
   'ลุ้นรับรางวัลจาก Jew และ Palmmy คนละ 6 รางวัล': 'A draw for six prizes each from Jew and Palmmy',
   'จองบัตรทาง iAM48': 'Book on iAM48',
+  'ประสบการณ์หลอน กุ๊กกุ๊': 'A spooky experience',
   'ลุ้นรับรางวัลจาก Proud และ Saonoi คนละ 6 รางวัล': 'A draw for six prizes each from Proud and Saonoi',
   'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ถึง 23 ต.ค. 2026 12:00 ทาง iAM48 Application': 'Tickets on sale 15 Oct 2026 12:00 to 23 Oct 2026 12:00 on the iAM48 Application',
   'บัตรเปิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application':
@@ -11561,6 +11589,7 @@ const FEST_EVENT = {
   'ev-concert-2026':   { kind:'concert', word:'Journey of Dreams', sub:'夢の旅 · CONCERT' },
   'ev-fame-fanmeet':   { word:"Fame's Airline", sub:'FANMEET', motif:'clouds' },
   'ev-hoop-bday-said': { sub:'THEATER SHOW' },
+  'ev-cgm48-popup-halloween-1015': { word:'Pop Up หลอน', sub:'CGM48 · HALLOWEEN', motif:'spooky', fx:'moon', pal:'blood', own:true },
 };
 function festKind(ev){
   const t = ev.title || '';
@@ -11609,7 +11638,11 @@ const FEST_SHAPES = {
 /* the other shapes keep to the sides, clear of the word and the faces */
 const FEST_EDGE = [[4,12,-18],[12,46,24],[6,74,-30],[16,22,12],[3,92,20],[17,86,-8],[93,30,8],[85,46,-24],[96,62,30],[87,74,-12],[92,90,14],[82,86,-20]];
 const FEST_SPOTS = [[6,14,-18],[17,52,24],[29,9,42],[41,64,-9],[52,20,15],[63,58,-33],[74,12,8],[85,46,29],[93,24,-14],[36,34,50],[58,38,-22],[81,66,12]];
+const FEST_SPOOKY = ['<path d="M12 7.2c-.9-1.6-2.5-2.4-4.3-2.1 1 .8 1.4 1.8 1.2 3-1.6-.9-3.6-.9-5.4 0 1.5.6 2.5 1.8 2.8 3.5C4.6 11 3 11.4 2 12.4c2.7-.2 4.9.8 6.6 3 .8-1.1 2-1.7 3.4-1.7s2.6.6 3.4 1.7c1.7-2.2 3.9-3.2 6.6-3-1-1-2.6-1.4-4.3-.8.3-1.7 1.3-2.9 2.8-3.5-1.8-.9-3.8-.9-5.4 0-.2-1.2.2-2.2 1.2-3-1.8-.3-3.4.5-4.3 2.1Z"/>',
+  '<path fill-rule="evenodd" d="M12 2.5a7 7 0 0 1 7 7v11.3l-2.3-1.6-2.4 1.6-2.3-1.6-2.3 1.6-2.4-1.6L5 20.8V9.5a7 7 0 0 1 7-7Zm-2.6 6.2a1.3 1.6 0 1 0 0 3.2 1.3 1.6 0 0 0 0-3.2Zm5.2 0a1.3 1.6 0 1 0 0 3.2 1.3 1.6 0 0 0 0-3.2Z"/>'];
 function renderFestDeco(motif){
+  if(motif === 'spooky')
+    return FEST_EDGE.map(([x, y, r], i) => `<svg class="cfs is-spook${i % 2 ? ' is-ghost' : ''}" viewBox="0 0 24 24" style="left:${x}%;top:${y}%;--r:${i % 2 ? r / 3 : r}deg;--s:${[20, 15, 24, 14, 18][i % 5]}px" aria-hidden="true">${FEST_SPOOKY[i % 2]}</svg>`).join('');
   if(motif === 'confetti' || !FEST_SHAPES[motif])
     return FEST_SPOTS.map(([x, y, r], i) => `<i class="cfi cfi${i % 5}" style="left:${x}%;top:${y}%;transform:rotate(${r}deg)"></i>`).join('');
   return FEST_EDGE.map(([x, y, r], i) => `<svg class="cfs cfi${i % 5}" viewBox="0 0 24 24" style="left:${x}%;top:${y}%;--r:${r}deg;--s:${[15, 11, 18, 12, 14][i % 5]}px" aria-hidden="true">${FEST_SHAPES[motif]}</svg>`).join('');
@@ -11639,10 +11672,11 @@ function renderEventBanner(ev){
   // more than fit: none at all — the line-up is listed further down the sheet
   const long = sub.length > 18;
   return `
-  <div class="evm-fest is-${k}${ev.poster ? ' is-postered' : ` pal-${K.pal}`}${faces ? '' : ' is-bare'}${K.word.length > 8 ? ' is-wide' : ''}${K.word.length > 13 ? ' is-longword' : ''}" aria-hidden="false">
+  <div class="evm-fest is-${k}${own.own ? ` pal-${K.pal}` : ev.poster ? ' is-postered' : ` pal-${K.pal}`}${faces ? '' : ' is-bare'}${K.word.length > 8 ? ' is-wide' : ''}${K.word.length > 13 ? ' is-longword' : ''}" aria-hidden="false">
     ${K.fx === 'beams' ? '<span class="evm-fest-beams" aria-hidden="true"><i></i><i></i></span>' : ''}
     ${K.fx === 'rays' ? '<span class="evm-fest-rays" aria-hidden="true"></span>' : ''}
     ${K.fx === 'bunting' ? renderFestBunting() : ''}
+    ${K.fx === 'moon' ? '<span class="evm-fest-moon" aria-hidden="true"></span><span class="evm-fest-drip" aria-hidden="true"></span>' : ''}
     <span class="evm-fest-deco" aria-hidden="true">${renderFestDeco(K.motif)}</span>
     <span class="evm-fest-word" data-noloc>${escapeHtml(K.word)}</span>
     ${sub ? `<span class="evm-fest-sub${long ? ' is-long' : ''}" data-noloc>${escapeHtml(sub)}</span>` : ''}
