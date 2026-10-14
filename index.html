@@ -5418,20 +5418,25 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --bg-body:#FBE3EE; --ink:#4A1F3A; --ink-soft:#86566F; --paper:#FDEFF5; --paper-dim:#F9E1EC; --card:#FFFFFF; --line:rgba(180,60,120,.16);
     --glass-card:rgba(255,255,255,.78); --glass-edge:rgba(180,60,120,.16); --glass-k:1; --shadow-rgb:150,40,90;
     --bg-header:rgba(253,236,244,.96); --bg-nav:rgba(255,255,255,.93); --fest-acc:#E4457E; color-scheme:light; }
-  /* the theme's word under the home page's title, and the switch */
-  .fest-row{ display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; margin-top:6px; }
-  .fest-word{ font-size:24px; line-height:1.2; color:var(--fest-acc, var(--bnk)); }
-  .fw-meadow{ font-family:'tt-ricordi-allegria', 'Pacifico', serif; font-weight:500; font-size:26px; }
-  .fw-halloween{ font-family:'FC Jong Pen Suk', 'Noto Sans Thai', serif; font-size:36px; text-shadow:0 0 14px rgba(232,51,60,.45), 0 2px 0 #2A0004; }
-  .fw-ge{ flex:1 1 0; min-width:0; font-family:'Cinzel', serif; font-weight:700; font-size:15px; letter-spacing:.07em; text-wrap:balance; }
-  .fw-yipeng{ font-family:'Charm', 'Noto Sans Thai', serif; font-weight:700; font-size:36px; text-shadow:0 0 18px rgba(255,170,70,.45); }
-  .fw-winter, .fw-birthday{ font-family:'Pacifico', cursive; font-size:24px; }
-  .fest-who{ font-size:13px; font-weight:800; color:var(--ink-soft); }
-  .fest-btn{ margin-left:auto; font:inherit; font-size:12px; font-weight:800; padding:4px 12px; border-radius:99px; cursor:pointer; color:var(--ink);
-    background:color-mix(in srgb, var(--ink) 7%, transparent); border:1px solid var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.14); transition:transform .12s, box-shadow .12s; }
-  .fest-btn:active{ transform:translateY(2px); box-shadow:none; }
-  .fest-row.is-off{ margin-top:4px; }
-  .fest-row.is-off .fest-btn{ margin-left:0; color:var(--ink-soft); }
+  /* in the header, beside "+ เพิ่มสมาชิก": the theme's word in its own face, and the switch */
+  /* it takes only the room left on the row (a basis of 0 never wraps it), and its word wraps or shrinks to fit */
+  #fest-slot{ flex:1 1 0; min-width:108px; display:flex; }
+  #fest-slot:empty{ display:none; }
+  header.top > #fest-slot{ flex-shrink:1; }
+  .fest-pill{ display:flex; align-items:center; gap:5px; min-width:0; max-width:100%; padding:3px 3px 3px 10px; border-radius:20px; cursor:pointer; font:inherit; color:var(--ink);
+    background:color-mix(in srgb, var(--card) 72%, transparent); border:1px solid var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.14); transition:transform .12s, box-shadow .12s; }
+  .fest-pill:active{ transform:translateY(2px); box-shadow:none; }
+  .fest-pill:focus-visible{ outline:2px solid var(--fest-acc, var(--bnk)); outline-offset:2px; }
+  /* set smaller until it fits the room (fit in FEST); the meadow's long title goes on two set lines */
+  .fest-w{ flex:0 1 auto; min-width:0; overflow:hidden; white-space:nowrap; text-align:left; font-size:15px; line-height:1.15; padding-block:1px; color:var(--fest-acc, var(--bnk)); }
+  .fest-x{ flex:none; width:22px; height:22px; display:grid; place-items:center; border-radius:50%; color:var(--ink); background:color-mix(in srgb, var(--ink) 9%, transparent); }
+  .fest-x svg{ width:12px; height:12px; }
+  .fest-pill.is-off{ padding:6px 12px; font-size:12.5px; font-weight:800; color:var(--ink-soft); white-space:nowrap; }
+  .fw-meadow{ font-family:'tt-ricordi-allegria', 'Pacifico', serif; font-weight:500; font-size:13.5px; line-height:1.05; }
+  .fw-halloween{ font-family:'FC Jong Pen Suk', 'Noto Sans Thai', serif; font-size:19px; line-height:1; text-shadow:0 0 10px rgba(232,51,60,.45), 0 1px 0 #2A0004; }
+  .fw-ge{ font-family:'Cinzel', serif; font-weight:700; font-size:14px; letter-spacing:.06em; line-height:1.1; }
+  .fw-yipeng{ font-family:'Charm', 'Noto Sans Thai', serif; font-weight:700; font-size:21px; line-height:1; text-shadow:0 0 12px rgba(255,170,70,.45); }
+  .fw-winter, .fw-birthday{ font-family:'Pacifico', cursive; font-size:13px; line-height:1.2; }
 </style>
 <script>
   /* Runs before first paint: a stored choice wins, otherwise follow the OS. */
@@ -9629,6 +9634,7 @@ function renderHeader(){
         data-action="set-lang" data-id="${l.id}"><b>${l.label}</b><span>${l.name}</span></button>`).join('')}</div>` : ''}
     </div>
     <button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>
+    <div id="fest-slot"></div>
     <div id="profile-slot"></div>
   </header>`;
 }
@@ -16790,7 +16796,6 @@ function renderFeed(){
         <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></span>
       </div>
       <div class="feed-title-row"><h1 class="feed-title">วันนี้ที่ 48</h1></div>
-      ${FEST.row()}
       <div class="feed-head-foot">
         ${state.oshi.length ? `
         <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
@@ -21085,7 +21090,7 @@ const FEST = (() => {
 
   /* ===================== the seasons ===================== */
   const THEMES = {
-    meadow: { name: 'อยากจะไปกับเธอ', en: 'Kimi to Doko ka e Ikitai', word: 'Kimi to Doko ka e Ikitai',
+    meadow: { name: 'อยากจะไปกับเธอ', en: 'Kimi to Doko ka e Ikitai', word: 'Kimi to Doko ka e Ikitai', pill: 'Kimi to Doko\nka e Ikitai',
       settle: { kinds: ['seed'], colors: ['#fff'], size: [10, 16], rate: 1.6, max: 60, fall: 30, k: 1.2, sway: 30, face: .004, cap: 22, th: [700, 2400] },
       sky(dt, sy){ drawClouds(SP.cloudDay, dt, sy, .9, .7); drawGrass(); } },
     halloween: { name: 'ฮาโลวีน', en: 'Halloween', word: 'ฮาโลวีนที่ 48', stars: 1, moon: { x: .8, y: 96 },
@@ -21094,7 +21099,7 @@ const FEST = (() => {
           cs.split(',').forEach((k, j) => ropes.push(makeWeb(c, k, 62 + ((i * 37 + j * 53) % 34)))); if(sp) ropes.push(makeSilk(c, sp)); }); },
       sky(dt, sy){ drawClouds(SP.cloudNight, dt, sy); stepBats(dt); drawBats(b, false); },
       front(){ drawBats(f, true); } },
-    ge: { name: 'คืนประกาศผล', en: 'Results night', word: 'Senbatsu General Election 2026',
+    ge: { name: 'คืนประกาศผล', en: 'Results night', word: 'GE2026',
       settle: { kinds: ['confetti', 'confetti', 'ribbon'], colors: ['#F2C14E', '#FFE6A0', '#E8333C', '#FFFFFF', '#C8902A'], size: [7, 12], rate: 5, max: 110, fall: 75, k: 2, sway: 34, face: .005, cap: 30, th: [800, 2600] },
       sky(dt){ stepFireworks(dt); drawFireworks(); } },
     yipeng: { name: 'ยี่เป็ง', en: 'Yi Peng', word: 'ยี่เป็ง', stars: .7, moon: { x: .18, y: 80 },
@@ -21175,7 +21180,20 @@ const FEST = (() => {
      today's cards; anywhere else, none. A redraw of the same cards keeps what
      has gathered on them; a sheet open over the page holds it still. */
   let cardsKey = '';
+  /* the pill's word, set smaller until it fits the room the row leaves it */
+  function fit(){
+    const w = document.querySelector('#fest-slot .fest-w'); if(!w) return;
+    w.style.fontSize = ''; const base = parseFloat(getComputedStyle(w).fontSize); let fs = base;
+    while(fs > base * .6 && w.scrollWidth > w.clientWidth + 1){ fs -= .5; w.style.fontSize = fs + 'px'; }
+  }
+  if(document.fonts) document.fonts.addEventListener('loadingdone', fit);
+  addEventListener('resize', fit);
+  // the row's room changes when sign-in brings the avatar in after the page is drawn
+  const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => requestAnimationFrame(fit)) : null;
+  let watched = null;
   function sync(){
+    const slot = document.getElementById('fest-slot');
+    if(slot){ const h = row(); if(slot._h !== h){ slot.innerHTML = h; slot._h = h; } if(ro && watched !== slot){ if(watched) ro.unobserve(watched); ro.observe(slot); watched = slot; } fit(); }
     const t = state.view === 'feed' && !state.query && !isOff() ? today() : null;
     const root = document.documentElement;
     if(!t){ if(theme){ theme = null; delete root.dataset.fest; moonEl.style.display = 'none'; f.clearRect(0, 0, W, H); b.clearRect(0, 0, W, H);
@@ -21199,15 +21217,15 @@ const FEST = (() => {
     }
     if(held || calm) still(); else go();
   }
-  /* the line under the home page's title: the theme's word, and the switch */
+  /* the header's pill: the theme's word, and the switch */
   function row(){
-    const t = state.view === 'feed' ? today() : null;
+    const t = state.view === 'feed' && !state.query ? today() : null;
     if(!t) return '';
     const th = THEMES[t.id], en = isEN();
-    if(isOff()) return `<div class="fest-row is-off"><button class="fest-btn" data-action="fest-on">${en ? `Turn on the ${th.en} theme` : `เปิดธีม${th.name}`}</button></div>`;
-    const who = t.id === 'birthday' ? `<span class="fest-who" data-noloc>${t.who.map(m => escapeHtml(nickName(m))).join(' · ')}</span>` : '';
-    return `<div class="fest-row"><span class="fest-word fw-${t.id}" data-noloc>${escapeHtml(th.word)}</span>${who}
-      <button class="fest-btn" data-action="fest-off" title="${en ? 'Back to the usual look' : 'กลับเป็นหน้าตาปกติ'}">${en ? 'Theme off' : 'ปิดธีม'}</button></div>`;
+    if(isOff()) return `<button class="fest-pill is-off" data-action="fest-on" title="${en ? `Turn on the ${th.en} theme` : `เปิดธีม${th.name}`}">${en ? 'Theme on' : 'เปิดธีม'}</button>`;
+    const who = t.id === 'birthday' ? ' · ' + t.who.map(m => nickName(m)).join(', ') : '';
+    return `<button class="fest-pill" data-action="fest-off" aria-label="${en ? 'Turn the theme off' : 'ปิดธีม'}" title="${escapeAttr((en ? th.en : th.name) + who + (en ? ' · turn the theme off' : ' · กดเพื่อปิดธีม'))}">
+      <span class="fest-w fw-${t.id}" data-noloc>${escapeHtml(th.pill || th.word).replace('\n', '<br>')}</span><span class="fest-x" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></button>`;
   }
   return { sync, row, setOff, today };
 })();

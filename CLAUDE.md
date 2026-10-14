@@ -62,8 +62,10 @@ the Firebase CLI from the owner's machine.
   December, and the birthday theme on any current member's birthday (but 14 Nov,
   results night, stays GE: `FIRM`). A theme sets `data-fest` on the root, its own
   colours over light or dark, and forces the site's `data-theme` to match its sky.
-  Things on `.today-hero` and `.ev-card` move with the scroll. Readers can turn it
-  off ("ปิดธีม", localStorage `48thdb-fest-off`). Keep it smooth on the iPhone:
+  Things on `.today-hero` and `.ev-card` move with the scroll. The theme's word
+  and its off switch are a pill in the header beside "+ เพิ่มสมาชิก" (`#fest-slot`,
+  the word shrinks to the room left), home page only; turned off it reads
+  "เปิดธีม" (localStorage `48thdb-fest-off`). Keep it smooth on the iPhone:
   only the two canvases redraw (the sky one at 1×), the sky, stars, moon, beams and
   fog are CSS or drawn once, nothing blurs over the sky while a theme is on, and a
   height-only resize (Safari's toolbar) restarts nothing. `window.__festDay`
