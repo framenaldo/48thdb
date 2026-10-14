@@ -14997,8 +14997,10 @@ const spIdle = plan => plan.notes ? 'แตะโซนบนผังหรื�
 function renderSeatPlan(ev){
   const plan = ev.seatPlan;
   if(!SEAT_LAYOUTS[plan.layout]) return '';
-  // a show sold in a bundle points to it, naming the other show in the bundle
-  const host = plan.bundleIn && SEED_SCHEDULE.find(e => e.id === plan.bundleIn);
+  // a show sold in a bundle points to it, naming the other show in the bundle —
+  // only while the bundle is on sale
+  const host0 = plan.bundleIn && SEED_SCHEDULE.find(e => e.id === plan.bundleIn);
+  const host = host0 && (host0.end || host0.start) >= toYmd(todayStart()) ? host0 : null;
   const pair = host && SEED_SCHEDULE.find(e => (host.related || []).includes(e.id) && e.id !== ev.id);
   const st0 = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0 };
   const { svg } = spScene(ev, st0), v = spViewBox(SEAT_LAYOUTS[plan.layout], st0, false);
