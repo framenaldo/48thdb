@@ -188,6 +188,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
        was unaffected, which hid it. clip alone already stops the drift. */
   }
   :root{ --font:'aktiv-grotesk','Noto Sans Thai',sans-serif; }
+  /* Safari on the iPhone blows small text up when the phone turns on its side
+     unless told not to; the page already sizes its own type for that width. */
+  html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; }
   body{ touch-action:manipulation; }
   body{
     font-family:var(--font);
