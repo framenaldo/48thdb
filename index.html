@@ -3369,6 +3369,22 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .hs-note{ margin:10px 2px 0; font-size:11.5px; line-height:1.5; color:#9C8E97; text-align:center; }
   .hs-none{ margin:10px 0 0; padding:10px; border-radius:14px; text-align:center; font-size:12.5px; background:rgba(255,255,255,.06); color:#B9ABB3; }
   @container (min-width:430px){ .hs-list{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+  /* a wide board (a phone on its side, a tablet, a computer): the hall on the
+     left, who is where beside it */
+  @container (min-width:600px){
+    .hs-stage{ display:grid; grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr); gap:16px; align-items:start; }
+    .hs-side > :first-child{ margin-top:0; }
+    .hs-side .hs-list{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  }
+  @container (min-width:860px){ .hs-side .hs-list{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+  /* the sheet holding the lane plan opens wide as soon as there is room, not
+     only on a computer */
+  @media (min-width:620px){
+    .modal-glass-card.is-event-sheet.has-lanes{ max-width:min(1100px, calc(100vw - 24px)); }
+  }
+  @media (min-width:1024px){
+    .has-lanes .evm-layout.has-media{ grid-template-columns:minmax(0, 30fr) minmax(0, 70fr); }
+  }
   /* a small phone: the walkway narrows and the lettering steps down, so a long name clears the faces */
   @container (max-width:280px){
     .hs-hall{ padding-left:16px; }
@@ -15811,15 +15827,14 @@ function renderLanePlan(ev){
         ${back || `<span class="hs-hint"><span class="is-3d">${en ? 'Drag sideways to turn the hall' : 'ลากซ้ายขวาเพื่อหมุนผัง'}</span><span class="is-2d">${en ? 'Laid flat, as the organiser’s plan' : 'วางราบแบบผังของผู้จัด'}</span></span>`}
         <button class="hs-share" data-action="hs-share">${ICONS.share}${en ? 'Share' : 'แชร์ผัง'}</button>
       </div>
-      <div class="hs-view">
+      <div class="hs-stage"><div class="hs-view">
         <div class="hs-floor">
           <div class="hs-hall">${lanes}</div>
           ${lobby}
         </div>
         ${spec}
       </div>
-      ${pickCard}
-      ${list}
+      <div class="hs-side">${pickCard}${list}</div></div>
       <div class="hs-tt">${hsTimetable()}</div>
       <p class="hs-note">${en ? 'A sketch from the organiser’s plan: lane 1 at the back, the doors at the bottom. Rounds may change.'
         : 'ผังจำลองจากผังของผู้จัด เลน 1 อยู่ด้านใน ประตูอยู่ด้านล่าง · รอบจับมืออาจเปลี่ยนแปลงภายหลัง'}</p>
@@ -16118,7 +16133,7 @@ function renderEventModal(){
   if(wantsGrad && !POSTER_GRADS) posterGrads();
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.scene?` is-scene-${ev.poster.scene}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}${grad?' has-grad':''}"${wantsGrad && !grad ? ` data-grad-src="${escapeAttr(ev.poster.img)}"` : ''} data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}${grad?`; --sheet-grad:${grad.light}; --sheet-grad-d:${grad.dark}`:''}">
+    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.scene?` is-scene-${ev.poster.scene}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}${grad?' has-grad':''}${ev.lanePlan?' has-lanes':''}"${wantsGrad && !grad ? ` data-grad-src="${escapeAttr(ev.poster.img)}"` : ''} data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}${grad?`; --sheet-grad:${grad.light}; --sheet-grad-d:${grad.dark}`:''}">
       <button class="modal-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
