@@ -5431,10 +5431,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --bg-body:#13284A; --ink:#EEF5FF; --ink-soft:#A9BCD6; --paper:#0E1B33; --paper-dim:#16264A; --card:#13223F; --line:rgba(210,230,255,.16);
     --glass-card:rgba(16,30,58,.76); --glass-edge:rgba(210,230,255,.2); --glass-k:.14; --shadow-rgb:0,0,0;
     --bg-header:rgba(10,20,40,.95); --bg-nav:rgba(14,26,50,.94); --fest-acc:#E8434A; color-scheme:dark; }
-  :root[data-fest="birthday"]{ --fest-sky:linear-gradient(#FFD6E6, #FBE3EE 60%, #FFF2F7);
+  :root[data-fest="birthday"]{ --fest-sky:radial-gradient(90vmax 50vmax at 50% -10%, rgba(228,69,126,.22), transparent 70%), linear-gradient(#FDEAF2, #FFF6F9 55%, #FFFBFC);
     --bg-body:#FBE3EE; --ink:#4A1F3A; --ink-soft:#86566F; --paper:#FDEFF5; --paper-dim:#F9E1EC; --card:#FFFFFF; --line:rgba(180,60,120,.16);
     --glass-card:rgba(255,255,255,.78); --glass-edge:rgba(180,60,120,.16); --glass-k:1; --shadow-rgb:150,40,90;
     --bg-header:rgba(253,236,244,.96); --bg-nav:rgba(255,255,255,.93); --fest-acc:#E4457E; color-scheme:light; }
+  :root[data-fest="birthday"][data-fest-tint="cgm"]{ --fest-sky:radial-gradient(90vmax 50vmax at 50% -10%, rgba(46,140,130,.22), transparent 70%), linear-gradient(#E6F4F1, #F4FBF9 55%, #FAFDFC);
+    --bg-body:#EEF8F5; --ink:#163A35; --ink-soft:#4F6E69; --paper:#F0F8F6; --paper-dim:#E2F1ED; --line:rgba(46,140,130,.18);
+    --glass-edge:rgba(46,140,130,.18); --shadow-rgb:20,80,70; --bg-header:rgba(236,247,244,.96); --fest-acc:#2E8C82; }
   /* in the header, beside "+ เพิ่มสมาชิก": the theme's word in its own face, and the switch */
   /* it takes only the room left on the row (a basis of 0 never wraps it), and its word wraps or shrinks to fit */
   #fest-slot{ flex:1 1 0; min-width:108px; display:flex; }
@@ -5453,7 +5456,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .fw-halloween{ font-family:'FC Jong Pen Suk', 'Noto Sans Thai', serif; font-size:19px; line-height:1; text-shadow:0 0 10px rgba(232,51,60,.45), 0 1px 0 #2A0004; }
   .fw-ge{ font-family:'Cinzel', serif; font-weight:700; font-size:14px; letter-spacing:.06em; line-height:1.1; }
   .fw-yipeng{ font-family:'Charm', 'Noto Sans Thai', serif; font-weight:700; font-size:21px; line-height:1; text-shadow:0 0 12px rgba(255,170,70,.45); }
-  .fw-winter, .fw-birthday{ font-family:'Pacifico', cursive; font-size:13px; line-height:1.2; }
+  .fw-winter{ font-family:'Pacifico', cursive; font-size:13px; line-height:1.2; }
+  .fw-birthday{ font-family:'Pacifico', cursive; font-size:12px; line-height:1.15; }
+  .fw-birthday b{ font-family:var(--font); font-weight:800; font-size:1.05em; color:var(--ink); }
+  .fest-pill.has-faces{ padding-left:4px; }
+  .fest-faces{ flex:none; display:flex; }
+  .fest-face{ width:30px !important; height:30px !important; border-radius:50% !important; box-shadow:0 0 0 2px #fff; }
+  .fest-faces .fest-face + .fest-face{ margin-left:-10px; }
 </style>
 <script>
   /* Runs before first paint: a stored choice wins, otherwise follow the OS. */
@@ -20944,12 +20953,14 @@ const FEST = (() => {
   /* ---- balloons ---- */
   let balloons = [];
   const BAL = ['#E4457E', '#F59BBE', '#FFD1E3', '#C9A7F0', '#FFE08A', '#FFFFFF'];
-  function seedBalloons(){ balloons = Array.from({ length: 12 }, () => ({ x: rnd(0, W), y: rnd(0, H + 80), d: rnd(.5, 1.1), vy: rnd(18, 34), ph: rnd(0, 6.3), c: pick(BAL) })).sort((a, z) => a.d - z.d); }
-  function stepBalloons(dt){ for(const l of balloons){ l.y -= l.vy * l.d * dt; l.x += Math.sin(T * .6 + l.ph) * 10 * l.d * dt; if(l.y < -90){ l.y = H + 60; l.x = rnd(0, W); } } }
+  /* balloons keep to the sides, where nothing is read: the gutters beside the page, or the screen's edges on a phone */
+  const sideX = () => { const band = Math.max(W * .1, (W - 1180) / 2); return Math.random() < .5 ? rnd(4, band) : rnd(W - band, W - 4); };
+  function seedBalloons(){ balloons = Array.from({ length: W > 900 ? 10 : 6 }, () => ({ x: sideX(), y: rnd(0, H + 80), d: rnd(.6, 1.05), vy: rnd(16, 28), ph: rnd(0, 6.3), c: pick(BAL) })).sort((a, z) => a.d - z.d); }
+  function stepBalloons(dt){ for(const l of balloons){ l.y -= l.vy * l.d * dt; l.x += Math.sin(T * .6 + l.ph) * 6 * l.d * dt; if(l.y < -90){ l.y = H + 60; l.x = sideX(); } } }
   function drawBalloons(){ b.strokeStyle = 'rgba(120,70,100,.45)'; b.lineWidth = 1; b.beginPath();
     for(const l of balloons){ const s = 34 * l.d, x = l.x + Math.sin(T * 1.2 + l.ph) * 3, y = l.y; b.moveTo(x, y + s * .62); b.quadraticCurveTo(x + Math.sin(T * 2 + l.ph) * 8, y + s * 1.3, x - 2, y + s * 2); }
     b.stroke();
-    for(const l of balloons){ const s = 34 * l.d, x = l.x + Math.sin(T * 1.2 + l.ph) * 3; b.globalAlpha = .45 + .5 * l.d; b.drawImage(SP.balloon[l.c], x - s * .5, l.y - s * .6, s, s * 1.2); }
+    for(const l of balloons){ const s = 34 * l.d, x = l.x + Math.sin(T * 1.2 + l.ph) * 3; b.globalAlpha = .35 + .4 * l.d; b.drawImage(SP.balloon[l.c], x - s * .5, l.y - s * .6, s, s * 1.2); }
     b.globalAlpha = 1; }
 
   /* ---- grass ---- */
@@ -21047,7 +21058,8 @@ const FEST = (() => {
       if(rec.bins) for(let i = 0; i < rec.bins.length; i++) rec.bins[i] = 4 + 4 * Math.sin(i * .5) * Math.sin(i * .17 + 1) + rnd(0, 2);
       else for(let i = 0; i < Math.round(w / 70); i++){ const it = stItem(cfg, 0, 0); it.lx = rnd(16, w - 16); it.ly = 0; it.top = true; rec.items.push(it); }
       for(let i = 0; i < (cfg.face ? Math.round(w * h / 26000) : 0); i++){ const it = stItem(cfg, 0, 0); it.lx = rnd(16, w - 16); it.ly = rnd(16, h - 16); it.top = false; rec.items.push(it); } }
-    for(let i = 0; i < cfg.rate * 5; i++) ST.free.push(stItem(cfg, rnd(0, W), rnd(-20, H)));
+    if(cfg.burst) for(let i = 0; i < cfg.burst; i++){ const it = stItem(cfg, rnd(0, W), rnd(-260, -10)); it.vy = rnd(160, 260); ST.free.push(it); }
+    else for(let i = 0; i < cfg.rate * 5; i++) ST.free.push(stItem(cfg, rnd(0, W), rnd(-20, H)));
   }
   function attach(it, c, r, rec, top, h){
     if(rec.bins && top){ const k = binOf(rec, r, it.x); rec.bins[k] = Math.min(16, rec.bins[k] + it.s * .3);
@@ -21126,9 +21138,12 @@ const FEST = (() => {
       settle: { kinds: ['snow'], colors: ['#fff'], size: [5, 9], rate: 9, max: 140, fall: 48, k: 1.5, sway: 18, face: 0, pile: true, cap: 0, th: [1e9, 1e9] },
       ropes(){ cards.forEach((c, i) => { if(i % 2 === 0 && i < 8) ropes.push(makeLights(c)); }); },
       sky(dt, sy){ stepSnow(dt); drawSnow(sy); } },
+    /* a birthday: one shower of confetti as the page opens, settling along the
+       cards' top edges, then only a piece now and then; a few balloons rising
+       up the sides, clear of what is being read; in her group's colours */
     birthday: { name: 'วันเกิด', en: 'Birthday', word: 'Happy Birthday',
-      settle: { kinds: ['confetti', 'confetti', 'ribbon'], colors: ['#E4457E', '#F59BBE', '#FFFFFF', '#FFD34E', '#C9A7F0'], size: [7, 12], rate: 4, max: 90, fall: 70, k: 2, sway: 30, face: .005, cap: 26, th: [800, 2600] },
-      sky(dt, sy){ drawClouds(SP.cloudPink, dt, sy, .8, .6); stepBalloons(dt); drawBalloons(); } },
+      settle: { kinds: ['confetti'], colors: ['#E4457E', '#F59BBE', '#FFFFFF', '#FFD34E'], size: [6, 10], rate: .3, burst: 48, max: 70, fall: 150, k: 1.4, sway: 22, face: 0, cap: 18, th: [800, 2600] },
+      sky(dt){ stepBalloons(dt); drawBalloons(); } },
   };
   for(const k in THEMES) THEMES[k].id = k;
   const DARK = new Set(['halloween', 'ge', 'yipeng', 'winter']);
@@ -21220,7 +21235,9 @@ const FEST = (() => {
     root.dataset.fest = t.id; root.dataset.theme = DARK.has(t.id) ? 'dark' : 'light';   // the site's own dark or light rules follow the theme's sky
     if(t.id === 'meadow') festTypekit();
     if(t.id === 'birthday'){ const cs = [...new Set(t.who.map(m => (getGroup(m.groupId) || {}).color).filter(Boolean))];
-      next.settle.colors = [...cs, ...cs, '#FFFFFF', '#FFD34E']; }
+      next.settle.colors = [...cs, ...cs, '#FFFFFF', '#FFD34E'];
+      if(t.who.every(m => m.groupId === 'cgm48')) root.dataset.festTint = 'cgm'; else delete root.dataset.festTint; }
+    else delete root.dataset.festTint;
     theme = next;
     const list = [...document.querySelectorAll('#main .feed-page .today-hero, #main .feed-page .ev-card')];
     const key = list.map((c, i) => c.dataset.id || 'i' + i).join('|');
@@ -21241,8 +21258,11 @@ const FEST = (() => {
     const th = THEMES[t.id], en = isEN();
     if(isOff()) return `<button class="fest-pill is-off" data-action="fest-on" title="${en ? `Turn on the ${th.en} theme` : `เปิดธีม${th.name}`}">${en ? 'Theme on' : 'เปิดธีม'}</button>`;
     const who = t.id === 'birthday' ? ' · ' + t.who.map(m => nickName(m)).join(', ') : '';
-    return `<button class="fest-pill" data-action="fest-off" aria-label="${en ? 'Turn the theme off' : 'ปิดธีม'}" title="${escapeAttr((en ? th.en : th.name) + who + (en ? ' · turn the theme off' : ' · กดเพื่อปิดธีม'))}">
-      <span class="fest-w fw-${t.id}" data-noloc>${escapeHtml(th.pill || th.word).replace('\n', '<br>')}</span><span class="fest-x" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></button>`;
+    // a birthday names whose it is: her face, and "Happy Birthday" over her name
+    const faces = t.id === 'birthday' ? `<span class="fest-faces">${t.who.slice(0, 2).map(m => renderAvatar(m, 'avatar-sm fest-face', (getGroup(m.groupId) || {}).color)).join('')}</span>` : '';
+    const word = t.id === 'birthday' ? `Happy Birthday<br><b>${t.who.map(m => escapeHtml(nickName(m))).join(' · ')}</b>` : escapeHtml(th.pill || th.word).replace('\n', '<br>');
+    return `<button class="fest-pill${faces ? ' has-faces' : ''}" data-action="fest-off" aria-label="${en ? 'Turn the theme off' : 'ปิดธีม'}" title="${escapeAttr((en ? th.en : th.name) + who + (en ? ' · turn the theme off' : ' · กดเพื่อปิดธีม'))}">
+      ${faces}<span class="fest-w fw-${t.id}" data-noloc>${word}</span><span class="fest-x" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></button>`;
   }
   return { sync, row, setOff, today };
 })();
