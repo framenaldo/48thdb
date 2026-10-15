@@ -599,6 +599,23 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --ink:#F6E6E6; --ink-soft:#C9A9AB; --paper:#150709; --paper-dim:#240A0D; --card:#1F0A0D; --glass-card:#22090C;
     --glass-edge:rgba(255,60,60,.28); --line:rgba(255,255,255,.12); --c-text:#FF6B6B;
     background:linear-gradient(180deg, #0B0708 0%, #1A0608 40%, #3A050A 100%); color:var(--ink); border-color:rgba(200,20,27,.6); }
+  /* Journey of Dreams' poster is a line-up framed in deep brown, the results' a sceptre in a red storm:
+     their sheets and home cards go dark in those colours, in either mode */
+  .modal-glass-card.is-postered.is-scene-cocoa, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-cocoa,
+  .ev-card.is-themed.is-scene-cocoa, :root[data-theme="dark"] .ev-card.is-themed.is-scene-cocoa,
+  .today-hero.is-themed.is-scene-cocoa, :root[data-theme="dark"] .today-hero.is-themed.is-scene-cocoa{
+    --ink:#F8E9E2; --ink-soft:#D2B3A8; --paper:#3A130C; --paper-dim:#4A1A11; --card:#4A1A11; --glass-card:#4A1A11;
+    --glass-edge:rgba(255,120,170,.26); --line:rgba(255,255,255,.13); --c-text:#FF8EBB;
+    background:linear-gradient(180deg, #4E1A10 0%, #3E140C 45%, #2A0D08 100%); color:var(--ink); border-color:rgba(236,70,140,.45); }
+  .modal-glass-card.is-postered.is-scene-ember, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-ember,
+  .ev-card.is-themed.is-scene-ember, :root[data-theme="dark"] .ev-card.is-themed.is-scene-ember,
+  .today-hero.is-themed.is-scene-ember, :root[data-theme="dark"] .today-hero.is-themed.is-scene-ember{
+    --ink:#F8EEDC; --ink-soft:#D2BDA4; --paper:#1E0807; --paper-dim:#2C0B09; --card:#2A0B09; --glass-card:#2A0B09;
+    --glass-edge:rgba(246,190,110,.26); --line:rgba(255,255,255,.12); --c-text:#F6C27A;
+    background:linear-gradient(180deg, #2A1210 0%, #3A0A08 40%, #5A0E08 100%); color:var(--ink); border-color:rgba(230,80,40,.5); }
+  .is-scene-cocoa .evm-fest.is-postered, :root[data-theme="dark"] .is-scene-cocoa .evm-fest.is-postered{ --fest-a:#5E2416; --fest-b:#4E1A10; --fest-ink:#FFC9DD; }
+  .is-scene-ember .evm-fest.is-postered, :root[data-theme="dark"] .is-scene-ember .evm-fest.is-postered{ --fest-a:#3A1814; --fest-b:#3A0A08; --fest-ink:#F6D58A; }
+  :is(.is-scene-cocoa, .is-scene-ember) :is(.ev-open, .today-hero-open){ color:var(--c-text); }
   .modal-glass-card.is-postered.is-scene-meadow{
     background:linear-gradient(180deg, #86B5DA 0%, #B9D5EB 14%, #E6EFF5 32%, #F6F4EC 56%, #EFEBCB 76%, #D3DB9D 90%, #B3C07A 100%);
   }
@@ -6496,7 +6513,7 @@ const SEED_SCHEDULE = [
     title:'BNK48 & CGM48 Journey of Dreams 夢の旅', short:'Concert Journey of Dreams',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
     timeline:'ge2026', related:['ev-election-results','ev-ge6-bundle','ev-ge6-heart'],
-    poster:{ accent:'#5A1E14', surface:'#FBF1EC', ink:'#3A140C', img:'posters/journey-of-dreams-lineup.jpg', w:1600, h:2000 },
+    poster:{ accent:'#C8336E', surface:'#FBF1EC', ink:'#3A140C', img:'posters/journey-of-dreams-lineup.jpg', w:1600, h:2000, scene:'cocoa' },
     price:'999 – 4,999', ticketUrl:'https://www.eventpop.me/e/173975?aff=evp',
     seatPlan:{ layout:'mcc-bangkapi', zones:[
       // what each ticket brings, from the the organiser "Ticket Benefits" chart
@@ -6518,7 +6535,7 @@ const SEED_SCHEDULE = [
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
     related:['ev-election-voting','ev-election-fanfest','ev-concert-2026','ev-ge6-bundle','ev-ge6-heart'],
     timeline:'ge2026',
-    poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-final-results-1114.jpg', w:1600, h:2000 },
+    poster:{ accent:'#9A2A1C', surface:'#FBF0E6', ink:'#4A150F', img:'posters/election-final-results-1114.jpg', w:1600, h:2000, scene:'ember' },
     price:'966 – 1,666', ticketUrl:'https://www.eventpop.me/e/174077?aff=evp',
     seatPlan:{ layout:'mcc-bangkapi', zones:[
       // what each ticket brings, from the the organiser "Ticket Benefits" chart
