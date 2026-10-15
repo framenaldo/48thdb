@@ -47,9 +47,9 @@
   "light": "linear-gradient(180deg, hsl(0 70% 78%) 0%, hsl(4 69% 78%) 17%, hsl(9 49% 78%) 33%, hsl(9 42% 81%) 50%, hsl(10 60% 80%) 67%, hsl(11 41% 84%) 83%, hsl(9 45% 78%) 100%)",
   "dark": "linear-gradient(180deg, hsl(0 35% 11%) 0%, hsl(4 35% 12%) 17%, hsl(9 34% 12%) 33%, hsl(9 29% 14%) 50%, hsl(10 35% 13%) 67%, hsl(11 28% 15%) 83%, hsl(9 32% 11%) 100%)"
  },
- "posters/election-final-results.jpg": {
-  "light": "linear-gradient(180deg, hsl(0 70% 78%) 0%, hsl(5 59% 78%) 17%, hsl(11 47% 78%) 33%, hsl(9 46% 80%) 50%, hsl(10 49% 80%) 67%, hsl(11 59% 79%) 83%, hsl(4 52% 78%) 100%)",
-  "dark": "linear-gradient(180deg, hsl(0 35% 10%) 0%, hsl(5 35% 11%) 17%, hsl(11 33% 11%) 33%, hsl(9 32% 13%) 50%, hsl(10 34% 13%) 67%, hsl(11 35% 12%) 83%, hsl(4 35% 11%) 100%)"
+ "posters/election-final-results-1114.jpg": {
+  "light": "linear-gradient(180deg, hsl(19 40% 79%) 0%, hsl(18 36% 82%) 17%, hsl(10 47% 78%) 33%, hsl(3 46% 78%) 50%, hsl(358 41% 78%) 67%, hsl(4 24% 78%) 83%, hsl(8 19% 78%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(19 28% 13%) 0%, hsl(18 25% 14%) 17%, hsl(10 33% 12%) 33%, hsl(3 32% 11%) 50%, hsl(358 29% 11%) 67%, hsl(4 17% 12%) 83%, hsl(8 13% 11%) 100%)"
  },
  "posters/fame-fanmeet-1025.jpg": {
   "light": "linear-gradient(180deg, hsl(221 23% 93%) 0%, hsl(184 20% 93%) 17%, hsl(21 32% 92%) 33%, hsl(241 9% 92%) 50%, hsl(211 34% 92%) 67%, hsl(228 21% 90%) 83%, hsl(230 27% 93%) 100%)",
@@ -83,9 +83,9 @@
   "light": "linear-gradient(180deg, hsl(324 30% 90%) 0%, hsl(320 24% 89%) 17%, hsl(337 29% 90%) 33%, hsl(314 22% 88%) 50%, hsl(251 18% 87%) 67%, hsl(282 23% 87%) 83%, hsl(302 23% 88%) 100%)",
   "dark": "linear-gradient(180deg, hsl(324 21% 18%) 0%, hsl(320 17% 18%) 17%, hsl(337 20% 18%) 33%, hsl(314 15% 17%) 50%, hsl(251 13% 16%) 67%, hsl(282 16% 17%) 83%, hsl(302 16% 17%) 100%)"
  },
- "posters/journey-of-dreams.jpg": {
-  "light": "linear-gradient(180deg, hsl(328 42% 81%) 0%, hsl(348 38% 79%) 17%, hsl(346 62% 78%) 33%, hsl(348 48% 78%) 50%, hsl(346 63% 78%) 67%, hsl(348 60% 79%) 83%, hsl(349 50% 82%) 100%)",
-  "dark": "linear-gradient(180deg, hsl(328 29% 13%) 0%, hsl(348 26% 13%) 17%, hsl(346 35% 11%) 33%, hsl(348 34% 11%) 50%, hsl(346 35% 11%) 67%, hsl(348 35% 13%) 83%, hsl(349 35% 14%) 100%)"
+ "posters/journey-of-dreams-lineup.jpg": {
+  "light": "linear-gradient(180deg, hsl(11 56% 78%) 0%, hsl(13 40% 79%) 17%, hsl(15 41% 79%) 33%, hsl(13 39% 79%) 50%, hsl(15 38% 80%) 67%, hsl(14 33% 80%) 83%, hsl(13 70% 78%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(11 35% 12%) 0%, hsl(13 28% 13%) 17%, hsl(15 29% 13%) 33%, hsl(13 27% 13%) 50%, hsl(15 27% 13%) 67%, hsl(14 23% 13%) 83%, hsl(13 35% 12%) 100%)"
  },
  "posters/kimi-roadshow-cnx.jpg": {
   "light": "linear-gradient(180deg, hsl(207 47% 88%) 0%, hsl(208 48% 89%) 17%, hsl(215 21% 91%) 33%, hsl(349 3% 89%) 50%, hsl(228 4% 85%) 67%, hsl(215 15% 82%) 83%, hsl(66 12% 83%) 100%)",
