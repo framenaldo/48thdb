@@ -5438,6 +5438,38 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-fest="birthday"][data-fest-tint="cgm"]{ --fest-sky:radial-gradient(90vmax 50vmax at 50% -10%, rgba(46,140,130,.22), transparent 70%), linear-gradient(#E6F4F1, #F4FBF9 55%, #FAFDFC);
     --bg-body:#EEF8F5; --ink:#163A35; --ink-soft:#4F6E69; --paper:#F0F8F6; --paper-dim:#E2F1ED; --line:rgba(46,140,130,.18);
     --glass-edge:rgba(46,140,130,.18); --shadow-rgb:20,80,70; --bg-header:rgba(236,247,244,.96); --fest-acc:#2E8C82; }
+  /* the same themes in the reader's other mode: the day themes at night, the night themes by day */
+  :root[data-fest="meadow"][data-theme="dark"]{ --fest-sky:radial-gradient(50vmax 34vmax at 82% 4%, rgba(190,210,255,.14), transparent 60%), linear-gradient(#08121F, #0F2030 55%, #16291F);
+    --bg-body:#16291F; --ink:#E6EEDD; --ink-soft:#A3B39B; --paper:#0E1A15; --paper-dim:#15241C; --card:#14221B; --line:rgba(220,240,210,.14);
+    --glass-card:rgba(18,32,26,.8); --glass-edge:rgba(220,240,210,.16); --glass-k:.14; --shadow-rgb:0,0,0;
+    --bg-header:rgba(10,20,26,.95); --bg-nav:rgba(14,26,22,.94); --fest-acc:#C9DA9C; color-scheme:dark; }
+  :root[data-fest="birthday"][data-theme="dark"]{ --fest-sky:radial-gradient(90vmax 50vmax at 50% -10%, rgba(228,69,126,.3), transparent 70%), linear-gradient(#1C0D18, #261220 55%, #2C1526);
+    --bg-body:#2C1526; --ink:#FBE8F0; --ink-soft:#C8A3B6; --paper:#1A0C16; --paper-dim:#25121F; --card:#22101C; --line:rgba(255,200,225,.14);
+    --glass-card:rgba(34,15,28,.8); --glass-edge:rgba(255,200,225,.16); --glass-k:.14; --shadow-rgb:0,0,0;
+    --bg-header:rgba(24,11,20,.95); --bg-nav:rgba(30,13,24,.94); --fest-acc:#FF7FAA; color-scheme:dark; }
+  :root[data-fest="birthday"][data-fest-tint="cgm"][data-theme="dark"]{ --fest-sky:radial-gradient(90vmax 50vmax at 50% -10%, rgba(46,140,130,.3), transparent 70%), linear-gradient(#08181A, #0D2224 55%, #102A28);
+    --bg-body:#102A28; --ink:#E2F4F0; --ink-soft:#9BBDB7; --paper:#0A1A19; --paper-dim:#112523; --card:#0F2220; --line:rgba(170,235,225,.14);
+    --glass-card:rgba(14,32,30,.8); --glass-edge:rgba(170,235,225,.16); --bg-header:rgba(8,22,21,.95); --bg-nav:rgba(12,28,26,.94); --fest-acc:#5CC9BC; }
+  :root[data-fest="halloween"][data-theme="light"]{ --fest-sky:linear-gradient(#D8CDD6, #E9E0E4 50%, #F3E3D6);
+    --bg-body:#F0E4E0; --ink:#2A1018; --ink-soft:#6E5560; --paper:#F6EFEE; --paper-dim:#ECE1E2; --card:#FFFFFF; --line:rgba(80,20,40,.14);
+    --glass-card:rgba(255,255,255,.8); --glass-edge:rgba(80,20,40,.14); --glass-k:1; --shadow-rgb:60,10,30;
+    --bg-header:rgba(240,232,235,.96); --bg-nav:rgba(255,255,255,.93); --fest-acc:#C21F2B; color-scheme:light; }
+  :root[data-fest="ge"][data-theme="light"]{ --fest-sky:radial-gradient(70vmax 40vmax at 50% -6%, rgba(255,214,120,.45), transparent 65%), linear-gradient(#FFF4DC, #FBEBCF 55%, #F6DFB8);
+    --bg-body:#F8E8CB; --ink:#3A1408; --ink-soft:#7A5A44; --paper:#FDF6EA; --paper-dim:#F6EAD4; --card:#FFFFFF; --line:rgba(120,60,10,.16);
+    --glass-card:rgba(255,255,255,.8); --glass-edge:rgba(160,100,20,.2); --glass-k:1; --shadow-rgb:120,60,10;
+    --bg-header:rgba(252,243,226,.96); --bg-nav:rgba(255,255,255,.93); --fest-acc:#A8231C; color-scheme:light; }
+  :root[data-fest="ge"][data-theme="light"] #fest-beams i{ background:linear-gradient(to top, rgba(214,150,40,.2), rgba(214,150,40,0) 85%); }
+  :root[data-fest="yipeng"][data-theme="light"]{ --fest-sky:linear-gradient(#C3C8E6, #E2D9EA 50%, #F7E2CF);
+    --bg-body:#F4E2D4; --ink:#2A1E3A; --ink-soft:#685C78; --paper:#F8F1EC; --paper-dim:#EEE3DC; --card:#FFFFFF; --line:rgba(60,40,90,.14);
+    --glass-card:rgba(255,255,255,.8); --glass-edge:rgba(200,120,40,.22); --glass-k:1; --shadow-rgb:70,50,100;
+    --bg-header:rgba(244,236,240,.96); --bg-nav:rgba(255,255,255,.93); --fest-acc:#C25E12; color-scheme:light; }
+  :root[data-fest="yipeng"][data-theme="light"] #fest-water{ background:linear-gradient(to bottom, rgba(150,170,214,0), rgba(150,170,214,.8) 30%, rgba(120,142,196,.92)); }
+  :root[data-fest="winter"][data-theme="light"]{ --fest-sky:linear-gradient(#B4C7DE, #CFDCEA 55%, #E2EAF4);
+    --bg-body:#DCE6F1; --ink:#13233D; --ink-soft:#50627E; --paper:#EEF3F9; --paper-dim:#E2EAF3; --card:#FFFFFF; --line:rgba(30,60,110,.14);
+    --glass-card:rgba(255,255,255,.82); --glass-edge:rgba(30,60,110,.14); --glass-k:1; --shadow-rgb:30,60,110;
+    --bg-header:rgba(230,238,247,.96); --bg-nav:rgba(255,255,255,.93); --fest-acc:#C8313A; color-scheme:light; }
+  :root[data-fest][data-theme="light"] #fest-moon{ opacity:.8; }
+  :root[data-fest="yipeng"][data-theme="light"] .fw-yipeng{ text-shadow:0 0 10px rgba(255,170,70,.35); }
   /* in the header, beside "+ เพิ่มสมาชิก": the theme's word in its own face, and the switch */
   /* it takes only the room left on the row (a basis of 0 never wraps it), and its word wraps or shrinks to fit */
   #fest-slot{ flex:1 1 0; min-width:108px; display:flex; }
@@ -20831,6 +20863,9 @@ const FEST = (() => {
   const rnd = (a, z) => a + Math.random() * (z - a), pick = a => a[Math.floor(Math.random() * a.length)];
   const DT = 1 / 60, DT2 = DT * DT;
   let W = 0, H = 0, DPR = 1, T = 0, vel = 0, acc = 0, lastY = 0, theme = null, running = false, held = false;
+  /* the reader's own light or dark: every theme has a sky for each */
+  let NIGHT = true, moonOn = false;
+  const byMode = v => Array.isArray(v) ? v[NIGHT ? 1 : 0] : v;
   const sf = () => Math.max(-5200, Math.min(5200, vel * 2.4 + acc * .06));
   let cards = [], R = new Map(), Rp = new Map();
   const ptr = { x: -999, y: -999, on: false };
@@ -20861,13 +20896,15 @@ const FEST = (() => {
     }))(Math.max(38, Math.min(80, Math.min(W, H) * .11)));
     const cloud = rgb => sprite(340, 120, g => [[90,70,70],[160,55,80],[230,72,62],[130,85,55],[280,82,40],[50,85,40]].forEach(([x, y, r]) => {
       const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},.9)`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }));
-    SP.cloudNight = cloud('46,22,48'); SP.cloudDay = cloud('255,255,255'); SP.cloudPink = cloud('255,255,255');
+    SP.cloudNight = cloud('46,22,48'); SP.cloudDay = cloud('255,255,255'); SP.cloudAsh = cloud('128,112,128'); SP.cloudDusk = cloud('70,92,120');
     const glow = (rgb, a, r) => sprite(r * 2, r * 2, g => { const gr = g.createRadialGradient(r, r, 0, r, r, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(0, 0, r * 2, r * 2); });
-    SP.warm = glow('255,170,80', .22, 64); SP.kglow = glow('255,190,100', .35, 40);
+    SP.warm = glow('255,170,80', .22, 64); SP.kglow = glow('255,190,100', .35, 40); SP.fly = glow('226,255,150', .85, 10);
     SP.bulb = Object.fromEntries(BULB.map(c => [c, glow(c, .55, 11)]));
     SP.balloon = Object.fromEntries(BAL.map(c => [c, sprite(40, 48, g => { const gr = g.createRadialGradient(15, 16, 2, 20, 22, 24); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.25, c); gr.addColorStop(1, c);
       g.fillStyle = gr; g.beginPath(); g.ellipse(20, 22, 18, 22, 0, 0, 7); g.fill(); g.beginPath(); g.moveTo(17, 46); g.lineTo(23, 46); g.lineTo(20, 42); g.fill(); })]));
     SP.snow = sprite(16, 16, g => { const gr = g.createRadialGradient(8, 8, 0, 8, 8, 8); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.45, 'rgba(255,255,255,.85)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 16, 16); });
+    // by day a flake needs a faint blue rim to show against white cards and a pale sky
+    SP.snowDay = sprite(16, 16, g => { const gr = g.createRadialGradient(8, 8, 0, 8, 8, 8); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.42, 'rgba(255,255,255,.95)'); gr.addColorStop(.62, 'rgba(110,145,190,.5)'); gr.addColorStop(1, 'rgba(110,145,190,0)'); g.fillStyle = gr; g.fillRect(0, 0, 16, 16); });
     SP.lantern = sprite(80, 100, g => {
       const glow = g.createRadialGradient(40, 50, 4, 40, 50, 40); glow.addColorStop(0, 'rgba(255,170,70,.55)'); glow.addColorStop(1, 'rgba(255,170,70,0)');
       g.fillStyle = glow; g.fillRect(0, 0, 80, 100);
@@ -20888,7 +20925,7 @@ const FEST = (() => {
   function paintStars(k){ const g = starsEl.getContext('2d'); starsEl.width = Math.round(W * DPR); starsEl.height = Math.round(H * DPR);
     starsEl.style.height = H + 'px'; g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H); if(!k) return;
     for(const s of stars){ g.globalAlpha = (.35 + .45 * Math.sin(s.p)) * k; g.fillStyle = '#FFF4E8'; g.fillRect(s.x, s.y, s.r, s.r); } }
-  function placeMoon(m){ if(!m){ moonEl.style.display = 'none'; return; } const S = SP.moon.w; moonEl.style.display = 'block';
+  function placeMoon(m){ moonOn = !!m; if(!m){ moonEl.style.display = 'none'; return; } const S = SP.moon.w; moonEl.style.display = 'block';
     moonEl.style.backgroundImage = `url(${SP.moon.toDataURL()})`; moonEl.style.width = S + 'px'; moonEl.style.height = S + 'px';
     moonEl.style.left = (W * m.x - S / 2) + 'px'; moonEl.style.top = (m.y - S / 2) + 'px'; }
   function drawClouds(spr, dt, sy, k = 1, speed = 1){ for(const c of clouds){ c.x += c.v * speed * dt; if(c.x > W + 40){ c.x = -340 * c.s - rnd(0, 200); c.y = rnd(30, H * .45); }
@@ -20922,15 +20959,15 @@ const FEST = (() => {
 
   /* ---- fireworks and stage lights ---- */
   let rockets = [], sparks = [], nextRocket = .3;
-  const FW = [[255, 210, 122], [255, 90, 78], [255, 255, 255], [247, 183, 51]];
+  const FW = [[255, 210, 122], [255, 90, 78], [255, 255, 255], [247, 183, 51]], FW_DAY = [[214, 150, 30], [206, 44, 52], [176, 112, 18], [232, 98, 60]];
   function stepFireworks(dt){
-    nextRocket -= dt; if(nextRocket <= 0){ rockets.push({ x: rnd(W * .12, W * .88), y: H + 10, vy: -rnd(420, 560), ty: rnd(H * .1, H * .4), c: pick(FW) }); nextRocket = rnd(.8, 2); }
+    nextRocket -= dt; if(nextRocket <= 0){ rockets.push({ x: rnd(W * .12, W * .88), y: H + 10, vy: -rnd(420, 560), ty: rnd(H * .1, H * .4), c: pick(NIGHT ? FW : FW_DAY) }); nextRocket = rnd(.8, 2); }
     for(let i = rockets.length - 1; i >= 0; i--){ const r = rockets[i]; r.y += r.vy * dt; r.vy += 150 * dt;
-      if(r.y <= r.ty || r.vy > -80){ const n = 60, c2 = pick(FW); for(let k = 0; k < n; k++){ const a = k / n * 6.283 + rnd(-.05, .05), s = rnd(110, 210);
+      if(r.y <= r.ty || r.vy > -80){ const n = 60, c2 = pick(NIGHT ? FW : FW_DAY); for(let k = 0; k < n; k++){ const a = k / n * 6.283 + rnd(-.05, .05), s = rnd(110, 210);
           sparks.push({ x: r.x, y: r.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rnd(1.1, 1.7), m: 1.7, c: Math.random() < .5 ? r.c : c2 }); } rockets.splice(i, 1); } }
     for(let i = sparks.length - 1; i >= 0; i--){ const p = sparks[i]; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 80 * dt; p.vx *= .985; p.vy *= .985; p.life -= dt; if(p.life <= 0) sparks.splice(i, 1); }
   }
-  function drawFireworks(){ b.globalCompositeOperation = 'lighter';
+  function drawFireworks(){ if(NIGHT) b.globalCompositeOperation = 'lighter';
     for(const r of rockets){ b.fillStyle = `rgba(${r.c},.9)`; b.fillRect(r.x - 1, r.y, 2, 10); }
     for(const p of sparks){ const a = Math.max(0, p.life / p.m); b.fillStyle = `rgba(${p.c},${(a * .95).toFixed(3)})`; b.fillRect(p.x - 1.2, p.y - 1.2, 2.4, 2.4);
       b.fillStyle = `rgba(${p.c},${(a * .25).toFixed(3)})`; b.fillRect(p.x - p.vx * .03, p.y - p.vy * .03, 2, 2); }
@@ -20947,7 +20984,7 @@ const FEST = (() => {
     for(const l of lanterns){ const s = 46 * l.d, fl = .82 + .18 * Math.sin(T * 9 + l.ph) * Math.sin(T * 3.3 + l.ph);
     b.globalAlpha = Math.min(1, (.35 + .65 * l.d) * fl); b.drawImage(SP.lantern, l.x - s * .4, l.y - s * .5, s * .8, s); } b.globalAlpha = 1; }
   function drawWater(){ const top = innerHeight - 70;
-    b.strokeStyle = 'rgba(255,190,110,.22)'; b.lineWidth = 1; b.beginPath();
+    b.strokeStyle = NIGHT ? 'rgba(255,190,110,.22)' : 'rgba(255,255,255,.6)'; b.lineWidth = 1; b.beginPath();
     for(let i = 0; i < 18; i++){ const y = top + 24 + (i % 6) * 7, x = ((i * 97 + T * (10 + i % 4 * 6)) % (W + 80)) - 40; b.moveTo(x, y); b.lineTo(x + 18 + (i % 3) * 10, y); } b.stroke();
     for(const k of krathongs){ const y = innerHeight - 30 + Math.sin(T * 1.6 + k.ph) * 2;
       b.drawImage(SP.kglow, k.x - 40, y - 58, 80, 80);
@@ -20963,30 +21000,34 @@ const FEST = (() => {
   const sideX = () => { const band = Math.max(W * .1, (W - 1180) / 2); return Math.random() < .5 ? rnd(4, band) : rnd(W - band, W - 4); };
   function seedBalloons(){ balloons = Array.from({ length: W > 900 ? 10 : 6 }, () => ({ x: sideX(), y: rnd(0, H + 80), d: rnd(.6, 1.05), vy: rnd(16, 28), ph: rnd(0, 6.3), c: pick(BAL) })).sort((a, z) => a.d - z.d); }
   function stepBalloons(dt){ for(const l of balloons){ l.y -= l.vy * l.d * dt; l.x += Math.sin(T * .6 + l.ph) * 6 * l.d * dt; if(l.y < -90){ l.y = H + 60; l.x = sideX(); } } }
-  function drawBalloons(){ b.strokeStyle = 'rgba(120,70,100,.45)'; b.lineWidth = 1; b.beginPath();
+  function drawBalloons(){ b.strokeStyle = NIGHT ? 'rgba(255,225,238,.3)' : 'rgba(120,70,100,.45)'; b.lineWidth = 1; b.beginPath();
     for(const l of balloons){ const s = 34 * l.d, x = l.x + Math.sin(T * 1.2 + l.ph) * 3, y = l.y; b.moveTo(x, y + s * .62); b.quadraticCurveTo(x + Math.sin(T * 2 + l.ph) * 8, y + s * 1.3, x - 2, y + s * 2); }
     b.stroke();
-    for(const l of balloons){ const s = 34 * l.d, x = l.x + Math.sin(T * 1.2 + l.ph) * 3; b.globalAlpha = .35 + .4 * l.d; b.drawImage(SP.balloon[l.c], x - s * .5, l.y - s * .6, s, s * 1.2); }
+    for(const l of balloons){ const s = 34 * l.d, x = l.x + Math.sin(T * 1.2 + l.ph) * 3; b.globalAlpha = (NIGHT ? .45 : .35) + .4 * l.d; b.drawImage(SP.balloon[l.c], x - s * .5, l.y - s * .6, s, s * 1.2); }
     b.globalAlpha = 1; }
 
   /* ---- grass ---- */
-  let blades = []; const GRASS = ['#6E9A4C', '#83AE5C', '#5C8A3E', '#9BC26E'];
-  function seedGrass(){ blades = Array.from({ length: Math.round(W / 4.4) }, (_, i) => ({ x: i * 4.4 + rnd(-2, 2), h: rnd(34, 86), ph: rnd(0, 6.3), c: pick(GRASS), fl: Math.random() < .07 })); }
+  let blades = []; const GRASS = ['#6E9A4C', '#83AE5C', '#5C8A3E', '#9BC26E'], GRASS_N = ['#2C4A30', '#365838', '#243E2A', '#41663F'];
+  function seedGrass(){ blades = Array.from({ length: Math.round(W / 4.4) }, (_, i) => ({ x: i * 4.4 + rnd(-2, 2), h: rnd(34, 86), ph: rnd(0, 6.3), c: Math.floor(rnd(0, 4)), fl: Math.random() < .07 }));
+    flies = Array.from({ length: W > 900 ? 22 : 12 }, () => ({ x: rnd(0, W), y: rnd(innerHeight * .35, innerHeight - 20), ph: rnd(0, 6.3), sp: rnd(.3, .7), r: rnd(14, 40) })); }
+  let flies = [];
+  function drawFlies(){ for(const q of flies){ const x = q.x + Math.sin(T * q.sp + q.ph) * q.r, y = q.y + Math.sin(T * q.sp * 1.3 + q.ph * 2) * q.r * .5;
+    b.globalAlpha = Math.max(0, Math.sin(T * 1.6 + q.ph * 3)) * .9; b.drawImage(SP.fly, x - 10, y - 10, 20, 20); } b.globalAlpha = 1; }
   function drawGrass(){ const base = innerHeight + 4, wind = Math.max(-30, Math.min(30, vel * .01));
-    b.lineCap = 'round'; b.lineWidth = 2.2; const tips = [];
-    for(const col of GRASS){ b.strokeStyle = col; b.beginPath();
-      for(const g of blades){ if(g.c !== col) continue; const sway = Math.sin(T * 1.3 + g.ph + g.x * .01) * g.h * .12 + wind * g.h / 60;
+    b.lineCap = 'round'; b.lineWidth = 2.2; const tips = [], P = NIGHT ? GRASS_N : GRASS;
+    for(let ci = 0; ci < 4; ci++){ b.strokeStyle = P[ci]; b.beginPath();
+      for(const g of blades){ if(g.c !== ci) continue; const sway = Math.sin(T * 1.3 + g.ph + g.x * .01) * g.h * .12 + wind * g.h / 60;
         b.moveTo(g.x, base); b.quadraticCurveTo(g.x + sway * .3, base - g.h * .55, g.x + sway, base - g.h); if(g.fl) tips.push(g.x + sway, base - g.h); }
       b.stroke(); }
-    b.fillStyle = '#FFFFFF'; b.beginPath(); for(let i = 0; i < tips.length; i += 2){ b.moveTo(tips[i] + 3.2, tips[i + 1]); b.arc(tips[i], tips[i + 1], 3.2, 0, 7); } b.fill();
-    b.fillStyle = '#F4C84A'; b.beginPath(); for(let i = 0; i < tips.length; i += 2){ b.moveTo(tips[i] + 1.3, tips[i + 1]); b.arc(tips[i], tips[i + 1], 1.3, 0, 7); } b.fill(); }
+    b.fillStyle = NIGHT ? '#C9CDBE' : '#FFFFFF'; b.beginPath(); for(let i = 0; i < tips.length; i += 2){ b.moveTo(tips[i] + 3.2, tips[i + 1]); b.arc(tips[i], tips[i + 1], 3.2, 0, 7); } b.fill();
+    b.fillStyle = NIGHT ? '#B8963A' : '#F4C84A'; b.beginPath(); for(let i = 0; i < tips.length; i += 2){ b.moveTo(tips[i] + 1.3, tips[i + 1]); b.arc(tips[i], tips[i + 1], 1.3, 0, 7); } b.fill(); }
 
 
   /* ---- snow in the air ---- */
   let flakes = [];
   function seedSnow(){ flakes = Array.from({ length: 80 }, () => ({ x: rnd(0, W), y: rnd(0, H), d: rnd(.3, 1), ph: rnd(0, 6.3) })); }
   function stepSnow(dt){ for(const s of flakes){ s.y += (18 + 40 * s.d) * dt; s.x += Math.sin(T * .7 + s.ph) * 14 * s.d * dt; if(s.y > H + 8){ s.y = -8; s.x = rnd(0, W); } } }
-  function drawSnow(sy){ for(const s of flakes){ const z = 3 + 6 * s.d; b.globalAlpha = .35 + .5 * s.d; b.drawImage(SP.snow, s.x - z / 2, ((s.y - sy * .05 * s.d) % (H + 16) + H + 16) % (H + 16) - 8 - z / 2, z, z); } b.globalAlpha = 1; }
+  function drawSnow(sy){ for(const s of flakes){ const z = 3 + 6 * s.d; b.globalAlpha = .35 + .5 * s.d; b.drawImage(NIGHT ? SP.snow : SP.snowDay, s.x - z / 2, ((s.y - sy * .05 * s.d) % (H + 16) + H + 16) % (H + 16) - 8 - z / 2, z, z); } b.globalAlpha = 1; }
 
   /* ===================== what clings to the cards ===================== */
   /* -- Verlet bits: webs, a spider's silk, a string of lights -- */
@@ -21029,19 +21070,19 @@ const FEST = (() => {
   const BULB = ['255,70,70', '80,220,120', '255,210,90', '255,255,255', '110,170,255'];
   function drawRopes(){
     f.lineCap = 'round';
-    for(const pass of [1]){ f.lineWidth = .85; f.strokeStyle = 'rgba(238,230,242,.62)'; f.beginPath();
+    for(const pass of [1]){ f.lineWidth = .85; f.strokeStyle = NIGHT ? 'rgba(238,230,242,.62)' : 'rgba(58,40,54,.5)'; f.beginPath();
       for(const o of ropes){ if(!o.on || o.type === 'lights') continue; const N = o.nodes;
         if(o.type === 'web') for(const c of o.cons){ f.moveTo(o.cx + N[c.a].x, o.cy + N[c.a].y); f.lineTo(o.cx + N[c.b].x, o.cy + N[c.b].y); }
         else { f.moveTo(o.cx + N[0].x, o.cy + N[0].y); for(let k = 1; k < N.length; k++) f.lineTo(o.cx + N[k].x, o.cy + N[k].y); } }
       f.stroke(); }
     for(const o of ropes){ if(!o.on) continue; const N = o.nodes;
       if(o.type === 'web') for(const d of o.dew){ const n = N[d.i], x = o.cx + n.x, y = o.cy + n.y;
-        f.fillStyle = 'rgba(190,210,255,.22)'; f.beginPath(); f.arc(x, y, d.r * 1.9, 0, 7); f.fill(); f.fillStyle = 'rgba(255,255,255,.85)'; f.beginPath(); f.arc(x - d.r * .2, y - d.r * .25, d.r * .55, 0, 7); f.fill(); }
+        f.fillStyle = NIGHT ? 'rgba(190,210,255,.22)' : 'rgba(90,100,140,.2)'; f.beginPath(); f.arc(x, y, d.r * 1.9, 0, 7); f.fill(); f.fillStyle = 'rgba(255,255,255,.85)'; f.beginPath(); f.arc(x - d.r * .2, y - d.r * .25, d.r * .55, 0, 7); f.fill(); }
       if(o.type === 'silk'){ const e = N[N.length - 1], p = N[N.length - 2]; drawSpider(o.cx + e.x, o.cy + e.y, Math.atan2(e.x - p.x, e.y - p.y), o.ph); }
       if(o.type === 'lights'){ f.strokeStyle = 'rgba(30,60,40,.9)'; f.lineWidth = 1.2; f.beginPath(); N.forEach((n, k) => k ? f.lineTo(o.cx + n.x, o.cy + n.y) : f.moveTo(o.cx + n.x, o.cy + n.y)); f.stroke();
-        f.globalCompositeOperation = 'lighter';
+        if(NIGHT) f.globalCompositeOperation = 'lighter';
         for(let k = 1; k < N.length - 1; k += 2){ const n = N[k], c = BULB[(k >> 1) % BULB.length], tw = .55 + .45 * Math.sin(T * 3 + k * 1.7 + o.ph), x = o.cx + n.x, y = o.cy + n.y + 4;
-          f.globalAlpha = tw; f.drawImage(SP.bulb[c], x - 11, y - 11, 22, 22); f.globalAlpha = .6 + .4 * tw;
+          f.globalAlpha = NIGHT ? tw : tw * .6; f.drawImage(SP.bulb[c], x - 11, y - 11, 22, 22); f.globalAlpha = .6 + .4 * tw;
           f.fillStyle = `rgb(${c})`; f.beginPath(); f.ellipse(x, y, 2.4, 3.6, 0, 0, 7); f.fill(); } f.globalAlpha = 1;
         f.globalCompositeOperation = 'source-over'; } }
   }
@@ -21104,7 +21145,7 @@ const FEST = (() => {
         for(let i = 0; i <= 8; i++){ const px = (i / 8 - .5) * s * 1.8, py = Math.sin(i * 1.3 + it.ph + (landed ? 0 : T * 4)) * s * .22; i ? f.lineTo(px, py) : f.moveTo(px, py); } f.stroke(); f.restore(); break; }
       case 'petal': { f.save(); f.translate(x, y - (landed ? 1.5 : 0)); f.rotate(it.rot); f.scale(1, landed ? .55 : Math.cos(it.rot * 1.6) * .5 + .5);
         f.fillStyle = it.c; f.beginPath(); f.ellipse(0, 0, s * .55, s * .3, 0, 0, 7); f.fill(); f.restore(); break; }
-      case 'snow': { const z = s; f.drawImage(SP.snow, x - z / 2, y - z / 2, z, z); break; }
+      case 'snow': { const z = s; f.drawImage(NIGHT ? SP.snow : SP.snowDay, x - z / 2, y - z / 2, z, z); break; }
     }
   }
   function drawSettlers(){
@@ -21127,32 +21168,33 @@ const FEST = (() => {
   const THEMES = {
     meadow: { name: 'อยากจะไปกับเธอ', en: 'Kimi to Doko ka e Ikitai', word: 'Kimi to Doko ka e Ikitai', pill: 'Kimi to Doko\nka e Ikitai',
       settle: { kinds: ['seed'], colors: ['#fff'], size: [10, 16], rate: 1.6, max: 60, fall: 30, k: 1.2, sway: 30, face: .004, cap: 22, th: [700, 2400] },
-      sky(dt, sy){ drawClouds(SP.cloudDay, dt, sy, .9, .7); drawGrass(); } },
-    halloween: { name: 'ฮาโลวีน', en: 'Halloween', word: 'ฮาโลวีนที่ 48', stars: 1, moon: { x: .8, y: 96 },
+      stars: [0, .7], moon: [null, { x: .82, y: 92 }],
+      sky(dt, sy){ if(NIGHT){ drawClouds(SP.cloudDusk, dt, sy, .45, .5); drawGrass(); drawFlies(); } else { drawClouds(SP.cloudDay, dt, sy, .9, .7); drawGrass(); } } },
+    halloween: { name: 'ฮาโลวีน', en: 'Halloween', word: 'ฮาโลวีนที่ 48', stars: [0, 1], moon: { x: .8, y: 96 },
       ropes(){ const P = [['tr'], ['bl', .8], ['br'], ['tr'], ['br', .3], ['br', .55], ['tr,br']];
         cards.forEach((c, i) => { const [cs, sp] = c.classList.contains('today-hero') ? ['tl,tr', .62] : P[i % P.length];
           cs.split(',').forEach((k, j) => ropes.push(makeWeb(c, k, 62 + ((i * 37 + j * 53) % 34)))); if(sp) ropes.push(makeSilk(c, sp)); }); },
-      sky(dt, sy){ drawClouds(SP.cloudNight, dt, sy); stepBats(dt); drawBats(b, false); },
+      sky(dt, sy){ drawClouds(NIGHT ? SP.cloudNight : SP.cloudAsh, dt, sy, NIGHT ? 1 : .55); stepBats(dt); drawBats(b, false); },
       front(){ drawBats(f, true); } },
     ge: { name: 'คืนประกาศผล', en: 'Results night', word: 'GE2026',
-      settle: { kinds: ['confetti', 'confetti', 'ribbon'], colors: ['#F2C14E', '#FFE6A0', '#E8333C', '#FFFFFF', '#C8902A'], size: [7, 12], rate: 5, max: 110, fall: 75, k: 2, sway: 34, face: .005, cap: 30, th: [800, 2600] },
+      settle: { kinds: ['confetti', 'confetti', 'ribbon'], colors: ['#F2C14E', '#FFE6A0', '#E8333C', '#FFFFFF', '#C8902A'],
+        byMode: [['#E0A526', '#C8902A', '#E8333C', '#B8252E', '#F2C14E'], ['#F2C14E', '#FFE6A0', '#E8333C', '#FFFFFF', '#C8902A']], size: [7, 12], rate: 5, max: 110, fall: 75, k: 2, sway: 34, face: .005, cap: 30, th: [800, 2600] },
       sky(dt){ stepFireworks(dt); drawFireworks(); } },
-    yipeng: { name: 'ยี่เป็ง', en: 'Yi Peng', word: 'ยี่เป็ง', stars: .7, moon: { x: .18, y: 80 },
+    yipeng: { name: 'ยี่เป็ง', en: 'Yi Peng', word: 'ยี่เป็ง', stars: [0, .7], moon: { x: .18, y: 80 },
       settle: { kinds: ['petal'], colors: ['#F5A623', '#FFC93C', '#F08A24', '#FFE08A'], size: [7, 11], rate: 1.4, max: 50, fall: 42, k: 1.6, sway: 24, face: .003, cap: 18, th: [700, 2400] },
       sky(dt){ stepLanterns(dt); drawLanterns(); drawWater(); } },
-    winter: { name: 'ฤดูหนาว', en: 'Winter', word: 'Merry Christmas', stars: .6,
+    winter: { name: 'ฤดูหนาว', en: 'Winter', word: 'Merry Christmas', stars: [0, .6],
       settle: { kinds: ['snow'], colors: ['#fff'], size: [5, 9], rate: 9, max: 140, fall: 48, k: 1.5, sway: 18, face: 0, pile: true, cap: 0, th: [1e9, 1e9] },
       ropes(){ cards.forEach((c, i) => { if(i % 2 === 0 && i < 8) ropes.push(makeLights(c)); }); },
       sky(dt, sy){ stepSnow(dt); drawSnow(sy); } },
     /* a birthday: one shower of confetti as the page opens, settling along the
        cards' top edges, then only a piece now and then; a few balloons rising
        up the sides, clear of what is being read; in her group's colours */
-    birthday: { name: 'วันเกิด', en: 'Birthday', word: 'Happy Birthday',
+    birthday: { name: 'วันเกิด', en: 'Birthday', word: 'Happy Birthday', stars: [0, .35],
       settle: { kinds: ['confetti'], colors: ['#E4457E', '#F59BBE', '#FFFFFF', '#FFD34E'], size: [6, 10], rate: .3, burst: 48, max: 70, fall: 150, k: 1.4, sway: 22, face: 0, cap: 18, th: [800, 2600] },
       sky(dt){ stepBalloons(dt); drawBalloons(); } },
   };
   for(const k in THEMES) THEMES[k].id = k;
-  const DARK = new Set(['halloween', 'ge', 'yipeng', 'winter']);
   /* days are Thai dates; MM-DD ones come back every year */
   const SCHEDULE = [['meadow', '2026-10-01', '2026-10-23'], ['halloween', '10-24', '11-01'], ['ge', '2026-11-02', '2026-11-15'],
     ['yipeng', '2026-11-16', '2026-11-30'], ['winter', '12-01', '12-31']];
@@ -21188,14 +21230,14 @@ const FEST = (() => {
   function restart(){
     bats = []; rockets = []; sparks = []; ropes = [];
     seedSky(); seedLanterns(); seedBalloons(); seedSnow();
-    paintStars(theme.stars || 0); placeMoon(theme.moon); b.clearRect(0, 0, W, H); f.clearRect(0, 0, W, H);
+    paintStars(byMode(theme.stars) || 0); placeMoon(byMode(theme.moon)); b.clearRect(0, 0, W, H); f.clearRect(0, 0, W, H);
     if(theme.ropes) theme.ropes(); stInit(theme.settle || null);
     if(theme.id === 'halloween'){ spawnBats(false); bats.forEach((t, i) => t.x = W * (.2 + i * .15)); }
     for(let i = 0; i < 200; i++) stepRopes();
   }
   function render(dt){
     const y = scrollY;
-    if(theme.moon) moonEl.style.transform = `translate3d(0,${(-y * .14).toFixed(1)}px,0)`;
+    if(moonOn) moonEl.style.transform = `translate3d(0,${(-y * .14).toFixed(1)}px,0)`;
     b.clearRect(0, 0, W, H); theme.sky(dt, y); f.clearRect(0, 0, W, H);
     drawSettlers(); drawRopes(); if(theme.front) theme.front();
   }
@@ -21237,8 +21279,9 @@ const FEST = (() => {
     if(!t){ if(theme){ theme = null; delete root.dataset.fest; moonEl.style.display = 'none'; f.clearRect(0, 0, W, H); b.clearRect(0, 0, W, H);
       root.dataset.theme = state.theme; } return; }
     held = !!(state.selectedEvent || state.selectedId || state.posterOf || state.dayOf);
-    const next = THEMES[t.id], fresh = !theme || theme.id !== t.id;
-    root.dataset.fest = t.id; root.dataset.theme = DARK.has(t.id) ? 'dark' : 'light';   // the site's own dark or light rules follow the theme's sky
+    const night = state.theme === 'dark', next = THEMES[t.id], fresh = !theme || theme.id !== t.id || night !== NIGHT;
+    NIGHT = night; root.dataset.fest = t.id; root.dataset.theme = state.theme;   // the theme dresses whichever mode the reader picked
+    if(next.settle && next.settle.byMode) next.settle.colors = byMode(next.settle.byMode);
     if(t.id === 'meadow') festTypekit();
     if(t.id === 'birthday'){ const cs = [...new Set(t.who.map(m => (getGroup(m.groupId) || {}).color).filter(Boolean))];
       next.settle.colors = [...cs, ...cs, '#FFFFFF', '#FFD34E'];

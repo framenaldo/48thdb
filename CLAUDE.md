@@ -60,8 +60,10 @@ the Firebase CLI from the owner's machine.
   theme — Kimi to Doko ka e Ikitai to 23 Oct, Halloween 24 Oct – 1 Nov, the GE
   results night 2–15 Nov, Yi Peng 16–30 Nov (Loy Krathong 24 Nov 2026), winter in
   December, and the birthday theme on any current member's birthday (but 14 Nov,
-  results night, stays GE: `FIRM`). A theme sets `data-fest` on the root, its own
-  colours over light or dark, and forces the site's `data-theme` to match its sky.
+  results night, stays GE: `FIRM`). A theme sets `data-fest` on the root and
+  dresses whichever mode the reader picked — the light/dark switch keeps working:
+  each theme has a sky and colours for both (`NIGHT` in the script; the night
+  themes by day, the day themes at night, in the CSS beside each).
   Things on `.today-hero` and `.ev-card` move with the scroll. The theme's word
   and its off switch are a pill in the header beside "+ เพิ่มสมาชิก" (`#fest-slot`,
   the word shrinks to the room left), home page only; turned off it reads
