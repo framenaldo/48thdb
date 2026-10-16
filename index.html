@@ -5394,6 +5394,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      nothing blurs over the moving sky while it is on. */
   .fest-layer{ position:fixed; left:0; top:0; width:100vw; pointer-events:none; z-index:-1; display:none; }
   .fest-layer.is-front{ z-index:10; }
+  /* what has landed on a card is drawn on the card's own little canvas, in the
+     page, so a scroll carries it with the card on the same frame */
+  :root[data-fest] .feed-page{ position:relative; }
+  #fest-cards{ position:absolute; left:0; top:0; width:0; height:0; overflow:visible; pointer-events:none; z-index:4; }
+  #fest-cards canvas{ position:absolute; display:block; }
   #fest-sky{ height:100vh; height:100lvh; background:var(--fest-sky, none); }
   :root[data-fest] #fest-sky, :root[data-fest] #fest-stars, :root[data-fest] #fest-bg, :root[data-fest] #fest-fx{ display:block; }
   #fest-moon{ width:0; height:0; background-repeat:no-repeat; background-size:contain; will-change:transform; }
@@ -21133,31 +21138,54 @@ const FEST = (() => {
           if(k % 3 === 0 || hit){ const it = stItem(cfg, x + rnd(-3, 3), r.top - rec.bins[k] - 2); it.s *= 1.5; it.heavy = true; it.vy = -vel * .2 + rnd(-30, 0); it.vx = rnd(-30, 30); it.th = 1e9; ST.free.push(it); } } } }
     }
   }
-  function drawItem(x, y, it, landed){
+  function drawItem(x, y, it, landed, g = f){
     const s = it.s;
     switch(it.k){
-      case 'seed': { f.save(); f.translate(x, y); f.rotate(landed ? Math.sin(T * 1.5 + it.ph) * .12 : Math.sin(it.rot) * .5);
-        f.strokeStyle = 'rgba(255,255,255,.9)'; f.lineWidth = .7; f.beginPath(); f.moveTo(0, 0); f.lineTo(0, -s);
-        for(let i = 0; i < 9; i++){ const a = -Math.PI / 2 + (i - 4) * .3; f.moveTo(0, -s); f.lineTo(Math.cos(a) * s * .55, -s + Math.sin(a) * s * .55); } f.stroke();
-        f.fillStyle = '#9C8A62'; f.beginPath(); f.ellipse(0, -1, 1.1, 2.2, 0, 0, 7); f.fill(); f.restore(); break; }
-      case 'confetti': { f.save(); f.translate(x, y - (landed ? 1.5 : 0)); f.rotate(landed ? it.rot : it.rot); f.scale(1, landed ? .35 : Math.cos(it.rot * 2.2)); f.fillStyle = it.c; f.fillRect(-s * .3, -s * .5, s * .6, s); f.restore(); break; }
-      case 'ribbon': { f.save(); f.translate(x, y - (landed ? 2 : 0)); f.rotate(landed ? 0 : it.rot * .4); f.strokeStyle = it.c; f.lineWidth = 2; f.beginPath();
-        for(let i = 0; i <= 8; i++){ const px = (i / 8 - .5) * s * 1.8, py = Math.sin(i * 1.3 + it.ph + (landed ? 0 : T * 4)) * s * .22; i ? f.lineTo(px, py) : f.moveTo(px, py); } f.stroke(); f.restore(); break; }
-      case 'petal': { f.save(); f.translate(x, y - (landed ? 1.5 : 0)); f.rotate(it.rot); f.scale(1, landed ? .55 : Math.cos(it.rot * 1.6) * .5 + .5);
-        f.fillStyle = it.c; f.beginPath(); f.ellipse(0, 0, s * .55, s * .3, 0, 0, 7); f.fill(); f.restore(); break; }
-      case 'snow': { const z = s; f.drawImage(NIGHT ? SP.snow : SP.snowDay, x - z / 2, y - z / 2, z, z); break; }
+      case 'seed': { g.save(); g.translate(x, y); g.rotate(landed ? Math.sin(T * 1.5 + it.ph) * .12 : Math.sin(it.rot) * .5);
+        g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = .7; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -s);
+        for(let i = 0; i < 9; i++){ const a = -Math.PI / 2 + (i - 4) * .3; g.moveTo(0, -s); g.lineTo(Math.cos(a) * s * .55, -s + Math.sin(a) * s * .55); } g.stroke();
+        g.fillStyle = '#9C8A62'; g.beginPath(); g.ellipse(0, -1, 1.1, 2.2, 0, 0, 7); g.fill(); g.restore(); break; }
+      case 'confetti': { g.save(); g.translate(x, y - (landed ? 1.5 : 0)); g.rotate(landed ? it.rot : it.rot); g.scale(1, landed ? .35 : Math.cos(it.rot * 2.2)); g.fillStyle = it.c; g.fillRect(-s * .3, -s * .5, s * .6, s); g.restore(); break; }
+      case 'ribbon': { g.save(); g.translate(x, y - (landed ? 2 : 0)); g.rotate(landed ? 0 : it.rot * .4); g.strokeStyle = it.c; g.lineWidth = 2; g.beginPath();
+        for(let i = 0; i <= 8; i++){ const px = (i / 8 - .5) * s * 1.8, py = Math.sin(i * 1.3 + it.ph + (landed ? 0 : T * 4)) * s * .22; i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); g.restore(); break; }
+      case 'petal': { g.save(); g.translate(x, y - (landed ? 1.5 : 0)); g.rotate(it.rot); g.scale(1, landed ? .55 : Math.cos(it.rot * 1.6) * .5 + .5);
+        g.fillStyle = it.c; g.beginPath(); g.ellipse(0, 0, s * .55, s * .3, 0, 0, 7); g.fill(); g.restore(); break; }
+      case 'snow': { const z = s; g.drawImage(NIGHT ? SP.snow : SP.snowDay, x - z / 2, y - z / 2, z, z); break; }
     }
+  }
+  /* Landed ones are drawn on a canvas laid over each card inside the page, not
+     on the screen-wide one: that one is redrawn a frame behind the scroll, and
+     the seeds on it shivered and floated against the card. In the page the
+     scroll moves them with the card itself. */
+  const LP = 28;   // room around the card, for what stands on its top edge
+  function cardBox(){
+    const page = document.querySelector('#main .feed-page'); if(!page) return null;
+    let box = page.querySelector(':scope > #fest-cards');
+    if(!box){ box = document.createElement('div'); box.id = 'fest-cards'; box.setAttribute('aria-hidden', 'true'); page.appendChild(box); }
+    return box;
+  }
+  function layerOf(c, box){
+    let L = c._festL; if(L && L.parentNode === box) return L;
+    L = c._festL = document.createElement('canvas'); L._k = ''; box.appendChild(L); return L;
   }
   function drawSettlers(){
     if(!ST.cfg) return;
-    for(const c of cards){ const r = R.get(c); if(!visible(r)) continue; const rec = ST.att.get(c);
-      if(rec.bins){ const x0 = r.left + 12; f.beginPath(); f.moveTo(x0 - 6, r.top + 1);
-        for(let k = 0; k < rec.bins.length; k++){ const x = x0 + k * 6 + 3, y = r.top + 1 - rec.bins[k], nx = x + 6, ny = r.top + 1 - (rec.bins[k + 1] ?? 0);
-          f.quadraticCurveTo(x, y, (x + nx) / 2, (y + ny) / 2); }
-        f.lineTo(x0 + rec.bins.length * 6 + 6, r.top + 1); f.closePath();
-        const g = f.createLinearGradient(0, r.top - 16, 0, r.top + 2); g.addColorStop(0, '#FFFFFF'); g.addColorStop(1, '#CFE0F2');
-        f.save(); f.translate(0, 1.5); f.fillStyle = 'rgba(0,0,0,.18)'; f.fill(); f.restore(); f.fillStyle = g; f.fill(); }
-      for(const it of rec.items) drawItem(r.left + it.lx, r.top + it.ly, it, true); }
+    const box = cardBox(); if(!box) return; const br = box.getBoundingClientRect();
+    for(const c of cards){ const r = R.get(c), rec = ST.att.get(c); if(!rec) continue; const L = layerOf(c, box);
+      if(!visible(r) || (!rec.items.length && !rec.bins)){ if(L._k){ L._k = ''; L.width = 0; L.height = 0; } continue; }
+      const x = Math.round(r.left - br.left) - LP, y = Math.round(r.top - br.top) - LP, w = Math.ceil(r.width) + LP * 2, h = Math.ceil(r.height) + LP * 2;
+      const key = `${x},${y},${w},${h},${DPR}`;
+      if(L._k !== key){ L._k = key; L.width = Math.ceil(w * DPR); L.height = Math.ceil(h * DPR); L.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px`; }
+      const g = L.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, L.width, L.height);
+      // draw in screen terms, shifted so the card's corner lands where it sits on this canvas
+      g.setTransform(DPR, 0, 0, DPR, -(br.left + x) * DPR, -(br.top + y) * DPR);
+      if(rec.bins){ const x0 = r.left + 12; g.beginPath(); g.moveTo(x0 - 6, r.top + 1);
+        for(let k = 0; k < rec.bins.length; k++){ const px = x0 + k * 6 + 3, py = r.top + 1 - rec.bins[k], nx = px + 6, ny = r.top + 1 - (rec.bins[k + 1] ?? 0);
+          g.quadraticCurveTo(px, py, (px + nx) / 2, (py + ny) / 2); }
+        g.lineTo(x0 + rec.bins.length * 6 + 6, r.top + 1); g.closePath();
+        const gr = g.createLinearGradient(0, r.top - 16, 0, r.top + 2); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(1, '#CFE0F2');
+        g.save(); g.translate(0, 1.5); g.fillStyle = 'rgba(0,0,0,.18)'; g.fill(); g.restore(); g.fillStyle = gr; g.fill(); }
+      for(const it of rec.items) drawItem(r.left + it.lx, r.top + it.ly, it, true, g); }
     for(const it of ST.free) drawItem(it.x, it.y, it, false);
   }
 
@@ -21276,7 +21304,7 @@ const FEST = (() => {
     if(slot){ const h = row(); if(slot._h !== h){ slot.innerHTML = h; slot._h = h; } if(ro && watched !== slot){ if(watched) ro.unobserve(watched); ro.observe(slot); watched = slot; } fit(); }
     const t = state.view === 'feed' && !state.query && !isOff() ? today() : null;
     const root = document.documentElement;
-    if(!t){ if(theme){ theme = null; delete root.dataset.fest; moonEl.style.display = 'none'; f.clearRect(0, 0, W, H); b.clearRect(0, 0, W, H);
+    if(!t){ if(theme){ theme = null; document.querySelectorAll('#fest-cards').forEach(e => e.remove()); delete root.dataset.fest; moonEl.style.display = 'none'; f.clearRect(0, 0, W, H); b.clearRect(0, 0, W, H);
       root.dataset.theme = state.theme; } return; }
     held = !!(state.selectedEvent || state.selectedId || state.posterOf || state.dayOf);
     const night = state.theme === 'dark', next = THEMES[t.id], fresh = !theme || theme.id !== t.id || night !== NIGHT;
