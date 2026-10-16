@@ -34,6 +34,16 @@ the Firebase CLI from the owner's machine.
 
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
   handler, and views switched on `state.view`.
+- **The header** is the logo, the search and one menu button (`renderSetMenu`:
+  GE2026, calendar, gallery and shop, then light/dark and the language), with the
+  season's pill and sign-in under it. "+ เพิ่มสมาชิก" lives on the members page.
+  The home page opens on a slim date-and-share card (its "วันนี้ที่ 48" heading is
+  kept only for search engines and screen readers), the live vote, then the
+  **dashboard** (`renderHomeDash`, zone `dash`): between election rounds the
+  latest round as a square with its top three, and tiles for the days to the
+  concert and results, the next 7 days' events, the open shops and the gallery.
+  While a round is read out, the results card takes its full size and the tiles
+  sit under it in one row.
 - **My layout.** A signed-in reader can move, hide or add zones on the home
   page and their profile, pick the bottom menu's four tabs (profile is always
   last), a background and their profile's colour (`LAYOUT_ZONES`,
