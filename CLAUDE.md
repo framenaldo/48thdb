@@ -74,7 +74,12 @@ the Firebase CLI from the owner's machine.
   dresses whichever mode the reader picked — the light/dark switch keeps working:
   each theme has a sky and colours for both (`NIGHT` in the script; the night
   themes by day, the day themes at night, in the CSS beside each).
-  Things on `.today-hero` and `.ev-card` move with the scroll. The theme's word
+  Things on `.today-hero` and `.ev-card` move with the scroll. The meadow's grass is
+  its own strip at the foot of the screen (`#fest-grass`, in front of the page, under
+  the menu bar): three depths of flat-coloured tapered blades on springs, a rolling
+  breeze, passing gusts, the page's fling and a finger parting them, with daisies
+  and dandelion clocks. Gradients inside every blade halved the frame rate on a
+  slow phone — keep the blades flat. The theme's word
   and its off switch are a pill in the header beside "+ เพิ่มสมาชิก" (`#fest-slot`,
   the word shrinks to the room left), home page only; turned off it reads
   "เปิดธีม" (localStorage `48thdb-fest-off`). Keep it smooth on the iPhone:

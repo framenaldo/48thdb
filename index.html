@@ -5460,6 +5460,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   #fest-beams i:first-child{ left:22%; --a:-28deg; --z:-6deg; }
   #fest-beams i:last-child{ left:78%; --a:28deg; --z:6deg; animation-delay:-3.5s; }
   @keyframes fest-sweep{ from{ transform:rotate(var(--a)); } to{ transform:rotate(var(--z)); } }
+  /* the meadow's grass: a strip at the foot of the screen, in front of the page and under the menu bar */
+  #fest-grass{ top:auto; bottom:0; z-index:9; }
+  :root[data-fest="meadow"] #fest-grass{ display:block; }
   #fest-water{ top:auto; bottom:0; height:72px; background:linear-gradient(to bottom, rgba(10,20,52,0), rgba(10,20,52,.88) 30%, rgba(4,8,22,.96)); }
   #fest-fog{ top:auto; bottom:-40px; left:0; width:100vw; height:220px; opacity:.7;
     background:radial-gradient(40% 60% at 25% 70%, rgba(120,52,84,.22), transparent 70%), radial-gradient(35% 55% at 70% 80%, rgba(120,52,84,.18), transparent 70%); }
@@ -21118,22 +21121,86 @@ const FEST = (() => {
     for(const l of balloons){ const s = 34 * l.d, x = l.x + Math.sin(T * 1.2 + l.ph) * 3; b.globalAlpha = (NIGHT ? .45 : .35) + .4 * l.d; b.drawImage(SP.balloon[l.c], x - s * .5, l.y - s * .6, s, s * 1.2); }
     b.globalAlpha = 1; }
 
-  /* ---- grass ---- */
-  let blades = []; const GRASS = ['#6E9A4C', '#83AE5C', '#5C8A3E', '#9BC26E'], GRASS_N = ['#2C4A30', '#365838', '#243E2A', '#41663F'];
-  function seedGrass(){ blades = Array.from({ length: Math.round(W / 4.4) }, (_, i) => ({ x: i * 4.4 + rnd(-2, 2), h: rnd(34, 86), ph: rnd(0, 6.3), c: Math.floor(rnd(0, 4)), fl: Math.random() < .07 }));
+  /* ---- grass ----
+     Its own strip pinned to the bottom of the screen, in front of the page but
+     under the menu bar, drawn sharp. Three depths of tapered blades — the far
+     ones shorter and paler — each a little spring the wind leans on: a steady
+     breeze that rolls across the field, gusts that run through it now and then,
+     a whoosh when the page is flung, and a finger near the bottom parts them.
+     A few daisies, and the dandelion clocks the seeds come from. */
+  const grassEl = mk('canvas', 'fest-grass', 'fest-layer'), gg = grassEl.getContext('2d');
+  let blades = [], puffs = [], GH = 90, gTop = 0, nextGust = 1.5, roots = null;
+  const gust = { x: -9999, v: 0, a: 0, w: 160 };
+  // per depth, far to near, by day and by night; the last is the few dry blades. Flat colours: a gradient
+  // in every blade cost too much on a phone, so the roots darken in one thin band drawn over them instead
+  const GRASS = ['#9DBB83', '#76A64E', '#5A933A', '#AFA862'], GRASS_N = ['#2E4A38', '#28482E', '#213F26', '#414C30'];
+  function seedGrass(){
+    GH = W > 700 ? 120 : 92; const dpr = Math.min(2, window.devicePixelRatio || 1);
+    roots = null; grassEl.width = Math.round(W * dpr); grassEl.height = Math.round(GH * dpr); grassEl.style.height = GH + 'px'; gg.setTransform(dpr, 0, 0, dpr, 0, 0);
+    blades = [];
+    [[5.4, .42, .7, 1.7], [5.8, .55, .85, 2.2], [6.4, .62, 1, 2.8]].forEach(([step, h0, h1, w], d) => {
+      for(let x = rnd(-2, 2); x < W + 4; x += step * rnd(.7, 1.3)){ const h = GH * rnd(h0, h1) * (Math.random() < .08 ? 1.15 : 1);
+        const rest = rnd(-.24, .24); blades.push({ x, h, w: w * rnd(.8, 1.25), d, dry: d === 2 && Math.random() < .035, a: rest, v: 0, rest, k: 70 - 34 * h / GH, ph: rnd(0, 6.3),
+          fl: d > 0 && Math.random() < .035 }); } });
+    puffs = Array.from({ length: W > 700 ? 5 : 3 }, () => ({ x: rnd(W * .05, W * .95), h: GH * rnd(.78, .9), a: 0, v: 0, k: 34, rest: rnd(-.12, .12), ph: rnd(0, 6.3) }));
     flies = Array.from({ length: W > 900 ? 22 : 12 }, () => ({ x: rnd(0, W), y: rnd(innerHeight * .35, innerHeight - 20), ph: rnd(0, 6.3), sp: rnd(.3, .7), r: rnd(14, 40) })); }
   let flies = [];
   function drawFlies(){ for(const q of flies){ const x = q.x + Math.sin(T * q.sp + q.ph) * q.r, y = q.y + Math.sin(T * q.sp * 1.3 + q.ph * 2) * q.r * .5;
     b.globalAlpha = Math.max(0, Math.sin(T * 1.6 + q.ph * 3)) * .9; b.drawImage(SP.fly, x - 10, y - 10, 20, 20); } b.globalAlpha = 1; }
-  function drawGrass(){ const base = innerHeight + 4, wind = Math.max(-30, Math.min(30, vel * .01));
-    b.lineCap = 'round'; b.lineWidth = 2.2; const tips = [], P = NIGHT ? GRASS_N : GRASS;
-    for(let ci = 0; ci < 4; ci++){ b.strokeStyle = P[ci]; b.beginPath();
-      for(const g of blades){ if(g.c !== ci) continue; const sway = Math.sin(T * 1.3 + g.ph + g.x * .01) * g.h * .12 + wind * g.h / 60;
-        b.moveTo(g.x, base); b.quadraticCurveTo(g.x + sway * .3, base - g.h * .55, g.x + sway, base - g.h); if(g.fl) tips.push(g.x + sway, base - g.h); }
-      b.stroke(); }
-    b.fillStyle = NIGHT ? '#C9CDBE' : '#FFFFFF'; b.beginPath(); for(let i = 0; i < tips.length; i += 2){ b.moveTo(tips[i] + 3.2, tips[i + 1]); b.arc(tips[i], tips[i + 1], 3.2, 0, 7); } b.fill();
-    b.fillStyle = NIGHT ? '#B8963A' : '#F4C84A'; b.beginPath(); for(let i = 0; i < tips.length; i += 2){ b.moveTo(tips[i] + 1.3, tips[i + 1]); b.arc(tips[i], tips[i + 1], 1.3, 0, 7); } b.fill(); }
-
+  /* where the wind leans a blade at x: rolling breeze, a passing gust, the fling of the page, a finger */
+  function windAt(x, h){
+    let w = .1 + .08 * Math.sin(x * .006 - T * 1.3) + .05 * Math.sin(x * .017 - T * 2.7 + 1);
+    const gx = (x - gust.x) / gust.w; w += gust.a * Math.exp(-gx * gx);
+    w += Math.max(-.4, Math.min(.4, vel * .00012));
+    w *= .55 + .45 * h / GH;
+    if(ptr.on && ptr.y > gTop - 30){ const dx = x - ptr.x, ad = Math.abs(dx); if(ad < 70) w += Math.sign(dx || 1) * (1 - ad / 70) * .95; }
+    return w;
+  }
+  function stepBlade(o, dt, flutter){
+    const target = (o.rest || 0) + windAt(o.x, o.h) + Math.sin(T * (3.4 + o.h * .02) + o.ph) * flutter;
+    o.v += (o.k * (target - o.a) - 5.5 * o.v) * dt; o.a = Math.max(-1.25, Math.min(1.25, o.a + o.v * dt));
+  }
+  function drawGrass(dt){
+    if(!grassEl.width) return;
+    gTop = innerHeight - GH;
+    if(dt){ nextGust -= dt; if(nextGust <= 0){ Object.assign(gust, { x: -260, v: rnd(170, 280), a: rnd(.22, .48), w: rnd(110, 220) }); nextGust = rnd(3.5, 8); }
+      gust.x += gust.v * dt;
+      const h = Math.min(dt, .04);   // the springs are soft enough to stay steady in one step
+      for(const o of blades) stepBlade(o, h, .035); for(const o of puffs) stepBlade(o, h, .02); }
+    const B = GH + 2, P = NIGHT ? GRASS_N : GRASS;
+    gg.clearRect(0, 0, W, GH);
+    const blade = o => { const a = o.a, L = 1 - a * a * .08, c = a * .35, nA = a * .6;
+      const cx = o.x + Math.sin(c) * o.h * .5, cy = B - Math.cos(c) * o.h * .5, tx = o.x + Math.sin(a) * o.h * L, ty = B - Math.cos(a) * o.h * L;
+      const nx = Math.cos(nA) * o.w * .6, ny = Math.sin(nA) * o.w * .6;
+      gg.moveTo(o.x - o.w, B); gg.quadraticCurveTo(cx - nx, cy - ny, tx, ty); gg.quadraticCurveTo(cx + nx, cy + ny, o.x + o.w, B); gg.closePath(); return [tx, ty]; };
+    const tips = []; let puffHeads = [];
+    for(let d = 0; d < 4; d++){
+      gg.fillStyle = P[d]; gg.beginPath();
+      for(const o of blades){ if(d === 3 ? !o.dry : (o.d !== d || o.dry)) continue; const t = blade(o); if(o.fl) tips.push(t); }
+      gg.fill();
+      if(d === 1){   // the dandelion clocks stand among the middle blades
+        gg.strokeStyle = NIGHT ? '#3D5A40' : '#6E9450'; gg.lineWidth = 1.3; gg.lineCap = 'round'; gg.beginPath();
+        const heads = puffs.map(o => { const tx = o.x + Math.sin(o.a) * o.h, ty = B - Math.cos(o.a) * o.h;
+          gg.moveTo(o.x, B); gg.quadraticCurveTo(o.x + Math.sin(o.a * .4) * o.h * .5, B - o.h * .5, tx, ty); return [tx, ty, o.a]; });
+        gg.stroke(); puffHeads = heads;
+      }
+    }
+    if(!roots || roots._n !== NIGHT){ roots = gg.createLinearGradient(0, B - 44, 0, B); roots.addColorStop(0, 'rgba(0,0,0,0)');
+      roots.addColorStop(1, NIGHT ? 'rgba(4,14,8,.65)' : 'rgba(34,70,22,.6)'); roots._n = NIGHT; }
+    gg.fillStyle = roots; gg.fillRect(0, B - 44, W, 44);
+    // the clocks' heads stand over the front blades: a soft white ball of fine rays
+    gg.fillStyle = NIGHT ? 'rgba(220,226,210,.18)' : 'rgba(255,255,255,.85)'; gg.beginPath();
+    for(const [x, y] of puffHeads){ gg.moveTo(x + 8.5, y); gg.arc(x, y, 8.5, 0, 7); } gg.fill();
+    gg.strokeStyle = NIGHT ? 'rgba(225,230,215,.7)' : 'rgba(150,160,140,.5)'; gg.lineWidth = .6; gg.beginPath();
+    for(const [x, y, a] of puffHeads) for(let i = 0; i < 24; i++){ const r = i / 24 * 6.283 + a * .3, l = i % 2 ? 8.5 : 7.5;
+      gg.moveTo(x + Math.cos(r) * 1.5, y + Math.sin(r) * 1.5); gg.lineTo(x + Math.cos(r) * l, y + Math.sin(r) * l); }
+    gg.stroke();
+    gg.fillStyle = NIGHT ? '#8A8E78' : '#B9A97A'; gg.beginPath(); for(const [x, y] of puffHeads){ gg.moveTo(x + 1.8, y); gg.arc(x, y, 1.8, 0, 7); } gg.fill();
+    // daisies on a few tips
+    gg.fillStyle = NIGHT ? '#C9CDBE' : '#FFFFFF'; gg.beginPath(); for(const [x, y] of tips) for(let i = 0; i < 6; i++){ const r = i / 6 * 6.283, px = x + Math.cos(r) * 2.6, py = y + Math.sin(r) * 2.6; gg.moveTo(px + Math.cos(r) * 2.2, py + Math.sin(r) * 2.2); gg.ellipse(px, py, 2.2, 1.2, r, 0, 7); } gg.fill();
+    if(!NIGHT){ gg.strokeStyle = 'rgba(110,125,100,.45)'; gg.lineWidth = .5; gg.stroke(); }   // by day a faint edge keeps white petals off the pale sky
+    gg.fillStyle = NIGHT ? '#B8963A' : '#F4C84A'; gg.beginPath(); for(const [x, y] of tips){ gg.moveTo(x + 1.5, y); gg.arc(x, y, 1.5, 0, 7); } gg.fill();
+  }
 
   /* ---- snow in the air ---- */
   let flakes = [];
@@ -21304,7 +21371,7 @@ const FEST = (() => {
     meadow: { name: 'อยากจะไปกับเธอ', en: 'Kimi to Doko ka e Ikitai', word: 'Kimi to Doko ka e Ikitai', pill: 'Kimi to Doko\nka e Ikitai',
       settle: { kinds: ['seed'], colors: ['#fff'], size: [10, 16], rate: .5, max: 18, fall: 30, k: 1.2, sway: 30, face: 0, edge: 170, cap: 6, th: [700, 2400] },
       stars: [0, .7], moon: [null, { x: .82, y: 92 }],
-      sky(dt, sy){ if(NIGHT){ drawClouds(SP.cloudDusk, dt, sy, .45, .5); drawGrass(); drawFlies(); } else { drawClouds(SP.cloudDay, dt, sy, .9, .7); drawGrass(); } } },
+      sky(dt, sy){ if(NIGHT){ drawClouds(SP.cloudDusk, dt, sy, .45, .5); drawFlies(); } else drawClouds(SP.cloudDay, dt, sy, .9, .7); drawGrass(dt); } },
     halloween: { name: 'ฮาโลวีน', en: 'Halloween', word: 'ฮาโลวีนที่ 48', stars: [0, 1], moon: { x: .8, y: 96 },
       ropes(){ const P = [['tr'], ['bl', .8], ['br'], ['tr'], ['br', .3], ['br', .55], ['tr,br']];
         cards.forEach((c, i) => { const [cs, sp] = c.classList.contains('today-hero') ? ['tl,tr', .62] : P[i % P.length];
