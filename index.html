@@ -353,7 +353,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .is-feedback{ order:8; }
   /* the live vote leads, the results right under it; while a round is being
      read out the results lead and the vote takes its old place among today's */
-  .feed-cols .is-gevote{ order:0; } .feed-cols .feed-ge, .feed-cols .feed-dash{ order:1; }
+  .feed-cols .is-gevote{ order:0; } .feed-cols .feed-ge, .feed-cols .feed-dash, .feed-cols .is-iamtl{ order:1; }
   .feed-cols.is-ge-live .feed-ge{ order:0; } .feed-cols.is-ge-live .is-gevote{ order:1; }
 
 
@@ -3717,6 +3717,36 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .feed-ge .gel-prog-t span:last-child{ font-weight:700; opacity:1; }
   .feed-ge .gel-now{ margin-top:18px; }
   .feed-ge.is-compact{ margin:16px 0 4px; }
+  /* iAM48 timeline posts on the home page: a row of framed cards that open the post on iAM48 */
+  .tl-row{ display:flex; gap:10px; overflow-x:auto; padding:2px 2px 10px; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .tl-row::-webkit-scrollbar{ display:none; }
+  .tl-card{ flex:0 0 272px; scroll-snap-align:start; display:flex; flex-direction:column; gap:9px; padding:11px 12px 12px; border-radius:18px;
+    background:var(--card); border:1px solid var(--line); box-shadow:0 3px 0 rgba(var(--shadow-rgb, 0,0,0),.12); color:var(--ink); text-decoration:none;
+    transition:transform .12s ease, box-shadow .12s ease; }
+  .tl-card:active{ transform:translateY(2px); box-shadow:none; }
+  .tl-head{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .tl-head .avatar-sm{ width:34px; height:34px; flex:none; }
+  .tl-who{ display:flex; flex-direction:column; min-width:0; line-height:1.2; }
+  .tl-who b{ font-size:14px; } .tl-who small{ font-size:11px; color:var(--ink-soft); font-weight:600; }
+  .tl-app{ margin-left:auto; flex:none; font-size:10px; font-weight:800; letter-spacing:.03em; padding:2px 8px; border-radius:99px;
+    color:#fff; background:linear-gradient(135deg, #E4457E, #F08AB0); }
+  .tl-body{ display:flex; gap:10px; align-items:flex-start; min-height:44px; }
+  .tl-text{ flex:1; min-width:0; font-size:13.5px; line-height:1.45; white-space:pre-line; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .tl-img{ position:relative; flex:none; width:74px; height:74px; border-radius:12px; overflow:hidden; background:var(--paper-dim); }
+  .tl-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .tl-img i{ position:absolute; right:4px; bottom:4px; font-style:normal; font-size:10.5px; font-weight:800; color:#fff; background:rgba(0,0,0,.55); padding:1px 6px; border-radius:99px; }
+  .tl-img.is-video::after{ content:''; position:absolute; left:50%; top:50%; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%;
+    background:rgba(0,0,0,.5) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 7l9 5-9 5z' fill='white'/%3E%3C/svg%3E") center/16px no-repeat; }
+  .tl-locked{ display:flex; align-items:center; gap:8px; overflow-x:auto; padding:0 2px 10px; scrollbar-width:none; }
+  .tl-locked::-webkit-scrollbar{ display:none; }
+  .tl-locked-h{ flex:none; display:flex; align-items:center; gap:5px; font-size:12px; font-weight:800; color:var(--ink-soft); }
+  .tl-locked-h svg{ width:14px; height:14px; }
+  .tl-chip{ flex:none; display:flex; align-items:center; gap:6px; padding:3px 11px 3px 3px; border-radius:99px; text-decoration:none; color:var(--ink);
+    background:var(--card); border:1px solid var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb, 0,0,0),.1); }
+  .tl-chip:active{ transform:translateY(1px); box-shadow:none; }
+  .tl-chip .avatar-sm{ width:26px; height:26px; } .tl-chip b{ font-size:12.5px; } .tl-chip small{ font-size:10.5px; color:var(--ink-soft); font-weight:600; }
+  .tl-lock{ display:flex; align-items:center; gap:7px; font-size:13px; font-weight:700; color:var(--ink-soft); }
+  .tl-lock svg{ width:16px; height:16px; flex:none; color:var(--c); }
   /* the header's one menu */
   .set-wrap{ position:relative; flex-shrink:0; }
   .set-btn{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; cursor:pointer; color:var(--ink);
@@ -3766,7 +3796,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .feed-dash{ margin-bottom:22px; }
   .dash-t.is-cal{ padding-top:0; } .dash-t.is-cal .dash-big{ margin-top:6px; } .dash-cal-h{ align-self:stretch; margin:0 -10px; padding:3px 10px; font-size:11px; font-weight:800; color:#fff; background:#E0243A; }
   .dash-t.is-cal .dash-big{ font-size:26px; } .dash-cal-h{ white-space:nowrap; }
-  @media (min-width:700px){ .dash{ grid-template-columns:repeat(6, minmax(0,1fr)); } .dash-t{ aspect-ratio:auto; } }
+  /* wide screens: the results a third of the width and as tall as their three names, the four tiles two by two beside them;
+     with no results square, the tiles in one row */
+  @media (min-width:700px){ .dash{ grid-template-columns:repeat(6, minmax(0,1fr)); }
+    .dash-ge{ grid-column:span 2; grid-row:span 2; aspect-ratio:auto; min-height:206px; }
+    .dash-t{ grid-column:span 2; aspect-ratio:auto; min-height:98px; }
+    .feed-dash.no-ge .dash{ grid-template-columns:repeat(4, minmax(0,1fr)); } .feed-dash.no-ge .dash-t{ grid-column:auto; min-height:120px; } }
   .feed-ge:not(.is-compact) .gel-mini > *{ flex-basis:calc((100% - 18px) / 4); }
   /* the election summed up, once it is over */
   .ge-sum-top{ display:block; width:100%; text-align:left; border:0; cursor:pointer; font:inherit; }
@@ -11028,6 +11063,57 @@ function loadLives(){
     .catch(() => { LIVES = { members:{} }; })
     .finally(() => { _livesLoading = false; });
 }
+/* ================= iAM48 TIMELINE =================
+   What the members post in the iAM48 app, as far as its public post pages
+   show: the Worker walks the post numbers every five minutes and keeps a week
+   (api.48thdb.com/timeline, `tlScan` in worker/live-worker.js). A card shows
+   the first lines and a small picture and opens the post on iAM48; a post
+   locked to the app says only that there is one. */
+let IAMTL = null, _tlTimer = null;
+const TL_POST = n => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
+function refreshTimeline(){
+  if(!_tlTimer) _tlTimer = setInterval(() => { if(!document.hidden) refreshTimeline(); }, 5 * 60000);
+  return fetch(`${LIVE_API}/timeline?t=${Math.floor(Date.now() / 60000)}`, { cache:'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if(!d || !Array.isArray(d.posts)) return;
+      const was = IAMTL ? IAMTL.posts.map(p => p.n).join() : null;
+      IAMTL = d;
+      if(d.posts.map(p => p.n).join() !== was && state.view === 'feed' && !state.selectedId && !state.layoutEdit) renderMain();
+    }).catch(() => {});
+}
+function tlAgo(iso){
+  const mins = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 60000)), en = isEN();
+  if(mins < 2) return en ? 'just now' : 'เมื่อสักครู่';
+  if(mins < 60) return en ? `${mins} min ago` : `${mins} นาทีที่แล้ว`;
+  const h = Math.round(mins / 60);
+  if(h < 24) return en ? `${h} h ago` : `${h} ชม. ที่แล้ว`;
+  const d = Math.round(h / 24);
+  return d === 1 ? (en ? 'yesterday' : 'เมื่อวาน') : (en ? `${d} days ago` : `${d} วันที่แล้ว`);
+}
+function tlCard(p, m){
+  const g = getGroup(m.groupId) || {}, en = isEN();
+  const img = !p.locked && p.imgs && p.imgs.length ? `<span class="tl-img${p.video ? ' is-video' : ''}"><img src="${escapeAttr(p.imgs[0])}" alt="" loading="lazy" decoding="async">${
+    p.imgs.length > 1 ? `<i>+${p.imgs.length - 1}</i>` : ''}</span>` : '';
+  const text = p.locked ? `<span class="tl-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>${en ? 'In the iAM48 app only' : 'ดูได้เฉพาะในแอป'}</span>`
+    : `<span class="tl-text" data-noloc>${escapeHtml(p.text || (p.video ? (en ? 'A new clip' : 'คลิปใหม่') : (en ? 'New photos' : 'รูปใหม่')))}</span>`;
+  return `<a class="tl-card${p.locked ? ' is-locked' : ''}" style="--c:${g.color || 'var(--bnk)'}" href="${TL_POST(p.n)}" target="_blank" rel="noopener">
+    <span class="tl-head">${renderAvatar(m, 'avatar-sm', g.color)}<span class="tl-who"><b>${escapeHtml(nickName(m))}</b><small>${tlAgo(p.at)}</small></span><span class="tl-app">iAM48</span></span>
+    <span class="tl-body">${text}${img}</span></a>`;
+}
+/* the home page's row: the newest posts, an oshi's only when the reader filters by oshi */
+function renderTimelineZone(){
+  const en = isEN(), mine = filteringByOshi();
+  const all = ((IAMTL && IAMTL.posts) || []).map(p => [p, getMember(p.m)]).filter(([, m]) => m && (!mine || isMyOshi(m)));
+  const open = all.filter(([p]) => !p.locked).slice(0, 12), locked = all.filter(([p]) => p.locked && Date.now() - Date.parse(p.at) < 86400000).slice(0, 8);
+  if(!open.length && !locked.length) return '';
+  // posts locked to the app say no more than who posted: a strip of names over the row of posts that can be read
+  const strip = locked.length ? `<div class="tl-locked"><span class="tl-locked-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>${en ? 'In the app only' : 'โพสต์เฉพาะในแอป'}</span>${
+    locked.map(([p, m]) => { const g = getGroup(m.groupId) || {};
+      return `<a class="tl-chip" style="--c:${g.color || 'var(--bnk)'}" href="${TL_POST(p.n)}" target="_blank" rel="noopener">${renderAvatar(m, 'avatar-sm', g.color)}<b>${escapeHtml(nickName(m))}</b><small>${tlAgo(p.at)}</small></a>`; }).join('')}</div>` : '';
+  return `<section class="feed-block is-iamtl"><h2 class="section-label">${en ? 'Latest on iAM48' : 'iAM48 ล่าสุด'}</h2>
+    ${strip}${open.length ? `<div class="tl-row">${open.map(([p, m]) => tlCard(p, m)).join('')}</div>` : ''}</section>`;
+}
 function refreshRecentLives(first){
   if(!_livesTimer) _livesTimer = setInterval(() => { if(!document.hidden) refreshRecentLives(); }, 5 * 60000);
   return fetch(`${IAM_API}?t=${Math.floor(Date.now() / 60000)}`, { cache:'no-store' })
@@ -16988,6 +17074,7 @@ function renderFeed(){
     <div class="feed-cols${geLive ? ' is-ge-live' : ''}"><div class="feed-main">
     ${geLive ? '' : gecHomeCard(isEN())}
     ${(() => { const ge = renderHomeGE(); return ge.includes('feed-dash') ? ge : ge + renderHomeDash(null); })()}
+    ${renderTimelineZone()}
 
     ${nowOn.length ? `
     <section class="feed-block today-hero-block">
@@ -18449,6 +18536,7 @@ const LAYOUT_ZONES = {
     { k:'vote', cls:'is-gevote', th:'โหวตสด', en:'Live vote' },
     { k:'results', cls:'feed-ge', th:'ผลเลือกตั้ง', en:'Election results' },
     { k:'dash', cls:'feed-dash', th:'แดชบอร์ด', en:'Dashboard' },
+    { k:'iamtl', cls:'is-iamtl', th:'iAM48 ล่าสุด', en:'Latest on iAM48' },
     { k:'fanfest', cls:'is-fflive', th:'Fan Festival', en:'Fan Festival' },
     { k:'today', cls:'today-hero-block', th:'งานวันนี้', en:'Today' },
     { k:'overtoday', cls:'is-over-today', th:'จบไปแล้ววันนี้', en:'Over today' },
@@ -25298,6 +25386,7 @@ async function init(){
   applyUrlToState();
   replaceHistory();
   render();
+  refreshTimeline();   // the members' iAM48 posts need no sign-in, so they come at once
 
   let checkedInitialAuth = false;
 

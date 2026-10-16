@@ -228,6 +228,105 @@ async function iamRecent(env) {
   return body;
 }
 
+/* iAM48 timeline posts: what members post in the app.
+ *
+ * Each post has a public page, app.bnk48.com/timeline/content-member-timeline/<n>,
+ * but there is no list of them: the numbers run in one sequence with the lives
+ * and everything else the app holds (posts are about one number in twenty), and
+ * a number that is not a member's post answers 404. So this walks the sequence
+ * on a cron of its own, every five minutes: the 16 numbers after the highest one
+ * settled, all at once, and three further ahead to learn how far the sequence
+ * has got. A 404 under the highest number known to exist was something else and
+ * is passed for good; one above it may simply not exist yet, and is asked again
+ * next time. Numbers known to exist further on — a post seen ahead, or the
+ * newest lives from the catch-up slices — move the walk on 16 at a time, so
+ * every number is asked at least once on the way.
+ *
+ * Kept per post: who, roughly when (the page says "40 mins ago"), the first 200
+ * characters of the text, up to three picture links, whether it is a clip, and
+ * whether it is locked to the app ("Exclusive on iAM48"), whose content is not
+ * asked for. The gift senders' pictures on the page are fans' — never kept. */
+const TL_KEY = 'tl-v1', TL_CACHE = 'https://live.state/tl-v1', TL_CRON = '2-59/5 * * * *';
+const TL_STEP = 16, TL_FAR = [30, 60, 100], TL_KEEP = 120, TL_KEEP_MS = 7 * 86400000;
+const TL_URL = (n) => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
+
+export function tlText(h) {
+  return String(h || '').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '')
+    .replace(/&#x([0-9a-f]+);/gi, (_, x) => String.fromCodePoint(parseInt(x, 16)))
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(+d))
+    .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
+    .replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+/* "40 mins ago", "an hour ago", "2 days ago" → about when, to the minute */
+export function tlWhen(ago, now) {
+  const m = String(ago || '').toLowerCase().match(/(\d+|an?|one)\s*(sec|min|hour|day|week)/);
+  if (!m) return new Date(now).toISOString();
+  const n = /^\d+$/.test(m[1]) ? +m[1] : 1;
+  const unit = { sec: 1e3, min: 6e4, hour: 36e5, day: 864e5, week: 6048e5 }[m[2]];
+  return new Date(Math.floor((now - n * unit) / 6e4) * 6e4).toISOString();
+}
+export function tlParse(n, html, now) {
+  const prof = html.match(/img\.bnk48cdn\.net\/member\/(\d+)\/profile/);
+  if (!prof) return null;
+  const iam = +prof[1];
+  if (html.indexOf('class="post-card') < 0) return { n, iam, at: new Date(Math.floor(now / 6e4) * 6e4).toISOString(), locked: true };
+  const ago = (html.match(/post-card-duration">\s*([^<]*?)\s*</) || [])[1] || '';
+  const text = tlText((html.match(/<p class="post-content-new-line">([\s\S]*?)<\/p>/) || [])[1]);
+  const imgs = [...new Set([...html.matchAll(/https:\/\/img\.bnk48cdn\.net\/content\/\d+\/(?:image|thumb)-[\w-]+\.(?:jpe?g|png|webp)/gi)].map((m) => m[0]))].slice(0, 3);
+  const post = { n, iam, at: tlWhen(ago, now), text: text.length > 200 ? text.slice(0, 199) + '…' : text, imgs };
+  if (/class="video-play"/.test(html)) post.video = true;
+  return post;
+}
+async function tlProbe(n, now) {
+  const res = await fetch(TL_URL(n), { headers: { 'user-agent': 'Mozilla/5.0 (48thDb timeline; 48thdb.com)', accept: 'text/html' }, cf: { cacheTtl: 0 } });
+  if (res.status === 404) return { n, gone: true };
+  if (!res.ok) return { n, failed: true };
+  return { n, post: tlParse(n, await res.text(), now) };
+}
+async function tlScan(env) {
+  const st = (await env.IAM.get(TL_KEY, 'json')) || { max: 0, posts: [] };
+  // the newest lives are numbers known to exist
+  const slices = await Promise.all([...Array(IAM_SLICES).keys()].map((i) => env.IAM.get(`slice:${i}`, 'json')));
+  let ahead = 0;
+  for (const s of slices) for (const list of Object.values((s && s.members) || {})) for (const v of list) if (v.id > ahead) ahead = v.id;
+  if (!st.max) { if (!ahead) return { skipped: 'no-start' }; st.max = ahead - 60; }
+  const from = st.max, now = Date.now();
+  const asks = [...Array(TL_STEP).keys()].map((i) => from + 1 + i).concat(TL_FAR.map((d) => from + d));
+  const got = await Promise.all(asks.map((n) => tlProbe(n, now).catch(() => ({ n, failed: true }))));
+  const ids = await iamIds(env).catch(() => ({}));
+  const who = Object.fromEntries(Object.entries(ids).map(([m, i]) => [i, m]));
+  const have = new Set(st.posts.map((p) => p.n));
+  let added = 0, seen = 0;
+  for (const r of got) {
+    if (!r.post) continue;
+    seen = Math.max(seen, r.n); ahead = Math.max(ahead, r.n);
+    const m = who[r.post.iam];
+    if (have.has(r.n) || !m) continue;     // a graduate's, or someone not on the list
+    st.posts.push({ ...r.post, m }); have.add(r.n); added++;
+  }
+  // settled: everything up to the highest post in the window; and when the
+  // sequence is known to run further, the whole window — unless a number in it failed to answer
+  const failed = got.find((r) => r.failed && r.n <= from + TL_STEP);
+  let max = Math.max(from, Math.min(seen, from + TL_STEP));
+  if (ahead > from + TL_STEP && !failed) max = from + TL_STEP;
+  else if (ahead > from && !failed) max = Math.max(max, Math.min(ahead, from + TL_STEP));
+  if (failed) max = Math.min(max, failed.n - 1);
+  st.max = Math.max(from, max);
+  st.posts = st.posts.filter((p) => now - Date.parse(p.at) < TL_KEEP_MS).sort((a, b) => b.n - a.n).slice(0, TL_KEEP);
+  st.at = new Date(now).toISOString();
+  if (added || st.max !== from) await env.IAM.put(TL_KEY, JSON.stringify(st));
+  await writeCache(TL_CACHE, { checked: st.at, posts: st.posts }, 60);
+  return { from, max: st.max, ahead, added };
+}
+async function tlRecent(env) {
+  const hit = await readCache(TL_CACHE);
+  if (hit) return hit;
+  const st = (await env.IAM.get(TL_KEY, 'json')) || { posts: [] };
+  const body = { checked: st.at || null, posts: st.posts || [] };
+  await writeCache(TL_CACHE, body, 60);
+  return body;
+}
+
 /* How many people came: the owner's profile page asks, and this reads
  * Cloudflare Web Analytics (the beacon Cloudflare puts on 48thdb.com) through
  * its GraphQL API. That needs a read-only token, kept as the Worker secret
@@ -698,6 +797,13 @@ export default {
       return new Response(JSON.stringify(body),
         { headers: { ...JSON_HEADERS, 'cache-control': `public, max-age=${STREAM_TTL_S / 2}` } });
     }
+    if (url.pathname === '/timeline') {
+      try {
+        return new Response(JSON.stringify(await tlRecent(env)), { headers: { ...JSON_HEADERS, 'cache-control': 'public, max-age=60' } });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: String((err && err.message) || err), posts: [] }), { status: 502, headers: JSON_HEADERS });
+      }
+    }
     if (url.pathname === '/iam') {
       try {
         return new Response(JSON.stringify(await iamRecent(env)), { headers: { ...JSON_HEADERS, 'cache-control': 'public, max-age=60' } });
@@ -724,8 +830,10 @@ export default {
 
   /* Every five minutes: a third of the members' iAM48 lists, every song
      video's view count, and in the evening (Thailand) a YouTube answer kept
-     warm for the first visitor. */
+     warm for the first visitor. Two minutes after, on its own cron: the iAM48 timeline. */
   async scheduled(event, env, ctx) {
+    // the timeline walk has a cron of its own, so its requests have a budget of their own
+    if (event.cron === TL_CRON) { ctx.waitUntil(tlScan(env).catch(() => {})); return; }
     const at = new Date(event.scheduledTime);
     const h = at.getUTCHours();
     if (h >= 10 && h <= 16) ctx.waitUntil(check(true).catch(() => {}));

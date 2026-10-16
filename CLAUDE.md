@@ -149,6 +149,16 @@ the Firebase CLI from the owner's machine.
   owner's 1500px originals live in Documents/48TH/…/Profile). A few still carry
   a base64 `photo:` — either form works. A replaced photo needs a new file name.
 
+## iAM48 posts
+
+The home page's "iAM48 ล่าสุด" row (zone `iamtl`, `renderTimelineZone`) shows what
+members post in the iAM48 app, from `api.48thdb.com/timeline`. The Worker walks the
+app's public post pages (`tlScan`, its own 5-minute cron — see worker/README.md):
+there is no list of posts, only numbers shared with lives and everything else.
+A card shows the first three lines and one small picture and opens the post on
+iAM48; posts locked to the app ("Exclusive on iAM48") are a strip of names only and
+their content is never asked for. Never show or keep the gift senders' pictures.
+
 ## The GE vote on the chain
 
 Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`/vote`) and a

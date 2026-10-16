@@ -11,8 +11,10 @@ routes = [
 # Every 5 minutes: a third of the members' iAM48 catch-up lists (so each is
 # looked at every 15 minutes), and in the evening, 17:00–23:59 in Thailand,
 # a YouTube answer kept warm for the first visitor.
+# Every five minutes, two after the others (2, 7, 12 …): the next stretch of iAM48
+# timeline numbers, for the members' posts (tlScan).
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["*/5 * * * *", "2-59/5 * * * *"]
 
 # The iAM48 lives each member published in the last three days.
 [[kv_namespaces]]
