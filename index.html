@@ -13411,6 +13411,12 @@ function gecMove(t, f, to, v){
   if(t.vault.includes(f) && !t.vault.includes(to) && to !== poll){ const c = t.chan[to] || (t.chan[to] = [0, 0]); c[0] += v; }
   if(t.chan[f] && !t.vault.includes(to)) t.chan[f][1] += v;
 }
+/* Not everyone the vault pays is a sales channel: it also sends a few tokens
+   (7, 13, 26 …) straight to some ~900 fans, which are buyers like any other.
+   A channel is a wallet the vault handed a stock to — on GE6 that is ten
+   wallets, from 1,202 to 800,004 tokens each, with nothing in between. */
+const GEC_CHAN_MIN = 1000;
+const gecChans = t => Object.keys(t.chan).filter(a => t.chan[a][0] >= GEC_CHAN_MIN);
 const gecEnds = l => ['0x' + l.topics[1].slice(26), '0x' + l.topics[2].slice(26)];
 async function gecSync(id, head){
   const p = GEC_POLLS[id];
@@ -13767,7 +13773,7 @@ function gecShareSpec(id){
   }
   if(id === 'supply'){
     const t = gecLoad('tok'); if(!t) return null;
-    const poll = p.addr.toLowerCase(), chans = Object.keys(t.chan);
+    const poll = p.addr.toLowerCase(), chans = gecChans(t);
     const sumOf = ks => ks.reduce((s, k) => s + Math.max(0, t.bal[k] || 0), 0);
     const skip = new Set([...t.vault, ...chans, poll]);
     let buyers = 0; for(const [a, v] of Object.entries(t.bal)) if(!skip.has(a) && v > 1e-9) buyers += v;
@@ -14060,7 +14066,7 @@ function gecSupplyCard(en, N, pc){
   if(!t || !t.minted) return '';
   const poll = GEC_POLLS.ge2026.addr.toLowerCase();
   const sumOf = ks => ks.reduce((s, k) => s + Math.max(0, t.bal[k] || 0), 0);
-  const chans = Object.keys(t.chan);
+  const chans = gecChans(t);
   const vault = sumOf(t.vault), chan = sumOf(chans), voted = Math.max(0, t.bal[poll] || 0);
   const skip = new Set([...t.vault, ...chans, poll]);
   let buyers = 0, holders = 0;
@@ -14080,8 +14086,8 @@ function gecSupplyCard(en, N, pc){
       <div class="gec-mrow is-total"><span>${en ? 'Minted, all of it' : 'ผลิตทั้งหมด'}</span><b>${gecTok(t.minted)}</b></div></div>
     <p class="gec-sub">${en ? `Sold through to buyers so far: <b>${gecTok(sold)}</b>, and <b>${pc(sold ? voted / sold : 0)}</b> of that has been voted.`
       : `ขายถึงมือผู้ซื้อแล้วทั้งหมด <b>${gecTok(sold)}</b> โทเคน · โหวตไปแล้ว <b>${pc(sold ? voted / sold : 0)}</b> ของที่ขายได้`}</p>
-    <p class="gec-sub">${en ? `How this is counted: GE6 was minted once, ${gecTok(t.minted)} tokens, into the organiser’s vault — the same wallet that created this vote. The vault passes tokens only to its sales channels (the ${chans.length} wallets it sends to), and they pass them on to buyers. Every figure comes from those transfers on the chain; none is a guess.`
-      : `นับยังไง: GE6 ผลิตครั้งเดียว ${gecTok(t.minted)} โทเคน เข้ากระเป๋าคลังของผู้จัด (กระเป๋าเดียวกับที่สร้างสัญญาโหวตนี้) คลังส่งโทเคนให้เฉพาะช่องทางขาย คือ ${chans.length} กระเป๋าที่รับตรงจากคลัง แล้วช่องทางขายส่งต่อให้ผู้ซื้อ ทุกตัวเลขนับจากการโอนจริงบนบล็อกเชน ไม่ได้ประมาณ`}</p>
+    <p class="gec-sub">${en ? `How this is counted: GE6 was minted once, ${gecTok(t.minted)} tokens, into the organiser’s vault — the same wallet that created this vote. The vault hands stock to its sales channels (the ${chans.length} wallets it sent 1,000 tokens or more), and they pass them on to buyers; the few tokens it sends straight to a fan count as that fan’s. Every figure comes from those transfers on the chain; none is a guess.`
+      : `นับยังไง: GE6 ผลิตครั้งเดียว ${gecTok(t.minted)} โทเคน เข้ากระเป๋าคลังของผู้จัด (กระเป๋าเดียวกับที่สร้างสัญญาโหวตนี้) คลังแบ่งโทเคนให้ช่องทางขาย คือ ${chans.length} กระเป๋าที่รับจากคลังรวม 1,000 โทเคนขึ้นไป แล้วช่องทางขายส่งต่อให้ผู้ซื้อ ส่วนกระเป๋าที่คลังส่งให้ตรง ๆ ไม่กี่โทเคน นับเป็นของผู้ซื้อ ทุกตัวเลขนับจากการโอนจริงบนบล็อกเชน ไม่ได้ประมาณ`}</p>
     <button class="chip gec-more" data-action="gec-chan" aria-expanded="${gecChanOpen}">${gecChanOpen ? (en ? 'Hide the sales channels' : 'ซ่อนช่องทางขาย') : (en ? `See the ${chans.length} sales channels` : `ดูช่องทางขาย ${chans.length} กระเป๋า`)}</button>
     ${gecChanOpen ? `<div class="gec-chans">${chanList.map(([a, c, left]) => `<div class="gec-chan"><a href="${GEC_API}/address/${a}" target="_blank" rel="noopener">${a.slice(0, 6)}…${a.slice(-4)}</a>
       <span>${en ? 'from vault' : 'รับจากคลัง'} <b>${gecTok(c[0])}</b></span><span>${en ? 'sold on' : 'ส่งให้ผู้ซื้อ'} <b>${gecTok(c[1])}</b></span><span>${en ? 'left' : 'เหลือ'} <b>${gecTok(left)}</b></span></div>`).join('')}</div>` : ''}</div>`;
@@ -24082,7 +24088,7 @@ async function drawGECCard(g, sub){
     gcdTake(g, L(`คิดที่ราคา ${gecPrice} บาทต่อโทเคน${o ? ' · ตัวเลข GE2025 คิดที่ราคาเดียวกัน' : ''}`, `At ${gecPrice} baht a token${o ? '; GE2025 at the same price' : ''}`), y + 40);
   }
   else if(id === 'supply'){
-    const t = gecLoad('tok'); const poll = p.addr.toLowerCase(), chans = Object.keys(t.chan);
+    const t = gecLoad('tok'); const poll = p.addr.toLowerCase(), chans = gecChans(t);
     const sumOf = ks => ks.reduce((s, k) => s + Math.max(0, t.bal[k] || 0), 0);
     const skip = new Set([...t.vault, ...chans, poll]); let buyers = 0;
     for(const [a, v] of Object.entries(t.bal)) if(!skip.has(a) && v > 1e-9) buyers += v;
