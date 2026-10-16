@@ -2338,21 +2338,19 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-theme="dark"] :is(.sl-no, .sl-head, .es-sl-pill){ color:color-mix(in srgb, var(--c) 40%, #fff); }
   :root[data-theme="dark"] .es-row.has-sl[aria-expanded="true"] .es-sl-pill{ color:#fff; }
 
-  /* today's events stand out from every other card: the site's pink-to-teal as the rim and a band
-     across the top (a poster's own colour can be as quiet as olive), a pink glow, the poster lifted
-     in a white frame */
+  /* today's events stand out from every other card: one even pink-to-teal rim (a poster's own colour
+     can be as quiet as olive), a soft pink glow, the poster lifted in a white frame */
   .today-hero{
     position:relative; overflow:hidden; margin:0 0 14px;
     border-radius:22px; border:0;
     background:linear-gradient(160deg, color-mix(in srgb, var(--c) 18%, var(--card)), var(--card) 75%);
-    box-shadow:0 12px 30px rgba(228,69,126,.28), 0 4px 0 rgba(46,140,130,.35);
+    box-shadow:0 10px 28px rgba(228,69,126,.22);
   }
   /* the rim is its own layer, so a poster's colours on the card's background leave it alone */
-  .today-hero::after{ content:''; position:absolute; inset:0; border-radius:inherit; padding:3px; pointer-events:none; z-index:2;
+  .today-hero::after{ content:''; position:absolute; inset:0; border-radius:inherit; padding:2.5px; pointer-events:none; z-index:2;
     background:linear-gradient(120deg, var(--brand-a), var(--brand-b));
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
     mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
-  .today-hero::before{ content:''; position:absolute; left:0; right:0; top:0; height:6px; background:linear-gradient(90deg, var(--brand-a), var(--brand-b)); }
   .today-hero.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out); }
   body:not(.is-scrolling) .today-hero.is-openable:active{ transform:scale(.985); transition-duration:.09s; }
   /* compact: the title and times beside a small copy of the poster, as the schedule's cards have it */
