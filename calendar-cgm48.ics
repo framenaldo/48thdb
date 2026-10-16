@@ -710,16 +710,62 @@ DTSTART;TZID=Asia/Bangkok:20261018T120000
 DTEND;TZID=Asia/Bangkok:20261018T180000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-mbk@48thdb
+UID:ev-kimi-roadshow-mbk-2026-10-24@48thdb
 DTSTAMP:20261024T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:MBK Center\, Bangkok
-DESCRIPTION:รอประกาศรายชื่อ\n• รอบเ
- วลารอประกาศอีกครั้ง\n\nhttps://48thd
- b.com/?e=ev-kimi-roadshow-mbk
+LOCATION:Avenue A \, G Floor\, MBK CENTER\, Bangkok
+DESCRIPTION:เมมเบอร์: Prae\, Nana\, Lookked\, Kwan\, Else\,
+  Punpon\n• รอบเวลาเดียวกันทั้งส
+ องวัน 24 และ 25 ต.ค.\n• 12:00–13:00 Free Mini Conc
+ ert\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 พบสมา
+ ชิกที่จุด Merchandise และ Hachi Cha\n• 17:00–1
+ 8:00 Group Hi-Touch\n• บัตรเข้าร่วม Group Hi-Tou
+ ch ได้จากการซื้อเข็มกลัดภา
+ ยในงาน\n• Zone 1 โซนนั่งชมด้านใ
+ น ถ่ายด้วยมือถือเท่านั้น ย
+ กไม่เกินระดับศีรษะ\n• Zone 2 โซ
+ นช่างภาพ ใช้กล้องได้ทุกชน
+ ิดและใช้อุปกรณ์เสริมได้\n•
+  Zone 3 โซนรอบนอก ใช้กล้องได้ท
+ ุกชนิด แต่ห้ามใช้ขาตั้ง บั
+ นได เก้าอี้\n• Group Hi-Touch ห้ามสวม
+ นาฬิกาข้อมือ แหวน กำไล หรื
+ อถือสิ่งของที่อาจเป็นอัน
+ ตรายต่อสมาชิก\n• กำหนดการอ
+ าจเปลี่ยนแปลงตามความเหมา
+ ะสม\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-mbk
 URL:https://48thdb.com/?e=ev-kimi-roadshow-mbk
-DTSTART;VALUE=DATE:20261024
-DTEND;VALUE=DATE:20261026
+DTSTART;TZID=Asia/Bangkok:20261024T120000
+DTEND;TZID=Asia/Bangkok:20261024T180000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-mbk-2026-10-25@48thdb
+DTSTAMP:20261024T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Avenue A \, G Floor\, MBK CENTER\, Bangkok
+DESCRIPTION:เมมเบอร์: Prae\, Nana\, Lookked\, Kwan\, Else\,
+  Punpon\n• รอบเวลาเดียวกันทั้งส
+ องวัน 24 และ 25 ต.ค.\n• 12:00–13:00 Free Mini Conc
+ ert\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 พบสมา
+ ชิกที่จุด Merchandise และ Hachi Cha\n• 17:00–1
+ 8:00 Group Hi-Touch\n• บัตรเข้าร่วม Group Hi-Tou
+ ch ได้จากการซื้อเข็มกลัดภา
+ ยในงาน\n• Zone 1 โซนนั่งชมด้านใ
+ น ถ่ายด้วยมือถือเท่านั้น ย
+ กไม่เกินระดับศีรษะ\n• Zone 2 โซ
+ นช่างภาพ ใช้กล้องได้ทุกชน
+ ิดและใช้อุปกรณ์เสริมได้\n•
+  Zone 3 โซนรอบนอก ใช้กล้องได้ท
+ ุกชนิด แต่ห้ามใช้ขาตั้ง บั
+ นได เก้าอี้\n• Group Hi-Touch ห้ามสวม
+ นาฬิกาข้อมือ แหวน กำไล หรื
+ อถือสิ่งของที่อาจเป็นอัน
+ ตรายต่อสมาชิก\n• กำหนดการอ
+ าจเปลี่ยนแปลงตามความเหมา
+ ะสม\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-mbk
+URL:https://48thdb.com/?e=ev-kimi-roadshow-mbk
+DTSTART;TZID=Asia/Bangkok:20261025T120000
+DTEND;TZID=Asia/Bangkok:20261025T180000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-ge6-handshake@48thdb
