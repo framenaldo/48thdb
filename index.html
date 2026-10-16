@@ -21215,7 +21215,7 @@ const FEST = (() => {
     for(const c of cards){ const w = c.offsetWidth, h = c.offsetHeight, rec = { items: [], bins: cfg.pile ? new Float32Array(Math.max(2, Math.floor((w - 24) / 6))) : null };
       ST.att.set(c, rec);
       if(rec.bins) for(let i = 0; i < rec.bins.length; i++) rec.bins[i] = 4 + 4 * Math.sin(i * .5) * Math.sin(i * .17 + 1) + rnd(0, 2);
-      else for(let i = 0; i < Math.round(w / 70); i++){ const it = stItem(cfg, 0, 0); it.lx = rnd(16, w - 16); it.ly = 0; it.top = true; rec.items.push(it); }
+      else for(let i = 0; i < Math.round(w / (cfg.edge || 70)); i++){ const it = stItem(cfg, 0, 0); it.lx = rnd(16, w - 16); it.ly = 0; it.top = true; rec.items.push(it); }
       for(let i = 0; i < (cfg.face ? Math.round(w * h / 26000) : 0); i++){ const it = stItem(cfg, 0, 0); it.lx = rnd(16, w - 16); it.ly = rnd(16, h - 16); it.top = false; rec.items.push(it); } }
     if(cfg.burst) for(let i = 0; i < cfg.burst; i++){ const it = stItem(cfg, rnd(0, W), rnd(-260, -10)); it.vy = rnd(160, 260); ST.free.push(it); }
     else for(let i = 0; i < cfg.rate * 5; i++) ST.free.push(stItem(cfg, rnd(0, W), rnd(-20, H)));
@@ -21302,7 +21302,7 @@ const FEST = (() => {
   /* ===================== the seasons ===================== */
   const THEMES = {
     meadow: { name: 'อยากจะไปกับเธอ', en: 'Kimi to Doko ka e Ikitai', word: 'Kimi to Doko ka e Ikitai', pill: 'Kimi to Doko\nka e Ikitai',
-      settle: { kinds: ['seed'], colors: ['#fff'], size: [10, 16], rate: 1.6, max: 60, fall: 30, k: 1.2, sway: 30, face: .004, cap: 22, th: [700, 2400] },
+      settle: { kinds: ['seed'], colors: ['#fff'], size: [10, 16], rate: .5, max: 18, fall: 30, k: 1.2, sway: 30, face: 0, edge: 170, cap: 6, th: [700, 2400] },
       stars: [0, .7], moon: [null, { x: .82, y: 92 }],
       sky(dt, sy){ if(NIGHT){ drawClouds(SP.cloudDusk, dt, sy, .45, .5); drawGrass(); drawFlies(); } else { drawClouds(SP.cloudDay, dt, sy, .9, .7); drawGrass(); } } },
     halloween: { name: 'ฮาโลวีน', en: 'Halloween', word: 'ฮาโลวีนที่ 48', stars: [0, 1], moon: { x: .8, y: 96 },
