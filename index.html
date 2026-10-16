@@ -2338,19 +2338,29 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-theme="dark"] :is(.sl-no, .sl-head, .es-sl-pill){ color:color-mix(in srgb, var(--c) 40%, #fff); }
   :root[data-theme="dark"] .es-row.has-sl[aria-expanded="true"] .es-sl-pill{ color:#fff; }
 
+  /* today's events stand out from every other card: the site's pink-to-teal as the rim and a band
+     across the top (a poster's own colour can be as quiet as olive), a pink glow, the poster lifted
+     in a white frame */
   .today-hero{
     position:relative; overflow:hidden; margin:0 0 14px;
-    border-radius:22px;
-    background:linear-gradient(160deg, color-mix(in srgb, var(--c) 16%, var(--card)), var(--card) 70%);
-    border:2px solid color-mix(in srgb, var(--c) 55%, var(--glass-edge));
-    box-shadow:0 10px 32px color-mix(in srgb, var(--c) 22%, transparent), 0 2px 8px rgba(var(--shadow-rgb),.08);
+    border-radius:22px; border:0;
+    background:linear-gradient(160deg, color-mix(in srgb, var(--c) 18%, var(--card)), var(--card) 75%);
+    box-shadow:0 12px 30px rgba(228,69,126,.28), 0 4px 0 rgba(46,140,130,.35);
   }
+  /* the rim is its own layer, so a poster's colours on the card's background leave it alone */
+  .today-hero::after{ content:''; position:absolute; inset:0; border-radius:inherit; padding:3px; pointer-events:none; z-index:2;
+    background:linear-gradient(120deg, var(--brand-a), var(--brand-b));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+    mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+  .today-hero::before{ content:''; position:absolute; left:0; right:0; top:0; height:6px; background:linear-gradient(90deg, var(--brand-a), var(--brand-b)); }
   .today-hero.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out); }
   body:not(.is-scrolling) .today-hero.is-openable:active{ transform:scale(.985); transition-duration:.09s; }
   /* compact: the title and times beside a small copy of the poster, as the schedule's cards have it */
-  .today-hero-top{ display:flex; align-items:flex-start; gap:12px; padding:14px 14px 0 16px; }
+  .today-hero-top{ display:flex; align-items:flex-start; gap:12px; padding:18px 16px 0 16px; }
   .today-hero-top .today-hero-body{ flex:1; min-width:0; padding:0; }
-  .today-hero-art{ flex:none; width:96px; border-radius:12px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,.18); }
+  .nowrap{ white-space:nowrap; }
+  .today-hero-art{ flex:none; width:96px; border-radius:12px; overflow:hidden; border:3px solid #fff; transform:rotate(2.5deg);
+    box-shadow:0 8px 20px color-mix(in srgb, var(--c) 40%, rgba(0,0,0,.25)); }
   .today-hero-art img{ display:block; width:100%; height:auto; }
   @media (min-width:640px){ .today-hero-art{ width:124px; } }
   .today-hero-body{ padding:16px 18px 14px; }
@@ -11832,7 +11842,7 @@ function renderTodayHero(ev, todayIso){
     ${open ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="today-hero-top">
       <div class="today-hero-body">
-        <p class="today-hero-status${live ? ' is-live' : ''}"><span class="today-live" aria-hidden="true"></span><span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</span></p>
+        <p class="today-hero-status${live ? ' is-live' : ''}"><span class="today-live" aria-hidden="true"></span><span>${status}${days > 1 ? ` · <span class="nowrap">วันที่ ${dayOf} จาก ${days}</span>` : ''}</span></p>
         <h3 class="today-hero-title">${renderEventIcon(ev, 'ev-icon is-hero')}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
         <p class="today-hero-meta">${hours ? `${hours} น.` : ''}${hours && ev.venue ? ' · ' : ''}${ev.venue ? escapeHtml(ev.venue) : ''}</p>
       </div>
