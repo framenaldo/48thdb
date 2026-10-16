@@ -246,7 +246,7 @@ async function iamRecent(env) {
  * characters of the text, up to three picture links, whether it is a clip, and
  * whether it is locked to the app ("Exclusive on iAM48"), whose content is not
  * asked for. The gift senders' pictures on the page are fans' — never kept. */
-const TL_KEY = 'tl-v1', TL_CACHE = 'https://live.state/tl-v1', TL_CRON = '2-59/5 * * * *';
+const TL_KEY = 'tl-v1', TL_CACHE = 'https://live.state/tl-v1', MAIN_CRON = '*/5 * * * *';
 const TL_STEP = 16, TL_FAR = [30, 60, 100], TL_KEEP = 120, TL_KEEP_MS = 7 * 86400000;
 const TL_URL = (n) => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
 
@@ -832,8 +832,10 @@ export default {
      video's view count, and in the evening (Thailand) a YouTube answer kept
      warm for the first visitor. Two minutes after, on its own cron: the iAM48 timeline. */
   async scheduled(event, env, ctx) {
-    // the timeline walk has a cron of its own, so its requests have a budget of their own
-    if (event.cron === TL_CRON) { ctx.waitUntil(tlScan(env).catch(() => {})); return; }
+    // the timeline walk has a cron of its own, so its requests have a budget of their own. Any
+    // schedule but the main one is the walk's: after a change of schedule Cloudflare kept firing
+    // the old one for over half an hour, under its old name
+    if (event.cron !== MAIN_CRON) { ctx.waitUntil(tlScan(env).catch(() => {})); return; }
     const at = new Date(event.scheduledTime);
     const h = at.getUTCHours();
     if (h >= 10 && h <= 16) ctx.waitUntil(check(true).catch(() => {}));

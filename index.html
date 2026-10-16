@@ -2347,28 +2347,21 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   }
   .today-hero.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out); }
   body:not(.is-scrolling) .today-hero.is-openable:active{ transform:scale(.985); transition-duration:.09s; }
-  .today-hero-art{
-    position:relative; display:flex; justify-content:center;
-    background:#000; isolation:isolate; overflow:hidden;
-  }
-  .today-hero-art::before{
-    content:''; position:absolute; inset:-30px; z-index:-1;
-    background:var(--art) center/cover; filter:blur(26px) saturate(140%) brightness(.8);
-  }
-  .today-hero-art img{
-    display:block; width:auto; height:auto; max-width:100%; max-height:min(46vh, 420px);
-    box-shadow:0 8px 30px rgba(0,0,0,.35);
-  }
-  .today-hero-band{ padding:6px 6px 0; }
+  /* compact: the title and times beside a small copy of the poster, as the schedule's cards have it */
+  .today-hero-top{ display:flex; align-items:flex-start; gap:12px; padding:14px 14px 0 16px; }
+  .today-hero-top .today-hero-body{ flex:1; min-width:0; padding:0; }
+  .today-hero-art{ flex:none; width:96px; border-radius:12px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,.18); }
+  .today-hero-art img{ display:block; width:100%; height:auto; }
+  @media (min-width:640px){ .today-hero-art{ width:124px; } }
   .today-hero-body{ padding:16px 18px 14px; }
-  .today-hero-foot{ padding-top:14px; padding-bottom:16px; }
+  .today-hero-foot{ padding:12px 16px 14px; }
   .today-hero-status{
     display:inline-flex; align-items:center; gap:8px; margin:0 0 8px;
     padding:5px 12px 5px 10px; border-radius:999px;
     background:var(--c); color:#fff;
-    font-family:var(--font); font-size:13px; font-weight:700; letter-spacing:.2px;
+    font-family:var(--font); font-size:12px; font-weight:700; letter-spacing:.2px; line-height:1.3;
   }
-  .today-live{
+  .today-live{ flex:none;
     width:8px; height:8px; border-radius:50%; background:#fff;
     animation:today-pulse 1.6s ease-out infinite;
   }
@@ -2391,9 +2384,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @media (prefers-reduced-motion: reduce){ .today-live, .today-hero-status.is-live{ animation:none; } }
   .today-hero-title{
     margin:0 0 6px; font-family:var(--font);
-    font-size:clamp(21px, 5.6vw, 27px); line-height:1.22; font-weight:800; color:var(--ink);
+    font-size:clamp(17px, 4.6vw, 22px); line-height:1.25; font-weight:800; color:var(--ink);
   }
-  .today-hero-meta{ margin:0; font-size:14px; color:var(--ink-soft); line-height:1.45; }
+  .today-hero-meta{ margin:0; font-size:13px; color:var(--ink-soft); line-height:1.4; }
   .today-hero .ev-groups{ margin-bottom:10px; }
   .today-hero-open{ margin:12px 0 0; font-size:13.5px; font-weight:700; color:var(--c); }
   .today-hero-open::after{ content:' ›'; }
@@ -11837,14 +11830,14 @@ function renderTodayHero(ev, todayIso){
   return `
   <article class="today-hero${open ? ' is-openable' : ''}${ev.poster ? ' is-themed' : ''}${ev.poster && ev.poster.scene ? ` is-scene-${ev.poster.scene}` : ''}" style="--c:${accent}${ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : ''}"
     ${open ? `data-action="open-event" data-id="${ev.id}"` : ''}>
-    <div class="today-hero-body">
-      <p class="today-hero-status${live ? ' is-live' : ''}"><span class="today-live" aria-hidden="true"></span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</p>
-      <h3 class="today-hero-title">${renderEventIcon(ev, 'ev-icon is-hero')}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
-      <p class="today-hero-meta">${hours ? `${hours} น.` : ''}${hours && ev.venue ? ' · ' : ''}${ev.venue ? escapeHtml(ev.venue) : ''}</p>
+    <div class="today-hero-top">
+      <div class="today-hero-body">
+        <p class="today-hero-status${live ? ' is-live' : ''}"><span class="today-live" aria-hidden="true"></span><span>${status}${days > 1 ? ` · วันที่ ${dayOf} จาก ${days}` : ''}</span></p>
+        <h3 class="today-hero-title">${renderEventIcon(ev, 'ev-icon is-hero')}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
+        <p class="today-hero-meta">${hours ? `${hours} น.` : ''}${hours && ev.venue ? ' · ' : ''}${ev.venue ? escapeHtml(ev.venue) : ''}</p>
+      </div>
+      ${img ? `<div class="today-hero-art"><img src="${escapeAttr(evThumb(img))}"${ev.poster.w ? ` width="${ev.poster.w}" height="${ev.poster.h}"` : ''} alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" decoding="async"></div>` : ''}
     </div>
-    ${img ? `<div class="today-hero-art" style="--art:url('${escapeAttr(img)}')">
-      <img src="${escapeAttr(img)}"${ev.poster.w ? ` width="${ev.poster.w}" height="${ev.poster.h}"` : ''} alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" decoding="async">
-    </div>` : `<div class="today-hero-band">${renderEventBanner(ev)}</div>`}
     <div class="today-hero-body today-hero-foot">
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g => groupTag(g)).join('')}</div>` : ''}
       ${renderEventPeople(people, 8)}
@@ -21127,8 +21120,9 @@ const FEST = (() => {
     clouds = Array.from({ length: 4 }, (_, i) => ({ x: rnd(-200, W), y: rnd(30, H * .45), s: rnd(.7, 1.5), v: rnd(6, 16), a: rnd(.45, .85) }));
   }
   /* the stars are drawn once a theme, on a canvas of their own; CSS makes them breathe */
-  function paintStars(k){ const g = starsEl.getContext('2d'); starsEl.width = Math.round(W * DPR); starsEl.height = Math.round(H * DPR);
-    starsEl.style.height = H + 'px'; g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H); if(!k) return;
+  function paintStars(k){ if(!k){ starsEl.width = 0; starsEl.height = 0; return; }   // no stars, no screen-sized canvas held for them
+    const g = starsEl.getContext('2d'); starsEl.width = Math.round(W * DPR); starsEl.height = Math.round(H * DPR);
+    starsEl.style.height = H + 'px'; g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H);
     for(const s of stars){ g.globalAlpha = (.35 + .45 * Math.sin(s.p)) * k; g.fillStyle = '#FFF4E8'; g.fillRect(s.x, s.y, s.r, s.r); } }
   function placeMoon(m){ moonOn = !!m; if(!m){ moonEl.style.display = 'none'; return; } const S = SP.moon.w; moonEl.style.display = 'block';
     moonEl.style.backgroundImage = `url(${SP.moon.toDataURL()})`; moonEl.style.width = S + 'px'; moonEl.style.height = S + 'px';
@@ -21436,10 +21430,20 @@ const FEST = (() => {
     if(!ST.cfg) return;
     const box = cardBox(); if(!box) return; const br = box.getBoundingClientRect();
     for(const c of cards){ const r = R.get(c), rec = ST.att.get(c); if(!rec) continue; const L = layerOf(c, box);
-      if(!visible(r) || (!rec.items.length && !rec.bins)){ if(L._k){ L._k = ''; L.width = 0; L.height = 0; } continue; }
-      const x = Math.round(r.left - br.left) - LP, y = Math.round(r.top - br.top) - LP, w = Math.ceil(r.width) + LP * 2, h = Math.ceil(r.height) + LP * 2;
-      const key = `${x},${y},${w},${h},${DPR}`;
+      if(!visible(r) || (!rec.items.length && !rec.bins)){ if(L._k){ L._k = ''; L._s = ''; L.width = 0; L.height = 0; } continue; }
+      /* the canvas covers only the band where things lie (most sit on the top edge), not the whole card:
+         a card with a poster is near 2,000 px tall, and Safari on the iPhone ran out of room for
+         several of those and drew stale pieces of other layers across the page */
+      let y0 = Infinity, y1 = -Infinity, sway = false, sum = 0;
+      for(const it of rec.items){ if(it.ly < y0) y0 = it.ly; if(it.ly > y1) y1 = it.ly; if(it.k === 'seed') sway = true; sum += it.lx; }
+      if(rec.bins){ y0 = Math.min(y0, -18); y1 = Math.max(y1, 2); for(let k = 0; k < rec.bins.length; k++) sum += rec.bins[k]; }
+      const top = Math.floor(y0) - LP, bot = Math.ceil(y1) + LP;
+      const x = Math.round(r.left - br.left) - LP, y = Math.round(r.top - br.top) + top, w = Math.ceil(r.width) + LP * 2, h = bot - top;
+      const key = `${x},${y},${w},${h},${DPR}`, sig = `${rec.items.length},${sum.toFixed(1)}`;
+      // what has landed lies still (a seed sways a little), so a card is drawn again only when that changes
+      if(L._k === key && L._s === sig && !sway) continue;
       if(L._k !== key){ L._k = key; L.width = Math.ceil(w * DPR); L.height = Math.ceil(h * DPR); L.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px`; }
+      L._s = sig;
       const g = L.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, L.width, L.height);
       // draw in screen terms, shifted so the card's corner lands where it sits on this canvas
       g.setTransform(DPR, 0, 0, DPR, -(br.left + x) * DPR, -(br.top + y) * DPR);
