@@ -173,6 +173,30 @@ until `GET /ask` answers 405 (`checkAI`). A morning summary written by AI on the
 home page (สรุปวันนี้) was tried and taken off at the owner's word — don't bring it
 back unasked.
 
+## หาโอชิจากดวง (/quiz)
+
+A horoscope quiz, reached from the ☰ menu (`renderQuiz`, view `quiz`). The
+reader's birthday (kept in localStorage only, never sent) against each current
+member's by three systems Thai fans know: the birth weekday by ทักษา (คู่มิตร
+1–5 2–4 3–6 7–8, คู่สมพล 1–6 2–8 3–5 4–7, คู่ศัตรู 1–3 2–5 4–8 6–7, 8 = ราหู =
+Wednesday after 18:00 — members' Wednesdays count as by day), ราศีแบบไทย
+(sidereal, เมษ from 13 Apr) and the year animal counted from ตรุษจีน (`QZ_CNY`,
+1950–2026: extend it before 2027). Four questions add what the reader likes,
+each answer one of the four elements. Only good reasons are printed about a
+member, never a clash. It says it is for fun: no school of horoscope has been
+shown to work, so don't call any "the accurate one". **Fan and artist, never a
+couple**: no สมพงษ์, เนื้อคู่, สเปก or dates with her — the reader's stars are
+ถูกโฉลก with a member, the questions are about watching and cheering her.
+Under the result, ดวงวันประกาศผล (`renderResultsDay`, until the GE results
+day): a shirt to cheer a member (her Kami Oshi first) in her เดช colour, else her
+มนตรี or ศรี, the reader's own ศรี, and colours to skip — the results day's
+กาลกิณี (green on a Saturday) and the reader's — by the ทักษา wheel 1 2 3 4 7 5 8 6
+(`qzHouse`). Above it, while the vote is open, ฤกษ์ดีกดโหวต: the next good ยาม
+by ยามอัฐกาล (`qzYams`: 1½-hour watches from 06:00 and 18:00 Thai time, by day
+1 6 4 2 7 5 3, by night 1 5 2 6 3 7 4, from the day's planet) ruled by her เดช
+planet or the reader's ศรี, none between midnight and 06:00. It says when, never
+how much to vote: tokens cost money.
+
 ## The GE vote on the chain
 
 Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`/vote`) and a

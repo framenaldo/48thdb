@@ -3765,6 +3765,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .set-go:active{ transform:translateY(1px); }
   .set-gi{ width:18px; height:18px; flex:none; color:var(--bnk); } .set-gi svg{ width:100%; height:100%; display:block; }
   .set-go .shop-dot{ position:static; margin-left:auto; }
+  .set-go.is-quiz{ grid-column:1 / -1; background:color-mix(in srgb, var(--brand-a) 9%, var(--card)); border-color:color-mix(in srgb, var(--brand-a) 35%, var(--line)); }
   .set-h{ font-size:11px; font-weight:800; color:var(--ink-soft); padding:8px 6px 3px; }
   .set-seg{ display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:3px; border-radius:14px; background:var(--paper-dim); }
   .set-seg button{ display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; border:0; border-radius:11px; font:inherit; font-size:13px; font-weight:700;
@@ -4478,6 +4479,116 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     }
   }
   .sr-row:active{ transform:scale(.992); transition-duration:.09s; }
+  /* หาโอชิ: one question to a framed card, answers as pills that press; the result a
+     card with her photo, the percentage on its rim, and the reasons as ticks */
+  .qz-head .qz-title{ margin:8px 0 4px; font-size:28px; font-weight:800; line-height:1.3; letter-spacing:-.02em;
+    background:linear-gradient(100deg, var(--brand-a), var(--brand-mid) 50%, var(--brand-b)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .qz-lead{ margin:0 0 4px; font-size:13.5px; line-height:1.6; color:var(--ink-soft); }
+  .qz-card, .qz-result{ position:relative; margin:4px 0 14px; padding:16px 16px 18px; border-radius:22px; background:var(--card); border:1px solid var(--line);
+    box-shadow:0 10px 26px rgba(60, 30, 60, .07); }
+  .qz-result{ padding:14px 14px 16px; }
+  .qz-back{ position:absolute; top:12px; right:12px; padding:5px 11px; border-radius:999px; font:inherit; font-size:12px; font-weight:700; color:var(--ink-soft);
+    background:var(--paper-dim); border:1px solid var(--line); cursor:pointer; }
+  .qz-step{ margin:0; font-size:11.5px; font-weight:800; letter-spacing:.04em; color:var(--brand-a); }
+  .qz-dots{ display:flex; gap:5px; margin:7px 0 12px; }
+  .qz-dots i{ flex:1; max-width:34px; height:5px; border-radius:999px; background:var(--line); }
+  .qz-dots i.is-on{ background:linear-gradient(90deg, var(--brand-a), var(--brand-b)); }
+  .qz-q{ margin:0 0 14px; font-size:20px; font-weight:800; line-height:1.4; letter-spacing:-.01em; }
+  .qz-date{ display:grid; grid-template-columns:.8fr 1.5fr 1.1fr; gap:8px; }
+  .qz-date select{ width:100%; min-width:0; padding:12px 10px; border-radius:14px; font:inherit; font-size:15px; font-weight:700; color:var(--ink);
+    background:var(--paper-dim); border:1.5px solid var(--line); -webkit-appearance:none; appearance:none; }
+  .qz-date select:focus{ outline:none; border-color:var(--brand-a); }
+  .qz-seg{ display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:12px; font-size:13px; font-weight:700; color:var(--ink-soft); }
+  .qz-seg button{ padding:7px 13px; border-radius:999px; font:inherit; font-size:13px; font-weight:700; color:var(--ink); background:var(--paper-dim); border:1px solid var(--line); cursor:pointer; }
+  .qz-seg button.is-on{ color:#fff; background:var(--brand-a); border-color:var(--brand-a); }
+  .qz-me{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:14px; font-size:12.5px; font-weight:800; color:var(--ink-soft); }
+  .qz-me.is-result{ margin:0 2px 12px; }
+  .qz-chip{ display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:800; color:var(--ink);
+    background:var(--paper-dim); border:1px solid var(--line); }
+  .qz-chip[style]::before{ content:''; width:8px; height:8px; border-radius:50%; background:var(--c); }
+  .qz-next{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:16px; }
+  .qz-next.is-center{ justify-content:center; }
+  .qz-go{ display:inline-flex; align-items:center; gap:7px; padding:12px 24px; border-radius:999px; font:inherit; font-size:15px; font-weight:800; color:#fff; cursor:pointer;
+    background:linear-gradient(135deg, var(--brand-a), color-mix(in srgb, var(--brand-a) 70%, var(--brand-mid))); border:0;
+    box-shadow:0 4px 0 color-mix(in srgb, var(--brand-a) 55%, #000), 0 8px 18px rgba(228, 69, 126, .25); transition:transform .1s ease, box-shadow .1s ease; }
+  .qz-go:active{ transform:translateY(3px); box-shadow:0 1px 0 color-mix(in srgb, var(--brand-a) 55%, #000), 0 3px 8px rgba(228, 69, 126, .2); }
+  .qz-go[disabled]{ opacity:.4; cursor:default; transform:none; }
+  .qz-go.is-ghost{ color:var(--ink); background:var(--card); border:1.5px solid var(--line); box-shadow:0 3px 0 var(--line); }
+  .qz-go.is-ghost:active{ box-shadow:0 0 0 var(--line); }
+  .qz-go svg{ width:16px; height:16px; }
+  .qz-skip{ padding:0; font:inherit; font-size:13px; font-weight:700; color:var(--ink-soft); background:none; border:0; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+  .qz-note{ margin:14px 0 0; font-size:11.5px; line-height:1.55; color:var(--ink-soft); }
+  .qz-opts{ display:grid; gap:9px; }
+  .qz-opt{
+    display:block; width:100%; padding:14px 16px; text-align:left; font:inherit; font-size:15px; font-weight:700; line-height:1.4; color:var(--ink); cursor:pointer;
+    border-radius:16px; background:var(--card); border:1.5px solid color-mix(in srgb, var(--c, var(--brand-a)) 30%, var(--line));
+    box-shadow:0 3px 0 color-mix(in srgb, var(--c, var(--brand-a)) 22%, var(--line)); transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .qz-opt:active{ transform:translateY(3px); box-shadow:0 0 0 transparent; }
+  .qz-opt.is-on{ border-color:var(--c, var(--brand-a)); background:color-mix(in srgb, var(--c, var(--brand-a)) 10%, var(--card)); }
+  @media (hover:hover){ .qz-opt:hover{ border-color:var(--c, var(--brand-a)); } }
+  .qz-best{ text-align:center; padding:16px 12px 6px; border-radius:20px;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--c) 14%, var(--card)), var(--card) 62%); border:1.5px solid color-mix(in srgb, var(--c) 40%, var(--line)); }
+  .qz-best-h{ margin:0 0 12px; font-size:12px; font-weight:800; letter-spacing:.05em; color:var(--c); }
+  .qz-best-pic{ position:relative; display:inline-block; padding:0; border:0; background:none; cursor:pointer; }
+  .qz-pic, .qz-run-pic{ container-type:inline-size; }
+  .qz-pic{ position:relative; display:grid; place-items:center; width:150px; height:150px; border-radius:50%; overflow:hidden; color:#fff; font-weight:800;
+    border:4px solid var(--card); box-shadow:0 0 0 3px var(--c), 0 12px 30px rgba(60, 30, 60, .18); }
+  .qz-pct{ position:absolute; right:-10px; bottom:6px; min-width:58px; padding:5px 10px; border-radius:999px; font-size:20px; font-weight:800; color:#fff;
+    background:linear-gradient(135deg, var(--brand-a), var(--brand-b)); border:3px solid var(--card); box-shadow:0 4px 12px rgba(228, 69, 126, .3); }
+  .qz-pct small{ font-size:12px; }
+  .qz-name{ margin:12px 0 0; font-size:26px; font-weight:800; letter-spacing:-.01em; }
+  .qz-sub{ margin:2px 0 10px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+  .qz-chips{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
+  .qz-why{ margin:14px 4px 0; padding:0; list-style:none; text-align:left; display:grid; gap:7px; }
+  .qz-why li{ position:relative; padding-left:24px; font-size:14px; line-height:1.5; }
+  .qz-why li::before{ content:'✓'; position:absolute; left:0; top:0; width:18px; height:18px; border-radius:50%; display:grid; place-items:center;
+    font-size:11px; font-weight:800; color:#fff; background:var(--c); }
+  .qz-acts{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:10px; margin:16px 0 10px; }
+  .qz-more-h{ margin:20px 2px 10px; }
+  .qz-run{ display:flex; align-items:center; gap:12px; width:100%; margin:0 0 9px; padding:10px 14px 10px 10px; text-align:left; font:inherit; color:var(--ink); cursor:pointer;
+    border-radius:18px; background:var(--card); border:1px solid var(--line); box-shadow:0 3px 0 color-mix(in srgb, var(--c) 25%, var(--line)); transition:transform .1s ease; }
+  .qz-run:active{ transform:translateY(2px); }
+  .qz-run-pic{ position:relative; flex:none; display:grid; place-items:center; width:52px; height:52px; border-radius:50%; overflow:hidden; color:#fff; font-size:12px; font-weight:800;
+    box-shadow:0 0 0 2px var(--c); }
+  .qz-run-t{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .qz-run-t b{ font-size:16px; font-weight:800; }
+  .qz-run-t small{ font-size:12px; color:var(--ink-soft); line-height:1.45; }
+  .qz-run-pct{ flex:none; font-size:17px; font-weight:800; color:var(--c); }
+  .qz-day{ margin:20px 0 4px; padding:14px 14px 12px; border-radius:20px; background:var(--card); border:1.5px solid color-mix(in srgb, #B3121E 30%, var(--line));
+    box-shadow:0 3px 0 color-mix(in srgb, #B3121E 18%, var(--line)); }
+  .qz-day-h{ display:flex; flex-direction:column; margin:0 0 10px; font-size:18px; font-weight:800; line-height:1.3; }
+  .qz-day-h span{ font-size:11.5px; font-weight:800; letter-spacing:.05em; color:#B3121E; }
+  :root[data-theme="dark"] .qz-day-h span{ color:#FF6B76; }
+  .qz-day-pick{ display:flex; align-items:center; gap:8px; margin:0 0 10px; font-size:13.5px; font-weight:700; color:var(--ink-soft); }
+  .qz-day-pick select{ flex:1; min-width:0; padding:9px 12px; border-radius:12px; font:inherit; font-size:15px; font-weight:800; color:var(--ink);
+    background:var(--paper-dim); border:1.5px solid var(--line); }
+  .qz-sws{ display:grid; gap:8px; }
+  .qz-sw{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:16px; background:var(--paper-dim); border:1px solid var(--line); }
+  .qz-sw.is-main{ background:color-mix(in srgb, var(--s) 13%, var(--card)); border-color:color-mix(in srgb, var(--s) 45%, var(--line)); }
+  .qz-sw-dot{ flex:none; width:40px; height:40px; border-radius:50%; background:var(--s);
+    box-shadow:inset 0 -4px 0 rgba(0, 0, 0, .14), 0 0 0 3px var(--card), 0 0 0 4px color-mix(in srgb, var(--s) 60%, var(--line)); }
+  .qz-sw.is-main .qz-sw-dot{ width:52px; height:52px; }
+  .qz-sw-t{ display:flex; flex-direction:column; min-width:0; }
+  .qz-sw-t b{ font-size:17px; font-weight:800; }
+  .qz-sw:not(.is-main) .qz-sw-t b{ font-size:15px; }
+  .qz-sw-t small{ font-size:12px; line-height:1.45; color:var(--ink-soft); }
+  .qz-day-sub{ margin:16px 0 8px; font-size:14px; font-weight:800; color:var(--ink); }
+  .qz-day-sub.is-minor{ margin-top:12px; font-size:12.5px; color:var(--ink-soft); }
+  .qz-yams{ display:grid; gap:7px; }
+  .qz-yam{ position:relative; display:flex; flex-direction:column; gap:1px; padding:9px 12px 9px 14px; border-radius:14px; background:var(--paper-dim); border:1px solid var(--line); }
+  .qz-yam::before{ content:''; position:absolute; left:0; top:9px; bottom:9px; width:4px; border-radius:0 4px 4px 0; background:var(--brand-b); }
+  .qz-yam.is-her::before{ background:var(--brand-a); }
+  .qz-yam b{ font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .qz-yam span{ font-size:12px; color:var(--ink-soft); }
+  .qz-yam i{ position:absolute; right:10px; top:50%; transform:translateY(-50%); padding:3px 9px; border-radius:999px; font-style:normal; font-size:11px; font-weight:800;
+    color:#fff; background:var(--brand-a); }
+  .qz-yam.is-now{ border-color:color-mix(in srgb, var(--brand-a) 45%, var(--line)); background:color-mix(in srgb, var(--brand-a) 8%, var(--card)); }
+  .qz-avoid{ margin:12px 0 0; padding:8px 11px; border-radius:12px; font-size:13px; font-weight:700; line-height:1.55; background:var(--paper-dim); }
+  .qz-avoid b{ margin-right:4px; color:#B3121E; }
+  :root[data-theme="dark"] .qz-avoid b{ color:#FF6B76; }
+  .qz-avoid small{ font-weight:600; color:var(--ink-soft); }
+  .qz-day-note{ margin:8px 2px 0; font-size:11.5px; color:var(--ink-soft); line-height:1.5; }
   /* ถามเว็บได้: the row that asks, then the answer as a framed card with the site's own cards in it */
   .ask-go{
     display:flex; align-items:center; gap:11px; width:100%; margin:14px 0 4px; padding:12px 14px; text-align:left;
@@ -9505,6 +9616,7 @@ const PAGE_META = {
   shop:     ['ร้านค้า BNK48 และ CGM48', 'BNK48 & CGM48 shop', 'สินค้าและบัตรของ BNK48 และ CGM48 ที่เปิดขายอยู่', 'BNK48 and CGM48 goods and tickets on sale now.'],
   groups:   ['ประวัติวง BNK48 และ CGM48', 'BNK48 & CGM48 history', 'ประวัติวง BNK48 และ CGM48 ทีม รุ่น และเหตุการณ์สำคัญ', 'The story of BNK48 and CGM48: teams, generations and milestones.'],
   gallery:  ['แกลเลอรี', 'Gallery', null, null],
+  quiz:     ['หาโอชิจากดวง — เทียบวันเกิดกับเมมเบอร์ BNK48 และ CGM48', 'Find your BNK48 or CGM48 oshi by the stars', 'ดูดวงหาโอชิ เทียบวันเกิดของคุณกับเมมเบอร์ทุกคนตามตำราทักษา ราศี และปีนักษัตร', 'A horoscope quiz: your birthday against every BNK48 and CGM48 member’s'],
   timeline: ['Senbatsu General Election 2026 (GE2026)', 'Senbatsu General Election 2026 (GE2026)', 'ข้อมูลการเลือกตั้ง GE2026 ของ BNK48 และ CGM48 ผู้สมัคร กำหนดการ และผลคะแนน', 'BNK48 and CGM48 GE2026: candidates, schedule and results.'],
   results:  ['ผลเลือกตั้ง GE2026', 'GE2026 results', 'ผลการเลือกตั้ง Senbatsu General Election 2026 ทุกรอบ ผลด่วน 1 ผลด่วน 2 และผลสุดท้าย', 'Senbatsu General Election 2026 results, every round.'],
   vote:     ['ยอดโหวต GE2026 สด จากบล็อกเชน', 'GE2026 live vote count from the blockchain', 'ยอดโหวต GE2026 นับสดจากบล็อกเชน จำนวนโทเคน ครั้ง และกระเป๋าที่โหวต', 'The GE2026 vote counted live from the blockchain: tokens, votes and wallets.'],
@@ -9895,6 +10007,7 @@ function renderSetMenu(){
       ${go('nav-calendar', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>', en ? 'Calendar' : 'ปฏิทิน')}
       ${go('nav-gallery', ICONS.gallery, en ? 'Gallery' : 'แกลเลอรี')}
       ${go('nav-shop', ICONS.shop, en ? 'Shop' : 'ร้านค้า', shops ? `<span class="shop-dot">${shops}</span>` : '')}
+      <button class="set-go is-quiz" data-action="nav-quiz"><span class="set-gi">${ICONS.star}</span>${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</button>
     </div>
     <div class="set-h">${en ? 'Look' : 'หน้าตา'}</div>
     <div class="set-seg">${['light', 'dark'].map(t => `<button class="${state.theme === t ? 'is-on' : ''}" ${state.theme === t ? 'disabled' : 'data-action="toggle-theme"'}>${t === 'dark' ? ICONS.moon : ICONS.sun}${t === 'dark' ? (en ? 'Dark' : 'มืด') : (en ? 'Light' : 'สว่าง')}</button>`).join('')}</div>
@@ -17228,6 +17341,301 @@ function renderAskBlock(q, total){
     <p class="ask-note">${en ? 'AI reads the question · the answer comes from 48thDb’s own data' : 'AI อ่านคำถาม · คำตอบมาจากข้อมูลใน 48thDb'}</p></section>`;
 }
 
+/* ================= หาโอชิ — a horoscope quiz (/quiz) =================
+   For fun, and says so: no school of horoscope has been shown to work, so it
+   uses the three Thai fans know best. The reader's birthday (kept on their
+   device only) against each current member's, by
+   - the day of the week, read by ทักษา: คู่มิตร 1–5 2–4 3–6 7–8, คู่สมพล
+     (the pairs for a couple) 1–6 2–8 3–5 4–7, คู่ศัตรู 1–3 2–5 4–8 6–7, where
+     1 อาทิตย์ … 7 เสาร์ and 8 ราหู is Wednesday night (from 18:00) — the
+     members' hours are not known, so their Wednesdays are by day;
+   - ราศีแบบไทย (sidereal: เมษ from 13 Apr) and its element;
+   - the year's animal, counted from ตรุษจีน: the three-way harmonies and the
+     six pairs (สามประสาน, ลิ่วเหอ), a clash (ชง) counting against.
+   Then four questions on what draws the reader to someone, each answer one of
+   the four elements; a member's element is her day's (by ทักษา: อาทิตย์ เสาร์
+   ไฟ, จันทร์ พฤหัส ดิน, อังคาร ราหู ลม, พุธ ศุกร์ น้ำ) and her sign's. Only
+   good reasons are ever printed about a member. */
+let _quiz = { step:0, ans:[] };
+const QZ_KEY = '48thdb-quiz-birth';
+const QZ_DAYS = [
+  { th:'อาทิตย์', en:'Sunday', c:'#E5484D', n:1, el:'F', tr:['มั่นใจ เป็นผู้นำ ใจกว้าง', 'confident, a leader, big-hearted'] },
+  { th:'จันทร์', en:'Monday', c:'#D9A400', n:2, el:'E', tr:['อ่อนโยน ช่างเอาใจ พูดเก่ง', 'gentle, caring, a good talker'] },
+  { th:'อังคาร', en:'Tuesday', c:'#E4609B', n:3, el:'A', tr:['ขยัน กล้า มุ่งมั่น', 'hard-working, brave, driven'] },
+  { th:'พุธ', en:'Wednesday', c:'#2F9E55', n:4, el:'W', tr:['ร่าเริง ช่างคุย หัวไว', 'cheerful, chatty, quick-witted'] },
+  { th:'พฤหัสบดี', en:'Thursday', c:'#E67E22', n:5, el:'E', tr:['ใจดี ซื่อตรง ใฝ่รู้', 'kind, honest, curious'] },
+  { th:'ศุกร์', en:'Friday', c:'#3D8BD9', n:6, el:'W', tr:['มีศิลปะ ละเอียดอ่อน รักความงาม', 'artistic, fine-grained, loves beauty'] },
+  { th:'เสาร์', en:'Saturday', c:'#8A5CC9', n:7, el:'F', tr:['มั่นคง จริงจัง ทุ่มเทเต็มที่', 'steady, serious, all in'] },
+];
+const QZ_RAHU = { th:'พุธกลางคืน', en:'Wednesday night', c:'#5E6470', n:8, el:'A', tr:['ลึกลับ มีเสน่ห์ คิดลึก', 'mysterious, charming, deep'] };
+const QZ_PAIRS = { friend:['1-5', '2-4', '3-6', '7-8'], couple:['1-6', '2-8', '3-5', '4-7'], foe:['1-3', '2-5', '4-8', '6-7'] };
+const qzPair = (a, b) => { const k = [a, b].sort().join('-'); return Object.keys(QZ_PAIRS).find(t => QZ_PAIRS[t].includes(k)) || (a === b ? 'same' : null); };
+// ราศีแบบไทย: where each starts (month*100 + day), from มังกร on 15 Jan
+const QZ_SIGNS = [[115, 'มังกร', 'Capricorn', 'E'], [213, 'กุมภ์', 'Aquarius', 'A'], [315, 'มีน', 'Pisces', 'W'], [413, 'เมษ', 'Aries', 'F'],
+  [515, 'พฤษภ', 'Taurus', 'E'], [615, 'เมถุน', 'Gemini', 'A'], [715, 'กรกฎ', 'Cancer', 'W'], [816, 'สิงห์', 'Leo', 'F'],
+  [917, 'กันย์', 'Virgo', 'E'], [1017, 'ตุลย์', 'Libra', 'A'], [1116, 'พิจิก', 'Scorpio', 'W'], [1216, 'ธนู', 'Sagittarius', 'F']];
+const QZ_ANIMALS = [['ชวด', 'Rat'], ['ฉลู', 'Ox'], ['ขาล', 'Tiger'], ['เถาะ', 'Rabbit'], ['มะโรง', 'Dragon'], ['มะเส็ง', 'Snake'],
+  ['มะเมีย', 'Horse'], ['มะแม', 'Goat'], ['วอก', 'Monkey'], ['ระกา', 'Rooster'], ['จอ', 'Dog'], ['กุน', 'Pig']];
+// ตรุษจีน, 1950 onward, as MMDD
+const QZ_CNY = '0217 0206 0127 0214 0203 0124 0212 0131 0218 0208 0128 0215 0205 0125 0213 0202 0121 0209 0130 0217 0206 0127 0215 0203 0123 0211 0131 0218 0207 0128 0216 0205 0125 0213 0202 0220 0209 0129 0217 0206 0127 0215 0204 0123 0210 0131 0219 0207 0128 0216 0205 0124 0212 0201 0122 0209 0129 0218 0207 0126 0214 0203 0123 0210 0131 0219 0208 0128 0216 0205 0125 0212 0201 0122 0210 0129 0217'.split(' ');
+const QZ_EL = { F:['ไฟ', 'Fire', 'สดใส พลังเต็มร้อย', 'bright and full of energy'], E:['ดิน', 'Earth', 'อบอุ่น มั่นคง ใส่ใจ', 'warm, steady and caring'],
+  A:['ลม', 'Air', 'ขี้เล่น ครีเอทีฟ ช่างคุย', 'playful, creative and chatty'], W:['น้ำ', 'Water', 'อ่อนโยน ลึกซึ้ง มีเสน่ห์', 'gentle, deep and charming'] };
+const QZ_MATES = { F:'A', A:'F', E:'W', W:'E' };
+const QZ_QUESTIONS = [
+  { th:'เห็นเมมเบอร์ครั้งแรก อะไรทำให้คุณหยุดดู?', en:'Seeing a member for the first time, what makes you stop and look?', o:[
+    ['F', 'รอยยิ้มกับพลังสดใส', 'Her smile and bright energy'], ['W', 'สายตานิ่ง ๆ ลึก ๆ มีเสน่ห์', 'A calm, deep gaze'],
+    ['E', 'ความอบอุ่น ใจดีกับทุกคน', 'Her warmth, kind to everyone'], ['A', 'ความขี้เล่น ตลก คุยสนุก', 'Her playful, funny side']] },
+  { th:'ไลฟ์แบบไหนที่คุณดูจนจบ?', en:'Which kind of live do you watch to the end?', o:[
+    ['A', 'เล่นเกม แกล้งเพื่อน ฮาทั้งไลฟ์', 'Games and teasing, laughing all through'], ['E', 'ทำอาหาร ชวนคุยเรื่องชีวิต', 'Cooking and chatting about life'],
+    ['F', 'ร้อง เต้น ปล่อยพลังเต็มที่', 'Singing and dancing, all out'], ['W', 'คุยดึก ๆ เรื่องลึก ๆ เปิดใจ', 'Late-night talks, opening up']] },
+  { th:'งานแบบไหนที่คุณอยากไปเชียร์ที่สุด?', en:'Which kind of event would you most like to go and cheer?', o:[
+    ['E', 'ไฮทัช แฮนด์เชค ได้ยิ้มให้กันใกล้ ๆ', 'A hi-touch or handshake, a smile up close'], ['F', 'คอนเสิร์ตใหญ่ ร้องเต้นเต็มพลัง', 'A big concert, singing and dancing all out'],
+    ['W', 'มินิไลฟ์อะคูสติก เพลงช้าซึ้ง ๆ', 'An acoustic mini live, slow songs that hit deep'], ['A', 'โรดโชว์ เล่นเกมบนเวที ฮาทั้งงาน', 'A roadshow with games on stage, laughs all through']] },
+  { th:'วันที่คุณเหนื่อย อะไรจากเมมเบอร์ที่ช่วยได้มากที่สุด?', en:'On a tiring day, what from a member helps you most?', o:[
+    ['W', 'เพลงช้า ๆ ที่เธอร้องในไลฟ์', 'A slow song she sang on a live'], ['A', 'คลิปฮา ๆ ที่เธอเล่นกับเพื่อน', 'A funny clip of her with the others'],
+    ['E', 'โพสต์ถามว่า “กินข้าวกันหรือยัง”', 'A post asking “have you all eaten?”'], ['F', 'พลังบวกที่ทำให้อยากลุกขึ้นสู้', 'Her energy that makes you want to keep going']] },
+];
+// a reading of one birthday: its day (Wednesday after 18:00 is ราหู), sign and year
+function qzRead(iso, night){
+  const [y, m, d] = iso.split('-').map(Number);
+  const wd = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  const day = wd === 3 && night ? QZ_RAHU : QZ_DAYS[wd];
+  const md = m * 100 + d;
+  const sign = [...QZ_SIGNS].reverse().find(s => s[0] <= md) || QZ_SIGNS[11];
+  const cny = QZ_CNY[y - 1950];
+  const yr = cny && md < +cny ? y - 1 : y;
+  return { day, sign, animal: ((yr - 4) % 12 + 12) % 12 };
+}
+// what ties two readings, best first; foes come back as a negative score only
+function qzTies(a, b){
+  const out = [];
+  let score = 0;
+  const p = qzPair(a.day.n, b.day.n);
+  if(p === 'friend'){ score += 3; out.push(['day', 'คู่มิตรตามตำราทักษา', 'Friend days in Thai astrology (ทักษา)']); }
+  else if(p === 'couple'){ score += 3; out.push(['day', 'คู่สมพล วันเกิดที่ส่งพลังให้กัน', 'Days that lend each other strength in Thai astrology (คู่สมพล)']); }
+  else if(p === 'same'){ score += 1.5; out.push(['day', 'เกิดวันเดียวกัน เข้าใจกันง่าย', 'Born on the same day of the week']); }
+  else if(p === 'foe') score -= 2;
+  const x = a.animal, y = b.animal, gap = ((x - y) % 12 + 12) % 12;
+  if(x !== y && gap % 4 === 0){ score += 3; out.push(['year', 'สามประสาน ปีที่หนุนกัน', 'A three-way harmony of years']); }
+  else if((x + y) % 12 === 1){ score += 3; out.push(['year', 'คู่ลิ่วเหอ ปีที่เป็นมิตรแท้', 'Years that are true friends']); }
+  else if(x === y){ score += 1.5; out.push(['year', 'ปีนักษัตรเดียวกัน', 'The same year animal']); }
+  else if(gap === 6) score -= 2;
+  if(a.sign[3] === b.sign[3]){ score += 2; out.push(['sign', `ราศีธาตุ${QZ_EL[a.sign[3]][0]}เหมือนกัน`, `Both ${QZ_EL[a.sign[3]][1].toLowerCase()} signs`]); }
+  else if(QZ_MATES[a.sign[3]] === b.sign[3]){ score += 1.5; out.push(['sign', `ธาตุ${QZ_EL[a.sign[3]][0]}กับธาตุ${QZ_EL[b.sign[3]][0]} เสริมกัน`, `${QZ_EL[a.sign[3]][1]} and ${QZ_EL[b.sign[3]][1].toLowerCase()} feed each other`]); }
+  return { score, out };
+}
+/* ดวงวันประกาศผล — shirt colours by ทักษา. Round the wheel 1 2 3 4 7 5 8 6 from
+   one's own day run บริวาร อายุ เดช ศรี มูละ อุตสาหะ มนตรี กาลกิณี, and each
+   planet has its colour. To cheer a member: her เดช (power, winning), else her
+   มนตรี (the backing of others) or ศรี; for the reader, their ศรี (good luck).
+   Never the results day's own กาลกิณี (green, on a Saturday) nor the reader's. */
+const QZ_WHEEL = [1, 2, 3, 4, 7, 5, 8, 6];
+const QZ_HOUSES = ['บริวาร', 'อายุ', 'เดช', 'ศรี', 'มูละ', 'อุตสาหะ', 'มนตรี', 'กาลกิณี'];
+const QZ_COLOURS = { 1:['แดง', 'Red', '#D93B3B'], 2:['เหลือง ครีม', 'Yellow or cream', '#F2C94C'], 3:['ชมพู', 'Pink', '#EC7AAA'], 4:['เขียว', 'Green', '#2F9E55'],
+  5:['ส้ม ทอง', 'Orange or gold', '#E8892B'], 6:['ฟ้า น้ำเงิน', 'Sky or navy blue', '#3D7DD9'], 7:['ม่วง', 'Purple', '#7B4FC4'], 8:['เทาเข้ม บรอนซ์', 'Charcoal or bronze', '#6B625A'] };
+const QZ_HOUSE_SAY = { 'เดช':['อำนาจ ชัยชนะ', 'power and winning'], 'มนตรี':['แรงหนุนจากคนรอบตัว', 'the backing of others'], 'ศรี':['โชค สิริมงคล', 'good fortune'] };
+const qzHouse = (n, house) => QZ_WHEEL[(QZ_WHEEL.indexOf(n) + QZ_HOUSES.indexOf(house)) % 8];
+/* ฤกษ์ดีกดโหวต — by ยามอัฐกาล: day and night each in eight ยาม of an hour and a
+   half from 06:00 and 18:00 (Thai time), the first ruled by the day's planet and
+   the rest in the order 1 6 4 2 7 5 3 by day and 1 5 2 6 3 7 4 by night, the
+   eighth as the first; a night belongs to the day before it. The good ยาม are her
+   เดช planet's (to lift her) and the reader's ศรี planet's. ราหู rules no ยาม, so
+   where it falls the next house is taken. It says when, never how much. */
+const QZ_YAM = { day:[1, 6, 4, 2, 7, 5, 3], night:[1, 5, 2, 6, 3, 7, 4] };
+const QZ_PLANET = { 1:['อาทิตย์', 'the Sun'], 2:['จันทร์', 'the Moon'], 3:['อังคาร', 'Mars'], 4:['พุธ', 'Mercury'], 5:['พฤหัสบดี', 'Jupiter'], 6:['ศุกร์', 'Venus'], 7:['เสาร์', 'Saturn'] };
+function qzYams(from, to){
+  const TH = 7 * 36e5, out = [], t = new Date(from + TH);
+  let day0 = Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate(), 6) - TH;
+  if(from < day0) day0 -= 864e5;                        // before dawn: still last night's ยาม
+  for(; day0 < to; day0 += 864e5){
+    const n = new Date(day0 + TH).getUTCDay() + 1;      // 1 Sunday … 7 Saturday
+    for(const [seq, off] of [[QZ_YAM.day, 0], [QZ_YAM.night, 12 * 36e5]])
+      for(let y = 0; y < 8; y++){ const s = day0 + off + y * 54e5; out.push([s, s + 54e5, seq[(seq.indexOf(n) + y) % 7]]); }
+  }
+  return out.filter(([s, e]) => e > from && s < to);
+}
+const qzRuler = (n, houses) => { for(const h of houses){ const p = qzHouse(n, h); if(p !== 8) return [h, p]; } return null; };
+function renderResultsDay(best){
+  const ev = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results), vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote);
+  if(!ev || toYmd(todayStart()) > ev.start) return '';
+  const en = isEN(), dayN = qzRead(ev.start, false).day.n, d = parseYmd(ev.start);
+  const me = _quiz.birth ? qzRead(_quiz.birth.iso, _quiz.birth.night) : null;
+  const bad = new Set([qzHouse(dayN, 'กาลกิณี'), ...(me ? [qzHouse(me.day.n, 'กาลกิณี')] : [])]);
+  const pick = (n, houses) => houses.map(h => [h, qzHouse(n, h)]).filter(([, c]) => !bad.has(c)).filter((x, i, a) => a.findIndex(y => y[1] === x[1]) === i);
+  const act = activeMembers();
+  const kami = state.kamiOshi && act.find(m => m.id === state.kamiOshi);
+  const her = act.find(m => m.id === _quiz.cheer) || kami || (best && best.m);
+  if(!her) return '';
+  const hr = qzRead(her.birthday, false);
+  const sw = ([house, c], who, main) => { const [th, e, hex] = QZ_COLOURS[c];
+    return `<div class="qz-sw${main ? ' is-main' : ''}" style="--s:${hex}"><span class="qz-sw-dot" aria-hidden="true"></span>
+      <span class="qz-sw-t"><b>${en ? e : 'สี' + th}</b><small>${en ? `${who} ${house === 'เดช' ? 'power' : house === 'มนตรี' ? 'support' : 'fortune'} colour (${house}) · ${QZ_HOUSE_SAY[house][1]}` : `สี${house}${who} · ${QZ_HOUSE_SAY[house][0]}`}</small></span></div>`; };
+  const herCols = pick(hr.day.n, ['เดช', 'มนตรี', 'ศรี']).slice(0, 2);
+  const myCols = me ? pick(me.day.n, ['ศรี', 'เดช']).slice(0, 1) : [];
+  const day = en ? `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()]} ${d.getDate()} ${EN_MONTHS_SHORT[d.getMonth()]}` : `${'อา จ อ พ พฤ ศ ส'.split(' ')[d.getDay()]}. ${d.getDate()} ${THAI_MONTHS[d.getMonth()]}`;
+  const avoid = [...bad].map((c, i) => `${en ? QZ_COLOURS[c][1] : 'สี' + QZ_COLOURS[c][0]} <small>(${i === 0 ? (en ? `the day’s กาลกิณี` : `กาลกิณีวัน${QZ_DAYS[d.getDay()].th}`) : (en ? 'your กาลกิณี' : 'กาลกิณีของคุณ')})</small>`);
+  const options = act.slice().sort((a, b) => nickName(a).localeCompare(nickName(b))).map(m => `<option value="${m.id}"${m.id === her.id ? ' selected' : ''}>${escapeHtml(nickName(m))}</option>`).join('');
+  // the vote, while it is open: the next good ยาม over two days, up to its last day (Thai time)
+  let yams = '';
+  const TH = 7 * 36e5, now = Date.now(), iso = toYmd(todayStart());
+  if(vote && vote.start <= iso && eventLastDay(vote) >= iso){
+    const close = Date.UTC(...eventLastDay(vote).split('-').map((v, i) => i === 1 ? v - 1 : +v)) + 864e5 - TH;
+    const hers = qzRuler(hr.day.n, ['เดช', 'มนตรี', 'ศรี']), mine = me ? qzRuler(me.day.n, ['ศรี', 'เดช']) : null;
+    const thDay = ms => new Date(ms + TH).toISOString().slice(0, 10), hm = ms => new Date(ms + TH).toISOString().slice(11, 16);
+    const today = thDay(now), tomorrow = thDay(now + 864e5);
+    const rows = qzYams(now, Math.min(close, now + 2 * 864e5))
+      .filter(([s]) => new Date(s + TH).getUTCHours() >= 6)          // no one is sent to vote in the small hours
+      .map(([s, e, p]) => [s, e, p, hers && p === hers[1] ? 'her' : mine && p === mine[1] ? 'me' : null]).filter(r => r[3]).slice(0, 4);
+    const when = s => { const k = thDay(s); return k === today ? (en ? 'Today' : 'วันนี้') : k === tomorrow ? (en ? 'Tomorrow' : 'พรุ่งนี้') : (() => { const x = parseYmd(k); return `${x.getDate()} ${monthsShort()[x.getMonth()]}`; })(); };
+    const house = h => ({ 'เดช':'power', 'มนตรี':'support', 'ศรี':'fortune' })[h];
+    const why = r => r[3] === 'her' ? (en ? `${QZ_PLANET[r[2]][1]}, ${nickName(her)}’s ${house(hers[0])} planet` : `ยาม${QZ_PLANET[r[2]][0]} · ${hers[0]}ของ ${nickName(her)}`)
+      : (en ? `${QZ_PLANET[r[2]][1]}, your ${house(mine[0])} planet` : `ยาม${QZ_PLANET[r[2]][0]} · ${mine[0]}ของคุณ`);
+    const v = parseYmd(eventLastDay(vote));
+    if(rows.length) yams = `<p class="qz-day-sub">${en ? `Good hours to vote · until ${v.getDate()} ${EN_MONTHS_SHORT[v.getMonth()]}` : `ฤกษ์ดีกดโหวต · ถึง ${v.getDate()} ${THAI_MONTHS[v.getMonth()]}`}</p>
+      <div class="qz-yams">${rows.map(r => `<div class="qz-yam${r[0] <= now ? ' is-now' : ''}${r[3] === 'her' ? ' is-her' : ''}"><b>${when(r[0])} ${hm(r[0])}–${hm(r[1]) === '00:00' ? '24:00' : hm(r[1])}</b><span>${escapeHtml(why(r))}</span>${r[0] <= now ? `<i>${en ? 'now' : 'ตอนนี้'}</i>` : ''}</div>`).join('')}</div>
+      <p class="qz-day-note">${en ? 'By the ยามอัฐกาล watches (Thai time). It only says when — vote what you are comfortable with.' : 'ตามยามอัฐกาล (เวลาไทย) บอกแค่ช่วงเวลา โหวตเท่าที่สบายใจ'}</p>`;
+  }
+  return `<section class="qz-day">
+    <p class="qz-day-h"><span>${en ? 'Stars for cheering' : 'ดวงเชียร์โอชิ'}</span>GE2026</p>
+    <label class="qz-day-pick">${en ? 'Cheering' : 'เชียร์'} <select id="qz-cheer">${options}</select></label>
+    ${yams}
+    <p class="qz-day-sub">${en ? `A shirt for results night · ${day}` : `เสื้อวันประกาศผล · ${day}`}</p>
+    <div class="qz-sws">${herCols.map((x, i) => sw(x, en ? `Her` : `ของ ${nickName(her)}`, !i)).join('')}</div>
+    <p class="qz-day-note">${en ? `${escapeHtml(nickName(her))} was born on a ${hr.day.en}${hr.day.n === 4 ? ' (counted by day)' : ''}.` : `${escapeHtml(nickName(her))} เกิดวัน${hr.day.th}${hr.day.n === 4 ? ' (นับเป็นพุธกลางวัน)' : ''}`}</p>
+    ${myCols.length ? `<p class="qz-day-sub is-minor">${en ? 'For you that day' : 'สีของคุณวันนั้น'}</p><div class="qz-sws">${myCols.map(x => sw(x, en ? 'Your' : 'ของคุณ', false)).join('')}</div>` : ''}
+    <p class="qz-avoid"><b>${en ? 'Skip' : 'เลี่ยง'}</b> ${avoid.join(' · ')}</p>
+    <p class="qz-day-note">${en ? 'By the Thai ทักษา wheel: each day’s planet and its colour.' : 'ตามตำราทักษา: ดาวประจำวันเกิดและสีประจำดาว'}</p>
+  </section>`;
+}
+function qzBirth(){
+  try{ const b = JSON.parse(localStorage.getItem(QZ_KEY) || 'null'); if(b && /^\d{4}-\d\d-\d\d$/.test(b.iso)) return b; }catch(e){}
+  return null;
+}
+const qzHash = s => { let h = 2166136261; for(const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; };
+function qzResults(){
+  const me = _quiz.birth ? qzRead(_quiz.birth.iso, _quiz.birth.night) : null;
+  const want = { F:0, E:0, A:0, W:0 };
+  _quiz.ans.forEach(el => { if(want[el] != null) want[el]++; });
+  const top = Object.entries(want).sort((a, b) => b[1] - a[1])[0][0];
+  const group = _quiz.group || 'all';
+  const seed = JSON.stringify([_quiz.birth, _quiz.ans, group]);
+  return activeMembers().filter(m => m.birthday && (group === 'all' || m.groupId === group)).map(m => {
+    const her = qzRead(m.birthday, false);
+    const els = [her.day.el, her.sign[3]];
+    // a day and a sign of the same element count half again, not twice, so no one wins by being all one thing
+    const like = els[0] === els[1] ? want[els[0]] * 1.5 : want[els[0]] + want[els[1]];
+    const ties = me ? qzTies(me, her) : { score:0, out:[] };
+    const total = (me ? like : like * 2) + ties.score + qzHash(seed + m.id) * .4;
+    return { m, her, els, like, ties, total, pct: Math.max(66, Math.min(99, Math.round(66 + total * 2.1))) };
+  }).sort((a, b) => b.total - a.total).map(r => ({ ...r, top }));
+}
+function qzChips(r, en){
+  return `<span class="qz-chip" style="--c:${r.day.c}">${en ? 'Born ' + r.day.en : 'เกิดวัน' + r.day.th}</span>
+    <span class="qz-chip">${en ? r.sign[2] : 'ราศี' + r.sign[1]}</span>
+    <span class="qz-chip">${en ? 'Year of the ' + QZ_ANIMALS[r.animal][1] : 'ปี' + QZ_ANIMALS[r.animal][0]}</span>`;
+}
+function qzMatchCard(r, rank){
+  const en = isEN(), m = r.m, g = getGroup(m.groupId);
+  const why = r.ties.out.map(t => en ? t[2] : t[1]);
+  if(r.els.includes(r.top)) why.push(en ? `${QZ_EL[r.top][3][0].toUpperCase() + QZ_EL[r.top][3].slice(1)}, the way you like` : `${QZ_EL[r.top][2]} ตรงกับแบบที่คุณชอบ`);
+  const trait = `${en ? `Born on a ${r.her.day.en}: ` : `คนเกิดวัน${r.her.day.th}: `}${r.her.day.tr[en ? 1 : 0]}`;
+  if(rank) return `<button class="qz-run" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
+    ${renderAvatar(m, 'qz-run-pic', g.color)}<span class="qz-run-t"><b>${escapeHtml(nickName(m))}</b><small>${escapeHtml(why[0] || trait)}</small></span><span class="qz-run-pct">${r.pct}%</span></button>`;
+  return `<article class="qz-best" style="--c:${g.color}">
+    <p class="qz-best-h">${en ? 'The member your stars favour most' : 'เมมเบอร์ที่ดวงถูกโฉลกกับคุณที่สุด'}</p>
+    <button class="qz-best-pic" data-action="open-member" data-id="${m.id}" aria-label="${escapeAttr(nickName(m))}">${renderAvatar(m, 'qz-pic', g.color)}<span class="qz-pct">${r.pct}<small>%</small></span></button>
+    <h2 class="qz-name">${escapeHtml(nickName(m))}</h2>
+    <p class="qz-sub">${escapeHtml(g.name)}${m.gen ? ` · ${en ? 'Gen ' + m.gen : 'รุ่น ' + m.gen}` : ''}</p>
+    <div class="qz-chips">${qzChips(r.her, en)}</div>
+    <ul class="qz-why">${why.slice(0, 4).map(w => `<li>${escapeHtml(w)}</li>`).join('')}<li>${escapeHtml(trait)}</li></ul>
+    <div class="qz-acts"><button class="qz-go" data-action="open-member" data-id="${m.id}">${en ? 'Open her profile' : 'ดูโปรไฟล์'}</button>
+      <button class="qz-go is-ghost" data-action="quiz-share">${ICONS.share}${en ? 'Share' : 'แชร์ผล'}</button></div>
+  </article>`;
+}
+function renderQuiz(){
+  const en = isEN(), q = _quiz, total = QZ_QUESTIONS.length + 2;
+  const head = `<header class="feed-head qz-head">
+    <p class="feed-today">${en ? 'Horoscope quiz' : 'ดูดวงหาโอชิ'}</p>
+    <h1 class="qz-title">${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</h1>
+    <p class="qz-lead">${en ? 'Your birthday against every member’s — by the day of the week (ทักษา), the Thai zodiac and the year animal — then four questions on the kind of member you love to watch. Just for fun.'
+      : 'เทียบวันเกิดของคุณกับเมมเบอร์ทุกคน ตามตำราทักษา ราศีแบบไทย และปีนักษัตร แล้วตอบอีกสี่ข้อว่าคุณชอบเมมเบอร์สไตล์ไหน ดูดวงเพื่อความสนุกนะ'}</p>
+  </header>`;
+  const dots = n => `<p class="qz-step">${en ? `Question ${n} of ${total}` : `ข้อ ${n}/${total}`}</p><div class="qz-dots">${Array.from({ length: total }, (_, i) => `<i class="${i < n ? 'is-on' : ''}"></i>`).join('')}</div>`;
+  const back = q.step ? `<button class="qz-back" data-action="quiz-back">← ${en ? 'Back' : 'ย้อนกลับ'}</button>` : '';
+  let body;
+  if(q.step === 0){
+    const b = q.birth || qzBirth() || {}, [y, mo, d] = (b.iso || '').split('-').map(Number);
+    const yrs = []; for(let i = new Date().getFullYear() - 8; i >= 1950; i--) yrs.push(i);
+    const me = b.iso ? qzRead(b.iso, b.night) : null;
+    const wed = b.iso && new Date(Date.UTC(y, mo - 1, d)).getUTCDay() === 3;
+    body = `${dots(1)}<h2 class="qz-q">${en ? 'When were you born?' : 'คุณเกิดวันที่เท่าไหร่?'}</h2>
+      <div class="qz-date">
+        <select id="qz-d" aria-label="${en ? 'Day' : 'วัน'}"><option value="">${en ? 'Day' : 'วัน'}</option>${Array.from({ length: 31 }, (_, i) => `<option${d === i + 1 ? ' selected' : ''}>${i + 1}</option>`).join('')}</select>
+        <select id="qz-m" aria-label="${en ? 'Month' : 'เดือน'}"><option value="">${en ? 'Month' : 'เดือน'}</option>${(en ? EN_MONTHS : MONTH_NAMES).map((n, i) => `<option value="${i + 1}"${mo === i + 1 ? ' selected' : ''}>${n}</option>`).join('')}</select>
+        <select id="qz-y" aria-label="${en ? 'Year' : 'ปี'}"><option value="">${en ? 'Year' : 'ปี พ.ศ.'}</option>${yrs.map(v => `<option value="${v}"${y === v ? ' selected' : ''}>${en ? v : v + 543}</option>`).join('')}</select>
+      </div>
+      ${wed ? `<div class="qz-seg"><span>${en ? 'Born on a Wednesday —' : 'เกิดวันพุธ ช่วงไหน?'}</span>
+        <button class="${b.night ? '' : 'is-on'}" data-action="quiz-night" data-id="0">${en ? 'by day' : 'กลางวัน'}</button>
+        <button class="${b.night ? 'is-on' : ''}" data-action="quiz-night" data-id="1">${en ? 'after 6 pm' : 'หลัง 18:00'}</button></div>` : ''}
+      ${me ? `<div class="qz-me"><span>${en ? 'You:' : 'คุณ:'}</span>${qzChips(me, en)}</div>` : ''}
+      <div class="qz-next"><button class="qz-go" data-action="quiz-birth"${me ? '' : ' disabled'}>${en ? 'Next' : 'ถัดไป'}</button>
+        <button class="qz-skip" data-action="quiz-nobirth">${en ? 'Skip — no birthday' : 'ข้าม ไม่บอกวันเกิด'}</button></div>
+      <p class="qz-note">${en ? 'Your birthday stays on this device; nothing is sent anywhere.' : 'วันเกิดของคุณเก็บไว้ในเครื่องนี้เท่านั้น ไม่ได้ส่งไปที่ไหน'}</p>`;
+  } else if(q.step <= QZ_QUESTIONS.length){
+    const Q = QZ_QUESTIONS[q.step - 1];
+    body = `${dots(q.step + 1)}<h2 class="qz-q">${en ? Q.en : Q.th}</h2>
+      <div class="qz-opts">${Q.o.map(([el, th, e]) => `<button class="qz-opt${q.ans[q.step - 1] === el ? ' is-on' : ''}" data-action="quiz-pick" data-id="${el}">${escapeHtml(en ? e : th)}</button>`).join('')}</div>`;
+  } else if(q.step === QZ_QUESTIONS.length + 1){
+    body = `${dots(total)}<h2 class="qz-q">${en ? 'From which group?' : 'อยากได้โอชิจากวงไหน?'}</h2>
+      <div class="qz-opts">${[['bnk48', 'BNK48'], ['cgm48', 'CGM48'], ['all', en ? 'Either' : 'ทั้งสองวง']].map(([id, n]) => {
+        const g = getGroup(id);
+        return `<button class="qz-opt" style="${g ? `--c:${g.color}` : ''}" data-action="quiz-group" data-id="${id}">${n}</button>`; }).join('')}</div>`;
+  } else {
+    const list = qzResults(), me = q.birth ? qzRead(q.birth.iso, q.birth.night) : null;
+    body = `${me ? `<div class="qz-me is-result"><span>${en ? 'You:' : 'ดวงคุณ:'}</span>${qzChips(me, en)}</div>` : ''}
+      ${list[0] ? qzMatchCard(list[0], 0) : ''}
+      ${list.length > 1 ? `<h3 class="section-label qz-more-h">${en ? 'Two more your stars favour' : 'อีกสองคนที่ดวงถูกโฉลกกับคุณ'}</h3>${list.slice(1, 3).map(r => qzMatchCard(r, 1)).join('')}` : ''}
+      ${renderResultsDay(list[0])}
+      <div class="qz-next is-center"><button class="qz-go is-ghost" data-action="quiz-again">↺ ${en ? 'Start again' : 'ทำใหม่'}</button></div>
+      <p class="qz-note">${en ? 'For fun only: no horoscope has been shown to work. Days by the Thai ทักษา pairs (คู่มิตร, คู่สมพล), the Thai sidereal zodiac, year animals from Chinese New Year; members born on a Wednesday are counted by day.'
+        : 'ดูดวงเพื่อความสนุก ไม่มีศาสตร์ไหนพิสูจน์ได้ว่าแม่น · วันเกิดตามตำราทักษา (คู่มิตร คู่สมพล) ราศีแบบไทย ปีนักษัตรนับตามตรุษจีน · เมมเบอร์ที่เกิดวันพุธนับเป็นพุธกลางวัน'}</p>`;
+    return `<div class="feed-page qz-page">${head}<section class="qz-result">${body}</section></div>`;
+  }
+  return `<div class="feed-page qz-page">${head}<section class="qz-card">${back}${body}</section></div>`;
+}
+function quizDate(){
+  const d = +(document.getElementById('qz-d') || {}).value, m = +(document.getElementById('qz-m') || {}).value, y = +(document.getElementById('qz-y') || {}).value;
+  if(!d || !m || !y) return null;
+  const t = new Date(Date.UTC(y, m - 1, d));
+  if(t.getUTCMonth() !== m - 1) return null;            // 31 February
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+function quizKeepBirth(b){ _quiz.birth = b; try{ localStorage.setItem(QZ_KEY, JSON.stringify(b)); }catch(e){} }
+async function quizShare(){
+  const best = qzResults()[0];
+  if(!best) return;
+  const en = isEN(), url = location.origin + '/quiz';
+  const text = en ? `My stars and ${nickName(best.m)}’s: ${best.pct}% — find yours on 48thDb` : `ดวงฉันถูกโฉลกกับ ${nickName(best.m)} ${best.pct}% · มาหาโอชิจากดวงของคุณที่ 48thDb`;
+  try{ if(navigator.share){ await navigator.share({ title: en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง', text, url }); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
+  try{ await navigator.clipboard.writeText(`${text} ${url}`); toast(en ? 'Copied' : 'คัดลอกแล้ว'); }catch(e){}
+}
+function quizAction(action, id){
+  const q = _quiz, last = QZ_QUESTIONS.length + 1;
+  if(action === 'quiz-birth'){ const iso = quizDate(); if(!iso) return; const was = q.birth || qzBirth();
+    quizKeepBirth({ iso, night: !!(was && was.iso === iso && was.night) }); q.step = 1; }
+  else if(action === 'quiz-nobirth'){ q.birth = null; q.step = 1; }
+  else if(action === 'quiz-night'){ const iso = quizDate(); if(iso) quizKeepBirth({ iso, night: id === '1' }); }
+  else if(action === 'quiz-pick'){ q.ans[q.step - 1] = id; q.step++; }
+  else if(action === 'quiz-group'){ q.group = id; q.step = last + 1; }
+  else if(action === 'quiz-back'){ q.step = Math.max(0, q.step - 1); }
+  else if(action === 'quiz-again'){ _quiz = { step:0, ans:[] }; }
+  else if(action === 'quiz-share'){ quizShare(); return; }
+  renderMain();
+  // the next question where the last one was, or the result from its top
+  const card = document.querySelector('#main .qz-card, #main .qz-result');
+  if(card && card.getBoundingClientRect().top < 70) scrollPageTo(Math.max(0, card.getBoundingClientRect().top + window.scrollY - 80));
+}
+
 function renderSearch(){
   const q = state.query.trim();
   const r = searchEverything(q);
@@ -18851,7 +19259,7 @@ const PAGE_NAMES = {
   'stats:overview':'สถิติ · ภาพรวม', 'stats:songs':'สถิติ · เพลง', 'stats:birthdays':'สถิติ · วันเกิด', 'stats:timeline':'สถิติ · ไทม์ไลน์', 'stats:lives':'สถิติ · ไลฟ์',
   'ge:overview':'GE2026 · ภาพรวม', 'ge:candidates':'GE2026 · ผู้สมัคร', 'ge:songs':'GE2026 · เพลงที่อยากได้', 'ge:chain':'GE2026 · โหวตสด',
   'ge:results':'GE2026 · ผลเลือกตั้ง', 'ge:timeline':'GE2026 · กำหนดการ', 'ge:events':'GE2026 · งานทั้งหมด',
-  shop:'ร้านค้า', calendar:'ปฏิทิน', gallery:'แกลเลอรี', search:'ค้นหา', profile:'โปรไฟล์', auth:'เข้าสู่ระบบ',
+  shop:'ร้านค้า', calendar:'ปฏิทิน', gallery:'แกลเลอรี', quiz:'หาโอชิจากดวง', search:'ค้นหา', profile:'โปรไฟล์', auth:'เข้าสู่ระบบ',
   member:'ชีตสมาชิก', event:'ชีตงาน', day:'ชีตวัน (ปฏิทิน)', poster:'โปสเตอร์ผู้สมัคร', vs:'เทียบสมาชิก',
 };
 
@@ -22047,6 +22455,7 @@ function renderMain(){
     state.view==='stats' ? renderStats() :
     state.view==='single' ? renderSingleDetail() :
     state.view==='gallery' ? renderGallery() :
+    state.view==='quiz' ? renderQuiz() :
     state.view==='tag' ? renderTagPage() :
     state.view==='profile' ? renderProfile() :
     state.view==='auth' ? renderAuth() :
@@ -22457,7 +22866,7 @@ const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
 // stays put, which is what lets this work on static hosting with no rewrites.
-const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','timeline','shop','calendar','gallery'];
+const SHAREABLE_VIEWS = ['feed','browse','groups','org','discography','stats','timeline','shop','calendar','gallery','quiz'];
 
 // Read at load time. The first history entry is written before the member list
 // has arrived, and writing it derives the address from a state that is still
@@ -25107,6 +25516,13 @@ function bindDelegatedEvents(){
       state.query = '';
       render(); pushHistory();
     }
+    else if(action==='nav-quiz'){
+      state.view = 'quiz';
+      state.selectedEvent = null; state.selectedId = null; state.editingId = null;
+      state.query = '';
+      render(); pushHistory(); window.scrollTo(0, 0);
+    }
+    else if(action.startsWith('quiz-')) quizAction(action, id);
     else if(action==='nav-gallery'){
       state.view = 'gallery';
       state.selectedEvent = null; state.selectedId = null; state.editingId = null;
@@ -25693,6 +26109,13 @@ function bindDelegatedEvents(){
   });
 
   document.body.addEventListener('change', (e)=>{
+    if(e.target.id === 'qz-cheer'){ _quiz.cheer = e.target.value; renderMain(); return; }
+    if(/^qz-[dmy]$/.test(e.target.id)){
+      const iso = quizDate(), go = document.querySelector('[data-action="quiz-birth"]');
+      if(iso){ quizKeepBirth({ iso, night:false }); renderMain(); }
+      else if(go) go.disabled = true;
+      return;
+    }
     if(e.target.id==='birth-month'){ state.birthMonth = e.target.value; renderMain(); replaceHistory(); }
     else if(e.target.id==='team-filter'){ state.teamFilter = e.target.value; state.genFilter = 'all'; state.captainFilter = 'all'; renderMain(); replaceHistory(); }
     else if(e.target.id==='sort-filter'){ state.sortBy = e.target.value; state.sortDir = 'asc'; renderMain(); replaceHistory(); }
