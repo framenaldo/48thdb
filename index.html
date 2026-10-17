@@ -3751,6 +3751,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .tl-lock svg{ width:16px; height:16px; flex:none; color:var(--c); }
   /* the header's one menu */
   .set-wrap{ position:relative; flex-shrink:0; }
+  /* on a wide screen the menu sits at the right, beside the profile, rather than after the search */
+  @media (min-width:700px){ header.top > .set-wrap{ order:1; margin-left:auto; } header.top > #profile-slot{ order:1; margin-left:0; } }
   .set-btn{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; cursor:pointer; color:var(--ink);
     background:var(--card); border:1px solid var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb, 0,0,0),.14); }
   .set-btn svg{ width:19px; height:19px; } .set-btn.is-on{ background:var(--ink); color:var(--paper); }
