@@ -368,6 +368,48 @@ DTSTART;TZID=Asia/Bangkok:20260920T120000
 DTEND;TZID=Asia/Bangkok:20260920T180000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-halloween-ontour-1020-2026-10-20@48thdb
+DTSTAMP:20261020T000000Z
+SUMMARY:CGM48 POP UP หลอน.. ON TOUR
+LOCATION:MUAN MORE SPACE\, Chiang Mai
+DESCRIPTION:เมมเบอร์: Lookked\, Prae\, Nana\, Chifa\, Else\
+ , Nisha\n• 16:00 สินค้า MERCHANDISE เริ่มจำห
+ น่าย\n• 18:00 การแสดง — ถ่ายทอดส
+ ดทาง YouTube CGM48 OFFICIAL\n• ซื้อเครื่อง
+ ดื่ม 1 แก้ว พร้อมแสดงใบเสร็
+ จ ต่อเจ้าหน้าที่หน้าประตู
+ ทางเข้า เพื่อเข้าชม CGM48 POP UP LIVE 
+ ON TOUR\n• สามารถนำใบเสร็จมารับ
+ เครื่องดื่มกับ Members ได้หลัง
+ จบกิจกรรม\n• เครื่องดื่ม POP UP 
+ LIVE ON TOUR 80 บาท\n• สามารถชำระได้ท
+ ี่จุดซื้อสินค้า ขอสงวนสิท
+ ธิ์ชำระผ่าน QR Code เท่านั้น\n• 
+ ลำดับการขอรับสิทธิ์เข้าด
+ ู ท่านที่มาถึงก่อน สามารถเ
+ ลือกพื้นที่ได้ตามอัธยาศั
+ ยในโซนต่าง ๆ\n• ด้านในพื้นท
+ ี่บริเวณหน้าเวที ไม่อนุญา
+ ตให้นำบันได ขาตั้งกล้อง เข
+ ้าในพื้นที่ และอนุญาตให้ถ
+ ่ายภาพโดยยกความสูงได้ไม่
+ เกินศีรษะเท่านั้น ส่วนกล้
+ องขนาดใหญ่ต้องอยู่ในบริเ
+ วณพื้นที่ที่กำหนด\n• Zone 1 โซน
+ รับชมด้านในบริเวณกิจกรรม 
+ ถ่ายภาพได้โดยยกความสูงไม
+ ่เกินศีรษะ และไม่รบกวนผู้
+ อื่น\n• Zone 2 โซนสำหรับช่างภาพ
+ ที่ต้องการบันทึกภาพและวี
+ ดีโอ ใช้กล้องได้ทุกชนิด แล
+ ะใช้อุปกรณ์เสริมได้\n• ภาพ
+ สินค้าสำหรับการโฆษณาเท่า
+ นั้น\n\nhttps://48thdb.com/?e=ev-cgm48-popup-halloween-ontour-1020
+URL:https://48thdb.com/?e=ev-cgm48-popup-halloween-ontour-1020
+DTSTART;TZID=Asia/Bangkok:20261020T180000
+DTEND;TZID=Asia/Bangkok:20261020T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-cgm48-popup-live-cnx-2026-09-22@48thdb
 DTSTAMP:20260922T000000Z
 SUMMARY:CGM48 POP UP LIVE ON TOUR
