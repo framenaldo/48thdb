@@ -17346,7 +17346,7 @@ function renderAskBlock(q, total){
     return `<button class="ask-go" data-action="ask-ai"><span class="ask-spark" aria-hidden="true">✦</span>
       <span class="ask-go-t"><b>${en ? 'Ask 48thDb' : 'ถาม 48thDb'}</b><small>“${escapeHtml(q)}”</small></span><span class="ask-go-arrow" aria-hidden="true">→</span></button>`;
   }
-  const head = `<p class="ask-q"><span class="ask-spark" aria-hidden="true">✦</span><span>“${escapeHtml(q)}”</span></p>`;
+  const head = `<p class="ask-q" data-noloc><span class="ask-spark" aria-hidden="true">✦</span><span>“${escapeHtml(q)}”</span></p>`;
   if(here.status === 'loading') return `<section class="ask-card is-loading">${head}<p class="ask-a"><span class="ask-dots"><i></i><i></i><i></i></span>${en ? 'Reading the question…' : 'กำลังอ่านคำถาม…'}</p></section>`;
   if(here.status !== 'done') return `<section class="ask-card">${head}<p class="ask-a is-soft">${here.status === 'limit'
     ? (en ? 'That is a lot of questions for today — the search below still works.' : 'วันนี้ถามไปเยอะแล้ว ลองใหม่พรุ่งนี้ ส่วนการค้นหาด้านล่างยังใช้ได้')
@@ -17515,7 +17515,7 @@ function renderQuizTile(){
   const day = toYmd(todayStart()), faces = m ? [m] : act.slice().sort((x, y) => qzHash(day + x.id) - qzHash(day + y.id)).slice(0, 3);
   const small = next ? `${en ? 'Vote at' : 'ฤกษ์โหวต'} ${next.when === (en ? 'Today' : 'วันนี้') ? '' : next.when + ' '}${next.hours.slice(0, 5)}`
     : m ? (en ? 'your stars’ pick' : 'ดวงถูกโฉลก') : (en ? 'by the stars ✦' : 'จากดวง ✦');
-  return `<button class="dash-t is-quiz" data-action="nav-quiz" title="${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}">
+  return `<button class="dash-t is-quiz" data-noloc data-action="nav-quiz" title="${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}">
     ${m ? `<span class="dash-i">${ICONS.star}</span>` : ''}
     <span class="dash-q-faces${m ? ' is-one' : ''}">${faces.map(x => renderAvatar(x, 'dash-q-face', getGroup(x.groupId).color)).join('')}${m ? `<i>${last.pct}%</i>` : ''}</span>
     <span class="dash-l">${m ? escapeHtml(nickName(m)) : (en ? 'Your oshi' : 'หาโอชิ')}<small>${escapeHtml(small)}</small></span></button>`;
@@ -17656,9 +17656,9 @@ function renderQuiz(){
       <div class="qz-next is-center"><button class="qz-go is-ghost" data-action="quiz-again">↺ ${en ? 'Start again' : 'ทำใหม่'}</button></div>
       <p class="qz-note">${en ? 'For fun only: no horoscope has been shown to work. Days by the Thai ทักษา pairs (คู่มิตร, คู่สมพล), the Thai sidereal zodiac, year animals from Chinese New Year; members born on a Wednesday are counted by day.'
         : 'ดูดวงเพื่อความสนุก ไม่มีศาสตร์ไหนพิสูจน์ได้ว่าแม่น · วันเกิดตามตำราทักษา (คู่มิตร คู่สมพล) ราศีแบบไทย ปีนักษัตรนับตามตรุษจีน · เมมเบอร์ที่เกิดวันพุธนับเป็นพุธกลางวัน'}</p>`;
-    return `<div class="feed-page qz-page">${head}<section class="qz-result">${body}</section></div>`;
+    return `<div class="feed-page qz-page" data-noloc>${head}<section class="qz-result">${body}</section></div>`;
   }
-  return `<div class="feed-page qz-page">${head}<section class="qz-card">${back}${body}</section></div>`;
+  return `<div class="feed-page qz-page" data-noloc>${head}<section class="qz-card">${back}${body}</section></div>`;
 }
 function quizDate(){
   const d = +(document.getElementById('qz-d') || {}).value, m = +(document.getElementById('qz-m') || {}).value, y = +(document.getElementById('qz-y') || {}).value;
