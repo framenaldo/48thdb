@@ -1923,21 +1923,6 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .feed-sum{ display:flex; flex-wrap:wrap; gap:4px 12px; margin:0; font-size:12px; font-weight:700; color:var(--ink-soft); }
   .feed-sum b{ color:var(--ink); font-weight:800; }
   .feed-sum .is-now b{ color:var(--bnk); }
-  /* สรุปวันนี้: the day's note in the date card, under a hairline; names and
-     events in it are the biographies' pink mentions and open their sheets */
-  .brief-slot:empty{ display:none; }
-  .brief{ margin-top:9px; padding-top:10px; border-top:1px solid var(--line); }
-  .brief-h{ display:flex; align-items:center; gap:7px; margin:0 0 5px; font-size:12px; color:var(--ink-soft); }
-  .brief-h b{ font-size:13px; font-weight:800; color:var(--ink); }
-  .brief-spark{ display:inline-grid; place-items:center; flex:none; width:20px; height:20px; border-radius:7px; font-size:11px; color:#fff;
-    background:linear-gradient(135deg, var(--brand-a), var(--brand-b)); box-shadow:0 2px 6px rgba(228, 69, 126, .25); }
-  .brief-by{ margin-left:auto; font-size:11px; font-weight:600; white-space:nowrap; }
-  .brief-text{ margin:0; font-size:14.5px; line-height:1.7; color:var(--ink); }
-  .brief-text .bio-mn{ white-space:nowrap; }
-  .brief-text .bio-mn.is-ev{ white-space:normal; }
-  .brief-oshi{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; margin:9px 0 0; padding:8px 11px; border-radius:14px;
-    background:var(--paper-dim); font-size:13px; line-height:1.55; }
-  .brief-oshi-h{ flex-basis:100%; font-size:11.5px; font-weight:800; color:var(--ink-soft); }
   /* the date sits in the same frosted material as the cards below it */
   .feed-today{
     display:inline-flex; align-items:center; gap:7px; margin:0;
@@ -4501,7 +4486,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     transition:transform .12s ease, box-shadow .12s ease;
   }
   .ask-go:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--brand-a) 22%, transparent), 0 4px 12px rgba(228, 69, 126, .08); }
-  .ask-go .brief-spark{ width:30px; height:30px; border-radius:10px; font-size:15px; }
+  .ask-spark{ display:inline-grid; place-items:center; flex:none; width:20px; height:20px; border-radius:7px; font-size:11px; color:#fff;
+    background:linear-gradient(135deg, var(--brand-a), var(--brand-b)); box-shadow:0 2px 6px rgba(228, 69, 126, .25); }
+  .ask-go .ask-spark{ width:30px; height:30px; border-radius:10px; font-size:15px; }
   .ask-go-t{ display:flex; flex-direction:column; min-width:0; flex:1; }
   .ask-go-t b{ font-size:14.5px; font-weight:800; }
   .ask-go-t small{ font-size:12px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -11222,98 +11209,21 @@ function renderTimelineZone(){
   return `<section class="feed-block is-iamtl"><h2 class="section-label">${en ? 'Latest on iAM48' : 'iAM48 ล่าสุด'}</h2>
     ${strip}${open.length ? `<div class="tl-row">${open.map(([p, m]) => tlCard(p, m)).join('')}</div>` : ''}</section>`;
 }
-/* ================= สรุปวันนี้ — the day in a few sentences =================
-   Written each morning by Workers AI from the day's events and birthdays and
-   the night's iAM48 posts (api.48thdb.com/brief, `briefTick` in
-   worker/live-worker.js), in Thai and in English. Members and events come as
-   tokens ([M1], [E1]) printed here as names that open their sheets, so the AI
-   never spells a name. Under it, for a reader with oshi, one line of what is
-   theirs today, put together here from the page's own data. A brief that is
-   not today's is not shown. The Worker answering at all also turns on asking
-   questions in the search (`_aiOn`). */
-let BRIEF = null, _briefTimer = null, _aiOn = false;
-function refreshBrief(){
-  if(!_briefTimer) _briefTimer = setInterval(() => { if(!document.hidden) refreshBrief(); }, 15 * 60000);
-  return fetch(`${LIVE_API}/brief?t=${Math.floor(Date.now() / 300000)}`, { cache:'no-store' })
-    .then(r => r.ok ? r.json() : null)
-    .then(d => {
-      if(!d || !('date' in d)) return;
-      const was = BRIEF && BRIEF.at, wasOn = _aiOn;
-      BRIEF = d.date ? d : null; _aiOn = true;
-      if((BRIEF && BRIEF.at) !== was) paintBrief();
-      if(!wasOn){
-        const box = document.getElementById('search-input');
-        if(box) box.placeholder = isEN() ? 'Search, or ask a question…' : 'ค้นหา หรือพิมพ์คำถาม…';
-        if(state.query.trim()) renderMain();
-      }
+/* Asking questions in the search (ถามเว็บได้) needs the Worker's /ask; until a
+   Worker that has it is deployed the search stays as it was. A GET there answers
+   405 from a Worker that has it. */
+let _aiOn = false;
+function checkAI(){
+  return fetch(`${LIVE_API}/ask`, { cache:'no-store' })
+    .then(r => {
+      if(r.status !== 405 || _aiOn) return;
+      _aiOn = true;
+      const box = document.getElementById('search-input');
+      if(box) box.placeholder = isEN() ? 'Search, or ask a question…' : 'ค้นหา หรือพิมพ์คำถาม…';
+      if(state.query.trim()) renderMain();
     }).catch(() => {});
 }
-// only the note is drawn again, so the page under the reader does not move
-function paintBrief(){
-  const slot = document.querySelector('#main .brief-slot');
-  if(!slot) return;
-  slot.innerHTML = renderBrief();
-  localize(slot);
-}
-// who is on an event on a given day: the day's line-up, a rota's slots, the members named for the day, or everyone on it
-function peopleOn(e, iso){
-  if(e.allMembers) return activeMembers().map(m => m.id);
-  if(e.lineup && e.lineup[iso]) return [...new Set(Object.values(e.lineup[iso]).flat())];
-  if(e.slots) return [...new Set(e.slots.filter(s => s.date === iso).flatMap(s => s.members || []))];
-  const ids = e.members || [];
-  if(!e.memberDays) return ids;
-  const [y, mo, d] = iso.split('-').map(Number);
-  return ids.filter(id => { const lab = e.memberDays[id]; if(!lab) return true;
-    const m = String(lab).match(/(\d{1,2})\s*(\S+)/); return !!m && +m[1] === d && THAI_MONTHS.indexOf(m[2]) === mo - 1; });
-}
-const briefMention = (m) => `<span class="bio-mn" role="link" tabindex="0" data-action="open-member" data-id="${escapeAttr(m.id)}">${escapeHtml(nickName(m))}</span>`;
-const briefEvent = (e) => `<span class="bio-mn is-ev" role="link" tabindex="0" data-action="open-event" data-id="${escapeAttr(e.id)}">${escapeHtml(eventShortName(e))}</span>`;
-function briefOshiLine(iso){
-  if(!state.oshi.length) return '';
-  const en = isEN(), bits = [];
-  for(const e of SEED_SCHEDULE){
-    if(e.cancelled || e.shop || e.period || !(e.start <= iso && eventLastDay(e) >= iso)) continue;
-    const on = peopleOn(e, iso).filter(id => state.oshi.includes(id)).map(getMember).filter(Boolean);
-    if(on.length) bits.push(`${on.slice(0, 3).map(briefMention).join(' ')}${on.length > 3 ? ` +${on.length - 3}` : ''} · ${briefEvent(e)}${e.time ? ` ${e.time}` : ''}`);
-  }
-  for(const id of state.oshi){
-    const m = getMember(id);
-    if(m && !m.graduated && m.birthday && m.birthday.slice(5) === iso.slice(5)) bits.push(`${briefMention(m)} ${en ? 'birthday' : 'วันเกิด'} 🎂`);
-  }
-  const posts = {};
-  for(const p of (IAMTL && IAMTL.posts) || []) if(state.oshi.includes(p.m) && Date.now() - Date.parse(p.at) < 864e5) posts[p.m] = (posts[p.m] || 0) + 1;
-  for(const [id, n] of Object.entries(posts).sort((a, b) => b[1] - a[1])){
-    const m = getMember(id);
-    if(m) bits.push(`${briefMention(m)} ${en ? `${n} iAM48 post${n > 1 ? 's' : ''}` : `โพสต์ iAM48 ${n} โพสต์`}`);
-  }
-  if(!bits.length) return '';
-  return `<p class="brief-oshi" data-noloc><span class="brief-oshi-h">⭐ ${en ? 'Your oshi today' : 'โอชิของคุณวันนี้'}</span>${bits.slice(0, 5).map(b => `<span class="brief-bit">${b}</span>`).join('')}</p>`;
-}
-function renderBrief(){
-  const iso = toYmd(todayStart()), en = isEN();
-  const b = BRIEF && BRIEF.date === iso ? BRIEF : null;
-  const mine = briefOshiLine(iso);
-  if(!b && !mine) return '';
-  let text = '';
-  if(b){
-    const refs = b.refs || {};
-    text = escapeHtml(en ? b.en : b.th).replace(/\[([ME]\d+)\]/g, (all, k) => {
-      const [id, label] = refs[k] || [];
-      if(!id) return '';
-      if(k[0] === 'M'){ const m = getMember(id); return m ? briefMention(m) : escapeHtml(label || ''); }
-      const e = SEED_SCHEDULE.find(x => x.id === id);
-      return e ? briefEvent(e) : escapeHtml(label || '');
-    });
-  }
-  const ai = b && b.by && (en ? b.by.en : b.by.th) !== 'plain';
-  const at = b && b.at ? new Date(b.at) : null;
-  const hm = at ? `${String(at.getHours()).padStart(2, '0')}:${String(at.getMinutes()).padStart(2, '0')}` : '';
-  return `<div class="brief">
-    ${b ? `<p class="brief-h"><span class="brief-spark" aria-hidden="true">✦</span><b>${en ? 'Today in brief' : 'สรุปวันนี้'}</b><span class="brief-by">${ai ? (en ? 'written by AI' : 'เขียนโดย AI') : ''}${ai && hm ? ' · ' : ''}${hm}</span></p>
-    <p class="brief-text" data-noloc>${text}</p>` : ''}
-    ${mine}
-  </div>`;
-}
+const askMention = (m) => `<span class="bio-mn" role="link" tabindex="0" data-action="open-member" data-id="${escapeAttr(m.id)}">${escapeHtml(nickName(m))}</span>`;
 function refreshRecentLives(first){
   if(!_livesTimer) _livesTimer = setInterval(() => { if(!document.hidden) refreshRecentLives(); }, 5 * 60000);
   return fetch(`${IAM_API}?t=${Math.floor(Date.now() / 60000)}`, { cache:'no-store' })
@@ -17160,7 +17070,7 @@ function askRange(when, month){
 }
 const askOn = (e, id) => e.allMembers ? !!getMember(id) && !getMember(id).graduated
   : (e.members || []).includes(id) || Object.values(e.lineup || {}).some(d => Object.values(d).some(l => l.includes(id))) || (e.slots || []).some(s => (s.members || []).includes(id));
-const askNames = (list, en) => { const n = list.map(briefMention); return n.length < 2 ? n.join('') : n.slice(0, -1).join(', ') + (en ? ' and ' : ' และ ') + n[n.length - 1]; };
+const askNames = (list, en) => { const n = list.map(askMention); return n.length < 2 ? n.join('') : n.slice(0, -1).join(', ') + (en ? ' and ' : ' และ ') + n[n.length - 1]; };
 const askTrackRow = t => { const g = getGroup(t.work.groupId);
   return `<button class="sr-row" style="--c:${g.color}" data-action="open-single" data-id="${t.work.id}">
     <span class="sr-kind">${t.centre ? (isEN() ? 'Center' : 'เซ็นเตอร์') : (isEN() ? 'Song' : 'เพลง')}</span>
@@ -17213,8 +17123,8 @@ function askAnswer(q, P){
       const known = people.filter(m => m.birthday);
       if(!known.length) return { line: en ? `${askNames(people, en)}: no birthday on record` : `ยังไม่มีวันเกิดของ ${askNames(people, en)}`, html: '' };
       const line = known.map(m => { const d = daysUntilBirthday(m, t);
-        return en ? `${briefMention(m)} was born on ${fmtDay(m.birthday)}${m.graduated ? '' : ` · ${age(m)} years old · ${d === 0 ? 'birthday today 🎂' : `birthday in ${d} days`}`}`
-          : `${briefMention(m)} เกิด ${fmtDay(m.birthday)}${m.graduated ? '' : ` · อายุ ${age(m)} ปี · ${d === 0 ? 'วันเกิดวันนี้ 🎂' : `อีก ${d} วันถึงวันเกิด`}`}`; }).join('<br>');
+        return en ? `${askMention(m)} was born on ${fmtDay(m.birthday)}${m.graduated ? '' : ` · ${age(m)} years old · ${d === 0 ? 'birthday today 🎂' : `birthday in ${d} days`}`}`
+          : `${askMention(m)} เกิด ${fmtDay(m.birthday)}${m.graduated ? '' : ` · อายุ ${age(m)} ปี · ${d === 0 ? 'วันเกิดวันนี้ 🎂' : `อีก ${d} วันถึงวันเกิด`}`}`; }).join('<br>');
       return { line, html: `<div class="grid-mini grid-mini-oshi">${known.map(m => renderMiniCard(m)).join('')}</div>` };
     }
     let list = activeMembers().filter(m => m.birthday && inGroup(m)), label;
@@ -17253,8 +17163,8 @@ function askAnswer(q, P){
       list = list.filter(m => m.birthday).sort((a, b) => P.sort === 'youngest' ? b.birthday.localeCompare(a.birthday) : a.birthday.localeCompare(b.birthday));
       const top = list[0];
       if(!top) return null;
-      return { line: en ? `${P.sort === 'youngest' ? 'Youngest' : 'Oldest'}${bits.length ? ' · ' + bits.join(' · ') : ''}: ${briefMention(top)}, born ${fmtDay(top.birthday)}`
-        : `${P.sort === 'youngest' ? 'อายุน้อยที่สุด' : 'อายุมากที่สุด'}${bits.length ? ' · ' + bits.join(' · ') : ''}: ${briefMention(top)} เกิด ${fmtDay(top.birthday)}`,
+      return { line: en ? `${P.sort === 'youngest' ? 'Youngest' : 'Oldest'}${bits.length ? ' · ' + bits.join(' · ') : ''}: ${askMention(top)}, born ${fmtDay(top.birthday)}`
+        : `${P.sort === 'youngest' ? 'อายุน้อยที่สุด' : 'อายุมากที่สุด'}${bits.length ? ' · ' + bits.join(' · ') : ''}: ${askMention(top)} เกิด ${fmtDay(top.birthday)}`,
         html: cards(list, 10, m => askMemberRow(m, fmtDay(m.birthday).replace(/ \d{4}$/, ''))) };
     }
     if(!bits.length) return null;
@@ -17303,10 +17213,10 @@ function renderAskBlock(q, total){
   const tryThese = `<div class="ask-try">${examples.map(x => `<button class="chip" data-action="ask-example" data-id="${escapeAttr(x)}">${escapeHtml(x)}</button>`).join('')}</div>`;
   if(!here){
     if(!askHint(q) && total) return '';
-    return `<button class="ask-go" data-action="ask-ai"><span class="brief-spark" aria-hidden="true">✦</span>
+    return `<button class="ask-go" data-action="ask-ai"><span class="ask-spark" aria-hidden="true">✦</span>
       <span class="ask-go-t"><b>${en ? 'Ask 48thDb' : 'ถาม 48thDb'}</b><small>“${escapeHtml(q)}”</small></span><span class="ask-go-arrow" aria-hidden="true">→</span></button>`;
   }
-  const head = `<p class="ask-q"><span class="brief-spark" aria-hidden="true">✦</span><span>“${escapeHtml(q)}”</span></p>`;
+  const head = `<p class="ask-q"><span class="ask-spark" aria-hidden="true">✦</span><span>“${escapeHtml(q)}”</span></p>`;
   if(here.status === 'loading') return `<section class="ask-card is-loading">${head}<p class="ask-a"><span class="ask-dots"><i></i><i></i><i></i></span>${en ? 'Reading the question…' : 'กำลังอ่านคำถาม…'}</p></section>`;
   if(here.status !== 'done') return `<section class="ask-card">${head}<p class="ask-a is-soft">${here.status === 'limit'
     ? (en ? 'That is a lot of questions for today — the search below still works.' : 'วันนี้ถามไปเยอะแล้ว ลองใหม่พรุ่งนี้ ส่วนการค้นหาด้านล่างยังใช้ได้')
@@ -17546,7 +17456,6 @@ function renderFeed(){
         <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></span>
       </div>
       <div class="feed-title-row sr-only"><h1 class="feed-title">วันนี้ที่ 48</h1></div>
-      <div class="brief-slot">${renderBrief()}</div>
       ${(() => { const sum = feedSummary(nowOn); return state.oshi.length || sum ? `<div class="feed-head-foot">
         ${state.oshi.length ? `
         <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
@@ -25906,7 +25815,7 @@ async function init(){
   replaceHistory();
   render();
   refreshTimeline();   // the members' iAM48 posts need no sign-in, so they come at once
-  refreshBrief();
+  checkAI();
 
   let checkedInitialAuth = false;
 

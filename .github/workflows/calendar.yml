@@ -1,13 +1,11 @@
 # Rebuild the subscribable calendars whenever the events in index.html change,
-# so a phone subscribed to calendar.ics sees the update on its next refresh —
-# and data/days.json, what is on each day, which the Worker reads every
-# morning for the home page's สรุปวันนี้.
+# so a phone subscribed to calendar.ics sees the update on its next refresh.
 name: Calendar feeds
 
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'scripts/build-calendar.mjs', 'scripts/build-days.mjs']
+    paths: ['index.html', 'scripts/build-calendar.mjs']
   workflow_dispatch:
 
 permissions:
@@ -28,21 +26,19 @@ jobs:
         with:
           node-version: '20'
       - name: Build feeds
-        run: |
-          node scripts/build-calendar.mjs
-          node scripts/build-days.mjs
+        run: node scripts/build-calendar.mjs
       - name: Publish if anything changed
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if git diff --quiet -- '*.ics' data/days.json; then
+          if git diff --quiet -- '*.ics'; then
             echo "Nothing changed."
             exit 0
           fi
           git config user.name  "48thdb-bot"
           git config user.email "48thdb-bot@users.noreply.github.com"
-          git add -- '*.ics' data/days.json
-          git commit -m "Rebuild calendar feeds and the days"
+          git add -- '*.ics'
+          git commit -m "Rebuild calendar feeds"
           git pull --rebase
           git push
           # A push made with the workflow's own token starts no other workflow,

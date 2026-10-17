@@ -159,28 +159,19 @@ A card shows the first three lines and one small picture and opens the post on
 iAM48; posts locked to the app ("Exclusive on iAM48") are a strip of names only and
 their content is never asked for. Never show or keep the gift senders' pictures.
 
-## AI on the page: สรุปวันนี้ and ถามเว็บได้
+## AI in the search: ถามเว็บได้
 
-Both run on Workers AI in the Worker and only ever word or read — the facts are
-the site's own.
-
-- **สรุปวันนี้** sits in the date card on the home page (`renderBrief`, from
-  `api.48thdb.com/brief`). The Worker writes it after 06:00 Thai time from
-  `data/days.json` — what is on each day, built from SEED_SCHEDULE by
-  `scripts/build-days.mjs` in the "Calendar feeds" workflow — and the night's iAM48
-  posts. Members and events go to the model as tokens ([M1], [E1]) the page prints
-  as pink mentions; an answer with a name, number or token of its own is thrown
-  away for a plain one (`briefCheck`, `briefPlain`). Under it a reader with oshi
-  gets one line of theirs, made on the page (`briefOshiLine`).
-- **ถามเว็บได้**: a question in the search (`renderAskBlock`, `askAnswer`). The
-  Worker's `/ask` only turns it into a query (intent, names as typed, when, month,
-  group …); the page finds the answer in its own data and draws its own cards.
-  Names are found in the question first (`askMembers` — the model misspells Thai
-  names, and a two-letter Thai name or a short English one counts only when the
-  model read it as a name too). It answers events, birthdays, members (group,
-  generation, hometown, hobby, tallest, youngest) and songs (who sings, centres,
-  the latest single); anything else says so. Both stay hidden until `/brief`
-  answers (`_aiOn`).
+A question typed into the search (`renderAskBlock`, `askAnswer`). The Worker's
+`/ask` (Workers AI) only turns it into a query (intent, names as typed, when,
+month, group …); the page finds the answer in its own data and draws its own
+cards, so nothing in it is made up. Names are found in the question first
+(`askMembers` — the model misspells Thai names, and a two-letter Thai name or a
+short English one counts only when the model read it as a name too). It answers
+events, birthdays, members (group, generation, hometown, hobby, tallest, youngest)
+and songs (who sings, centres, the latest single); anything else says so. Hidden
+until `GET /ask` answers 405 (`checkAI`). A morning summary written by AI on the
+home page (สรุปวันนี้) was tried and taken off at the owner's word — don't bring it
+back unasked.
 
 ## The GE vote on the chain
 
