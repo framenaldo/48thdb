@@ -6476,6 +6476,27 @@ const SEED_SCHEDULE = [
       'วันที่ 20 ก.ย. Khaimook ขึ้นแสดงและร่วมกิจกรรมแทน Niya ซึ่งติดภารกิจส่วนตัว — วันที่ 19 ก.ย. ยังเป็น Niya ตามเดิม',
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
       'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
+  // the Halloween pop-up on tour, in Chiang Mai: a venue and an audience (a drink buys the way in)
+  { id:'ev-cgm48-popup-halloween-ontour-1020', start:'2026-10-20', time:'18:00',
+    title:'CGM48 POP UP หลอน.. ON TOUR',
+    venue:'MUAN MORE SPACE, Chiang Mai', groups:['cgm48'],
+    members:['cgm-lookked','cgm-prae','cgm-nana','cgm-chifa','cgm-else','cgm-nisha'],
+    related:['ev-cgm48-popup-halloween-1015','ev-cgm48-popup-live-cnx'],
+    poster:{ accent:'#C8141B', surface:'#F6ECEC', ink:'#3A0A0D', img:'posters/cgm48-popup-halloween-ontour-1020.jpg', w:1500, h:1500, scene:'night' },
+    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL/live' },
+    detail:[
+      '16:00 สินค้า MERCHANDISE เริ่มจำหน่าย',
+      '18:00 การแสดง — ถ่ายทอดสดทาง YouTube CGM48 OFFICIAL'],
+    info:[
+      'ซื้อเครื่องดื่ม 1 แก้ว พร้อมแสดงใบเสร็จ ต่อเจ้าหน้าที่หน้าประตูทางเข้า เพื่อเข้าชม CGM48 POP UP LIVE ON TOUR',
+      'สามารถนำใบเสร็จมารับเครื่องดื่มกับ Members ได้หลังจบกิจกรรม',
+      'เครื่องดื่ม POP UP LIVE ON TOUR 80 บาท',
+      'สามารถชำระได้ที่จุดซื้อสินค้า ขอสงวนสิทธิ์ชำระผ่าน QR Code เท่านั้น',
+      'ลำดับการขอรับสิทธิ์เข้าดู ท่านที่มาถึงก่อน สามารถเลือกพื้นที่ได้ตามอัธยาศัยในโซนต่าง ๆ',
+      'ด้านในพื้นที่บริเวณหน้าเวที ไม่อนุญาตให้นำบันได ขาตั้งกล้อง เข้าในพื้นที่ และอนุญาตให้ถ่ายภาพโดยยกความสูงได้ไม่เกินศีรษะเท่านั้น ส่วนกล้องขนาดใหญ่ต้องอยู่ในบริเวณพื้นที่ที่กำหนด',
+      'Zone 1 โซนรับชมด้านในบริเวณกิจกรรม ถ่ายภาพได้โดยยกความสูงไม่เกินศีรษะ และไม่รบกวนผู้อื่น',
+      'Zone 2 โซนสำหรับช่างภาพที่ต้องการบันทึกภาพและวีดีโอ ใช้กล้องได้ทุกชนิด และใช้อุปกรณ์เสริมได้',
+      'ภาพสินค้าสำหรับการโฆษณาเท่านั้น'] },
   { id:'ev-cgm48-popup-live-cnx', start:'2026-09-22', time:'18:00', until:'19:00',
     title:'CGM48 POP UP LIVE ON TOUR',
     venue:'MUAN MORE SPACE, Chiang Mai', groups:['cgm48'],
@@ -11906,6 +11927,7 @@ const FEST_EVENT = {
   'ev-hoop-bday-said': { sub:'THEATER SHOW' },
   'ev-partner-1017':   { word:'Lanna Expo 2026', sub:'JAPAN–THAILAND 140TH ANNIVERSARY' },
   'ev-cgm48-popup-halloween-1015': { word:'POP UP หลอน', sub:'CGM48 · HALLOWEEN', motif:'spooky', fx:'moon', pal:'blood', own:true },
+  'ev-cgm48-popup-halloween-ontour-1020': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
 };
 function festKind(ev){
   const t = ev.title || '';
@@ -14468,7 +14490,7 @@ const EVENT_ICON = {
   'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
   'ev-getaway-pudthailee':'plane', 'ev-pancake-perfume':'sparkles', 'ev-pancake-captured':'photos',
   'ev-cgm48-popup-live-cnx':'live', 'ev-cgm48-popup-live-0924':'live', 'ev-cgm48-popup-live-0929':'live', 'ev-cgm48-popup-live-1001':'live',
-  'ev-cgm48-popup-live-1006':'live',
+  'ev-cgm48-popup-live-1006':'live', 'ev-cgm48-popup-halloween-ontour-1020':'live',
 };
 function eventIconName(ev){
   if(!ev) return '';
