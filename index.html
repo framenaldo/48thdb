@@ -2054,7 +2054,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .ev-when{
     display:inline-block; font-size:10px; font-weight:800; letter-spacing:.03em;
     color:#fff; background:var(--c); border-radius:999px; padding:2px 7px;
-    align-self:flex-start; white-space:nowrap;
+    align-self:flex-start; max-width:100%; line-height:1.35;   /* a long label wraps inside the date column, never over the title */
   }
   .ev-body{ min-width:0; flex:1; }
   /* The poster on the card, beside the text on the right, whole and in its own
@@ -5665,7 +5665,7 @@ const SEED_MEMBERS = [
   { id:'bnk-proud', name:'Proud', nameTh:'ภราว', realName:'Pharawee Chirathadasakun', realNameTh:'ภารวี จิรธาดาสกุล', groupId:'bnk48', teamId:'nv', gen:5, birthday:'2002-11-14', height:155, blood:'O', hometown:'ปทุมธานี', hobby:'ฟังเพลง อ่านนิยาย ทำอาหาร', likes:'ชีส ขนมหวาน แมวตัวอ้วน ๆ', photo:'photos/bnk-proud.jpg', facts:[] },
   { id:'bnk-saonoi', name:'Saonoi', nameTh:'สาวน้อย', realName:'Pichsinee Itthiratanakomol', realNameTh:'พิชญ์สินี อิทธิรัตนะโกมล', groupId:'bnk48', teamId:'nv', gen:5, birthday:'2005-11-09', height:161, blood:'O', hometown:'กรุงเทพฯ', hobby:'ร้องเพลง ดูหนังซีรีส์ เรียนภาษา ทำขนม', likes:'ไอดอล แมว ชาเขียว ช็อคมิ้น เมคอัพ', photo:'photos/bnk-saonoi.jpg', facts:['สมาชิกรุ่น 5 คนแรกที่ได้เข้าเซ็มบัตสึ','พูดภาษาเกาหลีได้'] },
   { id:'bnk-sindy', name:'Sindy', nameTh:'ซินดี้', realName:'Kitchaya Udomboondee', realNameTh:'กฤตชญา อุดมบุญดี', groupId:'bnk48', teamId:'nv', gen:4, birthday:'2009-04-03', height:160, blood:'AB', hobby:'ร้องเพลง วาดรูป เต้น ฟังเพลง เล่นเปียโน กีต้าร์ ถ่ายติ้กตอก', likes:'หมา แมว ชอบกินขนม', photo:'photos/bnk-sindy.jpg', facts:['ชื่อจีน 余泯錡','เล่นเปียโนและกีตาร์ได้','สีไฟฉายชมพู-ม่วง'] },
-  { id:'bnk-yoghurt', name:'Yoghurt', nameTh:'โยเกิร์ต', artist:'NCT', realName:'Nopparada Leartviriyaporn', realNameTh:'นพรดา เลิศวิริยะพร', groupId:'bnk48', teamId:'nv', gen:3, birthday:'2004-11-10', height:169, blood:'O', hometown:'กรุงเทพฯ', hobby:'ดูหนัง ฟังเพลง ทำขนม อ่านนิยาย เล่นกีต้าร์ เล่นอูคูเลเล่', likes:'นอน กิน ถ่ายรูป ดูหนัง ช็อคโกแลต ไดฟุกุชาเขียว กล้องฟิล์ม อวกาศ', photo:'photos/bnk-yoghurt.jpg', facts:['โอชิคือ ฟอร์จูน CGM48','เล่นกีตาร์และอูคูเลเลได้','สีไฟฉายแดง-น้ำเงิน'] },
+  { id:'bnk-yoghurt', name:'Yoghurt', nameTh:'โยเกิร์ต', artist:'NCT', realName:'Nopparada Leartviriyaporn', realNameTh:'นพรดา เลิศวิริยะพร', groupId:'bnk48', teamId:'nv', gen:3, birthday:'2004-11-10', height:169, blood:'O', hometown:'กรุงเทพฯ', hobby:'ดูหนัง ฟังเพลง ทำขนม อ่านนิยาย เล่นกีต้าร์ เล่นอูคูเลเล่', likes:'นอน กิน ถ่ายรูป ดูหนัง ช็อคโกแลต ไดฟุกุชาเขียว กล้องฟิล์ม อวกาศ', photo:'photos/bnk-yoghurt-2.jpg', facts:['โอชิคือ ฟอร์จูน CGM48','เล่นกีตาร์และอูคูเลเลได้','สีไฟฉายแดง-น้ำเงิน'] },
   // ---- BNK48 Trainee ----
   { id:'bnk-blythe', name:'Blythe', nameTh:'บลายธ์', realName:'Natransa Sirilapviboon', realNameTh:'ณัฏฐ์รัญศา ศิริลาภวิบูรณ์', groupId:'bnk48', teamId:'trainee-bnk', gen:6, birthday:'2010-07-22', height:164, blood:'B', hometown:'กรุงเทพฯ', club:'Manchester United', hobby:'ดูหนัง ฟังเพลง เต้น ร้องเพลง เล่นเกม ไปเที่ยว', likes:'สัตว์ทุกชนิด ข้าวผัดกุ้ง มาการอง ช็อคโกแล็ต', photo:'photos/bnk-blythe.jpg', facts:['สมาชิกคนเดียวของรุ่น 6 ที่มาจากการทาบทาม — ฮูพเห็นเธอร้องนำกับวงดนตรีที่สยามสแควร์ ซอย 3','คนที่ 2 ของวงที่มาจากการทาบทาม ต่อจากแก้ว','MBTI ENFP'] },
   { id:'bnk-cartoon', name:'Cartoon', nameTh:'การ์ตูน', realName:'Natthathida Na Amphai', realNameTh:'ณัฎฐธิดา ณ อัมภัย', groupId:'bnk48', teamId:'trainee-bnk', gen:6, birthday:'2009-08-26', height:163, blood:'AB', hometown:'ศรีสะเกษ', hobby:'อ่านนิยาย ร้องเพลง ดูอะนิเมะ เล่นเกม', likes:'แมว กระต่าย แพนด้าแดง ก๋วยเตี๋ยวน้ำตกไม่ผัก', photo:'photos/bnk-cartoon.jpg', facts:['MBTI INFP'] },
@@ -8469,7 +8469,7 @@ const EN = {
   'เกิดวันเดียวกัน': 'Born the same day',
   'เซ็นเตอร์': 'Centre',
   'วันนี้ที่ 48': '48 Today',
-  'วันนี้จบแล้ว · พรุ่งนี้ต่อ': 'Done for today · on again tomorrow',
+  'มีต่อ': 'More tomorrow',
   'วันเกิดวันนี้': 'Birthdays today',
   'วันเกิดที่ใกล้ถึง': 'Birthdays coming up',
   'กำลังมีงานวันนี้': 'On today',
@@ -11763,7 +11763,7 @@ function renderEventCard(ev, todayIso){
   const over = runsToday && !ev.period && doneForToday(ev, todayIso);
   // over for today but on again tomorrow (a two-day event): not faded, it is still ahead
   const more = over && eventLastDay(ev) > todayIso;
-  const when = ev.cancelled ? '' : more ? 'วันนี้จบแล้ว · พรุ่งนี้ต่อ' : over ? 'จบแล้ว' : eventWhenLabel(ev, todayIso);
+  const when = ev.cancelled ? '' : more ? 'มีต่อ' : over ? 'จบแล้ว' : eventWhenLabel(ev, todayIso);
   const isNow = runsToday && !over;
   // over for good: drawn faded, so what is still ahead stands out
   const done = (over && !more) || (!ev.cancelled && eventLastDay(ev) < todayIso);
