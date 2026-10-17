@@ -180,8 +180,9 @@ poll's `addresses:` topic) only says *when* to look; the 3-second poll is the fa
 counts on the chain; don't promise them. A new election needs its poll
 address and start/end blocks from the ElectionFactory's `createPoll`, and its
 token's address and mint block in `GEC_TOKEN` (the supply card follows every
-Transfer: mint → organiser's vault → the wallets the vault pays = sales channels
-→ buyers; it checks out exactly against the votes).
+Transfer: mint → organiser's vault → sales channels → buyers; it checks out exactly
+against the votes). A sales channel is a wallet the vault gave 1,000 tokens or more
+(`GEC_CHAN_MIN`): the vault also sends a few tokens straight to fans, who are buyers.
 
 ## House rules
 
