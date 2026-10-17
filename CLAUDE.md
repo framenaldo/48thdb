@@ -117,8 +117,8 @@ the Firebase CLI from the owner's machine.
   unit song's members. It folds under the "Mini Concert" row of กำหนดการ
   (`slFolds`) — the row's เซ็ตลิสต์ pill opens it; an event with no such row
   shows it as its own section. The owner's own setlist card for
-  the day is `setlists/<event>-<day>.jpg`, kept as the original file, with a
-  small `-s.jpg` for the button.
+  the day is `setlists/<event>-<day>.jpg` (or `.png`, as the owner exported it), kept as
+  the original file, with a small `-s.jpg` for the button. An `encore:true` part is the encore.
 - An event's `detail` (กำหนดการ) lines that start with a time — "12:00–13:00
   Mini Concert", "15:00 …", "28 ส.ค. 10:00 …" — draw as a timetable that follows
   the clock on the day (`renderSchedule`, `schedTick` in `tickClock`): over,

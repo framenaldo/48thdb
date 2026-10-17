@@ -6957,6 +6957,21 @@ const SEED_SCHEDULE = [
         'Group Hi-Touch':['bnk-arlee','bnk-luksorn','bnk-monet','bnk-praew','bnk-hoop','bnk-emmy'] },
       '2026-10-18':{ 'Mini Concert':['bnk-arlee','bnk-luksorn','bnk-jew','bnk-monet','bnk-praew','bnk-emmy'],
         'Group Hi-Touch':['bnk-arlee','bnk-luksorn','bnk-jew','bnk-monet','bnk-praew','bnk-emmy'] } },
+    // the owner's setlist cards; day 2 comes when the owner sends it
+    setlist:[
+      { date:'2026-10-17', img:'setlists/kimi-roadshow-t21-1.png', parts:[
+        { s:1, songs:[{ no:'M00', title:'Overture', alt:'BNK48 × CGM48 ver.', yt:'ifai7vki9LM' },
+          { no:'M01', title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', song:'bnk-sp-kimitodoko' },
+          { no:'M02', title:'Saikyou Twintail', alt:'ทวินเทล สุดยอดเลย!', song:'bnk-s18' }] },
+        { mc:1 },
+        { s:2, songs:[{ no:'M03', title:'First Rabbit' },
+          { no:'M04', title:'Onegai Valentine', alt:'วาเลนไทน์โชคดี', song:'cgm-s1' }] },
+        { mc:2 },
+        { s:3, unit:true, songs:[{ no:'M05', title:'อาการชัด', by:['bnk-monet', 'bnk-praew'] },
+          { no:'M06', title:'ไม่ง้อจะพอแล้วนะ', by:['bnk-hoop', 'bnk-emmy'] }] },
+        { mc:3, game:true },
+        { s:4, songs:[{ no:'M07', title:'Oh my pumpkin!', alt:'BNK48 ver.', song:'bnk-sp-ohmypumpkin' }] },
+        { mc:4, end:true }] }],
     info:[
       'Hoop ร่วมงานเฉพาะวันที่ 17 ต.ค. และ Jew เฉพาะวันที่ 18 ต.ค.',
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
@@ -6990,6 +7005,20 @@ const SEED_SCHEDULE = [
         'Group Hi-Touch':['cgm-lingling','cgm-jingjing','cgm-chifa','cgm-kwan','cgm-emma','cgm-satangpound'] },
       '2026-10-18':{ 'Mini Concert':['cgm-prae','cgm-lingling','cgm-jingjing','cgm-chifa','cgm-kwan','cgm-emma','cgm-satangpound'],
         'Group Hi-Touch':['cgm-prae','cgm-nana','cgm-lookked','cgm-lewlew','cgm-ginna','cgm-shenae'] } },
+    setlist:[
+      { date:'2026-10-17', img:'setlists/kimi-roadshow-cnx-1.png', parts:[
+        { s:1, songs:[{ no:'M00', title:'Overture', alt:'BNK48 × CGM48 ver.', yt:'ifai7vki9LM' },
+          { no:'M01', title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', song:'bnk-sp-kimitodoko' },
+          { no:'M02', title:'Kibou Ressha', alt:'รถไฟแห่งความหวัง', song:'cgm-s11' },
+          { no:'M03', title:'ได้(ด้าย)ไหม', alt:'Dai (Daai) Mai', song:'cgm-s10' }] },
+        { mc:1 },
+        { s:2, songs:[{ no:'M04', title:'Ponytail to Shushu', song:'bnk-a6' },
+          { no:'M05', title:'Chiang Mai 106', alt:'เชียงใหม่ 106', song:'cgm-s1' }] },
+        { mc:2, game:true },
+        { s:3, songs:[{ no:'M06', title:'Green Flash', song:'bnk-s18' },
+          { no:'M07', title:'Hetaretachi yo', alt:'สิ้นสุดทางแพ้', song:'cgm-s10' }] },
+        { mc:3, end:true },
+        { encore:true, songs:[{ no:'M08', title:'Kaze wo Matsu', alt:'ความทรงจำในสายลม', song:'cgm-sp-kazewomatsu' }] }] }],
     info:[
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
       'Zone 1 โซนนั่งชมด้านใน ถ่ายด้วยมือถือเท่านั้น ยกไม่เกินระดับศีรษะ',
@@ -16545,14 +16574,14 @@ function renderSetlist(ev, head){
   };
   const part = p => p.mc
     ? `<p class="sl-mc">MC${p.mc}${p.game ? (en ? ' · Game' : ' · เกม') : p.end ? (en ? ' · End' : ' · ปิดท้าย') : ''}</p>`
-    : `<div class="sl-sess"><p class="sl-head">${en ? `Session ${p.s}` : `ช่วงที่ ${p.s}`}${p.unit ? (en ? ' · Units' : ' · ยูนิต') : ''}</p>${p.songs.map(row).join('')}</div>`;
+    : `<div class="sl-sess"><p class="sl-head">${p.encore ? (en ? 'Encore' : 'อังกอร์') : en ? `Session ${p.s}` : `ช่วงที่ ${p.s}`}${p.unit ? (en ? ' · Units' : ' · ยูนิต') : ''}</p>${p.songs.map(row).join('')}</div>`;
   const panel = (d, i) => {
     const n = d.parts.reduce((k, p) => k + (p.songs || []).filter(x => x.no !== 'M00').length, 0);
     return `<div class="sl-panel" data-day="${i}"${i === on ? '' : ' hidden'} role="tabpanel">
       <div class="sl-box">${d.parts.map(part).join('')}</div>
       <p class="sl-note">${en ? 'A song with no names is sung by the whole line-up' : 'เพลงที่ไม่ระบุชื่อ ขึ้นแสดงทุกคน'}</p>
       <div class="sl-foot"><span class="sl-count">${en ? `${n} songs` : `${n} เพลง`}</span>
-        ${d.img ? `<button class="sl-img" data-action="open-poster" data-id="sl:${ev.id}:${i}"><img src="${escapeAttr(d.img.replace(/\.jpg$/, '-s.jpg'))}" alt="" loading="lazy" decoding="async">${en ? 'Setlist card' : 'ภาพเซ็ตลิสต์'}</button>` : ''}</div>
+        ${d.img ? `<button class="sl-img" data-action="open-poster" data-id="sl:${ev.id}:${i}"><img src="${escapeAttr(d.img.replace(/\.\w+$/, '-s.jpg'))}" alt="" loading="lazy" decoding="async">${en ? 'Setlist card' : 'ภาพเซ็ตลิสต์'}</button>` : ''}</div>
     </div>`;
   };
   return `${head ? '<h3 class="evm-head">เซ็ตลิสต์</h3>' : ''}
@@ -24694,7 +24723,9 @@ function bindDelegatedEvents(){
       renderMain(); replaceHistory();
     }
     else if(action==='sl-open'){
-      const panel = el.nextElementSibling, open = el.getAttribute('aria-expanded') !== 'true';
+      // the setlist follows its row, after the faces of who is on in it when the event has a line-up
+      let panel = el.nextElementSibling; while(panel && panel.classList.contains('es-who')) panel = panel.nextElementSibling;
+      const open = el.getAttribute('aria-expanded') !== 'true';
       _slOpen[id] = open; el.setAttribute('aria-expanded', open);
       if(panel && panel.classList.contains('es-sl')){ panel.hidden = !open; panel.classList.toggle('is-in', open); }
     }
