@@ -183,8 +183,9 @@ member's by three systems Thai fans know: the birth weekday by ทักษา (
 Wednesday after 18:00 — members' Wednesdays count as by day), ราศีแบบไทย
 (sidereal, เมษ from 13 Apr) and the year animal counted from ตรุษจีน (`QZ_CNY`,
 1950–2026: extend it before 2027). Five questions on moments every fan knows
-(hi-touch, a late live, the cheering board), emoji tiles, each answer one of the
-four elements; the most-picked element names the reader's fan type (`QZ_FAN`).
+(fan type, three seconds at hi-touch, a late live, where to stand at a roadshow),
+emoji tiles, each answer one of the four elements, then a grid of 64 emoji to tap
+(sixteen sorted to each element); the most-picked element names the reader's fan type (`QZ_FAN`).
 The last match is kept on the device (`48thdb-quiz-last`) for the home
 dashboard's quiz tile (`renderQuizTile`): three faces of the day, or the member it
 found with her % and, while the vote is open, the next good hour to vote for the

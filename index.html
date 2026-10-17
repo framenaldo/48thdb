@@ -4539,6 +4539,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     font-size:14px; line-height:1.4; min-height:122px; }
   .qz-opts.is-three .qz-opt{ min-height:0; }
   .qz-emo{ font-size:34px; line-height:1; }
+  .qz-hint{ margin:-8px 0 12px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+  .qz-emos{ display:grid; grid-template-columns:repeat(8, minmax(0, 1fr)); gap:6px; }
+  .qz-emo-b{ aspect-ratio:1; display:grid; place-items:center; padding:0; font-size:24px; line-height:1; cursor:pointer; border-radius:12px;
+    background:var(--paper-dim); border:1.5px solid transparent; box-shadow:0 2px 0 var(--line); transition:transform .1s ease; }
+  .qz-emo-b:active{ transform:translateY(2px) scale(.94); box-shadow:none; }
+  .qz-emo-b.is-on{ border-color:var(--brand-a); background:color-mix(in srgb, var(--brand-a) 12%, var(--card)); }
+  @media (min-width:700px){ .qz-emo-b{ font-size:28px; } }
   .qz-me-tr{ margin:8px 0 0; font-size:13px; line-height:1.55; color:var(--ink); }
   .qz-fan{ display:flex; align-items:center; gap:12px; margin:0 0 12px; padding:12px 14px; border-radius:18px;
     background:linear-gradient(120deg, color-mix(in srgb, var(--brand-a) 12%, var(--card)), color-mix(in srgb, var(--brand-b) 12%, var(--card))); border:1px solid var(--line); }
@@ -17401,19 +17408,23 @@ const QZ_MATES = { F:'A', A:'F', E:'W', W:'E' };
 // moments every fan knows; each answer leans to one of the four elements
 const QZ_QUESTIONS = [
   { th:'คุณเป็นแฟนคลับสายไหน?', en:'What kind of fan are you?', o:[
-    ['F', '📣', 'สายเชียร์ คอลจนเสียงแหบ', 'The cheerer, calling till your voice goes'], ['E', '📸', 'สายแคป เก็บทุกโมเมนต์', 'The archivist, saving every moment'],
+    ['F', '📣', 'สายเชียร์ คอลจนเสียงแหบ', 'The cheerer, calling till your voice goes'], ['E', '📸', 'สายถ่าย เก็บทุกโมเมนต์', 'The photographer, keeping every moment'],
     ['A', '🎉', 'สายแก๊ง ไปงานไหนก็เจอเพื่อน', 'The social one, friends at every event'], ['W', '🌙', 'สายเงียบ พูดน้อยแต่ไม่เคยพลาด', 'The quiet one who never misses a thing']] },
-  { th:'ไฮทัช 10 วินาที คุณจะพูดว่า…', en:'Ten seconds at hi-touch. You say…', o:[
-    ['F', '💪', '“สู้ ๆ นะ! เชียร์สุดใจ!”', '“Go for it! Cheering all the way!”'], ['A', '🤭', 'มุกที่ซ้อมมาทั้งคืน', 'The joke you rehearsed all night'],
+  { th:'ไฮทัช 3 วินาที คุณจะพูดว่า…', en:'Three seconds at hi-touch. You say…', o:[
+    ['F', '💪', '“สู้ ๆ นะ เชียร์เสมอ”', '“Go for it, always cheering you”'], ['A', '🤭', 'บทที่ซ้อมมา', 'The lines you rehearsed'],
     ['E', '🍚', '“กินข้าวยัง พักผ่อนบ้างนะ”', '“Have you eaten? Get some rest.”'], ['W', '🫠', '…ยิ้มอย่างเดียว พูดไม่ออก', '…just a smile, no words come out']] },
   { th:'ไลฟ์เด้งขึ้นมาตอนห้าทุ่ม คุณ…', en:'A live pops up at 11 pm. You…', o:[
     ['F', '⚡', 'พุ่งเข้าไปพิมพ์เป็นคนแรก', 'Rush in and comment first'], ['W', '🛌', 'นอนฟังเงียบ ๆ จนเธอบอกฝันดี', 'Listen in bed till she says goodnight'],
-    ['A', '📲', 'แคปหน้าตลก ๆ ส่งเข้ากลุ่ม', 'Screenshot the funny faces for the group chat'], ['E', '⏰', 'เก็บไว้ดูพรุ่งนี้ ต้องตื่นเช้า', 'Save it for tomorrow, early start']] },
-  { th:'ป้ายเชียร์ของคุณเขียนว่า…', en:'Your cheering board says…', o:[
-    ['E', '🏠', '“อยู่ตรงนี้เสมอนะ”', '“Always right here”'], ['F', '🏆', '“เซ็มบัตสึ! ปีนี้ต้องติด!”', '“Senbatsu! This is the year!”'],
-    ['W', '🎵', 'ท่อนเพลงที่ทำให้นึกถึงเธอ', 'A song line that brings her to mind'], ['A', '🐸', 'มุกหรือรูปตลกให้เธอขำ', 'A joke or a silly picture to make her laugh']] },
-  { th:'อีโมจิที่คุณกดให้เธอบ่อยที่สุด?', en:'The emoji you send her most?', o:[
-    ['F', '🔥', 'ไฟลุก', 'Fire'], ['E', '🫶', 'มือหัวใจ', 'Heart hands'], ['A', '😂', 'ขำน้ำตาไหล', 'Crying laughing'], ['W', '🥹', 'ซึ้งจนตาคลอ', 'Welling up']] },
+    ['A', '💬', 'ทักเพื่อนในกลุ่มให้มาดูด้วย', 'Call the group chat over to watch'], ['E', '⏰', 'เก็บไว้ดูทีหลัง', 'Save it for later']] },
+  { th:'งานโรดโชว์ คุณจะยืนตรงไหน?', en:'At a roadshow, where do you stand?', o:[
+    ['E', '📍', 'จุดเดิมทุกงาน ที่เธอจำได้', 'The same spot every time, the one she knows'], ['F', '🙌', 'แถวหน้าสุด เชียร์ให้สุดเสียง', 'Right at the front, cheering loudest'],
+    ['W', '👀', 'มุมเงียบ ๆ ที่มองเห็นเธอชัด', 'A quiet corner with a clear view of her'], ['A', '👯', 'ตรงไหนก็ได้ ขอให้อยู่กับแก๊ง', 'Anywhere, as long as the gang is there']] },
+  // sixty-four to pick from, sixteen for each element, in an order that does not give them away
+  { th:'อีโมจิที่คุณกดให้เธอบ่อยที่สุด?', en:'The emoji you send her most?', grid:{
+    F:['🔥', '⚡', '💪', '🙌', '🤩', '🥳', '💥', '😎', '💯', '🏆', '❤️‍🔥', '📣', '😤', '🎸', '☀️', '🚀'],
+    E:['🫶', '🥰', '☺️', '🤗', '🍀', '🌷', '🍰', '🍚', '🏠', '🐻', '💐', '🙏', '💛', '🍵', '🌻', '🧸'],
+    A:['😂', '🤣', '😜', '🤪', '🐸', '🙈', '😹', '🤭', '💬', '🎈', '🌈', '😝', '🐥', '🎮', '✌️', '🦄'],
+    W:['🥹', '😭', '🥺', '🌙', '💧', '🌊', '🫧', '🎵', '💜', '🌌', '😌', '🕊️', '🤍', '💙', '✨', '🌸'] } },
 ];
 // the reader as a fan, by the element most of their answers lean to
 const QZ_FAN = { F:['📣', 'แฟนสายไฟ', 'พลังเชียร์ไม่มีหมด', 'A fire fan', 'cheering that never runs out'],
@@ -17579,8 +17590,10 @@ function qzResults(){
     // a day and a sign of the same element count half again, not twice, so no one wins by being all one thing
     const like = els[0] === els[1] ? want[els[0]] * 1.5 : want[els[0]] + want[els[1]];
     const ties = me ? qzTies(me, her) : { score:0, out:[] };
-    const total = (me ? like : like * 2) + ties.score + qzHash(seed + m.id) * .4;
-    return { m, her, els, like, ties, total, pct: Math.max(66, Math.min(99, Math.round(66 + total * 2.1))) };
+    // the answers count double, so the same birthday can still find a different member: at equal weight one member
+    // topped half to three quarters of all the answers a birthday could give
+    const total = (me ? like * 2 : like * 4) + ties.score + qzHash(seed + m.id) * .4;
+    return { m, her, els, like, ties, total, pct: Math.max(64, Math.min(99, Math.round(62 + total * 1.6))) };
   }).sort((a, b) => b.total - a.total).map(r => ({ ...r, top }));
 }
 function qzChips(r, en){
@@ -17638,6 +17651,11 @@ function renderQuiz(){
       <p class="qz-note">${en ? 'Your birthday stays on this device; nothing is sent anywhere.' : 'วันเกิดของคุณเก็บไว้ในเครื่องนี้เท่านั้น ไม่ได้ส่งไปที่ไหน'}</p>`;
   } else if(q.step <= QZ_QUESTIONS.length){
     const Q = QZ_QUESTIONS[q.step - 1];
+    if(Q.grid){
+      const all = Object.entries(Q.grid).flatMap(([el, list]) => list.map(e => [el, e])).sort((a, b) => qzHash('emo' + a[1]) - qzHash('emo' + b[1]));
+      body = `${dots(q.step + 1)}<h2 class="qz-q">${en ? Q.en : Q.th}</h2><p class="qz-hint">${en ? 'Tap one' : 'แตะเลือกหนึ่งตัว'}</p>
+        <div class="qz-emos">${all.map(([el, e]) => `<button class="qz-emo-b${q.emo === e ? ' is-on' : ''}" data-action="quiz-pick" data-id="${el}|${e}" aria-label="${e}">${e}</button>`).join('')}</div>`;
+    } else
     body = `${dots(q.step + 1)}<h2 class="qz-q">${en ? Q.en : Q.th}</h2>
       <div class="qz-opts is-tiles">${Q.o.map(([el, emo, th, e]) => `<button class="qz-opt${q.ans[q.step - 1] === el ? ' is-on' : ''}" data-action="quiz-pick" data-id="${el}"><span class="qz-emo" aria-hidden="true">${emo}</span>${escapeHtml(en ? e : th)}</button>`).join('')}</div>`;
   } else if(q.step === QZ_QUESTIONS.length + 1){
@@ -17646,7 +17664,9 @@ function renderQuiz(){
         const g = getGroup(id);
         return `<button class="qz-opt" style="${g ? `--c:${g.color}` : ''}" data-action="quiz-group" data-id="${id}"><span class="qz-emo" aria-hidden="true">${emo}</span>${n}</button>`; }).join('')}</div>`;
   } else {
-    const list = qzResults(), me = q.birth ? qzRead(q.birth.iso, q.birth.night) : null, fan = QZ_FAN[list[0] ? list[0].top : 'F'];
+    const list = qzResults(), me = q.birth ? qzRead(q.birth.iso, q.birth.night) : null, top = list[0] ? list[0].top : 'F', fan = QZ_FAN[top].slice();
+    const grid = (QZ_QUESTIONS.find(x => x.grid) || {}).grid;
+    if(q.emo && grid && grid[top].includes(q.emo)) fan[0] = q.emo;
     if(list[0]) try{ localStorage.setItem(QZ_LAST, JSON.stringify({ id: list[0].m.id, pct: list[0].pct })); }catch(e){}
     body = `<div class="qz-fan"><span class="qz-fan-emo" aria-hidden="true">${fan[0]}</span><span><small>${en ? 'You are' : 'คุณคือ'}</small><b>${en ? fan[3] : fan[1]}</b><em>${en ? fan[4] : fan[2]}</em></span></div>
       ${me ? `<div class="qz-me is-result"><span>${en ? 'You:' : 'ดวงคุณ:'}</span>${qzChips(me, en)}</div>` : ''}
@@ -17682,7 +17702,7 @@ function quizAction(action, id){
     quizKeepBirth({ iso, night: !!(was && was.iso === iso && was.night) }); q.step = 1; }
   else if(action === 'quiz-nobirth'){ q.birth = null; q.step = 1; }
   else if(action === 'quiz-night'){ const iso = quizDate(); if(iso) quizKeepBirth({ iso, night: id === '1' }); }
-  else if(action === 'quiz-pick'){ q.ans[q.step - 1] = id; q.step++; }
+  else if(action === 'quiz-pick'){ const [el, emo] = String(id).split('|'); q.ans[q.step - 1] = el; if(emo) q.emo = emo; q.step++; }
   else if(action === 'quiz-group'){ q.group = id; q.step = last + 1; }
   else if(action === 'quiz-back'){ q.step = Math.max(0, q.step - 1); }
   else if(action === 'quiz-again'){ _quiz = { step:0, ans:[] }; }
