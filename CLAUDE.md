@@ -40,8 +40,9 @@ the Firebase CLI from the owner's machine.
   The home page opens on a slim date-and-share card (its "วันนี้ที่ 48" heading is
   kept only for search engines and screen readers), the live vote, then the
   **dashboard** (`renderHomeDash`, zone `dash`): between election rounds the
-  latest round as a square with its top three, and tiles for the days to the
-  concert and results, the next 7 days' events, the open shops and the gallery.
+  latest round as a square with its top three, and tiles for หาโอชิจากดวง (it took
+  the square that counted down to the concert and results), the next 7 days'
+  events, the open shops and the gallery.
   While a round is read out, the results card takes its full size and the tiles
   sit under it in one row.
 - **My layout.** A signed-in reader can move, hide or add zones on the home
@@ -181,8 +182,13 @@ member's by three systems Thai fans know: the birth weekday by ทักษา (
 1–5 2–4 3–6 7–8, คู่สมพล 1–6 2–8 3–5 4–7, คู่ศัตรู 1–3 2–5 4–8 6–7, 8 = ราหู =
 Wednesday after 18:00 — members' Wednesdays count as by day), ราศีแบบไทย
 (sidereal, เมษ from 13 Apr) and the year animal counted from ตรุษจีน (`QZ_CNY`,
-1950–2026: extend it before 2027). Four questions add what the reader likes,
-each answer one of the four elements. Only good reasons are printed about a
+1950–2026: extend it before 2027). Five questions on moments every fan knows
+(hi-touch, a late live, the cheering board), emoji tiles, each answer one of the
+four elements; the most-picked element names the reader's fan type (`QZ_FAN`).
+The last match is kept on the device (`48thdb-quiz-last`) for the home
+dashboard's quiz tile (`renderQuizTile`): three faces of the day, or the member it
+found with her % and, while the vote is open, the next good hour to vote for the
+Kami Oshi. Only good reasons are printed about a
 member, never a clash. It says it is for fun: no school of horoscope has been
 shown to work, so don't call any "the accurate one". **Fan and artist, never a
 couple**: no สมพงษ์, เนื้อคู่, สเปก or dates with her — the reader's stars are

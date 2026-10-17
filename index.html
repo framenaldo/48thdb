@@ -3793,12 +3793,20 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-i{ position:absolute; top:9px; right:9px; width:18px; height:18px; color:var(--c, var(--bnk)); } .dash-i svg{ width:100%; height:100%; }
   .dash-big{ font-size:24px; line-height:1; margin-top:2px; font-variant-numeric:tabular-nums; }
   .dash-l{ margin-top:auto; font-size:12px; font-weight:800; line-height:1.15; } .dash-l small{ display:block; font-size:10px; font-weight:600; line-height:1.2; color:var(--ink-soft); }
-  .dash-t.is-shop{ --c:#E4457E; } .dash-t.is-count{ --c:#C8902A; }
+  .dash-t.is-shop{ --c:#E4457E; }
   .dash-t.is-gal{ padding:0; justify-content:flex-end; border:0; }
   .dash-t.is-gal img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .dash-t.is-gal .dash-l{ position:relative; width:100%; margin:0; padding:18px 9px 8px; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.65)); }
   .dash-t.is-gal .dash-l small{ color:rgba(255,255,255,.85); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .feed-dash{ margin-bottom:22px; }
+  .dash-t.is-quiz{ --c:var(--brand-a); background:linear-gradient(140deg, color-mix(in srgb, var(--brand-a) 14%, var(--card)), color-mix(in srgb, var(--brand-b) 14%, var(--card))); }
+  .dash-q-faces{ position:relative; display:flex; margin-top:2px; }
+  .dash-q-face{ position:relative; display:grid; place-items:center; width:28px; height:28px; border-radius:50%; overflow:hidden; color:#fff; font-size:8px; font-weight:800;
+    border:2px solid var(--card); container-type:inline-size; }
+  .dash-q-face + .dash-q-face{ margin-left:-10px; }
+  .dash-q-faces.is-one .dash-q-face{ width:36px; height:36px; }
+  .dash-q-faces i{ position:absolute; left:24px; bottom:-3px; padding:1px 5px; border-radius:999px; font-style:normal; font-size:10px; font-weight:800; color:#fff;
+    background:linear-gradient(135deg, var(--brand-a), var(--brand-b)); border:2px solid var(--card); }
   .dash-t.is-cal{ padding-top:0; } .dash-t.is-cal .dash-big{ margin-top:6px; } .dash-cal-h{ align-self:stretch; margin:0 -10px; padding:3px 10px; font-size:11px; font-weight:800; color:#fff; background:#E0243A; }
   .dash-t.is-cal .dash-big{ font-size:26px; } .dash-cal-h{ white-space:nowrap; }
   /* wide screens: the results a third of the width and as tall as their three names, the four tiles two by two beside them;
@@ -4525,6 +4533,18 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     box-shadow:0 3px 0 color-mix(in srgb, var(--c, var(--brand-a)) 22%, var(--line)); transition:transform .1s ease, box-shadow .1s ease;
   }
   .qz-opt:active{ transform:translateY(3px); box-shadow:0 0 0 transparent; }
+  .qz-opts.is-tiles{ grid-template-columns:1fr 1fr; }
+  .qz-opts.is-tiles.is-three{ grid-template-columns:1fr 1fr 1fr; }
+  .qz-opts.is-tiles .qz-opt{ display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:7px; padding:14px 10px 13px; text-align:center;
+    font-size:14px; line-height:1.4; min-height:122px; }
+  .qz-opts.is-three .qz-opt{ min-height:0; }
+  .qz-emo{ font-size:34px; line-height:1; }
+  .qz-me-tr{ margin:8px 0 0; font-size:13px; line-height:1.55; color:var(--ink); }
+  .qz-fan{ display:flex; align-items:center; gap:12px; margin:0 0 12px; padding:12px 14px; border-radius:18px;
+    background:linear-gradient(120deg, color-mix(in srgb, var(--brand-a) 12%, var(--card)), color-mix(in srgb, var(--brand-b) 12%, var(--card))); border:1px solid var(--line); }
+  .qz-fan-emo{ font-size:38px; line-height:1; }
+  .qz-fan > span:last-child{ display:flex; flex-direction:column; }
+  .qz-fan small{ font-size:11.5px; font-weight:700; color:var(--ink-soft); } .qz-fan b{ font-size:19px; font-weight:800; } .qz-fan em{ font-style:normal; font-size:13px; color:var(--ink-soft); }
   .qz-opt.is-on{ border-color:var(--c, var(--brand-a)); background:color-mix(in srgb, var(--c, var(--brand-a)) 10%, var(--card)); }
   @media (hover:hover){ .qz-opt:hover{ border-color:var(--c, var(--brand-a)); } }
   .qz-best{ text-align:center; padding:16px 12px 6px; border-radius:20px;
@@ -13148,8 +13168,6 @@ function renderHomeDash(ge){
   const WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสฯ','ศุกร์','เสาร์'];
   const wk = new Date(d.getTime() + 6 * 86400000).toISOString().slice(0, 10);
   const week = SEED_SCHEDULE.filter(e => !e.period && !e.cancelled && e.start <= wk && eventLastDay(e) >= iso).length;
-  const big = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
-  const days = big ? Math.round((new Date(big.start + 'T00:00:00Z') - new Date(iso + 'T00:00:00Z')) / 86400000) : -1;
   const mem = activeMembers(), nb = mem.filter(m => m.groupId === 'bnk48').length;
   const tile = (attrs, cls, icon, big, label, small) => `<button class="dash-t ${cls}" ${attrs}>
       <span class="dash-i">${icon}</span><b class="dash-big">${big}</b><span class="dash-l">${label}${small ? `<small>${small}</small>` : ''}</span></button>`;
@@ -13162,8 +13180,7 @@ function renderHomeDash(ge){
   const rows = [].map(({ n, m, v }) => `<span class="dash-r"><i>${n}</i>${geFace(m, 'dash-face')}<b>${escapeHtml(m.name)}</b><small>${geVotes(v)}</small></span>`).join('');
   return `<section class="feed-block feed-dash${ge ? '' : ' no-ge'}"><div class="dash">
     ${square}
-    ${days >= 0 ? tile(`data-action="open-event" data-id="${big.id}"`, 'is-count', ICONS.crown, days ? days : (en ? 'Today' : 'วันนี้'),
-      days ? (en ? 'days' : 'วัน') : (en ? 'Tonight' : 'คืนนี้'), en ? 'to the concert & results' : 'ถึงคอนและประกาศผล') : ''}
+    ${renderQuizTile()}
     <button class="dash-t is-cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
       <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>
     ${tile('data-action="nav-shop"', 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด'))}
@@ -17357,7 +17374,7 @@ function renderAskBlock(q, total){
    ไฟ, จันทร์ พฤหัส ดิน, อังคาร ราหู ลม, พุธ ศุกร์ น้ำ) and her sign's. Only
    good reasons are ever printed about a member. */
 let _quiz = { step:0, ans:[] };
-const QZ_KEY = '48thdb-quiz-birth';
+const QZ_KEY = '48thdb-quiz-birth', QZ_LAST = '48thdb-quiz-last';
 const QZ_DAYS = [
   { th:'อาทิตย์', en:'Sunday', c:'#E5484D', n:1, el:'F', tr:['มั่นใจ เป็นผู้นำ ใจกว้าง', 'confident, a leader, big-hearted'] },
   { th:'จันทร์', en:'Monday', c:'#D9A400', n:2, el:'E', tr:['อ่อนโยน ช่างเอาใจ พูดเก่ง', 'gentle, caring, a good talker'] },
@@ -17381,20 +17398,28 @@ const QZ_CNY = '0217 0206 0127 0214 0203 0124 0212 0131 0218 0208 0128 0215 0205
 const QZ_EL = { F:['ไฟ', 'Fire', 'สดใส พลังเต็มร้อย', 'bright and full of energy'], E:['ดิน', 'Earth', 'อบอุ่น มั่นคง ใส่ใจ', 'warm, steady and caring'],
   A:['ลม', 'Air', 'ขี้เล่น ครีเอทีฟ ช่างคุย', 'playful, creative and chatty'], W:['น้ำ', 'Water', 'อ่อนโยน ลึกซึ้ง มีเสน่ห์', 'gentle, deep and charming'] };
 const QZ_MATES = { F:'A', A:'F', E:'W', W:'E' };
+// moments every fan knows; each answer leans to one of the four elements
 const QZ_QUESTIONS = [
-  { th:'เห็นเมมเบอร์ครั้งแรก อะไรทำให้คุณหยุดดู?', en:'Seeing a member for the first time, what makes you stop and look?', o:[
-    ['F', 'รอยยิ้มกับพลังสดใส', 'Her smile and bright energy'], ['W', 'สายตานิ่ง ๆ ลึก ๆ มีเสน่ห์', 'A calm, deep gaze'],
-    ['E', 'ความอบอุ่น ใจดีกับทุกคน', 'Her warmth, kind to everyone'], ['A', 'ความขี้เล่น ตลก คุยสนุก', 'Her playful, funny side']] },
-  { th:'ไลฟ์แบบไหนที่คุณดูจนจบ?', en:'Which kind of live do you watch to the end?', o:[
-    ['A', 'เล่นเกม แกล้งเพื่อน ฮาทั้งไลฟ์', 'Games and teasing, laughing all through'], ['E', 'ทำอาหาร ชวนคุยเรื่องชีวิต', 'Cooking and chatting about life'],
-    ['F', 'ร้อง เต้น ปล่อยพลังเต็มที่', 'Singing and dancing, all out'], ['W', 'คุยดึก ๆ เรื่องลึก ๆ เปิดใจ', 'Late-night talks, opening up']] },
-  { th:'งานแบบไหนที่คุณอยากไปเชียร์ที่สุด?', en:'Which kind of event would you most like to go and cheer?', o:[
-    ['E', 'ไฮทัช แฮนด์เชค ได้ยิ้มให้กันใกล้ ๆ', 'A hi-touch or handshake, a smile up close'], ['F', 'คอนเสิร์ตใหญ่ ร้องเต้นเต็มพลัง', 'A big concert, singing and dancing all out'],
-    ['W', 'มินิไลฟ์อะคูสติก เพลงช้าซึ้ง ๆ', 'An acoustic mini live, slow songs that hit deep'], ['A', 'โรดโชว์ เล่นเกมบนเวที ฮาทั้งงาน', 'A roadshow with games on stage, laughs all through']] },
-  { th:'วันที่คุณเหนื่อย อะไรจากเมมเบอร์ที่ช่วยได้มากที่สุด?', en:'On a tiring day, what from a member helps you most?', o:[
-    ['W', 'เพลงช้า ๆ ที่เธอร้องในไลฟ์', 'A slow song she sang on a live'], ['A', 'คลิปฮา ๆ ที่เธอเล่นกับเพื่อน', 'A funny clip of her with the others'],
-    ['E', 'โพสต์ถามว่า “กินข้าวกันหรือยัง”', 'A post asking “have you all eaten?”'], ['F', 'พลังบวกที่ทำให้อยากลุกขึ้นสู้', 'Her energy that makes you want to keep going']] },
+  { th:'คุณเป็นแฟนคลับสายไหน?', en:'What kind of fan are you?', o:[
+    ['F', '📣', 'สายเชียร์ คอลจนเสียงแหบ', 'The cheerer, calling till your voice goes'], ['E', '📸', 'สายแคป เก็บทุกโมเมนต์', 'The archivist, saving every moment'],
+    ['A', '🎉', 'สายแก๊ง ไปงานไหนก็เจอเพื่อน', 'The social one, friends at every event'], ['W', '🌙', 'สายเงียบ พูดน้อยแต่ไม่เคยพลาด', 'The quiet one who never misses a thing']] },
+  { th:'ไฮทัช 10 วินาที คุณจะพูดว่า…', en:'Ten seconds at hi-touch. You say…', o:[
+    ['F', '💪', '“สู้ ๆ นะ! เชียร์สุดใจ!”', '“Go for it! Cheering all the way!”'], ['A', '🤭', 'มุกที่ซ้อมมาทั้งคืน', 'The joke you rehearsed all night'],
+    ['E', '🍚', '“กินข้าวยัง พักผ่อนบ้างนะ”', '“Have you eaten? Get some rest.”'], ['W', '🫠', '…ยิ้มอย่างเดียว พูดไม่ออก', '…just a smile, no words come out']] },
+  { th:'ไลฟ์เด้งขึ้นมาตอนห้าทุ่ม คุณ…', en:'A live pops up at 11 pm. You…', o:[
+    ['F', '⚡', 'พุ่งเข้าไปพิมพ์เป็นคนแรก', 'Rush in and comment first'], ['W', '🛌', 'นอนฟังเงียบ ๆ จนเธอบอกฝันดี', 'Listen in bed till she says goodnight'],
+    ['A', '📲', 'แคปหน้าตลก ๆ ส่งเข้ากลุ่ม', 'Screenshot the funny faces for the group chat'], ['E', '⏰', 'เก็บไว้ดูพรุ่งนี้ ต้องตื่นเช้า', 'Save it for tomorrow, early start']] },
+  { th:'ป้ายเชียร์ของคุณเขียนว่า…', en:'Your cheering board says…', o:[
+    ['E', '🏠', '“อยู่ตรงนี้เสมอนะ”', '“Always right here”'], ['F', '🏆', '“เซ็มบัตสึ! ปีนี้ต้องติด!”', '“Senbatsu! This is the year!”'],
+    ['W', '🎵', 'ท่อนเพลงที่ทำให้นึกถึงเธอ', 'A song line that brings her to mind'], ['A', '🐸', 'มุกหรือรูปตลกให้เธอขำ', 'A joke or a silly picture to make her laugh']] },
+  { th:'อีโมจิที่คุณกดให้เธอบ่อยที่สุด?', en:'The emoji you send her most?', o:[
+    ['F', '🔥', 'ไฟลุก', 'Fire'], ['E', '🫶', 'มือหัวใจ', 'Heart hands'], ['A', '😂', 'ขำน้ำตาไหล', 'Crying laughing'], ['W', '🥹', 'ซึ้งจนตาคลอ', 'Welling up']] },
 ];
+// the reader as a fan, by the element most of their answers lean to
+const QZ_FAN = { F:['📣', 'แฟนสายไฟ', 'พลังเชียร์ไม่มีหมด', 'A fire fan', 'cheering that never runs out'],
+  E:['🫶', 'แฟนสายดิน', 'อบอุ่น ดูแลเก่ง อยู่ข้างเธอเสมอ', 'An earth fan', 'warm, caring, always there'],
+  A:['😂', 'แฟนสายลม', 'สายฮา เพื่อนเยอะ ไปไหนก็สนุก', 'An air fan', 'all laughs, friends everywhere'],
+  W:['🌙', 'แฟนสายน้ำ', 'เงียบ ๆ ลึก ๆ แต่ใจอยู่ทุกงาน', 'A water fan', 'quiet and deep, there at every show'] };
 // a reading of one birthday: its day (Wednesday after 18:00 is ราหู), sign and year
 function qzRead(iso, night){
   const [y, m, d] = iso.split('-').map(Number);
@@ -17455,6 +17480,46 @@ function qzYams(from, to){
   return out.filter(([s, e]) => e > from && s < to);
 }
 const qzRuler = (n, houses) => { for(const h of houses){ const p = qzHouse(n, h); if(p !== 8) return [h, p]; } return null; };
+// the next good ยาม to vote for her while the vote is open, over two days at most, none between midnight and 06:00
+function qzVoteHours(her, me, limit){
+  const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), iso = toYmd(todayStart());
+  if(!her || !her.birthday || !vote || vote.start > iso || eventLastDay(vote) < iso) return [];
+  const en = isEN(), TH = 7 * 36e5, now = Date.now();
+  const close = Date.UTC(...eventLastDay(vote).split('-').map((v, i) => i === 1 ? v - 1 : +v)) + 864e5 - TH;
+  const hers = qzRuler(qzRead(her.birthday, false).day.n, ['เดช', 'มนตรี', 'ศรี']), mine = me ? qzRuler(me.day.n, ['ศรี', 'เดช']) : null;
+  const thDay = ms => new Date(ms + TH).toISOString().slice(0, 10), hm = ms => new Date(ms + TH).toISOString().slice(11, 16);
+  const today = thDay(now), tomorrow = thDay(now + 864e5);
+  const house = h => ({ 'เดช':'power', 'มนตรี':'support', 'ศรี':'fortune' })[h];
+  return qzYams(now, Math.min(close, now + 2 * 864e5))
+    .filter(([s]) => new Date(s + TH).getUTCHours() >= 6)
+    .map(([s, e, p]) => {
+      const isHer = !!hers && p === hers[1], isMe = !!mine && p === mine[1];
+      if(!isHer && !isMe) return null;
+      const k = thDay(s), x = parseYmd(k);
+      return { now: s <= now, her: isHer,
+        when: k === today ? (en ? 'Today' : 'วันนี้') : k === tomorrow ? (en ? 'Tomorrow' : 'พรุ่งนี้') : `${x.getDate()} ${monthsShort()[x.getMonth()]}`,
+        hours: `${hm(s)}–${hm(e) === '00:00' ? '24:00' : hm(e)}`,
+        why: isHer ? (en ? `${QZ_PLANET[p][1]}, ${nickName(her)}’s ${house(hers[0])} planet` : `ยาม${QZ_PLANET[p][0]} · ${hers[0]}ของ ${nickName(her)}`)
+          : (en ? `${QZ_PLANET[p][1]}, your ${house(mine[0])} planet` : `ยาม${QZ_PLANET[p][0]} · ${mine[0]}ของคุณ`) };
+    }).filter(Boolean).slice(0, limit);
+}
+/* the home dashboard's quiz tile (where the countdown to the results was): the
+   quiz, or the member it found with the next good hour to vote */
+function renderQuizTile(){
+  const en = isEN();
+  let last = null; try{ last = JSON.parse(localStorage.getItem(QZ_LAST) || 'null'); }catch(e){}
+  const act = activeMembers(), m = last && act.find(x => x.id === last.id);
+  const kami = state.kamiOshi && act.find(x => x.id === state.kamiOshi);
+  const b = qzBirth(), cheer = kami || m, next = cheer ? qzVoteHours(cheer, b ? qzRead(b.iso, b.night) : null, 1)[0] : null;
+  // three faces a day when there is no match yet
+  const day = toYmd(todayStart()), faces = m ? [m] : act.slice().sort((x, y) => qzHash(day + x.id) - qzHash(day + y.id)).slice(0, 3);
+  const small = next ? `${en ? 'Vote at' : 'ฤกษ์โหวต'} ${next.when === (en ? 'Today' : 'วันนี้') ? '' : next.when + ' '}${next.hours.slice(0, 5)}`
+    : m ? (en ? 'your stars’ pick' : 'ดวงถูกโฉลก') : (en ? 'by the stars ✦' : 'จากดวง ✦');
+  return `<button class="dash-t is-quiz" data-action="nav-quiz" title="${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}">
+    ${m ? `<span class="dash-i">${ICONS.star}</span>` : ''}
+    <span class="dash-q-faces${m ? ' is-one' : ''}">${faces.map(x => renderAvatar(x, 'dash-q-face', getGroup(x.groupId).color)).join('')}${m ? `<i>${last.pct}%</i>` : ''}</span>
+    <span class="dash-l">${m ? escapeHtml(nickName(m)) : (en ? 'Your oshi' : 'หาโอชิ')}<small>${escapeHtml(small)}</small></span></button>`;
+}
 function renderResultsDay(best){
   const ev = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results), vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote);
   if(!ev || toYmd(todayStart()) > ev.start) return '';
@@ -17477,22 +17542,11 @@ function renderResultsDay(best){
   const options = act.slice().sort((a, b) => nickName(a).localeCompare(nickName(b))).map(m => `<option value="${m.id}"${m.id === her.id ? ' selected' : ''}>${escapeHtml(nickName(m))}</option>`).join('');
   // the vote, while it is open: the next good ยาม over two days, up to its last day (Thai time)
   let yams = '';
-  const TH = 7 * 36e5, now = Date.now(), iso = toYmd(todayStart());
-  if(vote && vote.start <= iso && eventLastDay(vote) >= iso){
-    const close = Date.UTC(...eventLastDay(vote).split('-').map((v, i) => i === 1 ? v - 1 : +v)) + 864e5 - TH;
-    const hers = qzRuler(hr.day.n, ['เดช', 'มนตรี', 'ศรี']), mine = me ? qzRuler(me.day.n, ['ศรี', 'เดช']) : null;
-    const thDay = ms => new Date(ms + TH).toISOString().slice(0, 10), hm = ms => new Date(ms + TH).toISOString().slice(11, 16);
-    const today = thDay(now), tomorrow = thDay(now + 864e5);
-    const rows = qzYams(now, Math.min(close, now + 2 * 864e5))
-      .filter(([s]) => new Date(s + TH).getUTCHours() >= 6)          // no one is sent to vote in the small hours
-      .map(([s, e, p]) => [s, e, p, hers && p === hers[1] ? 'her' : mine && p === mine[1] ? 'me' : null]).filter(r => r[3]).slice(0, 4);
-    const when = s => { const k = thDay(s); return k === today ? (en ? 'Today' : 'วันนี้') : k === tomorrow ? (en ? 'Tomorrow' : 'พรุ่งนี้') : (() => { const x = parseYmd(k); return `${x.getDate()} ${monthsShort()[x.getMonth()]}`; })(); };
-    const house = h => ({ 'เดช':'power', 'มนตรี':'support', 'ศรี':'fortune' })[h];
-    const why = r => r[3] === 'her' ? (en ? `${QZ_PLANET[r[2]][1]}, ${nickName(her)}’s ${house(hers[0])} planet` : `ยาม${QZ_PLANET[r[2]][0]} · ${hers[0]}ของ ${nickName(her)}`)
-      : (en ? `${QZ_PLANET[r[2]][1]}, your ${house(mine[0])} planet` : `ยาม${QZ_PLANET[r[2]][0]} · ${mine[0]}ของคุณ`);
+  const rows = qzVoteHours(her, me, 4), now = Date.now();
+  if(rows.length){
     const v = parseYmd(eventLastDay(vote));
-    if(rows.length) yams = `<p class="qz-day-sub">${en ? `Good hours to vote · until ${v.getDate()} ${EN_MONTHS_SHORT[v.getMonth()]}` : `ฤกษ์ดีกดโหวต · ถึง ${v.getDate()} ${THAI_MONTHS[v.getMonth()]}`}</p>
-      <div class="qz-yams">${rows.map(r => `<div class="qz-yam${r[0] <= now ? ' is-now' : ''}${r[3] === 'her' ? ' is-her' : ''}"><b>${when(r[0])} ${hm(r[0])}–${hm(r[1]) === '00:00' ? '24:00' : hm(r[1])}</b><span>${escapeHtml(why(r))}</span>${r[0] <= now ? `<i>${en ? 'now' : 'ตอนนี้'}</i>` : ''}</div>`).join('')}</div>
+    yams = `<p class="qz-day-sub">${en ? `Good hours to vote · until ${v.getDate()} ${EN_MONTHS_SHORT[v.getMonth()]}` : `ฤกษ์ดีกดโหวต · ถึง ${v.getDate()} ${THAI_MONTHS[v.getMonth()]}`}</p>
+      <div class="qz-yams">${rows.map(r => `<div class="qz-yam${r.now ? ' is-now' : ''}${r.her ? ' is-her' : ''}"><b>${r.when} ${r.hours}</b><span>${escapeHtml(r.why)}</span>${r.now ? `<i>${en ? 'now' : 'ตอนนี้'}</i>` : ''}</div>`).join('')}</div>
       <p class="qz-day-note">${en ? 'By the ยามอัฐกาล watches (Thai time). It only says when — vote what you are comfortable with.' : 'ตามยามอัฐกาล (เวลาไทย) บอกแค่ช่วงเวลา โหวตเท่าที่สบายใจ'}</p>`;
   }
   return `<section class="qz-day">
@@ -17557,8 +17611,8 @@ function renderQuiz(){
   const head = `<header class="feed-head qz-head">
     <p class="feed-today">${en ? 'Horoscope quiz' : 'ดูดวงหาโอชิ'}</p>
     <h1 class="qz-title">${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</h1>
-    <p class="qz-lead">${en ? 'Your birthday against every member’s — by the day of the week (ทักษา), the Thai zodiac and the year animal — then four questions on the kind of member you love to watch. Just for fun.'
-      : 'เทียบวันเกิดของคุณกับเมมเบอร์ทุกคน ตามตำราทักษา ราศีแบบไทย และปีนักษัตร แล้วตอบอีกสี่ข้อว่าคุณชอบเมมเบอร์สไตล์ไหน ดูดวงเพื่อความสนุกนะ'}</p>
+    <p class="qz-lead">${en ? 'Your birthday against every member’s — by the day of the week (ทักษา), the Thai zodiac and the year animal — then five questions on what kind of fan you are. Just for fun.'
+      : 'เทียบวันเกิดของคุณกับเมมเบอร์ทุกคน ตามตำราทักษา ราศีแบบไทย และปีนักษัตร แล้วตอบอีกห้าข้อว่าคุณเป็นแฟนสายไหน ดูดวงเพื่อความสนุกนะ'}</p>
   </header>`;
   const dots = n => `<p class="qz-step">${en ? `Question ${n} of ${total}` : `ข้อ ${n}/${total}`}</p><div class="qz-dots">${Array.from({ length: total }, (_, i) => `<i class="${i < n ? 'is-on' : ''}"></i>`).join('')}</div>`;
   const back = q.step ? `<button class="qz-back" data-action="quiz-back">← ${en ? 'Back' : 'ย้อนกลับ'}</button>` : '';
@@ -17577,22 +17631,25 @@ function renderQuiz(){
       ${wed ? `<div class="qz-seg"><span>${en ? 'Born on a Wednesday —' : 'เกิดวันพุธ ช่วงไหน?'}</span>
         <button class="${b.night ? '' : 'is-on'}" data-action="quiz-night" data-id="0">${en ? 'by day' : 'กลางวัน'}</button>
         <button class="${b.night ? 'is-on' : ''}" data-action="quiz-night" data-id="1">${en ? 'after 6 pm' : 'หลัง 18:00'}</button></div>` : ''}
-      ${me ? `<div class="qz-me"><span>${en ? 'You:' : 'คุณ:'}</span>${qzChips(me, en)}</div>` : ''}
+      ${me ? `<div class="qz-me"><span>${en ? 'You:' : 'คุณ:'}</span>${qzChips(me, en)}</div>
+        <p class="qz-me-tr">${en ? `Born on a ${me.day.en}: ${me.day.tr[1]}` : `คนเกิดวัน${me.day.th}: ${me.day.tr[0]}`} · ${en ? `a ${QZ_EL[me.sign[3]][1].toLowerCase()} sign` : `ราศีธาตุ${QZ_EL[me.sign[3]][0]}`}</p>` : ''}
       <div class="qz-next"><button class="qz-go" data-action="quiz-birth"${me ? '' : ' disabled'}>${en ? 'Next' : 'ถัดไป'}</button>
         <button class="qz-skip" data-action="quiz-nobirth">${en ? 'Skip — no birthday' : 'ข้าม ไม่บอกวันเกิด'}</button></div>
       <p class="qz-note">${en ? 'Your birthday stays on this device; nothing is sent anywhere.' : 'วันเกิดของคุณเก็บไว้ในเครื่องนี้เท่านั้น ไม่ได้ส่งไปที่ไหน'}</p>`;
   } else if(q.step <= QZ_QUESTIONS.length){
     const Q = QZ_QUESTIONS[q.step - 1];
     body = `${dots(q.step + 1)}<h2 class="qz-q">${en ? Q.en : Q.th}</h2>
-      <div class="qz-opts">${Q.o.map(([el, th, e]) => `<button class="qz-opt${q.ans[q.step - 1] === el ? ' is-on' : ''}" data-action="quiz-pick" data-id="${el}">${escapeHtml(en ? e : th)}</button>`).join('')}</div>`;
+      <div class="qz-opts is-tiles">${Q.o.map(([el, emo, th, e]) => `<button class="qz-opt${q.ans[q.step - 1] === el ? ' is-on' : ''}" data-action="quiz-pick" data-id="${el}"><span class="qz-emo" aria-hidden="true">${emo}</span>${escapeHtml(en ? e : th)}</button>`).join('')}</div>`;
   } else if(q.step === QZ_QUESTIONS.length + 1){
     body = `${dots(total)}<h2 class="qz-q">${en ? 'From which group?' : 'อยากได้โอชิจากวงไหน?'}</h2>
-      <div class="qz-opts">${[['bnk48', 'BNK48'], ['cgm48', 'CGM48'], ['all', en ? 'Either' : 'ทั้งสองวง']].map(([id, n]) => {
+      <div class="qz-opts is-tiles is-three">${[['bnk48', 'BNK48', '🩷'], ['cgm48', 'CGM48', '🩵'], ['all', en ? 'Either' : 'ทั้งสองวง', '✨']].map(([id, n, emo]) => {
         const g = getGroup(id);
-        return `<button class="qz-opt" style="${g ? `--c:${g.color}` : ''}" data-action="quiz-group" data-id="${id}">${n}</button>`; }).join('')}</div>`;
+        return `<button class="qz-opt" style="${g ? `--c:${g.color}` : ''}" data-action="quiz-group" data-id="${id}"><span class="qz-emo" aria-hidden="true">${emo}</span>${n}</button>`; }).join('')}</div>`;
   } else {
-    const list = qzResults(), me = q.birth ? qzRead(q.birth.iso, q.birth.night) : null;
-    body = `${me ? `<div class="qz-me is-result"><span>${en ? 'You:' : 'ดวงคุณ:'}</span>${qzChips(me, en)}</div>` : ''}
+    const list = qzResults(), me = q.birth ? qzRead(q.birth.iso, q.birth.night) : null, fan = QZ_FAN[list[0] ? list[0].top : 'F'];
+    if(list[0]) try{ localStorage.setItem(QZ_LAST, JSON.stringify({ id: list[0].m.id, pct: list[0].pct })); }catch(e){}
+    body = `<div class="qz-fan"><span class="qz-fan-emo" aria-hidden="true">${fan[0]}</span><span><small>${en ? 'You are' : 'คุณคือ'}</small><b>${en ? fan[3] : fan[1]}</b><em>${en ? fan[4] : fan[2]}</em></span></div>
+      ${me ? `<div class="qz-me is-result"><span>${en ? 'You:' : 'ดวงคุณ:'}</span>${qzChips(me, en)}</div>` : ''}
       ${list[0] ? qzMatchCard(list[0], 0) : ''}
       ${list.length > 1 ? `<h3 class="section-label qz-more-h">${en ? 'Two more your stars favour' : 'อีกสองคนที่ดวงถูกโฉลกกับคุณ'}</h3>${list.slice(1, 3).map(r => qzMatchCard(r, 1)).join('')}` : ''}
       ${renderResultsDay(list[0])}
