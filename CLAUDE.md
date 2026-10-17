@@ -202,7 +202,11 @@ day): a shirt to cheer a member (her Kami Oshi first) in her เดช colour, e
 by ยามอัฐกาล (`qzYams`: 1½-hour watches from 06:00 and 18:00 Thai time, by day
 1 6 4 2 7 5 3, by night 1 5 2 6 3 7 4, from the day's planet) ruled by her เดช
 planet or the reader's ศรี, none between midnight and 06:00. It says when, never
-how much to vote: tokens cost money.
+how much to vote: tokens cost money. แชร์ผล opens the share sheet with a card of
+its own (`drawQuizCard`): the reader's fan type and stars, the member in a ring of
+the eight ทักษา colours with her %, two reasons, the next two at her sides. The
+finished answers are kept on the device (`48thdb-quiz-done`), so the page opens on
+the last result; ทำใหม่ starts over, and leaving half way keeps the old result.
 
 ## The GE vote on the chain
 

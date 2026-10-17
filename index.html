@@ -17381,7 +17381,7 @@ function renderAskBlock(q, total){
    ไฟ, จันทร์ พฤหัส ดิน, อังคาร ราหู ลม, พุธ ศุกร์ น้ำ) and her sign's. Only
    good reasons are ever printed about a member. */
 let _quiz = { step:0, ans:[] };
-const QZ_KEY = '48thdb-quiz-birth', QZ_LAST = '48thdb-quiz-last';
+const QZ_KEY = '48thdb-quiz-birth', QZ_LAST = '48thdb-quiz-last', QZ_DONE = '48thdb-quiz-done';
 const QZ_DAYS = [
   { th:'อาทิตย์', en:'Sunday', c:'#E5484D', n:1, el:'F', tr:['มั่นใจ เป็นผู้นำ ใจกว้าง', 'confident, a leader, big-hearted'] },
   { th:'จันทร์', en:'Monday', c:'#D9A400', n:2, el:'E', tr:['อ่อนโยน ช่างเอาใจ พูดเก่ง', 'gentle, caring, a good talker'] },
@@ -17620,6 +17620,12 @@ function qzMatchCard(r, rank){
   </article>`;
 }
 function renderQuiz(){
+  if(_quiz.step === 0 && !_quiz.fresh){
+    let done = null; try{ done = JSON.parse(localStorage.getItem(QZ_DONE) || 'null'); }catch(e){}
+    // answers to a different set of questions no longer fit
+    if(done && Array.isArray(done.ans) && done.ans.length === QZ_QUESTIONS.length && done.group)
+      _quiz = { step: QZ_QUESTIONS.length + 2, ans: done.ans, emo: done.emo || null, group: done.group, birth: done.birth || null };
+  }
   const en = isEN(), q = _quiz, total = QZ_QUESTIONS.length + 2;
   const head = `<header class="feed-head qz-head">
     <p class="feed-today">${en ? 'Horoscope quiz' : 'ดูดวงหาโอชิ'}</p>
@@ -17688,13 +17694,14 @@ function quizDate(){
   return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 function quizKeepBirth(b){ _quiz.birth = b; try{ localStorage.setItem(QZ_KEY, JSON.stringify(b)); }catch(e){} }
-async function quizShare(){
-  const best = qzResults()[0];
-  if(!best) return;
-  const en = isEN(), url = location.origin + '/quiz';
-  const text = en ? `My stars and ${nickName(best.m)}’s: ${best.pct}% — find yours on 48thDb` : `ดวงฉันถูกโฉลกกับ ${nickName(best.m)} ${best.pct}% · มาหาโอชิจากดวงของคุณที่ 48thDb`;
-  try{ if(navigator.share){ await navigator.share({ title: en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง', text, url }); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
-  try{ await navigator.clipboard.writeText(`${text} ${url}`); toast(en ? 'Copied' : 'คัดลอกแล้ว'); }catch(e){}
+function quizShare(){
+  const list = qzResults();
+  if(!list[0]) return;
+  const top = list[0].top, fan = QZ_FAN[top].slice(), grid = (QZ_QUESTIONS.find(x => x.grid) || {}).grid;
+  if(_quiz.emo && grid && grid[top].includes(_quiz.emo)) fan[0] = _quiz.emo;
+  const url = location.origin + '/quiz', m = list[0].m;
+  openShareSheet({ kind:'quiz', list: list.slice(0, 3), fan, me: _quiz.birth ? qzRead(_quiz.birth.iso, _quiz.birth.night) : null, url, link: url,
+    title: isEN() ? `My stars favour ${nickName(m)} ${list[0].pct}% — 48thDb` : `ดวงฉันถูกโฉลกกับ ${nickName(m)} ${list[0].pct}% — 48thDb`, file:`48thdb-oshi-${m.name || m.id}` });
 }
 function quizAction(action, id){
   const q = _quiz, last = QZ_QUESTIONS.length + 1;
@@ -17703,9 +17710,10 @@ function quizAction(action, id){
   else if(action === 'quiz-nobirth'){ q.birth = null; q.step = 1; }
   else if(action === 'quiz-night'){ const iso = quizDate(); if(iso) quizKeepBirth({ iso, night: id === '1' }); }
   else if(action === 'quiz-pick'){ const [el, emo] = String(id).split('|'); q.ans[q.step - 1] = el; if(emo) q.emo = emo; q.step++; }
-  else if(action === 'quiz-group'){ q.group = id; q.step = last + 1; }
+  else if(action === 'quiz-group'){ q.group = id; q.step = last + 1;
+    try{ localStorage.setItem(QZ_DONE, JSON.stringify({ ans: q.ans, emo: q.emo || null, group: id, birth: q.birth || null })); }catch(e){} }
   else if(action === 'quiz-back'){ q.step = Math.max(0, q.step - 1); }
-  else if(action === 'quiz-again'){ _quiz = { step:0, ans:[] }; }
+  else if(action === 'quiz-again'){ _quiz = { step:0, ans:[], fresh:true }; }
   else if(action === 'quiz-share'){ quizShare(); return; }
   renderMain();
   // the next question where the last one was, or the result from its top
@@ -23226,6 +23234,70 @@ async function shareFooter(g, dark, url){
   g.globalAlpha = 1; g.textAlign = 'left';
 }
 
+/* หาโอชิ's card: the reader's fan type and stars, the member their stars favour
+   inside a ring of the eight ทักษา colours with her percentage, why, and the next
+   two at her sides. */
+async function drawQuizCard(g, sub){
+  const en = isEN(), P = 64, [best, ...more] = sub.list, m = best.m, grp = getGroup(m.groupId), c = grp ? grp.color : '#E4457E';
+  const F = (w, px) => `${w} ${px}px "Noto Sans Thai", sans-serif`, EMO = px => `${px}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+  g.fillStyle = '#150E22'; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  shareGlow(g, 540, 600, 620, c, .5);
+  shareGlow(g, 110, 120, 460, '#FF6FA5', .35);
+  shareGlow(g, 990, 1200, 520, '#3CC4A5', .28);
+  // a sky of small stars, the same on every card (a plain sequence: hashes of neighbouring numbers fell in lines)
+  let seed = 48;
+  const rnd = () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296;
+  for(let i = 0; i < 80; i++){
+    const x = rnd() * SHARE_W, y = rnd() * SHARE_H * .9, r = .8 + rnd() * 2.2;
+    g.globalAlpha = .2 + rnd() * .55; g.fillStyle = '#fff';
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  }
+  g.globalAlpha = 1;
+  shareText(g, `48thDb · ${en ? 'FIND YOUR OSHI BY THE STARS' : 'หาโอชิจากดวง'}`, P, 92, F(800, 28), '#FF9DC3');
+  // the reader: what kind of fan, and their stars
+  const fan = sub.fan;
+  shareText(g, fan[0], P, 214, EMO(92), '#fff');
+  shareText(g, en ? 'You are' : 'คุณคือ', P + 124, 160, F(700, 28), 'rgba(255,255,255,.7)');
+  shareText(g, en ? fan[3] : fan[1], P + 124, 216, F(800, 58), '#fff');
+  shareText(g, en ? fan[4] : fan[2], P + 124, 258, F(600, 28), 'rgba(255,255,255,.75)');
+  const chips = r => [en ? 'Born ' + r.day.en : 'เกิดวัน' + r.day.th, en ? r.sign[2] : 'ราศี' + r.sign[1], en ? 'Year of the ' + QZ_ANIMALS[r.animal][1] : 'ปี' + QZ_ANIMALS[r.animal][0]];
+  if(sub.me){ let x = P; chips(sub.me).forEach((t, i) => { x += sharePill(g, t, x, 288, i ? 'rgba(255,255,255,.14)' : sub.me.day.c, '#fff', 24) + 10; }); }
+  // her, in the ring of the ทักษา colours
+  const cx = 540, cy = 640, R = 186, ring = R + 52;
+  g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, ring, 0, Math.PI * 2); g.stroke();
+  QZ_WHEEL.forEach((n, i) => { const a = -Math.PI / 2 + i * Math.PI / 4;
+    g.beginPath(); g.arc(cx + Math.cos(a) * ring, cy + Math.sin(a) * ring, 13, 0, Math.PI * 2); g.fillStyle = QZ_COLOURS[n][2]; g.fill();
+    g.lineWidth = 4; g.strokeStyle = '#150E22'; g.stroke(); });
+  g.beginPath(); g.arc(cx, cy, R + 10, 0, Math.PI * 2); g.fillStyle = c; g.fill();
+  shareFace(g, m, await shareLoad(m.photo), cx - R, cy - R, R * 2, c);
+  // the percentage on her rim
+  const pct = `${best.pct}%`; g.font = F(800, 58); const pw = g.measureText(pct).width + 56, ph = 92, px = cx + R * .5, py = cy + R * .55;
+  const gr = g.createLinearGradient(px, py, px + pw, py + ph); gr.addColorStop(0, '#E4457E'); gr.addColorStop(1, '#2E8C82');
+  g.fillStyle = gr; shareRound(g, px, py, pw, ph, ph / 2); g.fill(); g.lineWidth = 6; g.strokeStyle = '#150E22'; g.stroke();
+  shareText(g, pct, px + pw / 2, py + 66, F(800, 58), '#fff', 'center');
+  // the next two at her sides
+  for(const [i, r] of more.slice(0, 2).entries()){
+    const sx = i ? SHARE_W - 150 : 150, sy = 830, sr = 58, sc = (getGroup(r.m.groupId) || {}).color || '#E4457E';
+    g.beginPath(); g.arc(sx, sy, sr + 6, 0, Math.PI * 2); g.fillStyle = sc; g.fill();
+    shareFace(g, r.m, await shareLoad(r.m.photo), sx - sr, sy - sr, sr * 2, sc);
+    shareText(g, nickName(r.m), sx, sy + sr + 46, F(800, 30), '#fff', 'center');
+    shareText(g, `${r.pct}%`, sx, sy + sr + 82, F(700, 26), shareMix(sc.startsWith('#') ? sc : '#E4457E', .35), 'center');
+  }
+  // who she is, and why
+  shareText(g, en ? 'Your stars favour' : 'ดวงถูกโฉลกกับ', cx, 930, F(700, 28), 'rgba(255,255,255,.7)', 'center');
+  let fs = 84; g.font = F(800, fs); while(g.measureText(nickName(m)).width > 560 && fs > 52){ fs -= 4; g.font = F(800, fs); }
+  shareText(g, nickName(m), cx, 1010, F(800, fs), '#fff', 'center');
+  shareText(g, [grp && grp.name, m.gen ? (en ? `Gen ${m.gen}` : `รุ่น ${m.gen}`) : '', ...chips(best.her)].filter(Boolean).join(' · '), cx, 1056, F(600, 27), 'rgba(255,255,255,.72)', 'center');
+  const why = best.ties.out.map(t => en ? t[2] : t[1]);
+  if(best.els.includes(best.top)) why.push(en ? `${QZ_EL[best.top][3]}, the way you like` : `${QZ_EL[best.top][2]} ตรงกับแบบที่คุณชอบ`);
+  g.font = F(700, 28);
+  why.slice(0, 2).forEach((w, i) => {
+    const line = '✓ ' + shareWrap(g, w, SHARE_W - P * 2 - 40, 1)[0];
+    shareText(g, line, cx, 1116 + i * 44, F(700, 28), i ? 'rgba(255,255,255,.85)' : '#FFD98A', 'center');
+  });
+  await shareFooter(g, true, sub.url);
+}
+
 /* A member's card: who she is, then what the database knows she has done —
    songs, centre spots and her lives on iAM48. */
 async function drawMemberCard(g, m, url){
@@ -25141,6 +25213,7 @@ async function buildShareCard(sub){
       timeline: drawStatsTimelineCard }[sub.cat] || drawStatsCard)(g, sub.url);
   else if(sub.kind === 'today') await drawTodayCard(g, sub.url);
   else if(sub.kind === 'gallery') await drawGalleryCard(g, sub);
+  else if(sub.kind === 'quiz') await drawQuizCard(g, sub);
   else await drawPageCard(g, sub.title.replace(/ — 48thDb$/, ''), sub.url);
   return new Promise(res => c.toBlob(res, 'image/png'));
 }
