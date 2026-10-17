@@ -280,7 +280,7 @@ export function tlParse(n, html, now) {
 async function tlProbe(n, now) {
   const res = await fetch(TL_URL(n), { headers: { 'user-agent': 'Mozilla/5.0 (48thDb timeline; 48thdb.com)', accept: 'text/html' }, cf: { cacheTtl: 0 } });
   if (res.status === 404) return { n, gone: true };
-  if (!res.ok) return { n, failed: true };
+  if (!res.ok) return { n, failed: true, status: res.status };
   return { n, post: tlParse(n, await res.text(), now) };
 }
 async function tlScan(env) {
@@ -292,7 +292,12 @@ async function tlScan(env) {
   if (!st.max) { if (!ahead) return { skipped: 'no-start' }; st.max = ahead - 60; }
   const from = st.max, now = Date.now();
   const asks = [...Array(TL_STEP).keys()].map((i) => from + 1 + i).concat(TL_FAR.map((d) => from + d));
-  const got = await Promise.all(asks.map((n) => tlProbe(n, now).catch(() => ({ n, failed: true }))));
+  const got = await Promise.all(asks.map((n) => tlProbe(n, now).catch((e) => ({ n, failed: true, status: String((e && e.message) || e).slice(0, 60) }))));
+  // a number that keeps failing (an error page, a refusal) is given up after three runs, so it cannot hold the walk forever
+  st.fails = st.fails || {};
+  for (const r of got) if (r.failed && r.n <= from + TL_STEP) { st.fails[r.n] = (st.fails[r.n] || 0) + 1; if (st.fails[r.n] >= 3) { r.failed = false; r.gone = true; } }
+  for (const k of Object.keys(st.fails)) if (+k <= from) delete st.fails[k];
+  st.last = { at: new Date(now).toISOString(), answers: got.reduce((o, r) => { const k = r.post ? 'post' : r.gone ? '404' : String(r.status || 'failed'); o[k] = (o[k] || 0) + 1; return o; }, {}) };
   const ids = await iamIds(env).catch(() => ({}));
   const who = Object.fromEntries(Object.entries(ids).map(([m, i]) => [i, m]));
   const have = new Set(st.posts.map((p) => p.n));
@@ -314,15 +319,15 @@ async function tlScan(env) {
   st.max = Math.max(from, max);
   st.posts = st.posts.filter((p) => now - Date.parse(p.at) < TL_KEEP_MS).sort((a, b) => b.n - a.n).slice(0, TL_KEEP);
   st.at = new Date(now).toISOString();
-  if (added || st.max !== from) await env.IAM.put(TL_KEY, JSON.stringify(st));
-  await writeCache(TL_CACHE, { checked: st.at, posts: st.posts }, 60);
+  if (added || st.max !== from || got.some((r) => r.failed)) await env.IAM.put(TL_KEY, JSON.stringify(st));
+  await writeCache(TL_CACHE, { checked: st.at, posts: st.posts, walk: { max: st.max, last: st.last } }, 60);
   return { from, max: st.max, ahead, added };
 }
 async function tlRecent(env) {
   const hit = await readCache(TL_CACHE);
   if (hit) return hit;
   const st = (await env.IAM.get(TL_KEY, 'json')) || { posts: [] };
-  const body = { checked: st.at || null, posts: st.posts || [] };
+  const body = { checked: st.at || null, posts: st.posts || [], walk: { max: st.max, last: st.last || null } };
   await writeCache(TL_CACHE, body, 60);
   return body;
 }
