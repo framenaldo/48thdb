@@ -28,6 +28,8 @@ binding = "HITS"
 dataset = "hits_48thdb"
 
 # Workers AI, for /translate: a member's biography in the other language,
-# asked by the owner's page when one is saved or approved.
+# asked by the owner's page when one is saved or approved; /brief, the home
+# page's note on the day, written each morning; and /ask, reading a question
+# typed into the search.
 [ai]
 binding = "AI"

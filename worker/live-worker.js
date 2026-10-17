@@ -659,6 +659,269 @@ async function translateBio(env, text, to) {
   return null;
 }
 
+/* สรุปวันนี้ — the home page's note on the day, written each morning (GET /brief).
+ * data/days.json (scripts/build-days.mjs, rebuilt whenever index.html changes)
+ * says what is on each day and whose birthday it is; the timeline walk adds the
+ * night's iAM48 posts. Workers AI puts that into two or three sentences, in Thai
+ * and in English. It only words what it is handed: members and events go in as
+ * tokens ([M1], [E1]) that the page prints as names it links, and an answer that
+ * brings a token, a number, a name or a word of English of its own is thrown
+ * away for a plain one built from the same facts. Written once after 06:00 Thai
+ * time, and again only when the day's schedule changes. */
+const DAYS_FROM = ['https://48thdb.com/data/days.json', 'https://raw.githubusercontent.com/framenaldo/48thdb/main/data/days.json'];
+const BRIEF_KEY = 'brief-v1', BRIEF_CACHE = 'https://live.state/brief-v1', BRIEF_HOUR = 6;
+// SEA-LION (made for South-East Asian languages) writes the better Thai, Llama the better English
+const BRIEF_MODELS = { th: ['@cf/aisingapore/gemma-sea-lion-v4-27b-it', '@cf/meta/llama-3.3-70b-instruct-fp8-fast'],
+  en: ['@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/aisingapore/gemma-sea-lion-v4-27b-it'] };
+const W_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const W_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const TH_DAYS = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+const TH_MONTHS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+const thaiDay = (ms) => new Date(ms + 7 * 36e5).toISOString().slice(0, 10);
+const plusDays = (d, n) => { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+const dayGap = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
+const TOKEN_RE = /\[[ME]\d+\]/g;
+
+async function daysSource() {
+  for (const url of DAYS_FROM) {
+    try {
+      const r = await fetch(url, { cf: { cacheTtl: 600, cacheEverything: true } });
+      if (r.ok) return await r.json();
+    } catch (e) { /* the next copy */ }
+  }
+  return null;
+}
+
+/* The day as facts with tokens: what the model is handed, what the plain note is
+   built from, and what an answer is checked against. */
+export function briefFacts(src, today, posts, now) {
+  const refs = {}, seen = {}, count = { M: 0, E: 0 };
+  const tok = (kind, id, label) => {
+    const k = kind + ':' + id;
+    if (!seen[k]) { seen[k] = `${kind}${++count[kind]}`; refs[seen[k]] = [id, label]; }
+    return `[${seen[k]}]`;
+  };
+  const names = src.names || {};
+  const mem = (id) => tok('M', id, (names[id] || [id])[0]);
+  const evt = (e) => tok('E', e.id, e.n);
+  const say = (d) => { const x = new Date(d + 'T00:00:00Z'); return `${W_DAYS[x.getUTCDay()]} ${x.getUTCDate()} ${W_MONTHS[x.getUTCMonth()]}`; };
+  const day = (d) => (src.days || {})[d] || { ev: [], bd: [] };
+  const where = (e) => (e.p ? `at ${e.p}${e.c ? ', ' + e.c : ''}` : e.online ? 'online' : '');
+  const when = (e) => (e.time ? (e.until ? `${e.time}–${e.until}` : e.time) : '');
+  const who = (e) => {
+    const bits = [];
+    if (e.on === 'all') bits.push('all BNK48 and CGM48 members');
+    else if (e.on) bits.push(`all ${e.on.toUpperCase()} members`);
+    const m = e.m || [];
+    if (m.length > 6) bits.push(`${m.length} members, among them ${m.slice(0, 4).map(mem).join(', ')}`);
+    else if (m.length) bits.push(m.map(mem).join(', '));
+    return bits.length ? `With ${bits.join(' and ')}.` : '';
+  };
+  const lines = [`Today is ${say(today)} ${today.slice(0, 4)}.`], keep = [];
+  const t = day(today), live = t.ev.filter((e) => !e.x);
+  if (live.length) {
+    lines.push('Events today:');
+    for (const e of live.slice(0, 4)) {
+      const run = e.d ? (e.d[0] === e.d[1] ? `last day of ${e.d[1]}` : `day ${e.d[0]} of ${e.d[1]}`) : '';
+      lines.push(`- ${evt(e)} (prints as "${e.n}"): ${[when(e), where(e), run].filter(Boolean).join(', ')}.${e.tba ? ' Line-up not announced yet.' : ''} ${who(e)}`.trim());
+    }
+  } else lines.push('No events today.');
+  for (const e of t.ev.filter((e) => e.x)) lines.push(`Cancelled today: ${evt(e)} (prints as "${e.n}").`);
+  for (const [id, age] of t.bd) lines.push(`Birthday today: ${mem(id)} turns ${age}.`);
+  const tm = day(plusDays(today, 1)), tmLive = tm.ev.filter((e) => !e.x && !(e.d && e.d[0] > 1));
+  if (tmLive.length) lines.push(`Tomorrow: ${tmLive.slice(0, 3).map((e) => `${evt(e)} (prints as "${e.n}")${e.time ? ' at ' + e.time : ''}${e.p ? ', ' + e.p : ''}`).join('; ')}.`);
+  if (!live.length && !tmLive.length) {
+    const next = Object.keys(src.days || {}).find((d) => d > plusDays(today, 1) && day(d).ev.some((e) => !e.x && !(e.d && e.d[0] > 1)));
+    if (next) { const e = day(next).ev.find((e) => !e.x && !(e.d && e.d[0] > 1)); lines.push(`Next event: ${evt(e)} (prints as "${e.n}") on ${say(next)}.`); }
+  }
+  const ge = src.ge || {};
+  if (ge.results && ge.results >= today) {
+    const n = dayGap(today, ge.results);
+    lines.push(n === 0 ? 'GE2026: the concert and the final results of the election are today.'
+      : `GE2026: ${n} days until the concert and the final results of the election (${say(ge.results)}).`);
+  }
+  // what changes during the day is left out of the signature, so new posts alone do not rewrite the note
+  keep.push(...lines);
+  const recent = (posts || []).filter((p) => p.m && now - Date.parse(p.at) < 864e5);
+  if (recent.length) {
+    const by = {};
+    for (const p of recent) by[p.m] = (by[p.m] || 0) + 1;
+    const top = Object.entries(by).sort((a, b) => b[1] - a[1])[0];
+    lines.push(`iAM48 app, last 24 hours: ${recent.length} posts by members${top[1] > 1 ? `; the most from ${mem(top[0])} (${top[1]} posts)` : ''}.`);
+  }
+  const facts = lines.join('\n');
+  const bare = facts.replace(TOKEN_RE, ' ');
+  return {
+    today, refs, facts, sig: keep.join('\n'),
+    nums: new Set((bare.match(/\d+/g) || []).map((n) => String(+n))),
+    words: new Set((bare.match(/[A-Za-z][A-Za-z0-9]*/g) || []).map((w) => w.toLowerCase())),
+    names: Object.values(names).flatMap(([en, th]) => [en, th]).filter((n) => n && n.length >= 3),
+    parts: { live, cancelled: t.ev.filter((e) => e.x), bd: t.bd, tomorrow: tmLive, ge: ge.results && ge.results >= today ? dayGap(today, ge.results) : null,
+      posts: recent.length, mem, evt },
+  };
+}
+
+export const briefPrompt = (lang) => `You write the short note at the top of the home page of 48thDb, a fan database of the Thai idol groups BNK48 and CGM48, telling fans what is on today.
+Write in ${lang === 'th' ? 'Thai' : 'English'}: two short sentences, at most ${lang === 'th' ? '220 characters' : '45 words'}, warm and plain, like a friend passing on the news. It is read on a phone, so keep only what matters most.
+Rules:
+- Use only the facts given. Never add a fact, a name, a place, a time, a date or a number that is not in them.
+- Members and events are tokens like [M1] and [E1]; the site prints each one as a name. Write the tokens exactly as given, square brackets included, and never write a member's or an event's name in words. Do not put the event's printed name next to its token.
+- Start with today's events (or that there are none, and the next one): where each is, and for the first one up to three of the members on. Then birthdays. Then, only if there is room, the rest. Leave out whatever does not fit.
+- Copy place names exactly as given, in their own language and letters.
+${lang === 'th' ? '- Thai with no polite particles (no ค่ะ, ครับ, นะคะ). Write a time as 12:00 น.\n' : ''}- No lists, headings, markdown or hashtags. At most one emoji.
+Reply with the note only.`;
+
+const EN_OK = new Set(['i', 'iam48', 'ge2026', 'bnk48', 'cgm48', 'mc', ...W_DAYS.map((d) => d.toLowerCase()), ...W_MONTHS.map((m) => m.toLowerCase())]);
+export function briefCheck(text, f, lang) {
+  if (!text || text.length < 20 || text.length > 520) return false;
+  if (/[*#_`|]|^\s*[-•]/m.test(text)) return false;
+  const toks = text.match(TOKEN_RE) || [];
+  if (toks.some((t) => !f.refs[t.slice(1, -1)])) return false;
+  if (Object.keys(f.refs).length && !toks.length) return false;
+  const bare = text.replace(TOKEN_RE, ' ');
+  if (/\[|\]/.test(bare)) return false;                                     // a token of its own making
+  for (const n of bare.match(/\d+/g) || []) if (!f.nums.has(String(+n))) return false;
+  if (lang === 'th') {
+    if (/ค่ะ|ครับ|นะคะ/.test(bare)) return false;
+    for (const w of bare.match(/[A-Za-z][A-Za-z0-9]*/g) || []) if (!f.words.has(w.toLowerCase()) && !EN_OK.has(w.toLowerCase())) return false;
+  } else {
+    // a capital in mid-sentence is a name: it must come from the facts
+    for (const m of bare.matchAll(/(?<![.!?:]\s|^)\b([A-Z][A-Za-z0-9]*)/g)) {
+      const w = m[1].toLowerCase();
+      if (!f.words.has(w) && !EN_OK.has(w)) return false;
+    }
+  }
+  const low = bare.toLowerCase();
+  if (f.names.some((n) => low.includes(n.toLowerCase()))) return false;      // a member named in words
+  return true;
+}
+
+/* The same facts said plainly, for when no answer passes. */
+export function briefPlain(f, lang) {
+  const P = f.parts, th = lang === 'th', out = [];
+  const dayWord = (e) => (!e.d ? '' : th ? (e.d[0] === 1 ? ' วันแรก' : e.d[0] === e.d[1] ? ' วันสุดท้าย' : ` วันที่ ${e.d[0]}`)
+    : (e.d[0] === 1 ? ', first day' : e.d[0] === e.d[1] ? ', last day' : `, day ${e.d[0]}`));
+  const ppl = (e) => {
+    const m = e.m || [], few = m.slice(0, 3).map(P.mem).join(th ? ' ' : ', ');
+    if (e.on === 'all') return th ? ' กับสมาชิกทุกคน' : ' with all members';
+    if (!m.length) return e.on ? (th ? ` กับสมาชิก ${e.on.toUpperCase()} ทุกคน` : ` with all ${e.on.toUpperCase()} members`) : '';
+    return th ? ` กับ ${few}${m.length > 3 ? ` และอีก ${m.length - 3} คน` : ''}` : ` with ${few}${m.length > 3 ? ` and ${m.length - 3} more` : ''}`;
+  };
+  const one = (e) => `${P.evt(e)}${dayWord(e)}${e.p ? (th ? ` ที่ ${e.p}` : ` at ${e.p}`) : e.online ? (th ? ' ออนไลน์' : ' online') : ''}${e.time ? (th ? ` ${e.time} น.` : ` at ${e.time}`) : ''}${P.live.length <= 2 ? ppl(e) : ''}`;   // with three on, the members are left to the cards
+  if (P.live.length) out.push((th ? 'วันนี้มี ' : 'Today: ') + P.live.slice(0, 3).map(one).join(th ? ' และ ' : '; '));
+  else if (P.tomorrow.length) out.push(th ? `วันนี้ไม่มีงาน พรุ่งนี้มี ${P.evt(P.tomorrow[0])}` : `No events today; tomorrow brings ${P.evt(P.tomorrow[0])}`);
+  else out.push(th ? 'วันนี้ไม่มีงาน' : 'No events today');
+  for (const [id, age] of P.bd) out.push(th ? `สุขสันต์วันเกิด ${P.mem(id)} ครบ ${age} ปี 🎂` : `Happy birthday to ${P.mem(id)}, ${age} today 🎂`);
+  if (P.ge != null) out.push(P.ge === 0 ? (th ? 'วันนี้คอนเสิร์ตและประกาศผล GE2026' : 'GE2026: the concert and the results are today')
+    : th ? `อีก ${P.ge} วันคอนเสิร์ตและประกาศผล GE2026` : `${P.ge} days to the GE2026 concert and results`);
+  if (P.posts) out.push(th ? `24 ชั่วโมงที่ผ่านมามีโพสต์ iAM48 ${P.posts} โพสต์` : `${P.posts} iAM48 posts in the last 24 hours`);
+  return out.join(th ? ' · ' : '. ') + (th ? '' : '.');
+}
+
+async function briefWrite(env, f, lang) {
+  if (env.AI) for (const model of BRIEF_MODELS[lang]) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const r = await env.AI.run(model, {
+          messages: [{ role: 'system', content: briefPrompt(lang) }, { role: 'user', content: f.facts }],
+          max_tokens: 400, temperature: attempt ? 0.1 : 0.5,
+        });
+        let out = String((r && (r.response ?? r.choices?.[0]?.message?.content)) || '');
+        out = out.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/^["“']|["”']$/g, '').replace(/\s*\n+\s*/g, ' ').trim();
+        if (briefCheck(out, f, lang)) return { text: out, by: model.split('/').pop() };
+      } catch (e) { /* the next try, or the next model */ }
+    }
+  }
+  return { text: briefPlain(f, lang), by: 'plain' };
+}
+
+export async function briefTick(env, now = Date.now()) {
+  if (new Date(now + 7 * 36e5).getUTCHours() < BRIEF_HOUR) return { skipped: 'early' };
+  const today = thaiDay(now);
+  const [was, src, tl] = await Promise.all([env.IAM.get(BRIEF_KEY, 'json'), daysSource(), env.IAM.get(TL_KEY, 'json')]);
+  if (!src || !src.days) return { skipped: 'no-days' };
+  const f = briefFacts(src, today, (tl && tl.posts) || [], now);
+  if (was && was.date === today && was.sig === f.sig) return { kept: true };
+  const [th, en] = await Promise.all([briefWrite(env, f, 'th'), briefWrite(env, f, 'en')]);
+  const body = { date: today, at: new Date(now).toISOString(), sig: f.sig, th: th.text, en: en.text, by: { th: th.by, en: en.by }, refs: f.refs };
+  await env.IAM.put(BRIEF_KEY, JSON.stringify(body));
+  await writeCache(BRIEF_CACHE, body, 300);
+  return { wrote: today, by: body.by };
+}
+async function briefRead(env) {
+  const hit = await readCache(BRIEF_CACHE);
+  if (hit) return hit;
+  const body = (await env.IAM.get(BRIEF_KEY, 'json')) || { date: null };
+  await writeCache(BRIEF_CACHE, body, 300);
+  return body;
+}
+
+/* ถามเว็บได้ — a question typed into the site's search (POST /ask, the question
+ * as plain text). Workers AI only reads it into a query — what is asked about,
+ * whom, when — and the page answers from its own data, so no answer is made up.
+ * The same question is read once a week at most (cached); a visitor asking
+ * very fast is told to slow down. */
+const ASK_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+const ASK_MAX = 140;
+const ASK_ENUMS = {
+  intent: ['events', 'birthdays', 'members', 'songs', 'other'],
+  group: ['bnk48', 'cgm48'],
+  when: ['today', 'tomorrow', 'yesterday', 'this_week', 'this_weekend', 'next_week', 'this_month', 'next_month', 'past', 'upcoming'],
+  sort: ['tallest', 'shortest', 'youngest', 'oldest', 'latest'],
+};
+const askPrompt = (today) => `You read one question typed into the search box of 48thDb, a fan database of BNK48 and CGM48 (Thai idol groups), and turn it into a query. You never answer the question yourself.
+Today is ${today}.
+Reply with JSON only:
+- intent: "events" (shows, events, lives, who performs where or when), "birthdays" (birthdays, ages, who was born when), "members" (finding members by group, generation, team, hometown, hobby, height, blood type), "songs" (songs, singles, albums, who is the center, who sings a song), or "other".
+- members: every member named, copied exactly as typed, letter for letter (Thai or English nicknames). Never translate or romanise a name. [] if none.
+- group: "bnk48" or "cgm48" only when the question names the group, else null.
+- when: "today", "tomorrow", "yesterday", "this_week", "this_weekend", "next_week", "this_month", "next_month", "past", "upcoming" or null.
+- month: 1-12 when a calendar month is named (พฤศจิกายน, พ.ย., November, เดือน 11), else null.
+- gen: the generation (รุ่น 3, 3rd gen → 3) or null.
+- place: a venue, mall or city where an event is held, as typed, else null.
+- center: true only when the question is about being the center (เซ็นเตอร์).
+- hometown: a province or city asked as someone's hometown (มาจาก, บ้านเกิด), else null.
+- hobby: a hobby or thing liked, as typed, else null.
+- sort: "tallest", "shortest", "youngest", "oldest", "latest" or null.
+- words: the name of a song, single, album or event if one is named, else null.`;
+const ASK_SCHEMA = { type: 'object', properties: {
+  intent: { type: 'string', enum: ASK_ENUMS.intent }, members: { type: 'array', items: { type: 'string' } },
+  group: { type: ['string', 'null'] }, when: { type: ['string', 'null'] }, month: { type: ['integer', 'null'] },
+  gen: { type: ['integer', 'null'] }, place: { type: ['string', 'null'] }, center: { type: 'boolean' },
+  hometown: { type: ['string', 'null'] }, hobby: { type: ['string', 'null'] }, sort: { type: ['string', 'null'] }, words: { type: ['string', 'null'] } },
+  required: ['intent', 'members'] };
+const askSeen = new Map();            // per isolate: ip → [asks, since]
+export function askClean(o) {
+  const s = (v) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, 60) : null);
+  const pick = (k) => (ASK_ENUMS[k].includes(o[k]) ? o[k] : null);
+  const n = (v, lo, hi) => (Number.isInteger(v) && v >= lo && v <= hi ? v : null);
+  return {
+    intent: pick('intent') || 'other',
+    members: (Array.isArray(o.members) ? o.members : []).map(s).filter(Boolean).slice(0, 6),
+    group: pick('group'), when: pick('when'), month: n(o.month, 1, 12), gen: n(o.gen, 1, 9),
+    place: s(o.place), center: o.center === true, hometown: s(o.hometown), hobby: s(o.hobby), sort: pick('sort'), words: s(o.words),
+  };
+}
+async function askRead(env, q, ip) {
+  const key = `https://live.state/ask-v1/${encodeURIComponent(q.toLowerCase())}`;
+  const hit = await readCache(key);
+  if (hit) return hit;
+  const now = Date.now(), seen = askSeen.get(ip) || [0, now];
+  if (now - seen[1] > 600000) { seen[0] = 0; seen[1] = now; }
+  if (++seen[0] > 40) throw Object.assign(new Error('slow down'), { status: 429 });
+  askSeen.set(ip, seen);
+  if (askSeen.size > 5000) askSeen.clear();
+  const d = new Date(now + 7 * 36e5);
+  const r = await env.AI.run(ASK_MODEL, {
+    messages: [{ role: 'system', content: askPrompt(`${W_DAYS[d.getUTCDay()]} ${d.getUTCDate()} ${W_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`) }, { role: 'user', content: q }],
+    max_tokens: 200, temperature: 0, response_format: { type: 'json_schema', json_schema: ASK_SCHEMA },
+  });
+  const raw = r && r.response;
+  const body = askClean(typeof raw === 'string' ? JSON.parse(raw) : raw || {});
+  await writeCache(key, body, 7 * 86400);
+  return body;
+}
+
 /* The GE vote on the chain, read for the page (POST /chain). TokenX's explorer
    turned visitors from Thailand away on 13 Oct 2026 (410 Gone, every page),
    while it still answers from abroad — so the page asks here and the Worker
@@ -767,6 +1030,18 @@ export default {
         return say({ error: String((err && err.message) || err) }, 502);
       }
     }
+    if (new URL(request.url).pathname === '/ask') {
+      const say = (body, status) => new Response(JSON.stringify(body), { status, headers: { ...JSON_HEADERS, 'cache-control': 'no-store' } });
+      if (request.method !== 'POST') return say({ error: 'POST only' }, 405);
+      try {
+        if (!env.AI) return say({ error: 'no-ai' }, 503);
+        const q = (await request.text()).replace(/\s+/g, ' ').trim();
+        if (!q || q.length > ASK_MAX) return say({ error: 'bad request' }, 400);
+        return say(await askRead(env, q, request.headers.get('cf-connecting-ip') || ''), 200);
+      } catch (err) {
+        return say({ error: String((err && err.message) || err) }, err && err.status || 502);
+      }
+    }
     if (request.method !== 'GET') {
       return new Response('Method not allowed', { status: 405, headers: JSON_HEADERS });
     }
@@ -775,6 +1050,14 @@ export default {
       const p = url.searchParams.get('p') || '', i = url.searchParams.get('i') || '';
       if (env.HITS && p && hitOk(p, 40) && hitOk(i, 80)) env.HITS.writeDataPoint({ blobs: [p, i], indexes: [p] });
       return new Response(null, { status: 204, headers: { 'access-control-allow-origin': '*', 'cache-control': 'no-store' } });
+    }
+    if (url.pathname === '/brief') {
+      try {
+        const { sig, ...body } = await briefRead(env);
+        return new Response(JSON.stringify(body), { headers: { ...JSON_HEADERS, 'cache-control': 'public, max-age=120' } });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: String((err && err.message) || err) }), { status: 502, headers: JSON_HEADERS });
+      }
     }
     if (url.pathname === '/visits') {
       const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
@@ -840,7 +1123,8 @@ export default {
     // the timeline walk has a cron of its own, so its requests have a budget of their own. Any
     // schedule but the main one is the walk's: after a change of schedule Cloudflare kept firing
     // the old one for over half an hour, under its old name
-    if (event.cron !== MAIN_CRON) { ctx.waitUntil(tlScan(env).catch(() => {})); return; }
+    // the day's note follows the walk, so it counts the posts just found
+    if (event.cron !== MAIN_CRON) { ctx.waitUntil(tlScan(env).catch(() => {}).then(() => briefTick(env)).catch(() => {})); return; }
     const at = new Date(event.scheduledTime);
     const h = at.getUTCHours();
     if (h >= 10 && h <= 16) ctx.waitUntil(check(true).catch(() => {}));
