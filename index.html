@@ -1781,6 +1781,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-theme="dark"] .gal-spot{ mix-blend-mode:screen; opacity:calc(.55 - var(--ad) * .45);
     background:radial-gradient(ellipse 46% 62% at 50% 0%, rgba(255,232,190,.55), rgba(255,220,170,.14) 55%, transparent 72%); }
   .gal-hang{ position:relative; z-index:1; width:100%; perspective:1100px; animation:gal-hang 1.15s cubic-bezier(.3,1.35,.5,1) both; animation-delay:calc(var(--i) * 90ms + .25s); transform-origin:50% -30px; }
+  .gal-bay.is-still .gal-hang{ animation:none; }   /* the far ones are out of sight as the room opens: no swing to run */
   @keyframes gal-hang{ 0%{ opacity:0; transform:translateY(-34px) rotate(-5deg); } 45%{ opacity:1; transform:translateY(0) rotate(2.4deg); } 70%{ transform:rotate(-1.1deg); } 88%{ transform:rotate(.4deg); } 100%{ opacity:1; transform:none; } }
   .gal-frame{
     display:block; width:100%; padding:8px; border:0; border-radius:3px; cursor:zoom-in;
@@ -20383,7 +20384,7 @@ function renderGallery(){
           ${g.note ? `<p>${escapeHtml(en ? g.note.en : g.note.th)}</p>` : ''}
           <span class="gal-walk">${en ? 'WALK THIS WAY' : 'เดินชมทางนี้'} <i>→</i></span>
         </div>
-        ${g.items.map((it, i) => `<figure class="gal-bay${it.w > it.h * 1.15 ? ' is-wide' : ''}" data-i="${i}" style="--i:${Math.min(i, 6)}">
+        ${g.items.map((it, i) => `<figure class="gal-bay${it.w > it.h * 1.15 ? ' is-wide' : ''}${i > 6 ? ' is-still' : ''}" data-i="${i}" style="--i:${Math.min(i, 6)}">
           <span class="gal-spot" aria-hidden="true"></span>
           <div class="gal-hang"><button class="gal-frame" data-action="gal-view" data-id="${g.id}" data-i="${i}" style="--ar:${it.w} / ${it.h}"
             aria-label="${escapeAttr(`${en ? 'View' : 'ดู'} ${galAlt(i, en)}`)}">
@@ -20416,19 +20417,23 @@ function setupGallery(root){
   const intro = track.querySelector('.gal-intro');
   const count = hall.querySelector('.gal-count b'), prog = hall.querySelector('.gal-prog');
   let raf = 0;
+  /* every place is read before anything is written: reading a print's place after writing to
+     the one before made the browser lay the whole wall out again for each of the seventy-odd
+     prints, every frame of a swipe. A print whose turn has not changed is not touched. */
   const paint = () => {
     raf = 0;
     const r = track.getBoundingClientRect(), mid = r.left + r.width / 2;
+    const ds = bays.map(b => { const br = b.getBoundingClientRect(); return Math.max(-1, Math.min(1, (br.left + br.width / 2 - mid) / (br.width * 1.4))); });
     let best = 0, bestD = Infinity;
     bays.forEach((b, i) => {
-      const br = b.getBoundingClientRect();
-      const d = Math.max(-1, Math.min(1, (br.left + br.width / 2 - mid) / (br.width * 1.4)));
-      b.style.setProperty('--d', d.toFixed(3));
-      // the print you are at, and its neighbours, hang as the original file
-      const im = b.querySelector('img[data-full]');
-      if(im && Math.abs(d) < 1){ const full = im.dataset.full; im.removeAttribute('data-full');
-        const pre = new Image(); pre.onload = () => { im.src = full; }; pre.src = full; }
-      b.style.setProperty('--ad', Math.abs(d).toFixed(3));
+      const d = ds[i], v = d.toFixed(3);
+      if(b._d !== v){ b._d = v; b.style.setProperty('--d', v); b.style.setProperty('--ad', Math.abs(d).toFixed(3)); }
+      // the print you are at, and its neighbours, hang as the original file — decoded off to
+      // the side first, so the swap does not stop the swipe while a 2,000-pixel picture unpacks
+      const im = Math.abs(d) < 1 && b.querySelector('img[data-full]');
+      if(im){ const full = im.dataset.full; im.removeAttribute('data-full');
+        const pre = new Image(); pre.src = full;
+        (pre.decode ? pre.decode() : new Promise(ok => { pre.onload = ok; })).then(() => { im.src = full; }, () => {}); }
       if(Math.abs(d) < bestD){ bestD = Math.abs(d); best = i; }
     });
     if(intro){ const ir = intro.getBoundingClientRect(); intro.style.opacity = Math.max(.25, 1 - Math.abs(ir.left + ir.width / 2 - mid) / r.width * 1.3).toFixed(2); }
@@ -21586,7 +21591,9 @@ const FEST = (() => {
     if(slot){ const h = row(); if(slot._h !== h){ slot.innerHTML = h; slot._h = h; } if(ro && watched !== slot){ if(watched) ro.unobserve(watched); ro.observe(slot); watched = slot; } fit(); }
     const t = state.view === 'feed' && !state.query && !isOff() ? today() : null;
     const root = document.documentElement;
-    if(!t){ if(theme){ theme = null; document.querySelectorAll('#fest-cards').forEach(e => e.remove()); delete root.dataset.fest; moonEl.style.display = 'none'; f.clearRect(0, 0, W, H); b.clearRect(0, 0, W, H);
+    if(!t){ if(theme){ theme = null; document.querySelectorAll('#fest-cards').forEach(e => e.remove()); delete root.dataset.fest; moonEl.style.display = 'none';
+      // let go of the screen-sized canvases while away from the home page (the gallery wants the memory); sized again on return
+      for(const c of [fx, bg, starsEl, grassEl]){ c.width = 0; c.height = 0; } W = 0; shownW = 0;
       root.dataset.theme = state.theme; } return; }
     held = !!(state.selectedEvent || state.selectedId || state.posterOf || state.dayOf);
     const night = state.theme === 'dark', next = THEMES[t.id], fresh = !theme || theme.id !== t.id || night !== NIGHT;
