@@ -18779,7 +18779,11 @@ function saveLayout(){
 function setLayout(patch){
   state.layout = { ...(state.layout || {}), ...patch };
   saveLayout();
+  // the whole page is drawn again (the header and menu wear the choice too),
+  // which left the reader at the top; keep them at the card they were using
+  const y = window.scrollY || 0;
   render();
+  scrollPageTo(y);
 }
 function enterLayoutEdit(page){
   if(!canLayout()){ state.view = 'auth'; render(); pushHistory(); return; }
@@ -24922,7 +24926,7 @@ function bindDelegatedEvents(){
     }
     else if(action==='lay-bg') setLayout({ bg:id });
     else if(action==='lay-acc') setLayout({ acc:id });
-    else if(action==='lay-reset-all'){ if(confirm(isEN() ? 'Put the whole site back as it comes?' : 'คืนค่าเดิมทั้งหมด ทั้งหน้าแรก หน้าโปรไฟล์ เมนูล่าง และธีม?')){ state.layout = null; state.navPick = null; saveLayout(); render(); } }
+    else if(action==='lay-reset-all'){ if(confirm(isEN() ? 'Put the whole site back as it comes?' : 'คืนค่าเดิมทั้งหมด ทั้งหน้าแรก หน้าโปรไฟล์ เมนูล่าง และธีม?')){ state.layout = null; state.navPick = null; saveLayout(); const y = window.scrollY || 0; render(); scrollPageTo(y); } }
     else if(action==='signups-refresh'){ el.textContent = 'กำลังโหลด…'; loadSignups(); }
     else if(action==='fb-del'){
       if(!confirm('ลบฟีดแบ็กนี้?')) return;
