@@ -32,6 +32,9 @@ the Firebase CLI from the owner's machine.
   a `PAGE_META` row and a place in `VIEWS` in scripts/make-member-pages.mjs,
   which writes sitemap.xml.
 
+- A page's tab is in its address so a reload lands on it: `/music?c=film` (the Works
+  category), `?d=albums` (its list), `/stats?st=songs` (`urlForSnapshot`, `applyUrlToState`).
+  A new tab on a page needs the same.
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
   handler, and views switched on `state.view`. Sheets (member, event, day,
   poster…) are drawn into `.ov-layer` at the end of `#main`; when only a sheet

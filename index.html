@@ -23305,6 +23305,12 @@ function urlForSnapshot(snap){
   // not one to share, but a reload should land back on it rather than on Home
   else if(snap.view === 'profile') at('profile');
   else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view)) at(snap.view);
+  // the tab a page is on, so a reload (or a shared link) lands on it and not on the first: the Works page's category and
+  // list, the stats tab (nothing else is in the address when a sheet is open over them)
+  if(![...p.keys()].length){
+    if(snap.view === 'discography'){ if(snap.worksCat && snap.worksCat !== 'music') p.set('c', snap.worksCat); if(snap.discTab && snap.discTab !== 'singles') p.set('d', snap.discTab); }
+    else if(snap.view === 'stats' && snap.statsTab && snap.statsTab !== 'overview') p.set('st', snap.statsTab);
+  }
   const q = p.toString();
   return path + (q ? '?' + q : '') ;
 }
@@ -23356,6 +23362,12 @@ function applyUrlToState(){
   if(view === 'profile'){ state.view = 'profile'; return; }
   if(view === 'gallery'){ state.view = 'gallery'; state.galleryId = galRoom(p.get('g') || seg[1]).id; return; }
   if(view && SHAREABLE_VIEWS.includes(view)){ state.view = view; if(view === 'timeline') state.timelineId = 'ge2026'; }
+  if(state.view === 'discography'){
+    const c = p.get('c'), d = p.get('d');
+    if(c && WORKS_CATS.some(x => x.id === c)) state.worksCat = c;
+    if(d && DISC_TABS.some(x => x.id === d)) state.discTab = d;
+  }
+  if(state.view === 'stats'){ const st = p.get('st'); if(st && STATS_TABS.some(x => x.id === st)) state.statsTab = st; }
 }
 
 const BACKUP_FORMAT = '48thdb-oshi-1';
