@@ -70,7 +70,8 @@ the Firebase CLI from the owner's machine.
   another kind of tile — a way into another part of the site (members, singles,
   stats, groups, the GE2026 page, my oshi, member of the day, ask) and nothing the
   home page already shows — from a sheet behind the ⇄ button
-  (`DASH_KINDS`, `openDashKindSheet`, `layout.dash.kinds`); the big results square
+  (`DASH_KINDS`, `openDashKindSheet`, `layout.dash.kinds`); the shop's slot shows the
+  member of the day by default (`DASH_DEFAULT`); the big results square
   stays; ค่าเดิม on the home page resets them too. A new tile needs a
   `data-tile` and a row in `DASH_TILES`.
 - **Biographies.** Each member's sheet has a short biography (IMDb-style)

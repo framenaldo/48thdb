@@ -13236,11 +13236,11 @@ function renderHomeDash(ge){
     rand: sl => { const m = mem.slice().sort((x, y) => qzHash(toYmd(todayStart()) + x.id) - qzHash(toYmd(todayStart()) + y.id))[0];
       return m ? `<button class="dash-t is-rand" data-tile="${sl}" data-kind="rand" data-noloc data-action="open-member" data-id="${m.id}">
         <span class="dash-q-faces is-one">${renderAvatar(m, 'dash-q-face', getGroup(m.groupId).color)}</span>
-        <span class="dash-l">${escapeHtml(nickName(m))}<small>${en ? 'member of the day' : 'เมมเบอร์ประจำวัน'}</small></span></button>` : ''; },
+        <span class="dash-l">${escapeHtml(nickName(m))}<small>${en ? 'a new member each day · tap to open' : 'สุ่มใหม่ทุกวัน · แตะดูโปรไฟล์'}</small></span></button>` : ''; },
     ask: sl => tile(`data-tile="${sl}" data-kind="ask" data-action="focus-search"`, 'is-ask', ICONS.star, '?', en ? 'Ask' : 'ถามเว็บ', en ? 'type a question' : 'พิมพ์คำถาม'),
   };
   const L = (myLayout().dash || {}).kinds || {};
-  const slot = k => `${(kinds[L[k]] || kinds[k])(k)}`;
+  const slot = k => `${(kinds[L[k] || DASH_DEFAULT[k] || k] || kinds[k])(k)}`;
   return `<section class="feed-block feed-dash${ge ? '' : ' no-ge'}"><div class="dash">
     ${square}
     ${slot('quiz')}${slot('cal')}${slot('shop')}${slot('gal')}
@@ -19633,6 +19633,8 @@ const DASH_KINDS = [{ k:'quiz', th:'หาโอชิจากดวง', en:'F
   { k:'gal', th:'แกลเลอรี', en:'Gallery' }, { k:'members', th:'สมาชิกทั้งหมด', en:'All members' }, { k:'work', th:'ซิงเกิลและอัลบั้ม', en:'Songs & albums' },
   { k:'stats', th:'สถิติ', en:'Stats' }, { k:'org', th:'วงและทีม · ผังวง', en:'Groups & org chart' }, { k:'ge', th:'หน้า GE2026', en:'GE2026 page' },
   { k:'me', th:'โอชิของฉัน', en:'My oshi' }, { k:'rand', th:'เมมเบอร์ประจำวัน', en:'Member of the day' }, { k:'ask', th:'ถาม 48thDb (ค้นหาด้วยคำถาม)', en:'Ask 48thDb' }];
+// the member of the day took the shop's tile (the shop is a ☰ menu entry too); the reader can put it back
+const DASH_DEFAULT = { shop:'rand' };
 const DASH_TILES = [{ k:'ge', th:'ผลด่วน', en:'Results' }, { k:'quiz', th:'หาโอชิ', en:'Find your oshi' }, { k:'cal', th:'ปฏิทิน', en:'Calendar' },
   { k:'shop', th:'ร้านค้า', en:'Shop' }, { k:'gal', th:'แกลเลอรี', en:'Gallery' }];
 function dashOrder(){
@@ -19714,7 +19716,7 @@ function leaveLayoutEdit(save){
 function openDashKindSheet(slot){
   if(state.layoutEdit !== 'home') return;
   const en = isEN(), d = state.layoutDraft.dash = state.layoutDraft.dash || {}, kinds = d.kinds = d.kinds || {};
-  const now = kinds[slot] || slot, used = new Set(['quiz', 'cal', 'shop', 'gal'].filter(k => k !== slot).map(k => kinds[k] || k));
+  const def = DASH_DEFAULT[slot] || slot, now = kinds[slot] || def, used = new Set(['quiz', 'cal', 'shop', 'gal'].filter(k => k !== slot).map(k => kinds[k] || DASH_DEFAULT[k] || k));
   closeShareSheet();
   const el = document.createElement('div');
   el.className = 'share-sheet';
@@ -19727,7 +19729,7 @@ function openDashKindSheet(slot){
   requestAnimationFrame(() => el.classList.add('show'));
   el.addEventListener('click', e => {
     const pick = e.target.closest('[data-kind-pick]');
-    if(pick){ kinds[slot] = pick.dataset.kindPick; if(kinds[slot] === slot) delete kinds[slot]; closeShareSheet(); renderMain(); return; }
+    if(pick){ kinds[slot] = pick.dataset.kindPick; if(kinds[slot] === def) delete kinds[slot]; closeShareSheet(); renderMain(); return; }
     if(e.target.closest('[data-share="close"]')) closeShareSheet();
   });
 }
