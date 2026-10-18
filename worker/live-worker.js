@@ -247,7 +247,7 @@ async function iamRecent(env) {
  * whether it is locked to the app ("Exclusive on iAM48"), whose content is not
  * asked for. The gift senders' pictures on the page are fans' — never kept. */
 const TL_KEY = 'tl-v1', TL_CACHE = 'https://live.state/tl-v1', MAIN_CRON = '*/5 * * * *';
-const TL_STEP = 16, TL_FAR = [30, 60, 100], TL_KEEP = 120, TL_KEEP_MS = 7 * 86400000;
+const TL_STEP = 16, TL_FAR = [30, 60, 100, 200], TL_KEEP = 120, TL_KEEP_MS = 7 * 86400000;
 const TL_URL = (n) => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
 
 export function tlText(h) {
@@ -289,6 +289,10 @@ async function tlScan(env) {
   const slices = await Promise.all([...Array(IAM_SLICES).keys()].map((i) => env.IAM.get(`slice:${i}`, 'json')));
   let ahead = 0;
   for (const s of slices) for (const list of Object.values((s && s.members) || {})) for (const v of list) if (v.id > ahead) ahead = v.id;
+  // and the highest number the walk itself has met, kept from run to run: a far look that found a post
+  // past a long run of empty numbers once left the walk waiting at the near end of the gap (18 Oct 2026)
+  const topWas = st.top || 0;
+  ahead = Math.max(ahead, topWas, ...st.posts.map((p) => p.n));
   if (!st.max) { if (!ahead) return { skipped: 'no-start' }; st.max = ahead - 60; }
   const from = st.max, now = Date.now();
   const asks = [...Array(TL_STEP).keys()].map((i) => from + 1 + i).concat(TL_FAR.map((d) => from + d));
@@ -317,9 +321,10 @@ async function tlScan(env) {
   else if (ahead > from && !failed) max = Math.max(max, Math.min(ahead, from + TL_STEP));
   if (failed) max = Math.min(max, failed.n - 1);
   st.max = Math.max(from, max);
+  st.top = Math.max(topWas, ahead);
   st.posts = st.posts.filter((p) => now - Date.parse(p.at) < TL_KEEP_MS).sort((a, b) => b.n - a.n).slice(0, TL_KEEP);
   st.at = new Date(now).toISOString();
-  if (added || st.max !== from || got.some((r) => r.failed)) await env.IAM.put(TL_KEY, JSON.stringify(st));
+  if (added || st.max !== from || st.top !== topWas || got.some((r) => r.failed)) await env.IAM.put(TL_KEY, JSON.stringify(st));
   await writeCache(TL_CACHE, { checked: st.at, posts: st.posts, walk: { max: st.max, last: st.last } }, 60);
   return { from, max: st.max, ahead, added };
 }
