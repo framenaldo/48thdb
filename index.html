@@ -4221,6 +4221,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .svc-btn img{ height:14px; width:auto; display:block; }
   .svc-btn:active{ transform:translateY(2px); box-shadow:none; }
   .svc-btn.is-text{ background:#00A8E1; color:#fff; border-color:#00A8E1; padding:8px 16px; }
+  .svc-btn.is-prime img{ height:18px; }
   .svc-ico{ display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#fff; box-shadow:0 2px 0 rgba(0,0,0,.2); margin:0 6px 0 0; }
   .svc-ico img{ height:15px; width:auto; display:block; }
   .mw-yt{ display:inline-flex; align-items:center; gap:6px; margin:8px 6px 0 0; text-decoration:none; }
@@ -21808,7 +21809,9 @@ function mediaEps(w, en){
 // the badge of each service is a plain mark in its colours, not its logo
 const STREAM_NAME = { netflix:'Netflix', prime:'Prime Video' };
 // services whose logo files are in streaming/ (the rest show their name as text until a logo is sent)
-const STREAM_LOGO = { netflix:true };
+const STREAM_LOGO = { netflix:true, prime:true };
+// those with a round icon as well (the N); the rest use their wordmark, or their name where space is short
+const STREAM_ICON = { netflix:true };
 const STREAM_BADGE = { netflix:'<span class="svc-n" aria-hidden="true">N</span>' };
 function mediaWatch(w, en, small){
   const chip = (href, label, aria) => `<a class="chip chip-link mw-yt${small ? ' is-small' : ''}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(aria)}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>${small ? '' : label}</a>`;
@@ -21818,10 +21821,10 @@ function mediaWatch(w, en, small){
   // a streaming service that still has the title (`watch` on the row): its own badge, dropped when the title leaves
   for(const x of w.watch || []) items.push([x.url, (en ? 'Watch on ' : 'ดูที่ ') + STREAM_NAME[x.svc], x.svc]);
   // the service's own logo: the wordmark on a long button, the N in a round one where space is short
-  const chipSvc = (href, label, svc) => !STREAM_LOGO[svc] ? `<a class="svc-btn is-${svc} is-text" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}"><span>${escapeHtml(label)}</span></a>`
+  const chipSvc = (href, label, svc) => !STREAM_LOGO[svc] || (small && !STREAM_ICON[svc]) ? `<a class="svc-btn is-${svc} is-text" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}"><span>${escapeHtml(label)}</span></a>`
     : small
     ? `<a class="svc-ico is-${svc}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}" title="${escapeAttr(label)}"><img src="streaming/${svc}-n.png" alt="${escapeAttr(STREAM_NAME[svc])}" loading="lazy" decoding="async"></a>`
-    : `<a class="svc-btn is-${svc}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}"><img src="streaming/${svc}-wordmark.png" alt="${escapeAttr(STREAM_NAME[svc])}" loading="lazy" decoding="async"><span>${escapeHtml(label)}</span></a>`;
+    : `<a class="svc-btn is-${svc}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}"><img src="streaming/${svc}-wordmark.${svc === 'prime' ? 'svg' : 'png'}" alt="${escapeAttr(STREAM_NAME[svc])}" loading="lazy" decoding="async"><span>${escapeHtml(label)}</span></a>`;
   return (small ? items.slice(0, 1) : items).map(([href, label, svc]) => svc ? chipSvc(href, label, svc) : chip(href, label, label + ' · ' + w.title)).join('');
 }
 function renderMediaCat(cat){
