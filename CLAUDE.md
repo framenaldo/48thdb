@@ -162,6 +162,12 @@ the Firebase CLI from the owner's machine.
   A roadshow's banner word is TT Ricordi Allegria from Adobe Fonts (kit
   `umx5wsc`, its stylesheet fetched only when a roadshow banner is drawn; the
   script stays as the fallback).
+- A work in the Works page can carry `yt` on its SEED_MEDIA row, the id of a video
+  on the groups' own YouTube channels (BNK48, CGM48, BNK48 and CGM48): a trailer for a
+  film, the full live for a concert or election, the first episode of a show. They were
+  found by searching YouTube by title and taken only from those channels (31 of 187 the
+  first time); a TV show, ad or guest spot on another channel has none. Check a link
+  before trusting one found this way.
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
   then `node scripts/make-poster-grads.mjs` for its sheet colours.

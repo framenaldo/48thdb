@@ -4208,6 +4208,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-tools button{ display:grid; place-items:center; width:30px; height:30px; padding:0; border:0; border-radius:50%; cursor:pointer; color:#fff;
     background:rgba(255,255,255,.14); font-size:18px; font-weight:800; line-height:1; pointer-events:auto !important; }
   .lay-row.is-now{ opacity:.6; }
+  .mw-yt{ display:inline-flex; align-items:center; gap:6px; margin-top:8px; text-decoration:none; }
+  .mw-yt svg{ width:13px; height:13px; color:#E0243A; }
+  .mw-yt.is-small{ margin:0 8px 0 0; padding:6px 8px; }
   /* the big square's other looks: a photo with a shade, or a colour of its own */
   .dash-bk{ justify-content:flex-end; text-align:left; padding:14px; background:linear-gradient(150deg, var(--bk, #E4457E), #1b1224 120%); box-shadow:0 4px 0 rgba(0,0,0,.25); }
   .dash-bk .bk-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
@@ -8219,27 +8222,27 @@ SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
    An event (kind 'event': elections, sports days, festivals, fanmeets) is
    kept the same way. */
 const SEED_MEDIA = [
-  { kind:'film', title:'BNK48: Girls Don\'t Cry', year:2018, by:'GDH', note:'doc', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'cgm-izurina'] },
+  { kind:'film', yt:'XLID310BFog', title:'BNK48: Girls Don\'t Cry', year:2018, by:'GDH', note:'doc', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan', 'cgm-izurina'] },
   { kind:'film', title:'Homestay', year:2018, members:['bnk-cherprang'] },
   { kind:'film', title:'App War', year:2018, members:['bnk-orn'] },
-  { kind:'film', title:'Where We Belong', alt:'ที่ตรงนั้น มีฉันหรือเปล่า', year:2019, by:'BNK48 Film', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-orn', 'bnk-tarwaan', 'bnk-namneung', 'bnk-pupe', 'bnk-faii', 'bnk-panda'], roles:{ 'bnk-jennis':'Sue', 'bnk-music':'Bell', 'bnk-orn':'Mew', 'bnk-tarwaan':'Prae', 'bnk-namneung':'Pahn', 'bnk-pupe':'Pook', 'bnk-faii':'Yok', 'bnk-panda':'Ja-ea' } },
+  { kind:'film', yt:'oN4k4cNlmdw', title:'Where We Belong', alt:'ที่ตรงนั้น มีฉันหรือเปล่า', year:2019, by:'BNK48 Film', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-orn', 'bnk-tarwaan', 'bnk-namneung', 'bnk-pupe', 'bnk-faii', 'bnk-panda'], roles:{ 'bnk-jennis':'Sue', 'bnk-music':'Bell', 'bnk-orn':'Mew', 'bnk-tarwaan':'Prae', 'bnk-namneung':'Pahn', 'bnk-pupe':'Pook', 'bnk-faii':'Yok', 'bnk-panda':'Ja-ea' } },
   { kind:'film', title:'Stratosphere: The Documentary', year:2019, note:'doc', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-faii'] },
   { kind:'film', title:'Thi Baan X BNK48', alt:'ไทบ้าน x BNK48 จากใจผู้สาวคนนี้', year:2020, by:'BNK48 Film', own:true, members:['bnk-kaew', 'bnk-kaimook', 'bnk-mobile', 'bnk-namneung', 'bnk-namsai', 'bnk-noey', 'bnk-pupe', 'bnk-tarwaan'] },
   { kind:'film', title:'Sisters', alt:'กระสือสยาม', year:2019, members:['bnk-mewnich'] },
   { kind:'film', title:'Bear in Mind', year:2019, members:['bnk-korn'] },
-  { kind:'film', title:'Me Before We', year:2019, by:'BNK48 Film', note:'short', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-faii', 'bnk-namneung', 'bnk-panda', 'bnk-tarwaan'] },
-  { kind:'film', title:'One Take', year:2020, by:'Netflix', note:'doc', own:true, members:['bnk-bamboo', 'bnk-cake', 'bnk-cherprang', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-khamin', 'bnk-kheng', 'bnk-korn', 'bnk-maira', 'bnk-mewnich', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-myyu', 'bnk-namneung', 'bnk-namsai', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-oom', 'bnk-orn', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-ratah', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-view', 'bnk-wee', 'cgm-aom'] },
+  { kind:'film', yt:'5769CEZsh9A', title:'Me Before We', year:2019, by:'BNK48 Film', note:'short', own:true, members:['bnk-jennis', 'bnk-music', 'bnk-faii', 'bnk-namneung', 'bnk-panda', 'bnk-tarwaan'] },
+  { kind:'film', yt:'fX1NDyyQJHI', title:'One Take', year:2020, by:'Netflix', note:'doc', own:true, members:['bnk-bamboo', 'bnk-cake', 'bnk-cherprang', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-khamin', 'bnk-kheng', 'bnk-korn', 'bnk-maira', 'bnk-mewnich', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-myyu', 'bnk-namneung', 'bnk-namsai', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-oom', 'bnk-orn', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-ratah', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-view', 'bnk-wee', 'cgm-aom'] },
   { kind:'film', title:'Mother Gamer', alt:'เกมเมอร์ เกมแม่', year:2020, members:['bnk-wee'] },
   { kind:'film', title:'God Bless the Trainees Too!', alt:'ห้าวเป้งจ๋า อย่าแกงน้อง', year:2021, by:'iAM Film', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
-  { kind:'film', title:'THE RA3BIT', year:2022, by:'iAM', note:'short', own:true, members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-mean', 'bnk-monet', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-yayee'] },
-  { kind:'film', title:'The Cheese Sisters', year:2022, by:'iAM Film', own:true, members:['bnk-namneung', 'bnk-noey', 'bnk-pun', 'bnk-jennis', 'bnk-wee', 'bnk-fond', 'cgm-marmink', 'cgm-kaning', 'cgm-angel', 'cgm-nenie'] },
+  { kind:'film', yt:'T2EITga2Cdw', title:'THE RA3BIT', year:2022, by:'iAM', note:'short', own:true, members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-mean', 'bnk-monet', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-yayee'] },
+  { kind:'film', yt:'mFj0tS30IyE', title:'The Cheese Sisters', year:2022, by:'iAM Film', own:true, members:['bnk-namneung', 'bnk-noey', 'bnk-pun', 'bnk-jennis', 'bnk-wee', 'bnk-fond', 'cgm-marmink', 'cgm-kaning', 'cgm-angel', 'cgm-nenie'] },
   { kind:'film', title:'Faces of Anne', alt:'แอน', year:2022, members:['bnk-jennis', 'bnk-music'] },
   { kind:'film', title:'Haunted Universities 2nd Semester', alt:'เทอมสองสยองขวัญ', year:2022, members:['bnk-music'] },
-  { kind:'film', title:'The Fabric', alt:'ผ้าผีบอก', year:2022, members:['bnk-gygee', 'bnk-mobile', 'bnk-namneung', 'bnk-pupe', 'bnk-wee'] },
+  { kind:'film', yt:'0YAvS9eWnRk', title:'The Fabric', alt:'ผ้าผีบอก', year:2022, members:['bnk-gygee', 'bnk-mobile', 'bnk-namneung', 'bnk-pupe', 'bnk-wee'] },
   { kind:'film', title:'SLR', year:2022, members:['bnk-cherprang'] },
   { kind:'series', title:'Self', alt:'เราเห็นนาย', year:2022, by:'Studio Commuan', members:['cgm-ping'] },
   { kind:'film', title:'Taklee Genesis', year:2024, members:['bnk-peak'] },
-  { kind:'film', title:'To Do List', alt:'ไม่อยากให้เป็นครั้งสุดท้าย', year:2025, note:'short', own:true, members:['bnk-pancake', 'cgm-kaning', 'cgm-nenie', 'bnk-hoop', 'cgm-champoo', 'bnk-popper', 'cgm-sita', 'bnk-yoghurt', 'bnk-l', 'bnk-jew', 'bnk-grace', 'bnk-neen'], roles:{ 'bnk-pancake':'Takamiya Mika', 'cgm-kaning':'Eiike Hina', 'cgm-nenie':'Satoaki Hikari', 'bnk-hoop':'Katsushi Suzuka', 'cgm-champoo':'Maihara Renka', 'bnk-popper':'Kaneyoshi Aika', 'cgm-sita':'Masakazu Emi', 'bnk-yoghurt':'Fukune Miho', 'bnk-l':'Kurogane Eri', 'bnk-jew':'Tamaishi Tomomi', 'bnk-grace':'Toyosumi Arisa', 'bnk-neen':'Shirahana Nagisa' } },
+  { kind:'film', yt:'ssSRNpncVT8', title:'To Do List', alt:'ไม่อยากให้เป็นครั้งสุดท้าย', year:2025, note:'short', own:true, members:['bnk-pancake', 'cgm-kaning', 'cgm-nenie', 'bnk-hoop', 'cgm-champoo', 'bnk-popper', 'cgm-sita', 'bnk-yoghurt', 'bnk-l', 'bnk-jew', 'bnk-grace', 'bnk-neen'], roles:{ 'bnk-pancake':'Takamiya Mika', 'cgm-kaning':'Eiike Hina', 'cgm-nenie':'Satoaki Hikari', 'bnk-hoop':'Katsushi Suzuka', 'cgm-champoo':'Maihara Renka', 'bnk-popper':'Kaneyoshi Aika', 'cgm-sita':'Masakazu Emi', 'bnk-yoghurt':'Fukune Miho', 'bnk-l':'Kurogane Eri', 'bnk-jew':'Tamaishi Tomomi', 'bnk-grace':'Toyosumi Arisa', 'bnk-neen':'Shirahana Nagisa' } },
   { kind:'voice', title:'Kamisama Minarai: Himitsu no Cocotama', year:2018, members:['bnk-music'], roles:{ 'bnk-music':'Kokoro Yotsuba' } },
   { kind:'voice', title:'Detective Conan: Fallen Angel of the Highway', year:2026, members:['bnk-hoop'], roles:{ 'bnk-hoop':'Minato Tateoki' } },
   { kind:'series', title:'Be My Boy The Series', alt:'รักแล้วไง...หยุดไม่ได้แล้วล่ะ', year:2018, by:'Channel 5', members:['bnk-jennis'] },
@@ -8266,10 +8269,10 @@ const SEED_MEDIA = [
   { kind:'series', title:'Bussaba Lui Fai', alt:'บุษบาลุยไฟ', year:2023, by:'Thai PBS', members:['bnk-cherprang'], roles:{ 'bnk-cherprang':'Lamjuan' } },
   { kind:'series', title:'Club Friday the Series: Moments & Memories', year:2023, by:'One 31', members:['bnk-cherprang'] },
   { kind:'series', title:'Escape to Homestay', alt:'เพื่อนผมมีมรดกเป็นโฮมสเตย์ครับ', year:2023, members:['bnk-fond'] },
-  { kind:'series', title:'Shock Me Girls', alt:'รักช็อตใจ ยัยช็อตฟีล', year:2026, by:'TikTok', own:true, members:['bnk-monet', 'bnk-praew', 'bnk-grape', 'bnk-marine', 'bnk-janry', 'bnk-niya', 'bnk-wawa', 'bnk-patt', 'bnk-mint', 'bnk-cartoon', 'bnk-mirin', 'bnk-khowjow', 'bnk-luksorn', 'bnk-galeya', 'bnk-blythe', 'bnk-inkcha', 'bnk-mail', 'bnk-micha', 'bnk-sindy', 'bnk-emmy', 'cgm-ploen', 'cgm-nisha', 'bnk-rose'], roles:{ 'bnk-monet':'Georgie', 'bnk-praew':'Mintra', 'bnk-grape':'Saimai', 'bnk-marine':'Sia', 'bnk-janry':'Tawan', 'bnk-niya':'Oil', 'bnk-wawa':'Gungun', 'bnk-patt':'Jubia', 'bnk-mint':'Lunla', 'bnk-cartoon':'Micha', 'bnk-mirin':'Ninja', 'bnk-khowjow':'Anna', 'bnk-luksorn':'Kae', 'bnk-galeya':'Future', 'bnk-blythe':'Bungorn', 'bnk-inkcha':'Jubjang', 'bnk-mail':'Bonus', 'bnk-micha':'Mei', 'bnk-sindy':'Mona', 'bnk-emmy':'Mew', 'cgm-ploen':'Kiwi', 'cgm-nisha':'Keawlin', 'bnk-rose':'Ally' } },
-  { kind:'series', title:'CGM48 Dorm', alt:'CGM48 Dorm มหาสนุก', year:2021, by:'YouTube CGM48', note:'sitcom', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
-  { kind:'show', title:'BNK48 Senpai', year:2017, by:'Channel 3', note:'doc', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
-  { kind:'show', title:'BNK48 Show', year:2017, by:'Channel 3', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+  { kind:'series', yt:'B26d-oTWt4A', title:'Shock Me Girls', alt:'รักช็อตใจ ยัยช็อตฟีล', year:2026, by:'TikTok', own:true, members:['bnk-monet', 'bnk-praew', 'bnk-grape', 'bnk-marine', 'bnk-janry', 'bnk-niya', 'bnk-wawa', 'bnk-patt', 'bnk-mint', 'bnk-cartoon', 'bnk-mirin', 'bnk-khowjow', 'bnk-luksorn', 'bnk-galeya', 'bnk-blythe', 'bnk-inkcha', 'bnk-mail', 'bnk-micha', 'bnk-sindy', 'bnk-emmy', 'cgm-ploen', 'cgm-nisha', 'bnk-rose'], roles:{ 'bnk-monet':'Georgie', 'bnk-praew':'Mintra', 'bnk-grape':'Saimai', 'bnk-marine':'Sia', 'bnk-janry':'Tawan', 'bnk-niya':'Oil', 'bnk-wawa':'Gungun', 'bnk-patt':'Jubia', 'bnk-mint':'Lunla', 'bnk-cartoon':'Micha', 'bnk-mirin':'Ninja', 'bnk-khowjow':'Anna', 'bnk-luksorn':'Kae', 'bnk-galeya':'Future', 'bnk-blythe':'Bungorn', 'bnk-inkcha':'Jubjang', 'bnk-mail':'Bonus', 'bnk-micha':'Mei', 'bnk-sindy':'Mona', 'bnk-emmy':'Mew', 'cgm-ploen':'Kiwi', 'cgm-nisha':'Keawlin', 'bnk-rose':'Ally' } },
+  { kind:'series', yt:'Kym9UktISPQ', title:'CGM48 Dorm', alt:'CGM48 Dorm มหาสนุก', year:2021, by:'YouTube CGM48', note:'sitcom', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+  { kind:'show', yt:'Jic6MsUagUU', title:'BNK48 Senpai', year:2017, by:'Channel 3', note:'doc', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
+  { kind:'show', yt:'jDTSy98flmg', title:'BNK48 Show', year:2017, by:'Channel 3', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
   { kind:'show', title:'Victory BNK48', year:2018, by:'Workpoint TV', own:true, members:['bnk-bamboo', 'bnk-cake', 'bnk-can', 'bnk-cherprang', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-khamin', 'bnk-kheng', 'bnk-korn', 'bnk-maira', 'bnk-maysa', 'bnk-mewnich', 'bnk-mind', 'bnk-minmin', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-myyu', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-nink', 'bnk-noey', 'bnk-oom', 'bnk-orn', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-ratah', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-view', 'bnk-wee', 'cgm-aom', 'cgm-izurina'] },
   { kind:'show', title:'BNK48 Senpai: 2nd Generation', year:2018, by:'Workpoint TV', note:'doc', own:true, members:['bnk-bamboo', 'bnk-cake', 'bnk-deenee', 'bnk-faii', 'bnk-fifa', 'bnk-fond', 'bnk-gygee', 'bnk-june', 'bnk-khamin', 'bnk-kheng', 'bnk-maira', 'bnk-mewnich', 'bnk-minmin', 'bnk-myyu', 'bnk-natherine', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-oom', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-ratah', 'bnk-stang', 'bnk-view', 'bnk-wee', 'cgm-aom'] },
   { kind:'show', title:'Phuean Ruam Thang the Journey', alt:'เพื่อนร่วมทางเดอะเจอร์นีย์', year:2018, by:'MCOT HD', members:['bnk-jan', 'bnk-kaew', 'bnk-pun', 'bnk-tarwaan'] },
@@ -8280,22 +8283,22 @@ const SEED_MEDIA = [
   { kind:'show', title:'ii ne Japan', year:2019, by:'MCOT HD', members:['bnk-noey', 'bnk-namneung', 'bnk-miori', 'bnk-phukkhom', 'cgm-aom', 'bnk-cake'] },
   { kind:'show', title:'The Ska X BNK48', year:2019, by:'YouTube', members:['bnk-bamboo', 'bnk-maira', 'bnk-gygee', 'bnk-kaimook', 'bnk-mobile', 'bnk-pupe'] },
   { kind:'show', title:'Fun x Fun Japan!', year:2019, by:'GMM 25', members:['bnk-music', 'bnk-jane'] },
-  { kind:'show', title:'girls guide ไปโตยกั๋น', year:2019, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
-  { kind:'show', title:'BNK48 Senpai: 3rd Generation', year:2020, by:'AIS Play', note:'doc', own:true, members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-jaokhem', 'bnk-jeje', 'bnk-kaofrang', 'bnk-mean', 'bnk-monet', 'bnk-paeyah', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-popper', 'bnk-yayee', 'bnk-yoghurt'] },
-  { kind:'show', title:'CGM48 Senpai', year:2020, by:'AIS Play', note:'doc', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
-  { kind:'show', title:'Speedy Quiz ถามไวตอบได้', year:2020, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
+  { kind:'show', yt:'Y1TZeNGH4l4', title:'girls guide ไปโตยกั๋น', year:2019, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
+  { kind:'show', yt:'Jic6MsUagUU', title:'BNK48 Senpai: 3rd Generation', year:2020, by:'AIS Play', note:'doc', own:true, members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-jaokhem', 'bnk-jeje', 'bnk-kaofrang', 'bnk-mean', 'bnk-monet', 'bnk-paeyah', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-popper', 'bnk-yayee', 'bnk-yoghurt'] },
+  { kind:'show', yt:'fGFgEWdXer0', title:'CGM48 Senpai', year:2020, by:'AIS Play', note:'doc', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
+  { kind:'show', yt:'S3zWjQbTXBU', title:'Speedy Quiz ถามไวตอบได้', year:2020, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
   { kind:'show', title:'Daily Life From Home', year:2020, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
   { kind:'show', title:'เที่ยวมั้ยครับ ประเทศไทย', year:2020, by:'Bie The Ska', note:'guest', members:['cgm-fortune', 'cgm-marmink', 'cgm-nena'] },
   { kind:'show', title:'CGM48 Stand By Me', year:2021, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
   { kind:'show', title:'CGM48 We Will...From Home', year:2021, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
-  { kind:'show', title:'INDY CAMP', year:2021, by:'YouTube BNK48', own:true, members:['cgm-fortune', 'cgm-marmink', 'cgm-pepo'] },
-  { kind:'show', title:'CGM48 Teach tips ซ.จ.อ.สอนทิพย์', year:2021, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
-  { kind:'show', title:'CGM48 2nd Generation The Journey', year:2023, by:'YouTube CGM48', note:'doc', own:true, members:['cgm-emma', 'cgm-ginna', 'cgm-jingjing', 'cgm-lookked', 'cgm-nana', 'cgm-papang', 'cgm-twobam'] },
+  { kind:'show', yt:'xbzWEnq9Bw8', title:'INDY CAMP', year:2021, by:'YouTube BNK48', own:true, members:['cgm-fortune', 'cgm-marmink', 'cgm-pepo'] },
+  { kind:'show', yt:'xYgt0yDSfAw', title:'CGM48 Teach tips ซ.จ.อ.สอนทิพย์', year:2021, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
+  { kind:'show', yt:'aKWIlbil2lE', title:'CGM48 2nd Generation The Journey', year:2023, by:'YouTube CGM48', note:'doc', own:true, members:['cgm-emma', 'cgm-ginna', 'cgm-jingjing', 'cgm-lookked', 'cgm-nana', 'cgm-papang', 'cgm-twobam'] },
   { kind:'show', title:'GENERATION CHANGE', alt:'Documentary of CGM48 3rd Generation', year:2025, by:'YouTube CGM48', note:'doc', own:true, members:['cgm-kwan', 'cgm-lingling', 'cgm-ploen', 'cgm-prae', 'cgm-runma'] },
   { kind:'show', title:'CGM48 โฮะ!!', year:2025, by:'YouTube CGM48', own:true, whole:'cgm48', members:[] },
   { kind:'show', title:'LYRAlity Show', year:2020, by:'YouTube', members:['bnk-noey', 'bnk-pun'] },
   { kind:'show', title:'Shine Boys', year:2026, note:'guest-syr3n', members:['bnk-hoop', 'bnk-pancake'] },
-  { kind:'concert', title:'BNK48 We Love You', year:2017, by:'Quartier Water Garden, The EmQuartier, Bangkok', note:'kidcat', own:true, whole:'bnk48', date:'2017-09-23', members:[] },
+  { kind:'concert', yt:'zb5oAc3yJME', title:'BNK48 We Love You', year:2017, by:'Quartier Water Garden, The EmQuartier, Bangkok', note:'kidcat', own:true, whole:'bnk48', date:'2017-09-23', members:[] },
   { kind:'concert', title:'BNK48 Mini Live and Handshake', year:2017, by:'Kamphaeng Phet Auditorium, J.J Mall, Bangkok', note:'grad', own:true, date:'2017-11-18', members:['bnk-cincin'] },
   { kind:'concert', title:'BNK48 1st Concert "STARTO"', year:2018, by:'BITEC Hall 106, Bangkok', own:true, whole:'bnk48', date:'2018-03-31', end:'2018-04-01', members:[] },
   { kind:'concert', title:'AKB48 53rd Single World Senbatsu General Election Concert', year:2018, by:'Nagoya Dome, Nagoya', note:'akb', whole:'bnk48', date:'2018-06-16', members:[] },
@@ -8316,8 +8319,8 @@ const SEED_MEDIA = [
   { kind:'concert', title:'BNK48 Wonderland', year:2020, by:'Ultra Arena Hall, Show DC, Bangkok', note:'election', own:true, whole:'bnk48', date:'2020-07-26', members:[] },
   { kind:'concert', title:'Live GrabFood AGENTS OF S.A.L.E – FINAL MISSION', year:2021, by:'Grab Thailand Facebook and YouTube', note:'online', whole:'bnk48', date:'2021-06-22', members:[] },
   { kind:'concert', title:'AKB48 Group Asia Festival 2021 ONLINE', year:2021, by:'Tokyo Dome City Hall, Tokyo', note:'akb-online', whole:'both', date:'2021-06-27', members:[] },
-  { kind:'concert', title:'BNK48 3rd Generation: THE DE3UT', year:2022, by:'Event Area, CentralWorld, Bangkok', note:'gen', own:true, date:'2022-02-07', members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-jaokhem', 'bnk-kaofrang', 'bnk-mean', 'bnk-monet', 'bnk-paeyah', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-popper', 'bnk-yayee', 'bnk-yoghurt'] },
-  { kind:'concert', title:'BNK48 11th Single "Sayonara Crawl" First Performance', year:2022, by:'Asiatique The Riverfront, Bangkok', note:'first', own:true, whole:'bnk48', date:'2022-03-20', members:[] },
+  { kind:'concert', yt:'TMsPu1YbD2E', title:'BNK48 3rd Generation: THE DE3UT', year:2022, by:'Event Area, CentralWorld, Bangkok', note:'gen', own:true, date:'2022-02-07', members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-jaokhem', 'bnk-kaofrang', 'bnk-mean', 'bnk-monet', 'bnk-paeyah', 'bnk-pampam', 'bnk-pancake', 'bnk-peak', 'bnk-pim', 'bnk-popper', 'bnk-yayee', 'bnk-yoghurt'] },
+  { kind:'concert', yt:'S2cSVnsKC7s', title:'BNK48 11th Single "Sayonara Crawl" First Performance', year:2022, by:'Asiatique The Riverfront, Bangkok', note:'first', own:true, whole:'bnk48', date:'2022-03-20', members:[] },
   { kind:'concert', title:'INDY CAMP Festival Concert 01', year:2022, by:'ChangChui Creative Park, Bangkok', own:true, whole:'both', date:'2022-08-21', members:[] },
   { kind:'concert', title:'BNK48 & CGM48 Request Hour 2022', year:2022, by:'Union Hall, Union Mall, Bangkok', note:'request', own:true, whole:'both', date:'2022-10-30', members:[] },
   { kind:'concert', title:'BNK48 1st Gen Special Single "Jiwaru DAYS" First Performance', year:2022, by:'Riverside, Terminal 21 Rama 3, Bangkok', note:'first', own:true, date:'2022-11-20', members:['bnk-cherprang', 'bnk-jaa', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-korn', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
@@ -8332,18 +8335,18 @@ const SEED_MEDIA = [
   { kind:'concert', title:'Miori BNK48\'s Graduation Ceremony & BNK48 ChristmaS Party', year:2023, by:'SF World Cinema, CentralWorld, Bangkok', note:'grad', own:true, date:'2023-12-25', members:['bnk-miori'] },
   { kind:'concert', title:'CGM48 Concert "Memory of Flowers" & Aom\'s Graduation Ceremony', year:2024, by:'Centerpoint Studio, Bangkok', note:'grad', own:true, date:'2024-04-27', members:['cgm-aom'] },
   { kind:'concert', title:'BNK48 2nd Generation Graduation Concert "Last Season"', year:2024, by:'Centerpoint Studio, Bangkok', note:'gengrad', own:true, date:'2024-04-28', members:['bnk-fond', 'bnk-gygee', 'bnk-khamin', 'bnk-minmin', 'bnk-myyu', 'bnk-new', 'bnk-niky', 'bnk-nine', 'bnk-pakwan', 'bnk-panda', 'bnk-phukkhom', 'bnk-ratah', 'bnk-stang', 'bnk-wee'] },
-  { kind:'concert', title:'Voices of BNK48 Showcase', year:2024, by:'Ultra Arena Bravo BKK, Bangkok', own:true, whole:'bnk48', date:'2024-06-23', members:[] },
+  { kind:'concert', yt:'veRxF5Dt9GU', title:'Voices of BNK48 Showcase', year:2024, by:'Ultra Arena Bravo BKK, Bangkok', own:true, whole:'bnk48', date:'2024-06-23', members:[] },
   { kind:'concert', title:'Paeyah BNK48\'s Graduation Ceremony', year:2024, by:'Ultra Arena Bravo BKK, Bangkok', note:'grad', own:true, date:'2024-06-23', members:['bnk-paeyah'] },
   { kind:'concert', title:'BNK48 Music Box – First Live Concert "Journey of กล่องเสียงของฉัน"', year:2024, by:'Mr.FOX Live House, Bangkok', own:true, whole:'bnk48', date:'2024-08-31', members:[] },
   { kind:'concert', title:'BNK48 17th Single "BORDERLESS" Special Performance', year:2024, by:'Siam Paragon, Bangkok', note:'first', own:true, whole:'bnk48', date:'2024-09-01', members:[] },
-  { kind:'concert', title:'BNK48 & CGM48 Request Hour 2024', year:2024, by:'Centerpoint Studio, Bangkok', note:'request', own:true, whole:'both', date:'2024-09-15', members:[] },
+  { kind:'concert', yt:'oaolMqMYXiI', title:'BNK48 & CGM48 Request Hour 2024', year:2024, by:'Centerpoint Studio, Bangkok', note:'request', own:true, whole:'both', date:'2024-09-15', members:[] },
   { kind:'concert', title:'Fortune CGM48\'s Graduation Ceremony', year:2024, by:'MUAN MORE SPACE, Chiang Mai', note:'grad', own:true, date:'2024-10-13', members:['cgm-fortune'] },
   { kind:'concert', title:'Izurina CGM48\'s Graduation Concert ~Thuk Khon Arigatou~', year:2024, by:'Ultra Arena Bravo BKK, Bangkok', note:'grad', own:true, date:'2024-11-30', members:['cgm-izurina'] },
   { kind:'concert', title:'Satchan BNK48\'s Graduation Ceremony', year:2024, by:'Major Cineplex Ratchayothin, Bangkok', note:'grad', own:true, date:'2024-12-25', members:['bnk-satchan'] },
   { kind:'concert', title:'BNK48 & CGM48 Concert "BATTLE OF LEGACY"', year:2025, by:'Union Hall, Union Mall, Bangkok', own:true, whole:'both', date:'2025-03-29', members:[] },
   { kind:'concert', title:'BNK48 "Rabbit in Borderland" The Musical', year:2025, by:'Ultra Arena Bravo BKK, Bangkok', note:'musical', own:true, date:'2025-08-09', members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-fame', 'bnk-grace', 'bnk-hoop', 'bnk-kaofrang', 'bnk-mean', 'bnk-monet', 'bnk-pancake', 'bnk-peak', 'bnk-popper', 'bnk-yayee', 'bnk-yoghurt'] },
   { kind:'concert', title:'Popper BNK48\'s Graduation Ceremony "Last Flight"', year:2025, by:'Ultra Arena Bravo BKK, Bangkok', note:'grad', own:true, date:'2025-08-09', members:['bnk-popper'] },
-  { kind:'concert', title:'BNK48 & CGM48 Concert "CHAPTER: NEXT"', year:2025, by:'MCC Hall, The Mall Lifestore Bangkapi, Bangkok', own:true, whole:'both', date:'2025-08-23', members:[] },
+  { kind:'concert', yt:'59J63MLyi2o', title:'BNK48 & CGM48 Concert "CHAPTER: NEXT"', year:2025, by:'MCC Hall, The Mall Lifestore Bangkapi, Bangkok', own:true, whole:'both', date:'2025-08-23', members:[] },
   { kind:'concert', title:'CGM48 1st Generation Graduation Concert "The Final Station...MINATO 39"', year:2025, by:'The Mall Lifestore Bangkapi, Bangkok', note:'gengrad', own:true, date:'2025-08-24', members:['cgm-angel', 'cgm-champoo', 'cgm-fahsai', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-nena', 'cgm-nenie', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
   { kind:'concert', title:'BNK48 3rd Generation Graduation Concert "Once Upon a Time... The Rabbits Were Born"', year:2026, by:'Island Hall, Fashion Island, Bangkok', note:'gengrad', own:true, date:'2026-03-01', members:['bnk-earn', 'bnk-earth', 'bnk-eve', 'bnk-grace', 'bnk-kaofrang', 'bnk-mean', 'bnk-peak', 'bnk-yayee'] },
   { kind:'concert', title:'Runma CGM48\'s Farewell & Graduation Ceremony', year:2026, by:'MUAN MORE SPACE, Chiang Mai', note:'grad', own:true, date:'2026-03-07', members:['cgm-runma'] },
@@ -8360,17 +8363,17 @@ const SEED_MEDIA = [
   { kind:'event', title:'เทศกาลกีฬาบางกอก๔๘', alt:'BNK48 Sports Day', year:2019, by:'Indoor Stadium Huamark, Bangkok', note:'sports', own:true, whole:'bnk48', date:'2019-09-07', members:[] },
   { kind:'event', title:'Mimigumo 1st Fanmeet "Secret of Mimigumo"', year:2019, by:'KBank Siam Pic-Ganesha Theatre, Bangkok', note:'fanmeet', own:true, date:'2019-12-21', end:'2019-12-22', members:['bnk-jaa', 'bnk-kaimook', 'bnk-music'] },
   { kind:'event', title:'BNK48 9th Single Senbatsu General Election', year:2020, by:'BNK48 Digital Live Studio, MBK Center · online', note:'ge', own:true, whole:'both', date:'2020-04-19', members:[] },
-  { kind:'event', title:'BNK48 Janken Tournament 2020', year:2020, by:'Union Mall, Bangkok', note:'janken', own:true, whole:'bnk48', date:'2020-09-26', members:[] },
+  { kind:'event', yt:'CJZdKbXYFqI', title:'BNK48 Janken Tournament 2020', year:2020, by:'Union Mall, Bangkok', note:'janken', own:true, whole:'bnk48', date:'2020-09-26', members:[] },
   { kind:'event', title:'Pokémon UNITE AKB48 Group Invitational', year:2022, by:'online', note:'esports', whole:'both', date:'2022-01-08', members:[] },
   { kind:'event', title:'Charaline 1st Fanmeet "Verb of Feeling"', year:2022, by:'Union Mall, Bangkok', note:'fanmeet', own:true, whole:'bnk48', date:'2022-02-12', end:'2022-02-13', members:[] },
-  { kind:'event', title:'BNK48 12th Single Senbatsu General Election', year:2022, by:'Union Mall, Bangkok', note:'ge', own:true, whole:'both', date:'2022-04-09', members:[] },
+  { kind:'event', yt:'eurN9ttoHO8', title:'BNK48 12th Single Senbatsu General Election', year:2022, by:'Union Mall, Bangkok', note:'ge', own:true, whole:'both', date:'2022-04-09', members:[] },
   { kind:'event', title:'งานกีฬาสีอนุบาลหนูน้อย48 2022', year:2022, by:'Thunder Dome, Muang Thong Thani', note:'sports', own:true, whole:'both', date:'2022-09-10', members:[] },
   { kind:'event', title:'BNK48 Janken Tournament 2023', year:2023, by:'Union Mall, Bangkok', note:'janken', own:true, whole:'bnk48', date:'2023-04-09', members:[] },
   { kind:'event', title:'BNK48 & CGM48 Fan Festival 2023', year:2023, by:'Union Hall, Union Mall, Bangkok', note:'fanfest', own:true, whole:'both', date:'2023-12-02', end:'2023-12-03', members:[] },
-  { kind:'event', title:'BNK48 16th Single Senbatsu General Election', year:2023, by:'Union Hall, Union Mall, Bangkok', note:'ge', own:true, whole:'both', date:'2023-12-09', members:[] },
-  { kind:'event', title:'BNK48 7th Anniversary', year:2024, by:'Royal Park Plaza, Paradise Park, Bangkok', note:'anniv', own:true, whole:'bnk48', date:'2024-06-01', end:'2024-06-02', members:[] },
+  { kind:'event', yt:'4EGrHyXIvf0', title:'BNK48 16th Single Senbatsu General Election', year:2023, by:'Union Hall, Union Mall, Bangkok', note:'ge', own:true, whole:'both', date:'2023-12-09', members:[] },
+  { kind:'event', yt:'MsQWAO8unOg', title:'BNK48 7th Anniversary', year:2024, by:'Royal Park Plaza, Paradise Park, Bangkok', note:'anniv', own:true, whole:'bnk48', date:'2024-06-01', end:'2024-06-02', members:[] },
   { kind:'event', title:'365-Nichi no Kamihikouki – 365 วันกับเครื่องบินกระดาษ (2024 ver.) Final Results Announcement', year:2024, by:'LG Floor - Caribbean Village, Terminal21 Rama3, Bangkok', note:'poll', own:true, whole:'bnk48', date:'2024-07-02', members:[] },
-  { kind:'event', title:'BNK48 & CGM48 Sports Day 2024 NEKO WARS', year:2024, by:'Gymnasium 4, Thammasat University Rangsit', note:'sports', own:true, whole:'both', date:'2024-07-28', members:[] },
+  { kind:'event', yt:'OtmO5rM_pj0', title:'BNK48 & CGM48 Sports Day 2024 NEKO WARS', year:2024, by:'Gymnasium 4, Thammasat University Rangsit', note:'sports', own:true, whole:'both', date:'2024-07-28', members:[] },
   { kind:'event', title:'Japan Expo Thailand 2025', year:2025, by:'CentralWorld, Bangkok', note:'expo', whole:'both', date:'2025-02-07', end:'2025-02-09', members:[] },
   { kind:'event', title:'BNK48 & CGM48 Senbatsu General Election 2025', year:2025, by:'Union Hall, Union Mall, Bangkok', note:'ge', own:true, whole:'both', date:'2025-03-29', members:[] },
   { kind:'event', title:'48EXPO -8th Anniversary-', year:2025, by:'MCC Hall, The Mall Lifestore Bangkapi, Bangkok', note:'anniv', own:true, whole:'both', date:'2025-05-31', end:'2025-06-02', members:[] },
@@ -8391,7 +8394,7 @@ const SEED_MEDIA = [
   { kind:'ad', title:'Yayoi Japanese Restaurant', year:2018, by:'MK Restaurant Group', whole:'bnk48', members:[] },
   { kind:'ad', title:'TruePoint × BNK48', year:2018, by:'True Corporation', whole:'bnk48', members:[] },
   { kind:'ad', title:'Fujifilm X-A5', year:2018, by:'Fujifilm Thailand', whole:'bnk48', members:[] },
-  { kind:'ad', title:'BNK48 × Changsuek', year:2018, by:'Football Association of Thailand', whole:'bnk48', members:[] },
+  { kind:'ad', yt:'lHWThIEnZ5w', title:'BNK48 × Changsuek', year:2018, by:'Football Association of Thailand', whole:'bnk48', members:[] },
   { kind:'ad', title:'Jele Beautie × BNK48', year:2018, by:'S.N.N.P. Intertrade', whole:'bnk48', members:[] },
   { kind:'ad', title:'Lactasoy × BNK48', year:2018, by:'Lactasoy', whole:'bnk48', members:[] },
   { kind:'ad', title:'Samsung Galaxy J8 × BNK48', year:2018, by:'Samsung Thailand', whole:'bnk48', members:[] },
@@ -10540,7 +10543,7 @@ function renderMemberMedia(m){
     return `<div class="work-row md-row" style="--k:${c}"><span class="work-main">
         <span class="work-track" data-noloc>${escapeHtml(w.title)}${w.alt ? ` <small class="md-alt">${escapeHtml(w.alt)}</small>` : ''}</span>
         <span class="work-from" data-noloc>${bits.map(x => escapeHtml(String(x))).join(' · ')}</span></span>
-      <span class="md-kind">${en ? enl : th}</span></div>`;
+      ${w.yt ? mediaWatch(w, en, true) : ''}<span class="md-kind">${en ? enl : th}</span></div>`;
   };
   const kinds = Object.keys(MEDIA_KIND).filter(k => n[k]).map(k => `<span class="md-n">${MEDIA_KIND[k][en ? 1 : 0]} ${n[k]}</span>`).join(' · ');
   return `<h3 class="section-label">${en ? 'Other work' : 'ผลงานอื่น'}</h3>
@@ -21772,6 +21775,13 @@ const groupInYear = (m, year) => { const iso = `${year || new Date().getFullYear
   return t ? t.groupId : m.groupId; };
 const mediaGroups = w => [...new Set([...w.members.map(getMember).filter(Boolean).map(m => groupInYear(m, w.year)),
   ...(w.whole === 'both' ? ['bnk48', 'cgm48'] : w.whole ? [w.whole] : [])])];
+/* A work's video on the group's own YouTube channel (`yt` on its SEED_MEDIA row, the video's id): a
+   trailer for a film, the live for a concert, the first episode of a show. */
+const mediaWatchLabel = w => ({ film:['ดูตัวอย่าง', 'Trailer'], concert:['ดูย้อนหลัง', 'Watch the live'], event:['ดูย้อนหลัง', 'Watch'], show:['ดูตอนแรก', 'First episode'], series:['ดูตอนแรก', 'First episode'] }[w.kind] || ['ดูบน YouTube', 'Watch']);
+function mediaWatch(w, en, small){
+  const [th, e] = mediaWatchLabel(w), href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(w.yt);
+  return `<a class="chip chip-link mw-yt${small ? ' is-small' : ''}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr((en ? e : th) + ' · ' + w.title)}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>${small ? '' : (en ? e : th)}</a>`;
+}
 function renderMediaCat(cat){
   const en = isEN(), inGroup = w => state.groupFilter === 'all' || mediaGroups(w).includes(state.groupFilter);
   const list = SEED_MEDIA.filter(w => mediaCat(w) === cat && inGroup(w))
@@ -21798,6 +21808,7 @@ function renderMediaCat(cat){
       <div class="timeline-title" data-noloc>${escapeHtml(w.title)}${w.alt ? ` <span class="title-alt">${escapeHtml(w.alt)}</span>` : ''}</div>
       ${who}
       ${w.ev && SEED_SCHEDULE.some(e => e.id === w.ev) ? `<button class="chip chip-link mw-ev" data-action="open-event" data-id="${w.ev}">${en ? 'The event →' : 'ดูงานนี้ →'}</button>` : ''}
+      ${w.yt ? mediaWatch(w, en) : ''}
     </div>`;
   };
   const parts = MEDIA_SORTS[cat] || [['', '', () => true]], used = new Set();
