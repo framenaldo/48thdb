@@ -67,8 +67,9 @@ the Firebase CLI from the owner's machine.
   shop, gallery), picked up where it is — a held press on a phone, a drag with a mouse —
   and carried over the others (`tileDown`…`tileDrop`), with an eye in its corner
   (`applyDash`, `dash-toggle`). Each small slot (quiz, cal, shop, gal) also takes
-  another kind of tile — countdown to the results, next birthday, the Kami Oshi's
-  next event, latest on iAM48, the live vote — from a sheet behind the ⇄ button
+  another kind of tile — a way into another part of the site (members, singles,
+  stats, groups, the GE2026 page, my oshi, member of the day, ask) and nothing the
+  home page already shows — from a sheet behind the ⇄ button
   (`DASH_KINDS`, `openDashKindSheet`, `layout.dash.kinds`); the big results square
   stays; ค่าเดิม on the home page resets them too. A new tile needs a
   `data-tile` and a row in `DASH_TILES`.
