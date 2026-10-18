@@ -62,6 +62,11 @@ the Firebase CLI from the owner's machine.
   Zones are matched by class (home) or `data-zone` (profile) and ordered with
   CSS `order`, so a new home section needs a row in `LAYOUT_ZONES.home` or it
   can't be moved.
+- **Dashboard tiles** are arranged one by one while arranging the home page:
+  `layout.dash = { order, hidden }` over `DASH_TILES` (results, quiz, calendar,
+  shop, gallery), each tile showing ‹ eye › (`applyDash`, `dash-move`,
+  `dash-toggle`); ค่าเดิม on the home page resets them too. A new tile needs a
+  `data-tile` and a row in `DASH_TILES`.
 - **Biographies.** Each member's sheet has a short biography (IMDb-style)
   that anyone signed in can write: the owner's goes up at once, everyone
   else's waits in `pending/` (kind `bio`). Stored in Firestore

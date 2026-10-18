@@ -4200,6 +4200,16 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .lay-editing [data-zone] > :not(.lay-tools):not(.lay-tag){ pointer-events:none; }
   .lay-editing .lay-hidden{ outline-color:#A39CAB; }
   .lay-editing .lay-hidden > :not(.lay-tools):not(.lay-tag){ opacity:.35; filter:grayscale(1); }
+  .dash-t.dash-off, .dash-ge.dash-off{ display:none; }
+  .lay-editing .dash-t.dash-off, .lay-editing .dash-ge.dash-off{ display:flex; }
+  .lay-editing .dash-off > :not(.dash-tools){ opacity:.3; filter:grayscale(1); }
+  .dash-tools{ position:absolute; left:50%; bottom:6px; transform:translateX(-50%); z-index:6; display:flex; gap:4px; padding:3px; border-radius:99px;
+    background:rgba(35,27,43,.88); pointer-events:auto !important; }
+  .dash-tools button{ display:grid; place-items:center; width:28px; height:28px; padding:0; border:0; border-radius:50%; cursor:pointer; color:#fff;
+    background:rgba(255,255,255,.14); font-size:18px; font-weight:800; line-height:1; pointer-events:auto !important; }
+  .dash-tools button[disabled]{ opacity:.3; cursor:default; }
+  .dash-tools svg{ width:16px; height:16px; }
+  .lay-editing .dash > [data-tile]{ pointer-events:none; }
   .lay-tag{ position:absolute; top:-16px; left:6px; z-index:6; padding:3px 10px; border-radius:99px; background:#E4457E; color:#fff; font-size:11.5px; font-weight:800; box-shadow:0 3px 0 #B32F60; }
   .lay-hidden > .lay-tag{ background:#8E8697; box-shadow:0 3px 0 #6A6372; }
   .lay-tools{ position:absolute; top:-18px; right:6px; z-index:6; display:flex; gap:6px; }
@@ -13189,7 +13199,7 @@ function renderHomeDash(ge){
       <span class="dash-i">${icon}</span><b class="dash-big">${big}</b><span class="dash-l">${label}${small ? `<small>${small}</small>` : ''}</span></button>`;
   const shops = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
   const room = GALLERY[GALLERY.length - 1], cover = room && room.items[0] ? `${room.dir}${room.items[0].f}-s.jpg` : '';
-  const square = ge ? (({ round, told, hhmm, top }) => `<button class="dash-ge" data-action="open-ge-results">
+  const square = ge ? (({ round, told, hhmm, top }) => `<button class="dash-ge" data-tile="ge" data-action="open-ge-results">
       <span class="dash-ge-top"><b>${geRoundLabel(round)}</b>${hhmm ? `<small>${en ? 'Updated' : 'อัปเดต'} ${hhmm}${en ? '' : ' น.'}</small>` : ''}</span>
       <span class="dash-rows">${top.map(({ n, m, v }) => `<span class="dash-r"><i>${n}</i>${geFace(m, 'dash-face')}<b>${escapeHtml(m.name)}</b><small>${geVotes(v)}</small></span>`).join('')}</span>
       <span class="dash-ge-foot"><span>${en ? `${told}/${GE_SEATS} ranks` : `ประกาศ ${told}/${GE_SEATS}`}</span><b>${en ? 'All →' : 'ดูทั้งหมด →'}</b></span></button>`)(ge) : '';
@@ -13197,10 +13207,10 @@ function renderHomeDash(ge){
   return `<section class="feed-block feed-dash${ge ? '' : ' no-ge'}"><div class="dash">
     ${square}
     ${renderQuizTile()}
-    <button class="dash-t is-cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
+    <button class="dash-t is-cal" data-tile="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
       <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>
-    ${tile('data-action="nav-shop"', 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด'))}
-    <button class="dash-t is-gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
+    ${tile('data-tile="shop" data-action="nav-shop"', 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด'))}
+    <button class="dash-t is-gal" data-tile="gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
       <span class="dash-l">${en ? 'Gallery' : 'แกลเลอรี'}<small>${room ? escapeHtml(room.title) : ''}</small></span></button>
   </div></section>`;
 }
@@ -17542,7 +17552,7 @@ function renderQuizTile(){
   const day = toYmd(todayStart()), faces = m ? [m] : act.slice().sort((x, y) => qzHash(day + x.id) - qzHash(day + y.id)).slice(0, 3);
   const small = next ? `${en ? 'Vote at' : 'ฤกษ์โหวต'} ${next.when === (en ? 'Today' : 'วันนี้') ? '' : next.when + ' '}${next.hours.slice(0, 5)}`
     : m ? (en ? 'your stars’ pick' : 'ดวงถูกโฉลก') : (en ? 'by the stars ✦' : 'จากดวง ✦');
-  return `<button class="dash-t is-quiz" data-noloc data-action="nav-quiz" title="${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}">
+  return `<button class="dash-t is-quiz" data-tile="quiz" data-noloc data-action="nav-quiz" title="${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}">
     ${m ? `<span class="dash-i">${ICONS.star}</span>` : ''}
     <span class="dash-q-faces${m ? ' is-one' : ''}">${faces.map(x => renderAvatar(x, 'dash-q-face', getGroup(x.groupId).color)).join('')}${m ? `<i>${last.pct}%</i>` : ''}</span>
     <span class="dash-l">${m ? escapeHtml(nickName(m)) : (en ? 'Your oshi' : 'หาโอชิ')}<small>${escapeHtml(small)}</small></span></button>`;
@@ -19483,6 +19493,7 @@ const LAYOUT_ACC = [
   { k:'purple', th:'ม่วง', c:'#7A5CC9' }, { k:'blue', th:'ฟ้า', c:'#3D6FB6' }, { k:'gold', th:'ทอง', c:'#C8961E' },
   { k:'oshi', th:'สีวงของ Kami Oshi', c:null },
 ];
+const dashDefault = () => DASH_TILES.map(t => t.k);
 const canLayout = () => !!(state.account && state.account.loggedIn);
 function myLayout(){
   if(state.layoutEdit && state.layoutDraft) return state.layoutDraft;
@@ -19584,11 +19595,38 @@ function applyBackground(){
   if(b && b.img){ root.dataset.bgPhoto = '1'; root.style.setProperty('--bg-photo', `url(${b.img})`); }
   else { delete root.dataset.bgPhoto; root.style.removeProperty('--bg-photo'); }
 }
+/* The dashboard's tiles are arranged one by one: layout.dash = { order, hidden } over these
+   keys. Each shows ‹ eye › while arranging; the order is CSS `order` in the dashboard's grid. */
+const DASH_TILES = [{ k:'ge', th:'ผลด่วน', en:'Results' }, { k:'quiz', th:'หาโอชิ', en:'Find your oshi' }, { k:'cal', th:'ปฏิทิน', en:'Calendar' },
+  { k:'shop', th:'ร้านค้า', en:'Shop' }, { k:'gal', th:'แกลเลอรี', en:'Gallery' }];
+function dashOrder(){
+  const L = myLayout().dash || {}, out = (L.order || []).filter(k => DASH_TILES.some(t => t.k === k));
+  DASH_TILES.forEach(t => { if(!out.includes(t.k)) out.push(t.k); });
+  return out;
+}
+function applyDash(root){
+  const box = root.querySelector('.dash'); if(!box) return;
+  const L = myLayout().dash || {}, edit = state.layoutEdit === 'home', order = dashOrder();
+  const live = order.filter(k => box.querySelector(`:scope > [data-tile="${k}"]`));
+  box.querySelectorAll(':scope > [data-tile]').forEach(el => {
+    const k = el.dataset.tile, hid = (L.hidden || []).includes(k);
+    el.style.order = order.indexOf(k) + 1;
+    el.classList.toggle('dash-off', hid);
+    el.querySelector(':scope > .dash-tools')?.remove();
+    if(edit){
+      const en = isEN(), i = live.indexOf(k);
+      el.insertAdjacentHTML('beforeend', `<span class="dash-tools">
+        <button data-action="dash-move" data-id="${k}" data-dir="-1" aria-label="${en ? 'Earlier' : 'ก่อนหน้า'}"${i <= 0 ? ' disabled' : ''}>‹</button>
+        <button data-action="dash-toggle" data-id="${k}" aria-label="${hid ? (en ? 'Show' : 'แสดง') : (en ? 'Hide' : 'ซ่อน')}">${hid ? ICONS.eyeOff : ICONS.eye}</button>
+        <button data-action="dash-move" data-id="${k}" data-dir="1" aria-label="${en ? 'Later' : 'ถัดไป'}"${i >= live.length - 1 ? ' disabled' : ''}>›</button></span>`);
+    }
+  });
+}
 function applyLayoutAll(){
   if(state.layoutEdit && state.view !== (state.layoutEdit === 'home' ? 'feed' : 'profile')){ state.layoutEdit = null; state.layoutDraft = null; }
   applyBackground();
   const main = document.getElementById('main');
-  if(main && state.view === 'feed') applyLayout('home', main);
+  if(main && state.view === 'feed'){ applyLayout('home', main); applyDash(main); }
   if(main && state.view === 'profile') applyLayout('profile', main);
   layoutChrome();
 }
@@ -19601,6 +19639,9 @@ function cleanLayout(L){
     const same = JSON.stringify(p.order || def) === JSON.stringify(def) && !(p.hidden || []).length && !(p.added || []).length;
     if(same) delete out[page];
   }
+  const d = out.dash;
+  if(!d) delete out.dash;
+  else if( JSON.stringify(d.order || dashDefault()) === JSON.stringify(dashDefault()) && !(d.hidden || []).length) delete out.dash;
   if(!out.bg) delete out.bg;
   if(!out.acc) delete out.acc;
   if(!out.nav || JSON.stringify(out.nav) === JSON.stringify(NAV_DEFAULT)) delete out.nav;
@@ -19633,7 +19674,7 @@ function enterLayoutEdit(page){
   window.scrollTo(0, 0);
 }
 function leaveLayoutEdit(save){
-  if(save){ state.layout = { ...(state.layout || {}), [state.layoutEdit]: state.layoutDraft[state.layoutEdit] }; saveLayout(); }
+  if(save){ state.layout = { ...(state.layout || {}), [state.layoutEdit]: state.layoutDraft[state.layoutEdit], ...(state.layoutEdit === 'home' ? { dash: state.layoutDraft.dash } : {}) }; saveLayout(); }
   state.layoutEdit = null; state.layoutDraft = null;
   render();
 }
@@ -25854,12 +25895,26 @@ function bindDelegatedEvents(){
     else if(action==='lay-edit'){ tipDone('signed'); enterLayoutEdit(id); }
     else if(action==='tip-close'){ tipDone(id); renderMain(); }
     else if(action==='lay-done') leaveLayoutEdit(true);
-    else if(action==='lay-reset'){ const pg = state.layoutEdit; if(pg){ state.layoutDraft[pg] = { order:LAYOUT_ZONES[pg].map(z => z.k), hidden:[], added:[] }; renderMain(); } }
+    else if(action==='lay-reset'){ const pg = state.layoutEdit; if(pg){ state.layoutDraft[pg] = { order:LAYOUT_ZONES[pg].map(z => z.k), hidden:[], added:[] }; if(pg === 'home') delete state.layoutDraft.dash; renderMain(); } }
     else if(action==='lay-toggle'){
       const p = state.layoutEdit && state.layoutDraft[state.layoutEdit];
       if(p){ p.hidden = p.hidden.includes(id) ? p.hidden.filter(x => x !== id) : [...p.hidden, id]; renderMain(); }
     }
     else if(action==='lay-sheet') openZoneSheet();
+    else if(action==='dash-toggle' || action==='dash-move'){
+      if(state.layoutEdit !== 'home') return;
+      const d = state.layoutDraft.dash = state.layoutDraft.dash || {};
+      d.order = dashOrder(); d.hidden = d.hidden || [];
+      if(action === 'dash-toggle') d.hidden = d.hidden.includes(id) ? d.hidden.filter(x => x !== id) : [...d.hidden, id];
+      else {
+        const box = document.querySelector('#main .dash'), live = d.order.filter(k => box && box.querySelector(`:scope > [data-tile="${k}"]`));
+        const i = live.indexOf(id), j = i + (+el.dataset.dir), a = live[i], b = live[j];
+        if(i < 0 || !b) return;
+        const ia = d.order.indexOf(a), ib = d.order.indexOf(b);
+        d.order[ia] = b; d.order[ib] = a;
+      }
+      applyDash(document.getElementById('main'));
+    }
     else if(action==='lay-nav-slot'){ state.navPick = state.navPick === +id ? null : +id; renderMain(); }
     else if(action==='lay-nav-pick'){
       const keys = navKeys().slice(0, 4), i = state.navPick ?? 0, was = keys.indexOf(id);
