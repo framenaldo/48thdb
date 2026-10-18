@@ -167,7 +167,12 @@ the Firebase CLI from the owner's machine.
   film, the full live for a concert or election, the first episode of a show. They were
   found by searching YouTube by title and taken only from those channels (31 of 187 the
   first time); a TV show, ad or guest spot on another channel has none. Check a link
-  before trusting one found this way.
+  before trusting one found this way. A show or series whose episodes sit in a
+  playlist on the groups' own channels lists every one under its card
+  ("ดูทุกตอน"): `data/episodes.json`, by the work's title, `[label, video id, length]`,
+  read from the channels' playlists (BNK48's ids start PLPW9IgM1jwd, CGM48's PL8aEdSGJXUm)
+  and loaded when the Works page is drawn (`mediaEps`). Add a new episode there; such a
+  work carries no single `yt`.
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
   then `node scripts/make-poster-grads.mjs` for its sheet colours.
