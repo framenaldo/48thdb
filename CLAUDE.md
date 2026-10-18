@@ -71,8 +71,10 @@ the Firebase CLI from the owner's machine.
   stats, groups, the GE2026 page, my oshi, member of the day, ask) and nothing the
   home page already shows — from a sheet behind the ⇄ button
   (`DASH_KINDS`, `openDashKindSheet`, `layout.dash.kinds`); the shop's slot shows the
-  member of the day by default (`DASH_DEFAULT`); the big results square
-  stays; ค่าเดิม on the home page resets them too. A new tile needs a
+  member of the day by default (`DASH_DEFAULT`); the big results square also
+  takes a look of its own (`DASH_BIG`, `bigKinds`, `layout.dash.kinds.ge`): member of
+  the day on her photo, my oshi, GE2026 countdown, all members, latest releases, the
+  quiz; ค่าเดิม on the home page resets them too. A new tile needs a
   `data-tile` and a row in `DASH_TILES`.
 - **Biographies.** Each member's sheet has a short biography (IMDb-style)
   that anyone signed in can write: the owner's goes up at once, everyone

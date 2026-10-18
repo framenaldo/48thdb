@@ -4208,6 +4208,34 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-tools button{ display:grid; place-items:center; width:30px; height:30px; padding:0; border:0; border-radius:50%; cursor:pointer; color:#fff;
     background:rgba(255,255,255,.14); font-size:18px; font-weight:800; line-height:1; pointer-events:auto !important; }
   .lay-row.is-now{ opacity:.6; }
+  /* the big square's other looks: a photo with a shade, or a colour of its own */
+  .dash-bk{ justify-content:flex-end; text-align:left; padding:14px; background:linear-gradient(150deg, var(--bk, #E4457E), #1b1224 120%); box-shadow:0 4px 0 rgba(0,0,0,.25); }
+  .dash-bk .bk-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .dash-bk .bk-shade{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,.72) 100%); }
+  .dash-bk > *:not(.bk-img):not(.bk-shade):not(.dash-tools):not(.bk-top){ position:relative; }
+  .dash-bk .bk-top{ position:absolute !important; top:12px; left:14px; right:14px; display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .dash-bk .bk-top i{ font-style:normal; font-size:11.5px; font-weight:800; letter-spacing:.04em; padding:3px 10px; border-radius:99px; background:rgba(0,0,0,.45); }
+  .dash-bk .bk-top small{ display:none; }
+  .dash-bk .bk-main{ display:flex; flex-direction:column; gap:2px; margin-top:auto; }
+  .dash-bk .bk-main b{ font-size:21px; line-height:1.15; font-weight:800; letter-spacing:-.01em; }
+  .dash-bk .bk-main span{ font-size:12px; font-weight:700; opacity:.95; line-height:1.3; }
+  .dash-bk .bk-main small{ font-size:11px; opacity:.8; line-height:1.3; }
+  .dash-bk .bk-go{ margin-top:6px; font-size:11.5px; font-weight:800; opacity:.9; }
+  .dash-bk{ padding:12px; gap:0; }
+  .dash-bk.bk-hub{ background:radial-gradient(circle at 85% 0%, rgba(179,18,30,.9), transparent 60%), #2A0508; }
+  .dash-bk .bk-logo{ display:none; }
+  .dash-bk.bk-hub .bk-main b{ font-size:46px; color:#FFD27A; line-height:1; }
+  .dash-bk.bk-hub::before{ content:'GE2026'; position:absolute; top:12px; left:12px; font-size:11.5px; font-weight:800; letter-spacing:.06em; padding:3px 10px; border-radius:99px; background:rgba(0,0,0,.4); }
+  .dash-bk.bk-mosaic{ background:linear-gradient(150deg, #2E8C82, #1b1224 130%); }
+  .dash-bk .bk-faces{ display:grid; grid-template-columns:repeat(3, 1fr); gap:5px; margin-bottom:auto; }
+  .dash-bk .bk-faces.is-row{ display:flex; gap:0; margin-bottom:auto; } .dash-bk .bk-faces.is-row .bk-face + .bk-face{ margin-left:-14px; }
+  .dash-bk .bk-face{ position:relative; display:grid; place-items:center; width:100%; aspect-ratio:1; border-radius:50%; overflow:hidden; color:#fff; font-size:9px; font-weight:800; container-type:inline-size; border:2px solid rgba(255,255,255,.35); }
+  .dash-bk .bk-faces.is-row .bk-face{ width:52px; height:52px; }
+  .dash-bk.bk-works{ background:linear-gradient(150deg, #C8902A, #3a1a10 130%); }
+  .dash-bk .bk-list{ display:flex; flex-direction:column; gap:5px; margin:32px 0 auto; }
+  .dash-bk .bk-row{ display:flex; flex-direction:column; padding:5px 9px; border-radius:11px; background:rgba(0,0,0,.28); }
+  .dash-bk .bk-row b{ font-size:12.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.2; } .dash-bk .bk-row small{ font-size:11px; opacity:.8; }
+  .dash-bk.bk-quiz{ background:linear-gradient(140deg, #E4457E, #2E8C82); } .dash-bk.bk-oshi:not(:has(.bk-img)){ background:linear-gradient(150deg, #E4457E, #1b1224 120%); }
   .dash-t.is-bday .dash-l small, .dash-t.is-oshi .dash-l small, .dash-t.is-iam .dash-l small{ overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; white-space:normal; }
   .dash-t.is-work .dash-l small{ overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; white-space:normal; }
   .dash-t.is-rand .dash-q-faces.is-one .dash-q-face{ width:30px; height:30px; } .dash-t.is-rand .dash-l{ font-size:12.5px; }
@@ -13213,6 +13241,43 @@ function renderHomeDash(ge){
       <span class="dash-rows">${top.map(({ n, m, v }) => `<span class="dash-r"><i>${n}</i>${geFace(m, 'dash-face')}<b>${escapeHtml(m.name)}</b><small>${geVotes(v)}</small></span>`).join('')}</span>
       <span class="dash-ge-foot"><span>${en ? `${told}/${GE_SEATS} ranks` : `ประกาศ ${told}/${GE_SEATS}`}</span><b>${en ? 'All →' : 'ดูทั้งหมด →'}</b></span></button>`)(ge) : '';
   const rows = [].map(({ n, m, v }) => `<span class="dash-r"><i>${n}</i>${geFace(m, 'dash-face')}<b>${escapeHtml(m.name)}</b><small>${geVotes(v)}</small></span>`).join('');
+  // the big square: the results by default, or one of these (layout.dash.kinds.ge), each with a look of its own
+  const dayN = ymd => Math.max(0, Math.round((new Date(ymd + 'T00:00:00Z') - new Date(iso + 'T00:00:00Z')) / 86400000));
+  const photo = m => m.photo ? `<img class="bk-img" src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
+  const bk = (kind, attrs, inner, bg) => `<button class="dash-ge dash-bk bk-${kind}" data-tile="ge" data-kind="${kind}" data-noloc ${attrs}${bg ? ` style="--bk:${bg}"` : ''}>${inner}</button>`;
+  const bigKinds = {
+    rand: () => { const m = mem.slice().sort((x, y) => qzHash(toYmd(todayStart()) + x.id) - qzHash(toYmd(todayStart()) + y.id))[0]; if(!m) return '';
+      const g = getGroup(m.groupId), age = m.birthday ? calcAge(m.birthday) : null;
+      return bk('rand', `data-action="open-member" data-id="${m.id}"`, `${photo(m)}<span class="bk-shade"></span>
+        <span class="bk-top"><i>${en ? 'Member of the day' : 'เมมเบอร์ประจำวัน'}</i><small>${en ? 'new each day' : 'สุ่มใหม่ทุกวัน'}</small></span>
+        <span class="bk-main"><b>${escapeHtml(nickName(m))}</b><span>${escapeHtml(g.name)}${m.gen ? ` · ${en ? 'Gen ' + m.gen : 'รุ่น ' + m.gen}` : ''}${age != null ? ` · ${en ? age + ' yrs' : age + ' ปี'}` : ''}</span>
+        ${m.hometown ? `<small>${escapeHtml(m.hometown)}</small>` : ''}</span><span class="bk-go">${en ? 'Open →' : 'ดูโปรไฟล์ →'}</span>`, g.color); },
+    oshi: () => { const k = (state.kamiOshi && getMember(state.kamiOshi)) || (state.oshi[0] && getMember(state.oshi[0])) || null;
+      if(!k) return bk('oshi', 'data-action="nav" data-view="profile"', `<span class="bk-main"><b>${en ? 'My oshi' : 'โอชิของฉัน'}</b><span>${en ? 'Pick a Kami Oshi and she stands here' : 'เลือก Kami Oshi แล้วเธอจะมาอยู่ตรงนี้'}</span></span><span class="bk-go">${en ? 'Open my profile →' : 'ไปโปรไฟล์ →'}</span>`, '#E4457E');
+      const g = getGroup(k.groupId), ev = SEED_SCHEDULE.filter(e => !e.shop && !e.period && !e.cancelled && eventLastDay(e) >= iso && askOn(e, k.id)).sort((a, b) => a.start.localeCompare(b.start))[0];
+      const bd = k.birthday && !k.graduated ? daysUntilBirthday(k, todayStart()) : null;
+      return bk('oshi', `data-action="open-member" data-id="${k.id}"`, `${photo(k)}<span class="bk-shade"></span>
+        <span class="bk-top"><i>${state.kamiOshi === k.id ? 'Kami Oshi' : 'Oshi'}</i></span>
+        <span class="bk-main"><b>${escapeHtml(nickName(k))}</b>
+        <span>${ev ? `${(() => { const n = dayN(ev.start); return n === 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : (en ? `in ${n} days` : `อีก ${n} วัน`); })()} · ${escapeHtml(eventShortName(ev))}` : (en ? 'No event announced' : 'ยังไม่มีงานที่ประกาศ')}</span>
+        ${bd != null ? `<small>${bd === 0 ? (en ? 'Birthday today 🎂' : 'วันเกิดวันนี้ 🎂') : (en ? `Birthday in ${bd} days` : `วันเกิดอีก ${bd} วัน`)}</small>` : ''}</span><span class="bk-go">${en ? 'Open →' : 'ดูโปรไฟล์ →'}</span>`, g.color); },
+    hub: () => { const big = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results), n = big ? dayN(big.start) : null;
+      return bk('hub', 'data-action="open-ge"', `<img class="bk-logo" src="${GE_PAGE.logo}" alt="GE2026"><span class="bk-main"><b>${n == null ? 'GE2026' : n === 0 ? (en ? 'Tonight' : 'คืนนี้') : n}</b>
+        <span>${n == null ? '' : n === 0 ? (en ? 'concert & results' : 'คอนเสิร์ตและประกาศผล') : (en ? 'days to the concert & results' : 'วัน ถึงคอนเสิร์ตและประกาศผล')}</span>
+        <small>${en ? 'candidates · songs · results · live vote' : 'ผู้สมัคร · เพลง · ผลเลือกตั้ง · ยอดโหวตสด'}</small></span><span class="bk-go">${en ? 'Open GE2026 →' : 'เปิดหน้า GE2026 →'}</span>`); },
+    mosaic: () => { const day = toYmd(todayStart()), faces = mem.slice().sort((x, y) => qzHash(day + 'm' + x.id) - qzHash(day + 'm' + y.id)).slice(0, 9);
+      return bk('mosaic', 'data-action="nav" data-view="browse"', `<span class="bk-faces">${faces.map(x => renderAvatar(x, 'bk-face', getGroup(x.groupId).color)).join('')}</span>
+        <span class="bk-main"><b>${mem.length} ${en ? 'members' : 'สมาชิก'}</b><span>BNK48 ${nb} · CGM48 ${mem.length - nb}</span></span><span class="bk-go">${en ? 'See everyone →' : 'ดูทุกคน →'}</span>`); },
+    works: () => { const ws = ALL_WORKS().slice().sort((x, y) => y.year - x.year || workSeq(y) - workSeq(x)).slice(0, 3);
+      return bk('works', 'data-action="nav" data-view="discography"', `<span class="bk-top"><i>${en ? 'Latest releases' : 'ผลงานล่าสุด'}</i></span>
+        <span class="bk-list">${ws.map(w => `<span class="bk-row"><b>${escapeHtml(w.title)}</b><small>${escapeHtml(getGroup(w.groupId).name)} · ${w.year}</small></span>`).join('')}</span>
+        <span class="bk-go">${en ? 'All works →' : 'ผลงานทั้งหมด →'}</span>`); },
+    quiz: () => { let last = null; try{ last = JSON.parse(localStorage.getItem(QZ_LAST) || 'null'); }catch(e){}
+      const m = last && mem.find(x => x.id === last.id), day = toYmd(todayStart()), faces = m ? [m] : mem.slice().sort((x, y) => qzHash(day + x.id) - qzHash(day + y.id)).slice(0, 3);
+      return bk('quiz', 'data-action="nav-quiz"', `<span class="bk-faces is-row">${faces.map(x => renderAvatar(x, 'bk-face', getGroup(x.groupId).color)).join('')}</span>
+        <span class="bk-main"><b>${m ? (en ? `Your stars favour ${escapeHtml(nickName(m))}` : `ดวงคุณถูกโฉลกกับ ${escapeHtml(nickName(m))}`) : (en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง')}</b>
+        <span>${m ? `${last.pct}%` : (en ? 'Your birthday, the Thai zodiac, five questions' : 'วันเกิด ราศี ปีนักษัตร กับคำถามห้าข้อ')}</span></span><span class="bk-go">${m ? (en ? 'See again →' : 'ดูผลอีกครั้ง →') : (en ? 'Start →' : 'เริ่มเลย →')}</span>`); },
+  };
   // what each small tile can show; a slot keeps its place and shows the kind the reader picked (layout.dash.kinds)
   const days = (() => { const big = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results); return big ? Math.round((new Date(big.start + 'T00:00:00Z') - new Date(iso + 'T00:00:00Z')) / 86400000) : -1; })();
   const kinds = {
@@ -13241,8 +13306,9 @@ function renderHomeDash(ge){
   };
   const L = (myLayout().dash || {}).kinds || {};
   const slot = k => `${(kinds[L[k] || DASH_DEFAULT[k] || k] || kinds[k])(k)}`;
-  return `<section class="feed-block feed-dash${ge ? '' : ' no-ge'}"><div class="dash">
-    ${square}
+  const bigKind = ((myLayout().dash || {}).kinds || {}).ge;
+  return `<section class="feed-block feed-dash${ge || (bigKind && bigKinds[bigKind]) ? '' : ' no-ge'}"><div class="dash">
+    ${(() => { const k = ((myLayout().dash || {}).kinds || {}).ge; return k && bigKinds[k] ? bigKinds[k]() : square; })()}
     ${slot('quiz')}${slot('cal')}${slot('shop')}${slot('gal')}
   </div></section>`;
 }
@@ -19635,6 +19701,8 @@ const DASH_KINDS = [{ k:'quiz', th:'หาโอชิจากดวง', en:'F
   { k:'me', th:'โอชิของฉัน', en:'My oshi' }, { k:'rand', th:'เมมเบอร์ประจำวัน', en:'Member of the day' }, { k:'ask', th:'ถาม 48thDb (ค้นหาด้วยคำถาม)', en:'Ask 48thDb' }];
 // the member of the day took the shop's tile (the shop is a ☰ menu entry too); the reader can put it back
 const DASH_DEFAULT = { shop:'rand' };
+const DASH_BIG = [{ k:'ge', th:'ผลด่วนเลือกตั้ง', en:'Election results' }, { k:'rand', th:'เมมเบอร์ประจำวัน', en:'Member of the day' }, { k:'oshi', th:'โอชิของฉัน', en:'My oshi' },
+  { k:'hub', th:'GE2026 · นับถอยหลัง', en:'GE2026 · countdown' }, { k:'mosaic', th:'สมาชิกทั้งหมด', en:'All members' }, { k:'works', th:'ผลงานล่าสุด', en:'Latest releases' }, { k:'quiz', th:'หาโอชิจากดวง', en:'Find your oshi' }];
 const DASH_TILES = [{ k:'ge', th:'ผลด่วน', en:'Results' }, { k:'quiz', th:'หาโอชิ', en:'Find your oshi' }, { k:'cal', th:'ปฏิทิน', en:'Calendar' },
   { k:'shop', th:'ร้านค้า', en:'Shop' }, { k:'gal', th:'แกลเลอรี', en:'Gallery' }];
 function dashOrder(){
@@ -19652,7 +19720,7 @@ function applyDash(root){
     el.querySelector(':scope > .dash-tools')?.remove();
     if(edit){
       const en = isEN();
-      el.insertAdjacentHTML('beforeend', `<span class="dash-tools">${k === 'ge' ? '' : `<button data-action="dash-kind" data-id="${k}" aria-label="${en ? 'Change what it shows' : 'เปลี่ยนเนื้อหา'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3.5 7.5 7 11"/><path d="M3.5 7.5H17a3.5 3.5 0 0 1 3.5 3.5"/><path d="M17 20l3.5-3.5L17 13"/><path d="M20.5 16.5H7A3.5 3.5 0 0 1 3.5 13"/></svg></button>`}<button data-action="dash-toggle" data-id="${k}" aria-label="${hid ? (en ? 'Show' : 'แสดง') : (en ? 'Hide' : 'ซ่อน')}">${hid ? ICONS.eyeOff : ICONS.eye}</button></span>`);
+      el.insertAdjacentHTML('beforeend', `<span class="dash-tools">${`<button data-action="dash-kind" data-id="${k}" aria-label="${en ? 'Change what it shows' : 'เปลี่ยนเนื้อหา'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3.5 7.5 7 11"/><path d="M3.5 7.5H17a3.5 3.5 0 0 1 3.5 3.5"/><path d="M17 20l3.5-3.5L17 13"/><path d="M20.5 16.5H7A3.5 3.5 0 0 1 3.5 13"/></svg></button>`}<button data-action="dash-toggle" data-id="${k}" aria-label="${hid ? (en ? 'Show' : 'แสดง') : (en ? 'Hide' : 'ซ่อน')}">${hid ? ICONS.eyeOff : ICONS.eye}</button></span>`);
     }
   });
 }
@@ -19716,14 +19784,15 @@ function leaveLayoutEdit(save){
 function openDashKindSheet(slot){
   if(state.layoutEdit !== 'home') return;
   const en = isEN(), d = state.layoutDraft.dash = state.layoutDraft.dash || {}, kinds = d.kinds = d.kinds || {};
-  const def = DASH_DEFAULT[slot] || slot, now = kinds[slot] || def, used = new Set(['quiz', 'cal', 'shop', 'gal'].filter(k => k !== slot).map(k => kinds[k] || DASH_DEFAULT[k] || k));
+  const big = slot === 'ge', list = big ? DASH_BIG : DASH_KINDS;
+  const def = DASH_DEFAULT[slot] || slot, now = kinds[slot] || def, used = big ? new Set() : new Set(['quiz', 'cal', 'shop', 'gal'].filter(k => k !== slot).map(k => kinds[k] || DASH_DEFAULT[k] || k));
   closeShareSheet();
   const el = document.createElement('div');
   el.className = 'share-sheet';
   el.innerHTML = `<div class="share-back" data-share="close"></div>
     <div class="share-panel" role="dialog" aria-label="${en ? 'What this tile shows' : 'ช่องนี้แสดงอะไร'}">
       <div class="share-head"><b>${en ? 'What this tile shows' : 'ช่องนี้แสดงอะไร'}</b><button class="share-x" data-share="close" aria-label="${en ? 'Close' : 'ปิด'}">✕</button></div>
-      ${DASH_KINDS.filter(x => x.k === now || !used.has(x.k)).map(x => `<button class="lay-row${x.k === now ? ' is-now' : ''}" data-kind-pick="${x.k}"><span>${escapeHtml(en ? x.en : x.th)}</span>${x.k === now ? `<em>${en ? 'now' : 'ตอนนี้'}</em>` : '<i>→</i>'}</button>`).join('')}
+      ${list.filter(x => x.k === now || !used.has(x.k)).map(x => `<button class="lay-row${x.k === now ? ' is-now' : ''}" data-kind-pick="${x.k}"><span>${escapeHtml(en ? x.en : x.th)}</span>${x.k === now ? `<em>${en ? 'now' : 'ตอนนี้'}</em>` : '<i>→</i>'}</button>`).join('')}
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
