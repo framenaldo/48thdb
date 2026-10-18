@@ -4203,13 +4203,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-t.dash-off, .dash-ge.dash-off{ display:none; }
   .lay-editing .dash-t.dash-off, .lay-editing .dash-ge.dash-off{ display:flex; }
   .lay-editing .dash-off > :not(.dash-tools){ opacity:.3; filter:grayscale(1); }
-  .dash-tools{ position:absolute; left:50%; bottom:6px; transform:translateX(-50%); z-index:6; display:flex; gap:4px; padding:3px; border-radius:99px;
+  .dash-tools{ position:absolute; right:5px; top:5px; z-index:6; display:flex; padding:2px; border-radius:99px;
     background:rgba(35,27,43,.88); pointer-events:auto !important; }
-  .dash-tools button{ display:grid; place-items:center; width:28px; height:28px; padding:0; border:0; border-radius:50%; cursor:pointer; color:#fff;
+  .dash-tools button{ display:grid; place-items:center; width:30px; height:30px; padding:0; border:0; border-radius:50%; cursor:pointer; color:#fff;
     background:rgba(255,255,255,.14); font-size:18px; font-weight:800; line-height:1; pointer-events:auto !important; }
   .dash-tools button[disabled]{ opacity:.3; cursor:default; }
   .dash-tools svg{ width:16px; height:16px; }
-  .lay-editing .dash > [data-tile]{ pointer-events:none; }
+  .lay-editing [data-zone] > .dash:not(.x) > [data-tile]:not(.x), .lay-editing [data-zone] > .dash > [data-tile] > :not(.x){ pointer-events:auto; -webkit-touch-callout:none; user-select:none; -webkit-user-select:none; cursor:grab; }
+  .dash > .tile-up{ z-index:70; box-shadow:0 14px 30px rgba(0,0,0,.4); cursor:grabbing; transition:none; }
+  .dash > .tile-press{ transform:scale(.97); }
   .lay-tag{ position:absolute; top:-16px; left:6px; z-index:6; padding:3px 10px; border-radius:99px; background:#E4457E; color:#fff; font-size:11.5px; font-weight:800; box-shadow:0 3px 0 #B32F60; }
   .lay-hidden > .lay-tag{ background:#8E8697; box-shadow:0 3px 0 #6A6372; }
   .lay-tools{ position:absolute; top:-18px; right:6px; z-index:6; display:flex; gap:6px; }
@@ -19607,18 +19609,14 @@ function dashOrder(){
 function applyDash(root){
   const box = root.querySelector('.dash'); if(!box) return;
   const L = myLayout().dash || {}, edit = state.layoutEdit === 'home', order = dashOrder();
-  const live = order.filter(k => box.querySelector(`:scope > [data-tile="${k}"]`));
   box.querySelectorAll(':scope > [data-tile]').forEach(el => {
     const k = el.dataset.tile, hid = (L.hidden || []).includes(k);
     el.style.order = order.indexOf(k) + 1;
     el.classList.toggle('dash-off', hid);
     el.querySelector(':scope > .dash-tools')?.remove();
     if(edit){
-      const en = isEN(), i = live.indexOf(k);
-      el.insertAdjacentHTML('beforeend', `<span class="dash-tools">
-        <button data-action="dash-move" data-id="${k}" data-dir="-1" aria-label="${en ? 'Earlier' : 'ก่อนหน้า'}"${i <= 0 ? ' disabled' : ''}>‹</button>
-        <button data-action="dash-toggle" data-id="${k}" aria-label="${hid ? (en ? 'Show' : 'แสดง') : (en ? 'Hide' : 'ซ่อน')}">${hid ? ICONS.eyeOff : ICONS.eye}</button>
-        <button data-action="dash-move" data-id="${k}" data-dir="1" aria-label="${en ? 'Later' : 'ถัดไป'}"${i >= live.length - 1 ? ' disabled' : ''}>›</button></span>`);
+      const en = isEN();
+      el.insertAdjacentHTML('beforeend', `<span class="dash-tools"><button data-action="dash-toggle" data-id="${k}" aria-label="${hid ? (en ? 'Show' : 'แสดง') : (en ? 'Hide' : 'ซ่อน')}">${hid ? ICONS.eyeOff : ICONS.eye}</button></span>`);
     }
   });
 }
@@ -19821,8 +19819,63 @@ function layDrop(){
     a.onfinish = done; a.oncancel = done;
   } else done();
 }
+/* A dashboard tile is picked up where it is (a held press on a phone, a drag with a mouse) and
+   carried over the others; the one under it takes its place, the rest slide. */
+let _td = null, _tdPend = null;
+function tileDown(e, el){
+  if(e.pointerType === 'mouse') e.preventDefault();
+  _tdPend = { el, x:e.clientX, y:e.clientY, mouse:e.pointerType === 'mouse',
+    timer: e.pointerType === 'mouse' ? 0 : setTimeout(() => { const p = _tdPend; _tdPend = null; if(p) tileStart(p.el, p.lx ?? p.x, p.ly ?? p.y); }, 260) };
+  el.classList.add('tile-press');
+}
+function tileCancelPend(){ if(_tdPend){ clearTimeout(_tdPend.timer); _tdPend.el.classList.remove('tile-press'); _tdPend = null; } }
+function tileStart(el, x, y){
+  tileCancelPend();
+  const r = el.getBoundingClientRect();
+  el.classList.add('tile-up');
+  _td = { el, gx:x - (r.left + r.width / 2), gy:y - (r.top + r.height / 2) };
+  try{ navigator.vibrate && navigator.vibrate(12); }catch(e){}
+  tileMove(x, y);
+}
+function tileMove(x, y){
+  const T = _td, box = T.el.parentElement;
+  const hit = [...box.querySelectorAll(':scope > [data-tile]')].filter(o => o !== T.el && getComputedStyle(o).display !== 'none')
+    .find(o => { const r = o.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; });
+  if(hit){
+    const d = state.layoutDraft.dash = state.layoutDraft.dash || {};
+    d.order = dashOrder(); d.hidden = d.hidden || [];
+    const ia = d.order.indexOf(T.el.dataset.tile), ib = d.order.indexOf(hit.dataset.tile);
+    const first = new Map([...box.querySelectorAll(':scope > [data-tile]')].map(o => [o, o.getBoundingClientRect()]));
+    T.el.style.transform = '';
+    // the dragged tile moves to the other's slot: the tiles between shift by one
+    const [k] = d.order.splice(ia, 1); d.order.splice(ib, 0, k);
+    const tools = [...box.querySelectorAll(':scope > [data-tile]')].map(o => o.querySelector(':scope > .dash-tools'));
+    box.querySelectorAll(':scope > [data-tile]').forEach(o => { o.style.order = d.order.indexOf(o.dataset.tile) + 1; });
+    for(const [o, r0] of first){
+      if(o === T.el) continue;
+      const r1 = o.getBoundingClientRect(), dx = r0.left - r1.left, dy = r0.top - r1.top;
+      if((Math.abs(dx) > .5 || Math.abs(dy) > .5) && o.animate) o.animate([{ transform:`translate(${dx}px, ${dy}px)` }, { transform:'none' }], { duration:200, easing:'cubic-bezier(.2,.8,.2,1)' });
+    }
+  }
+  T.el.style.transform = '';
+  const r = T.el.getBoundingClientRect();
+  T.el.style.transform = `translate(${x - T.gx - (r.left + r.width / 2)}px, ${y - T.gy - (r.top + r.height / 2)}px)`;
+}
+function tileDrop(){
+  const T = _td; _td = null;
+  const el = T.el, from = el.style.transform;
+  el.style.transform = '';
+  el.classList.remove('tile-up', 'tile-press');
+  if(el.animate && from) el.animate([{ transform:from }, { transform:'none' }], { duration:180, easing:'cubic-bezier(.2,.8,.2,1)' });
+  applyDash(document.getElementById('main'));
+}
 function layDown(e){
   if(!state.layoutEdit || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  if(e.target.closest && e.target.closest('.dash-tools')) return;   // the eye is only tapped
+  if(state.layoutEdit === 'home' && e.target.closest && !_td && !_lay){
+    const tile = e.target.closest('#main .dash > [data-tile]');
+    if(tile){ tileDown(e, tile); return; }
+  }
   const el = e.target.closest && e.target.closest('#main [data-zone]');
   if(!el || e.target.closest('.lay-eye') || _lay) return;
   const handle = !!e.target.closest('.lay-h');
@@ -19835,6 +19888,15 @@ function layDown(e){
 function layCancelPend(){ if(_layPend){ clearTimeout(_layPend.timer); _layPend.el.classList.remove('lay-press'); _layPend = null; } }
 document.addEventListener('pointerdown', layDown);
 document.addEventListener('pointermove', e => {
+  if(_td){ e.preventDefault(); tileMove(e.clientX, e.clientY); return; }
+  const tp = _tdPend;
+  if(tp){
+    const moved = Math.hypot(e.clientX - tp.x, e.clientY - tp.y);
+    tp.lx = e.clientX; tp.ly = e.clientY;
+    if(tp.mouse && moved > 4) tileStart(tp.el, e.clientX, e.clientY);
+    else if(!tp.mouse && moved > 9) tileCancelPend();
+    return;
+  }
   if(_lay){ e.preventDefault(); layMove(e.clientX, e.clientY); return; }
   const p = _layPend; if(!p) return;
   const moved = Math.hypot(e.clientX - p.x, e.clientY - p.y);
@@ -19842,11 +19904,11 @@ document.addEventListener('pointermove', e => {
   if(p.mouse && moved > 4){ const el = p.el; layCancelPend(); el.classList.remove('lay-press'); layStart(el, p.x, p.y); layMove(e.clientX, e.clientY); }
   else if(!p.mouse && moved > 9) layCancelPend();          // a swipe: let the page scroll
 }, { passive:false });
-const layUp = () => { layCancelPend(); document.querySelectorAll('.lay-press').forEach(x => x.classList.remove('lay-press')); if(_lay) layDrop(); };
+const layUp = () => { tileCancelPend(); if(_td) tileDrop(); layCancelPend(); document.querySelectorAll('.lay-press').forEach(x => x.classList.remove('lay-press')); if(_lay) layDrop(); };
 document.addEventListener('pointerup', layUp);
 document.addEventListener('pointercancel', layUp);
 // once a zone is up, the finger moves it rather than the page
-document.addEventListener('touchmove', e => { if(_lay) e.preventDefault(); }, { passive:false });
+document.addEventListener('touchmove', e => { if(_lay || _td) e.preventDefault(); }, { passive:false });
 document.addEventListener('contextmenu', e => { if(state.layoutEdit && e.target.closest && e.target.closest('#main [data-zone]')) e.preventDefault(); });
 
 /* While the home page is being arranged, a long list of events shows only
@@ -25659,6 +25721,7 @@ function bindDelegatedEvents(){
     const anchor = e.target.closest('a[href]');
     if(anchor && anchor !== el && el.contains(anchor)) return;
     const action = el.dataset.action;
+    if(state.layoutEdit && el.dataset.tile) return;   // arranging: a tile is picked up, not opened
     _sheetY = sheetScrollTop();   // where the open sheet stood, before this tap redraws it away
     const id = el.dataset.id;
 
@@ -25901,18 +25964,11 @@ function bindDelegatedEvents(){
       if(p){ p.hidden = p.hidden.includes(id) ? p.hidden.filter(x => x !== id) : [...p.hidden, id]; renderMain(); }
     }
     else if(action==='lay-sheet') openZoneSheet();
-    else if(action==='dash-toggle' || action==='dash-move'){
+    else if(action==='dash-toggle'){
       if(state.layoutEdit !== 'home') return;
       const d = state.layoutDraft.dash = state.layoutDraft.dash || {};
       d.order = dashOrder(); d.hidden = d.hidden || [];
-      if(action === 'dash-toggle') d.hidden = d.hidden.includes(id) ? d.hidden.filter(x => x !== id) : [...d.hidden, id];
-      else {
-        const box = document.querySelector('#main .dash'), live = d.order.filter(k => box && box.querySelector(`:scope > [data-tile="${k}"]`));
-        const i = live.indexOf(id), j = i + (+el.dataset.dir), a = live[i], b = live[j];
-        if(i < 0 || !b) return;
-        const ia = d.order.indexOf(a), ib = d.order.indexOf(b);
-        d.order[ia] = b; d.order[ib] = a;
-      }
+      d.hidden = d.hidden.includes(id) ? d.hidden.filter(x => x !== id) : [...d.hidden, id];
       applyDash(document.getElementById('main'));
     }
     else if(action==='lay-nav-slot'){ state.navPick = state.navPick === +id ? null : +id; renderMain(); }

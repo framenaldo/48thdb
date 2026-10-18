@@ -64,8 +64,9 @@ the Firebase CLI from the owner's machine.
   can't be moved.
 - **Dashboard tiles** are arranged one by one while arranging the home page:
   `layout.dash = { order, hidden }` over `DASH_TILES` (results, quiz, calendar,
-  shop, gallery), each tile showing ‹ eye › (`applyDash`, `dash-move`,
-  `dash-toggle`); ค่าเดิม on the home page resets them too. A new tile needs a
+  shop, gallery), picked up where it is — a held press on a phone, a drag with a mouse —
+  and carried over the others (`tileDown`…`tileDrop`), with an eye in its corner
+  (`applyDash`, `dash-toggle`); ค่าเดิม on the home page resets them too. A new tile needs a
   `data-tile` and a row in `DASH_TILES`.
 - **Biographies.** Each member's sheet has a short biography (IMDb-style)
   that anyone signed in can write: the owner's goes up at once, everyone
