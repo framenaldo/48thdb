@@ -4216,8 +4216,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .mw-eps-list a{ display:flex; justify-content:space-between; gap:12px; padding:8px 8px; border-radius:10px; font-size:13px; line-height:1.4; color:var(--ink); text-decoration:none; }
   .mw-eps-list a:active, .mw-eps-list a:hover{ background:color-mix(in srgb, var(--brand-a) 10%, transparent); }
   .mw-eps-list small{ flex:none; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
-  .mw-svc.is-netflix{ background:#E50914; border-color:#E50914; color:#fff; }
-  .mw-svc .svc-n{ display:inline-grid; place-items:center; width:16px; height:16px; border-radius:4px; background:#fff; color:#E50914; font-size:12px; font-weight:900; line-height:1; }
+  .svc-btn{ display:inline-flex; align-items:center; gap:10px; margin:8px 6px 0 0; padding:7px 14px 7px 10px; border-radius:14px; background:#fff; color:#1C1329;
+    text-decoration:none; font-size:13px; font-weight:800; box-shadow:0 3px 0 rgba(0,0,0,.18); border:1px solid rgba(0,0,0,.06); }
+  .svc-btn img{ height:14px; width:auto; display:block; }
+  .svc-btn:active{ transform:translateY(2px); box-shadow:none; }
+  .svc-ico{ display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#fff; box-shadow:0 2px 0 rgba(0,0,0,.2); margin:0 6px 0 0; }
+  .svc-ico img{ height:15px; width:auto; display:block; }
   .mw-yt{ display:inline-flex; align-items:center; gap:6px; margin:8px 6px 0 0; text-decoration:none; }
   .mw-yt svg{ width:13px; height:13px; color:#E0243A; }
   .mw-yt.is-small{ margin:0 8px 0 0; padding:6px 8px; }
@@ -21810,7 +21814,10 @@ function mediaWatch(w, en, small){
   const items = [w.film && [v(w.film), en ? 'Watch the film' : 'ดูหนัง'], w.yt && [v(w.yt), en ? e : th], w.chan && ['https://www.youtube.com/' + w.chan, en ? 'YouTube channel' : 'ช่อง YouTube']].filter(Boolean);
   // a streaming service that still has the title (`watch` on the row): its own badge, dropped when the title leaves
   for(const x of w.watch || []) items.push([x.url, (en ? 'Watch on ' : 'ดูที่ ') + STREAM_NAME[x.svc], x.svc]);
-  const chipSvc = (href, label, svc) => `<a class="chip chip-link mw-yt mw-svc is-${svc}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}">${STREAM_BADGE[svc] || ''}${small ? '' : escapeHtml(label)}</a>`;
+  // the service's own logo: the wordmark on a long button, the N in a round one where space is short
+  const chipSvc = (href, label, svc) => small
+    ? `<a class="svc-ico is-${svc}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}" title="${escapeAttr(label)}"><img src="streaming/${svc}-n.png" alt="${escapeAttr(STREAM_NAME[svc])}" loading="lazy" decoding="async"></a>`
+    : `<a class="svc-btn is-${svc}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}"><img src="streaming/${svc}-wordmark.png" alt="${escapeAttr(STREAM_NAME[svc])}" loading="lazy" decoding="async"><span>${escapeHtml(label)}</span></a>`;
   return (small ? items.slice(0, 1) : items).map(([href, label, svc]) => svc ? chipSvc(href, label, svc) : chip(href, label, label + ' · ' + w.title)).join('');
 }
 function renderMediaCat(cat){

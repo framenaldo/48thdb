@@ -165,7 +165,7 @@ the Firebase CLI from the owner's machine.
   A roadshow's banner word is TT Ricordi Allegria from Adobe Fonts (kit
   `umx5wsc`, its stylesheet fetched only when a roadshow banner is drawn; the
   script stays as the fallback).
-- A work in the Works page can carry `watch: [{svc, url}]` for a streaming service that still has it (`STREAM_NAME`, `STREAM_BADGE`; a plain mark, not the logo); when the title leaves that service, take the entry out. It can carry `yt` (a trailer, a first episode, a live; not kept where `film` is set — the owner wants only the whole film there), `film` (the whole film, from the owner) and `chan` (a channel of its own, e.g. `@theskaxbnk4868`) on its SEED_MEDIA row, the id of a video
+- A work in the Works page can carry `watch: [{svc, url}]` for a streaming service that still has it (`STREAM_NAME`; the owner's logo files in `streaming/` — `<svc>-wordmark.png` on a long button, `<svc>-n.png` in a round icon on a member's row); when the title leaves that service, take the entry out. It can carry `yt` (a trailer, a first episode, a live; not kept where `film` is set — the owner wants only the whole film there), `film` (the whole film, from the owner) and `chan` (a channel of its own, e.g. `@theskaxbnk4868`) on its SEED_MEDIA row, the id of a video
   on the groups' own YouTube channels (BNK48, CGM48, BNK48 and CGM48): a trailer for a
   film, the full live for a concert or election, the first episode of a show. They were
   found by searching YouTube by title and taken only from those channels (31 of 187 the
