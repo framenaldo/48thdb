@@ -174,6 +174,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   }
   .star-pop{ animation:starPop .55s var(--ease-out); }
   body.modal-locked{ position:fixed; left:0; right:0; overflow:hidden; }
+  .ov-layer{ display:contents; }
   /* The layout is built for one width and scrolls vertically. Panning the
      whole page sideways or pinching it only ever leaves it off-centre, so
      both are off — the scrollers inside the page are untouched. */
@@ -524,6 +525,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --chrome-bg:rgba(255,255,255,calc(.7*var(--glass-k)));
     --chrome-edge:rgba(255,255,255,calc(.6*var(--glass-k)));
     --chrome-fg:var(--ink);
+  }
+  /* A sheet on a phone all but fills the screen, so the frosted glass behind it
+     hardly shows — but blurring the page under it, scrim and sheet, cost the
+     phone a fresh blur in every frame of the sheet coming up. Solid instead. */
+  @media (max-width:640px), (orientation:landscape) and (max-height:540px){
+    .modal-backdrop{ backdrop-filter:none; -webkit-backdrop-filter:none; }
+    .modal-glass-card{ backdrop-filter:none; -webkit-backdrop-filter:none; }
+    .modal-glass-card:not(.is-postered){ background:var(--card); }
   }
   .modal-close-btn{
     position:absolute; top:14px; right:14px; z-index:2;
@@ -11333,7 +11342,7 @@ function tlCard(p, m){
   const text = p.locked ? `<span class="tl-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>${en ? 'In the iAM48 app only' : 'ดูได้เฉพาะในแอป'}</span>`
     : `<span class="tl-text" data-noloc>${escapeHtml(p.text || (p.video ? (en ? 'A new clip' : 'คลิปใหม่') : (en ? 'New photos' : 'รูปใหม่')))}</span>`;
   return `<a class="tl-card${p.locked ? ' is-locked' : ''}" style="--c:${g.color || 'var(--bnk)'}" href="${TL_POST(p.n)}" target="_blank" rel="noopener">
-    <span class="tl-head">${renderAvatar(m, 'avatar-sm', g.color)}<span class="tl-who"><b>${escapeHtml(nickName(m))}</b><small>${tlAgo(p.at)}</small></span><span class="tl-app">iAM48</span></span>
+    <span class="tl-head">${renderAvatar(m, 'avatar-sm', g.color)}<span class="tl-who"><b>${escapeHtml(nickName(m))}</b><small data-ago="${escapeAttr(p.at)}">${tlAgo(p.at)}</small></span><span class="tl-app">iAM48</span></span>
     <span class="tl-body">${text}${img}</span></a>`;
 }
 /* the home page's row: the newest posts, an oshi's only when the reader filters by oshi */
@@ -11345,7 +11354,7 @@ function renderTimelineZone(){
   // posts locked to the app say no more than who posted: a strip of names over the row of posts that can be read
   const strip = locked.length ? `<div class="tl-locked"><span class="tl-locked-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>${en ? 'In the app only' : 'โพสต์เฉพาะในแอป'}</span>${
     locked.map(([p, m]) => { const g = getGroup(m.groupId) || {};
-      return `<a class="tl-chip" style="--c:${g.color || 'var(--bnk)'}" href="${TL_POST(p.n)}" target="_blank" rel="noopener">${renderAvatar(m, 'avatar-sm', g.color)}<b>${escapeHtml(nickName(m))}</b><small>${tlAgo(p.at)}</small></a>`; }).join('')}</div>` : '';
+      return `<a class="tl-chip" style="--c:${g.color || 'var(--bnk)'}" href="${TL_POST(p.n)}" target="_blank" rel="noopener">${renderAvatar(m, 'avatar-sm', g.color)}<b>${escapeHtml(nickName(m))}</b><small data-ago="${escapeAttr(p.at)}">${tlAgo(p.at)}</small></a>`; }).join('')}</div>` : '';
   return `<section class="feed-block is-iamtl"><h2 class="section-label">${en ? 'Latest on iAM48' : 'iAM48 ล่าสุด'}</h2>
     ${strip}${open.length ? `<div class="tl-row">${open.map(([p, m]) => tlCard(p, m)).join('')}</div>` : ''}</section>`;
 }
@@ -21947,7 +21956,9 @@ function syncBodyScrollLock(){
   }
 }
 
-let _lastRenderedView = null;
+let _lastRenderedView = null, _drawnPage = null;
+// a page as drawn, less what keeps itself fresh in place: the "x minutes ago" and the home page's live vote (gecHomePaint)
+const pageSig = h => h.replace(/(data-ago="[^"]*">)[^<]*/g, '$1').replace(/<button class="gec-teaser is-home[\s\S]*?<\/button>/, '');
 let _sheetKeep = null;
 function sheetKeepNow(){
   const was = document.querySelector('#main .is-member-sheet'), sc = was && was.querySelector('.modal-scroll');
@@ -22532,8 +22543,8 @@ function renderMain(){
   const navContainer = document.getElementById('nav-container');
   if(navContainer) syncNav(navContainer);
   const main = document.getElementById('main');
-  let html;
-  try{ html =
+  let page, over = '';
+  try{ page =
     (state.query.trim() ? renderSearch() :
     state.view==='feed' ? renderFeed() :
     state.view==='timeline' ? renderGEPage() :
@@ -22552,8 +22563,8 @@ function renderMain(){
     state.view==='profile' ? renderProfile() :
     state.view==='auth' ? renderAuth() :
     state.view==='editprofile' ? renderEditProfile() :
-    renderForm())
-    + (state.comparePicking ? renderComparePicker()
+    renderForm());
+    over = (state.comparePicking ? renderComparePicker()
        : state.compareWith && state.selectedId ? renderCompareModal()
        : state.selectedId ? renderDetailModal() : '')
     + (state.bioOf && state.selectedId && !state.comparePicking && !state.compareWith ? renderBioSheet() : '')
@@ -22565,12 +22576,37 @@ function renderMain(){
   }catch(err){
     // one bad record must not blank the whole site
     console.error(err);
-    html = `<div class="empty-state render-failed"><p>${isEN() ? 'This page could not be shown.' : 'หน้านี้แสดงไม่ได้ชั่วคราว'}</p>
+    page = `<div class="empty-state render-failed"><p>${isEN() ? 'This page could not be shown.' : 'หน้านี้แสดงไม่ได้ชั่วคราว'}</p>
       <button class="chip chip-link" data-action="nav" data-view="feed">${isEN() ? 'Back to home' : 'กลับหน้าแรก'}</button></div>`;
+    over = '';
   }
   // a member's sheet drawn again for the same member stays where it was read to
   const keep = _sheetKeep || sheetKeepNow(); _sheetKeep = null;
-  main.innerHTML = html;
+  /* A sheet opening or closing over a page that has not changed draws only the
+     sheets, and runs only their own set-up. Drawing the whole page again under a
+     member's sheet made the browser lay all of it out as the sheet came up —
+     the stutter on opening one on a phone. */
+  const layer = main.querySelector(':scope > .ov-layer'), sig = pageSig(page);
+  if(layer && sig === _drawnPage && state.view === _lastRenderedView){
+    main.querySelectorAll('[data-ago]').forEach(el => { el.textContent = tlAgo(el.dataset.ago); });
+    layer.innerHTML = over;
+    _hsShown = !!layer.querySelector('.modal-scroll .hs');
+    if(keep && keep.id === state.selectedId){ const ns = layer.querySelector('.is-member-sheet .modal-scroll'); if(ns) ns.scrollTop = keep.top; }
+    paintSheetGrads(layer);
+    if(_dvTop && _dvTop.day === state.dayOf){ const nb = layer.querySelector('.is-day-sheet .dv-body'); if(nb) nb.scrollTop = _dvTop.top; }
+    localize(layer);
+    syncBodyScrollLock();
+    geAnimate(layer); odoRun(layer);
+    bindPosterZoom();
+    applyPageMeta();
+    FEST.sync();
+    bioClamp(layer);
+    schedTick();
+    sendHit();
+    return;
+  }
+  _drawnPage = sig;
+  main.innerHTML = page + `<div class="ov-layer">${over}</div>`;
   _hsShown = !!main.querySelector('.modal-scroll .hs');
   if(keep && keep.id === state.selectedId){ const ns = main.querySelector('.is-member-sheet .modal-scroll'); if(ns) ns.scrollTop = keep.top; }
   paintSheetGrads(main);
@@ -25447,9 +25483,13 @@ function initHistory(){
     const snap = e.state && e.state.snap;
     if(!snap) return;
     _navDepth = (e.state && e.state.depth) || 0;
+    const was = NAV_KEYS.map(k => JSON.stringify(state[k]));
     NAV_KEYS.forEach(k => state[k] = snap[k]);
     state.profileMenuOpen = false;
-    render();
+    // back from a sheet to the same page: only the sheets are drawn again (the header and the page stay)
+    const SHEETS = ['selectedId', 'selectedEvent', 'dayOf', 'posterOf', 'bioOf', 'compareWith', 'comparePicking', 'geClip', 'editingId'];
+    if(NAV_KEYS.every((k, i) => SHEETS.includes(k) || was[i] === JSON.stringify(state[k]))) renderMain();
+    else render();
     restoreScroll((e.state && e.state.scrollY) || 0);
     const sy = e.state && e.state.sheetY;
     if(sy){ const put = () => { const m = document.querySelector('.modal-scroll'); if(m) m.scrollTop = sy; }; put(); requestAnimationFrame(put); }

@@ -33,7 +33,14 @@ the Firebase CLI from the owner's machine.
   which writes sitemap.xml.
 
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
-  handler, and views switched on `state.view`.
+  handler, and views switched on `state.view`. Sheets (member, event, day,
+  poster…) are drawn into `.ov-layer` at the end of `#main`; when only a sheet
+  opens or closes over a page that has not changed (`pageSig`, which leaves out
+  what refreshes itself in place: the "x minutes ago" and the home page's live
+  vote), `renderMain` swaps the sheets alone and runs only their set-up, and
+  going back from a sheet calls `renderMain`, not `render`. Rebuilding the page
+  under a sheet was the stutter on opening one. On phones sheets are solid, with
+  no backdrop blur: blurring the page under a moving sheet cost every frame.
 - **The header** is the logo, the search and one menu button (`renderSetMenu`:
   GE2026, calendar, gallery and shop, then light/dark and the language), with the
   season's pill and sign-in under it. "+ เพิ่มสมาชิก" lives on the members page.
