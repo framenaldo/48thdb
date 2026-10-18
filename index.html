@@ -4207,6 +4207,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     background:rgba(35,27,43,.88); pointer-events:auto !important; }
   .dash-tools button{ display:grid; place-items:center; width:30px; height:30px; padding:0; border:0; border-radius:50%; cursor:pointer; color:#fff;
     background:rgba(255,255,255,.14); font-size:18px; font-weight:800; line-height:1; pointer-events:auto !important; }
+  .lay-row.is-now{ opacity:.6; }
+  .dash-t.is-bday .dash-l small, .dash-t.is-oshi .dash-l small, .dash-t.is-iam .dash-l small{ overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; white-space:normal; }
+  .dash-t.is-vote .dash-big{ font-size:17px; margin-top:6px; } .dash-t.is-vote .dash-i{ display:none; }
+  .dash-t.is-bday .dash-q-faces.is-one .dash-q-face, .dash-t.is-oshi .dash-q-faces.is-one .dash-q-face, .dash-t.is-iam .dash-q-faces.is-one .dash-q-face{ width:30px; height:30px; }
+  .dash-t.is-iam .dash-big{ margin-top:4px; font-size:22px; }
+  .dash-t.is-bday .dash-l, .dash-t.is-oshi .dash-l{ font-size:12.5px; }
   .dash-tools button[disabled]{ opacity:.3; cursor:default; }
   .dash-tools svg{ width:16px; height:16px; }
   .lay-editing [data-zone] > .dash:not(.x) > [data-tile]:not(.x), .lay-editing [data-zone] > .dash > [data-tile] > :not(.x){ pointer-events:auto; -webkit-touch-callout:none; user-select:none; -webkit-user-select:none; cursor:grab; }
@@ -13206,14 +13212,41 @@ function renderHomeDash(ge){
       <span class="dash-rows">${top.map(({ n, m, v }) => `<span class="dash-r"><i>${n}</i>${geFace(m, 'dash-face')}<b>${escapeHtml(m.name)}</b><small>${geVotes(v)}</small></span>`).join('')}</span>
       <span class="dash-ge-foot"><span>${en ? `${told}/${GE_SEATS} ranks` : `ประกาศ ${told}/${GE_SEATS}`}</span><b>${en ? 'All →' : 'ดูทั้งหมด →'}</b></span></button>`)(ge) : '';
   const rows = [].map(({ n, m, v }) => `<span class="dash-r"><i>${n}</i>${geFace(m, 'dash-face')}<b>${escapeHtml(m.name)}</b><small>${geVotes(v)}</small></span>`).join('');
+  // what each small tile can show; a slot keeps its place and shows the kind the reader picked (layout.dash.kinds)
+  const days = (() => { const big = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results); return big ? Math.round((new Date(big.start + 'T00:00:00Z') - new Date(iso + 'T00:00:00Z')) / 86400000) : -1; })();
+  const kinds = {
+    quiz: sl => renderQuizTile(sl),
+    cal: sl => `<button class="dash-t is-cal" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
+      <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>`,
+    shop: sl => tile(`data-tile="${sl}" data-kind="shop" data-action="nav-shop"`, 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด')),
+    gal: sl => `<button class="dash-t is-gal" data-tile="${sl}" data-kind="gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
+      <span class="dash-l">${en ? 'Gallery' : 'แกลเลอรี'}<small>${room ? escapeHtml(room.title) : ''}</small></span></button>`,
+    count: sl => { const big = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
+      return tile(`data-tile="${sl}" data-kind="count"${big ? ` data-action="open-event" data-id="${big.id}"` : ''}`, 'is-count', ICONS.crown, days > 0 ? days : days === 0 ? (en ? 'Today' : 'วันนี้') : '–',
+        days > 0 ? (en ? 'days' : 'วัน') : (en ? 'to the results' : 'ถึงประกาศผล'), en ? 'to the concert & results' : 'ถึงคอนและประกาศผล'); },
+    bday: sl => { const t0 = todayStart(), next = mem.filter(m => m.birthday).map(m => ({ m, n: daysUntilBirthday(m, t0) })).sort((a, b) => a.n - b.n)[0];
+      return next ? `<button class="dash-t is-bday" data-tile="${sl}" data-kind="bday" data-noloc data-action="open-member" data-id="${next.m.id}">
+        <span class="dash-q-faces is-one">${renderAvatar(next.m, 'dash-q-face', getGroup(next.m.groupId).color)}</span>
+        <span class="dash-l">${escapeHtml(nickName(next.m))}<small>${next.n === 0 ? (en ? 'birthday today 🎂' : 'วันเกิดวันนี้ 🎂') : en ? `birthday in ${next.n} days` : `วันเกิดอีก ${next.n} วัน`}</small></span></button>`
+        : tile(`data-tile="${sl}" data-kind="bday"`, 'is-bday', ICONS.star, '–', en ? 'Birthday' : 'วันเกิด', ''); },
+    oshi: sl => { const k = (state.kamiOshi && getMember(state.kamiOshi)) || (state.oshi[0] && getMember(state.oshi[0])) || null;
+      if(!k) return `<button class="dash-t is-oshi" data-tile="${sl}" data-kind="oshi" data-action="nav" data-view="profile"><span class="dash-i">${ICONS.star}</span><b class="dash-big">–</b><span class="dash-l">${en ? 'My oshi' : 'โอชิของฉัน'}<small>${en ? 'pick a Kami Oshi' : 'เลือก Kami Oshi'}</small></span></button>`;
+      const ev = SEED_SCHEDULE.filter(e => !e.shop && !e.period && !e.cancelled && eventLastDay(e) >= iso && askOn(e, k.id)).sort((a, b) => a.start.localeCompare(b.start))[0];
+      const dd = ev ? Math.max(0, Math.round((new Date(ev.start + 'T00:00:00Z') - new Date(iso + 'T00:00:00Z')) / 86400000)) : null;
+      return `<button class="dash-t is-oshi" data-tile="${sl}" data-kind="oshi" data-noloc${ev ? ` data-action="open-event" data-id="${ev.id}"` : ` data-action="open-member" data-id="${k.id}"`}>
+        <span class="dash-q-faces is-one">${renderAvatar(k, 'dash-q-face', getGroup(k.groupId).color)}</span>
+        <span class="dash-l">${escapeHtml(nickName(k))}<small>${ev ? `${dd === 0 ? (en ? 'today · ' : 'วันนี้ · ') : dd === 1 ? (en ? 'tomorrow · ' : 'พรุ่งนี้ · ') : (en ? `in ${dd} days · ` : `อีก ${dd} วัน · `)}${escapeHtml(eventShortName(ev))}` : (en ? 'nothing announced' : 'ยังไม่มีงานที่ประกาศ')}</small></span></button>`; },
+    iam: sl => { const posts = ((IAMTL && IAMTL.posts) || []).filter(p => !p.locked && Date.now() - Date.parse(p.at) < 864e5), top = posts[0], m = top && getMember(top.m);
+      return `<button class="dash-t is-iam" data-tile="${sl}" data-kind="iam" data-noloc${top ? ` data-action="tl-open" data-id="${top.n}"` : ''}>
+        <b class="dash-big">${posts.length || '–'}</b><span class="dash-l">iAM48<small>${m ? (en ? `latest: ${escapeHtml(nickName(m))}` : `ล่าสุด ${escapeHtml(nickName(m))}`) : (en ? 'no new posts' : 'ยังไม่มีโพสต์ใหม่')}</small></span></button>`; },
+    vote: sl => `<button class="dash-t is-vote" data-tile="${sl}" data-kind="vote" data-action="nav-vote"><span class="dash-i">${ICONS.ballot}</span>
+      <b class="dash-big">${gecLite ? gecN(gecLite.sum) : '–'}</b><span class="dash-l">${en ? 'tokens voted' : 'โทเคนที่โหวต'}<small>${gecLite ? `${gecN(gecLite.n)} ${en ? 'votes' : 'ครั้ง'}` : (en ? 'reading…' : 'กำลังโหลด…')}</small></span></button>`,
+  };
+  const L = (myLayout().dash || {}).kinds || {};
+  const slot = k => `${(kinds[L[k]] || kinds[k])(k)}`;
   return `<section class="feed-block feed-dash${ge ? '' : ' no-ge'}"><div class="dash">
     ${square}
-    ${renderQuizTile()}
-    <button class="dash-t is-cal" data-tile="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
-      <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>
-    ${tile('data-tile="shop" data-action="nav-shop"', 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด'))}
-    <button class="dash-t is-gal" data-tile="gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
-      <span class="dash-l">${en ? 'Gallery' : 'แกลเลอรี'}<small>${room ? escapeHtml(room.title) : ''}</small></span></button>
+    ${slot('quiz')}${slot('cal')}${slot('shop')}${slot('gal')}
   </div></section>`;
 }
 function renderHomeGE(opt = {}){
@@ -17544,7 +17577,7 @@ function qzVoteHours(her, me, limit){
 }
 /* the home dashboard's quiz tile (where the countdown to the results was): the
    quiz, or the member it found with the next good hour to vote */
-function renderQuizTile(){
+function renderQuizTile(slot = 'quiz'){
   const en = isEN();
   let last = null; try{ last = JSON.parse(localStorage.getItem(QZ_LAST) || 'null'); }catch(e){}
   const act = activeMembers(), m = last && act.find(x => x.id === last.id);
@@ -17554,7 +17587,7 @@ function renderQuizTile(){
   const day = toYmd(todayStart()), faces = m ? [m] : act.slice().sort((x, y) => qzHash(day + x.id) - qzHash(day + y.id)).slice(0, 3);
   const small = next ? `${en ? 'Vote at' : 'ฤกษ์โหวต'} ${next.when === (en ? 'Today' : 'วันนี้') ? '' : next.when + ' '}${next.hours.slice(0, 5)}`
     : m ? (en ? 'your stars’ pick' : 'ดวงถูกโฉลก') : (en ? 'by the stars ✦' : 'จากดวง ✦');
-  return `<button class="dash-t is-quiz" data-tile="quiz" data-noloc data-action="nav-quiz" title="${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}">
+  return `<button class="dash-t is-quiz" data-tile="${slot}" data-kind="quiz" data-noloc data-action="nav-quiz" title="${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}">
     ${m ? `<span class="dash-i">${ICONS.star}</span>` : ''}
     <span class="dash-q-faces${m ? ' is-one' : ''}">${faces.map(x => renderAvatar(x, 'dash-q-face', getGroup(x.groupId).color)).join('')}${m ? `<i>${last.pct}%</i>` : ''}</span>
     <span class="dash-l">${m ? escapeHtml(nickName(m)) : (en ? 'Your oshi' : 'หาโอชิ')}<small>${escapeHtml(small)}</small></span></button>`;
@@ -19599,6 +19632,9 @@ function applyBackground(){
 }
 /* The dashboard's tiles are arranged one by one: layout.dash = { order, hidden } over these
    keys. Each shows ‹ eye › while arranging; the order is CSS `order` in the dashboard's grid. */
+const DASH_KINDS = [{ k:'quiz', th:'หาโอชิจากดวง', en:'Find your oshi' }, { k:'cal', th:'งานใน 7 วัน', en:'Events this week' }, { k:'shop', th:'ร้านค้า', en:'Shop' },
+  { k:'gal', th:'แกลเลอรี', en:'Gallery' }, { k:'count', th:'นับถอยหลังประกาศผล', en:'Days to the results' }, { k:'bday', th:'วันเกิดที่ใกล้ถึง', en:'Next birthday' },
+  { k:'oshi', th:'งานถัดไปของโอชิ', en:'My oshi’s next event' }, { k:'iam', th:'โพสต์ iAM48 ล่าสุด', en:'Latest on iAM48' }, { k:'vote', th:'ยอดโหวตสด', en:'Live vote' }];
 const DASH_TILES = [{ k:'ge', th:'ผลด่วน', en:'Results' }, { k:'quiz', th:'หาโอชิ', en:'Find your oshi' }, { k:'cal', th:'ปฏิทิน', en:'Calendar' },
   { k:'shop', th:'ร้านค้า', en:'Shop' }, { k:'gal', th:'แกลเลอรี', en:'Gallery' }];
 function dashOrder(){
@@ -19616,7 +19652,7 @@ function applyDash(root){
     el.querySelector(':scope > .dash-tools')?.remove();
     if(edit){
       const en = isEN();
-      el.insertAdjacentHTML('beforeend', `<span class="dash-tools"><button data-action="dash-toggle" data-id="${k}" aria-label="${hid ? (en ? 'Show' : 'แสดง') : (en ? 'Hide' : 'ซ่อน')}">${hid ? ICONS.eyeOff : ICONS.eye}</button></span>`);
+      el.insertAdjacentHTML('beforeend', `<span class="dash-tools">${k === 'ge' ? '' : `<button data-action="dash-kind" data-id="${k}" aria-label="${en ? 'Change what it shows' : 'เปลี่ยนเนื้อหา'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3.5 7.5 7 11"/><path d="M3.5 7.5H17a3.5 3.5 0 0 1 3.5 3.5"/><path d="M17 20l3.5-3.5L17 13"/><path d="M20.5 16.5H7A3.5 3.5 0 0 1 3.5 13"/></svg></button>`}<button data-action="dash-toggle" data-id="${k}" aria-label="${hid ? (en ? 'Show' : 'แสดง') : (en ? 'Hide' : 'ซ่อน')}">${hid ? ICONS.eyeOff : ICONS.eye}</button></span>`);
     }
   });
 }
@@ -19639,7 +19675,7 @@ function cleanLayout(L){
   }
   const d = out.dash;
   if(!d) delete out.dash;
-  else if( JSON.stringify(d.order || dashDefault()) === JSON.stringify(dashDefault()) && !(d.hidden || []).length) delete out.dash;
+  else if( JSON.stringify(d.order || dashDefault()) === JSON.stringify(dashDefault()) && !(d.hidden || []).length && !Object.keys(d.kinds || {}).length) delete out.dash;
   if(!out.bg) delete out.bg;
   if(!out.acc) delete out.acc;
   if(!out.nav || JSON.stringify(out.nav) === JSON.stringify(NAV_DEFAULT)) delete out.nav;
@@ -19675,6 +19711,27 @@ function leaveLayoutEdit(save){
   if(save){ state.layout = { ...(state.layout || {}), [state.layoutEdit]: state.layoutDraft[state.layoutEdit], ...(state.layoutEdit === 'home' ? { dash: state.layoutDraft.dash } : {}) }; saveLayout(); }
   state.layoutEdit = null; state.layoutDraft = null;
   render();
+}
+/* a dashboard tile's contents: the kinds not on another tile, and the one it has now */
+function openDashKindSheet(slot){
+  if(state.layoutEdit !== 'home') return;
+  const en = isEN(), d = state.layoutDraft.dash = state.layoutDraft.dash || {}, kinds = d.kinds = d.kinds || {};
+  const now = kinds[slot] || slot, used = new Set(['quiz', 'cal', 'shop', 'gal'].filter(k => k !== slot).map(k => kinds[k] || k));
+  closeShareSheet();
+  const el = document.createElement('div');
+  el.className = 'share-sheet';
+  el.innerHTML = `<div class="share-back" data-share="close"></div>
+    <div class="share-panel" role="dialog" aria-label="${en ? 'What this tile shows' : 'ช่องนี้แสดงอะไร'}">
+      <div class="share-head"><b>${en ? 'What this tile shows' : 'ช่องนี้แสดงอะไร'}</b><button class="share-x" data-share="close" aria-label="${en ? 'Close' : 'ปิด'}">✕</button></div>
+      ${DASH_KINDS.filter(x => x.k === now || !used.has(x.k)).map(x => `<button class="lay-row${x.k === now ? ' is-now' : ''}" data-kind-pick="${x.k}"><span>${escapeHtml(en ? x.en : x.th)}</span>${x.k === now ? `<em>${en ? 'now' : 'ตอนนี้'}</em>` : '<i>→</i>'}</button>`).join('')}
+    </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  el.addEventListener('click', e => {
+    const pick = e.target.closest('[data-kind-pick]');
+    if(pick){ kinds[slot] = pick.dataset.kindPick; if(kinds[slot] === slot) delete kinds[slot]; closeShareSheet(); renderMain(); return; }
+    if(e.target.closest('[data-share="close"]')) closeShareSheet();
+  });
 }
 function openZoneSheet(){
   const page = state.layoutEdit;
@@ -25976,6 +26033,8 @@ function bindDelegatedEvents(){
       if(p){ p.hidden = p.hidden.includes(id) ? p.hidden.filter(x => x !== id) : [...p.hidden, id]; renderMain(); }
     }
     else if(action==='lay-sheet') openZoneSheet();
+    else if(action==='dash-kind'){ openDashKindSheet(id); }
+    else if(action==='tl-open'){ window.open(TL_POST(id), '_blank', 'noopener'); }
     else if(action==='dash-toggle'){
       if(state.layoutEdit !== 'home') return;
       const d = state.layoutDraft.dash = state.layoutDraft.dash || {};
