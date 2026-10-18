@@ -4220,6 +4220,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     text-decoration:none; font-size:13px; font-weight:800; box-shadow:0 3px 0 rgba(0,0,0,.18); border:1px solid rgba(0,0,0,.06); }
   .svc-btn img{ height:14px; width:auto; display:block; }
   .svc-btn:active{ transform:translateY(2px); box-shadow:none; }
+  .svc-btn.is-text{ background:#00A8E1; color:#fff; border-color:#00A8E1; padding:8px 16px; }
   .svc-ico{ display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#fff; box-shadow:0 2px 0 rgba(0,0,0,.2); margin:0 6px 0 0; }
   .svc-ico img{ height:15px; width:auto; display:block; }
   .mw-yt{ display:inline-flex; align-items:center; gap:6px; margin:8px 6px 0 0; text-decoration:none; }
@@ -8255,7 +8256,7 @@ const SEED_MEDIA = [
   { kind:'film', yt:'0YAvS9eWnRk', title:'The Fabric', alt:'ผ้าผีบอก', year:2022, members:['bnk-gygee', 'bnk-mobile', 'bnk-namneung', 'bnk-pupe', 'bnk-wee'] },
   { kind:'film', title:'SLR', year:2022, members:['bnk-cherprang'] },
   { kind:'series', title:'Self', alt:'เราเห็นนาย', year:2022, by:'Studio Commuan', members:['cgm-ping'] },
-  { kind:'film', title:'Taklee Genesis', year:2024, members:['bnk-peak'] },
+  { kind:'film', watch:[{ svc:'prime', url:'https://www.primevideo.com/detail/amzn1.dv.gti.7a67f26c-47ac-4fc0-90be-7b0ba9f7c78c' }], title:'Taklee Genesis', year:2024, members:['bnk-peak'] },
   { kind:'film', film:'_nf9OC98xQo', title:'To Do List', alt:'ไม่อยากให้เป็นครั้งสุดท้าย', year:2025, note:'short', own:true, members:['bnk-pancake', 'cgm-kaning', 'cgm-nenie', 'bnk-hoop', 'cgm-champoo', 'bnk-popper', 'cgm-sita', 'bnk-yoghurt', 'bnk-l', 'bnk-jew', 'bnk-grace', 'bnk-neen'], roles:{ 'bnk-pancake':'Takamiya Mika', 'cgm-kaning':'Eiike Hina', 'cgm-nenie':'Satoaki Hikari', 'bnk-hoop':'Katsushi Suzuka', 'cgm-champoo':'Maihara Renka', 'bnk-popper':'Kaneyoshi Aika', 'cgm-sita':'Masakazu Emi', 'bnk-yoghurt':'Fukune Miho', 'bnk-l':'Kurogane Eri', 'bnk-jew':'Tamaishi Tomomi', 'bnk-grace':'Toyosumi Arisa', 'bnk-neen':'Shirahana Nagisa' } },
   { kind:'voice', title:'Kamisama Minarai: Himitsu no Cocotama', year:2018, members:['bnk-music'], roles:{ 'bnk-music':'Kokoro Yotsuba' } },
   { kind:'voice', title:'Detective Conan: Fallen Angel of the Highway', year:2026, members:['bnk-hoop'], roles:{ 'bnk-hoop':'Minato Tateoki' } },
@@ -21805,7 +21806,9 @@ function mediaEps(w, en){
     <ol class="mw-eps-list" data-noloc>${L.map(([t, id, len]) => `<li><a href="https://www.youtube.com/watch?v=${encodeURIComponent(id)}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(t)}</span><small>${escapeHtml(len)}</small></a></li>`).join('')}</ol></details>`;
 }
 // the badge of each service is a plain mark in its colours, not its logo
-const STREAM_NAME = { netflix:'Netflix' };
+const STREAM_NAME = { netflix:'Netflix', prime:'Prime Video' };
+// services whose logo files are in streaming/ (the rest show their name as text until a logo is sent)
+const STREAM_LOGO = { netflix:true };
 const STREAM_BADGE = { netflix:'<span class="svc-n" aria-hidden="true">N</span>' };
 function mediaWatch(w, en, small){
   const chip = (href, label, aria) => `<a class="chip chip-link mw-yt${small ? ' is-small' : ''}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(aria)}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>${small ? '' : label}</a>`;
@@ -21815,7 +21818,8 @@ function mediaWatch(w, en, small){
   // a streaming service that still has the title (`watch` on the row): its own badge, dropped when the title leaves
   for(const x of w.watch || []) items.push([x.url, (en ? 'Watch on ' : 'ดูที่ ') + STREAM_NAME[x.svc], x.svc]);
   // the service's own logo: the wordmark on a long button, the N in a round one where space is short
-  const chipSvc = (href, label, svc) => small
+  const chipSvc = (href, label, svc) => !STREAM_LOGO[svc] ? `<a class="svc-btn is-${svc} is-text" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}"><span>${escapeHtml(label)}</span></a>`
+    : small
     ? `<a class="svc-ico is-${svc}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}" title="${escapeAttr(label)}"><img src="streaming/${svc}-n.png" alt="${escapeAttr(STREAM_NAME[svc])}" loading="lazy" decoding="async"></a>`
     : `<a class="svc-btn is-${svc}" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}"><img src="streaming/${svc}-wordmark.png" alt="${escapeAttr(STREAM_NAME[svc])}" loading="lazy" decoding="async"><span>${escapeHtml(label)}</span></a>`;
   return (small ? items.slice(0, 1) : items).map(([href, label, svc]) => svc ? chipSvc(href, label, svc) : chip(href, label, label + ' · ' + w.title)).join('');
