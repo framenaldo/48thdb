@@ -37,7 +37,9 @@ the Firebase CLI from the owner's machine.
   poster…) are drawn into `.ov-layer` at the end of `#main`; when only a sheet
   opens or closes over a page that has not changed (`pageSig`, which leaves out
   what refreshes itself in place: the "x minutes ago" and the home page's live
-  vote), `renderMain` swaps the sheets alone and runs only their set-up, and
+  vote, plus the saved arrangement), `renderMain` swaps the sheets alone and runs
+  only their set-up — never while a page is being arranged (zones move on screen
+  without a draw, so ค่าเดิม and hiding need the full draw) — and
   going back from a sheet calls `renderMain`, not `render`. Rebuilding the page
   under a sheet was the stutter on opening one. On phones sheets are solid, with
   no backdrop blur: blurring the page under a moving sheet cost every frame.

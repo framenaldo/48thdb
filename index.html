@@ -22586,8 +22586,11 @@ function renderMain(){
      sheets, and runs only their own set-up. Drawing the whole page again under a
      member's sheet made the browser lay all of it out as the sheet came up —
      the stutter on opening one on a phone. */
-  const layer = main.querySelector(':scope > .ov-layer'), sig = pageSig(page);
-  if(layer && sig === _drawnPage && state.view === _lastRenderedView){
+  // the reader's arrangement is applied after drawing (applyLayoutAll), and dragging a zone moves it on
+  // screen without a draw — so while a page is being arranged it is always drawn in full (ค่าเดิม, hiding
+  // or adding a zone did nothing on 18 Oct), and a saved arrangement counts as part of the page
+  const layer = main.querySelector(':scope > .ov-layer'), sig = pageSig(page) + '\u0000' + JSON.stringify(state.layout || null);
+  if(layer && !state.layoutEdit && sig === _drawnPage && state.view === _lastRenderedView){
     main.querySelectorAll('[data-ago]').forEach(el => { el.textContent = tlAgo(el.dataset.ago); });
     layer.innerHTML = over;
     _hsShown = !!layer.querySelector('.modal-scroll .hs');
