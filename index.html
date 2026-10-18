@@ -15346,17 +15346,23 @@ SEAT_LAYOUTS['union-roadshow'] = (() => {
   };
 })();
 /* Central Chiangmai Airport's Grand Hall (ลานกิจกรรม ชั้น 1), the same zones as
-   Union's chart, measured off photos of an earlier show on the same floor: a
-   stage about 0.8 m high, a screen behind, a speaker on a pole either side
-   over a sub, monitors on the edge, a walkway in front of the first row, and
-   some 50 chairs — five rows of ten, five either side of an aisle. A sketch. */
+   Union's chart, measured off photos of an earlier show on the same floor and of
+   this one (17 Oct 2026): a stage about 0.8 m high, a printed backdrop behind with
+   moving heads and LED bars along its foot and a lighting truss at its left, a
+   speaker on a pole over a sub at each front corner — nothing on the stage's
+   front edge — a walkway in front of the first row, and some 50 chairs — five
+   rows of ten, five either side of an aisle. A sketch. */
 SEAT_LAYOUTS['cnx-roadshow'] = (() => {
   // packed tight, as in the photos: the standing zones all but touch the seats
   const W = 8, dark = { top:'#151116', side:'#3a3139' }, steel = { top:'#9AA0A8', side:'#9AA0A8' };
+  // on the floor at a front corner of the stage, close in
   const speaker = x => [
-    { pts:SP_RM(x, 2.6, 0.6, 0.6), h:0.6 * SP_M, ...dark },                                              // the sub
-    { pts:SP_RM(x + 0.26, 2.86, 0.08, 0.08), z0:0.6 * SP_M, h:1.2 * SP_M, ...steel },                      // the pole
-    { pts:SP_RM(x, 2.65, 0.6, 0.5), z0:1.8 * SP_M, h:0.8 * SP_M, ...dark, text:'ลำโพง', at:[(x + 0.3) * SP_M, 2.9 * SP_M] } ];
+    { pts:SP_RM(x, 3.0, 0.6, 0.6), h:0.6 * SP_M, ...dark },                                              // the sub
+    { pts:SP_RM(x + 0.26, 3.26, 0.08, 0.08), z0:0.6 * SP_M, h:1.2 * SP_M, ...steel },                      // the pole
+    { pts:SP_RM(x, 3.05, 0.6, 0.5), z0:1.8 * SP_M, h:0.8 * SP_M, ...dark, text:'ลำโพง', at:[(x + 0.3) * SP_M, 3.3 * SP_M] } ];
+  // the lights along the foot of the backdrop: moving heads and LED bars, left to right as in the photo
+  const head = x => ({ pts:SP_RM(x, 0.12, 0.36, 0.36), z0:0.8 * SP_M, h:0.5 * SP_M, ...dark });
+  const bar = x => ({ pts:SP_RM(x, 0.18, 0.95, 0.22), z0:0.8 * SP_M, h:0.14 * SP_M, top:'#9FE3B0', side:'#2b2630' });
   return {
     cx:W / 2 * SP_M, cy:6.7 * SP_M, w:(W + 5.4) * SP_M, tightZ:true,
     levels:{ floor:{ th:'พื้น', en:'Floor', m:0, cap:{ th:['พื้น'], en:['Floor'] } } },
@@ -15365,8 +15371,9 @@ SEAT_LAYOUTS['cnx-roadshow'] = (() => {
     blocks:[
       { pts:SP_RM(0.3, -0.35, W - 0.6, 0.2), h:3.2 * SP_M, ...SP_WALL },                                    // the screen
       { pts:SP_RM(0, 0, W, 3.6), h:0.8 * SP_M, text:'STAGE', at:[W / 2 * SP_M, 1.7 * SP_M], big:true },   // the stage
-      ...[1.0, 2.7, 4.75, 6.45].map(x => ({ pts:SP_RM(x, 3.1, 0.55, 0.42), z0:0.8 * SP_M, h:0.3 * SP_M, ...dark })),   // monitors
-      ...speaker(-1.4), ...speaker(W + 0.8) ],
+      head(0.25), bar(0.95), head(2.05), bar(2.75), bar(3.85), head(5.15), bar(5.85), head(7.35),
+      { pts:SP_RM(-0.05, -0.45, 0.3, 0.3), h:3.4 * SP_M, ...steel },                                       // the lighting truss
+      ...speaker(-0.75), ...speaker(W + 0.15) ],
     sections:{
       Z1:{ level:'floor', pts:SP_RM(0, 3.7, W, 5.7), at:[W / 2 * SP_M, 3.75 * SP_M], text:'ZONE 1', under:true, labelTop:true, small:true },
       Z3L:{ level:'floor', pts:SP_RM(-1.7, 3.7, 1.6, 7.8), at:[-0.9 * SP_M, 7.6 * SP_M], text:'3', under:true },
