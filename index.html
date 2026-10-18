@@ -19833,14 +19833,24 @@ function tileStart(el, x, y){
   tileCancelPend();
   const r = el.getBoundingClientRect();
   el.classList.add('tile-up');
-  _td = { el, gx:x - (r.left + r.width / 2), gy:y - (r.top + r.height / 2) };
+  _td = { el, gx:x - (r.left + r.width / 2), gy:y - (r.top + r.height / 2), slots:null, at:0 };
+  tileSlots();
   try{ navigator.vibrate && navigator.vibrate(12); }catch(e){}
   tileMove(x, y);
 }
+// where every tile's slot is, as laid out (not as it is sliding): the check for "over another tile" reads these,
+// since a tile still sliding into place sat under the finger and was swapped straight back, over and over
+function tileSlots(){
+  const T = _td, sy = window.scrollY, was = T.el.style.transform;
+  T.el.style.transform = '';
+  T.slots = [...T.el.parentElement.querySelectorAll(':scope > [data-tile]')].filter(o => getComputedStyle(o).display !== 'none').map(o => {
+    const r = o.getBoundingClientRect(); return { el:o, l:r.left, t:r.top + sy, w:r.width, h:r.height }; });
+  T.el.style.transform = was;
+}
 function tileMove(x, y){
-  const T = _td, box = T.el.parentElement;
-  const hit = [...box.querySelectorAll(':scope > [data-tile]')].filter(o => o !== T.el && getComputedStyle(o).display !== 'none')
-    .find(o => { const r = o.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; });
+  const T = _td, box = T.el.parentElement, sy = window.scrollY;
+  // the middle of a slot only: crossing an edge does not swap, so the finger can rest on a border
+  const hit = performance.now() - T.at < 220 ? null : (T.slots.find(o => o.el !== T.el && x >= o.l + o.w * .18 && x <= o.l + o.w * .82 && y + 0 >= o.t - sy + o.h * .18 && y <= o.t - sy + o.h * .82) || {}).el;
   if(hit){
     const d = state.layoutDraft.dash = state.layoutDraft.dash || {};
     d.order = dashOrder(); d.hidden = d.hidden || [];
@@ -19851,6 +19861,8 @@ function tileMove(x, y){
     const [k] = d.order.splice(ia, 1); d.order.splice(ib, 0, k);
     const tools = [...box.querySelectorAll(':scope > [data-tile]')].map(o => o.querySelector(':scope > .dash-tools'));
     box.querySelectorAll(':scope > [data-tile]').forEach(o => { o.style.order = d.order.indexOf(o.dataset.tile) + 1; });
+    T.at = performance.now();
+    tileSlots();
     for(const [o, r0] of first){
       if(o === T.el) continue;
       const r1 = o.getBoundingClientRect(), dx = r0.left - r1.left, dy = r0.top - r1.top;
