@@ -162,7 +162,7 @@ the Firebase CLI from the owner's machine.
   A roadshow's banner word is TT Ricordi Allegria from Adobe Fonts (kit
   `umx5wsc`, its stylesheet fetched only when a roadshow banner is drawn; the
   script stays as the fallback).
-- A work in the Works page can carry `yt` on its SEED_MEDIA row, the id of a video
+- A work in the Works page can carry `yt` (a trailer, a first episode, a live), `film` (the whole film, from the owner) and `chan` (a channel of its own, e.g. `@theskaxbnk4868`) on its SEED_MEDIA row, the id of a video
   on the groups' own YouTube channels (BNK48, CGM48, BNK48 and CGM48): a trailer for a
   film, the full live for a concert or election, the first episode of a show. They were
   found by searching YouTube by title and taken only from those channels (31 of 187 the
