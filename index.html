@@ -5749,7 +5749,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @keyframes fest-sweep{ from{ transform:rotate(var(--a)); } to{ transform:rotate(var(--z)); } }
   /* the meadow's grass: a strip at the foot of the screen, in front of the page and under the menu bar */
   #fest-grass{ top:auto; bottom:0; z-index:9; }
-  :root[data-fest="meadow"] #fest-grass{ display:block; }
+  /* the ground the blades grow from carries on below the screen's edge: Safari on the iPhone
+     draws the page under its floating address bar, past where a fixed bottom:0 ends, so
+     without it the grass hangs in the air with the page showing beneath */
+  #fest-turf{ top:auto; bottom:-200px; height:201px; z-index:9; background:#2F6421; }
+  :root[data-fest="meadow"] :is(#fest-grass, #fest-turf){ display:block; }
   #fest-water{ top:auto; bottom:0; height:72px; background:linear-gradient(to bottom, rgba(10,20,52,0), rgba(10,20,52,.88) 30%, rgba(4,8,22,.96)); }
   #fest-fog{ top:auto; bottom:-40px; left:0; width:100vw; height:220px; opacity:.7;
     background:radial-gradient(40% 60% at 25% 70%, rgba(120,52,84,.22), transparent 70%), radial-gradient(35% 55% at 70% 80%, rgba(120,52,84,.18), transparent 70%); }
@@ -22432,6 +22436,7 @@ const FEST = (() => {
      a whoosh when the page is flung, and a finger near the bottom parts them.
      A few daisies, and the dandelion clocks the seeds come from. */
   const grassEl = mk('canvas', 'fest-grass', 'fest-layer'), gg = grassEl.getContext('2d');
+  const turfEl = mk('div', 'fest-turf', 'fest-layer');
   let blades = [], puffs = [], GH = 90, gTop = 0, nextGust = 1.5, roots = null;
   const gust = { x: -9999, v: 0, a: 0, w: 160 };
   // per depth, far to near, by day and by night; the last is the few dry blades. Flat colours: a gradient
@@ -22491,6 +22496,10 @@ const FEST = (() => {
     if(!roots || roots._n !== NIGHT){ roots = gg.createLinearGradient(0, B - 44, 0, B); roots.addColorStop(0, 'rgba(0,0,0,0)');
       roots.addColorStop(1, NIGHT ? 'rgba(4,14,8,.65)' : 'rgba(34,70,22,.6)'); roots._n = NIGHT; }
     gg.fillStyle = roots; gg.fillRect(0, B - 44, W, 44);
+    // the soil line: the blades' feet fade into the solid ground of #fest-turf below the screen's edge
+    if(!roots.soil){ const turf = NIGHT ? '#0F2416' : '#2F6421'; turfEl.style.background = turf;
+      roots.soil = gg.createLinearGradient(0, B - 14, 0, B - 2); roots.soil.addColorStop(0, turf + '00'); roots.soil.addColorStop(1, turf); }
+    gg.fillStyle = roots.soil; gg.fillRect(0, B - 14, W, 14);
     // the clocks' heads stand over the front blades: a soft white ball of fine rays
     gg.fillStyle = NIGHT ? 'rgba(220,226,210,.18)' : 'rgba(255,255,255,.85)'; gg.beginPath();
     for(const [x, y] of puffHeads){ gg.moveTo(x + 8.5, y); gg.arc(x, y, 8.5, 0, 7); } gg.fill();
