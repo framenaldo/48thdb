@@ -33,7 +33,7 @@ the Firebase CLI from the owner's machine.
   which writes sitemap.xml.
 
 - A page's tab is in its address so a reload lands on it: `/works/film`, `/works/concert`, `/works/event`, `/works/series`, `/works/special`,
-  `/works/mv`, `/works/ad` for the Works categories (`WORKS_SLUGS`; the songs are `/works`), `?d=albums` (its list), `/stats?st=songs` (`urlForSnapshot`, `applyUrlToState`).
+  `/works/mv`, `/works/ad` for the Works categories (`WORKS_SLUGS`; the songs are `/works/songs`; `/works` still opens), `?d=albums` (its list), `/stats?st=songs` (`urlForSnapshot`, `applyUrlToState`).
   A new tab on a page needs the same.
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
   handler, and views switched on `state.view`. Sheets (member, event, day,
@@ -132,7 +132,7 @@ the Firebase CLI from the owner's machine.
   counted off the organiser's chart): drawn as little chairs in 3D, rings in
   2D, and counted on each zone's row. Chairs only, never what is sold. MCC
   Hall's are 2,350.
-- The Works page (/works, once /music; view `discography`) holds everything the groups made
+- The Works page (/works/songs, once /music; view `discography`) holds everything the groups made
   or took part in: the songs, then concerts, events, films, series, shows, other
   artists' MVs and ads from `SEED_MEDIA`, picked by category (`WORKS_CATS`). A
   concert or event carries its `date` (and `end`), venue as `by`, and `ev` when
