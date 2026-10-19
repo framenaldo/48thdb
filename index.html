@@ -3775,6 +3775,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .set-go:active{ transform:translateY(1px); }
   .set-gi{ width:18px; height:18px; flex:none; color:var(--bnk); } .set-gi svg{ width:100%; height:100%; display:block; }
   .set-go .shop-dot{ position:static; margin-left:auto; }
+  .inst-steps{ margin:4px 0 6px; padding:0 0 0 22px; display:grid; gap:10px; font-size:15px; line-height:1.5; }
+  .inst-steps li::marker{ font-weight:800; color:var(--brand-a); }
   .set-go.is-quiz{ grid-column:1 / -1; background:color-mix(in srgb, var(--brand-a) 9%, var(--card)); border-color:color-mix(in srgb, var(--brand-a) 35%, var(--line)); }
   .set-h{ font-size:11px; font-weight:800; color:var(--ink-soft); padding:8px 6px 3px; }
   .set-seg{ display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:3px; border-radius:14px; background:var(--paper-dim); }
@@ -8446,6 +8448,7 @@ const SEED_MEDIA = [
   { kind:'mv', title:'เหงา...เข้าใจ', year:2026, by:'4EVE', members:['bnk-hoop'] },
 ];
 const ICONS = {
+  install:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M12 8v6M9.5 11.5 12 14l2.5-2.5"/></svg>`,
   star:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></svg>`,
   starOn:`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></svg>`,
   ticket:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5Z"/><path d="M14 6v2M14 11v2M14 16v2"/></svg>`,
@@ -10124,6 +10127,34 @@ async function saveOshiData(){
 
 // ============================= RENDER: PIECES =============================
 /* the header's one menu: the pages that used to have buttons up here, then light or dark and the language */
+/* ---- "Add to Home Screen": the page is a web app (manifest + service worker); Chrome offers its own install prompt,
+   iPhone Safari has none, so it gets the steps ---- */
+let _installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); _installEvt = e; });
+window.addEventListener('appinstalled', () => { _installEvt = null; if(state.setMenuOpen) render(); });
+function isInstalledApp(){ try{ return navigator.standalone === true || matchMedia('(display-mode: standalone)').matches; }catch(e){ return false; } }
+async function installApp(){
+  if(_installEvt){ const e = _installEvt; _installEvt = null; try{ e.prompt(); await e.userChoice; }catch(x){} return; }
+  const en = isEN(), ua = navigator.userAgent, ios = /iPhone|iPad|iPod/.test(ua) || (/Mac/.test(ua) && navigator.maxTouchPoints > 1);
+  const share = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg>';
+  const steps = ios
+    ? (en ? [`Open this page in <b>Safari</b>`, `Tap ${share} <b>Share</b> at the bottom`, `Scroll down and tap <b>Add to Home Screen</b>`, `Tap <b>Add</b>`]
+          : [`เปิดหน้านี้ใน <b>Safari</b>`, `แตะปุ่ม ${share} <b>แชร์</b> ที่แถบด้านล่าง`, `เลื่อนลงแล้วแตะ <b>เพิ่มลงในหน้าจอโฮม</b>`, `แตะ <b>เพิ่ม</b>`])
+    : (en ? [`Open the browser menu <b>⋮</b>`, `Tap <b>Install app</b> or <b>Add to Home screen</b>`]
+          : [`เปิดเมนูของเบราว์เซอร์ <b>⋮</b>`, `แตะ <b>ติดตั้งแอป</b> หรือ <b>เพิ่มไปยังหน้าจอหลัก</b>`]);
+  closeShareSheet();
+  const el = document.createElement('div');
+  el.className = 'share-sheet';
+  el.innerHTML = `<div class="share-back" data-share="close"></div>
+    <div class="share-panel" role="dialog" aria-label="${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}">
+      <div class="share-head"><b>${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}</b><button class="share-x" data-share="close" aria-label="${en ? 'Close' : 'ปิด'}">✕</button></div>
+      <p class="lay-sheet-note">${en ? 'It opens like an app, full screen, with its own icon.' : 'เปิดได้เหมือนแอป เต็มจอ มีไอคอนของตัวเอง'}</p>
+      <ol class="inst-steps">${steps.map(t => `<li>${t}</li>`).join('')}</ol>
+    </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  el.addEventListener('click', e => { if(e.target.closest('[data-share="close"]')) closeShareSheet(); });
+}
 function renderSetMenu(){
   const en = isEN(), shops = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
   const go = (action, icon, label, extra) => `<button class="set-go" data-action="${action}"><span class="set-gi">${icon}</span>${label}${extra || ''}</button>`;
@@ -10133,6 +10164,7 @@ function renderSetMenu(){
       ${go('nav-calendar', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>', en ? 'Calendar' : 'ปฏิทิน')}
       ${go('nav-gallery', ICONS.gallery, en ? 'Gallery' : 'แกลเลอรี')}
       ${go('nav-shop', ICONS.shop, en ? 'Shop' : 'ร้านค้า', shops ? `<span class="shop-dot">${shops}</span>` : '')}
+      ${isInstalledApp() ? '' : `<button class="set-go is-quiz" data-action="install-app"><span class="set-gi">${ICONS.install}</span>${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}</button>`}
       <button class="set-go is-quiz" data-action="nav-quiz"><span class="set-gi">${ICONS.star}</span>${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</button>
     </div>
     <div class="set-h">${en ? 'Look' : 'หน้าตา'}</div>
@@ -26449,6 +26481,7 @@ function bindDelegatedEvents(){
       state.ageMin=''; state.ageMax=''; state.heightMin=''; state.heightMax=''; state.birthMonth='all';
       renderMain(); replaceHistory();
     }
+    else if(action==='install-app'){ state.setMenuOpen = false; render(); installApp(); }
     else if(action==='toggle-theme'){
       applyTheme(state.theme==='dark' ? 'light' : 'dark');
     }
