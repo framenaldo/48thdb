@@ -229,6 +229,22 @@ DTSTART;TZID=Asia/Bangkok:20260920T120000
 DTEND;TZID=Asia/Bangkok:20260920T180000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-mbk-haunted-graveyard-1020-2026-10-20@48thdb
+DTSTAMP:20261020T000000Z
+SUMMARY:MBK Center THE HAUNTED GRAVEYARD #ป่าช้าสยองข
+ วัญ
+LOCATION:ชั้น 7 Zone A\, MBK Center\, Bangkok
+DESCRIPTION:เมมเบอร์: Praew\, Emmy\, Marine\, Palmmy\n• 1
+ 5:00 งานแถลงข่าว THE HAUNTED GRAVEYARD #ป่าช
+ ้าสยองขวัญ\n• ร่วมงานกับ Popper\
+ n• ศิลปิน BNK48 ร่วมงานแถลงข่า
+ ว: Praew\, Emmy\, Marine และ Palmmy\n\nhttps://48thdb.com/?e=ev-mb
+ k-haunted-graveyard-1020
+URL:https://48thdb.com/?e=ev-mbk-haunted-graveyard-1020
+DTSTART;TZID=Asia/Bangkok:20261020T150000
+DTEND;TZID=Asia/Bangkok:20261020T160000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-kimi-special-event-bangkapi-2026-10-13@48thdb
 DTSTAMP:20261013T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Special Eve
