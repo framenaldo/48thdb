@@ -5753,7 +5753,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      draws the page under its floating address bar, past where a fixed bottom:0 ends, so
      without it the grass hangs in the air with the page showing beneath */
   #fest-turf{ top:auto; bottom:-200px; height:201px; z-index:9; background:#2F6421; }
-  :root[data-fest="meadow"] :is(#fest-grass, #fest-turf){ display:block; }
+  /* the grass is taken off for now (GRASS_ON in the script): the strip never fits Safari's bottom edge on every phone.
+     Put GRASS_ON back to true to bring it back, and this rule back to display:block */
+  :root[data-fest="meadow"] :is(#fest-grass, #fest-turf){ display:none; }
   #fest-water{ top:auto; bottom:0; height:72px; background:linear-gradient(to bottom, rgba(10,20,52,0), rgba(10,20,52,.88) 30%, rgba(4,8,22,.96)); }
   #fest-fog{ top:auto; bottom:-40px; left:0; width:100vw; height:220px; opacity:.7;
     background:radial-gradient(40% 60% at 25% 70%, rgba(120,52,84,.22), transparent 70%), radial-gradient(35% 55% at 70% 80%, rgba(120,52,84,.18), transparent 70%); }
@@ -22468,8 +22470,9 @@ const FEST = (() => {
     const target = (o.rest || 0) + windAt(o.x, o.h) + Math.sin(T * (3.4 + o.h * .02) + o.ph) * flutter;
     o.v += (o.k * (target - o.a) - 5.5 * o.v) * dt; o.a = Math.max(-1.25, Math.min(1.25, o.a + o.v * dt));
   }
+  const GRASS_ON = false;
   function drawGrass(dt){
-    if(!grassEl.width) return;
+    if(!GRASS_ON || !grassEl.width) return;
     gTop = innerHeight - GH;
     if(dt){ nextGust -= dt; if(nextGust <= 0){ Object.assign(gust, { x: -260, v: rnd(170, 280), a: rnd(.22, .48), w: rnd(110, 220) }); nextGust = rnd(3.5, 8); }
       gust.x += gust.v * dt;

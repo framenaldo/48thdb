@@ -102,6 +102,7 @@ the Firebase CLI from the owner's machine.
   each theme has a sky and colours for both (`NIGHT` in the script; the night
   themes by day, the day themes at night, in the CSS beside each).
   Things on `.today-hero` and `.ev-card` move with the scroll. The meadow's grass is
+  switched off (`GRASS_ON` false, its CSS display:none — Safari's bottom edge never let it sit right); it was
   its own strip at the foot of the screen (`#fest-grass`, in front of the page, under
   the menu bar): three depths of flat-coloured tapered blades on springs, a rolling
   breeze, passing gusts, the page's fling and a finger parting them, with daisies
