@@ -3775,6 +3775,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .set-go:active{ transform:translateY(1px); }
   .set-gi{ width:18px; height:18px; flex:none; color:var(--bnk); } .set-gi svg{ width:100%; height:100%; display:block; }
   .set-go .shop-dot{ position:static; margin-left:auto; }
+  .inst-why{ margin:2px 0 14px; padding:0; list-style:none; display:grid; gap:7px; font-size:14px; line-height:1.45; }
+  .inst-why li{ position:relative; padding-left:22px; } .inst-why li::before{ content:'✓'; position:absolute; left:2px; font-weight:800; color:var(--brand-b); }
+  .set-two{ display:grid; text-align:left; line-height:1.25; } .set-two small{ font-size:11.5px; font-weight:600; opacity:.7; }
   .inst-steps{ margin:4px 0 6px; padding:0 0 0 22px; display:grid; gap:10px; font-size:15px; line-height:1.5; }
   .inst-steps li::marker{ font-weight:800; color:var(--brand-a); }
   .set-go.is-quiz{ grid-column:1 / -1; background:color-mix(in srgb, var(--brand-a) 9%, var(--card)); border-color:color-mix(in srgb, var(--brand-a) 35%, var(--line)); }
@@ -10148,7 +10151,9 @@ async function installApp(){
   el.innerHTML = `<div class="share-back" data-share="close"></div>
     <div class="share-panel" role="dialog" aria-label="${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}">
       <div class="share-head"><b>${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}</b><button class="share-x" data-share="close" aria-label="${en ? 'Close' : 'ปิด'}">✕</button></div>
-      <p class="lay-sheet-note">${en ? 'It opens like an app, full screen, with its own icon.' : 'เปิดได้เหมือนแอป เต็มจอ มีไอคอนของตัวเอง'}</p>
+      <p class="lay-sheet-note"><b>${en ? 'Keep 48thDb on your phone like an app' : 'เก็บ 48thDb ไว้ในเครื่องเหมือนแอป'}</b></p>
+      <ul class="inst-why">${(en ? ['One tap from the home screen: no searching, no typing the address', 'Opens full screen, with no browser bars', 'Its own icon next to your other apps', 'Always the latest: it updates itself, nothing to download again']
+        : ['แตะที่ไอคอนหน้าโฮมก็เข้าเลย ไม่ต้องค้นหาหรือพิมพ์ที่อยู่เว็บ', 'เปิดเต็มจอ ไม่มีแถบเบราว์เซอร์บัง', 'มีไอคอนของตัวเองอยู่ข้างแอปอื่น ๆ', 'ได้ของใหม่ล่าสุดทุกครั้งที่เปิด ไม่ต้องโหลดแอปใหม่']).map(t => `<li>${t}</li>`).join('')}</ul>
       <ol class="inst-steps">${steps.map(t => `<li>${t}</li>`).join('')}</ol>
     </div>`;
   document.body.appendChild(el);
@@ -10164,7 +10169,7 @@ function renderSetMenu(){
       ${go('nav-calendar', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>', en ? 'Calendar' : 'ปฏิทิน')}
       ${go('nav-gallery', ICONS.gallery, en ? 'Gallery' : 'แกลเลอรี')}
       ${go('nav-shop', ICONS.shop, en ? 'Shop' : 'ร้านค้า', shops ? `<span class="shop-dot">${shops}</span>` : '')}
-      ${isInstalledApp() ? '' : `<button class="set-go is-quiz" data-action="install-app"><span class="set-gi">${ICONS.install}</span>${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}</button>`}
+      ${isInstalledApp() ? '' : `<button class="set-go is-quiz" data-action="install-app"><span class="set-gi">${ICONS.install}</span><span class="set-two">${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}<small>${en ? 'Opens like an app, in one tap' : 'เปิดเหมือนแอป แตะเดียวเข้าเลย'}</small></span></button>`}
       <button class="set-go is-quiz" data-action="nav-quiz"><span class="set-gi">${ICONS.star}</span>${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</button>
     </div>
     <div class="set-h">${en ? 'Look' : 'หน้าตา'}</div>
