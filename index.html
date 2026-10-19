@@ -6755,6 +6755,17 @@ const SEED_SCHEDULE = [
       'Zone 1 โซนรับชมด้านในบริเวณกิจกรรม ถ่ายภาพได้โดยยกความสูงไม่เกินศีรษะ และไม่รบกวนผู้อื่น',
       'Zone 2 โซนสำหรับช่างภาพที่ต้องการบันทึกภาพและวีดีโอ ใช้กล้องได้ทุกชนิด และใช้อุปกรณ์เสริมได้',
       'ภาพสินค้าสำหรับการโฆษณาเท่านั้น'] },
+  // a press event in MBK Center's Halloween: Popper (a guest) and four BNK48 members; about an hour
+  { id:'ev-mbk-haunted-graveyard-1020', start:'2026-10-20', time:'15:00', until:'16:00',
+    title:'MBK Center THE HAUNTED GRAVEYARD #ป่าช้าสยองขวัญ',
+    venue:'ชั้น 7 Zone A, MBK Center, Bangkok', groups:['bnk48'],
+    members:['bnk-praew','bnk-emmy','bnk-marine','bnk-palmmy'],
+    poster:{ accent:'#C8141B', surface:'#F6ECEC', ink:'#3A0A0D', img:'posters/mbk-haunted-graveyard-1020.webp', w:1601, h:2000, scene:'night' },
+    detail:[
+      '15:00 งานแถลงข่าว THE HAUNTED GRAVEYARD #ป่าช้าสยองขวัญ'],
+    info:[
+      'ร่วมงานกับ Popper',
+      'ศิลปิน BNK48 ร่วมงานแถลงข่าว: Praew, Emmy, Marine และ Palmmy'] },
   { id:'ev-cgm48-popup-live-cnx', start:'2026-09-22', time:'18:00', until:'19:00',
     title:'CGM48 POP UP LIVE ON TOUR',
     venue:'MUAN MORE SPACE, Chiang Mai', groups:['cgm48'],
@@ -12243,6 +12254,7 @@ const FEST_EVENT = {
   'ev-hoop-bday-said': { sub:'THEATER SHOW' },
   'ev-partner-1017':   { word:'Lanna Expo 2026', sub:'JAPAN–THAILAND 140TH ANNIVERSARY' },
   'ev-cgm48-popup-halloween-1015': { word:'POP UP หลอน', sub:'CGM48 · HALLOWEEN', motif:'spooky', fx:'moon', pal:'blood', own:true },
+  'ev-mbk-haunted-graveyard-1020': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-cgm48-popup-halloween-ontour-1020': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
 };
 function festKind(ev){
