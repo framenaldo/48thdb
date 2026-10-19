@@ -33,7 +33,8 @@ the Firebase CLI from the owner's machine.
   which writes sitemap.xml.
 
 - A page's tab is in its address so a reload lands on it: `/works/film`, `/works/concert`, `/works/event`, `/works/series`, `/works/special`,
-  `/works/mv`, `/works/ad` for the Works categories (`WORKS_SLUGS`; the songs are `/works/songs`; `/works` still opens), `?d=albums` (its list), `/stats?st=songs` (`urlForSnapshot`, `applyUrlToState`).
+  `/works/mv`, `/works/ad` for the Works categories (`WORKS_SLUGS`; the songs are `/works/songs`; `/works` still opens), `/works/songs/albums` (its list), `/stats/songs` (the stats tab; the old
+  `?d=` `?c=` `?st=` forms still open and are rewritten) (`urlForSnapshot`, `applyUrlToState`).
   A new tab on a page needs the same.
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
   handler, and views switched on `state.view`. Sheets (member, event, day,

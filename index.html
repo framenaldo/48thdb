@@ -23362,8 +23362,8 @@ function urlForSnapshot(snap){
   // the tab a page is on, so a reload (or a shared link) lands on it and not on the first: the Works page's category and
   // list, the stats tab (nothing else is in the address when a sheet is open over them)
   if(![...p.keys()].length){
-    if(snap.view === 'discography'){ path = '/works/' + (snap.worksCat === 'music' || !snap.worksCat ? 'songs' : snap.worksCat); if(snap.discTab && snap.discTab !== 'singles') p.set('d', snap.discTab); }
-    else if(snap.view === 'stats' && snap.statsTab && snap.statsTab !== 'overview') p.set('st', snap.statsTab);
+    if(snap.view === 'discography'){ path = '/works/' + (snap.worksCat === 'music' || !snap.worksCat ? 'songs' : snap.worksCat); if((snap.worksCat === 'music' || !snap.worksCat) && snap.discTab && snap.discTab !== 'singles') path += '/' + snap.discTab; }
+    else if(snap.view === 'stats' && snap.statsTab && snap.statsTab !== 'overview') path = '/stats/' + snap.statsTab;
   }
   const q = p.toString();
   return path + (q ? '?' + q : '') ;
@@ -23417,11 +23417,11 @@ function applyUrlToState(){
   if(view === 'gallery'){ state.view = 'gallery'; state.galleryId = galRoom(p.get('g') || seg[1]).id; return; }
   if(view && SHAREABLE_VIEWS.includes(view)){ state.view = view; if(view === 'timeline') state.timelineId = 'ge2026'; }
   if(state.view === 'discography'){
-    const c = p.get('c') || (WORKS_SLUGS.includes(seg[0]) ? seg[0] : seg[0] === 'works' && seg[1] === 'songs' ? 'music' : seg[0] === 'works' && WORKS_SLUGS.includes(seg[1]) ? seg[1] : null), d = p.get('d');
+    const c = p.get('c') || (WORKS_SLUGS.includes(seg[0]) ? seg[0] : seg[0] === 'works' && seg[1] === 'songs' ? 'music' : seg[0] === 'works' && WORKS_SLUGS.includes(seg[1]) ? seg[1] : null), d = p.get('d') || (seg[0] === 'works' && seg[1] === 'songs' ? seg[2] : null);
     if(c && WORKS_CATS.some(x => x.id === c)) state.worksCat = c;
     if(d && DISC_TABS.some(x => x.id === d)) state.discTab = d;
   }
-  if(state.view === 'stats'){ const st = p.get('st'); if(st && STATS_TABS.some(x => x.id === st)) state.statsTab = st; }
+  if(state.view === 'stats'){ const st = p.get('st') || (seg[0] === 'stats' ? seg[1] : null); if(st && STATS_TABS.some(x => x.id === st)) state.statsTab = st; }
 }
 
 const BACKUP_FORMAT = '48thdb-oshi-1';
