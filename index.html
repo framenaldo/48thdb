@@ -5852,9 +5852,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .fest-faces .fest-face + .fest-face{ margin-left:-10px; }
 </style>
 <script>
-  /* Runs before first paint: a stored choice wins, otherwise follow the OS. */
+  /* Runs before first paint: follow the OS. A tap on the switch holds only for this visit (sessionStorage). */
   (function(){
-    var t; try{ t = localStorage.getItem('48thdb-theme'); }catch(e){}
+    var t; try{ localStorage.removeItem('48thdb-theme'); t = sessionStorage.getItem('48thdb-theme'); }catch(e){}
     if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t;
   })();
@@ -8488,14 +8488,19 @@ let state = {
   theme: document.documentElement.dataset.theme || 'light'
 };
 
-function applyTheme(theme){
+function applyTheme(theme, fromSystem){
   state.theme = theme;
   document.documentElement.dataset.theme = theme;
-  try{ localStorage.setItem('48thdb-theme', theme); }catch(e){}
+  try{ if(fromSystem) sessionStorage.removeItem('48thdb-theme'); else sessionStorage.setItem('48thdb-theme', theme); }catch(e){}
   const btn = document.querySelector('.theme-btn');
   if(btn) btn.innerHTML = theme==='dark' ? ICONS.sun : ICONS.moon;
   if(typeof FEST !== 'undefined') FEST.sync();   // a themed home page keeps its theme's light or dark
 }
+
+// the device switches light/dark (settings, or by the clock): the site follows at once
+try{
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => applyTheme(e.matches ? 'dark' : 'light', true));
+}catch(e){}
 
 // ============================= HELPERS =============================
 function getGroup(id){ return GROUPS.find(g=>g.id===id); }
