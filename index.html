@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<base href="/">   <!-- every address in the page is from the root, so /works/film finds its pictures and data -->
 <script>/* /gallery/ and /gallery are the same page; without the slash, relative addresses stay at the root */
 if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.replaceState(null, '', location.pathname.replace(/\/+$/, '') + location.search + location.hash);</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -23337,7 +23338,7 @@ const BOOT_QUERY = location.search;
    A view's address is its slug; ?v=<view>, the older form, still opens it. */
 const BOOT_PATH = location.pathname;
 const VIEW_SLUG = { browse:'members', discography:'works', timeline:'ge2026' };
-const WORKS_SLUGS = ['concert','event','film','series','special','mv','ad'];   // each tab of the Works page is /<tab>; the songs are /works
+const WORKS_SLUGS = ['concert','event','film','series','special','mv','ad'];   // each tab of the Works page is /works/<tab>; the songs are /works (the short /<tab> still opens)
 const SLUG_VIEW = { music:'discography', ...Object.fromEntries(WORKS_SLUGS.map(c => [c, 'discography'])), ...Object.fromEntries(Object.entries(VIEW_SLUG).map(([v, sl]) => [sl, v])) };   // /music, the Works page's first address, still opens
 
 function urlForSnapshot(snap){
@@ -23361,7 +23362,7 @@ function urlForSnapshot(snap){
   // the tab a page is on, so a reload (or a shared link) lands on it and not on the first: the Works page's category and
   // list, the stats tab (nothing else is in the address when a sheet is open over them)
   if(![...p.keys()].length){
-    if(snap.view === 'discography'){ if(WORKS_SLUGS.includes(snap.worksCat)) path = '/' + snap.worksCat; if(snap.discTab && snap.discTab !== 'singles') p.set('d', snap.discTab); }
+    if(snap.view === 'discography'){ if(WORKS_SLUGS.includes(snap.worksCat)) path = '/works/' + snap.worksCat; if(snap.discTab && snap.discTab !== 'singles') p.set('d', snap.discTab); }
     else if(snap.view === 'stats' && snap.statsTab && snap.statsTab !== 'overview') p.set('st', snap.statsTab);
   }
   const q = p.toString();
@@ -23416,7 +23417,7 @@ function applyUrlToState(){
   if(view === 'gallery'){ state.view = 'gallery'; state.galleryId = galRoom(p.get('g') || seg[1]).id; return; }
   if(view && SHAREABLE_VIEWS.includes(view)){ state.view = view; if(view === 'timeline') state.timelineId = 'ge2026'; }
   if(state.view === 'discography'){
-    const c = p.get('c') || (WORKS_SLUGS.includes(seg[0]) ? seg[0] : null), d = p.get('d');
+    const c = p.get('c') || (WORKS_SLUGS.includes(seg[0]) ? seg[0] : seg[0] === 'works' && WORKS_SLUGS.includes(seg[1]) ? seg[1] : null), d = p.get('d');
     if(c && WORKS_CATS.some(x => x.id === c)) state.worksCat = c;
     if(d && DISC_TABS.some(x => x.id === d)) state.discTab = d;
   }
