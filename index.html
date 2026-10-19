@@ -4222,6 +4222,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .svc-btn:active{ transform:translateY(2px); box-shadow:none; }
   .svc-btn.is-text{ background:#00A8E1; color:#fff; border-color:#00A8E1; padding:4px 10px; }
   .svc-btn.is-prime img{ height:13px; }
+  .svc-btn.is-trueid img{ height:13px; }
   .svc-ico{ display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#fff; box-shadow:0 2px 0 rgba(0,0,0,.2); margin:0 6px 0 0; }
   .svc-ico img{ height:15px; width:auto; display:block; }
   .mw-yt{ display:inline-flex; align-items:center; gap:6px; margin:8px 6px 0 0; text-decoration:none; }
@@ -21820,7 +21821,7 @@ function mediaEps(w, en){
 // the badge of each service is a plain mark in its colours, not its logo
 const STREAM_NAME = { netflix:'Netflix', prime:'Prime Video', trueid:'TrueID' };
 // services whose logo files are in streaming/ (the rest show their name as text until a logo is sent)
-const STREAM_LOGO = { netflix:true, prime:true };
+const STREAM_LOGO = { netflix:true, prime:true, trueid:true };
 // those with a round icon as well (the N); the rest use their wordmark, or their name where space is short
 const STREAM_ICON = { netflix:true };
 const STREAM_BADGE = { netflix:'<span class="svc-n" aria-hidden="true">N</span>' };
