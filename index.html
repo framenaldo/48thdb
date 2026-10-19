@@ -22323,7 +22323,7 @@ const FEST = (() => {
       gr.addColorStop(0, '#FFF6E6'); gr.addColorStop(.7, '#EAD5BA'); gr.addColorStop(1, '#C2A68A'); g.fillStyle = gr; g.beginPath(); g.arc(cx, cx, R0, 0, 7); g.fill();
       [[-.3,-.2,.18],[.25,.1,.13],[-.05,.35,.1],[.35,-.35,.08],[-.42,.25,.07]].forEach(([x, y, r]) => { g.fillStyle = 'rgba(150,118,92,.28)'; g.beginPath(); g.arc(cx + x * R0, cx + y * R0, r * R0, 0, 7); g.fill(); });
     }))(Math.max(38, Math.min(80, Math.min(W, H) * .11)));
-    const cloud = rgb => sprite(340, 120, g => [[90,70,70],[160,55,80],[230,72,62],[130,85,55],[280,82,40],[50,85,40]].forEach(([x, y, r]) => {
+    const cloud = rgb => sprite(340, 180, g => [[90,100,70],[160,85,80],[230,102,62],[130,115,55],[280,112,40],[50,115,40]].forEach(([x, y, r]) => {
       const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},.9)`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }));
     SP.cloudNight = cloud('46,22,48'); SP.cloudDay = cloud('255,255,255'); SP.cloudAsh = cloud('128,112,128'); SP.cloudDusk = cloud('70,92,120');
     const glow = (rgb, a, r) => sprite(r * 2, r * 2, g => { const gr = g.createRadialGradient(r, r, 0, r, r, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(0, 0, r * 2, r * 2); });
@@ -22359,7 +22359,7 @@ const FEST = (() => {
     moonEl.style.backgroundImage = `url(${SP.moon.toDataURL()})`; moonEl.style.width = S + 'px'; moonEl.style.height = S + 'px';
     moonEl.style.left = (W * m.x - S / 2) + 'px'; moonEl.style.top = (m.y - S / 2) + 'px'; }
   function drawClouds(spr, dt, sy, k = 1, speed = 1){ for(const c of clouds){ c.x += c.v * speed * dt; if(c.x > W + 40){ c.x = -340 * c.s - rnd(0, 200); c.y = rnd(30, H * .45); }
-    b.globalAlpha = c.a * k; b.drawImage(spr, c.x, c.y - sy * .08, 340 * c.s, 120 * c.s); } b.globalAlpha = 1; }
+    b.globalAlpha = c.a * k; b.drawImage(spr, c.x, c.y - 30 * c.s - sy * .08, 340 * c.s, 180 * c.s); } b.globalAlpha = 1; }
 
   /* ---- bats ---- */
   let bats = [], nextFlock = .8, nextFront = 6;
