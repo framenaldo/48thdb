@@ -22,7 +22,7 @@ the Firebase CLI from the owner's machine.
 ## Shape of index.html
 
 - Every view has a clean address — 48thdb.com/gallery, /vote, /results,
-  /stats, /members, /music, /ge2026 … (`VIEW_SLUG`, `urlForSnapshot`,
+  /stats, /members, /works, /ge2026 … (`VIEW_SLUG`, `urlForSnapshot`,
   `applyUrlToState`). The host hands any address that is not a file to
   index.html (`not_found_handling` in site.wrangler.toml); the older `?v=<view>`
   links still open and are rewritten. An event, member or song is still `?e=`,
@@ -32,7 +32,7 @@ the Firebase CLI from the owner's machine.
   a `PAGE_META` row and a place in `VIEWS` in scripts/make-member-pages.mjs,
   which writes sitemap.xml.
 
-- A page's tab is in its address so a reload lands on it: `/music?c=film` (the Works
+- A page's tab is in its address so a reload lands on it: `/works?c=film` (the Works
   category), `?d=albums` (its list), `/stats?st=songs` (`urlForSnapshot`, `applyUrlToState`).
   A new tab on a page needs the same.
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click
@@ -132,7 +132,7 @@ the Firebase CLI from the owner's machine.
   counted off the organiser's chart): drawn as little chairs in 3D, rings in
   2D, and counted on each zone's row. Chairs only, never what is sold. MCC
   Hall's are 2,350.
-- The Works page (/music, view `discography`) holds everything the groups made
+- The Works page (/works, once /music; view `discography`) holds everything the groups made
   or took part in: the songs, then concerts, events, films, series, shows, other
   artists' MVs and ads from `SEED_MEDIA`, picked by category (`WORKS_CATS`). A
   concert or event carries its `date` (and `end`), venue as `by`, and `ev` when

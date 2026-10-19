@@ -6757,7 +6757,7 @@ const SEED_SCHEDULE = [
       'ภาพสินค้าสำหรับการโฆษณาเท่านั้น'] },
   // a press event in MBK Center's Halloween: Popper (a guest) and four BNK48 members; about an hour
   { id:'ev-mbk-haunted-graveyard-1020', start:'2026-10-20', time:'15:00', until:'16:00',
-    title:'MBK Center THE HAUNTED GRAVEYARD #ป่าช้าสยองขวัญ',
+    title:'ป่าช้าสยองขวัญ',
     venue:'ชั้น 7 Zone A, MBK Center, Bangkok', groups:['bnk48'],
     members:['bnk-praew','bnk-emmy','bnk-marine','bnk-palmmy'],
     poster:{ accent:'#C8141B', surface:'#F6ECEC', ink:'#3A0A0D', img:'posters/mbk-haunted-graveyard-1020.webp', w:1601, h:2000, scene:'night' },
@@ -8247,7 +8247,7 @@ SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
    of those years, stays). `roles` names her part where the wiki does; `note`
    is doc (a documentary), short (a short film), sitcom, contestant, guest,
    guest-syr3n or song. The group's own works sit here too, on the Works page
-   (/music): `own` marks what the group or its studio made (BNK48 Film, iAM
+   (/works): `own` marks what the group or its studio made (BNK48 Film, iAM
    Film, its shows), and `whole` a work of the whole group whose line-up is
    not on record — an ad, or a channel's running show — so it names no one.
    The ads are from the group's list of commercials and the trade press,
@@ -9729,7 +9729,7 @@ function applyDocumentLanguage(){
 }
 
 /* Each address its own title, description and canonical, so a search engine
-   that runs the page sees /gallery, /music, /stats … as pages of their own
+   that runs the page sees /gallery, /works, /stats … as pages of their own
    rather than copies of the home page. The HTML carries no canonical: one
    there would contradict this. A member's sheet points at her own page, /m/<id>. */
 const PAGE_META = {
@@ -23336,8 +23336,8 @@ const BOOT_QUERY = location.search;
    (not_found_handling in site.wrangler.toml), which reads the path here.
    A view's address is its slug; ?v=<view>, the older form, still opens it. */
 const BOOT_PATH = location.pathname;
-const VIEW_SLUG = { browse:'members', discography:'music', timeline:'ge2026' };
-const SLUG_VIEW = Object.fromEntries(Object.entries(VIEW_SLUG).map(([v, sl]) => [sl, v]));
+const VIEW_SLUG = { browse:'members', discography:'works', timeline:'ge2026' };
+const SLUG_VIEW = { music:'discography', ...Object.fromEntries(Object.entries(VIEW_SLUG).map(([v, sl]) => [sl, v])) };   // /music, the Works page's first address, still opens
 
 function urlForSnapshot(snap){
   const p = new URLSearchParams();
