@@ -25904,6 +25904,43 @@ function lockPinchZoom(){
   }, {passive:false});
 }
 
+/* The first member sheet of a visit cost twice what the rest did (about 70 ms
+   to 30 ms with a fast desktop): its markup, the Thai text and its fonts, the
+   styles and the code that draws it were all cold. So once the page is up and
+   the browser is idle, one sheet is drawn and laid out in a hidden box and
+   thrown away, and the first one a reader opens is already the second.
+   A finger going down on a member also starts fetching her photo, which
+   would otherwise arrive after the sheet had begun to come up. */
+function warmMemberSheet(){
+  const go = () => {
+    try{
+      if(state.selectedId || state.selectedEvent || state.dayOf) return;   // a sheet is already open
+      const m = state.members.find(x => x.photo && !x.graduated) || state.members[0];
+      if(!m) return;
+      const keep = state.selectedId;
+      state.selectedId = m.id;
+      let html; try{ html = renderDetailModal(); } finally { state.selectedId = keep; }
+      const box = document.createElement('div');
+      box.setAttribute('aria-hidden', 'true');
+      box.style.cssText = 'position:fixed;inset:0;visibility:hidden;pointer-events:none;z-index:-1;';
+      box.innerHTML = html.replace(/ src="/g, ' data-src="').replace(/ id="/g, ' data-id0="');   // lay it out, fetch nothing, claim no ids
+      localize(box);
+      document.body.appendChild(box);
+      void box.offsetHeight;
+      box.remove();
+    }catch(e){}
+  };
+  if(window.requestIdleCallback) requestIdleCallback(go, { timeout: 4000 }); else setTimeout(go, 2500);
+  const seen = new Set();
+  document.addEventListener('pointerdown', e => {
+    const el = e.target.closest && e.target.closest('[data-action="open-member"]');
+    const m = el && getMember(el.dataset.id);
+    if(!m || !m.photo || seen.has(m.id)) return;
+    seen.add(m.id);
+    const im = new Image(); im.decoding = 'async'; im.src = m.photo;
+  }, { passive: true, capture: true });
+}
+
 // ============================= EVENTS (delegated) =============================
 const RIPPLE_SEL = '.btn-add,.btn-secondary,.btn-danger,.signin-btn,.pill,.gen-filter-chip,'
   + '.oshi-btn,.kami-btn,.team-row,.modal-close-btn,.profile-dropdown button';
@@ -26773,6 +26810,7 @@ async function init(){
   render();
   refreshTimeline();   // the members' iAM48 posts need no sign-in, so they come at once
   checkAI();
+  warmMemberSheet();
 
   let checkedInitialAuth = false;
 
