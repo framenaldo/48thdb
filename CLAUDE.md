@@ -32,7 +32,7 @@ the Firebase CLI from the owner's machine.
   a `PAGE_META` row and a place in `VIEWS` in scripts/make-member-pages.mjs,
   which writes sitemap.xml.
 
-- A page's tab is in its address so a reload lands on it: `/works?c=film` (the Works
+- A page's tab is in its address so a reload lands on it: `/film` for the films, `/works?c=series` for the rest (the Works
   category), `?d=albums` (its list), `/stats?st=songs` (`urlForSnapshot`, `applyUrlToState`).
   A new tab on a page needs the same.
 - `state` + `render()` / `renderMain()`, one delegated `data-action` click

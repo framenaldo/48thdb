@@ -222,7 +222,7 @@ ${groups.map(g => sect(`อดีตสมาชิก ${g}`, people.filter(p =>
 `);
 
 // the page's own views at their clean addresses; each sets its own canonical (applyPageMeta)
-const VIEWS = ['members', 'works', 'stats', 'calendar', 'groups', 'gallery', 'ge2026', 'results', 'vote', 'gesongs', 'quiz'];
+const VIEWS = ['members', 'works', 'film', 'stats', 'calendar', 'groups', 'gallery', 'ge2026', 'results', 'vote', 'gesongs', 'quiz'];
 put('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>${ORIGIN}/</loc></url>
