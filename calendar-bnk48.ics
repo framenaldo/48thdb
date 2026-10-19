@@ -28,9 +28,9 @@ DESCRIPTION:เมมเบอร์: Hoop\, Janry\, L\, Lookked\, Nana\, J
  เวทีแรก\n• 28 ส.ค. 10:00 Opening Ceremony — Hoop\, J
  anry\, L\, Lookked\, Nana\, Jingjing\n• 29 ส.ค. 18:30 CGM48 Performa
  nce Stage — CGM48 ทั้งวง\n• 30 ส.ค. 20:00 BNK48 Perfor
- mance Stage — BNK48 ทั้งวง\n\nhttps://48thdb.com/?e=ev-nippo
- nhaku-2026
-URL:https://48thdb.com/?e=ev-nipponhaku-2026
+ mance Stage — BNK48 ทั้งวง\n\nhttps://48thdb.com/event/ev-ni
+ pponhaku-2026
+URL:https://48thdb.com/event/ev-nipponhaku-2026
 DTSTART;VALUE=DATE:20260828
 DTEND;VALUE=DATE:20260831
 END:VEVENT
@@ -40,8 +40,8 @@ DTSTAMP:20260829T000000Z
 SUMMARY:CHARITY FOOTBALL MATCH 2026
 LOCATION:Thunderdome Stadium\, Nonthaburi
 DESCRIPTION:เมมเบอร์: Blythe\, Luksorn\, Mail\, Mint\, Miri
- n\, Praew\n\nhttps://48thdb.com/?e=ev-charity-football-2026
-URL:https://48thdb.com/?e=ev-charity-football-2026
+ n\, Praew\n\nhttps://48thdb.com/event/ev-charity-football-2026
+URL:https://48thdb.com/event/ev-charity-football-2026
 DTSTART;VALUE=DATE:20260829
 DTEND;VALUE=DATE:20260830
 END:VEVENT
@@ -51,9 +51,9 @@ DTSTAMP:20260905T000000Z
 SUMMARY:Pancake BNK48's Solo Single "Yume de Kiss me!" Perfume Crafting Wor
  kshop
 LOCATION:SIAMSQUARE Soi 10\, Bangkok
-DESCRIPTION:เมมเบอร์: Pancake\n\nhttps://48thdb.com/?e=ev-p
- ancake-perfume
-URL:https://48thdb.com/?e=ev-pancake-perfume
+DESCRIPTION:เมมเบอร์: Pancake\n\nhttps://48thdb.com/event/e
+ v-pancake-perfume
+URL:https://48thdb.com/event/ev-pancake-perfume
 DTSTART;VALUE=DATE:20260905
 DTEND;VALUE=DATE:20260906
 END:VEVENT
@@ -69,8 +69,8 @@ DESCRIPTION:เมมเบอร์: Arlee\, Blythe\, Jew\, Khowjow\, Luks
  ย. — Arlee\, Blythe\, Jew\, Khowjow\, Luksorn\, Praew\, Chifa\, Lewlew
  \, Namphet\, Punpon\, Tara\n• 6 ก.ย. — Blythe\, Jew\, Khowjow\, Lu
  ksorn\, Nall\, Praew\, Chifa\, Lewlew\, Namphet\, Punpon\, Tara\n\nhttps:/
- /48thdb.com/?e=ev-roadshow-0905
-URL:https://48thdb.com/?e=ev-roadshow-0905
+ /48thdb.com/event/ev-roadshow-0905
+URL:https://48thdb.com/event/ev-roadshow-0905
 DTSTART;VALUE=DATE:20260905
 DTEND;VALUE=DATE:20260907
 END:VEVENT
@@ -79,9 +79,9 @@ UID:ev-pancake-captured@48thdb
 DTSTAMP:20260906T000000Z
 SUMMARY:Pancake BNK48's Solo Single "Yume de Kiss me!" Captured Moment
 LOCATION:UNION CO-EVENT STUDIO 5 FL.\, UNION MALL\, Bangkok
-DESCRIPTION:เมมเบอร์: Pancake\n\nhttps://48thdb.com/?e=ev-p
- ancake-captured
-URL:https://48thdb.com/?e=ev-pancake-captured
+DESCRIPTION:เมมเบอร์: Pancake\n\nhttps://48thdb.com/event/e
+ v-pancake-captured
+URL:https://48thdb.com/event/ev-pancake-captured
 DTSTART;VALUE=DATE:20260906
 DTEND;VALUE=DATE:20260907
 END:VEVENT
@@ -96,9 +96,9 @@ DESCRIPTION:เมมเบอร์: Micha\, Patt\, Arlee\, Emmy\, Grape\,
  ของวันที่ 12 ก.ย. ด้วยปัญหาสุ
  ขภาพ\n• บัตรเปิดขาย 27 ส.ค. 2026 12:00
   ทาง iAM48 Application\n• ไม่มีการถ่ายท
- อดสดทาง iAM Application\n\nhttps://48thdb.com/?e=ev-micha-pa
- tt-bday
-URL:https://48thdb.com/?e=ev-micha-patt-bday
+ อดสดทาง iAM Application\n\nhttps://48thdb.com/event/ev-micha
+ -patt-bday
+URL:https://48thdb.com/event/ev-micha-patt-bday
 DTSTART;TZID=Asia/Bangkok:20260912T130000
 DTEND;TZID=Asia/Bangkok:20260912T150000
 END:VEVENT
@@ -113,9 +113,9 @@ DESCRIPTION:เมมเบอร์: Berry\, Sindy\, Grape\, Inkcha\, L\,
  ้วยสมาชิกที่เหลือ ไม่มีคน
  ขึ้นแทน\n• บัตรเปิดขาย 27 ส.ค. 2
  026 12:00 ทาง iAM48 Application\n• ไม่มีการถ่
- ายทอดสดทาง iAM Application\n\nhttps://48thdb.com/?e=ev
- -berry-sindy-bday
-URL:https://48thdb.com/?e=ev-berry-sindy-bday
+ ายทอดสดทาง iAM Application\n\nhttps://48thdb.com/event
+ /ev-berry-sindy-bday
+URL:https://48thdb.com/event/ev-berry-sindy-bday
 DTSTART;TZID=Asia/Bangkok:20260912T170000
 DTEND;TZID=Asia/Bangkok:20260912T190000
 END:VEVENT
@@ -127,8 +127,9 @@ LOCATION:The Theater Hall ชั้น C\, The Bazaar Hotel Bangkok
 DESCRIPTION:เมมเบอร์: Emmy\, Jew\, Micha\, Monet\, Palmmy\,
   Praew\n• บัตรเปิดขาย 27 ส.ค. 2026 12:00 ท
  าง iAM48 Application\n• ไม่มีการถ่ายทอ
- ดสดทาง iAM Application\n\nhttps://48thdb.com/?e=ev-emmy-bday
-URL:https://48thdb.com/?e=ev-emmy-bday
+ ดสดทาง iAM Application\n\nhttps://48thdb.com/event/ev-emmy-bda
+ y
+URL:https://48thdb.com/event/ev-emmy-bday
 DTSTART;TZID=Asia/Bangkok:20260913T130000
 DTEND;TZID=Asia/Bangkok:20260913T150000
 END:VEVENT
@@ -143,8 +144,8 @@ DESCRIPTION:เมมเบอร์: Hoop\n• ของที่ระล
  ก Hoop 6 รางวัล\n• Hi-Bye VDO OK\n• บัตรเป
  ิดขาย 27 ส.ค. 2026 12:00 ทาง iAM48 Application\n• 
  ไม่มีการถ่ายทอดสดทาง iAM Applicati
- on\n\nhttps://48thdb.com/?e=ev-hoop-bday-said
-URL:https://48thdb.com/?e=ev-hoop-bday-said
+ on\n\nhttps://48thdb.com/event/ev-hoop-bday-said
+URL:https://48thdb.com/event/ev-hoop-bday-said
 DTSTART;TZID=Asia/Bangkok:20260913T170000
 DTEND;TZID=Asia/Bangkok:20260913T190000
 END:VEVENT
@@ -179,8 +180,8 @@ DESCRIPTION:เมมเบอร์: Hoop\n• เดินทางจา
  งกับบัตรที่ซื้อ เปลี่ยนชื
  ่อผู้เข้าร่วมภายหลังไม่ไ
  ด้\n• บัตรเปิดขาย 1 ส.ค. 2026 18:00 ทา
- ง iAM48 Application\n\nhttps://48thdb.com/?e=ev-getaway-pudthailee
-URL:https://48thdb.com/?e=ev-getaway-pudthailee
+ ง iAM48 Application\n\nhttps://48thdb.com/event/ev-getaway-pudthailee
+URL:https://48thdb.com/event/ev-getaway-pudthailee
 DTSTART;VALUE=DATE:20260918
 DTEND;VALUE=DATE:20260921
 END:VEVENT
@@ -201,8 +202,8 @@ DESCRIPTION:เมมเบอร์: Marine\, Niya\, Khaimook\, Micha\, Na
  roup Hi-Touch ได้จากการซื้อเข็มกลั
  ดภายในงาน\n• กำหนดการอาจเป
  ลี่ยนแปลงตามความเหมาะสม\n\nh
- ttps://48thdb.com/?e=ev-roadshow-mbk
-URL:https://48thdb.com/?e=ev-roadshow-mbk
+ ttps://48thdb.com/event/ev-roadshow-mbk
+URL:https://48thdb.com/event/ev-roadshow-mbk
 DTSTART;TZID=Asia/Bangkok:20260919T120000
 DTEND;TZID=Asia/Bangkok:20260919T180000
 END:VEVENT
@@ -223,8 +224,8 @@ DESCRIPTION:เมมเบอร์: Marine\, Niya\, Khaimook\, Micha\, Na
  roup Hi-Touch ได้จากการซื้อเข็มกลั
  ดภายในงาน\n• กำหนดการอาจเป
  ลี่ยนแปลงตามความเหมาะสม\n\nh
- ttps://48thdb.com/?e=ev-roadshow-mbk
-URL:https://48thdb.com/?e=ev-roadshow-mbk
+ ttps://48thdb.com/event/ev-roadshow-mbk
+URL:https://48thdb.com/event/ev-roadshow-mbk
 DTSTART;TZID=Asia/Bangkok:20260920T120000
 DTEND;TZID=Asia/Bangkok:20260920T180000
 END:VEVENT
@@ -237,9 +238,9 @@ DESCRIPTION:เมมเบอร์: Praew\, Emmy\, Marine\, Palmmy\n• 1
  5:00 งานแถลงข่าว THE HAUNTED GRAVEYARD #ป่าช
  ้าสยองขวัญ\n• ร่วมงานกับ Popper\
  n• ศิลปิน BNK48 ร่วมงานแถลงข่า
- ว: Praew\, Emmy\, Marine และ Palmmy\n\nhttps://48thdb.com/?e=ev-mb
- k-haunted-graveyard-1020
-URL:https://48thdb.com/?e=ev-mbk-haunted-graveyard-1020
+ ว: Praew\, Emmy\, Marine และ Palmmy\n\nhttps://48thdb.com/event/ev
+ -mbk-haunted-graveyard-1020
+URL:https://48thdb.com/event/ev-mbk-haunted-graveyard-1020
 DTSTART;TZID=Asia/Bangkok:20261020T150000
 DTEND;TZID=Asia/Bangkok:20261020T160000
 END:VEVENT
@@ -256,8 +257,8 @@ DESCRIPTION:เมมเบอร์: Arlee\, Emmy\, L\, Luksorn\, Praew\,
   Cha\n• 17:00–18:00 Group Hi-Touch\n• 19:00–20:00 Special Live Tal
  k\n• บัตรเข้าร่วม Group Hi-Touch ได้จา
  กการซื้อเข็มกลัดภายในงาน\n
- \nhttps://48thdb.com/?e=ev-kimi-special-event-bangkapi
-URL:https://48thdb.com/?e=ev-kimi-special-event-bangkapi
+ \nhttps://48thdb.com/event/ev-kimi-special-event-bangkapi
+URL:https://48thdb.com/event/ev-kimi-special-event-bangkapi
 DTSTART;TZID=Asia/Bangkok:20261013T123000
 DTEND;TZID=Asia/Bangkok:20261013T200000
 END:VEVENT
@@ -274,8 +275,8 @@ DESCRIPTION:เมมเบอร์: Proud\, Saonoi\, Fame\, Galeya\, Inkc
  นละ 6 รางวัล\n• บัตรเปิดขาย 15 
  ต.ค. 2026 12:00 ถึง 23 ต.ค. 2026 12:00 ทาง iAM48 Appli
  cation\n• ไม่มีการถ่ายทอดสดทาง i
- AM Application\n\nhttps://48thdb.com/?e=ev-proud-saonoi-bday
-URL:https://48thdb.com/?e=ev-proud-saonoi-bday
+ AM Application\n\nhttps://48thdb.com/event/ev-proud-saonoi-bday
+URL:https://48thdb.com/event/ev-proud-saonoi-bday
 DTSTART;TZID=Asia/Bangkok:20261024T130000
 DTEND;TZID=Asia/Bangkok:20261024T150000
 END:VEVENT
@@ -291,9 +292,9 @@ DESCRIPTION:เมมเบอร์: Jew\, Palmmy\, Arlee\, Emmy\, L\, Luk
  จาก Jew และ Palmmy คนละ 6 รางวัล\n• บ
  ัตรเปิดขาย 15 ต.ค. 2026 12:00 ถึง 23 ต.ค
  . 2026 12:00 ทาง iAM48 Application\n• ไม่มีการถ
- ่ายทอดสดทาง iAM Application\n\nhttps://48thdb.com/?e
- =ev-jew-palmmy-bday
-URL:https://48thdb.com/?e=ev-jew-palmmy-bday
+ ่ายทอดสดทาง iAM Application\n\nhttps://48thdb.com/ev
+ ent/ev-jew-palmmy-bday
+URL:https://48thdb.com/event/ev-jew-palmmy-bday
 DTSTART;TZID=Asia/Bangkok:20261024T170000
 DTEND;TZID=Asia/Bangkok:20261024T190000
 END:VEVENT
@@ -323,8 +324,8 @@ DESCRIPTION:เมมเบอร์: Fame\n• 13:00–15:00 ลงทะ
  ต.ค. 2569 18:00 ทาง iAM48 Application\n• ของที่ไ
  ด้ในบัตร: เซลฟีกับเฟม\, Boarding Pas
  s\, Inhaler\, Postcard\n• #FameFirstFanmeet #FameBNK48\n\nhttps://48thdb
- .com/?e=ev-fame-fanmeet
-URL:https://48thdb.com/?e=ev-fame-fanmeet
+ .com/event/ev-fame-fanmeet
+URL:https://48thdb.com/event/ev-fame-fanmeet
 DTSTART;VALUE=DATE:20261025
 DTEND;VALUE=DATE:20261026
 END:VEVENT
@@ -339,9 +340,9 @@ DESCRIPTION:เมมเบอร์: Niya\, Monet\, Micha\, Praew\, Yoghur
  นนั้น\n• งานจัด 13:00–22:00 น. — ยัง
  ไม่ประกาศเวลาขึ้นเวทีของ B
  NK48\n• จัดโดย Nine Entertain และ MCOT Event · ออ
- กอากาศทาง MCOT HD 30\n\nhttps://48thdb.com/?e=ev-nine-ch
- arity
-URL:https://48thdb.com/?e=ev-nine-charity
+ กอากาศทาง MCOT HD 30\n\nhttps://48thdb.com/event/ev-nine
+ -charity
+URL:https://48thdb.com/event/ev-nine-charity
 DTSTART;TZID=Asia/Bangkok:20260930T130000
 DTEND;TZID=Asia/Bangkok:20260930T220000
 END:VEVENT
@@ -357,8 +358,8 @@ DESCRIPTION:• ช่วงโหวต 1 ต.ค. 12:00 – 12 พ.ย. 2
  สึได้ไปถ่าย MV ที่ญี่ปุ่น\n• K
  ami7 Special Project — เพลงร่วมกับ AKB48\n• ป
  ระกาศในงาน BNK48 & CGM48 Bon Odori 2026\n• #BNK48CGM
- 48_GE2026\n\nhttps://48thdb.com/?e=ev-election-voting
-URL:https://48thdb.com/?e=ev-election-voting
+ 48_GE2026\n\nhttps://48thdb.com/event/ev-election-voting
+URL:https://48thdb.com/event/ev-election-voting
 DTSTART;VALUE=DATE:20261001
 DTEND;VALUE=DATE:20261113
 TRANSP:TRANSPARENT
@@ -374,8 +375,8 @@ DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
  ต.ค. 2026 12:00 ทาง eventpop.me\n• จัดรอบกลา
  งวัน วันเดียวกับการประกาศ
  ผลการเลือกตั้งซึ่งจัดรอบ
- ค่ำ\n\nhttps://48thdb.com/?e=ev-concert-2026
-URL:https://48thdb.com/?e=ev-concert-2026
+ ค่ำ\n\nhttps://48thdb.com/event/ev-concert-2026
+URL:https://48thdb.com/event/ev-concert-2026
 DTSTART;TZID=Asia/Bangkok:20261114T130000
 DTEND;TZID=Asia/Bangkok:20261114T150000
 END:VEVENT
@@ -395,8 +396,8 @@ DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
  อบกลางวัน\n• Top 12 เซ็มบัตสึได
  ้ไปถ่าย MV ที่ญี่ปุ่น\n• Kami7 Special
   Project — เพลงร่วมกับ AKB48\n• #BNK48CGM48_GE20
- 26\n\nhttps://48thdb.com/?e=ev-election-results
-URL:https://48thdb.com/?e=ev-election-results
+ 26\n\nhttps://48thdb.com/event/ev-election-results
+URL:https://48thdb.com/event/ev-election-results
 DTSTART;TZID=Asia/Bangkok:20261114T180000
 DTEND;TZID=Asia/Bangkok:20261114T200000
 END:VEVENT
@@ -430,9 +431,9 @@ DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
  ธ 16:00–17:00 · Group Hi-Touch 17:00–18:00\n• Khowjow ย้า
  ย Group Hi-Touch วันที่ 4 ต.ค. จากรอบ 17:00
  –18:00 ไปรอบ 19:00–20:00\n• รายละเอียด
- อื่นรอประกาศ\n\nhttps://48thdb.com/?e=ev-election-
- fanfest
-URL:https://48thdb.com/?e=ev-election-fanfest
+ อื่นรอประกาศ\n\nhttps://48thdb.com/event/ev-electi
+ on-fanfest
+URL:https://48thdb.com/event/ev-election-fanfest
 DTSTART;VALUE=DATE:20261003
 DTEND;VALUE=DATE:20261005
 END:VEVENT
@@ -459,8 +460,8 @@ DESCRIPTION:รอประกาศรายชื่อ\n• การแ
  ครั้งบริเวณหน้างาน\n• ตรวจ
  สอบรายละเอียดและข้อปฏิบั
  ติของแต่ละโซนจากภาพประกา
- ศ\n\nhttps://48thdb.com/?e=ev-kimi-first-performance
-URL:https://48thdb.com/?e=ev-kimi-first-performance
+ ศ\n\nhttps://48thdb.com/event/ev-kimi-first-performance
+URL:https://48thdb.com/event/ev-kimi-first-performance
 DTSTART;TZID=Asia/Bangkok:20261003T180000
 DTEND;TZID=Asia/Bangkok:20261003T200000
 END:VEVENT
@@ -472,8 +473,8 @@ DESCRIPTION:• พรีออเดอร์ 26 ก.ย. 12:00 – 30 ต
  .ค. 2026 23:00 น. ทาง iAM Shop\n• ส่งสินค้า 
  30 พ.ย. 2026 เป็นต้นไป\n• Music Code Edition ซ
  ื้อหรือแลกได้ถึง 10 พ.ย. 2026 23:00 
- น.\n\nhttps://48thdb.com/?e=ev-ge6-single
-URL:https://48thdb.com/?e=ev-ge6-single
+ น.\n\nhttps://48thdb.com/event/ev-ge6-single
+URL:https://48thdb.com/event/ev-ge6-single
 DTSTART;VALUE=DATE:20260926
 DTEND;VALUE=DATE:20261031
 TRANSP:TRANSPARENT
@@ -486,8 +487,8 @@ DESCRIPTION:• พรีออเดอร์ 26 ก.ย. 12:00 – 10 พ
  .ย. 2026 23:00 น. ทาง iAM Shop\n• ส่งสินค้า 
  11 ธ.ค. 2026 เป็นต้นไป\n• หนึ่งชุด
  มีรูปสุ่ม 5 ใบ จาก 348 แบบ และ GE6
-  Token 1 เหรียญ\n\nhttps://48thdb.com/?e=ev-ge6-photoset
-URL:https://48thdb.com/?e=ev-ge6-photoset
+  Token 1 เหรียญ\n\nhttps://48thdb.com/event/ev-ge6-photoset
+URL:https://48thdb.com/event/ev-ge6-photoset
 DTSTART;VALUE=DATE:20260926
 DTEND;VALUE=DATE:20261111
 TRANSP:TRANSPARENT
@@ -504,8 +505,8 @@ DESCRIPTION:เมมเบอร์: Galeya\n• เสื้อวัน
  าง iAM48 Application\n• ส่งสินค้า 17 พ.ย. 2026
   เป็นต้นไป\n• ภาพสินค้าใช้เ
  พื่อการโฆษณาเท่านั้น\n\nhttps://48
- thdb.com/?e=ev-bday-tee-galeya-2026
-URL:https://48thdb.com/?e=ev-bday-tee-galeya-2026
+ thdb.com/event/ev-bday-tee-galeya-2026
+URL:https://48thdb.com/event/ev-bday-tee-galeya-2026
 DTSTART;VALUE=DATE:20261003
 DTEND;VALUE=DATE:20261019
 TRANSP:TRANSPARENT
@@ -525,8 +526,8 @@ DESCRIPTION:• บัตร BNK48 & CGM48 Journey of Dreams 夢の旅 ก
  นั่งได้เฉพาะ 13 ต.ค. 10:00 – 14 ต.ค. 202
  6 23:59 ถ้าไม่ได้เลือก ระบบจะเ
  ลือกให้ในโซนที่ซื้อไว้\n\nhttp
- s://48thdb.com/?e=ev-ge6-bundle
-URL:https://48thdb.com/?e=ev-ge6-bundle
+ s://48thdb.com/event/ev-ge6-bundle
+URL:https://48thdb.com/event/ev-ge6-bundle
 DTSTART;VALUE=DATE:20260926
 DTEND;VALUE=DATE:20261011
 TRANSP:TRANSPARENT
@@ -555,8 +556,8 @@ DESCRIPTION:เมมเบอร์: Hoop\, Pancake\, Praew\, Chifa\, Ling
  ถือสิ่งของที่อาจเป็นอันต
  รายต่อสมาชิก\n• กำหนดการอา
  จเปลี่ยนแปลงตามความเหมาะ
- สม\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-union
-URL:https://48thdb.com/?e=ev-kimi-roadshow-union
+ สม\n\nhttps://48thdb.com/event/ev-kimi-roadshow-union
+URL:https://48thdb.com/event/ev-kimi-roadshow-union
 DTSTART;TZID=Asia/Bangkok:20261010T120000
 DTEND;TZID=Asia/Bangkok:20261010T180000
 END:VEVENT
@@ -584,8 +585,8 @@ DESCRIPTION:เมมเบอร์: Hoop\, Pancake\, Praew\, Chifa\, Ling
  ถือสิ่งของที่อาจเป็นอันต
  รายต่อสมาชิก\n• กำหนดการอา
  จเปลี่ยนแปลงตามความเหมาะ
- สม\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-union
-URL:https://48thdb.com/?e=ev-kimi-roadshow-union
+ สม\n\nhttps://48thdb.com/event/ev-kimi-roadshow-union
+URL:https://48thdb.com/event/ev-kimi-roadshow-union
 DTSTART;TZID=Asia/Bangkok:20261011T120000
 DTEND;TZID=Asia/Bangkok:20261011T180000
 END:VEVENT
@@ -615,8 +616,8 @@ DESCRIPTION:เมมเบอร์: Arlee\, Emmy\, Hoop\, Jew\, Luksorn\,
  ถือสิ่งของที่อาจเป็นอันต
  รายต่อสมาชิก\n• กำหนดการอา
  จเปลี่ยนแปลงตามความเหมาะ
- สม\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-t21
-URL:https://48thdb.com/?e=ev-kimi-roadshow-t21
+ สม\n\nhttps://48thdb.com/event/ev-kimi-roadshow-t21
+URL:https://48thdb.com/event/ev-kimi-roadshow-t21
 DTSTART;TZID=Asia/Bangkok:20261017T120000
 DTEND;TZID=Asia/Bangkok:20261017T180000
 END:VEVENT
@@ -646,8 +647,8 @@ DESCRIPTION:เมมเบอร์: Arlee\, Emmy\, Hoop\, Jew\, Luksorn\,
  ถือสิ่งของที่อาจเป็นอันต
  รายต่อสมาชิก\n• กำหนดการอา
  จเปลี่ยนแปลงตามความเหมาะ
- สม\n\nhttps://48thdb.com/?e=ev-kimi-roadshow-t21
-URL:https://48thdb.com/?e=ev-kimi-roadshow-t21
+ สม\n\nhttps://48thdb.com/event/ev-kimi-roadshow-t21
+URL:https://48thdb.com/event/ev-kimi-roadshow-t21
 DTSTART;TZID=Asia/Bangkok:20261018T120000
 DTEND;TZID=Asia/Bangkok:20261018T180000
 END:VEVENT
@@ -675,9 +676,9 @@ DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
  nformation รับชั่วโมงจอดรถ 6 ชั่วโ
  มง · รถจักรยานยนต์จอดฟรีตล
  อดวัน\n• รอบจับมืออาจเปลี่
- ยนแปลงภายหลัง\n\nhttps://48thdb.com/?e=ev-ge6-ha
- ndshake
-URL:https://48thdb.com/?e=ev-ge6-handshake
+ ยนแปลงภายหลัง\n\nhttps://48thdb.com/event/ev-ge6
+ -handshake
+URL:https://48thdb.com/event/ev-ge6-handshake
 DTSTART;VALUE=DATE:20261031
 DTEND;VALUE=DATE:20261102
 END:VEVENT
@@ -701,8 +702,8 @@ DESCRIPTION:• แลกบัตรได้ 7 ต.ค. 12:00 – 3 พ.
  มาณ 10 นาที\n• Yoghurt ไม่มีรอบใน Roun
  d 1 เนื่องจากภารกิจส่วนตัว แ
  ละจะมีรอบทดแทนใน Round 2\n\nhttps://48thdb
- .com/?e=ev-ge6-myo1
-URL:https://48thdb.com/?e=ev-ge6-myo1
+ .com/event/ev-ge6-myo1
+URL:https://48thdb.com/event/ev-ge6-myo1
 DTSTART;VALUE=DATE:20261105
 DTEND;VALUE=DATE:20261109
 END:VEVENT
@@ -725,8 +726,9 @@ DESCRIPTION:• แลกบัตรได้ 7 ต.ค. 12:00 – 24 พ.
  ้ารอใน Waiting Room ก่อนเวลารอบประ
  มาณ 10 นาที\n• Yoghurt มี 2 รอบติดกั
  นในวันที่ 27 พ.ย. แทนรอบที่ไม
- ่ได้จัดใน Round 1\n\nhttps://48thdb.com/?e=ev-ge6-myo2
-URL:https://48thdb.com/?e=ev-ge6-myo2
+ ่ได้จัดใน Round 1\n\nhttps://48thdb.com/event/ev-ge6-myo
+ 2
+URL:https://48thdb.com/event/ev-ge6-myo2
 DTSTART;VALUE=DATE:20261126
 DTEND;VALUE=DATE:20261130
 END:VEVENT
@@ -739,8 +741,9 @@ DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
  ยังไม่ประกาศ\n• งานต่อเนื่
  องหลังประกาศผลการเลือกตั
  ้ง\n• รายละเอียดสถานที่และ
- เวลารอประกาศ\n\nhttps://48thdb.com/?e=ev-ge6-heart
-URL:https://48thdb.com/?e=ev-ge6-heart
+ เวลารอประกาศ\n\nhttps://48thdb.com/event/ev-ge6-he
+ art
+URL:https://48thdb.com/event/ev-ge6-heart
 DTSTART;VALUE=DATE:20261115
 DTEND;VALUE=DATE:20261116
 END:VEVENT

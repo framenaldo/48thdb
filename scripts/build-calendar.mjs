@@ -70,7 +70,7 @@ function describe(ev, extra){
   if(ev.lineupTba) lines.push('รอประกาศรายชื่อ');
   if(ev.tba) lines.push('รายละเอียดและเวลายังไม่ประกาศ');
   for(const l of [...(ev.detail || []), ...(ev.info || [])]) lines.push('• ' + l);
-  lines.push('', SITE + '?e=' + ev.id);
+  lines.push('', SITE + 'event/' + ev.id);
   return lines.join('\n');
 }
 
@@ -83,7 +83,7 @@ function vevents(ev){
     ev.cancelled ? 'STATUS:CANCELLED' : null,
     where ? `LOCATION:${esc(where)}` : null,
     `DESCRIPTION:${esc(describe(ev, extra))}`,
-    `URL:${SITE}?e=${ev.id}`,
+    `URL:${SITE}event/${ev.id}`,
   ].filter(Boolean);
   const last = ev.end || ev.start;
   if(ev.slots && ev.slots.length){
@@ -132,6 +132,6 @@ const bdays = MEMBERS.filter(m => !m.graduated && m.birthday).map(m => [
   `SUMMARY:${esc(`🎂 ${m.name} ${GROUP_NAME[m.groupId] || ''}`.trim())}`,
   `DTSTART;VALUE=DATE:${ymd(m.birthday)}`, `DTEND;VALUE=DATE:${ymd(addDays(m.birthday, 1))}`,
   'RRULE:FREQ=YEARLY', 'TRANSP:TRANSPARENT',
-  `DESCRIPTION:${esc(`วันเกิด ${m.nameTh || m.name} (${m.name})\n${SITE}?m=${m.id}`)}`, `URL:${SITE}?m=${m.id}`]);
+  `DESCRIPTION:${esc(`วันเกิด ${m.nameTh || m.name} (${m.name})\n${SITE}member/${m.id}`)}`, `URL:${SITE}member/${m.id}`]);
 writeFileSync(new URL('../birthdays.ics', import.meta.url), calendar('48thDb · วันเกิดเมมเบอร์', 'วันเกิดของเมมเบอร์ BNK48 และ CGM48 ปัจจุบัน', bdays));
 console.log('birthdays.ics', bdays.length, 'members');

@@ -9760,11 +9760,11 @@ function applyPageMeta(){
     title = `${en ? 'Gallery' : 'แกลเลอรี'} ${g.title}`; desc = en ? g.note.en : g.note.th; }
   if(state.view === 'tag' && state.tagOf){ title = '#' + tagLabel(state.tagOf);
     desc = en ? `BNK48 and CGM48 members whose biographies are tagged #${tagLabel(state.tagOf)}` : `สมาชิก BNK48 และ CGM48 ที่ประวัติย่อมีแท็ก #${tagLabel(state.tagOf)}`;
-    path = '/?t=' + encodeURIComponent(state.tagOf); }
+    path = '/tag/' + encodeURIComponent(state.tagOf); }
   const m = state.selectedId ? getMember(state.selectedId) : null;
   const s = state.view === 'single' && state.selectedSingle ? findWork(state.selectedSingle) : null;
   if(m){ title = nickName(m); path = '/m/' + m.id; }
-  else if(s){ title = s.title; path = `/?s=${s.id}`; }
+  else if(s){ title = s.title; path = `/song/${encodeURIComponent(s.id)}`; }
   else if(key === 'feed' && state.view !== 'tag') path = '/';
   document.title = key === 'feed' && !m && !s && state.view !== 'tag' ? title : `${title} — 48thDb`;
   const d = document.querySelector('meta[name="description"]'); if(d) d.content = desc;
@@ -23345,12 +23345,16 @@ function urlForSnapshot(snap){
   const p = new URLSearchParams();
   let path = '/';
   const at = v => { path = '/' + (VIEW_SLUG[v] || v); };
-  if(String(snap.posterOf || '').startsWith('ge:')) p.set('p', snap.posterOf.slice(3));
-  else if(snap.selectedEvent)  p.set('e', snap.selectedEvent);
-  else if(snap.selectedId){    p.set('m', snap.selectedId);
+  let sheet = true;
+  const pick = (kind, id) => { path = '/' + kind + '/' + encodeURIComponent(id); };
+  if(String(snap.posterOf || '').startsWith('ge:')) pick('ge2026', snap.posterOf.slice(3));
+  else if(snap.selectedEvent)  pick('event', snap.selectedEvent);
+  else if(snap.selectedId){    pick('member', snap.selectedId);
                                if(snap.compareWith) p.set('vs', snap.compareWith); }
-  else if(snap.selectedSingle) p.set('s', snap.selectedSingle);
-  else if(snap.view === 'tag' && snap.tagOf) p.set('t', snap.tagOf);
+  else if(snap.selectedSingle) pick('song', snap.selectedSingle);
+  else if(snap.view === 'tag' && snap.tagOf) pick('tag', snap.tagOf);
+  else sheet = false;
+  if(sheet){}
   else if(snap.view === 'timeline' && snap.geTab === 'results') at('results');
   else if(snap.view === 'timeline' && snap.geTab === 'chain') at('vote');
   else if(snap.view === 'timeline' && snap.geTab === 'songs') at('gesongs');
@@ -23361,7 +23365,7 @@ function urlForSnapshot(snap){
   else if(snap.view && snap.view !== 'feed' && SHAREABLE_VIEWS.includes(snap.view)) at(snap.view);
   // the tab a page is on, so a reload (or a shared link) lands on it and not on the first: the Works page's category and
   // list, the stats tab (nothing else is in the address when a sheet is open over them)
-  if(![...p.keys()].length){
+  if(!sheet){
     if(snap.view === 'discography'){ path = '/works/' + (snap.worksCat === 'music' || !snap.worksCat ? 'songs' : snap.worksCat); if((snap.worksCat === 'music' || !snap.worksCat) && snap.discTab && snap.discTab !== 'singles') path += '/' + snap.discTab; }
     else if(snap.view === 'stats' && snap.statsTab && snap.statsTab !== 'overview') path = '/stats/' + snap.statsTab;
   }
@@ -23375,7 +23379,10 @@ function applyUrlToState(){
   const p = new URLSearchParams(BOOT_QUERY);
   const seg = BOOT_PATH.split('/').filter(Boolean).map(x => decodeURIComponent(x).toLowerCase());
   const view = p.get('v') || (seg[0] ? SLUG_VIEW[seg[0]] || seg[0] : null);
-  const ev = p.get('e'), mem = p.get('m'), sng = p.get('s'), pst = p.get('p'), tg = p.get('t');
+  // a sheet's address is /event/<id>, /member/<id>, /song/<id>, /tag/<name>, /ge2026/<candidate>; the old ?e= ?m= ?s= ?t= ?p= still open
+  const raw = BOOT_PATH.split('/').filter(Boolean).map(x => { try{ return decodeURIComponent(x); }catch(e){ return x; } });
+  const sub = k => raw[0] && raw[0].toLowerCase() === k && raw[1] ? raw[1] : null;
+  const ev = p.get('e') || sub('event'), mem = p.get('m') || sub('member'), sng = p.get('s') || sub('song'), pst = p.get('p') || sub('ge2026'), tg = p.get('t') || sub('tag');
 
   if(pst && isGECandidate(pst)){
     state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'candidates';
@@ -24101,7 +24108,7 @@ function hsShareSubject(){
   if(!ev) return null;
   const d = HS_DAYS[state.hsDay] ? state.hsDay : 0, r = HS_ROUNDS[state.hsRound] ? state.hsRound : null;
   const pick = state.hsPick && getMember(state.hsPick) ? state.hsPick : null;
-  const link = `${location.origin}/?e=${ev.id}&hs=${d}${r != null ? '.' + r : ''}${pick ? '.' + pick : ''}`;
+  const link = `${location.origin}/event/${encodeURIComponent(ev.id)}?hs=${d}${r != null ? '.' + r : ''}${pick ? '.' + pick : ''}`;
   const pm = pick && getMember(pick);
   return { kind:'hsplan', ev, day:d, round:r, pick, osh: !!state.hsOshi, flat: !!state.hsFlat, yaw: state.hsFlat ? 0 : state.hsYaw || 0, url:link, link,
     title:`${pm ? pm.name + ' · ' : ''}ผังเลนจับมือ ${ev.title} — 48thDb`,
@@ -25019,7 +25026,7 @@ function shareSubject(){
   // the festival sheet on its booth plan shares the plan itself, for the day and hour on screen
   if(ev && ev.boothPlan === 'fanfest' && state.ffTab !== 'acts' && document.querySelector('.modal-scroll .ff-board')){
     const d = FF_DAYS[state.ffDay] ? state.ffDay : 0, sl = FF_DAYS[d].slots[state.ffSlot] ? state.ffSlot : null;
-    const link = `${location.origin}/?e=${ev.id}&ff=${d}${sl != null ? '.' + sl : ''}`;
+    const link = `${location.origin}/event/${encodeURIComponent(ev.id)}?ff=${d}${sl != null ? '.' + sl : ''}`;
     return { kind:'ffplan', ev, day:d, slot:sl, url:link, link, title:`ผังบูธ Fan Festival — 48thDb`,
       file:`48thdb-fanfest-${FF_DAYS[d].date}${sl != null ? '-' + FF_DAYS[d].slots[sl].t.replace(':', '') : ''}` };
   }
@@ -25048,7 +25055,7 @@ function shareSubject(){
 function milestoneShare(vid){
   const m = ytMilestones().find(x => x.vid === vid);
   if(!m) return null;
-  const url = location.origin + '/?s=' + encodeURIComponent(m.workId);
+  const url = location.origin + '/song/' + encodeURIComponent(m.workId);
   return { kind:'milestone', ...m, url,
     title:`${m.track} ${isEN() ? `passed ${m.mark.toLocaleString('en-US')} views` : `ครบ ${m.mark.toLocaleString('en-US')} วิว`} — 48thDb`,
     file:`48thdb-${m.workId}-${m.mark}` };

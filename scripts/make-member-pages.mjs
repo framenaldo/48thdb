@@ -63,7 +63,7 @@ const people = JSON.parse(await run(`JSON.stringify(state.members.map(m => {
 // tags become ordinary links, names read as the site shows them by default
 const bios = JSON.parse(await run(`(async () => {
   const snap = await fbDb.collection('bios').get(), out = {}, was = state.lang;
-  const href = (k, id) => k === 'm' ? '/m/' + id : k === 'w' ? '/?s=' + encodeURIComponent(id) : '/?e=' + encodeURIComponent(id);
+  const href = (k, id) => k === 'm' ? '/m/' + id : k === 'w' ? '/song/' + encodeURIComponent(id) : '/event/' + encodeURIComponent(id);
   const line = text => { let o = '', last = 0; BIO_RE.lastIndex = 0;
     for(let m; (m = BIO_RE.exec(text)); ){
       o += escapeHtml(text.slice(last, m.index)); last = BIO_RE.lastIndex;
@@ -168,7 +168,7 @@ const HEAD = (title, desc, url, img) => `<!doctype html>
 const photoSrc = p => !p.photo ? '' : p.photo.startsWith('data:') ? p.photo : '/' + p.photo.replace(/^\//, '');
 
 for(const p of people){
-  const url = `${ORIGIN}/m/${p.id}`, site = `/?m=${p.id}`;
+  const url = `${ORIGIN}/m/${p.id}`, site = `/member/${p.id}`;
   const who = `${p.name}${p.th ? ` (${p.th})` : ''}`;
   const unit = [p.group, p.team].filter(Boolean).join(' ');
   const bio = bios[p.id] || {}, lead = `${who} ${p.graduated ? 'อดีตสมาชิก' : 'สมาชิก'} ${unit}${p.gen ? ` รุ่น ${p.gen}` : ''}`;

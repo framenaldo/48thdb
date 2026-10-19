@@ -25,8 +25,9 @@ the Firebase CLI from the owner's machine.
   /stats, /members, /works, /ge2026 … (`VIEW_SLUG`, `urlForSnapshot`,
   `applyUrlToState`). The host hands any address that is not a file to
   index.html (`not_found_handling` in site.wrangler.toml); the older `?v=<view>`
-  links still open and are rewritten. An event, member or song is still `?e=`,
-  `?m=`, `?s=`. Don't name a folder after a view slug unless it has no index.html.
+  links still open and are rewritten. An event, member, song or tag is /event/<id>,
+  /member/<id>, /song/<id>, /tag/<name> (a GE candidate's poster /ge2026/<id>); the old `?e=` `?m=` `?s=`
+  `?t=` `?p=` forms still open and are rewritten. /m/<id> is the static profile page for search engines. Don't name a folder after a view slug unless it has no index.html.
   Each view sets its own title, description and canonical (`PAGE_META`,
   `applyPageMeta`); index.html carries no static canonical. A new view needs
   a `PAGE_META` row and a place in `VIEWS` in scripts/make-member-pages.mjs,
@@ -90,7 +91,7 @@ the Firebase CLI from the owner's machine.
   event) for mentions, which print in pink with no picture; `#{tag}` or
   `#{tag|label}` for tags; `[words](https://…)` for links. Nobody's name is
   shown as the writer, and a bio shows nothing about who mentions whom.
-  Tag pages are `/?t=<tag>` (view `tag`). Bio text carries `data-noloc`, so
+  Tag pages are `/tag/<tag>` (view `tag`). Bio text carries `data-noloc`, so
   the language passes leave it as written. Search engines read the bio from
   the static /m/<id> pages, so rerun `node scripts/make-member-pages.mjs`
   after bios change.

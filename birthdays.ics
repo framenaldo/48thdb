@@ -26,9 +26,9 @@ DTSTART;VALUE=DATE:20041015
 DTEND;VALUE=DATE:20041016
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด เฟม (Fame)\nhttps://48thdb.com/?m=b
- nk-fame
-URL:https://48thdb.com/?m=bnk-fame
+DESCRIPTION:วันเกิด เฟม (Fame)\nhttps://48thdb.com/memb
+ er/bnk-fame
+URL:https://48thdb.com/member/bnk-fame
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-hoop@48thdb
@@ -38,9 +38,9 @@ DTSTART;VALUE=DATE:20020918
 DTEND;VALUE=DATE:20020919
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด ฮูพ (Hoop)\nhttps://48thdb.com/?m=b
- nk-hoop
-URL:https://48thdb.com/?m=bnk-hoop
+DESCRIPTION:วันเกิด ฮูพ (Hoop)\nhttps://48thdb.com/memb
+ er/bnk-hoop
+URL:https://48thdb.com/member/bnk-hoop
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-janry@48thdb
@@ -51,8 +51,8 @@ DTEND;VALUE=DATE:20080104
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด แจนรี่ (Janry)\nhttps://48thd
- b.com/?m=bnk-janry
-URL:https://48thdb.com/?m=bnk-janry
+ b.com/member/bnk-janry
+URL:https://48thdb.com/member/bnk-janry
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-luksorn@48thdb
@@ -63,8 +63,8 @@ DTEND;VALUE=DATE:20050628
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ลูกศร (Luksorn)\nhttps://48thdb
- .com/?m=bnk-luksorn
-URL:https://48thdb.com/?m=bnk-luksorn
+ .com/member/bnk-luksorn
+URL:https://48thdb.com/member/bnk-luksorn
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-mail@48thdb
@@ -74,9 +74,9 @@ DTSTART;VALUE=DATE:20100717
 DTEND;VALUE=DATE:20100718
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด เมล (Mail)\nhttps://48thdb.com/?m=b
- nk-mail
-URL:https://48thdb.com/?m=bnk-mail
+DESCRIPTION:วันเกิด เมล (Mail)\nhttps://48thdb.com/memb
+ er/bnk-mail
+URL:https://48thdb.com/member/bnk-mail
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-marine@48thdb
@@ -87,8 +87,8 @@ DTEND;VALUE=DATE:20060430
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด มารีน (Marine)\nhttps://48thdb.
- com/?m=bnk-marine
-URL:https://48thdb.com/?m=bnk-marine
+ com/member/bnk-marine
+URL:https://48thdb.com/member/bnk-marine
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-micha@48thdb
@@ -99,8 +99,8 @@ DTEND;VALUE=DATE:20070613
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด มิชา (Micha)\nhttps://48thdb.com/
- ?m=bnk-micha
-URL:https://48thdb.com/?m=bnk-micha
+ member/bnk-micha
+URL:https://48thdb.com/member/bnk-micha
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-monet@48thdb
@@ -111,8 +111,8 @@ DTEND;VALUE=DATE:20080805
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด โมเน่ต์ (Monet)\nhttps://48
- thdb.com/?m=bnk-monet
-URL:https://48thdb.com/?m=bnk-monet
+ thdb.com/member/bnk-monet
+URL:https://48thdb.com/member/bnk-monet
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-patt@48thdb
@@ -122,9 +122,9 @@ DTSTART;VALUE=DATE:20080617
 DTEND;VALUE=DATE:20080618
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด แพท (Patt)\nhttps://48thdb.com/?m=b
- nk-patt
-URL:https://48thdb.com/?m=bnk-patt
+DESCRIPTION:วันเกิด แพท (Patt)\nhttps://48thdb.com/memb
+ er/bnk-patt
+URL:https://48thdb.com/member/bnk-patt
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-praew@48thdb
@@ -135,8 +135,8 @@ DTEND;VALUE=DATE:20080524
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด แพรว (Praew)\nhttps://48thdb.com/
- ?m=bnk-praew
-URL:https://48thdb.com/?m=bnk-praew
+ member/bnk-praew
+URL:https://48thdb.com/member/bnk-praew
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-wawa@48thdb
@@ -147,8 +147,8 @@ DTEND;VALUE=DATE:20090812
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด วาว่า (Wawa)\nhttps://48thdb.co
- m/?m=bnk-wawa
-URL:https://48thdb.com/?m=bnk-wawa
+ m/member/bnk-wawa
+URL:https://48thdb.com/member/bnk-wawa
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-arlee@48thdb
@@ -159,8 +159,8 @@ DTEND;VALUE=DATE:20040327
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด อาหลี (Arlee)\nhttps://48thdb.c
- om/?m=bnk-arlee
-URL:https://48thdb.com/?m=bnk-arlee
+ om/member/bnk-arlee
+URL:https://48thdb.com/member/bnk-arlee
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-berry@48thdb
@@ -171,8 +171,8 @@ DTEND;VALUE=DATE:20050724
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด เบอร์รี่ (Berry)\nhttps:/
- /48thdb.com/?m=bnk-berry
-URL:https://48thdb.com/?m=bnk-berry
+ /48thdb.com/member/bnk-berry
+URL:https://48thdb.com/member/bnk-berry
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-emmy@48thdb
@@ -183,8 +183,8 @@ DTEND;VALUE=DATE:20070914
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด เอ็มมี่ (Emmy)\nhttps://48t
- hdb.com/?m=bnk-emmy
-URL:https://48thdb.com/?m=bnk-emmy
+ hdb.com/member/bnk-emmy
+URL:https://48thdb.com/member/bnk-emmy
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-jew@48thdb
@@ -194,9 +194,9 @@ DTSTART;VALUE=DATE:20031128
 DTEND;VALUE=DATE:20031129
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด จิว (Jew)\nhttps://48thdb.com/?m=bn
- k-jew
-URL:https://48thdb.com/?m=bnk-jew
+DESCRIPTION:วันเกิด จิว (Jew)\nhttps://48thdb.com/membe
+ r/bnk-jew
+URL:https://48thdb.com/member/bnk-jew
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-l@48thdb
@@ -206,9 +206,9 @@ DTSTART;VALUE=DATE:20030213
 DTEND;VALUE=DATE:20030214
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด แอล (L)\nhttps://48thdb.com/?m=bnk-
- l
-URL:https://48thdb.com/?m=bnk-l
+DESCRIPTION:วันเกิด แอล (L)\nhttps://48thdb.com/member/
+ bnk-l
+URL:https://48thdb.com/member/bnk-l
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-palmmy@48thdb
@@ -219,8 +219,8 @@ DTEND;VALUE=DATE:20031029
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ปาล์มมี่ (Palmmy)\nhttps:
- //48thdb.com/?m=bnk-palmmy
-URL:https://48thdb.com/?m=bnk-palmmy
+ //48thdb.com/member/bnk-palmmy
+URL:https://48thdb.com/member/bnk-palmmy
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-pancake@48thdb
@@ -231,8 +231,8 @@ DTEND;VALUE=DATE:20070207
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด แพนเค้ก (Pancake)\nhttps://
- 48thdb.com/?m=bnk-pancake
-URL:https://48thdb.com/?m=bnk-pancake
+ 48thdb.com/member/bnk-pancake
+URL:https://48thdb.com/member/bnk-pancake
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-proud@48thdb
@@ -243,8 +243,8 @@ DTEND;VALUE=DATE:20021115
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ภราว (Proud)\nhttps://48thdb.com/
- ?m=bnk-proud
-URL:https://48thdb.com/?m=bnk-proud
+ member/bnk-proud
+URL:https://48thdb.com/member/bnk-proud
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-saonoi@48thdb
@@ -255,8 +255,8 @@ DTEND;VALUE=DATE:20051110
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด สาวน้อย (Saonoi)\nhttps://4
- 8thdb.com/?m=bnk-saonoi
-URL:https://48thdb.com/?m=bnk-saonoi
+ 8thdb.com/member/bnk-saonoi
+URL:https://48thdb.com/member/bnk-saonoi
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-sindy@48thdb
@@ -267,8 +267,8 @@ DTEND;VALUE=DATE:20090404
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ซินดี้ (Sindy)\nhttps://48thd
- b.com/?m=bnk-sindy
-URL:https://48thdb.com/?m=bnk-sindy
+ b.com/member/bnk-sindy
+URL:https://48thdb.com/member/bnk-sindy
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-yoghurt@48thdb
@@ -279,8 +279,8 @@ DTEND;VALUE=DATE:20041111
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด โยเกิร์ต (Yoghurt)\nhttps
- ://48thdb.com/?m=bnk-yoghurt
-URL:https://48thdb.com/?m=bnk-yoghurt
+ ://48thdb.com/member/bnk-yoghurt
+URL:https://48thdb.com/member/bnk-yoghurt
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-blythe@48thdb
@@ -291,8 +291,8 @@ DTEND;VALUE=DATE:20100723
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด บลายธ์ (Blythe)\nhttps://48th
- db.com/?m=bnk-blythe
-URL:https://48thdb.com/?m=bnk-blythe
+ db.com/member/bnk-blythe
+URL:https://48thdb.com/member/bnk-blythe
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-cartoon@48thdb
@@ -303,8 +303,8 @@ DTEND;VALUE=DATE:20090827
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด การ์ตูน (Cartoon)\nhttps://
- 48thdb.com/?m=bnk-cartoon
-URL:https://48thdb.com/?m=bnk-cartoon
+ 48thdb.com/member/bnk-cartoon
+URL:https://48thdb.com/member/bnk-cartoon
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-galeya@48thdb
@@ -315,8 +315,8 @@ DTEND;VALUE=DATE:20081225
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด เกลญ่า (Galeya)\nhttps://48th
- db.com/?m=bnk-galeya
-URL:https://48thdb.com/?m=bnk-galeya
+ db.com/member/bnk-galeya
+URL:https://48thdb.com/member/bnk-galeya
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-grape@48thdb
@@ -327,8 +327,8 @@ DTEND;VALUE=DATE:20110409
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด เกรพ (Grape)\nhttps://48thdb.com/
- ?m=bnk-grape
-URL:https://48thdb.com/?m=bnk-grape
+ member/bnk-grape
+URL:https://48thdb.com/member/bnk-grape
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-inkcha@48thdb
@@ -339,8 +339,8 @@ DTEND;VALUE=DATE:20070801
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด อิ้งค์ชา (Inkcha)\nhttps:
- //48thdb.com/?m=bnk-inkcha
-URL:https://48thdb.com/?m=bnk-inkcha
+ //48thdb.com/member/bnk-inkcha
+URL:https://48thdb.com/member/bnk-inkcha
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-khaimook@48thdb
@@ -351,8 +351,8 @@ DTEND;VALUE=DATE:20040106
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ไข่มุก (Khaimook)\nhttps://48
- thdb.com/?m=bnk-khaimook
-URL:https://48thdb.com/?m=bnk-khaimook
+ thdb.com/member/bnk-khaimook
+URL:https://48thdb.com/member/bnk-khaimook
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-khowjow@48thdb
@@ -363,8 +363,8 @@ DTEND;VALUE=DATE:20070224
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ข้าวจ้าว (Khowjow)\nhttps
- ://48thdb.com/?m=bnk-khowjow
-URL:https://48thdb.com/?m=bnk-khowjow
+ ://48thdb.com/member/bnk-khowjow
+URL:https://48thdb.com/member/bnk-khowjow
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-mayji@48thdb
@@ -375,8 +375,8 @@ DTEND;VALUE=DATE:20050506
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด เมย์จิ (Mayji)\nhttps://48thd
- b.com/?m=bnk-mayji
-URL:https://48thdb.com/?m=bnk-mayji
+ b.com/member/bnk-mayji
+URL:https://48thdb.com/member/bnk-mayji
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-mint@48thdb
@@ -387,8 +387,8 @@ DTEND;VALUE=DATE:20100205
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด มิ้นท์ (Mint)\nhttps://48thdb
- .com/?m=bnk-mint
-URL:https://48thdb.com/?m=bnk-mint
+ .com/member/bnk-mint
+URL:https://48thdb.com/member/bnk-mint
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-mirin@48thdb
@@ -399,8 +399,8 @@ DTEND;VALUE=DATE:20100529
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด มิริน (Mirin)\nhttps://48thdb.c
- om/?m=bnk-mirin
-URL:https://48thdb.com/?m=bnk-mirin
+ om/member/bnk-mirin
+URL:https://48thdb.com/member/bnk-mirin
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-nall@48thdb
@@ -410,9 +410,9 @@ DTSTART;VALUE=DATE:20010825
 DTEND;VALUE=DATE:20010826
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด แนล (Nall)\nhttps://48thdb.com/?m=b
- nk-nall
-URL:https://48thdb.com/?m=bnk-nall
+DESCRIPTION:วันเกิด แนล (Nall)\nhttps://48thdb.com/memb
+ er/bnk-nall
+URL:https://48thdb.com/member/bnk-nall
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-nammonn@48thdb
@@ -423,8 +423,8 @@ DTEND;VALUE=DATE:20030811
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด น้ำมนต์ (Nammonn)\nhttps://
- 48thdb.com/?m=bnk-nammonn
-URL:https://48thdb.com/?m=bnk-nammonn
+ 48thdb.com/member/bnk-nammonn
+URL:https://48thdb.com/member/bnk-nammonn
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-neen@48thdb
@@ -434,9 +434,9 @@ DTSTART;VALUE=DATE:20020414
 DTEND;VALUE=DATE:20020415
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด นีน (Neen)\nhttps://48thdb.com/?m=b
- nk-neen
-URL:https://48thdb.com/?m=bnk-neen
+DESCRIPTION:วันเกิด นีน (Neen)\nhttps://48thdb.com/memb
+ er/bnk-neen
+URL:https://48thdb.com/member/bnk-neen
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-niya@48thdb
@@ -447,8 +447,8 @@ DTEND;VALUE=DATE:20090215
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด นีญ่า (Niya)\nhttps://48thdb.co
- m/?m=bnk-niya
-URL:https://48thdb.com/?m=bnk-niya
+ m/member/bnk-niya
+URL:https://48thdb.com/member/bnk-niya
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-bnk-rose@48thdb
@@ -458,9 +458,9 @@ DTSTART;VALUE=DATE:20071101
 DTEND;VALUE=DATE:20071102
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด โรส (Rose)\nhttps://48thdb.com/?m=b
- nk-rose
-URL:https://48thdb.com/?m=bnk-rose
+DESCRIPTION:วันเกิด โรส (Rose)\nhttps://48thdb.com/memb
+ er/bnk-rose
+URL:https://48thdb.com/member/bnk-rose
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-lookked@48thdb
@@ -471,8 +471,8 @@ DTEND;VALUE=DATE:20000707
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ลูกเกด (Lookked)\nhttps://48t
- hdb.com/?m=cgm-lookked
-URL:https://48thdb.com/?m=cgm-lookked
+ hdb.com/member/cgm-lookked
+URL:https://48thdb.com/member/cgm-lookked
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-nana@48thdb
@@ -482,9 +482,9 @@ DTSTART;VALUE=DATE:20030227
 DTEND;VALUE=DATE:20030228
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด นานา (Nana)\nhttps://48thdb.com/?
- m=cgm-nana
-URL:https://48thdb.com/?m=cgm-nana
+DESCRIPTION:วันเกิด นานา (Nana)\nhttps://48thdb.com/m
+ ember/cgm-nana
+URL:https://48thdb.com/member/cgm-nana
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-jingjing@48thdb
@@ -495,8 +495,8 @@ DTEND;VALUE=DATE:20020131
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด จิงจิง (Jingjing)\nhttps://48
- thdb.com/?m=cgm-jingjing
-URL:https://48thdb.com/?m=cgm-jingjing
+ thdb.com/member/cgm-jingjing
+URL:https://48thdb.com/member/cgm-jingjing
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-prae@48thdb
@@ -506,9 +506,9 @@ DTSTART;VALUE=DATE:20050103
 DTEND;VALUE=DATE:20050104
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด แพร (Prae)\nhttps://48thdb.com/?m=c
- gm-prae
-URL:https://48thdb.com/?m=cgm-prae
+DESCRIPTION:วันเกิด แพร (Prae)\nhttps://48thdb.com/memb
+ er/cgm-prae
+URL:https://48thdb.com/member/cgm-prae
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-lingling@48thdb
@@ -519,8 +519,8 @@ DTEND;VALUE=DATE:20020721
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด หลิงหลิง (Lingling)\nhttp
- s://48thdb.com/?m=cgm-lingling
-URL:https://48thdb.com/?m=cgm-lingling
+ s://48thdb.com/member/cgm-lingling
+URL:https://48thdb.com/member/cgm-lingling
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-else@48thdb
@@ -531,8 +531,8 @@ DTEND;VALUE=DATE:20030813
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด เอลฟ์ (Else)\nhttps://48thdb.co
- m/?m=cgm-else
-URL:https://48thdb.com/?m=cgm-else
+ m/member/cgm-else
+URL:https://48thdb.com/member/cgm-else
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-ginna@48thdb
@@ -543,8 +543,8 @@ DTEND;VALUE=DATE:20061211
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด จีนน่า (Ginna)\nhttps://48thd
- b.com/?m=cgm-ginna
-URL:https://48thdb.com/?m=cgm-ginna
+ b.com/member/cgm-ginna
+URL:https://48thdb.com/member/cgm-ginna
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-ploen@48thdb
@@ -555,8 +555,8 @@ DTEND;VALUE=DATE:20080227
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด เพลิน (Ploen)\nhttps://48thdb.c
- om/?m=cgm-ploen
-URL:https://48thdb.com/?m=cgm-ploen
+ om/member/cgm-ploen
+URL:https://48thdb.com/member/cgm-ploen
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-kwan@48thdb
@@ -566,9 +566,9 @@ DTSTART;VALUE=DATE:20080304
 DTEND;VALUE=DATE:20080305
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด ขวัญ (Kwan)\nhttps://48thdb.com/?
- m=cgm-kwan
-URL:https://48thdb.com/?m=cgm-kwan
+DESCRIPTION:วันเกิด ขวัญ (Kwan)\nhttps://48thdb.com/m
+ ember/cgm-kwan
+URL:https://48thdb.com/member/cgm-kwan
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-nisha@48thdb
@@ -579,8 +579,8 @@ DTEND;VALUE=DATE:20090905
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด นิชา (Nisha)\nhttps://48thdb.com/
- ?m=cgm-nisha
-URL:https://48thdb.com/?m=cgm-nisha
+ member/cgm-nisha
+URL:https://48thdb.com/member/cgm-nisha
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-valentine@48thdb
@@ -591,8 +591,8 @@ DTEND;VALUE=DATE:20080215
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด วาเลนไทน์ (Valentine)\n
- https://48thdb.com/?m=cgm-valentine
-URL:https://48thdb.com/?m=cgm-valentine
+ https://48thdb.com/member/cgm-valentine
+URL:https://48thdb.com/member/cgm-valentine
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-satangpound@48thdb
@@ -603,8 +603,8 @@ DTEND;VALUE=DATE:20071027
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด สตางค์ปอนด์ (Satang
- pound)\nhttps://48thdb.com/?m=cgm-satangpound
-URL:https://48thdb.com/?m=cgm-satangpound
+ pound)\nhttps://48thdb.com/member/cgm-satangpound
+URL:https://48thdb.com/member/cgm-satangpound
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-praifa@48thdb
@@ -615,8 +615,8 @@ DTEND;VALUE=DATE:20120105
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ปรายฟ้า (Praifa)\nhttps://4
- 8thdb.com/?m=cgm-praifa
-URL:https://48thdb.com/?m=cgm-praifa
+ 8thdb.com/member/cgm-praifa
+URL:https://48thdb.com/member/cgm-praifa
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-shenae@48thdb
@@ -627,8 +627,8 @@ DTEND;VALUE=DATE:20061108
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ชีเน่ (Shenae)\nhttps://48thdb.
- com/?m=cgm-shenae
-URL:https://48thdb.com/?m=cgm-shenae
+ com/member/cgm-shenae
+URL:https://48thdb.com/member/cgm-shenae
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-emma@48thdb
@@ -639,8 +639,8 @@ DTEND;VALUE=DATE:20040213
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด เอมม่า (Emma)\nhttps://48thdb
- .com/?m=cgm-emma
-URL:https://48thdb.com/?m=cgm-emma
+ .com/member/cgm-emma
+URL:https://48thdb.com/member/cgm-emma
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-hongyok@48thdb
@@ -651,8 +651,8 @@ DTEND;VALUE=DATE:20040128
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด หงษ์หยก (Hongyok)\nhttps://
- 48thdb.com/?m=cgm-hongyok
-URL:https://48thdb.com/?m=cgm-hongyok
+ 48thdb.com/member/cgm-hongyok
+URL:https://48thdb.com/member/cgm-hongyok
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-chifa@48thdb
@@ -663,8 +663,8 @@ DTEND;VALUE=DATE:20081018
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ชิฟา (Chifa)\nhttps://48thdb.com/
- ?m=cgm-chifa
-URL:https://48thdb.com/?m=cgm-chifa
+ member/cgm-chifa
+URL:https://48thdb.com/member/cgm-chifa
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-tara@48thdb
@@ -674,9 +674,9 @@ DTSTART;VALUE=DATE:20130605
 DTEND;VALUE=DATE:20130606
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
-DESCRIPTION:วันเกิด ธารา (Tara)\nhttps://48thdb.com/?
- m=cgm-tara
-URL:https://48thdb.com/?m=cgm-tara
+DESCRIPTION:วันเกิด ธารา (Tara)\nhttps://48thdb.com/m
+ ember/cgm-tara
+URL:https://48thdb.com/member/cgm-tara
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-punpon@48thdb
@@ -687,8 +687,8 @@ DTEND;VALUE=DATE:20090113
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด ปันผล (Punpon)\nhttps://48thdb.
- com/?m=cgm-punpon
-URL:https://48thdb.com/?m=cgm-punpon
+ com/member/cgm-punpon
+URL:https://48thdb.com/member/cgm-punpon
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-lewlew@48thdb
@@ -699,8 +699,8 @@ DTEND;VALUE=DATE:20061225
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด หลิวหลิว (Lewlew)\nhttps:
- //48thdb.com/?m=cgm-lewlew
-URL:https://48thdb.com/?m=cgm-lewlew
+ //48thdb.com/member/cgm-lewlew
+URL:https://48thdb.com/member/cgm-lewlew
 END:VEVENT
 BEGIN:VEVENT
 UID:bday-cgm-namphet@48thdb
@@ -711,7 +711,7 @@ DTEND;VALUE=DATE:20080225
 RRULE:FREQ=YEARLY
 TRANSP:TRANSPARENT
 DESCRIPTION:วันเกิด น้ำเพชร (Namphet)\nhttps://
- 48thdb.com/?m=cgm-namphet
-URL:https://48thdb.com/?m=cgm-namphet
+ 48thdb.com/member/cgm-namphet
+URL:https://48thdb.com/member/cgm-namphet
 END:VEVENT
 END:VCALENDAR
