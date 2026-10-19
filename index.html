@@ -8287,7 +8287,7 @@ const SEED_MEDIA = [
   { kind:'series', title:'The Broken Us', alt:'ณ ขณะเหงา', year:2022, members:['bnk-jennis'] },
   { kind:'series', title:'School Tales the Series', year:2022, by:'Netflix', members:['bnk-jennis', 'bnk-orn'] },
   { kind:'series', title:'Rhythm of Life', year:2022, members:['bnk-mobile'] },
-  { kind:'series', title:'Thank You Teacher', year:2023, by:'TrueID', members:['bnk-cherprang', 'bnk-hoop'], roles:{ 'bnk-cherprang':'Ko' } },
+  { kind:'series', watch:[{ svc:'trueid', url:'https://www.trueid.net/watch/th-th/series/5Qb1dXvDVob3/aDBGG1OR4LEZ' }], title:'Thank You Teacher', year:2023, by:'TrueID', members:['bnk-cherprang', 'bnk-hoop'], roles:{ 'bnk-cherprang':'Ko' } },
   { kind:'series', title:'Bussaba Lui Fai', alt:'บุษบาลุยไฟ', year:2023, by:'Thai PBS', members:['bnk-cherprang'], roles:{ 'bnk-cherprang':'Lamjuan' } },
   { kind:'series', title:'Club Friday the Series: Moments & Memories', year:2023, by:'One 31', members:['bnk-cherprang'] },
   { kind:'series', title:'Escape to Homestay', alt:'เพื่อนผมมีมรดกเป็นโฮมสเตย์ครับ', year:2023, members:['bnk-fond'] },
@@ -21818,7 +21818,7 @@ function mediaEps(w, en){
     <ol class="mw-eps-list" data-noloc>${L.map(([t, id, len]) => `<li><a href="https://www.youtube.com/watch?v=${encodeURIComponent(id)}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(t)}</span><small>${escapeHtml(len)}</small></a></li>`).join('')}</ol></details>`;
 }
 // the badge of each service is a plain mark in its colours, not its logo
-const STREAM_NAME = { netflix:'Netflix', prime:'Prime Video' };
+const STREAM_NAME = { netflix:'Netflix', prime:'Prime Video', trueid:'TrueID' };
 // services whose logo files are in streaming/ (the rest show their name as text until a logo is sent)
 const STREAM_LOGO = { netflix:true, prime:true };
 // those with a round icon as well (the N); the rest use their wordmark, or their name where space is short
