@@ -4214,6 +4214,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-tools button{ display:grid; place-items:center; width:30px; height:30px; padding:0; border:0; border-radius:50%; cursor:pointer; color:#fff;
     background:rgba(255,255,255,.14); font-size:18px; font-weight:800; line-height:1; pointer-events:auto !important; }
   .lay-row.is-now{ opacity:.6; }
+  .ev-fold{ margin:14px 0 0; border-radius:14px; background:var(--paper-dim); border:1px solid var(--line); }
+  .ev-fold > summary{ display:flex; align-items:center; gap:8px; padding:11px 14px; font-weight:800; cursor:pointer; list-style:none; }
+  .ev-fold > summary::-webkit-details-marker{ display:none; }
+  .ev-fold > summary small{ font-weight:700; color:var(--ink-soft); }
+  .ev-fold > summary::after{ content:'›'; margin-left:auto; font-size:20px; transition:transform .15s; } .ev-fold[open] > summary::after{ transform:rotate(90deg); }
+  .ev-fold-list{ margin:0; padding:0 14px 12px 36px; list-style:decimal; } .ev-fold-list li{ margin:3px 0; }
   .mw-eps{ margin-top:8px; border-radius:14px; background:var(--paper-dim); border:1px solid var(--line); }
   .mw-eps > summary{ display:flex; align-items:center; gap:7px; padding:9px 12px; font-size:13px; font-weight:800; cursor:pointer; list-style:none; }
   .mw-eps > summary::-webkit-details-marker{ display:none; } .mw-eps > summary svg{ width:13px; height:13px; color:#E0243A; }
@@ -7356,7 +7362,10 @@ const SEED_SCHEDULE = [
       'Camera Zone 100 คน อนุญาตให้ใช้กล้องถ่ายภาพและอุปกรณ์เสริมได้เฉพาะโซนนี้',
       'โซนกิจกรรมทั้งหมดสำหรับผู้ลงทะเบียนและได้รับสิทธิ์เท่านั้น ผู้ที่ไม่ได้รับสิทธิ์ยังรับชมได้ในบริเวณโดยรอบ',
       'ผู้ได้รับสิทธิ์ Random Play Dance ให้ความร่วมมือเต้นเฉพาะในพื้นที่ที่กำหนด หากก่อความวุ่นวายหรือสร้างอันตรายต่อเมมเบอร์ ทีมงานขอสงวนสิทธิ์เชิญออกจากพื้นที่และ/หรือดำเนินคดีตามกฎหมาย',
-      'เวลาจบกิจกรรมยังไม่ประกาศ'] },
+      'เวลาจบกิจกรรมยังไม่ประกาศ'],
+    sections:[
+      { head:'Random Dance Playlist (Shuffle)', fold:true, lines:["2565","#Sukinanda","Aisuru Hito – เธอ","Aitakatta – อยากจะได้พบเธอ","Baby! Baby! Baby!","BINGO!","Bloom","BNK48×CGM48","BORDERLESS","Celebration","Chiang Mai 106","Colorcon WInk","Doushitemo Kimi ga Suki da – จะยังไงก็รักเธอ","First Rabbit","Generation Change","Green Flash","Heart no Dasshutsu Game – ปริศนาห้องหัวใจ","Hetaretachi yo – สิ้นสุดทางแพ้","Hokori no Oka – เนินเขาแห่งความฝัน","Honest Man","Houtei Sokudo to Yuuetsukan – ซิ่งให้สุด...หยุดที่เธอ","Kegareteiru Shinjitsu – ความจริงสีเทา","Kibou Ressha – รถไฟแห่งความหวัง","Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ","Kimi wa Melody – เธอคือ...เมโลดี้","Koi Tsunjatta – Let me know!","Koisuru Fortune Cookie – คุกกี้เสี่ยงทาย","Kurumi to Dialogue – แล้ว...ต้องทำยังไงล่ะ?","LOVE TRIP","Maeshika Mukanee – สุดเส้นทาง","Make noise","Masaka no Confession – คำสารภาพที่ไม่คาดฝัน","Mirai to wa?","Must be now","Ponytail to Shushu","Reborn","RUMOR","Saikou ka yo – สุดยอดไปเลย","Saikyou Twintail – ทวินเทล สุดยอดเลย!","Saishuu Bell ga Naru – เสียงระฆังแห่งความฝัน","Shoujotachi yo – วันใหม่","Totsuzen Do love me! – โทษทีนะ...รักกันได้ไหม?","UHHO UHHOHO","Warota People – หัวเราะเซ่!","Yobisute Fantasy – เรียกชื่อที ใจไม่ดีแล้ว!","Yume de Kiss me!","Yume wa Nigenai – จะไม่หนีจากความฝัน","มะลิ [Remix ver.]"] },
+      { head:'กฎของงาน', lines:["งดจับจองพื้นที่ก่อนเริ่มกิจกรรม ห้ามมีการวางสิ่งของจับจองพื้นที่ ทีมงานจะไม่รับผิดชอบต่อความเสียหายหรือสูญหายที่อาจเกิดขึ้น","เมื่อถึงเวลารันคิว กรุณาเข้าแถวอย่างเป็นระเบียบ พร้อมแสดงริสแบนด์ในการเข้าไปในพื้นที่จัดกิจกรรม งดการวิ่งเบียด หรือผลักกันในทุกกรณี","กรุณาไม่ยืนกีดขวางทางเดินสาธารณะ พื้นที่ร้านค้า และพื้นที่ของศูนย์การค้า นอกบริเวณที่จัดกิจกรรม","ไม่อนุญาตให้นำ อาวุธ วัตถุมีคม และวัตถุอันตรายเข้าไปในพื้นที่จัดกิจกรรม","ห้ามมีการขว้างปา โทรศัพท์มือถือ ตุ๊กตา ผ้าเชียร์ ป้ายเชียร์ ขวดน้ำ แท่งไฟ รวมถึงสิ่งของอื่น ๆ ไปบริเวณที่ศิลปินทำการแสดง เพราะอาจทำให้ศิลปินและผู้ชมที่อยู่ภายในงาน ได้รับบาดเจ็บได้","ขอความร่วมมือทุกท่านในการรักษาความสะอาดของพื้นที่โดยรอบ","ภายในงานไม่มีจุดบริการรับฝากของสำหรับผู้เข้าร่วมงาน","ไม่มีการเปิดรับของสำหรับส่งให้ศิลปิน","ในบริเวณพื้นที่การจัดกิจกรรม มีการบันทึกภาพและเสียงของผู้ที่มาเข้าร่วมกิจกรรม ไว้เพื่อเผยแพร่ในสื่อออนไลน์และสื่ออื่น ๆ ตามประสงค์ของผู้จัด ทางผู้จัดขอถือว่าให้สิทธิ์ยินยอมให้ใช้ภาพและเสียงของท่านตามประสงค์ของผู้จัดโดยมิต้องแจ้งให้ท่านทราบล่วงหน้า","หากมีการฝ่าฝืนกฎระเบียบข้างต้น ทางทีมงานขออนุญาตเชิญผู้ฝ่าฝืนออกจากพื้นที่จัดกิจกรรมทันที","อาจมีการเปลี่ยนแปลงตามความเหมาะสม"] }] },
   { id:'ev-ge6-handshake', logo:'kimi', start:'2026-10-31', end:'2026-11-01', lanePlan:'kimi',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Handshake Event',
     venue:'MCC Hall, The Mall Lifestore Ngamwongwan', groups:['bnk48','cgm48'],
@@ -17249,7 +17258,9 @@ function renderEventModal(){
         <h3 class="evm-head">รายละเอียด</h3>
         <ul class="ev-detail">${ev.info.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>` : ''}
 
-        ${(ev.sections || []).map(s => `
+        ${(ev.sections || []).map(s => s.fold ? `
+        <details class="ev-fold"><summary>${escapeHtml(s.head)}<small>${s.lines.length}</small></summary>
+        <ol class="ev-detail ev-fold-list">${s.lines.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ol></details>` : `
         <h3 class="evm-head">${escapeHtml(s.head)}</h3>
         <ul class="ev-detail">${s.lines.map(d=>`<li>${escapeHtml(d)}</li>`).join('')}</ul>`).join('')}
 
