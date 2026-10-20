@@ -3,3 +3,4 @@
 firebase-rules/
 public/
 .wrangler/
+worker/.vapid-private

@@ -8451,6 +8451,7 @@ const SEED_MEDIA = [
   { kind:'mv', title:'เหงา...เข้าใจ', year:2026, by:'4EVE', members:['bnk-hoop'] },
 ];
 const ICONS = {
+  bell:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>`,
   install:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M12 8v6M9.5 11.5 12 14l2.5-2.5"/></svg>`,
   star:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></svg>`,
   starOn:`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></svg>`,
@@ -10152,13 +10153,92 @@ async function installApp(){
     <div class="share-panel" role="dialog" aria-label="${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}">
       <div class="share-head"><b>${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}</b><button class="share-x" data-share="close" aria-label="${en ? 'Close' : 'ปิด'}">✕</button></div>
       <p class="lay-sheet-note"><b>${en ? 'Keep 48thDb on your phone like an app' : 'เก็บ 48thDb ไว้ในเครื่องเหมือนแอป'}</b></p>
-      <ul class="inst-why">${(en ? ['One tap from the home screen: no searching, no typing the address', 'Opens full screen, with no browser bars', 'Its own icon next to your other apps', 'Always the latest: it updates itself, nothing to download again']
-        : ['แตะที่ไอคอนหน้าโฮมก็เข้าเลย ไม่ต้องค้นหาหรือพิมพ์ที่อยู่เว็บ', 'เปิดเต็มจอ ไม่มีแถบเบราว์เซอร์บัง', 'มีไอคอนของตัวเองอยู่ข้างแอปอื่น ๆ', 'ได้ของใหม่ล่าสุดทุกครั้งที่เปิด ไม่ต้องโหลดแอปใหม่']).map(t => `<li>${t}</li>`).join('')}</ul>
+      <ul class="inst-why">${(en ? ['One tap from the home screen: no searching, no typing the address', 'Opens full screen, with no browser bars', 'Its own icon next to your other apps', 'Always the latest: it updates itself, nothing to download again', ...(_pushKey ? ['Reminders about 30 minutes before an event starts']: [])]
+        : ['แตะที่ไอคอนหน้าโฮมก็เข้าเลย ไม่ต้องค้นหาหรือพิมพ์ที่อยู่เว็บ', 'เปิดเต็มจอ ไม่มีแถบเบราว์เซอร์บัง', 'มีไอคอนของตัวเองอยู่ข้างแอปอื่น ๆ', 'ได้ของใหม่ล่าสุดทุกครั้งที่เปิด ไม่ต้องโหลดแอปใหม่', ...(_pushKey ? ['รับแจ้งเตือนก่อนงานเริ่มราว 30 นาที']: [])]).map(t => `<li>${t}</li>`).join('')}</ul>
       <ol class="inst-steps">${steps.map(t => `<li>${t}</li>`).join('')}</ol>
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
   el.addEventListener('click', e => { if(e.target.closest('[data-share="close"]')) closeShareSheet(); });
+}
+/* ---- notifications: "starting soon" (worker/push.js sends, sw.js shows). Hidden until the Worker answers /push/key. ---- */
+let _pushKey = null;
+const PUSH_LS = '48thdb-push';
+const pushPrefs = () => { try{ return JSON.parse(localStorage.getItem(PUSH_LS)) || null; }catch(e){ return null; } };
+const pushCan = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+const isIOSDevice = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Mac/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const pushShown = () => !!_pushKey && (pushCan() || (isIOSDevice() && !isInstalledApp()));
+const pushOshi = () => [...new Set([...(state.oshi || []), state.kamiOshi].filter(Boolean))];
+const urlB64 = k => Uint8Array.from(atob(k.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+function checkPush(){
+  return fetch(`${LIVE_API}/push/key`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).then(j => {
+    if(!j || !j.key) return; _pushKey = j.key; if(state.setMenuOpen) render(); pushSync(); }).catch(() => {});
+}
+async function pushSubscribe(mode){
+  const reg = await navigator.serviceWorker.ready;
+  let sub = await reg.pushManager.getSubscription();
+  if(!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlB64(_pushKey) });
+  const res = await fetch(`${LIVE_API}/push/sub`, { method:'POST', body:JSON.stringify({ sub:sub.toJSON(), prefs:{ mode, oshi:pushOshi() } }) });
+  if(!res.ok) throw new Error('push ' + res.status);
+  const j = await res.json();
+  try{ localStorage.setItem(PUSH_LS, JSON.stringify({ mode, k:j.k, at:Date.now() })); }catch(e){}
+}
+async function pushOff(){
+  const pr = pushPrefs();
+  try{ const sub = await (await navigator.serviceWorker.ready).pushManager.getSubscription();
+    if(pr && pr.k) await fetch(`${LIVE_API}/push/unsub`, { method:'POST', body:JSON.stringify({ k:pr.k }) }).catch(() => {});
+    if(sub) await sub.unsubscribe(); }catch(e){}
+  try{ localStorage.removeItem(PUSH_LS); }catch(e){}
+}
+/* once a day, tell the Worker again (keeps the subscription alive and carries a changed oshi) */
+function pushSync(){
+  const pr = pushPrefs();
+  if(pr && pushCan() && Notification.permission === 'granted' && Date.now() - pr.at > 86400000) pushSubscribe(pr.mode).catch(() => {});
+}
+function openPushSheet(){
+  const en = isEN(), pr = pushPrefs(), on = !!pr && pushCan() && Notification.permission === 'granted';
+  let mode = (pr && pr.mode) || 'all';
+  const t = (th, e) => en ? e : th;
+  closeShareSheet();
+  const el = document.createElement('div');
+  el.className = 'share-sheet';
+  const body = () => {
+    if(!pushCan()) return `<p class="lay-sheet-note">${t('iPhone รับแจ้งเตือนจากเว็บได้เมื่อเพิ่มเว็บไว้หน้าโฮมก่อน ทำตามขั้นตอนแล้วเปิดเว็บจากไอคอนบนหน้าโฮม จากนั้นกลับมากดเปิดแจ้งเตือนที่นี่', 'iPhone can send web notifications once the site is on your Home Screen. Add it, open it from the icon, then turn notifications on here.')}</p>
+      <button class="lay-row" data-push="install"><span>${t('ดูวิธีเพิ่มเว็บไว้หน้าโฮม', 'How to add it to the Home Screen')}</span><i>›</i></button>`;
+    const denied = Notification.permission === 'denied';
+    return `<p class="lay-sheet-note">${t('เตือนก่อนงานเริ่มราว 30 นาที แม้ปิดเว็บอยู่', 'A reminder about 30 minutes before an event starts, even with the site closed.')}</p>
+      <button class="lay-row${mode === 'all' ? ' is-now' : ''}" data-push-mode="all"><span>${t('ทุกงาน', 'Every event')}</span>${mode === 'all' ? `<em>${t('เลือกอยู่', 'chosen')}</em>` : ''}</button>
+      <button class="lay-row${mode === 'oshi' ? ' is-now' : ''}" data-push-mode="oshi"><span>${t('เฉพาะงานที่มีโอชิของฉัน', 'Only events with my oshi')}</span>${mode === 'oshi' ? `<em>${t('เลือกอยู่', 'chosen')}</em>` : ''}</button>
+      ${mode === 'oshi' && !pushOshi().length ? `<p class="lay-sheet-note">${t('ยังไม่ได้เลือกโอชิ กดหัวใจที่หน้าสมาชิกก่อน แล้วจะเตือนเฉพาะงานของเธอ', 'No oshi picked yet. Tap the heart on a member and only her events will remind you.')}</p>` : ''}
+      ${denied ? `<p class="lay-sheet-note">${t('เบราว์เซอร์ปิดการแจ้งเตือนของเว็บนี้ไว้ เปิดได้ที่การตั้งค่าของเบราว์เซอร์', 'Notifications are blocked for this site in your browser settings.')}</p>` : ''}
+      <button class="lay-row" data-push="save" ${denied ? 'disabled' : ''}><span><b>${on ? t('บันทึก', 'Save') : t('เปิดแจ้งเตือน', 'Turn on notifications')}</b></span><i>${on ? '✓' : '🔔'}</i></button>
+      ${on ? `<button class="lay-row" data-push="off"><span>${t('ปิดแจ้งเตือน', 'Turn off')}</span></button>` : ''}
+      <p class="lay-sheet-note push-msg" id="push-msg" role="status"></p>`;
+  };
+  const paint = () => { el.innerHTML = `<div class="share-back" data-share="close"></div>
+    <div class="share-panel" role="dialog" aria-label="${t('แจ้งเตือนงาน', 'Event reminders')}">
+      <div class="share-head"><b>${t('แจ้งเตือนงาน', 'Event reminders')}</b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>${body()}</div>`; };
+  paint();
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  el.addEventListener('click', async e => {
+    if(e.target.closest('[data-share="close"]')){ closeShareSheet(); return; }
+    const m = e.target.closest('[data-push-mode]');
+    if(m){ mode = m.dataset.pushMode; paint(); return; }
+    const a = e.target.closest('[data-push]'); if(!a) return;
+    const say = x => { const n = el.querySelector('#push-msg'); if(n) n.textContent = x; };
+    if(a.dataset.push === 'install'){ closeShareSheet(); installApp(); return; }
+    if(a.dataset.push === 'off'){ await pushOff(); closeShareSheet(); if(state.setMenuOpen) render(); return; }
+    if(a.dataset.push === 'save'){
+      try{
+        say(t('กำลังเปิด…', 'Turning on…'));
+        const perm = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+        if(perm !== 'granted'){ paint(); return; }
+        await pushSubscribe(mode);
+        closeShareSheet(); if(state.setMenuOpen) render();
+      }catch(err){ say(t('เปิดไม่สำเร็จ ลองใหม่อีกครั้ง', 'Could not turn it on. Try again.')); }
+    }
+  });
 }
 function renderSetMenu(){
   const en = isEN(), shops = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
@@ -10170,6 +10250,7 @@ function renderSetMenu(){
       ${go('nav-gallery', ICONS.gallery, en ? 'Gallery' : 'แกลเลอรี')}
       ${go('nav-shop', ICONS.shop, en ? 'Shop' : 'ร้านค้า', shops ? `<span class="shop-dot">${shops}</span>` : '')}
       ${isInstalledApp() ? '' : `<button class="set-go is-quiz" data-action="install-app"><span class="set-gi">${ICONS.install}</span><span class="set-two">${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}<small>${en ? 'Opens like an app, in one tap' : 'เปิดเหมือนแอป แตะเดียวเข้าเลย'}</small></span></button>`}
+      ${pushShown() ? `<button class="set-go is-quiz" data-action="open-push"><span class="set-gi">${ICONS.bell}</span><span class="set-two">${en ? 'Event reminders' : 'แจ้งเตือนงาน'}<small>${pushPrefs() ? (en ? 'On' : 'เปิดอยู่') : (en ? 'about 30 minutes before it starts' : 'เตือนก่อนงานเริ่มราว 30 นาที')}</small></span></button>` : ''}
       <button class="set-go is-quiz" data-action="nav-quiz"><span class="set-gi">${ICONS.star}</span>${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</button>
     </div>
     <div class="set-h">${en ? 'Look' : 'หน้าตา'}</div>
@@ -26486,6 +26567,7 @@ function bindDelegatedEvents(){
       state.ageMin=''; state.ageMax=''; state.heightMin=''; state.heightMax=''; state.birthMonth='all';
       renderMain(); replaceHistory();
     }
+    else if(action==='open-push'){ state.setMenuOpen = false; render(); openPushSheet(); }
     else if(action==='install-app'){ state.setMenuOpen = false; render(); installApp(); }
     else if(action==='toggle-theme'){
       applyTheme(state.theme==='dark' ? 'light' : 'dark');
@@ -26874,6 +26956,7 @@ async function init(){
   render();
   refreshTimeline();   // the members' iAM48 posts need no sign-in, so they come at once
   checkAI();
+  checkPush();
   warmMemberSheet();
 
   let checkedInitialAuth = false;

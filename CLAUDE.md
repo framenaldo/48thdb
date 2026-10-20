@@ -200,6 +200,20 @@ A card shows the first three lines and one small picture and opens the post on
 iAM48; posts locked to the app ("Exclusive on iAM48") are a strip of names only and
 their content is never asked for. Never show or keep the gift senders' pictures.
 
+## Notifications: แจ้งเตือนงาน
+
+A reminder about 30 minutes before an event starts, from the ☰ menu (`openPushSheet`, `pushSubscribe`; hidden
+until `GET api.48thdb.com/push/key` answers, so the page can ship before the Worker). Web push: the browser's
+subscription goes to the Worker (`POST /push/sub`, KV `ps:<hash>`, with `mode` all or oshi and the reader's oshi
+ids); `scripts/build-calendar.mjs` writes `data/push-schedule.json` (every start time, from SEED_SCHEDULE) with the
+calendars; the Worker's own cron (`4-59/5`, `pushTick` in worker/push.js) picks starts 25–35 minutes away, queues a
+message (`pm:<hash>`) and wakes the browser with an empty VAPID-signed push — nothing is encrypted; `sw.js` then
+`POST /push/msg` for the text and shows it. iPhone allows web push only from the Home Screen app, so there the
+button first sends the reader to "เพิ่มเว็บไว้หน้าโฮม". Setting up: the private VAPID key is the Worker secret
+`VAPID_PRIVATE` (file `worker/.vapid-private`, gitignored; `npx wrangler secret put VAPID_PRIVATE <
+.vapid-private`), the public half `VAPID_PUBLIC` is in wrangler.toml. At most 40 pushes a run (the free plan's
+subrequest limit). Not sent yet: live-now and election results.
+
 ## AI in the search: ถามเว็บได้
 
 A question typed into the search (`renderAskBlock`, `askAnswer`). The Worker's

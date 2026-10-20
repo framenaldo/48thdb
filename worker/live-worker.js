@@ -27,6 +27,8 @@ const YT_KEY = 'https://live.state/youtube-v1';
 const YT_TTL_MS = 30000;              // one look per channel per half minute, shared by everyone
 const KEEP_MS = 5 * 60 * 1000;        // how long a refused check may stand on the last answer
 
+import { pushRoute, pushTick } from './push.js';
+
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
   'access-control-allow-origin': '*',
@@ -246,7 +248,7 @@ async function iamRecent(env) {
  * characters of the text, up to three picture links, whether it is a clip, and
  * whether it is locked to the app ("Exclusive on iAM48"), whose content is not
  * asked for. The gift senders' pictures on the page are fans' — never kept. */
-const TL_KEY = 'tl-v1', TL_CACHE = 'https://live.state/tl-v1', MAIN_CRON = '*/5 * * * *';
+const TL_KEY = 'tl-v1', TL_CACHE = 'https://live.state/tl-v1', MAIN_CRON = '*/5 * * * *', PUSH_CRON = '4-59/5 * * * *';
 const TL_STEP = 16, TL_FAR = [30, 60, 100, 200], TL_KEEP = 120, TL_KEEP_MS = 7 * 86400000;
 const TL_URL = (n) => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
 
@@ -825,6 +827,8 @@ export default {
       return new Response(null, { headers: { ...JSON_HEADERS, 'access-control-allow-headers': 'authorization, content-type',
         'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-max-age': '86400' } });
     }
+    const pushed = await pushRoute(request, env, new URL(request.url));
+    if (pushed) return pushed;
     if (new URL(request.url).pathname === '/translate') {
       const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
       const say = (body, status) => new Response(JSON.stringify(body), { status, headers: own });
@@ -926,6 +930,7 @@ export default {
     // the timeline walk has a cron of its own, so its requests have a budget of their own. Any
     // schedule but the main one is the walk's: after a change of schedule Cloudflare kept firing
     // the old one for over half an hour, under its old name
+    if (event.cron === PUSH_CRON) { ctx.waitUntil(pushTick(env, event.scheduledTime).catch(() => {})); return; }
     if (event.cron !== MAIN_CRON) { ctx.waitUntil(tlScan(env).catch(() => {})); return; }
     const at = new Date(event.scheduledTime);
     const h = at.getUTCHours();

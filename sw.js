@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v14';
+const VERSION = 'v15';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
@@ -125,4 +125,36 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(staleWhileRevalidate(request));
   }
   // Everything else, Firestore included, goes straight to the network.
+});
+
+/* ---- push: "starting soon" notifications (worker/push.js) ----
+ * The wake-up from the push service carries nothing. Ask the Worker for the message queued for this browser and
+ * show it; if that cannot be reached, still show something — a push must always end in a notification. */
+const PUSH_API = 'https://api.48thdb.com/push/msg';
+async function pushKey(endpoint) {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(endpoint));
+  return [...new Uint8Array(d)].slice(0, 16).map((x) => x.toString(16).padStart(2, '0')).join('');
+}
+async function showPush() {
+  let m = { title: '48thDb', body: 'มีอะไรใหม่ในเว็บ', url: '/' };
+  try {
+    const sub = await self.registration.pushManager.getSubscription();
+    if (sub) {
+      const res = await fetch(PUSH_API, { method: 'POST', body: JSON.stringify({ k: await pushKey(sub.endpoint) }) });
+      if (res.ok) m = { ...m, ...(await res.json()) };
+    }
+  } catch (err) { /* the default above */ }
+  return self.registration.showNotification(m.title, {
+    body: m.body, icon: '/icon4-192.png', badge: '/icon4-192.png', tag: m.tag || '48thdb', data: { url: m.url || '/' },
+  });
+}
+self.addEventListener('push', (event) => { event.waitUntil(showPush()); });
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = new URL((event.notification.data && event.notification.data.url) || '/', self.location.origin).href;
+  event.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of all) if (c.url.startsWith(self.location.origin) && 'focus' in c) { await c.focus(); if ('navigate' in c) { try { await c.navigate(url); } catch (e) { /* stays where it is */ } } return; }
+    await self.clients.openWindow(url);
+  })());
 });

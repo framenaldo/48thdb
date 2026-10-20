@@ -135,3 +135,19 @@ const bdays = MEMBERS.filter(m => !m.graduated && m.birthday).map(m => [
   `DESCRIPTION:${esc(`วันเกิด ${m.nameTh || m.name} (${m.name})\n${SITE}member/${m.id}`)}`, `URL:${SITE}member/${m.id}`]);
 writeFileSync(new URL('../birthdays.ics', import.meta.url), calendar('48thDb · วันเกิดเมมเบอร์', 'วันเกิดของเมมเบอร์ BNK48 และ CGM48 ปัจจุบัน', bdays));
 console.log('birthdays.ics', bdays.length, 'members');
+
+// what the Worker reads to send "starting soon" notifications (worker/live-worker.js, pushTick): one row per
+// start time, in epoch milliseconds (Thai time, +07:00), from today on. m = who is on (a = every member).
+const at = (d, tm) => Date.parse(`${d}T${tm}:00+07:00`);
+const pushRows = [];
+for(const ev of all){
+  if(ev.cancelled || ev.period || ev.tba) continue;
+  const who = ev.allMembers ? { a: 1 } : { m: (ev.members || []).filter(Boolean), g: groupsOf(ev) };
+  const row = (id, ms, extra) => pushRows.push({ id, n: ev.bar || ev.title, t: ms, ...who, ...(extra || {}), w: ev.venue || (ev.online ? 'ออนไลน์' : '') });
+  if(ev.slots && ev.slots.length) ev.slots.forEach((s, i) => row(`${ev.id}-${s.date}-${i}`, at(s.date, s.time), { m: s.members, g: groupsOf(ev), e: ev.id }));
+  else if(ev.time) for(const d of days(ev.start, ev.end || ev.start)) row(`${ev.id}-${d}`, at(d, ev.time), { e: ev.id });
+}
+const horizon = Date.now() - 36 * 3600 * 1000;
+const keep = pushRows.filter(r => r.t >= horizon).sort((a, b) => a.t - b.t);
+writeFileSync(new URL('../data/push-schedule.json', import.meta.url), JSON.stringify(keep));
+console.log('push-schedule.json', keep.length, 'starts');

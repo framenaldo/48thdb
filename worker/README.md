@@ -189,3 +189,13 @@ npm จึงเขียนแคชปกติไม่ได้ ถ้าแ
 5. เสร็จแล้วสั่งรันทดสอบได้ที่แท็บ Actions → Deploy site → Run workflow
 
 > โทเค็นนี้ไม่ต้องส่งให้ใคร วางใน GitHub โดยตรงได้เลย
+
+## Notifications (push.js)
+
+`/push/key`, `/push/sub`, `/push/unsub`, `/push/msg` and a cron of their own (`4-59/5 * * * *`, `pushTick`):
+a reminder about 30 minutes before an event starts, from `data/push-schedule.json`. Needs the VAPID pair — the public half is
+`VAPID_PUBLIC` in wrangler.toml, the private half the secret `VAPID_PRIVATE`:
+
+    cd worker && npx wrangler secret put VAPID_PRIVATE < .vapid-private
+
+then deploy as usual. Until both are there `/push/key` answers 503 and the page hides the button.

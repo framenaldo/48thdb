@@ -13,8 +13,9 @@ routes = [
 # a YouTube answer kept warm for the first visitor.
 # Every five minutes, two after the others (2, 7, 12 …): the next stretch of iAM48
 # timeline numbers, for the members' posts (tlScan).
+# Four minutes after (4, 9, 14 …): the "starting soon" notifications (push.js, pushTick).
 [triggers]
-crons = ["*/5 * * * *", "2-59/5 * * * *"]
+crons = ["*/5 * * * *", "2-59/5 * * * *", "4-59/5 * * * *"]
 
 # The iAM48 lives each member published in the last three days.
 [[kv_namespaces]]
@@ -32,3 +33,8 @@ dataset = "hits_48thdb"
 # a question typed into the search.
 [ai]
 binding = "AI"
+
+# Web push. The public half of the VAPID key (safe to publish); the private half is a secret, set once with
+#   npx wrangler secret put VAPID_PRIVATE < .vapid-private
+[vars]
+VAPID_PUBLIC = "BPn92GZR3xdLvMBKTSsp4H5fEhq33V_Z3VHk1Cs1TI83S_9oWOBpUBtY1FezrWKe-f5QwvmhxSgww7q_IKGPTb4"
