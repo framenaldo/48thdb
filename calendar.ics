@@ -1264,6 +1264,30 @@ DTSTART;VALUE=DATE:20261031
 DTEND;VALUE=DATE:20261102
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-ruamnamjai-16-2026-11-08@48thdb
+DTSTAMP:20261108T000000Z
+SUMMARY:Power of Thai Foundation "Ruam Namjai" Year 16 Charity Concert — 
+ SX Sustainability Expo 2026
+LOCATION:SX Grand Plenary Hall\, Queen Sirikit National Convention Center\,
+  Bangkok
+DESCRIPTION:เมมเบอร์: Sindy\, Janry\, Grape\, Monet\, Praew
+ \, Marine\n• 14:00 เปิดประตู\n• 16:00–19:40 คอ
+ นเสิร์ตการกุศลรอบพิเศษ "คื
+ นรอยยิ้มให้น้อง ๆ นักเรียน
+ "\n• ร่วมบริจาค 300 บาท เพื่อรั
+ บบัตรเข้าชมคอนเสิร์ตได้ใ
+ นวันงาน ลงทะเบียนเข้าชมผ่
+ าน QR บนโปสเตอร์\n• รายได้เพื
+ ่อช่วยเหลือโรงเรียนที่ปร
+ ะสบภัยพิบัติ จัดโดยมูลนิธ
+ ิพลังน้ำใจไทย\n• ศิลปินในง
+ าน: Potato\, 4EVE\, Better Weather\, Duo One\, True AF 2026 และ 
+ BNK48\n\nhttps://48thdb.com/event/ev-ruamnamjai-16
+URL:https://48thdb.com/event/ev-ruamnamjai-16
+DTSTART;TZID=Asia/Bangkok:20261108T160000
+DTEND;TZID=Asia/Bangkok:20261108T194000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-ge6-myo1@48thdb
 DTSTAMP:20261105T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You
