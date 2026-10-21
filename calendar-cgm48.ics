@@ -363,6 +363,17 @@ DTSTART;TZID=Asia/Bangkok:20261015T180000
 DTEND;TZID=Asia/Bangkok:20261015T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-halloween-1022-2026-10-22@48thdb
+DTSTAMP:20261022T000000Z
+SUMMARY:CGM48 Pop Up หลอน
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Namphet\, Emma\, Ploen\, Shenae\n\nht
+ tps://48thdb.com/event/ev-cgm48-popup-halloween-1022
+URL:https://48thdb.com/event/ev-cgm48-popup-halloween-1022
+DTSTART;TZID=Asia/Bangkok:20261022T180000
+DTEND;TZID=Asia/Bangkok:20261022T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:ยกเลิก: CGM48 11th Single "Koi Tsunjatta – Let me kno
