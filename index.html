@@ -2310,6 +2310,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* who is on in a part: their faces under its row */
   .es-who{ display:flex; flex-wrap:wrap; gap:6px; padding:0 13px 11px; margin-top:-1px; background:var(--card); }
   .es-who[hidden]{ display:none; }
+  .es-who.es-groups{ display:block; padding:0 13px 11px; }
+  .es-who.es-groups[hidden]{ display:none; }
+  .es-grp{ display:flex; flex-direction:column; gap:6px; padding:8px 10px 9px; border-radius:12px; margin-top:6px; border:1px solid color-mix(in srgb, var(--gc) 35%, transparent); background:color-mix(in srgb, var(--gc) 9%, transparent); --gc:#C8141B; }
+  .es-grp.is-tea{ --gc:#2E8C82; }
+  .es-glabel{ align-self:flex-start; font-size:11px; font-weight:800; letter-spacing:.03em; padding:2px 10px; border-radius:999px; color:#fff; background:var(--gc); }
+  .es-gwho{ display:flex; flex-wrap:wrap; gap:6px; }
   .es-row.is-done + .es-who{ opacity:.55; }
   .es-row{ position:relative; display:grid; grid-template-columns:auto minmax(0, 1fr); column-gap:14px; align-items:baseline;
     padding:11px 13px; background:var(--card); transition:background-color .3s; }
@@ -7521,42 +7527,27 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#C8141B', surface:'#F6ECEC', ink:'#3A0A0D', img:'posters/mbk-haunted-graveyard-1026.jpg', w:2000, h:2000, scene:'night' },
     members:['bnk-janry','bnk-blythe','cgm-lookked','cgm-nana','bnk-marine','bnk-wawa','bnk-sindy','cgm-prae','bnk-inkcha','bnk-emmy','bnk-khowjow','bnk-mayji','bnk-l','bnk-hoop','bnk-palmmy','cgm-else','cgm-punpon','bnk-saonoi','bnk-yoghurt','bnk-neen','bnk-praew','bnk-berry','bnk-khaimook','bnk-nammonn','bnk-cartoon','bnk-mint','bnk-grape','bnk-micha','bnk-luksorn','bnk-arlee','bnk-rose','bnk-nall','bnk-jew','bnk-patt','bnk-galeya','bnk-niya','cgm-hongyok','cgm-nisha','cgm-kwan','cgm-emma','cgm-lingling','bnk-proud','bnk-pancake','bnk-fame','bnk-mirin','bnk-mail'],
     detail:[
-      'รอบเปิดป่าช้ารอบพิเศษ พบศิลปินเซอร์ไพรส์ เฉพาะวันที่ 26–29 ต.ค. มีสองตาราง: Member Schedule และ Hachi Cha Schedule',
-      '16:00–17:00 รอบที่ 1 · Member Schedule',
-      '16:00–17:00 รอบที่ 1 · Hachi Cha Schedule',
-      '17:15–18:15 รอบที่ 2 · Member Schedule',
-      '17:15–18:15 รอบที่ 2 · Hachi Cha Schedule',
-      '18:30–19:30 รอบที่ 3 · Member Schedule',
-      '18:30–19:30 รอบที่ 3 · Hachi Cha Schedule'],
-    // the two schedule posters: four members a round on each, day by day
+      'รอบเปิดป่าช้ารอบพิเศษ พบศิลปินเซอร์ไพรส์ เฉพาะวันที่ 26–29 ต.ค. แต่ละรอบมีสองกลุ่ม: เข้าบ้านผี (Member Schedule) และขายน้ำ Hachi Cha (Hachi Cha Schedule)',
+      '16:00–17:00 รอบที่ 1',
+      '17:15–18:15 รอบที่ 2',
+      '18:30–19:30 รอบที่ 3'],
+    // the two schedule posters: each round has a haunted-house group and a Hachi Cha (drinks) group, four members each
     lineup:{
-      '2026-10-26':{ 'รอบที่ 1 · Member':['bnk-janry','bnk-blythe','cgm-lookked','cgm-nana'],
-        'รอบที่ 1 · Hachi Cha':['bnk-marine','bnk-wawa','bnk-sindy','cgm-prae'],
-        'รอบที่ 2 · Member':['bnk-marine','bnk-wawa','bnk-inkcha','cgm-prae'],
-        'รอบที่ 2 · Hachi Cha':['bnk-janry','bnk-blythe','bnk-emmy','bnk-khowjow'],
-        'รอบที่ 3 · Member':['bnk-mayji','bnk-marine','bnk-emmy','bnk-khowjow'],
-        'รอบที่ 3 · Hachi Cha':['cgm-nana','cgm-lookked','bnk-inkcha','bnk-l'] },
-      '2026-10-27':{ 'รอบที่ 1 · Member':['bnk-hoop','bnk-palmmy','cgm-else','cgm-punpon'],
-        'รอบที่ 1 · Hachi Cha':['bnk-saonoi','bnk-yoghurt','bnk-sindy','bnk-neen'],
-        'รอบที่ 2 · Member':['bnk-saonoi','bnk-yoghurt','bnk-praew','bnk-berry'],
-        'รอบที่ 2 · Hachi Cha':['cgm-else','cgm-punpon','bnk-mayji','bnk-palmmy'],
-        'รอบที่ 3 · Member':['bnk-khaimook','bnk-neen','bnk-mayji','bnk-palmmy'],
-        'รอบที่ 3 · Hachi Cha':['bnk-nammonn','bnk-l','bnk-praew','bnk-berry'] },
-      '2026-10-28':{ 'รอบที่ 1 · Member':['bnk-cartoon','bnk-mint','bnk-grape','bnk-micha'],
-        'รอบที่ 1 · Hachi Cha':['bnk-luksorn','bnk-arlee','bnk-rose','bnk-nall'],
-        'รอบที่ 2 · Member':['bnk-luksorn','bnk-arlee','bnk-jew','bnk-patt'],
-        'รอบที่ 2 · Hachi Cha':['bnk-cartoon','bnk-mint','bnk-galeya','bnk-niya'],
-        'รอบที่ 3 · Member':['bnk-rose','bnk-nall','bnk-galeya','bnk-niya'],
-        'รอบที่ 3 · Hachi Cha':['bnk-grape','bnk-micha','bnk-jew','bnk-patt'] },
-      '2026-10-29':{ 'รอบที่ 1 · Member':['cgm-hongyok','cgm-nisha','cgm-kwan','cgm-emma'],
-        'รอบที่ 1 · Hachi Cha':['cgm-lingling','bnk-hoop','bnk-proud','bnk-khaimook'],
-        'รอบที่ 2 · Member':['cgm-lingling','bnk-hoop','bnk-pancake','bnk-fame'],
-        'รอบที่ 2 · Hachi Cha':['cgm-kwan','cgm-emma','bnk-mirin','bnk-mail'],
-        'รอบที่ 3 · Member':['bnk-proud','bnk-khaimook','bnk-mirin','bnk-mail'],
-        'รอบที่ 3 · Hachi Cha':['cgm-hongyok','cgm-nisha','bnk-pancake','bnk-fame'] } },
+      '2026-10-26':{ 'รอบที่ 1':{ 'เข้าบ้านผี':['bnk-janry','bnk-blythe','cgm-lookked','cgm-nana'], 'ขายน้ำ Hachi Cha':['bnk-marine','bnk-wawa','bnk-sindy','cgm-prae'] },
+        'รอบที่ 2':{ 'เข้าบ้านผี':['bnk-marine','bnk-wawa','bnk-inkcha','cgm-prae'], 'ขายน้ำ Hachi Cha':['bnk-janry','bnk-blythe','bnk-emmy','bnk-khowjow'] },
+        'รอบที่ 3':{ 'เข้าบ้านผี':['bnk-mayji','bnk-marine','bnk-emmy','bnk-khowjow'], 'ขายน้ำ Hachi Cha':['cgm-nana','cgm-lookked','bnk-inkcha','bnk-l'] } },
+      '2026-10-27':{ 'รอบที่ 1':{ 'เข้าบ้านผี':['bnk-hoop','bnk-palmmy','cgm-else','cgm-punpon'], 'ขายน้ำ Hachi Cha':['bnk-saonoi','bnk-yoghurt','bnk-sindy','bnk-neen'] },
+        'รอบที่ 2':{ 'เข้าบ้านผี':['bnk-saonoi','bnk-yoghurt','bnk-praew','bnk-berry'], 'ขายน้ำ Hachi Cha':['cgm-else','cgm-punpon','bnk-mayji','bnk-palmmy'] },
+        'รอบที่ 3':{ 'เข้าบ้านผี':['bnk-khaimook','bnk-neen','bnk-mayji','bnk-palmmy'], 'ขายน้ำ Hachi Cha':['bnk-nammonn','bnk-l','bnk-praew','bnk-berry'] } },
+      '2026-10-28':{ 'รอบที่ 1':{ 'เข้าบ้านผี':['bnk-cartoon','bnk-mint','bnk-grape','bnk-micha'], 'ขายน้ำ Hachi Cha':['bnk-luksorn','bnk-arlee','bnk-rose','bnk-nall'] },
+        'รอบที่ 2':{ 'เข้าบ้านผี':['bnk-luksorn','bnk-arlee','bnk-jew','bnk-patt'], 'ขายน้ำ Hachi Cha':['bnk-cartoon','bnk-mint','bnk-galeya','bnk-niya'] },
+        'รอบที่ 3':{ 'เข้าบ้านผี':['bnk-rose','bnk-nall','bnk-galeya','bnk-niya'], 'ขายน้ำ Hachi Cha':['bnk-grape','bnk-micha','bnk-jew','bnk-patt'] } },
+      '2026-10-29':{ 'รอบที่ 1':{ 'เข้าบ้านผี':['cgm-hongyok','cgm-nisha','cgm-kwan','cgm-emma'], 'ขายน้ำ Hachi Cha':['cgm-lingling','bnk-hoop','bnk-proud','bnk-khaimook'] },
+        'รอบที่ 2':{ 'เข้าบ้านผี':['cgm-lingling','bnk-hoop','bnk-pancake','bnk-fame'], 'ขายน้ำ Hachi Cha':['cgm-kwan','cgm-emma','bnk-mirin','bnk-mail'] },
+        'รอบที่ 3':{ 'เข้าบ้านผี':['bnk-proud','bnk-khaimook','bnk-mirin','bnk-mail'], 'ขายน้ำ Hachi Cha':['cgm-hongyok','cgm-nisha','bnk-pancake','bnk-fame'] } } },
     info:[
       'จำหน่ายบัตรรอบพิเศษ 200 บาท',
-      'ตารางสมาชิกตามโปสเตอร์ Member Schedule และ Hachi Cha Schedule แต่ละรอบมีสมาชิก 4 คนต่อตาราง'] },
+      'ตารางสมาชิกตามโปสเตอร์ Member Schedule และ Hachi Cha Schedule แต่ละรอบมีสมาชิก 4 คนต่อกลุ่ม'] },
   { id:'ev-kimi-roadshow-rama9', logo:'kimi', start:'2026-11-07', end:'2026-11-08', tba:true,
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'Central Rama 9, Bangkok', groups:['bnk48','cgm48'],
@@ -17305,11 +17296,18 @@ function renderSchedule(ev){
   const LU = ev.lineup, luDays = LU ? Object.keys(LU).sort() : [];
   const luOn = luDays.includes(iso) ? iso : luDays.find(d => d > iso) || luDays[0];
   const M = monthsShort(), luLabel = d => { const x = parseYmd(d); return `${x.getDate()} ${M[x.getMonth()]}`; };
+  const luFaces = ids => ids.map(getMember).filter(Boolean).map(m => { const g = getGroup(m.groupId);
+    return `<button class="ev-person${state.oshi.includes(m.id) ? ' is-oshi' : ''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(nickName(m))}</span></button>`; }).join('');
+  // a part's value is a list of ids, or { label: ids } when it has groups (the Haunted Graveyard: the ghost house, and the drinks stand)
+  const LU_GRP = { 'เข้าบ้านผี':['เข้าบ้านผี', 'Haunted house', 'ghost'], 'ขายน้ำ Hachi Cha':['ขายน้ำ Hachi Cha', 'Hachi Cha drinks', 'tea'] };
   const luWho = what => luDays.map(d => {
     const key = Object.keys(LU[d]).find(k => what.toLowerCase().includes(k.toLowerCase()));
-    const ms = key ? LU[d][key].map(getMember).filter(Boolean) : [];
-    return ms.length ? `<div class="es-who" data-day="${d}"${d === luOn ? '' : ' hidden'}>${ms.map(m => { const g = getGroup(m.groupId);
-      return `<button class="ev-person${state.oshi.includes(m.id) ? ' is-oshi' : ''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(nickName(m))}</span></button>`; }).join('')}</div>` : '';
+    const v = key ? LU[d][key] : null, hid = `data-day="${d}"${d === luOn ? '' : ' hidden'}`;
+    if(!v) return '';
+    if(Array.isArray(v)){ const f = luFaces(v); return f ? `<div class="es-who" ${hid}>${f}</div>` : ''; }
+    const gs = Object.entries(v).map(([lab, ids]) => { const f = luFaces(ids), t = LU_GRP[lab] || [lab, lab, 'ghost'];
+      return f ? `<div class="es-grp is-${t[2]}"><span class="es-glabel">${escapeHtml(en ? t[1] : t[0])}</span><div class="es-gwho">${f}</div></div>` : ''; }).join('');
+    return gs ? `<div class="es-who es-groups" ${hid}>${gs}</div>` : '';
   }).join('');
   const luPills = luDays.length > 1 ? `<div class="sl-days es-days" role="tablist">${luDays.map(d => { const x = parseYmd(d);
     return `<button class="sl-day${d === luOn ? ' is-on' : ''}" data-action="es-day" data-value="${d}" role="tab" aria-selected="${d === luOn}">${luLabel(d)}<small>${
