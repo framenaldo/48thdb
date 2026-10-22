@@ -23175,11 +23175,15 @@ const FEST = (() => {
      today's cards; anywhere else, none. A redraw of the same cards keeps what
      has gathered on them; a sheet open over the page holds it still. */
   let cardsKey = '';
+  let booted = false;
   /* the pill's word, set smaller until it fits the room the row leaves it */
   function fit(){
     const w = document.querySelector('#fest-slot .fest-w'); if(!w) return;
-    w.style.fontSize = ''; const base = parseFloat(getComputedStyle(w).fontSize); let fs = base;
-    while(fs > base * .6 && w.scrollWidth > w.clientWidth + 1){ fs -= .5; w.style.fontSize = fs + 'px'; }
+    // text scales with its size, so one measurement gives the size that fits; stepping down half a pixel at a time cost a layout each step
+    w.style.fontSize = ''; const base = parseFloat(getComputedStyle(w).fontSize);
+    if(w.scrollWidth <= w.clientWidth + 1) return;
+    let fs = Math.max(base * .6, base * w.clientWidth / w.scrollWidth - .5); w.style.fontSize = fs + 'px';
+    if(fs > base * .6 && w.scrollWidth > w.clientWidth + 1){ fs = Math.max(base * .6, fs - 1); w.style.fontSize = fs + 'px'; }
   }
   if(document.fonts) document.fonts.addEventListener('loadingdone', fit);
   addEventListener('resize', fit);
@@ -23204,6 +23208,8 @@ const FEST = (() => {
       next.settle.colors = [...cs, ...cs, '#FFFFFF', '#FFD34E'];
       if(t.who.every(m => m.groupId === 'cgm48')) root.dataset.festTint = 'cgm'; else delete root.dataset.festTint; }
     else delete root.dataset.festTint;
+    // The first draw of a visit paints the page, then sets the canvases up: the sprites and the sky cost about a third of that first draw, and nothing is moving yet to miss them.
+    if(!booted){ booted = true; requestAnimationFrame(() => setTimeout(sync, 0)); return; }
     theme = next;
     const list = [...document.querySelectorAll('#main .feed-page .today-hero, #main .feed-page .ev-card')];
     const key = list.map((c, i) => c.dataset.id || 'i' + i).join('|');
@@ -23316,8 +23322,8 @@ function renderMain(){
   if(_dvTop && _dvTop.day === state.dayOf){ const nb = main.querySelector('.is-day-sheet .dv-body'); if(nb) nb.scrollTop = _dvTop.top; }   // a redraw keeps the day sheet where it was
   const arrived = state.view !== _lastRenderedView;
   if(arrived){
-    main.classList.remove('view-fade-in');
-    void main.offsetWidth;
+    // the fade restarts by forcing a layout in between; on the first draw there is nothing to restart, and that layout (the whole page) would be paid twice
+    if(_lastRenderedView !== null){ main.classList.remove('view-fade-in'); void main.offsetWidth; }
     main.classList.add('view-fade-in');
     _lastRenderedView = state.view;
   }
@@ -23337,7 +23343,7 @@ function renderMain(){
   odoRun(main);
   attachMainEvents();
   startBirthdayFireworks();
-  bindEdgeFades();
+  requestAnimationFrame(bindEdgeFades);   // it measures the chips, which forces a layout; after the rest of this draw there is only one
   bindPosterZoom();
   bindOrgZoom();
   applyPageMeta();
@@ -27236,6 +27242,8 @@ async function init(){
       state.account = null;
     }
     state.isOwner = await checkOwner();
+    // the shared list and the reader's own data do not wait on the owner-only reads below
+    const sharedP = loadMembers().catch(() => null), oshiP = loadOshiData();
     await loadPending();
     await loadFeedback();
     listenFlash();
@@ -27250,7 +27258,7 @@ async function init(){
     // carries the account card, and the owner's review queue with it.
     let changed = (state.account && state.account.uid) !== wasAccount || state.isOwner !== wasOwner;
     try{
-      const shared = await loadMembers();
+      const shared = await sharedP;
       if(shared && shared.length && JSON.stringify(shared) !== JSON.stringify(state.members)){
         state.members = shared;
         learnNames();
@@ -27258,7 +27266,7 @@ async function init(){
       }
     }catch(e){}
 
-    const oshiData = await loadOshiData();
+    const oshiData = await oshiP;
     if(JSON.stringify(oshiData.oshi) !== JSON.stringify(state.oshi)
       || oshiData.kamiOshi !== state.kamiOshi) changed = true;
     state.oshi = oshiData.oshi;
@@ -27275,10 +27283,12 @@ async function init(){
     // Who is signed in shows in the header, which is cheap to redraw on its own.
     renderProfileSlot();
     if(!changed) return;
-    // Never pull the page out from under someone reading or typing.
-    if(state.posterOf || state.editingId) return;
-    if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
-    render();
+    // Never pull the page out from under someone reading or typing — and not under a finger either: the redraw waits for a quiet moment
+    calmRender(() => {
+      if(state.posterOf || state.editingId) return;
+      if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+      render();
+    });
   });
 }
 init();
