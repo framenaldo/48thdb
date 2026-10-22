@@ -4579,6 +4579,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      card with her photo, the percentage on its rim, and the reasons as ticks */
   .qz-head .qz-title{ margin:8px 0 4px; font-size:28px; font-weight:800; line-height:1.3; letter-spacing:-.02em;
     background:linear-gradient(100deg, var(--brand-a), var(--brand-mid) 50%, var(--brand-b)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .qz-tabs{ display:flex; gap:6px; margin:10px 0 10px; overflow-x:auto; scrollbar-width:none; }
+  .qz-tabs::-webkit-scrollbar{ display:none; }
+  .qz-tab{ flex:1 1 0; min-width:0; display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:999px; font:inherit; font-size:13.5px; font-weight:800; white-space:nowrap;
+    color:var(--ink); cursor:pointer; background:var(--card); border:1.5px solid var(--line); box-shadow:0 3px 0 var(--line); transition:transform .1s ease, box-shadow .1s ease; }
+  .qz-tab:active{ transform:translateY(3px); box-shadow:0 0 0 var(--line); }
+  .qz-tab.is-on{ color:#fff; background:linear-gradient(135deg, var(--brand-a), color-mix(in srgb, var(--brand-a) 70%, var(--brand-mid))); border-color:var(--brand-a);
+    box-shadow:0 3px 0 color-mix(in srgb, var(--brand-a) 55%, #000); }
   .qz-lead{ margin:0 0 4px; font-size:13.5px; line-height:1.6; color:var(--ink-soft); }
   .qz-card, .qz-result{ position:relative; margin:4px 0 14px; padding:16px 16px 18px; border-radius:22px; background:var(--card); border:1px solid var(--line);
     box-shadow:0 10px 26px rgba(60, 30, 60, .07); }
@@ -17879,12 +17886,13 @@ function renderResultsDay(best){
   const ev = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results), vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote);
   if(!ev || toYmd(todayStart()) > ev.start) return '';
   const en = isEN(), dayN = qzRead(ev.start, false).day.n, d = parseYmd(ev.start);
-  const me = _quiz.birth ? qzRead(_quiz.birth.iso, _quiz.birth.night) : null;
+  const bd = _quiz.birth || qzBirth(), me = bd ? qzRead(bd.iso, bd.night) : null;
   const bad = new Set([qzHouse(dayN, 'กาลกิณี'), ...(me ? [qzHouse(me.day.n, 'กาลกิณี')] : [])]);
   const pick = (n, houses) => houses.map(h => [h, qzHouse(n, h)]).filter(([, c]) => !bad.has(c)).filter((x, i, a) => a.findIndex(y => y[1] === x[1]) === i);
   const act = activeMembers();
   const kami = state.kamiOshi && act.find(m => m.id === state.kamiOshi);
-  const her = act.find(m => m.id === _quiz.cheer) || kami || (best && best.m);
+  let lastId = null; try{ lastId = (JSON.parse(localStorage.getItem(QZ_LAST) || 'null') || {}).id; }catch(e){}
+  const her = act.find(m => m.id === _quiz.cheer) || kami || (best && best.m) || act.find(m => m.id === lastId) || act.find(m => m.birthday);
   if(!her) return '';
   const hr = qzRead(her.birthday, false);
   const sw = ([house, c], who, main) => { const [th, e, hex] = QZ_COLOURS[c];
@@ -17922,12 +17930,13 @@ function qzBirth(){
 }
 const qzHash = s => { let h = 2166136261; for(const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; };
 function qzResults(){
-  const me = _quiz.birth ? qzRead(_quiz.birth.iso, _quiz.birth.night) : null;
+  const birth = _quiz.mode === 'quiz' ? null : _quiz.birth;          // the quiz tab asks about the fan, not the birthday
+  const me = birth ? qzRead(birth.iso, birth.night) : null;
   const want = { F:0, E:0, A:0, W:0 };
   _quiz.ans.forEach(el => { if(want[el] != null) want[el]++; });
   const top = Object.entries(want).sort((a, b) => b[1] - a[1])[0][0];
   const group = _quiz.group || 'all';
-  const seed = JSON.stringify([_quiz.birth, _quiz.ans, group]);
+  const seed = JSON.stringify([birth, _quiz.ans, group]);
   return activeMembers().filter(m => m.birthday && (group === 'all' || m.groupId === group)).map(m => {
     const her = qzRead(m.birthday, false);
     const els = [her.day.el, her.sign[3]];
@@ -17963,30 +17972,26 @@ function qzMatchCard(r, rank){
       <button class="qz-go is-ghost" data-action="quiz-share">${ICONS.share}${en ? 'Share' : 'แชร์ผล'}</button></div>
   </article>`;
 }
-function renderQuiz(){
-  if(_quiz.step === 0 && !_quiz.fresh){
-    let done = null; try{ done = JSON.parse(localStorage.getItem(QZ_DONE) || 'null'); }catch(e){}
-    // answers to a different set of questions no longer fit
-    if(done && Array.isArray(done.ans) && done.ans.length === QZ_QUESTIONS.length && done.group)
-      _quiz = { step: QZ_QUESTIONS.length + 2, ans: done.ans, emo: done.emo || null, group: done.group, birth: done.birth || null };
-  }
-  const en = isEN(), q = _quiz, total = QZ_QUESTIONS.length + 2;
-  const head = `<header class="feed-head qz-head">
-    <p class="feed-today">${en ? 'Horoscope quiz' : 'ดูดวงหาโอชิ'}</p>
-    <h1 class="qz-title">${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</h1>
-    <p class="qz-lead">${en ? 'Your birthday against every member’s — by the day of the week (ทักษา), the Thai zodiac and the year animal — then five questions on what kind of fan you are. Just for fun.'
-      : 'เทียบวันเกิดของคุณกับเมมเบอร์ทุกคน ตามตำราทักษา ราศีแบบไทย และปีนักษัตร แล้วตอบอีกห้าข้อว่าคุณเป็นแฟนสายไหน ดูดวงเพื่อความสนุกนะ'}</p>
-  </header>`;
-  const dots = n => `<p class="qz-step">${en ? `Question ${n} of ${total}` : `ข้อ ${n}/${total}`}</p><div class="qz-dots">${Array.from({ length: total }, (_, i) => `<i class="${i < n ? 'is-on' : ''}"></i>`).join('')}</div>`;
-  const back = q.step ? `<button class="qz-back" data-action="quiz-back">← ${en ? 'Back' : 'ย้อนกลับ'}</button>` : '';
-  let body;
-  if(q.step === 0){
-    const b = q.birth || qzBirth() || {}, [y, mo, d] = (b.iso || '').split('-').map(Number);
-    const yrs = []; for(let i = new Date().getFullYear() - 8; i >= 1950; i--) yrs.push(i);
-    const me = b.iso ? qzRead(b.iso, b.night) : null;
-    const wed = b.iso && new Date(Date.UTC(y, mo - 1, d)).getUTCDay() === 3;
-    body = `${dots(1)}<h2 class="qz-q">${en ? 'When were you born?' : 'คุณเกิดวันที่เท่าไหร่?'}</h2>
-      <div class="qz-date">
+/* Three ways in, one tab each: the birthday alone (date, group, her), the quiz alone (five questions, group, her),
+   and the vote itself — good hours and a shirt for results night, which wants only a member (and her birthday if the
+   reader gives one). state.quizMode is the tab and lives in the address (/quiz/quiz, /quiz/day). */
+const QZ_MODES = [['birth', '🎂', 'ใส่วันเกิด', 'Birthday'], ['quiz', '🎯', 'เล่นควิซ', 'Quiz'], ['day', '🗳️', 'ฤกษ์โหวต', 'Vote']];
+const quizLast = () => (_quiz.mode === 'quiz' ? QZ_QUESTIONS.length + 1 : 1);      // the step that asks for a group
+function quizStart(mode){
+  const base = { mode, step: mode === 'quiz' ? 1 : 0, ans: [], birth: qzBirth() };
+  if(mode === 'day') return base;
+  let done = null; try{ done = JSON.parse(localStorage.getItem(QZ_DONE + '-' + mode) || 'null'); }catch(e){}
+  // answers to a different set of questions no longer fit
+  if(done && done.group && (mode === 'birth' ? done.birth : Array.isArray(done.ans) && done.ans.length === QZ_QUESTIONS.length))
+    return { ...base, step: (mode === 'birth' ? 1 : QZ_QUESTIONS.length + 1) + 1, ans: done.ans || [], emo: done.emo || null, group: done.group, birth: done.birth || base.birth };
+  return base;
+}
+function qzDateHtml(b, en){
+  const [y, mo, d] = (b.iso || '').split('-').map(Number);
+  const yrs = []; for(let i = new Date().getFullYear() - 8; i >= 1950; i--) yrs.push(i);
+  const me = b.iso ? qzRead(b.iso, b.night) : null;
+  const wed = b.iso && new Date(Date.UTC(y, mo - 1, d)).getUTCDay() === 3;
+  return { me, html: `<div class="qz-date">
         <select id="qz-d" aria-label="${en ? 'Day' : 'วัน'}"><option value="">${en ? 'Day' : 'วัน'}</option>${Array.from({ length: 31 }, (_, i) => `<option${d === i + 1 ? ' selected' : ''}>${i + 1}</option>`).join('')}</select>
         <select id="qz-m" aria-label="${en ? 'Month' : 'เดือน'}"><option value="">${en ? 'Month' : 'เดือน'}</option>${(en ? EN_MONTHS : MONTH_NAMES).map((n, i) => `<option value="${i + 1}"${mo === i + 1 ? ' selected' : ''}>${n}</option>`).join('')}</select>
         <select id="qz-y" aria-label="${en ? 'Year' : 'ปี'}"><option value="">${en ? 'Year' : 'ปี พ.ศ.'}</option>${yrs.map(v => `<option value="${v}"${y === v ? ' selected' : ''}>${en ? v : v + 543}</option>`).join('')}</select>
@@ -17995,37 +18000,67 @@ function renderQuiz(){
         <button class="${b.night ? '' : 'is-on'}" data-action="quiz-night" data-id="0">${en ? 'by day' : 'กลางวัน'}</button>
         <button class="${b.night ? 'is-on' : ''}" data-action="quiz-night" data-id="1">${en ? 'after 6 pm' : 'หลัง 18:00'}</button></div>` : ''}
       ${me ? `<div class="qz-me"><span>${en ? 'You:' : 'คุณ:'}</span>${qzChips(me, en)}</div>
-        <p class="qz-me-tr">${en ? `Born on a ${me.day.en}: ${me.day.tr[1]}` : `คนเกิดวัน${me.day.th}: ${me.day.tr[0]}`} · ${en ? `a ${QZ_EL[me.sign[3]][1].toLowerCase()} sign` : `ราศีธาตุ${QZ_EL[me.sign[3]][0]}`}</p>` : ''}
-      <div class="qz-next"><button class="qz-go" data-action="quiz-birth"${me ? '' : ' disabled'}>${en ? 'Next' : 'ถัดไป'}</button>
-        <button class="qz-skip" data-action="quiz-nobirth">${en ? 'Skip — no birthday' : 'ข้าม ไม่บอกวันเกิด'}</button></div>
+        <p class="qz-me-tr">${en ? `Born on a ${me.day.en}: ${me.day.tr[1]}` : `คนเกิดวัน${me.day.th}: ${me.day.tr[0]}`} · ${en ? `a ${QZ_EL[me.sign[3]][1].toLowerCase()} sign` : `ราศีธาตุ${QZ_EL[me.sign[3]][0]}`}</p>` : ''}` };
+}
+function renderQuiz(){
+  const mode = state.quizMode || 'birth';
+  if(_quiz.mode !== mode) _quiz = quizStart(mode);
+  const en = isEN(), q = _quiz, last = quizLast(), total = mode === 'quiz' ? QZ_QUESTIONS.length + 1 : 2;
+  const lead = { birth: en ? 'Your birthday against every member’s — by the day of the week (ทักษา), the Thai zodiac and the year animal. Just for fun.'
+      : 'เทียบวันเกิดของคุณกับเมมเบอร์ทุกคน ตามตำราทักษา ราศีแบบไทย และปีนักษัตร ดูดวงเพื่อความสนุกนะ',
+    quiz: en ? 'Five questions on what kind of fan you are — no birthday needed. Just for fun.' : 'ตอบห้าข้อว่าคุณเป็นแฟนสายไหน ไม่ต้องบอกวันเกิด เล่นเพื่อความสนุกนะ',
+    day: en ? 'Good hours to vote for your oshi, and a shirt colour for results night.' : 'หาฤกษ์ดีกดโหวตให้โอชิ และสีเสื้อสำหรับวันประกาศผล' }[mode];
+  const head = `<header class="feed-head qz-head">
+    <p class="feed-today">${en ? 'Horoscope quiz' : 'ดูดวงหาโอชิ'}</p>
+    <h1 class="qz-title">${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</h1>
+    <div class="qz-tabs" role="tablist">${QZ_MODES.map(([k, e, th, n]) => `<button class="qz-tab${mode === k ? ' is-on' : ''}" role="tab" aria-selected="${mode === k}" data-action="quiz-mode" data-id="${k}"><span aria-hidden="true">${e}</span>${en ? n : th}</button>`).join('')}</div>
+    <p class="qz-lead">${lead}</p>
+  </header>`;
+  const dots = n => `<p class="qz-step">${en ? `Step ${n} of ${total}` : `ข้อ ${n}/${total}`}</p><div class="qz-dots">${Array.from({ length: total }, (_, i) => `<i class="${i < n ? 'is-on' : ''}"></i>`).join('')}</div>`;
+  const back = q.step > (mode === 'quiz' ? 1 : 0) && q.step <= last ? `<button class="qz-back" data-action="quiz-back">← ${en ? 'Back' : 'ย้อนกลับ'}</button>` : '';
+  let body;
+  if(mode === 'day'){
+    q.birth = q.birth || qzBirth();
+    const dt = qzDateHtml(q.birth || {}, en), shirt = renderResultsDay(null);
+    return `<div class="feed-page qz-page" data-noloc>${head}<section class="qz-card"><h2 class="qz-q">${en ? 'Your birthday (optional)' : 'วันเกิดของคุณ (ไม่ใส่ก็ได้)'}</h2>
+      ${dt.html}<p class="qz-note">${en ? 'With it, we add the colour that is yours that day and the hours that suit you. It stays on this device.' : 'ใส่แล้วจะเพิ่มสีและยามที่ถูกโฉลกกับคุณด้วย เก็บไว้ในเครื่องนี้เท่านั้น'}</p></section>
+      ${shirt || `<section class="qz-card"><p class="qz-q" style="margin:0">${en ? 'The vote and results night have passed — nothing to pick for now.' : 'ผ่านช่วงโหวตและวันประกาศผลแล้ว ตอนนี้ยังไม่มีฤกษ์หรือสีเสื้อให้เลือก'}</p></section>`}</div>`;
+  }
+  if(q.step === 0){
+    const dt = qzDateHtml(q.birth || qzBirth() || {}, en);
+    body = `${dots(1)}<h2 class="qz-q">${en ? 'When were you born?' : 'คุณเกิดวันที่เท่าไหร่?'}</h2>
+      ${dt.html}
+      <div class="qz-next"><button class="qz-go" data-action="quiz-birth"${dt.me ? '' : ' disabled'}>${en ? 'Next' : 'ถัดไป'}</button></div>
       <p class="qz-note">${en ? 'Your birthday stays on this device; nothing is sent anywhere.' : 'วันเกิดของคุณเก็บไว้ในเครื่องนี้เท่านั้น ไม่ได้ส่งไปที่ไหน'}</p>`;
-  } else if(q.step <= QZ_QUESTIONS.length){
+  } else if(q.step < last){
     const Q = QZ_QUESTIONS[q.step - 1];
     if(Q.grid){
       const all = Object.entries(Q.grid).flatMap(([el, list]) => list.map(e => [el, e])).sort((a, b) => qzHash('emo' + a[1]) - qzHash('emo' + b[1]));
-      body = `${dots(q.step + 1)}<h2 class="qz-q">${en ? Q.en : Q.th}</h2><p class="qz-hint">${en ? 'Tap one' : 'แตะเลือกหนึ่งตัว'}</p>
+      body = `${dots(q.step)}<h2 class="qz-q">${en ? Q.en : Q.th}</h2><p class="qz-hint">${en ? 'Tap one' : 'แตะเลือกหนึ่งตัว'}</p>
         <div class="qz-emos">${all.map(([el, e]) => `<button class="qz-emo-b${q.emo === e ? ' is-on' : ''}" data-action="quiz-pick" data-id="${el}|${e}" aria-label="${e}">${e}</button>`).join('')}</div>`;
     } else
-    body = `${dots(q.step + 1)}<h2 class="qz-q">${en ? Q.en : Q.th}</h2>
+    body = `${dots(q.step)}<h2 class="qz-q">${en ? Q.en : Q.th}</h2>
       <div class="qz-opts is-tiles">${Q.o.map(([el, emo, th, e]) => `<button class="qz-opt${q.ans[q.step - 1] === el ? ' is-on' : ''}" data-action="quiz-pick" data-id="${el}"><span class="qz-emo" aria-hidden="true">${emo}</span>${escapeHtml(en ? e : th)}</button>`).join('')}</div>`;
-  } else if(q.step === QZ_QUESTIONS.length + 1){
+  } else if(q.step === last){
     body = `${dots(total)}<h2 class="qz-q">${en ? 'From which group?' : 'อยากได้โอชิจากวงไหน?'}</h2>
       <div class="qz-opts is-tiles is-three">${[['bnk48', 'BNK48', '🩷'], ['cgm48', 'CGM48', '🩵'], ['all', en ? 'Either' : 'ทั้งสองวง', '✨']].map(([id, n, emo]) => {
         const g = getGroup(id);
         return `<button class="qz-opt" style="${g ? `--c:${g.color}` : ''}" data-action="quiz-group" data-id="${id}"><span class="qz-emo" aria-hidden="true">${emo}</span>${n}</button>`; }).join('')}</div>`;
   } else {
-    const list = qzResults(), me = q.birth ? qzRead(q.birth.iso, q.birth.night) : null, top = list[0] ? list[0].top : 'F', fan = QZ_FAN[top].slice();
+    const list = qzResults(), me = mode === 'birth' && q.birth ? qzRead(q.birth.iso, q.birth.night) : null, top = list[0] ? list[0].top : 'F', fan = QZ_FAN[top].slice();
     const grid = (QZ_QUESTIONS.find(x => x.grid) || {}).grid;
     if(q.emo && grid && grid[top].includes(q.emo)) fan[0] = q.emo;
     if(list[0]) try{ localStorage.setItem(QZ_LAST, JSON.stringify({ id: list[0].m.id, pct: list[0].pct })); }catch(e){}
-    body = `<div class="qz-fan"><span class="qz-fan-emo" aria-hidden="true">${fan[0]}</span><span><small>${en ? 'You are' : 'คุณคือ'}</small><b>${en ? fan[3] : fan[1]}</b><em>${en ? fan[4] : fan[2]}</em></span></div>
+    const resEv = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results), dayOpen = !!resEv && toYmd(todayStart()) <= resEv.start;
+    body = `${mode === 'quiz' ? `<div class="qz-fan"><span class="qz-fan-emo" aria-hidden="true">${fan[0]}</span><span><small>${en ? 'You are' : 'คุณคือ'}</small><b>${en ? fan[3] : fan[1]}</b><em>${en ? fan[4] : fan[2]}</em></span></div>` : ''}
       ${me ? `<div class="qz-me is-result"><span>${en ? 'You:' : 'ดวงคุณ:'}</span>${qzChips(me, en)}</div>` : ''}
       ${list[0] ? qzMatchCard(list[0], 0) : ''}
-      ${list.length > 1 ? `<h3 class="section-label qz-more-h">${en ? 'Two more your stars favour' : 'อีกสองคนที่ดวงถูกโฉลกกับคุณ'}</h3>${list.slice(1, 3).map(r => qzMatchCard(r, 1)).join('')}` : ''}
-      ${renderResultsDay(list[0])}
-      <div class="qz-next is-center"><button class="qz-go is-ghost" data-action="quiz-again">↺ ${en ? 'Start again' : 'ทำใหม่'}</button></div>
-      <p class="qz-note">${en ? 'For fun only: no horoscope has been shown to work. Days by the Thai ทักษา pairs (คู่มิตร, คู่สมพล), the Thai sidereal zodiac, year animals from Chinese New Year; members born on a Wednesday are counted by day.'
-        : 'ดูดวงเพื่อความสนุก ไม่มีศาสตร์ไหนพิสูจน์ได้ว่าแม่น · วันเกิดตามตำราทักษา (คู่มิตร คู่สมพล) ราศีแบบไทย ปีนักษัตรนับตามตรุษจีน · เมมเบอร์ที่เกิดวันพุธนับเป็นพุธกลางวัน'}</p>`;
+      ${list.length > 1 ? `<h3 class="section-label qz-more-h">${en ? (mode === 'quiz' ? 'Two more to your taste' : 'Two more your stars favour') : (mode === 'quiz' ? 'อีกสองคนที่น่าจะถูกใจคุณ' : 'อีกสองคนที่ดวงถูกโฉลกกับคุณ')}</h3>${list.slice(1, 3).map(r => qzMatchCard(r, 1)).join('')}` : ''}
+      <div class="qz-next is-center">${list[0] && dayOpen ? `<button class="qz-go" data-action="quiz-day" data-id="${list[0].m.id}">🗳️ ${en ? `Vote hours & shirt for ${escapeHtml(nickName(list[0].m))}` : `ฤกษ์โหวต · สีเสื้อของ ${escapeHtml(nickName(list[0].m))}`}</button>` : ''}
+        <button class="qz-go is-ghost" data-action="quiz-again">↺ ${en ? 'Start again' : 'ทำใหม่'}</button></div>
+      <p class="qz-note">${mode === 'quiz' ? (en ? 'For fun only. Each answer leans to one of four elements; members are matched by the elements of their birth day and sign.' : 'เล่นเพื่อความสนุก แต่ละคำตอบเอนไปทางธาตุหนึ่งในสี่ แล้วจับคู่กับธาตุของวันเกิดและราศีของเมมเบอร์')
+        : (en ? 'For fun only: no horoscope has been shown to work. Days by the Thai ทักษา pairs (คู่มิตร, คู่สมพล), the Thai sidereal zodiac, year animals from Chinese New Year; members born on a Wednesday are counted by day.'
+        : 'ดูดวงเพื่อความสนุก ไม่มีศาสตร์ไหนพิสูจน์ได้ว่าแม่น · วันเกิดตามตำราทักษา (คู่มิตร คู่สมพล) ราศีแบบไทย ปีนักษัตรนับตามตรุษจีน · เมมเบอร์ที่เกิดวันพุธนับเป็นพุธกลางวัน')}</p>`;
     return `<div class="feed-page qz-page" data-noloc>${head}<section class="qz-result">${body}</section></div>`;
   }
   return `<div class="feed-page qz-page" data-noloc>${head}<section class="qz-card">${back}${body}</section></div>`;
@@ -18041,23 +18076,28 @@ function quizKeepBirth(b){ _quiz.birth = b; try{ localStorage.setItem(QZ_KEY, JS
 function quizShare(){
   const list = qzResults();
   if(!list[0]) return;
-  const top = list[0].top, fan = QZ_FAN[top].slice(), grid = (QZ_QUESTIONS.find(x => x.grid) || {}).grid;
-  if(_quiz.emo && grid && grid[top].includes(_quiz.emo)) fan[0] = _quiz.emo;
+  const top = list[0].top, fan = _quiz.mode === 'quiz' ? QZ_FAN[top].slice() : null, grid = (QZ_QUESTIONS.find(x => x.grid) || {}).grid;
+  if(fan && _quiz.emo && grid && grid[top].includes(_quiz.emo)) fan[0] = _quiz.emo;
   const url = location.origin + '/quiz', m = list[0].m;
-  openShareSheet({ kind:'quiz', list: list.slice(0, 3), fan, me: _quiz.birth ? qzRead(_quiz.birth.iso, _quiz.birth.night) : null, url, link: url,
+  openShareSheet({ kind:'quiz', list: list.slice(0, 3), fan, me: _quiz.mode !== 'quiz' && _quiz.birth ? qzRead(_quiz.birth.iso, _quiz.birth.night) : null, url, link: url,
     title: isEN() ? `My stars favour ${nickName(m)} ${list[0].pct}% — 48thDb` : `ดวงฉันถูกโฉลกกับ ${nickName(m)} ${list[0].pct}% — 48thDb`, file:`48thdb-oshi-${m.name || m.id}` });
 }
 function quizAction(action, id){
-  const q = _quiz, last = QZ_QUESTIONS.length + 1;
+  const q = _quiz, last = quizLast();
+  if(action === 'quiz-mode' || action === 'quiz-day'){
+    const mode = action === 'quiz-day' ? 'day' : id;
+    state.quizMode = mode; _quiz = quizStart(mode);
+    if(action === 'quiz-day') _quiz.cheer = id;
+    renderMain(); pushHistory(); window.scrollTo(0, 0); return;
+  }
   if(action === 'quiz-birth'){ const iso = quizDate(); if(!iso) return; const was = q.birth || qzBirth();
     quizKeepBirth({ iso, night: !!(was && was.iso === iso && was.night) }); q.step = 1; }
-  else if(action === 'quiz-nobirth'){ q.birth = null; q.step = 1; }
   else if(action === 'quiz-night'){ const iso = quizDate(); if(iso) quizKeepBirth({ iso, night: id === '1' }); }
   else if(action === 'quiz-pick'){ const [el, emo] = String(id).split('|'); q.ans[q.step - 1] = el; if(emo) q.emo = emo; q.step++; }
   else if(action === 'quiz-group'){ q.group = id; q.step = last + 1;
-    try{ localStorage.setItem(QZ_DONE, JSON.stringify({ ans: q.ans, emo: q.emo || null, group: id, birth: q.birth || null })); }catch(e){} }
-  else if(action === 'quiz-back'){ q.step = Math.max(0, q.step - 1); }
-  else if(action === 'quiz-again'){ _quiz = { step:0, ans:[], fresh:true }; }
+    try{ localStorage.setItem(QZ_DONE + '-' + q.mode, JSON.stringify({ ans: q.ans, emo: q.emo || null, group: id, birth: q.birth || null })); }catch(e){} }
+  else if(action === 'quiz-back'){ q.step = Math.max(q.mode === 'quiz' ? 1 : 0, q.step - 1); }
+  else if(action === 'quiz-again'){ _quiz = { mode: q.mode, step: q.mode === 'quiz' ? 1 : 0, ans: [], birth: qzBirth() }; }
   else if(action === 'quiz-share'){ quizShare(); return; }
   renderMain();
   // the next question where the last one was, or the result from its top
@@ -23497,7 +23537,7 @@ function attachMainEvents(){
 // the browser/phone back button alike.
 const NAV_KEYS = ['view','selectedId','selectedEvent','editingId','favoritesOnly','oshiOnly','query','groupFilter','compareWith','comparePicking','calMonth','calDay',
   'teamFilter','genFilter','captainFilter','showGraduated','sortBy','sortDir',
-  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','worksCat','posterOf','geClip','timelineId','dayOf','geTab','bdayScope','livesScope','galleryId','bioOf','tagOf'];
+  'statsTab','advOpen','ageMin','ageMax','heightMin','heightMax','birthMonth','selectedSingle','discTab','worksCat','posterOf','geClip','timelineId','dayOf','geTab','bdayScope','livesScope','galleryId','bioOf','tagOf','quizMode'];
 
 // A screen worth linking to gets a query string, so a shared link reopens
 // exactly what the sender was looking at. Only the query changes — the path
@@ -23544,6 +23584,7 @@ function urlForSnapshot(snap){
   if(!sheet){
     if(snap.view === 'discography'){ path = '/works/' + (snap.worksCat === 'music' || !snap.worksCat ? 'songs' : snap.worksCat); if((snap.worksCat === 'music' || !snap.worksCat) && snap.discTab && snap.discTab !== 'singles') path += '/' + snap.discTab; }
     else if(snap.view === 'stats' && snap.statsTab && snap.statsTab !== 'overview') path = '/stats/' + snap.statsTab;
+    else if(snap.view === 'quiz' && snap.quizMode && snap.quizMode !== 'birth') path = '/quiz/' + snap.quizMode;
   }
   const q = p.toString();
   return path + (q ? '?' + q : '') ;
@@ -23604,6 +23645,7 @@ function applyUrlToState(){
     if(c && WORKS_CATS.some(x => x.id === c)) state.worksCat = c;
     if(d && DISC_TABS.some(x => x.id === d)) state.discTab = d;
   }
+  if(state.view === 'quiz'){ const qm = seg[0] === 'quiz' ? seg[1] : null; if(QZ_MODES.some(x => x[0] === qm)) state.quizMode = qm; }
   if(state.view === 'stats'){ const st = p.get('st') || (seg[0] === 'stats' ? seg[1] : null); if(st && STATS_TABS.some(x => x.id === st)) state.statsTab = st; }
 }
 
@@ -23827,12 +23869,14 @@ async function drawQuizCard(g, sub){
   shareText(g, `48thDb · ${en ? 'FIND YOUR OSHI BY THE STARS' : 'หาโอชิจากดวง'}`, P, 92, F(800, 28), '#FF9DC3');
   // the reader: what kind of fan, and their stars
   const fan = sub.fan;
-  shareText(g, fan[0], P, 214, EMO(92), '#fff');
-  shareText(g, en ? 'You are' : 'คุณคือ', P + 124, 160, F(700, 28), 'rgba(255,255,255,.7)');
-  shareText(g, en ? fan[3] : fan[1], P + 124, 216, F(800, 58), '#fff');
-  shareText(g, en ? fan[4] : fan[2], P + 124, 258, F(600, 28), 'rgba(255,255,255,.75)');
+  if(fan){
+    shareText(g, fan[0], P, 214, EMO(92), '#fff');
+    shareText(g, en ? 'You are' : 'คุณคือ', P + 124, 160, F(700, 28), 'rgba(255,255,255,.7)');
+    shareText(g, en ? fan[3] : fan[1], P + 124, 216, F(800, 58), '#fff');
+    shareText(g, en ? fan[4] : fan[2], P + 124, 258, F(600, 28), 'rgba(255,255,255,.75)');
+  }
   const chips = r => [en ? 'Born ' + r.day.en : 'เกิดวัน' + r.day.th, en ? r.sign[2] : 'ราศี' + r.sign[1], en ? 'Year of the ' + QZ_ANIMALS[r.animal][1] : 'ปี' + QZ_ANIMALS[r.animal][0]];
-  if(sub.me){ let x = P; chips(sub.me).forEach((t, i) => { x += sharePill(g, t, x, 288, i ? 'rgba(255,255,255,.14)' : sub.me.day.c, '#fff', 24) + 10; }); }
+  if(sub.me){ let x = P; chips(sub.me).forEach((t, i) => { x += sharePill(g, t, x, fan ? 288 : 230, i ? 'rgba(255,255,255,.14)' : sub.me.day.c, '#fff', 24) + 10; }); }
   // her, in the ring of the ทักษา colours
   const cx = 540, cy = 640, R = 186, ring = R + 52;
   g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, ring, 0, Math.PI * 2); g.stroke();
