@@ -11689,7 +11689,7 @@ function refreshTimeline(){
       if(!d || !Array.isArray(d.posts)) return;
       const was = IAMTL ? IAMTL.posts.map(p => p.n).join() : null;
       IAMTL = d;
-      if(d.posts.map(p => p.n).join() !== was && state.view === 'feed' && !state.selectedId && !state.layoutEdit) renderMain();
+      if(d.posts.map(p => p.n).join() !== was && state.view === 'feed' && !state.selectedId && !state.layoutEdit) calmRender(() => renderMain());
     }).catch(() => {});
 }
 function tlAgo(iso){
@@ -13363,6 +13363,7 @@ function listenGE(){
     _geUnsub = fbDb.collection('ge').onSnapshot(snap => {
       const next = {};
       snap.docs.forEach(d => { next[d.id] = d.data(); });
+      const same = JSON.stringify(next) === JSON.stringify(state.geRounds || {});
       state.geRounds = next;
       if(tickerSpeedMine != null && +((next.ticker || {}).speed) === tickerSpeedMine) tickerSpeedMine = null;
       syncTicker();
@@ -13370,7 +13371,8 @@ function listenGE(){
       if(state.selectedId || state.selectedEvent || state.posterOf || state.editingId) return;
       // the owner mid-entry keeps their cursor; the page catches up after
       if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
-      if(state.view === 'timeline' || state.view === 'gelive' || state.view === 'feed'){ const hold = geHoldScroll(); renderMain(); hold(); }
+      if(same) return;
+      if(state.view === 'timeline' || state.view === 'gelive' || state.view === 'feed') calmRender(() => { const hold = geHoldScroll(); renderMain(); hold(); });
     }, () => {});
   }catch(e){}
 }
@@ -15192,7 +15194,7 @@ function loadLiveNow(again){
     if(JSON.stringify(LIVE_NOW.live) === was) return true;
     if(!document.getElementById('main')) return true;   // the first paint will show it
     syncTicker();
-    if(!state.selectedId && !state.posterOf && !state.editingId) renderMain();
+    if(!state.selectedId && !state.posterOf && !state.editingId) calmRender(() => renderMain());
     return true;
   };
   // never from the service worker's copy: the whole point is the latest answer
@@ -15647,15 +15649,20 @@ function listenEventLinks(){
   if(_evLinksUnsub) return;
   try{
     _evLinksUnsub = fbDb.collection('eventlinks').onSnapshot(snap => {
+      const was = JSON.stringify(_evLinks || {});
       _evLinks = {};
       snap.docs.forEach(d => { _evLinks[d.id] = d.data(); });
       applyEventLinks();
+      // an answer that changes nothing (the usual one) draws nothing
+      if(JSON.stringify(_evLinks) === was) return;
       if(!document.getElementById('main')) return;
       if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
-      // keep a reader's place in an open sheet
-      const sc = document.querySelector('.modal-scroll'), top = sc ? sc.scrollTop : 0;
-      renderMain();
-      const sc2 = document.querySelector('.modal-scroll'); if(sc2) sc2.scrollTop = top;
+      calmRender(() => {
+        // keep a reader's place in an open sheet
+        const sc = document.querySelector('.modal-scroll'), top = sc ? sc.scrollTop : 0;
+        renderMain();
+        const sc2 = document.querySelector('.modal-scroll'); if(sc2) sc2.scrollTop = top;
+      });
     }, () => {});
   }catch(e){}
 }
@@ -21560,6 +21567,21 @@ const SEED_YOUTUBE = {
 };
 const YT_KIND = { mv:['MV','MV'], live:['ดูการแสดง','Performance'], lyric:['Lyric Video','Lyric video'], video:['วิดีโอ','Video'] };
 const YT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FF0000" d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8C22 15.2 22 12 22 12s0-3.2-.4-4.8z"/><path fill="#fff" d="M10 15.5v-7l6 3.5z"/></svg>';
+/* Redraws that nobody asked for (a Firestore answer, a data file arriving) used
+   to land wherever the reader's finger was: a button moved out from under it
+   a moment before the tap. They now wait until the page has been left alone for
+   a moment, and several arriving together become one. */
+let _lastTouch = 0, _calmT = 0, _calmJobs = [];
+['pointerdown','touchstart','touchmove','wheel','keydown'].forEach(t =>
+  addEventListener(t, () => { _lastTouch = Date.now(); }, { capture:true, passive:true }));
+function calmRender(job){
+  if(job) _calmJobs.push(job);
+  clearTimeout(_calmT);
+  const wait = 900 - (Date.now() - _lastTouch);
+  if(wait > 0 || document.body.classList.contains('is-scrolling')){ _calmT = setTimeout(() => calmRender(), Math.max(wait, 200)); return; }
+  const jobs = _calmJobs; _calmJobs = [];
+  jobs.forEach(j => { try{ j(); }catch(e){} });
+}
 /* View counts come from data/youtube.json, which the nightly job refreshes;
    YouTube cannot be asked from the page itself. */
 let YT_STATS = null, _ytLoading = false;
@@ -21568,7 +21590,8 @@ function loadYouTubeStats(){
   _ytLoading = true;
   fetch('data/youtube.json', { cache:'no-cache' })
     .then(r => r.ok ? r.json() : null)
-    .then(d => { YT_STATS = d || { videos:{} }; if(state.view === 'single' || state.view === 'stats' || state.view === 'feed') renderMain(); syncTicker(); })
+    .then(d => { YT_STATS = d || { videos:{} }; const needs = state.view === 'single' || state.view === 'stats' || (state.view === 'feed' && ytMilestones().some(x => x.sign && Date.now() - ytAt(x.at) < 86400000));
+      if(needs) calmRender(() => renderMain()); syncTicker(); })
     .catch(() => { YT_STATS = { videos:{} }; })
     .finally(() => { _ytLoading = false; ytFollow(); });
 }
