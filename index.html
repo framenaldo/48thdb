@@ -653,6 +653,29 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .is-scene-paper .evm-fest-deco .cfs.cfi1, .is-scene-paper .evm-fest-deco .cfs.cfi4{ color:#2B1B2E; opacity:.55; }
   .is-scene-paper :is(.ev-open, .today-hero-open){ color:var(--c-text); }
   :root[data-theme="dark"] .is-scene-paper :is(.evm-price, .evm-logo, .slot-date, .ev-starts){ color:var(--ink); }
+  /* Fame's Airline Fanmeet: the airline's own look — sky and cloud, an airmail stripe along the top, white planes crossing — in either mode */
+  .modal-glass-card.is-postered.is-scene-airline, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-airline,
+  .ev-card.is-themed.is-scene-airline, :root[data-theme="dark"] .ev-card.is-themed.is-scene-airline,
+  .today-hero.is-themed.is-scene-airline, :root[data-theme="dark"] .today-hero.is-themed.is-scene-airline{
+    --sheet-bg:#EAF6FD; --sheet-ink:#232E48; --pc:#26324F;
+    --ink:#232E48; --ink-soft:#4F6178; --paper:#FFFFFF; --paper-dim:#E3F1FA; --card:#FFFFFF; --glass-card:#FFFFFF;
+    --glass-edge:rgba(38,50,79,.28); --line:rgba(38,50,79,.16); --c-text:#26324F;
+    background:
+      repeating-linear-gradient(135deg, #E2505F 0 12px, #fff 12px 24px, #2C6DB2 24px 36px, #fff 36px 48px) top left / 100% 7px no-repeat,
+      linear-gradient(180deg, #A9DAF3 0, #D5EEFB 90px, #F4FAFE 220px, #FFFFFF 340px);
+    color:var(--ink); border:1px solid rgba(38,50,79,.35); box-shadow:0 6px 20px rgba(60,120,170,.2); }
+  .modal-glass-card.is-postered.is-scene-airline, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-airline{
+    background:
+      repeating-linear-gradient(135deg, #E2505F 0 12px, #fff 12px 24px, #2C6DB2 24px 36px, #fff 36px 48px) top left / 100% 7px no-repeat,
+      linear-gradient(180deg, #A9DAF3 0, #D5EEFB 160px, #F4FAFE 380px, #FFFFFF 560px); }
+  .is-scene-airline .evm-fest::before{ display:none; }
+  .is-scene-airline .evm-fest.is-postered, :root[data-theme="dark"] .is-scene-airline .evm-fest.is-postered{ --fest-a:#A9DAF3; --fest-b:#D5EEFB; --fest-ink:#26324F; }
+  .is-scene-airline .evm-fest-deco .cfs{ color:#fff; opacity:.95; filter:drop-shadow(0 1px 1px rgba(38,50,79,.25)); }
+  .is-scene-airline .evm-fest-deco .cfs.cfi1, .is-scene-airline .evm-fest-deco .cfs.cfi3{ color:#26324F; opacity:.45; filter:none; }
+  .is-scene-airline .evm-fest-name, :root[data-theme="dark"] .is-scene-airline .evm-fest-name{ background:#fff; color:#26324F; }
+  .is-scene-airline :is(.ev-open, .today-hero-open){ color:var(--c-text); }
+  :root[data-theme="dark"] .is-scene-airline :is(.ev-icon, .evm-icon):not(.is-yt):not(.is-img){ color:#26324F; }
+  :root[data-theme="dark"] .is-scene-airline :is(.evm-price, .evm-logo, .slot-date, .ev-starts){ color:var(--ink); }
   .evm-fest-img{ position:relative; display:block; width:min(240px, 66%); height:auto; margin:2px auto 6px; transform:rotate(-3deg);
     filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff); }
   .modal-glass-card.is-postered.is-scene-meadow{
@@ -6956,7 +6979,7 @@ const SEED_SCHEDULE = [
     title:"Fame's Airline Fanmeet",
     venue:'The Theater Hall ชั้น C, The Bazaar Hotel Bangkok',
     groups:['bnk48'], members:['bnk-fame'],
-    poster:{ accent:'#26324F', surface:'#F3FAFE', ink:'#232E48', img:'posters/fame-fanmeet-1025.jpg', w:1500, h:2000 },
+    poster:{ accent:'#26324F', surface:'#F3FAFE', ink:'#232E48', img:'posters/fame-fanmeet-1025.jpg', w:1500, h:2000, scene:'airline' },
     price:'1,777', ticketUrl:'https://app.bnk48.com/performance',
     detail:['13:00–15:00 ลงทะเบียนยืนยันตัวตน หน้า The Theater Hall ชั้น C'],
     info:['แฟนมีตเดี่ยวครั้งแรกของเฟม เลื่อนมาจากวันที่ 27 ก.ย. 2569 เพราะฝนตกและน้ำท่วมในกรุงเทพฯ',
@@ -12505,7 +12528,7 @@ const FEST_KINDS = {
 /* where the title alone would not say, or an event has its own way of putting it */
 const FEST_EVENT = {
   'ev-concert-2026':   { kind:'concert', word:'Journey of Dreams', sub:'夢の旅 · CONCERT' },
-  'ev-fame-fanmeet':   { word:"Fame's Airline", sub:'FANMEET', motif:'clouds' },
+  'ev-fame-fanmeet':   { word:"Fame's Airline", sub:'FANMEET · BOARDING PASS', motif:'planes' },
   'ev-hoop-bday-said': { sub:'THEATER SHOW' },
   'ev-partner-1017':   { word:'Lanna Expo 2026', sub:'JAPAN–THAILAND 140TH ANNIVERSARY' },
   'ev-cgm48-popup-halloween-1015': { word:'POP UP หลอน', sub:'CGM48 · HALLOWEEN', motif:'spooky', fx:'moon', pal:'blood', own:true },
@@ -12558,6 +12581,7 @@ const FEST_SHAPES = {
   sparkles:'<path d="M12 1.5c.6 5.6 2.9 8.6 9.5 10.5-6.6 1.9-8.9 4.9-9.5 10.5-.6-5.6-2.9-8.6-9.5-10.5C9.1 10.1 11.4 7.1 12 1.5Z"/>',
   discs:   '<path fill-rule="evenodd" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 7.4a2.6 2.6 0 1 0 0 5.2 2.6 2.6 0 0 0 0-5.2Z"/>',
   bubbles: '<path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H10l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/>',
+  planes:  '<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
   clouds:  '<path d="M7 19a5 5 0 0 1-.6-10A6.5 6.5 0 0 1 18.8 10 4.5 4.5 0 0 1 18 19Z"/>',
   balls:   '<path fill-rule="evenodd" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 5.6-3.7 2.7 1.4 4.4h4.6l1.4-4.4Z"/>',
 };
@@ -15120,6 +15144,7 @@ const EV_ICONS = {
   photos:    '<rect x="3" y="3" width="14" height="14" rx="2.4"/><path d="M7 21h12a2 2 0 0 0 2-2V7"/><circle cx="8.2" cy="8.2" r="1.5"/><path d="m3.4 14.4 3.2-3.2 4 4"/>',
   cup:       '<path d="M5 8h11v6a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5Z"/><path d="M16 9.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 2.5 7.5 5M12 2.5 11.5 5"/>',
   ball:      '<circle cx="12" cy="12" r="9"/><path d="m12 7.5 3.6 2.6-1.4 4.2H9.8L8.4 10.1Z"/><path d="M12 3v4.5M3.6 9.6l4.8.5M20.4 9.6l-4.8.5M6.8 19.6 9.8 14.3M17.2 19.6l-3-5.3"/>',
+  airplane:  '<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
   plane:     '<path d="M10.5 13.5 3 11.2l18-7.2-7.2 18-2.3-7.5Z"/><path d="m10.5 13.5 3.8-3.8"/>',
   tv:        '<rect x="2.5" y="6.5" width="19" height="13" rx="2.4"/><path d="m8 2.5 4 4 4-4"/>',
   live:      '<rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="m10.4 9.6 4.4 2.4-4.4 2.4Z"/>',
@@ -15132,7 +15157,7 @@ const EVENT_ICON = {
   'ev-ge6-single':'disc', 'ev-ge6-photoset':'photos', 'ev-ge6-handshake':'handshake',
   'ev-ge6-myo1':'myo', 'ev-ge6-myo2':'myo', 'ev-concert-2026':'mic', 'ev-ge6-heart':'heart',
   'ev-roadshow-mbk':'mic', 'ev-roadshow-fashionisland':'mic', 'ev-roadshow-0905':'mic',
-  'ev-nine-charity':'mic', 'ev-charity-football-2026':'ball', 'ev-fame-fanmeet':'heart',
+  'ev-nine-charity':'mic', 'ev-charity-football-2026':'ball', 'ev-fame-fanmeet':'airplane',
   'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
   'ev-getaway-pudthailee':'plane', 'ev-pancake-perfume':'sparkles', 'ev-pancake-captured':'photos',
   'ev-cgm48-popup-live-cnx':'live', 'ev-cgm48-popup-live-0924':'live', 'ev-cgm48-popup-live-0929':'live', 'ev-cgm48-popup-live-1001':'live',
