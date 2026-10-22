@@ -626,6 +626,33 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .is-scene-cocoa .evm-fest.is-postered, :root[data-theme="dark"] .is-scene-cocoa .evm-fest.is-postered{ --fest-a:#5E2416; --fest-b:#4E1A10; --fest-ink:#FFC9DD; }
   .is-scene-ember .evm-fest.is-postered, :root[data-theme="dark"] .is-scene-ember .evm-fest.is-postered{ --fest-a:#3A1814; --fest-b:#3A0A08; --fest-ink:#F6D58A; }
   :is(.is-scene-cocoa, .is-scene-ember) :is(.ev-open, .today-hero-open){ color:var(--c-text); }
+  /* Shock Me Girls: a sheet of lined school paper, pink at the top, with pink lightning — in either mode, like the series' own art */
+  .modal-glass-card.is-postered.is-scene-paper, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-paper,
+  .ev-card.is-themed.is-scene-paper, :root[data-theme="dark"] .ev-card.is-themed.is-scene-paper,
+  .today-hero.is-themed.is-scene-paper, :root[data-theme="dark"] .today-hero.is-themed.is-scene-paper{
+    --sheet-bg:#FFFFFF; --sheet-ink:#2B1B2E; --pc:#E85BC6;
+    --ink:#2B1B2E; --ink-soft:#6E5A70; --paper:#FFFFFF; --paper-dim:#FDEBF7; --card:#FFFFFF; --glass-card:#FFFFFF;
+    --glass-edge:rgba(232,91,198,.35); --line:rgba(110,130,190,.22); --c-text:#C93AA6;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23F06FD2' d='M14 1 4 13.6h6.4L8.6 23 20 9.6h-6.7Z'/%3E%3C/svg%3E") no-repeat right 14px top 12px / 26px 26px,
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%232B1B2E' stroke-width='1.6' stroke-linejoin='round' d='m12 2 2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 16.9l-6.1 3.5 1.5-6.8L2.2 9l6.9-.7Z'/%3E%3C/svg%3E") no-repeat right 46px top 34px / 14px 14px,
+      linear-gradient(90deg, transparent 0 10px, rgba(232,70,100,.38) 10px 11.5px, transparent 11.5px),
+      repeating-linear-gradient(180deg, transparent 0 27px, rgba(110,140,200,.2) 27px 28px),
+      linear-gradient(180deg, #FFC4EE 0, #FFE9F8 70px, #FFFFFF 200px);
+    color:var(--ink); border-color:rgba(232,91,198,.55); box-shadow:0 6px 20px rgba(232,91,198,.18); }
+  .modal-glass-card.is-postered.is-scene-paper, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-paper{
+    background:
+      linear-gradient(90deg, transparent 0 10px, rgba(232,70,100,.38) 10px 11.5px, transparent 11.5px),
+      repeating-linear-gradient(180deg, transparent 0 27px, rgba(110,140,200,.2) 27px 28px),
+      linear-gradient(180deg, #FFC4EE 0, #FFE9F8 120px, #FFFFFF 320px); }
+  .is-scene-paper .evm-fest.is-postered, :root[data-theme="dark"] .is-scene-paper .evm-fest.is-postered{ --fest-a:#FFE3F5; --fest-b:#FFFFFF; --fest-ink:#E85BC6; }
+  .is-scene-paper .evm-fest-name, :root[data-theme="dark"] .is-scene-paper .evm-fest-name{ background:#fff; color:#C93AA6; }
+  .is-scene-paper .evm-fest-deco .cfs{ color:#F06FD2; opacity:.85; }
+  .is-scene-paper .evm-fest-deco .cfs.cfi1, .is-scene-paper .evm-fest-deco .cfs.cfi4{ color:#2B1B2E; opacity:.55; }
+  .is-scene-paper :is(.ev-open, .today-hero-open){ color:var(--c-text); }
+  :root[data-theme="dark"] .is-scene-paper :is(.evm-price, .evm-logo, .slot-date, .ev-starts){ color:var(--ink); }
+  .evm-fest-img{ position:relative; display:block; width:min(240px, 66%); height:auto; margin:2px auto 6px; transform:rotate(-3deg);
+    filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 6px 10px rgba(232,91,198,.3)); }
   .modal-glass-card.is-postered.is-scene-meadow{
     background:linear-gradient(180deg, #86B5DA 0%, #B9D5EB 14%, #E6EFF5 32%, #F6F4EC 56%, #EFEBCB 76%, #D3DB9D 90%, #B3C07A 100%);
   }
@@ -7479,6 +7506,7 @@ const SEED_SCHEDULE = [
   { id:'ev-shock-me-girls-orientation', start:'2026-11-20',
     title:'SHOCK ME GIRLS: SEMESTER 2 ORIENTATION DAY',
     venue:'Major Sukhumvit-Ekkamai, Bangkok', groups:['bnk48'],
+    poster:{ accent:'#E85BC6', surface:'#FFFFFF', ink:'#2B1B2E', scene:'paper' },
     members:['bnk-monet','bnk-praew','bnk-janry','bnk-marine','bnk-sindy'],
     info:['ผู้ร่วมงานตามโปสเตอร์ตารางงาน: Monet, Praew, Janry, Marine, Sindy และสมาชิกอื่น ๆ'] },
   { id:'ev-kimi-roadshow-t21-nov', logo:'kimi', start:'2026-11-21', end:'2026-11-22', tba:true,
@@ -12478,6 +12506,7 @@ const FEST_EVENT = {
   'ev-kimi-busking-1030': { word:'Busking', sub:'KIMI TO DOKO KA E IKITAI · DANCE PARTY' },
   'ev-mbk-haunted-graveyard-1020': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-mbk-haunted-graveyard-1026': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
+  'ev-shock-me-girls-orientation': { word:'Shock Me Girls', sub:'SEMESTER 2 · ORIENTATION DAY', motif:'bolts', img:'logos/shock-me-girls.png' },
   'ev-cgm48-popup-halloween-ontour-1020': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
 };
 function festKind(ev){
@@ -12515,6 +12544,7 @@ function festRelease(ev){
 }
 /* the scattered things, one shape a kind; their colours are the confetti's */
 const FEST_SHAPES = {
+  bolts:   '<path d="M14 1 4 13.6h6.4L8.6 23 20 9.6h-6.7Z"/>',
   hearts:  '<path d="M12 21 4.5 13.6C3.1 12.2 2 10.7 2 8.6A4.8 4.8 0 0 1 6.8 4c1.6 0 2.9.8 5.2 3 2.3-2.2 3.6-3 5.2-3A4.8 4.8 0 0 1 22 8.6c0 2.1-1.1 3.6-2.5 5Z"/>',
   notes:   '<path d="M9 18.2a3.2 3.2 0 1 1-2.2-3V4.6l12-2.6v12.7a3.2 3.2 0 1 1-2.2-3V6.4L9 8.1Z"/>',
   stars:   '<path d="m12 2 2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 16.9l-6.1 3.5 1.5-6.8L2.2 9l6.9-.7Z"/>',
@@ -12578,7 +12608,7 @@ function renderEventBanner(ev){
     ${K.fx === 'bunting' ? renderFestBunting() : ''}
     ${K.fx === 'moon' ? '<span class="evm-fest-moon" aria-hidden="true"></span><span class="evm-fest-drip" aria-hidden="true"></span>' : ''}
     <span class="evm-fest-deco" aria-hidden="true">${renderFestDeco(K.motif)}</span>
-    <span class="evm-fest-word" data-noloc>${escapeHtml(K.word)}</span>
+    ${K.img ? `<img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">` : `<span class="evm-fest-word" data-noloc>${escapeHtml(K.word)}</span>`}
     ${sub ? `<span class="evm-fest-sub${long ? ' is-long' : ''}" data-noloc>${escapeHtml(sub)}</span>` : ''}
     ${faces}
   </div>`;
