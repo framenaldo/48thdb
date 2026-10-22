@@ -1363,4 +1363,83 @@ URL:https://48thdb.com/event/ev-ge6-heart
 DTSTART;VALUE=DATE:20261115
 DTEND;VALUE=DATE:20261116
 END:VEVENT
+BEGIN:VEVENT
+UID:ev-mbk-haunted-graveyard-1026@48thdb
+DTSTAMP:20261026T000000Z
+SUMMARY:THE HAUNTED GRAVEYARD
+LOCATION:MBK Center\, Bangkok
+DESCRIPTION:รายละเอียดและเวลายังไ
+ ม่ประกาศ\n• รายชื่อสมาชิกร
+ อประกาศ\n\nhttps://48thdb.com/event/ev-mbk-haunted-graveyard
+ -1026
+URL:https://48thdb.com/event/ev-mbk-haunted-graveyard-1026
+DTSTART;VALUE=DATE:20261026
+DTEND;VALUE=DATE:20261030
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-rama9@48thdb
+DTSTAMP:20261107T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Central Rama 9\, Bangkok
+DESCRIPTION:รายละเอียดและเวลายังไ
+ ม่ประกาศ\n• รายชื่อสมาชิกแ
+ ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
+ kimi-roadshow-rama9
+URL:https://48thdb.com/event/ev-kimi-roadshow-rama9
+DTSTART;VALUE=DATE:20261107
+DTEND;VALUE=DATE:20261109
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-shock-me-girls-orientation@48thdb
+DTSTAMP:20261120T000000Z
+SUMMARY:SHOCK ME GIRLS: SEMESTER 2 ORIENTATION DAY
+LOCATION:Major Sukhumvit-Ekkamai\, Bangkok
+DESCRIPTION:เมมเบอร์: Monet\, Praew\, Janry\, Marine\, Sind
+ y\n• ผู้ร่วมงานตามโปสเตอร์ต
+ ารางงาน: Monet\, Praew\, Janry\, Marine\, Sindy และส
+ มาชิกอื่น ๆ\n\nhttps://48thdb.com/event/ev-shock-me-gi
+ rls-orientation
+URL:https://48thdb.com/event/ev-shock-me-girls-orientation
+DTSTART;VALUE=DATE:20261120
+DTEND;VALUE=DATE:20261121
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-t21-nov@48thdb
+DTSTAMP:20261121T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Terminal21 Rama 3\, Bangkok
+DESCRIPTION:รายละเอียดและเวลายังไ
+ ม่ประกาศ\n• รายชื่อสมาชิกแ
+ ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
+ kimi-roadshow-t21-nov
+URL:https://48thdb.com/event/ev-kimi-roadshow-t21-nov
+DTSTART;VALUE=DATE:20261121
+DTEND;VALUE=DATE:20261123
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-phitsanulok@48thdb
+DTSTAMP:20261121T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Central Phitsanulok\, Phitsanulok
+DESCRIPTION:รายละเอียดและเวลายังไ
+ ม่ประกาศ\n• รายชื่อสมาชิกแ
+ ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
+ kimi-roadshow-phitsanulok
+URL:https://48thdb.com/event/ev-kimi-roadshow-phitsanulok
+DTSTART;VALUE=DATE:20261121
+DTEND;VALUE=DATE:20261123
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-bigc-rajdamri@48thdb
+DTSTAMP:20261128T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Big C Rajdamri\, Bangkok
+DESCRIPTION:รายละเอียดและเวลายังไ
+ ม่ประกาศ\n• รายชื่อสมาชิกแ
+ ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
+ kimi-roadshow-bigc-rajdamri
+URL:https://48thdb.com/event/ev-kimi-roadshow-bigc-rajdamri
+DTSTART;VALUE=DATE:20261128
+DTEND;VALUE=DATE:20261130
+END:VEVENT
 END:VCALENDAR
