@@ -835,17 +835,76 @@ DTSTART;VALUE=DATE:20261115
 DTEND;VALUE=DATE:20261116
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-mbk-haunted-graveyard-1026@48thdb
+UID:ev-mbk-haunted-graveyard-1026-2026-10-26@48thdb
 DTSTAMP:20261026T000000Z
 SUMMARY:THE HAUNTED GRAVEYARD
 LOCATION:MBK Center\, Bangkok
-DESCRIPTION:รายละเอียดและเวลายังไ
- ม่ประกาศ\n• รายชื่อสมาชิกร
- อประกาศ\n\nhttps://48thdb.com/event/ev-mbk-haunted-graveyard
- -1026
+DESCRIPTION:• รอบเปิดป่าช้ารอบพิเ
+ ศษ พบศิลปิน BNK48 เซอร์ไพรส์ เ
+ ฉพาะวันที่ 26–29 ต.ค.\n• 16:00–17:00 รอ
+ บที่ 1\n• 17:15–18:15 รอบที่ 2\n• 18:30–19:30 
+ รอบที่ 3\n• จำหน่ายบัตรรอบพิ
+ เศษ 200 บาท\n• ศิลปิน BNK48 ที่มาเ
+ ซอร์ไพรส์ รอประกาศชื่อ (โป
+ สเตอร์เป็นภาพเงา 6 คน)\n\nhttps://48th
+ db.com/event/ev-mbk-haunted-graveyard-1026
 URL:https://48thdb.com/event/ev-mbk-haunted-graveyard-1026
-DTSTART;VALUE=DATE:20261026
-DTEND;VALUE=DATE:20261030
+DTSTART;TZID=Asia/Bangkok:20261026T160000
+DTEND;TZID=Asia/Bangkok:20261026T193000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-mbk-haunted-graveyard-1026-2026-10-27@48thdb
+DTSTAMP:20261026T000000Z
+SUMMARY:THE HAUNTED GRAVEYARD
+LOCATION:MBK Center\, Bangkok
+DESCRIPTION:• รอบเปิดป่าช้ารอบพิเ
+ ศษ พบศิลปิน BNK48 เซอร์ไพรส์ เ
+ ฉพาะวันที่ 26–29 ต.ค.\n• 16:00–17:00 รอ
+ บที่ 1\n• 17:15–18:15 รอบที่ 2\n• 18:30–19:30 
+ รอบที่ 3\n• จำหน่ายบัตรรอบพิ
+ เศษ 200 บาท\n• ศิลปิน BNK48 ที่มาเ
+ ซอร์ไพรส์ รอประกาศชื่อ (โป
+ สเตอร์เป็นภาพเงา 6 คน)\n\nhttps://48th
+ db.com/event/ev-mbk-haunted-graveyard-1026
+URL:https://48thdb.com/event/ev-mbk-haunted-graveyard-1026
+DTSTART;TZID=Asia/Bangkok:20261027T160000
+DTEND;TZID=Asia/Bangkok:20261027T193000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-mbk-haunted-graveyard-1026-2026-10-28@48thdb
+DTSTAMP:20261026T000000Z
+SUMMARY:THE HAUNTED GRAVEYARD
+LOCATION:MBK Center\, Bangkok
+DESCRIPTION:• รอบเปิดป่าช้ารอบพิเ
+ ศษ พบศิลปิน BNK48 เซอร์ไพรส์ เ
+ ฉพาะวันที่ 26–29 ต.ค.\n• 16:00–17:00 รอ
+ บที่ 1\n• 17:15–18:15 รอบที่ 2\n• 18:30–19:30 
+ รอบที่ 3\n• จำหน่ายบัตรรอบพิ
+ เศษ 200 บาท\n• ศิลปิน BNK48 ที่มาเ
+ ซอร์ไพรส์ รอประกาศชื่อ (โป
+ สเตอร์เป็นภาพเงา 6 คน)\n\nhttps://48th
+ db.com/event/ev-mbk-haunted-graveyard-1026
+URL:https://48thdb.com/event/ev-mbk-haunted-graveyard-1026
+DTSTART;TZID=Asia/Bangkok:20261028T160000
+DTEND;TZID=Asia/Bangkok:20261028T193000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-mbk-haunted-graveyard-1026-2026-10-29@48thdb
+DTSTAMP:20261026T000000Z
+SUMMARY:THE HAUNTED GRAVEYARD
+LOCATION:MBK Center\, Bangkok
+DESCRIPTION:• รอบเปิดป่าช้ารอบพิเ
+ ศษ พบศิลปิน BNK48 เซอร์ไพรส์ เ
+ ฉพาะวันที่ 26–29 ต.ค.\n• 16:00–17:00 รอ
+ บที่ 1\n• 17:15–18:15 รอบที่ 2\n• 18:30–19:30 
+ รอบที่ 3\n• จำหน่ายบัตรรอบพิ
+ เศษ 200 บาท\n• ศิลปิน BNK48 ที่มาเ
+ ซอร์ไพรส์ รอประกาศชื่อ (โป
+ สเตอร์เป็นภาพเงา 6 คน)\n\nhttps://48th
+ db.com/event/ev-mbk-haunted-graveyard-1026
+URL:https://48thdb.com/event/ev-mbk-haunted-graveyard-1026
+DTSTART;TZID=Asia/Bangkok:20261029T160000
+DTEND;TZID=Asia/Bangkok:20261029T193000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-kimi-roadshow-rama9@48thdb
