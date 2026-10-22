@@ -699,6 +699,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-meadow{
     background:linear-gradient(180deg, #1F3B57 0%, #1A2939 26%, #171B24 55%, #1C2320 80%, #2A3820 100%);
   }
+  /* on the dark red scenes the price pill took the poster's red and sank into it: light pill, dark lettering */
+  :is(.is-scene-ember, .is-scene-cocoa, .is-scene-night) .evm-price:not(.is-closed),
+  :root[data-theme="dark"] :is(.is-scene-ember, .is-scene-cocoa, .is-scene-night) .evm-price:not(.is-closed){
+    background:#FFE7BD; border-color:#FFE7BD; color:#4A150F; }
+  :is(.is-scene-cocoa) .evm-price:not(.is-closed){ background:#FFD3E3; border-color:#FFD3E3; color:#4A1420; }
   :root[data-theme="dark"] .is-postered .evm-price.is-link,
   :root[data-theme="dark"] .is-postered .evm-closed{ color:#fff; }
   :root[data-theme="dark"] .is-postered .evm-closed{ background:#B84545; }
