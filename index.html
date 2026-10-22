@@ -7458,11 +7458,19 @@ const SEED_SCHEDULE = [
     info:['งานต่อเนื่องหลังประกาศผลการเลือกตั้ง',
       'รายละเอียดสถานที่และเวลารอประกาศ'],
     allMembers:true },
-  { id:'ev-mbk-haunted-graveyard-1026', start:'2026-10-26', end:'2026-10-29', tba:true,
+  { id:'ev-mbk-haunted-graveyard-1026', start:'2026-10-26', end:'2026-10-29', time:'16:00', until:'19:30',
     title:'THE HAUNTED GRAVEYARD',
     venue:'MBK Center, Bangkok', groups:['bnk48'],
     related:['ev-mbk-haunted-graveyard-1020'],
-    info:['รายชื่อสมาชิกรอประกาศ'] },
+    poster:{ accent:'#C8141B', surface:'#F6ECEC', ink:'#3A0A0D', img:'posters/mbk-haunted-graveyard-1026.jpg', w:2000, h:2000, scene:'night' },
+    detail:[
+      'รอบเปิดป่าช้ารอบพิเศษ พบศิลปิน BNK48 เซอร์ไพรส์ เฉพาะวันที่ 26–29 ต.ค.',
+      '16:00–17:00 รอบที่ 1',
+      '17:15–18:15 รอบที่ 2',
+      '18:30–19:30 รอบที่ 3'],
+    info:[
+      'จำหน่ายบัตรรอบพิเศษ 200 บาท',
+      'ศิลปิน BNK48 ที่มาเซอร์ไพรส์ รอประกาศชื่อ (โปสเตอร์เป็นภาพเงา 6 คน)'] },
   { id:'ev-kimi-roadshow-rama9', logo:'kimi', start:'2026-11-07', end:'2026-11-08', tba:true,
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'Central Rama 9, Bangkok', groups:['bnk48','cgm48'],
@@ -12469,6 +12477,7 @@ const FEST_EVENT = {
   'ev-cgm48-popup-halloween-1022': { word:'POP UP หลอน', sub:'CGM48 · HALLOWEEN', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-kimi-busking-1030': { word:'Busking', sub:'KIMI TO DOKO KA E IKITAI · DANCE PARTY' },
   'ev-mbk-haunted-graveyard-1020': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
+  'ev-mbk-haunted-graveyard-1026': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-cgm48-popup-halloween-ontour-1020': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
 };
 function festKind(ev){
