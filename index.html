@@ -2731,7 +2731,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     display:inline-flex; align-items:center; gap:5px; vertical-align:2px;
     margin-left:7px; padding:2px 9px 2px 7px; border-radius:999px;
     background:color-mix(in srgb, #E02118 14%, transparent); color:#C21C14;
-    font-family:var(--font); font-size:11px; font-weight:800; letter-spacing:.7px;
+    font-family:var(--font); font-size:11px; font-weight:800; letter-spacing:.7px; white-space:nowrap;
   }
   .live-chip::before{ content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
   /* in the sheet's meta row the flex gap already spaces it */
@@ -9203,6 +9203,7 @@ const EN = {
   'ราคาเริ่มต้น 145 บาท': 'From 145 THB',
   'กำลังจัดอยู่': 'On now',
   'กำลังไลฟ์อยู่': 'On air now',
+  'ไลฟ์อยู่ · กดดู ▶': 'Live now · tap to watch ▶',
   '48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ': '48thdb.com is an unofficial fan site',
   'นโยบายความเป็นส่วนตัว': 'Privacy policy',
   'ด่วน': 'FLASH',
@@ -15248,7 +15249,7 @@ function renderLiveChip(ev, cls){
   const direct = air && (/youtube\.com\/(live\/|watch)|youtu\.be\//.test(ev.stream.url || '') ? ev.stream.url : air.url);
   if(air) return `<a class="live-chip is-on is-air${cls ? ' ' + cls : ''}"
     href="${escapeAttr(direct)}" target="_blank" rel="noopener noreferrer"
-    title="${escapeAttr(air.title || '')}">กำลังไลฟ์อยู่</a>`;
+    title="${escapeAttr(air.title || '')}">ไลฟ์อยู่ · กดดู ▶</a>`;
   // Once the show is over the badge becomes a way to watch it again — when the
   // link is the show's own video or post, not just a channel page.
   const replay = isReplayLink(ev.stream.url) ? `<a class="live-chip is-replay${cls ? ' ' + cls : ''}" href="${escapeAttr(ev.stream.url)}"
