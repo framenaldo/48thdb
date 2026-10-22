@@ -117,6 +117,10 @@ the Firebase CLI from the owner's machine.
   fog are CSS or drawn once, nothing blurs over the sky while a theme is on, and a
   height-only resize (Safari's toolbar) restarts nothing. `window.__festDay`
   pretends another day for testing. Next year's dated themes need new dates.
+- Nothing on the home page may arrive late and push the page down under a finger: what comes from the network
+  is drawn on the first paint from the copy the phone kept last time (localStorage: `48thdb-ge` the election
+  rounds, `48thdb-tl` the iAM48 posts, `48thdb-gec-home` the vote card's figures), and on a first visit a
+  placeholder of the same size holds its place (`is-wait`). A new home section that loads late needs the same.
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.

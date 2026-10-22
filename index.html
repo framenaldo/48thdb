@@ -3811,6 +3811,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .tl-img i{ position:absolute; right:4px; bottom:4px; font-style:normal; font-size:10.5px; font-weight:800; color:#fff; background:rgba(0,0,0,.55); padding:1px 6px; border-radius:99px; }
   .tl-img.is-video::after{ content:''; position:absolute; left:50%; top:50%; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%;
     background:rgba(0,0,0,.5) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 7l9 5-9 5z' fill='white'/%3E%3C/svg%3E") center/16px no-repeat; }
+  .tl-ghost{ height:142px; box-sizing:border-box; background:var(--paper-dim) !important; box-shadow:none !important; border-color:var(--line) !important; }
+  .tl-ghost-strip{ display:block; flex:1; height:34px; border-radius:99px; background:var(--paper-dim); }
   .tl-locked{ display:flex; align-items:center; gap:8px; overflow-x:auto; padding:0 2px 10px; scrollbar-width:none; }
   .tl-locked::-webkit-scrollbar{ display:none; }
   .tl-locked-h{ flex:none; display:flex; align-items:center; gap:5px; font-size:12px; font-weight:800; color:var(--ink-soft); }
@@ -3854,6 +3856,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash > button{ font:inherit; text-align:left; cursor:pointer; border-radius:18px; transition:transform .12s ease, box-shadow .12s ease; }
   .dash-ge{ grid-column:span 2; grid-row:span 2; aspect-ratio:1; display:flex; flex-direction:column; gap:4px; padding:12px 14px; border:0; color:#fff;
     background:radial-gradient(circle at 85% 0%, rgba(179,18,30,.9), transparent 60%), #2A0508; box-shadow:0 4px 0 rgba(0,0,0,.25); position:relative; overflow:hidden; }
+  .dash-ge.is-wait{ background:radial-gradient(circle at 85% 0%, rgba(179,18,30,.35), transparent 60%), color-mix(in srgb, #2A0508 55%, var(--paper-dim)); box-shadow:none; }
   .dash-ge:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.25); }
   .dash-ge-top{ display:flex; align-items:baseline; justify-content:space-between; gap:6px; } .dash-ge-top b{ font-size:15px; }
   .dash-ge-top small{ font-size:10.5px; opacity:.75; white-space:nowrap; }
@@ -4101,7 +4104,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gec-teaser:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(90,10,18,.45); }
   .gec-t-k{ font-size:12.5px; font-weight:800; letter-spacing:.02em; color:#F3C969; }
   .gec-t-k .gec-live{ background:#FF5A6B; }
-  .gec-t-v{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; font-size:34px; font-weight:800; line-height:1.15; color:#F3C969; font-variant-numeric:tabular-nums; }
+  .gec-t-v{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; font-size:34px; font-weight:800; line-height:1.2; color:#F3C969; font-variant-numeric:tabular-nums; }
   .gec-t-v small{ font-size:13px; font-weight:700; color:rgba(255,255,255,.75); }
   .gec-t-row{ font-size:13px; font-weight:600; color:rgba(255,255,255,.85); }
   .gec-t-row b{ color:#fff; } .gec-t-row .gec-t-x{ color:#F3C969; }
@@ -11700,18 +11703,21 @@ function loadLives(){
    (api.48thdb.com/timeline, `tlScan` in worker/live-worker.js). A card shows
    the first lines and a small picture and opens the post on iAM48; a post
    locked to the app says only that there is one. */
-let IAMTL = null, _tlTimer = null;
+const TL_LS = '48thdb-tl';
+let IAMTL = (() => { try{ const c = JSON.parse(localStorage.getItem(TL_LS) || 'null'); return c && Array.isArray(c.posts) ? c : null; }catch(e){ return null; } })(), _tlTimer = null, _tlTried = false;
 const TL_POST = n => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
 function refreshTimeline(){
   if(!_tlTimer) _tlTimer = setInterval(() => { if(!document.hidden) refreshTimeline(); }, 5 * 60000);
   return fetch(`${LIVE_API}/timeline?t=${Math.floor(Date.now() / 60000)}`, { cache:'no-store' })
     .then(r => r.ok ? r.json() : null)
     .then(d => {
-      if(!d || !Array.isArray(d.posts)) return;
+      const first = !_tlTried; _tlTried = true;
+      if(!d || !Array.isArray(d.posts)){ if(first && !IAMTL && state.view === 'feed') calmRender(() => renderMain()); return; }
       const was = IAMTL ? IAMTL.posts.map(p => p.n).join() : null;
       IAMTL = d;
+      try{ localStorage.setItem(TL_LS, JSON.stringify({ posts:d.posts.slice(0, 60) })); }catch(e){}
       if(d.posts.map(p => p.n).join() !== was && state.view === 'feed' && !state.selectedId && !state.layoutEdit) calmRender(() => renderMain());
-    }).catch(() => {});
+    }).catch(() => { if(!_tlTried){ _tlTried = true; if(!IAMTL && state.view === 'feed') calmRender(() => renderMain()); } });
 }
 function tlAgo(iso){
   const mins = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 60000)), en = isEN();
@@ -11735,6 +11741,9 @@ function tlCard(p, m){
 /* the home page's row: the newest posts, an oshi's only when the reader filters by oshi */
 function renderTimelineZone(){
   const en = isEN(), mine = filteringByOshi();
+  // nothing kept yet and the first answer still coming: the row's place, so it does not push the page down when it arrives
+  if(!IAMTL && !_tlTried) return `<section class="feed-block is-iamtl is-wait" aria-hidden="true"><h2 class="section-label">${en ? 'Latest on iAM48' : 'iAM48 ล่าสุด'}</h2>
+    <div class="tl-locked"><span class="tl-ghost-strip"></span></div><div class="tl-row">${'<span class="tl-card tl-ghost"></span>'.repeat(3)}</div></section>`;
   const all = ((IAMTL && IAMTL.posts) || []).map(p => [p, getMember(p.m)]).filter(([, m]) => m && (!mine || isMyOshi(m)));
   const open = all.filter(([p]) => !p.locked).slice(0, 12), locked = all.filter(([p]) => p.locked && Date.now() - Date.parse(p.at) < 86400000).slice(0, 8);
   if(!open.length && !locked.length) return '';
@@ -13377,7 +13386,14 @@ const GE_HISTORY = [
       ['bnk-nammonn',10219.79],['cgm-jingjing',10084.99],['bnk-marine',9879.16],['bnk-nall',9702.67],['bnk-patt',9184.77],['cgm-lookked',8861.25],
       ['bnk-palmmy',8758.81],['bnk-proud',7699.06],['bnk-sindy',7309.45],['bnk-galeya',6803.52],['cgm-ploen',5876.25],['bnk-khaimook',5807.6] ] },
 ];
-let _geUnsub = null;
+let _geUnsub = null, _geLoaded = false;
+/* the rounds as last seen, kept on the device: the dashboard's square is drawn on the first paint instead of
+   arriving seconds later and pushing the page down under a finger. A copy older than half an hour drops "live". */
+const GE_LS = '48thdb-ge';
+(() => { try{ const c = JSON.parse(localStorage.getItem(GE_LS) || 'null');
+  if(!c || !c.rounds) return;
+  if(Date.now() - c.at > 30 * 60000) for(const k in c.rounds) if(c.rounds[k]) delete c.rounds[k].live;
+  state.geRounds = c.rounds; }catch(e){} })();
 function listenGE(){
   if(_geUnsub) return;
   try{
@@ -13385,7 +13401,8 @@ function listenGE(){
       const next = {};
       snap.docs.forEach(d => { next[d.id] = d.data(); });
       const same = JSON.stringify(next) === JSON.stringify(state.geRounds || {});
-      state.geRounds = next;
+      state.geRounds = next; _geLoaded = true;
+      try{ localStorage.setItem(GE_LS, JSON.stringify({ at:Date.now(), rounds:next })); }catch(e){}
       if(tickerSpeedMine != null && +((next.ticker || {}).speed) === tickerSpeedMine) tickerSpeedMine = null;
       syncTicker();
       if(!document.getElementById('main')) return;
@@ -13656,8 +13673,10 @@ function renderHomeDash(ge){
   const L = (myLayout().dash || {}).kinds || {};
   const slot = k => `${(kinds[L[k] || DASH_DEFAULT[k] || k] || kinds[k])(k)}`;
   const bigKind = ((myLayout().dash || {}).kinds || {}).ge;
-  return `<section class="feed-block feed-dash${ge || (bigKind && bigKinds[bigKind]) ? '' : ' no-ge'}"><div class="dash">
-    ${(() => { const k = ((myLayout().dash || {}).kinds || {}).ge; return k && bigKinds[k] ? bigKinds[k]() : square; })()}
+  const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), night = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
+  const waitGE = !ge && !_geLoaded && !Object.keys(state.geRounds || {}).length && vote && night && iso >= vote.start && iso <= eventLastDay(night);
+  return `<section class="feed-block feed-dash${ge || waitGE || (bigKind && bigKinds[bigKind]) ? '' : ' no-ge'}"><div class="dash">
+    ${(() => { const k = ((myLayout().dash || {}).kinds || {}).ge; return k && bigKinds[k] ? bigKinds[k]() : waitGE ? '<span class="dash-ge is-wait" data-tile="ge" aria-hidden="true"></span>' : square; })()}
     ${slot('quiz')}${slot('cal')}${slot('shop')}${slot('gal')}
   </div></section>`;
 }
@@ -14717,14 +14736,31 @@ function odoRun(root){
     setTimeout(done, 750 + cols.length * 30 + 150);
   });
 }
+const GEC_HOME_LS = '48thdb-gec-home';
 function gecHomeTeaser(en){
   const p = GEC_POLLS.ge2026, L = gecLite;
   // counted in days, as the GE2026 page counts them
   const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote);
   const left = vote ? Math.max(0, Math.round((parseYmd(eventLastDay(vote)) - parseYmd(toYmd(todayStart()))) / 864e5)) : 0;
   const poster = `<img class="gec-t-poster" src="posters/election-2026-s.jpg" alt="" loading="lazy" decoding="async">`;
-  if(!L) return `<button class="gec-teaser is-home is-wait" data-action="nav-vote">${poster}<span class="gec-t-k"><i class="gec-live"></i>${en ? 'Live Voting' : 'ยอดโหวตสด'}</span>
-    <span class="gec-t-row">${en ? 'Reading the votes…' : 'กำลังโหลดยอดโหวต…'}</span></button>`;
+  // still reading: the card in its full shape with what this phone saw last (or dashes), so nothing under it moves when the figures arrive
+  let C = null; if(!L){ try{ C = JSON.parse(localStorage.getItem(GEC_HOME_LS) || 'null'); }catch(e){} }
+  else{ try{ localStorage.setItem(GEC_HOME_LS, JSON.stringify({ sum:L.sum, n:L.n, w:L.ws ? L.ws.size : 0 })); }catch(e){} }
+  const V = L ? { sum:L.sum, n:L.n, w:L.ws ? L.ws.size : 0 } : C;
+  if(!V) return `<button class="gec-teaser is-home is-wait" data-action="nav-vote">${poster}
+    <span class="gec-t-k"><i class="gec-live"></i>${en ? 'Voting · live on the blockchain' : 'โทเคนที่โหวตแล้ว · จากบล็อกเชน'}</span>
+    <span class="gec-t-v">–</span>
+    <span class="gec-t-row">${en ? 'Reading the votes…' : 'กำลังโหลดยอดโหวต…'}</span>
+    <span class="gec-t-row">&nbsp;</span>
+    <span class="gec-t-row">${en ? `Voting closes in ${left} days · 12 Nov` : `ปิดโหวตในอีก ${left} วัน · 12 พ.ย.`}</span>
+    <span class="gec-t-go">${en ? 'All the vote figures →' : 'ดูสถิติการโหวต →'}</span></button>`;
+  if(!L) return `<button class="gec-teaser is-home is-wait" data-action="nav-vote">${poster}
+    <span class="gec-t-k"><i class="gec-live"></i>${en ? 'Voting · live on the blockchain' : 'โทเคนที่โหวตแล้ว · จากบล็อกเชน'}</span>
+    <span class="gec-t-v">${odo('h-sum', gecTok(V.sum))}</span>
+    <span class="gec-t-row"><b>${odo('h-n', gecN(V.n))}</b> ${en ? 'votes' : 'ครั้ง'}${V.w ? ` · <b>${odo('h-w', gecN(V.w))}</b> ${en ? 'wallets' : 'กระเป๋า'}` : ''}</span>
+    <span class="gec-t-row">${en ? 'Worth ฿' : 'มูลค่า'} <b class="gec-t-x">${odo('h-baht', gecTok(V.sum * gecPrice))}${en ? '' : ' บาท'}</b></span>
+    <span class="gec-t-row">${en ? `Voting closes in ${left} days · 12 Nov` : `ปิดโหวตในอีก ${left} วัน · 12 พ.ย.`}</span>
+    <span class="gec-t-go">${en ? 'All the vote figures →' : 'ดูสถิติการโหวต →'}</span></button>`;
   return `<button class="gec-teaser is-home" data-action="nav-vote">${poster}
     <span class="gec-t-k"><i class="gec-live"></i>${en ? 'Voting · live on the blockchain' : 'โทเคนที่โหวตแล้ว · จากบล็อกเชน'}</span>
     <span class="gec-t-v">${odo('h-sum', gecTok(L.sum))}</span>
@@ -27241,6 +27277,7 @@ async function init(){
     } else {
       state.account = null;
     }
+    listenGE();   // the results need nothing below; started first, the dashboard has them sooner
     state.isOwner = await checkOwner();
     // the shared list and the reader's own data do not wait on the owner-only reads below
     const sharedP = loadMembers().catch(() => null), oshiP = loadOshiData();
