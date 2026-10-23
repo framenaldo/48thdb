@@ -183,6 +183,9 @@ the Firebase CLI from the owner's machine.
   read from the channels' playlists (BNK48's ids start PLPW9IgM1jwd, CGM48's PL8aEdSGJXUm)
   and loaded when the Works page is drawn (`mediaEps`). Add a new episode there; such a
   work carries no single `yt`.
+- An event can carry more pictures to swipe through under its first: `poster.more = [{ img, w, h, th, en }]`
+  (`posterSlides`; `th`/`en` label each dot, the first by `poster.th`/`poster.en`; each opens the viewer as
+  `pm:<event>:<n>`). The card and the shop show the first only.
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
   then `node scripts/make-poster-grads.mjs` for its sheet colours.

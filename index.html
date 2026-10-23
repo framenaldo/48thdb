@@ -5090,6 +5090,18 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* The poster itself, where we have one. It is a separate file rather than
      part of the page, so it is fetched only when this sheet is opened and the
      page itself stays the size it was. */
+  .evm-slides{ margin:0 0 16px; }
+  .evm-track{ display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; border-radius:14px; }
+  .evm-track::-webkit-scrollbar{ display:none; }
+  .evm-slide{ flex:0 0 100%; scroll-snap-align:center; scroll-snap-stop:always; width:100%; }
+  .evm-slides .evm-poster{ margin:0; }
+  .evm-dots{ display:flex; justify-content:center; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .evm-dot{ display:inline-flex; align-items:center; gap:6px; height:26px; min-width:26px; padding:0 9px; border-radius:99px; border:1px solid var(--line); background:var(--card); color:var(--ink-soft); font:inherit; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 2px 0 var(--line); }
+  .evm-dot:not(:has(span)){ width:26px; padding:0; justify-content:center; }
+  .evm-dot:not(:has(span))::before{ content:''; width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.5; }
+  .evm-dot:active{ transform:translateY(2px); box-shadow:none; }
+  .evm-dot.on{ background:color-mix(in srgb, var(--poster-accent, var(--brand-a)) 16%, var(--card)); color:var(--ink); border-color:color-mix(in srgb, var(--poster-accent, var(--brand-a)) 55%, var(--line)); }
+  .evm-dot.on::before{ opacity:1; }
   .evm-poster{
     display:block; width:100%; height:auto; margin:0 0 16px;
     border-radius:14px; border:1px solid var(--line);
@@ -7123,7 +7135,9 @@ const SEED_SCHEDULE = [
         en:'Pre-orders for the special single "Kimi to Doko ka e Ikitai" open 26 Sep at 12:00' },
       { from:'2026-10-27', to:'2026-10-30', th:'ปิดพรีออเดอร์ Physical Edition 30 ต.ค. 23:00 น.',
         en:'Pre-orders for the Physical Edition close 30 Oct at 23:00' }],
-    poster:{ accent:'#5E7A3F', surface:'#F1F6EF', ink:'#2F4020', img:'posters/ge6-single-aw.jpg', w:1600, h:2000 },
+    poster:{ accent:'#5E7A3F', surface:'#F1F6EF', ink:'#2F4020', img:'posters/ge6-single-aw.jpg', w:1600, h:2000,
+      th:'ภาพสินค้า', en:'The products',
+      more:[{ img:'posters/ge6-single.jpg', w:1365, h:2048, th:'ราคาและรูปแบบ', en:'Prices & editions' }] },
     info:['พรีออเดอร์ 26 ก.ย. 12:00 – 30 ต.ค. 2026 23:00 น. ทาง iAM Shop',
       'ส่งสินค้า 30 พ.ย. 2026 เป็นต้นไป',
       'Music Code Edition ซื้อหรือแลกได้ถึง 10 พ.ย. 2026 23:00 น.'],
@@ -11240,10 +11254,12 @@ function renderPosterViewer(){
     <img class="poster-full" src="${escapeAttr(d.img)}" alt="เซ็ตลิสต์ ${escapeAttr(ev.title)} วันที่ ${+i + 1}" decoding="async">
   </div>`;
   }
-  const ev = SEED_SCHEDULE.find(e => e.id === state.posterOf);
+  let pmN = 0, pmId = state.posterOf;
+  if(String(pmId).startsWith('pm:')){ const [, eid, n] = pmId.split(':'); pmId = eid; pmN = +n || 0; }
+  const ev = SEED_SCHEDULE.find(e => e.id === pmId);
   if(!ev || !ev.poster || !ev.poster.img) return '';
   // One file for both: the poster as it was published, at its own size.
-  const full = ev.poster.img;
+  const full = pmN && ev.poster.more && ev.poster.more[pmN - 1] ? ev.poster.more[pmN - 1].img : ev.poster.img;
   return `
   <div class="poster-viewer">
     <button class="poster-close" data-action="close-poster" title="ปิด" aria-label="ปิด">
@@ -17383,6 +17399,23 @@ function schedTick(){
     });
   });
 }
+/* A poster, or several to swipe through: poster.img first, then poster.more = [{ img, w, h, th, en }] (the label shows under it).
+   Each opens the full-size viewer at its own picture (state.posterOf 'pm:<event>:<n>'). */
+document.addEventListener('scroll', e => {
+  const t = e.target; if(!t || !t.matches || !t.matches('[data-track]')) return;
+  const i = Math.round(t.scrollLeft / Math.max(1, t.clientWidth));
+  t.parentElement.querySelectorAll('.evm-dot').forEach((d, k) => d.classList.toggle('on', k === i));
+}, true);
+function posterSlides(ev){
+  const en = isEN(), p = ev.poster, list = [{ img:p.img, w:p.w, h:p.h, th:p.th, en:p.en }, ...(p.more || [])];
+  const one = (x, i) => `<button class="evm-poster-btn${list.length > 1 ? ' evm-slide' : ''}" data-action="open-poster" data-id="${i ? `pm:${ev.id}:${i}` : ev.id}"
+      title="${en ? 'View it full size' : 'ดูโปสเตอร์เต็ม'}" aria-label="${en ? 'View it full size' : 'ดูโปสเตอร์เต็ม'}">
+      <img class="evm-poster" src="${escapeAttr(x.img)}"${x.w ? ` width="${x.w}" height="${x.h}"` : ''}
+        alt="${en ? 'Poster' : 'โปสเตอร์งาน'} ${escapeAttr(ev.title)}" ${i ? 'loading="lazy"' : 'loading="lazy"'} decoding="async"></button>`;
+  if(list.length < 2) return one(list[0], 0);
+  return `<div class="evm-slides"><div class="evm-track" data-track>${list.map(one).join('')}</div>
+    <div class="evm-dots" role="tablist">${list.map((x, i) => `<button class="evm-dot${i ? '' : ' on'}" data-action="slide-to" data-i="${i}" role="tab" aria-label="${i + 1} / ${list.length}${x.th ? ' · ' + escapeAttr(en ? (x.en || x.th) : x.th) : ''}">${x.th ? `<span>${escapeHtml(en ? (x.en || x.th) : x.th)}</span>` : ''}</button>`).join('')}</div></div>`;
+}
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);
   if(!ev) return '';
@@ -17408,11 +17441,7 @@ function renderEventModal(){
         <div class="evm-layout has-media">
         <div class="evm-media">
         ${renderEventBanner(ev)}
-        ${ev.poster && ev.poster.img ? `<button class="evm-poster-btn" data-action="open-poster" data-id="${ev.id}"
-          title="ดูโปสเตอร์เต็ม" aria-label="ดูโปสเตอร์เต็ม">
-          <img class="evm-poster" src="${escapeAttr(ev.poster.img)}"${ev.poster.w ? ` width="${ev.poster.w}" height="${ev.poster.h}"` : ''}
-            alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" loading="lazy" decoding="async">
-        </button>` : ''}
+        ${ev.poster && ev.poster.img ? posterSlides(ev) : ''}
         </div>
         <div class="evm-body">
         ${ev.cancelled ? `<p class="evm-cancel" role="status">${escapeHtml(ev.cancelled)}</p>` : ''}
@@ -26462,6 +26491,7 @@ function bindDelegatedEvents(){
       leaveOverlays(); state.view = 'tag'; state.tagOf = id;
       render(); pushHistory(); window.scrollTo(0, 0);
     }
+    else if(action==='slide-to'){ const tr = btn.closest('.evm-slides').querySelector('[data-track]'); tr.scrollTo({ left:tr.clientWidth * (+btn.dataset.i), behavior:'smooth' }); }
     else if(action==='open-poster'){
       state.geClip = false; state.posterOf = id; renderMain(); pushHistory();
     }
