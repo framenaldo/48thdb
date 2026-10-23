@@ -47,10 +47,6 @@
   "light": "linear-gradient(180deg, hsl(0 70% 78%) 0%, hsl(4 69% 78%) 17%, hsl(9 49% 78%) 33%, hsl(9 42% 81%) 50%, hsl(10 60% 80%) 67%, hsl(11 41% 84%) 83%, hsl(9 45% 78%) 100%)",
   "dark": "linear-gradient(180deg, hsl(0 35% 11%) 0%, hsl(4 35% 12%) 17%, hsl(9 34% 12%) 33%, hsl(9 29% 14%) 50%, hsl(10 35% 13%) 67%, hsl(11 28% 15%) 83%, hsl(9 32% 11%) 100%)"
  },
- "posters/fame-fanmeet-1025.jpg": {
-  "light": "linear-gradient(180deg, hsl(221 23% 93%) 0%, hsl(184 20% 93%) 17%, hsl(21 32% 92%) 33%, hsl(241 9% 92%) 50%, hsl(211 34% 92%) 67%, hsl(228 21% 90%) 83%, hsl(230 27% 93%) 100%)",
-  "dark": "linear-gradient(180deg, hsl(221 16% 20%) 0%, hsl(184 14% 20%) 17%, hsl(21 22% 19%) 33%, hsl(241 6% 19%) 50%, hsl(211 24% 19%) 67%, hsl(228 15% 18%) 83%, hsl(230 19% 19%) 100%)"
- },
  "posters/ge2026-ticket-bundle.jpg": {
   "light": "linear-gradient(180deg, hsl(350 56% 79%) 0%, hsl(355 53% 79%) 17%, hsl(357 54% 79%) 33%, hsl(355 62% 79%) 50%, hsl(352 62% 78%) 67%, hsl(354 50% 78%) 83%, hsl(354 69% 78%) 100%)",
   "dark": "linear-gradient(180deg, hsl(350 35% 12%) 0%, hsl(355 35% 13%) 17%, hsl(357 35% 12%) 33%, hsl(355 35% 12%) 50%, hsl(352 35% 12%) 67%, hsl(354 35% 12%) 83%, hsl(354 35% 11%) 100%)"
@@ -59,9 +55,9 @@
   "light": "linear-gradient(180deg, hsl(359 70% 78%) 0%, hsl(26 46% 78%) 17%, hsl(9 64% 78%) 33%, hsl(12 53% 78%) 50%, hsl(11 67% 78%) 67%, hsl(15 62% 78%) 83%, hsl(25 40% 79%) 100%)",
   "dark": "linear-gradient(180deg, hsl(359 35% 11%) 0%, hsl(26 32% 12%) 17%, hsl(9 35% 11%) 33%, hsl(12 35% 11%) 50%, hsl(11 35% 11%) 67%, hsl(15 35% 11%) 83%, hsl(25 28% 13%) 100%)"
  },
- "posters/ge6-single.jpg": {
-  "light": "linear-gradient(180deg, hsl(195 23% 87%) 0%, hsl(171 14% 89%) 17%, hsl(60 12% 92%) 33%, hsl(56 24% 91%) 50%, hsl(51 43% 91%) 67%, hsl(56 48% 89%) 83%, hsl(57 26% 88%) 100%)",
-  "dark": "linear-gradient(180deg, hsl(195 16% 16%) 0%, hsl(171 10% 18%) 17%, hsl(60 8% 19%) 33%, hsl(56 17% 19%) 50%, hsl(51 30% 19%) 67%, hsl(56 34% 17%) 83%, hsl(57 18% 17%) 100%)"
+ "posters/ge6-single-aw.jpg": {
+  "light": "linear-gradient(180deg, hsl(195 35% 92%) 0%, hsl(198 17% 91%) 17%, hsl(97 6% 88%) 33%, hsl(174 12% 91%) 50%, hsl(100 12% 89%) 67%, hsl(83 10% 90%) 83%, hsl(90 24% 87%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(195 24% 19%) 0%, hsl(198 12% 19%) 17%, hsl(97 4% 17%) 33%, hsl(174 9% 19%) 50%, hsl(100 9% 17%) 67%, hsl(83 7% 18%) 83%, hsl(90 17% 17%) 100%)"
  },
  "posters/getaway-pudthailee.jpg": {
   "light": "linear-gradient(180deg, hsl(203 24% 89%) 0%, hsl(180 24% 89%) 17%, hsl(83 16% 89%) 33%, hsl(192 25% 89%) 50%, hsl(149 18% 90%) 67%, hsl(155 33% 91%) 83%, hsl(178 35% 90%) 100%)",
