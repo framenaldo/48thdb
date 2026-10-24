@@ -6851,6 +6851,28 @@ const SEED_SCHEDULE = [
       'Zone 1 โซนรับชมด้านในบริเวณกิจกรรม ถ่ายภาพได้โดยยกความสูงไม่เกินศีรษะ และไม่รบกวนผู้อื่น',
       'Zone 2 โซนสำหรับช่างภาพที่ต้องการบันทึกภาพและวีดีโอ ใช้กล้องได้ทุกชนิด และใช้อุปกรณ์เสริมได้',
       'ภาพสินค้าสำหรับการโฆษณาเท่านั้น'] },
+  // the Halloween pop-up on tour, second night in Chiang Mai (27 Oct); the stream link is the channel's live page, not printed on the posters
+  { id:'ev-cgm48-popup-halloween-ontour-1027', start:'2026-10-27', time:'18:00',
+    title:'CGM48 POP UP หลอน.. ON TOUR',
+    venue:'MUAN MORE SPACE, Chiang Mai', groups:['cgm48'],
+    members:['cgm-lewlew','cgm-jingjing','cgm-satangpound','cgm-valentine','cgm-ginna','cgm-tara'],
+    related:['ev-cgm48-popup-halloween-ontour-1020','ev-cgm48-popup-halloween-1015'],
+    poster:{ accent:'#C8141B', surface:'#F6ECEC', ink:'#3A0A0D', img:'posters/cgm48-popup-halloween-ontour-1027.jpg', w:1500, h:1500, scene:'night',
+      more:[{ img:'posters/cgm48-popup-halloween-ontour-1027-2.jpg', w:1500, h:1500, th:'เครื่องดื่มและสินค้า', en:'Drink & merch' },
+            { img:'posters/cgm48-popup-halloween-ontour-1027-3.jpg', w:1500, h:1500, th:'กติกาและผังโซน', en:'Rules & zones' }] },
+    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL/live' },
+    detail:[
+      '16:00 สินค้า MERCHANDISE เริ่มจำหน่าย',
+      '18:00 การแสดง — ถ่ายทอดสดทาง YouTube CGM48 OFFICIAL'],
+    info:[
+      'ซื้อเครื่องดื่ม 1 แก้ว พร้อมแสดงใบเสร็จ ต่อเจ้าหน้าที่หน้าประตูทางเข้า เพื่อเข้าชม CGM48 POP UP LIVE ON TOUR',
+      'สามารถนำใบเสร็จมารับเครื่องดื่มกับ Members ได้หลังจบกิจกรรม',
+      'เครื่องดื่ม POP UP LIVE ON TOUR 80 บาท',
+      'สามารถชำระได้ที่จุดซื้อสินค้า ขอสงวนสิทธิ์ชำระผ่าน QR Code เท่านั้น',
+      'ลำดับการขอรับสิทธิ์เข้าดู ท่านที่มาถึงก่อน สามารถเลือกพื้นที่ได้ตามอัธยาศัยในโซนต่าง ๆ',
+      'Zone 1 โซนรับชมด้านในบริเวณกิจกรรม ถ่ายภาพได้โดยยกความสูงไม่เกินศีรษะ และไม่รบกวนผู้อื่น',
+      'Zone 2 โซนสำหรับช่างภาพที่ต้องการบันทึกภาพและวีดีโอ ใช้กล้องได้ทุกชนิด และใช้อุปกรณ์เสริมได้',
+      'ภาพสินค้าสำหรับการโฆษณาเท่านั้น'] },
   // a press event in MBK Center's Halloween: Popper (a guest) and four BNK48 members; about an hour
   { id:'ev-mbk-haunted-graveyard-1020', start:'2026-10-20', time:'15:00', until:'16:00',
     title:'ป่าช้าสยองขวัญ',
@@ -12583,6 +12605,7 @@ const FEST_EVENT = {
   'ev-mbk-haunted-graveyard-1026': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-shock-me-girls-orientation': { word:'Shock Me Girls', sub:'SEMESTER 2 · ORIENTATION DAY', motif:'bolts', img:'logos/shock-me-girls.png' },
   'ev-cgm48-popup-halloween-ontour-1020': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
+  'ev-cgm48-popup-halloween-ontour-1027': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
 };
 function festKind(ev){
   const t = ev.title || '';
@@ -15235,7 +15258,7 @@ const EVENT_ICON = {
   'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
   'ev-getaway-pudthailee':'plane', 'ev-pancake-perfume':'sparkles', 'ev-pancake-captured':'photos',
   'ev-cgm48-popup-live-cnx':'live', 'ev-cgm48-popup-live-0924':'live', 'ev-cgm48-popup-live-0929':'live', 'ev-cgm48-popup-live-1001':'live',
-  'ev-cgm48-popup-live-1006':'live', 'ev-cgm48-popup-halloween-ontour-1020':'live',
+  'ev-cgm48-popup-live-1006':'live', 'ev-cgm48-popup-halloween-ontour-1020':'live', 'ev-cgm48-popup-halloween-ontour-1027':'live',
 };
 function eventIconName(ev){
   if(!ev) return '';
