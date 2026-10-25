@@ -7104,6 +7104,14 @@ const SEED_SCHEDULE = [
       'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpop.me',
       'จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ'],
     allMembers:true },
+  // a talk on BNK48's channel ahead of the final results: online only
+  { id:'ev-ge6-live-talk-1026', start:'2026-10-26', time:'19:00',
+    title:'BNK48 & CGM48 Live Talk', short:'Live Talk',
+    online:'YouTube BNK48 Official', groups:['bnk48','cgm48'],
+    members:['bnk-jew','bnk-palmmy','bnk-wawa','cgm-lingling','cgm-nisha','cgm-else'],
+    related:['ev-election-results','ev-concert-2026','ev-election-voting'],
+    poster:{ accent:'#8E1E2E', surface:'#F6EDE6', ink:'#2A1116', img:'posters/ge2026-live-talk-1026.jpg', w:1920, h:1080 },
+    stream:{ label:'YouTube BNK48 Official', channel:'bnk48', url:'https://www.youtube.com/@bnk48official/live' } },
   { id:'ev-election-results', start:'2026-11-14', time:'18:00',
     sales:{ from:'2026-10-15T12:00' },
     title:'BNK48 & CGM48 Senbatsu General Election 2026 · Final Results', short:'General Election 2026 Final Results',
@@ -12617,6 +12625,7 @@ const FEST_KINDS = {
 /* where the title alone would not say, or an event has its own way of putting it */
 const FEST_EVENT = {
   'ev-concert-2026':   { kind:'concert', word:'Journey of Dreams', sub:'夢の旅 · CONCERT' },
+  'ev-ge6-live-talk-1026': { word:'Live Talk', sub:'JOURNEY OF DREAMS · GE2026 FINAL RESULTS' },
   'ev-fame-fanmeet':   { word:"Fame's Airline", sub:'FANMEET · BOARDING PASS', motif:'planes' },
   'ev-hoop-bday-said': { sub:'THEATER SHOW' },
   'ev-partner-1017':   { word:'Lanna Expo 2026', sub:'JAPAN–THAILAND 140TH ANNIVERSARY' },
@@ -15274,7 +15283,7 @@ const EV_ICONS = {
 const EVENT_ICON = {
   'ev-election-voting':'token', 'ev-election-results':'trophy', 'ev-election-fanfest':'sparkles',
   'ev-ge6-single':'disc', 'ev-ge6-photoset':'photos', 'ev-ge6-handshake':'handshake',
-  'ev-ge6-myo1':'myo', 'ev-ge6-myo2':'myo', 'ev-concert-2026':'mic', 'ev-ge6-heart':'heart',
+  'ev-ge6-myo1':'myo', 'ev-ge6-myo2':'myo', 'ev-concert-2026':'mic', 'ev-ge6-live-talk-1026':'live', 'ev-ge6-heart':'heart',
   'ev-roadshow-mbk':'mic', 'ev-roadshow-fashionisland':'mic', 'ev-roadshow-0905':'mic',
   'ev-nine-charity':'mic', 'ev-charity-football-2026':'ball', 'ev-fame-fanmeet':'airplane',
   'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
