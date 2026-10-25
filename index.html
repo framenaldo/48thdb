@@ -5867,6 +5867,28 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --bg-body:#EEF4E4; --ink:#2C3626; --ink-soft:#56634F; --paper:#EEF4E8; --paper-dim:#E3EDDC; --card:#FFFFFF; --line:rgba(60,80,50,.16);
     --glass-card:rgba(255,255,255,.76); --glass-edge:rgba(60,80,50,.16); --glass-k:1; --shadow-rgb:40,60,40;
     --bg-header:rgba(236,244,250,.95); --bg-nav:rgba(255,255,255,.92); --fest-acc:#4E5A3C; color-scheme:light; }
+  /* Halloween's cobwebs and spiders live inside the cards, so they scroll with them exactly (they were
+     drawn on the screen-sized canvas and trailed the cards on a quick scroll) */
+  .fx-web, .fx-silk{ position:absolute; pointer-events:none; z-index:3; color:rgba(58,40,54,.5); }
+  :root[data-theme="dark"] .fx-web, :root[data-theme="dark"] .fx-silk{ color:rgba(238,230,242,.62); }
+  .fx-web{ width:var(--s); height:var(--s); }
+  .fx-web svg{ display:block; width:100%; height:100%; overflow:visible; }
+  .fx-web.tl{ top:0; left:0; } .fx-web.tr{ top:0; right:0; transform:scaleX(-1); }
+  .fx-web.bl{ bottom:0; left:0; transform:scaleY(-1); } .fx-web.br{ bottom:0; right:0; transform:scale(-1,-1); }
+  .fx-web .dew{ fill:#fff; opacity:.85; animation:fx-dew 4.5s ease-in-out infinite alternate; animation-delay:var(--d); }
+  @keyframes fx-dew{ from{ opacity:.35; } to{ opacity:.95; } }
+  .ev-card.fx-on{ position:relative; }
+  .ev-card.fx-hang{ z-index:2; }
+  .fx-silk{ top:100%; width:32px; margin-left:-16px; height:calc(var(--l) + 22px); overflow:hidden; transform-origin:50% 0;
+    animation:fx-swing var(--sw) ease-in-out infinite alternate; animation-delay:var(--d); }
+  .fx-silk-in{ position:absolute; inset:0; animation:fx-climb var(--cl) ease-in-out infinite alternate; animation-delay:var(--d); }
+  .fx-silk-in::before{ content:''; position:absolute; left:50%; top:0; width:1px; height:var(--l); background:currentColor; }
+  .fx-silk svg{ position:absolute; left:0; top:calc(var(--l) - 3px); width:32px; height:24px; overflow:visible; }
+  .fx-silk .legs{ transform-origin:16px 6px; animation:fx-legs .5s ease-in-out infinite alternate; }
+  @keyframes fx-swing{ from{ transform:rotate(-4deg); } to{ transform:rotate(4deg); } }
+  @keyframes fx-climb{ from{ transform:translateY(0); } to{ transform:translateY(calc(var(--l) * -.3)); } }
+  @keyframes fx-legs{ from{ transform:scaleX(.94); } to{ transform:scaleX(1.04); } }
+  @media (prefers-reduced-motion:reduce){ .fx-web .dew, .fx-silk, .fx-silk-in, .fx-silk .legs{ animation:none; } }
   :root[data-fest="halloween"]{ --fest-sky:linear-gradient(#0B0610, #170914 62%, #2A0E1C);
     --bg-body:#2A0E1C; --ink:#F2E8DD; --ink-soft:#BBA9B2; --paper:#140A12; --paper-dim:#22121E; --card:#1C0F1C; --line:rgba(255,232,214,.14);
     --glass-card:rgba(24,12,26,.78); --glass-edge:rgba(255,232,214,.14); --glass-k:.14; --shadow-rgb:0,0,0;
@@ -23000,24 +23022,9 @@ const FEST = (() => {
   function drawSnow(sy){ for(const s of flakes){ const z = 3 + 6 * s.d; b.globalAlpha = .35 + .5 * s.d; b.drawImage(NIGHT ? SP.snow : SP.snowDay, s.x - z / 2, ((s.y - sy * .05 * s.d) % (H + 16) + H + 16) % (H + 16) - 8 - z / 2, z, z); } b.globalAlpha = 1; }
 
   /* ===================== what clings to the cards ===================== */
-  /* -- Verlet bits: webs, a spider's silk, a string of lights -- */
+  /* -- Verlet bits: a string of lights (Halloween's webs and spiders are in the cards: deco) -- */
   let ropes = [];
   function link(N, a, z, k, s){ return { a, b: z, r: Math.hypot(N[z].x - N[a].x, N[z].y - N[a].y) * k, s }; }
-  function makeWeb(card, corner, S){
-    const sx = corner[1] === 'l' ? 1 : -1, sy = corner[0] === 't' ? 1 : -1, N = [], C = [];
-    const add = (x, y, pin) => { N.push({ x, y, px: x, py: y, pin }); return N.length - 1; };
-    const hub = add(sx * S * .36, sy * S * .36, false), ends = [], ds = [1, .64, .3];
-    ds.forEach(d => ends.push([sx * S * d, 0])); ends.push([0, 0]); [...ds].reverse().forEach(d => ends.push([0, sy * S * d]));
-    const spokes = [];
-    for(const [ax, ay] of ends){ const ids = [hub]; for(let k = 1; k <= 5; k++){ const t = k / 5; ids.push(add(N[hub].x + (ax - N[hub].x) * t, N[hub].y + (ay - N[hub].y) * t, k === 5)); }
-      for(let k = 0; k < 5; k++) C.push(link(N, ids[k], ids[k + 1], 1, 1)); spokes.push(ids); }
-    for(let i = 0; i < spokes.length - 1; i++) for(let k = 1; k < 5; k++) C.push(link(N, spokes[i][k], spokes[i + 1][k], 1.05, .55));
-    const dew = N.map((n, i) => i).filter(i => !N[i].pin && Math.random() < .3).map(i => ({ i, r: rnd(1, 2.1) }));
-    return { type: 'web', S, card, sx, sy, nodes: N, cons: C, dew, ph: rnd(0, 6.3), cx: 0, cy: 0, on: false, g: 140, iters: 5 };
-  }
-  function makeSilk(card, at){ const n = 14, L = rnd(70, 110), N = [];
-    for(let k = 0; k <= n; k++) N.push({ x: 0, y: L * k / n, px: 0, py: L * k / n, pin: k === 0 });
-    return { type: 'silk', card, at, nodes: N, cons: N.slice(1).map((_, k) => ({ a: k, b: k + 1, r: L / n, s: 1 })), L, ph: rnd(0, 6.3), cx: 0, cy: 0, on: false, g: 420, iters: 8 }; }
   function makeLights(card){ const w = card.offsetWidth - 28, n = 22, N = [];
     for(let k = 0; k <= n; k++) N.push({ x: w * k / n, y: 0, px: w * k / n, py: 0, pin: k === 0 || k === n });
     return { type: 'lights', card, nodes: N, cons: N.slice(1).map((_, k) => ({ a: k, b: k + 1, r: w / n * 1.012, s: 1 })), ph: rnd(0, 6.3), cx: 0, cy: 0, on: false, g: 360, iters: 10 }; }
@@ -23051,7 +23058,6 @@ const FEST = (() => {
     for(const o of ropes){ if(!o.on) continue; const N = o.nodes;
       if(o.type === 'web') for(const d of o.dew){ const n = N[d.i], x = o.cx + n.x, y = o.cy + n.y;
         f.fillStyle = NIGHT ? 'rgba(190,210,255,.22)' : 'rgba(90,100,140,.2)'; f.beginPath(); f.arc(x, y, d.r * 1.9, 0, 7); f.fill(); f.fillStyle = 'rgba(255,255,255,.85)'; f.beginPath(); f.arc(x - d.r * .2, y - d.r * .25, d.r * .55, 0, 7); f.fill(); }
-      if(o.type === 'silk'){ const e = N[N.length - 1], p = N[N.length - 2]; drawSpider(o.cx + e.x, o.cy + e.y, Math.atan2(e.x - p.x, e.y - p.y), o.ph); }
       if(o.type === 'lights'){ f.strokeStyle = 'rgba(30,60,40,.9)'; f.lineWidth = 1.2; f.beginPath(); N.forEach((n, k) => k ? f.lineTo(o.cx + n.x, o.cy + n.y) : f.moveTo(o.cx + n.x, o.cy + n.y)); f.stroke();
         if(NIGHT) f.globalCompositeOperation = 'lighter';
         for(let k = 1; k < N.length - 1; k += 2){ const n = N[k], c = BULB[(k >> 1) % BULB.length], tw = .55 + .45 * Math.sin(T * 3 + k * 1.7 + o.ph), x = o.cx + n.x, y = o.cy + n.y + 4;
@@ -23060,11 +23066,29 @@ const FEST = (() => {
         f.globalCompositeOperation = 'source-over'; } }
     f.globalAlpha = 1;
   }
-  function drawSpider(x, y, ang, ph){ f.save(); f.translate(x, y); f.rotate(-ang); f.strokeStyle = '#0A0406'; f.fillStyle = '#0A0406'; f.lineWidth = 1.3;
-    for(const side of [1, -1]) for(let k = 0; k < 4; k++){ const a0 = (-.9 + k * .55 + Math.sin(T * 6 + k + ph) * .12) * side, kx = Math.sin(a0) * 8, ky = 2 - Math.cos(a0) * 5;
-      f.beginPath(); f.moveTo(0, 2); f.quadraticCurveTo(kx, ky - 4, kx * 1.5, ky + 6); f.stroke(); }
-    f.beginPath(); f.ellipse(0, 5, 4.4, 5.6, 0, 0, 7); f.fill(); f.beginPath(); f.arc(0, -1, 2.8, 0, 7); f.fill();
-    f.fillStyle = 'rgba(232,51,60,.9)'; f.beginPath(); f.arc(-1, -1.6, .7, 0, 7); f.arc(1, -1.6, .7, 0, 7); f.fill(); f.restore(); }
+  /* the cobweb in a card's top-left corner, as the other corners see it flipped: spokes from a hub to the
+     two edges, rings between them sagging toward the hub, a few drops of dew */
+  const webCache = new Map();
+  function webHTML(corner, S, seed){
+    if(!webCache.has(S)){
+      const hub = [S * .34, S * .34], ends = [[S, 0], [S * .62, 0], [S * .28, 0], [5, 5], [0, S * .28], [0, S * .62], [0, S]];
+      const at = (e, t) => [hub[0] + (e[0] - hub[0]) * t, hub[1] + (e[1] - hub[1]) * t], f2 = v => v.toFixed(1);
+      let d = ends.map(e => `M${f2(hub[0])} ${f2(hub[1])}L${f2(e[0])} ${f2(e[1])}`).join('');
+      for(const t of [.22, .42, .62, .82]) for(let i = 0; i < ends.length - 1; i++){ const a = at(ends[i], t), b = at(ends[i + 1], t), m = at(ends[i], t * .86), n = at(ends[i + 1], t * .86);
+        d += `M${f2(a[0])} ${f2(a[1])}Q${f2((m[0] + n[0]) / 2)} ${f2((m[1] + n[1]) / 2)} ${f2(b[0])} ${f2(b[1])}`; }
+      webCache.set(S, { d, at, ends });
+    }
+    const { d, at, ends } = webCache.get(S);
+    let dew = '';
+    for(let k = 0; k < 3; k++){ const e = ends[(seed * 3 + k * 2) % ends.length], p = at(e, [.42, .62, .82][(seed + k) % 3]);
+      dew += `<circle class="dew" style="--d:-${(seed + k * 1.7) % 4.5}s" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${(1 + ((seed + k) % 3) * .4).toFixed(1)}"/>`; }
+    return `<i class="fx-web ${corner}" aria-hidden="true" style="--s:${S}px"><svg viewBox="0 0 ${S} ${S}"><path d="${d}" fill="none" stroke="currentColor" stroke-width=".85" stroke-linecap="round"/>${dew}</svg></i>`;
+  }
+  const SPIDER_SVG = '<svg viewBox="0 0 32 24"><g class="legs" fill="none" stroke="#0A0406" stroke-width="1.3" stroke-linecap="round">'
+    + [1, -1].map(s => [0, 1, 2, 3].map(k => { const a = (-.9 + k * .55) * s, kx = Math.sin(a) * 8, ky = 2 - Math.cos(a) * 5;
+        return `<path d="M16 6Q${(16 + kx).toFixed(1)} ${(ky + 0).toFixed(1)} ${(16 + kx * 1.5).toFixed(1)} ${(ky + 10).toFixed(1)}"/>`; }).join('')).join('')
+    + '</g><ellipse cx="16" cy="9" rx="4.4" ry="5.6" fill="#0A0406"/><circle cx="16" cy="3" r="2.8" fill="#0A0406"/>'
+    + '<circle cx="15" cy="2.4" r=".7" fill="rgba(232,51,60,.9)"/><circle cx="17" cy="2.4" r=".7" fill="rgba(232,51,60,.9)"/></svg>';
 
   /* -- settlers: seeds, confetti, petals, snow that fall, land on the cards' top
         edges (snow piles up), stick to the glass now and then, and are shaken
@@ -23178,9 +23202,13 @@ const FEST = (() => {
       stars: [0, .7], moon: [null, { x: .82, y: 92 }],
       sky(dt, sy){ if(NIGHT){ drawClouds(SP.cloudDusk, dt, sy, .45, .5); drawFlies(); } else drawClouds(SP.cloudDay, dt, sy, .9, .7); drawGrass(dt); } },
     halloween: { name: 'ฮาโลวีน', en: 'Halloween', word: 'ฮาโลวีนที่ 48', stars: [0, 1], moon: { x: .8, y: 96 },
-      ropes(){ const P = [['tr'], ['bl', .8], ['br'], ['tr'], ['br', .3], ['br', .55], ['tr,br']];
-        cards.forEach((c, i) => { const [cs, sp] = c.classList.contains('today-hero') ? ['tl,tr', .62] : P[i % P.length];
-          cs.split(',').forEach((k, j) => ropes.push(makeWeb(c, k, 62 + ((i * 37 + j * 53) % 34)))); if(sp) ropes.push(makeSilk(c, sp)); }); },
+      deco(list){ const P = [['tr'], ['bl', .8], ['br'], ['tr'], ['br', .3], ['br', .55], ['tr,br']];
+        list.forEach((c, i) => { if(c.querySelector(':scope > .fx-web')) return;
+          // the hero hides what pokes out of it, so it keeps its webs and lets no spider down
+          const hero = c.classList.contains('today-hero'), [cs, sp] = hero ? ['tl,tr'] : P[i % P.length];
+          let h = cs.split(',').map((k, j) => webHTML(k, 62 + ((i * 37 + j * 53) % 34), i * 7 + j)).join('');
+          if(sp){ const L = 70 + ((i * 29) % 40); h += `<i class="fx-silk" aria-hidden="true" style="left:${sp * 100}%;--l:${L}px;--sw:${(3.4 + (i % 3) * .7).toFixed(1)}s;--cl:${9 + (i % 4) * 2}s;--d:-${(i * 1.3) % 5}s"><i class="fx-silk-in">${SPIDER_SVG}</i></i>`; c.classList.add('fx-hang'); }
+          if(!hero) c.classList.add('fx-on'); c.insertAdjacentHTML('beforeend', h); }); },
       sky(dt, sy){ drawClouds(NIGHT ? SP.cloudNight : SP.cloudAsh, dt, sy, NIGHT ? 1 : .55); stepBats(dt); drawBats(b, false); },
       front(){ drawBats(f, true); } },
     ge: { name: 'คืนประกาศผล', en: 'Results night', word: 'GE2026',
@@ -23238,7 +23266,8 @@ const FEST = (() => {
     bats = []; rockets = []; sparks = []; ropes = [];
     seedSky(); seedLanterns(); seedBalloons(); seedSnow();
     paintStars(byMode(theme.stars) || 0); placeMoon(byMode(theme.moon)); b.clearRect(0, 0, W, H); f.clearRect(0, 0, W, H);
-    if(theme.ropes) theme.ropes(); stInit(theme.settle || null);
+    document.querySelectorAll('.fx-web, .fx-silk').forEach(e => e.remove()); document.querySelectorAll('.fx-on, .fx-hang').forEach(e => e.classList.remove('fx-on', 'fx-hang'));
+    if(theme.ropes) theme.ropes(); if(theme.deco) theme.deco(cards); stInit(theme.settle || null);
     if(theme.id === 'halloween'){ spawnBats(false); bats.forEach((t, i) => t.x = W * (.2 + i * .15)); }
     for(let i = 0; i < 200; i++) stepRopes();
   }
@@ -23287,7 +23316,7 @@ const FEST = (() => {
     if(slot){ const h = row(); if(slot._h !== h){ slot.innerHTML = h; slot._h = h; } if(ro && watched !== slot){ if(watched) ro.unobserve(watched); ro.observe(slot); watched = slot; } fit(); }
     const t = state.view === 'feed' && !state.query && !isOff() ? today() : null;
     const root = document.documentElement;
-    if(!t){ if(theme){ theme = null; document.querySelectorAll('#fest-cards').forEach(e => e.remove()); delete root.dataset.fest; moonEl.style.display = 'none';
+    if(!t){ if(theme){ theme = null; document.querySelectorAll('#fest-cards, .fx-web, .fx-silk').forEach(e => e.remove()); document.querySelectorAll('.fx-on, .fx-hang').forEach(e => e.classList.remove('fx-on', 'fx-hang')); delete root.dataset.fest; moonEl.style.display = 'none';
       // let go of the screen-sized canvases while away from the home page (the gallery wants the memory); sized again on return
       for(const c of [fx, bg, starsEl, grassEl]){ c.width = 0; c.height = 0; } W = 0; shownW = 0;
       root.dataset.theme = state.theme; } return; }
@@ -23311,7 +23340,7 @@ const FEST = (() => {
       const swap = new Map(cards.map((c, i) => [c, list[i]]));
       for(const o of ropes) o.card = swap.get(o.card) || o.card;
       const att = new Map(); for(const [c, rec] of ST.att) att.set(swap.get(c) || c, rec); ST.att = att;
-      cards = list; measure();
+      cards = list; measure(); if(theme.deco) theme.deco(cards);
     }
     if(held || calm) still(); else go();
   }
