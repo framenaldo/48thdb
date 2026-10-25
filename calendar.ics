@@ -685,7 +685,7 @@ DTSTART;TZID=Asia/Bangkok:20261024T170000
 DTEND;TZID=Asia/Bangkok:20261024T190000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-fame-fanmeet@48thdb
+UID:ev-fame-fanmeet-2026-10-25@48thdb
 DTSTAMP:20261025T000000Z
 SUMMARY:Fame's Airline Fanmeet
 LOCATION:The Theater Hall ชั้น C\, The Bazaar Hotel Bangkok
@@ -712,8 +712,8 @@ DESCRIPTION:เมมเบอร์: Fame\n• 13:00–15:00 ลงทะ
  s\, Inhaler\, Postcard\n• #FameFirstFanmeet #FameBNK48\n\nhttps://48thdb
  .com/event/ev-fame-fanmeet
 URL:https://48thdb.com/event/ev-fame-fanmeet
-DTSTART;VALUE=DATE:20261025
-DTEND;VALUE=DATE:20261026
+DTSTART;TZID=Asia/Bangkok:20261025T130000
+DTEND;TZID=Asia/Bangkok:20261025T200000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-nine-charity-2026-09-30@48thdb
