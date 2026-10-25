@@ -24334,43 +24334,137 @@ async function drawMemberCard(g, m, url){
   await shareFooter(g, true, url);
 }
 
-async function drawEventCard(g, ev, url){
+/* the event's share card: the sheet's own theme (its banner word, its colours), the title and place, and who is on.
+   An event with a poster keeps the poster; one without wears the colours of its kind. */
+const SHARE_PAL = {   // [top, bottom, ink, panel text]
+  rose:['#FBE3EC', '#F2C2D6', '#A3245A'], mint:['#DDF3EE', '#B9E3DA', '#1F6B62'], night:['#2B2350', '#120F26', '#F2E9FF'],
+  sun:['#FFF1D6', '#FAD3A6', '#9A4A12'], gold:['#3A2410', '#190D05', '#F6D58A'], blood:['#0B0708', '#4A060B', '#FF3A3A'],
+  sky:['#DCEEFC', '#B7D8F4', '#1F4E7A'], grape:['#EADFF7', '#CDB8EA', '#5B2E91'] };
+function shareFestTheme(ev){
+  const own = { ...(FEST_EVENT[ev.id] || {}), ...(ev.fest || {}) }, k = festKind(ev), K = { ...FEST_KINDS[k], ...own };
+  const sub = own.sub != null ? own.sub : (k === 'birthday' || k === 'tee' ? K.sub : festRelease(ev) || K.sub);
+  const hasPoster = !!(ev.poster && ev.poster.img) && !own.own;
+  return { K, k, sub, pal: SHARE_PAL[K.pal] || SHARE_PAL.grape, hasPoster };
+}
+const shareFestFont = (K, k) => K.pal === 'blood' ? '"FC Jong Pen Suk"' : k === 'roadshow' ? '"tt-ricordi-allegria", "Pacifico"' : '"Pacifico"';
+/* who is on: faces with names in rows, sized to the number; a whole-group line-up is said, not drawn */
+async function shareEventPeople(g, ev, x, y, w, maxH, ink, dark, compact){
   const en = isEN();
+  const say = (text, yy) => { g.font = '800 40px "Noto Sans Thai", sans-serif'; g.fillStyle = ink; g.textBaseline = 'alphabetic'; g.textAlign = 'center'; g.fillText(text, x + w / 2, yy); g.textAlign = 'left'; };
+  if(ev.allMembers || (ev.members || []).length > 40){
+    const gs = (ev.groups && ev.groups.length ? ev.groups : ['bnk48', 'cgm48']).map(id => getGroup(id)).filter(Boolean);
+    say(gs.length > 1 ? (en ? 'All BNK48 & CGM48 members' : 'เมมเบอร์ BNK48 และ CGM48 ทุกคน') : (en ? 'All ' + gs[0].name + ' members' : 'เมมเบอร์ ' + gs[0].name + ' ทุกคน'), y + 54);
+    if(compact) return;
+    let px = 0; const pills = gs.map(gr => { g.font = '800 30px "Noto Sans Thai", sans-serif'; return [gr, g.measureText(gr.name).width + 56]; });
+    const total = pills.reduce((t, p) => t + p[1] + 16, -16); px = x + (w - total) / 2;
+    pills.forEach(([gr, pw]) => { g.fillStyle = gr.color; shareRound(g, px, y + 82, pw, 56, 28); g.fill(); g.fillStyle = '#fff'; g.font = '800 30px "Noto Sans Thai", sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'center'; g.fillText(gr.name, px + pw / 2, y + 111); g.textAlign = 'left'; px += pw + 16; });
+    return;
+  }
+  const ms = (ev.members || []).map(getMember).filter(Boolean);
+  if(!ms.length){ if(ev.lineupTba){ say(en ? 'Line-up to be announced' : 'รอประกาศรายชื่อ', y + 54); } return; }
+  const n = ms.length, { size, perRow, rowH, rows } = sharePeopleGrid(n, w, maxH);
+  const shown = ms.slice(0, rows * perRow), more = n - shown.length;
+  const photos = await Promise.all(shown.map(m => shareLoad(m.photo)));
+  shown.forEach((m, i) => {
+    const row = Math.floor(i / perRow), inRow = Math.min(perRow, shown.length - row * perRow), col = i % perRow;
+    const gap = Math.min(40, (w - inRow * size) / Math.max(1, inRow)), rowW = inRow * size + (inRow - 1) * gap;
+    const fx = x + (w - rowW) / 2 + col * (size + gap), fy = y + row * rowH, c = (getGroup(m.groupId) || {}).color || '#888';
+    shareFace(g, m, photos[i], fx, fy, size, c);
+    g.strokeStyle = c; g.lineWidth = 6; g.beginPath(); g.arc(fx + size / 2, fy + size / 2, size / 2 + 3, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = ink; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.font = `800 ${n <= 6 ? 32 : 26}px "Noto Sans Thai", sans-serif`;
+    g.fillText(shareWrap(g, nickName(m), size + gap - 6, 1)[0] || '', fx + size / 2, fy + size + 40); g.textAlign = 'left';
+  });
+  if(more > 0){ g.font = '800 30px "Noto Sans Thai", sans-serif'; g.fillStyle = ink; g.globalAlpha = .8; g.textAlign = 'center'; g.fillText(en ? '+' + more + ' more' : '+ อีก ' + more + ' คน', x + w / 2, y + rows * rowH + 20); g.textAlign = 'left'; g.globalAlpha = 1; }
+}
+/* the biggest faces that fit the room: every one of them if it can be, else as many rows as fit with "+ n more" */
+function sharePeopleGrid(n, w, maxH){
+  let best = null;
+  for(const size of [220, 190, 160, 136, 116, 100, 88]){
+    const perRow = Math.max(1, Math.floor((w + 20) / (size + 20))), rowH = size + 62, need = Math.ceil(n / perRow);
+    best = { size, perRow, rowH, rows: Math.max(1, Math.min(need, Math.floor(maxH / rowH))) };
+    if(need * rowH <= maxH) return best;
+  }
+  return best;
+}
+const shareEventPeopleH = (ev, maxH, w = 888, compact) => {
+  if(ev.allMembers || (ev.members || []).length > 40) return compact ? 70 : 150;
+  const n = (ev.members || []).map(getMember).filter(Boolean).length; if(!n) return ev.lineupTba ? 80 : 0;
+  const L = sharePeopleGrid(n, w, maxH); return L.rows * L.rowH + (L.rows * L.perRow < n ? 40 : 0);
+};
+async function drawEventCard(g, ev, url){
+  const en = isEN(), T = shareFestTheme(ev);
   const accent = ev.poster && ev.poster.accent || ((getGroup((ev.groups || [])[0]) || {}).color) || '#1C1329';
-  g.fillStyle = shareMix(accent, .55, '#000000'); g.fillRect(0, 0, SHARE_W, SHARE_H);
-  const im = ev.poster && ev.poster.img ? await shareLoad(ev.poster.img) : null;
-  // A release's own lettering leads the panel, and the title follows it small.
-  const art = ev.logo && SONG_LOGOS[ev.logo] ? await shareLoad(SONG_LOGOS[ev.logo].png) : null;
-  const logoW = art ? 620 : 0, logoH = art ? Math.round(logoW / SONG_LOGOS[ev.logo].ratio) : 0;
-  // measure the words first
   const year = +ev.start.slice(0, 4);
   const when = `${eventDateLabel(ev)} ${en ? year : year + 543}${ev.time ? ` · ${ev.time}${en ? '' : ' น.'}` : ''}`;
-  const titleSize = art ? 38 : 54, titleStep = art ? 52 : 68;
-  g.font = `800 ${titleSize}px "Noto Sans Thai", sans-serif`;
-  const lines = shareWrap(g, ev.title, SHARE_W - 192, art ? 3 : 4);
   const place = ev.venue || ev.online || '';
-  g.font = '600 32px "Noto Sans Thai", sans-serif';
-  const placeLines = place ? shareWrap(g, place, SHARE_W - 192, 2) : [];
-  const panelH = 70 + 52 + (art ? logoH + 26 : 0) + lines.length * titleStep
-    + (placeLines.length ? 24 + placeLines.length * 46 : 0) + 56;
-  const panelBottom = SHARE_H - 170, panelTop = im ? panelBottom - panelH : Math.max(220, (SHARE_H - 170 - panelH) / 2);
-  if(im){
-    shareBlurCover(g, im, 0, 0, SHARE_W, SHARE_H, .6);
-    const box = shareContain(g, im, 90, 60, SHARE_W - 180, panelTop - 60 - 40);
-    g.save(); g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 40; shareRound(g, box.x, box.y, box.w, box.h, 26); g.fillStyle = '#000'; g.fill(); g.restore();
-    g.save(); shareRound(g, box.x, box.y, box.w, box.h, 26); g.clip(); g.drawImage(im, box.x, box.y, box.w, box.h); g.restore();
+  try{ await document.fonts.load('80px ' + shareFestFont(T.K, T.k).split(',')[0]); await document.fonts.load('800 40px "Noto Sans Thai"'); }catch(e){}
+  if(T.hasPoster){
+    // the poster, as before, with who is on in the white panel under it
+    g.fillStyle = shareMix(accent, .55, '#000000'); g.fillRect(0, 0, SHARE_W, SHARE_H);
+    const im = await shareLoad(ev.poster.img);
+    const art = null, logoW = 0, logoH = 0;   // the poster carries the release's lettering already
+    const titleSize = 44, titleStep = 54;
+    g.font = `800 ${titleSize}px "Noto Sans Thai", sans-serif`;
+    const lines = shareWrap(g, ev.title, SHARE_W - 192, art ? 2 : 3);
+    g.font = '600 30px "Noto Sans Thai", sans-serif';
+    const placeLines = place ? shareWrap(g, place, SHARE_W - 192, 1) : [];
+    const head = 48 + 52 + 16 + (art ? logoH + 20 : 0) + lines.length * titleStep + (placeLines.length ? 18 + 42 : 0);
+    const peopleMax = 150, ph = shareEventPeopleH(ev, peopleMax, SHARE_W - 192, true), panelH = head + (ph ? ph + 24 : 0) + 26;
+    const panelBottom = SHARE_H - 170, panelTop = panelBottom - panelH;
+    if(im){
+      shareBlurCover(g, im, 0, 0, SHARE_W, SHARE_H, .6);
+      const box = shareContain(g, im, 90, 56, SHARE_W - 180, panelTop - 56 - 34);
+      g.save(); g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 40; shareRound(g, box.x, box.y, box.w, box.h, 26); g.fillStyle = '#000'; g.fill(); g.restore();
+      g.save(); shareRound(g, box.x, box.y, box.w, box.h, 26); g.clip(); g.drawImage(im, box.x, box.y, box.w, box.h); g.restore();
+    }
+    g.fillStyle = '#ffffff'; shareRound(g, 48, panelTop, SHARE_W - 96, panelH, 34); g.fill();
+    let y = panelTop + 48;
+    sharePill(g, when, 96, y, accent, '#ffffff', 28); y += 52 + 16;
+    if(art){ g.drawImage(shareTint(art, accent, logoW, logoH), 96, y, logoW, logoH); y += logoH + 20; }
+    g.textBaseline = 'alphabetic'; g.fillStyle = art ? '#5B5068' : '#1C1329'; g.font = `800 ${titleSize}px "Noto Sans Thai", sans-serif`;
+    lines.forEach(l => { y += titleStep; g.fillText(l, 96, y); });
+    if(placeLines.length){ y += 18; g.font = '600 30px "Noto Sans Thai", sans-serif'; g.fillStyle = '#5B5068'; placeLines.forEach(l => { y += 42; g.fillText(l, 96, y); }); }
+    if(ph) await shareEventPeople(g, ev, 96, y + 26, SHARE_W - 192, peopleMax, '#1C1329', false, true);
+    await shareFooter(g, true, url);
+    return;
   }
-  g.fillStyle = '#ffffff'; shareRound(g, 48, panelTop, SHARE_W - 96, panelH, 34); g.fill();
-  let y = panelTop + 48;
-  sharePill(g, when, 96, y, accent, '#ffffff', 30);
-  y += 52 + 20;
-  if(art){ g.drawImage(shareTint(art, accent, logoW, logoH), 96, y, logoW, logoH); y += logoH + 26; }
-  g.textBaseline = 'alphabetic'; g.fillStyle = art ? '#5B5068' : '#1C1329';
-  g.font = `800 ${titleSize}px "Noto Sans Thai", sans-serif`;
-  lines.forEach(l => { y += titleStep; g.fillText(l, 96, y); });
-  if(placeLines.length){ y += 24; g.font = '600 32px "Noto Sans Thai", sans-serif'; g.fillStyle = '#5B5068';
-    placeLines.forEach(l => { y += 46; g.fillText(l, 96, y); }); }
-  await shareFooter(g, true, url);
+  // no poster: the kind's own colours, its word and release, a panel with the title, then who is on
+  const [pa, pb, ink] = T.pal, dark = ['night', 'gold', 'blood'].includes(T.K.pal);
+  const bg = g.createLinearGradient(0, 0, 0, SHARE_H); bg.addColorStop(0, pa); bg.addColorStop(1, pb);
+  g.fillStyle = bg; g.fillRect(0, 0, SHARE_W, SHARE_H);
+  // a scatter in the theme's ink, the same few places every time
+  g.save(); g.fillStyle = ink; g.globalAlpha = .13;
+  [[110, 130, 26], [960, 210, 18], [880, 90, 12], [170, 300, 14], [990, 420, 22], [70, 520, 16]].forEach(([cx, cy, r]) => { g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill(); });
+  g.strokeStyle = ink; g.lineWidth = 3; for(let r = 130; r < 560; r += 44){ g.globalAlpha = .06; g.beginPath(); g.arc(SHARE_W + 40, -30, r, 0, Math.PI * 2); g.stroke(); }
+  g.restore();
+  // the banner: its word (or picture) and its second line
+  let y = 120;
+  const wordImg = T.K.img ? await shareLoad(T.K.img) : null;
+  g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+  if(wordImg){ const mh = 230, sc = Math.min(mh / wordImg.height, 760 / wordImg.width); const w = wordImg.width * sc, h = wordImg.height * sc; g.drawImage(wordImg, (SHARE_W - w) / 2, y, w, h); y += h + 18; }
+  else {
+    const f = shareFestFont(T.K, T.k); let fs = 120; g.font = `${fs}px ${f}, "Noto Sans Thai", cursive`;
+    const ww = g.measureText(T.K.word).width; if(ww > 900){ fs = Math.floor(fs * 900 / ww); g.font = `${fs}px ${f}, "Noto Sans Thai", cursive`; }
+    g.fillStyle = ink; g.save(); if(!dark){ g.shadowColor = 'rgba(255,255,255,.6)'; g.shadowOffsetY = 3; } g.fillText(T.K.word, SHARE_W / 2, y + fs * .9); g.restore(); y += fs * 1.15 + 8;
+  }
+  if(T.sub){ g.font = '800 26px "Noto Sans Thai", sans-serif'; g.fillStyle = ink; g.globalAlpha = .75;
+    const sub = shareWrap(g, T.sub.split('').join(String.fromCharCode(8202)), 900, 2); sub.forEach(l => { g.fillText(l, SHARE_W / 2, y + 26); y += 38; }); g.globalAlpha = 1; y += 14; }
+  g.textAlign = 'left';
+  // the white panel
+  const px = 56, pw = SHARE_W - 112;
+  g.font = '800 54px "Noto Sans Thai", sans-serif'; const lines = shareWrap(g, ev.title, pw - 96, 3);
+  g.font = '600 32px "Noto Sans Thai", sans-serif'; const placeLines = place ? shareWrap(g, place, pw - 96, 2) : [];
+  const panelH = 40 + 52 + 22 + lines.length * 66 + (placeLines.length ? 18 + placeLines.length * 44 : 0) + 38;
+  const peopleTop = y + panelH + 40, peopleMax = SHARE_H - 170 - peopleTop, ph = shareEventPeopleH(ev, Math.max(peopleMax, 170), pw);
+  const slack = Math.max(0, peopleMax - ph), top = y + Math.min(40, slack / 2);
+  g.save(); g.shadowColor = 'rgba(0,0,0,.18)'; g.shadowBlur = 30; g.shadowOffsetY = 8; g.fillStyle = '#ffffff'; shareRound(g, px, top, pw, panelH, 34); g.fill(); g.restore();
+  let yy = top + 40;
+  sharePill(g, when, px + 40, yy, accent, '#ffffff', 28); yy += 52 + 22;
+  g.textBaseline = 'alphabetic'; g.fillStyle = '#1C1329'; g.font = '800 54px "Noto Sans Thai", sans-serif';
+  lines.forEach(l => { yy += 66; g.fillText(l, px + 40, yy - 8); });
+  if(placeLines.length){ yy += 18; g.font = '600 32px "Noto Sans Thai", sans-serif'; g.fillStyle = '#5B5068'; placeLines.forEach(l => { yy += 44; g.fillText(l, px + 40, yy - 8); }); }
+  if(ph) await shareEventPeople(g, ev, 56, top + panelH + 30, pw, Math.max(peopleMax, 170), dark ? '#ffffff' : '#1C1329', dark);
+  await shareFooter(g, dark, url);
 }
 
 async function drawSingleCard(g, s, url){
