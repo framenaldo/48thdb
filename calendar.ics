@@ -767,6 +767,17 @@ DTSTART;TZID=Asia/Bangkok:20261114T130000
 DTEND;TZID=Asia/Bangkok:20261114T150000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-ge6-live-talk-1026-2026-10-26@48thdb
+DTSTAMP:20261026T000000Z
+SUMMARY:BNK48 & CGM48 Live Talk
+LOCATION:YouTube BNK48 Official
+DESCRIPTION:เมมเบอร์: Jew\, Palmmy\, Wawa\, Lingling\, Nish
+ a\, Else\n\nhttps://48thdb.com/event/ev-ge6-live-talk-1026
+URL:https://48thdb.com/event/ev-ge6-live-talk-1026
+DTSTART;TZID=Asia/Bangkok:20261026T190000
+DTEND;TZID=Asia/Bangkok:20261026T210000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-election-results-2026-11-14@48thdb
 DTSTAMP:20261114T000000Z
 SUMMARY:BNK48 & CGM48 Senbatsu General Election 2026 · Final Results
