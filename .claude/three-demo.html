@@ -1,0 +1,39 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D viewer demo</title>
+<style>
+  :root{ color-scheme:dark; }
+  body{ margin:0; background:#120910; color:#f3e9ef; font-family:system-ui,sans-serif; }
+  .wrap{ max-width:760px; margin:0 auto; padding:16px; }
+  h1{ font-size:18px; }
+  .stage{ position:relative; border-radius:18px; overflow:hidden; background:radial-gradient(120% 90% at 50% 0,#2a0e1c,#120910); border:1px solid rgba(255,255,255,.08); aspect-ratio:16/10; }
+  canvas{ display:block; width:100%; height:100%; }
+  .bar{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  button{ background:#E4457E; color:#fff; border:0; border-radius:999px; padding:8px 14px; font-weight:800; font-size:13px; }
+  button.alt{ background:#2E8C82; }
+  .note{ font-size:12px; opacity:.7; margin-top:10px; line-height:1.5; }
+</style></head>
+<body><div class="wrap">
+<h1>48thdb · ตัวดูเวที 3D (Three.js)</h1>
+<div class="stage"><canvas id="cv"></canvas></div>
+<div class="bar">
+  <button id="rot">หยุด/หมุน</button>
+  <button class="alt" id="media">ใส่/เอาจอด้านหลังออก</button>
+</div>
+<p class="note">เวทีนี้สร้างด้วยโค้ด เป็นตัวแทนโมเดลที่จะ export จาก Unreal Engine/Blender เป็น .glb แล้วสลับเข้ามาภายหลัง จอด้านหลังคือช่องใส่ภาพ/วิดีโอที่เรนเดอร์จาก UE5</p>
+</div>
+<script type="importmap">
+{ "imports": {
+  "three": "../lib/three/three.module.min.js",
+  "three/addons/": "../lib/three/jsm/"
+} }
+</script>
+<script type="module">
+import { createStageViewer } from '../lib/three/viewer.js';
+const v = createStageViewer(document.getElementById('cv'), { accent:'#E4457E', teal:'#2E8C82', night:true });
+let rot = true, media = false;
+document.getElementById('rot').onclick = () => { rot = !rot; v.setAutoRotate(rot); };
+document.getElementById('media').onclick = () => { media = !media; v.setMedia(media ? 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%23E4457E"/><stop offset="1" stop-color="%232E8C82"/></linearGradient></defs><rect width="640" height="360" fill="url(%23g)"/><text x="320" y="190" font-family="sans-serif" font-size="48" font-weight="900" fill="white" text-anchor="middle">UE5 RENDER</text></svg>`.replace(/%23/g,'#')) : null); };
+window.__ready = true;
+</script>
+</body></html>
