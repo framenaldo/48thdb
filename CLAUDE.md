@@ -183,6 +183,11 @@ the Firebase CLI from the owner's machine.
   read from the channels' playlists (BNK48's ids start PLPW9IgM1jwd, CGM48's PL8aEdSGJXUm)
   and loaded when the Works page is drawn (`mediaEps`). Add a new episode there; such a
   work carries no single `yt`.
+- Who is on, wherever it is shown, is a photo tile with her name over it (`rotaTile`, `rt-f`); a tap lights her in every
+  round of that block and a second tap opens her page (`rota-hl`). An event with rounds of several kinds and/or days
+  carries `rota: { day?, head, where, kinds:[{k,th,en,c}], rounds:[{d?,k,n,a,b,ids}] }` (`renderRota`: day pills when the
+  rounds span days, tabs by kind and "โอชิฉัน", rounds past or on now marked by the clock) — the Busking day and the
+  Haunted Graveyard. A roadshow's `lineup` and a booth's `slots` keep their own tables but draw the same tiles.
 - An event can carry more pictures to swipe through under its first: `poster.more = [{ img, w, h, th, en }]`
   (`posterSlides`; `th`/`en` label each dot, the first by `poster.th`/`poster.en`; each opens the viewer as
   `pm:<event>:<n>`). The card and the shop show the first only.

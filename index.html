@@ -2324,7 +2324,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .es-what{ min-width:0; font-size:14px; line-height:1.5; color:var(--ink); }
   .es-st{ display:flex; align-items:center; gap:6px; margin-top:3px; font-size:12px; font-weight:800; color:color-mix(in srgb, var(--c) 72%, var(--ink)); }
   .es-st:empty{ display:none; }
-  .rota{ margin:0 0 6px; }
+  .rt-box{ margin:0 0 6px; }
   .rt-where{ font-size:12px; font-weight:700; color:var(--ink-soft); margin-left:6px; }
   .rt-tabs{ display:flex; gap:6px; overflow-x:auto; padding:2px 1px 8px; scrollbar-width:none; }
   .rt-tabs::-webkit-scrollbar{ display:none; }
@@ -2347,7 +2347,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-f::after{ content:''; position:absolute; inset:auto 0 0; height:46%; background:linear-gradient(to top, rgba(0,0,0,.72), transparent); }
   .rt-f span{ position:absolute; z-index:1; left:3px; right:3px; bottom:4px; font-size:10px; font-weight:800; line-height:1.1; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-shadow:0 1px 2px rgba(0,0,0,.6); }
   .rt-f.is-oshi{ outline:2.5px solid #FFC83D; outline-offset:-2.5px; }
-  .rota.has-hl .rt-f{ opacity:.25; transition:opacity .15s; } .rota.has-hl .rt-f.hl{ opacity:1; outline:3px solid #FFC83D; outline-offset:-3px; }
+  [data-rota].has-hl .rt-f{ opacity:.25; transition:opacity .15s; } [data-rota].has-hl .rt-f.hl{ opacity:1; outline:3px solid #FFC83D; outline-offset:-3px; }
+  .rt-g .rt-f{ min-width:0; } .slot-who .rt-g, .rota-who .rt-g, .es-who .rt-g, .es-gwho .rt-g{ width:100%; }
+  .rt-days{ display:flex; gap:6px; overflow-x:auto; padding:0 1px 8px; scrollbar-width:none; } .rt-days::-webkit-scrollbar{ display:none; }
+  .rt-day{ flex:none; display:flex; flex-direction:column; align-items:center; min-width:54px; padding:5px 10px; border-radius:12px; border:1px solid var(--line); background:var(--card); font:inherit; font-size:15px; font-weight:800; color:var(--ink); line-height:1.15; box-shadow:0 2px 0 var(--line); cursor:pointer; }
+  .rt-day small{ font-size:11px; font-weight:700; color:var(--ink-soft); } .rt-day.on{ background:var(--ink); border-color:var(--ink); color:var(--paper); } .rt-day.on small{ color:inherit; opacity:.8; }
   .es-row.has-tone{ box-shadow:inset 4px 0 0 var(--rt); }
   .es-kind{ display:inline-block; padding:1px 10px; margin-right:4px; border-radius:99px; font-size:13px; font-weight:800; white-space:nowrap; color:#fff; background:var(--rt); }
   .es-row.has-tone.is-done .es-kind{ filter:saturate(.5); }
@@ -7631,20 +7635,33 @@ const SEED_SCHEDULE = [
       '16:00–17:00 รอบที่ 1',
       '17:15–18:15 รอบที่ 2',
       '18:30–19:30 รอบที่ 3'],
-    // the two schedule posters: each round has a haunted-house group and a Hachi Cha (drinks) group, four members each
-    lineup:{
-      '2026-10-26':{ 'รอบที่ 1':{ 'เข้าบ้านผี':['bnk-janry','bnk-blythe','cgm-lookked','cgm-nana'], 'ขายน้ำ Hachi Cha':['bnk-marine','bnk-wawa','bnk-sindy','cgm-prae'] },
-        'รอบที่ 2':{ 'เข้าบ้านผี':['bnk-marine','bnk-wawa','bnk-inkcha','cgm-prae'], 'ขายน้ำ Hachi Cha':['bnk-janry','bnk-blythe','bnk-emmy','bnk-khowjow'] },
-        'รอบที่ 3':{ 'เข้าบ้านผี':['bnk-mayji','bnk-marine','bnk-emmy','bnk-khowjow'], 'ขายน้ำ Hachi Cha':['cgm-nana','cgm-lookked','bnk-inkcha','bnk-l'] } },
-      '2026-10-27':{ 'รอบที่ 1':{ 'เข้าบ้านผี':['bnk-hoop','bnk-palmmy','cgm-else','cgm-punpon'], 'ขายน้ำ Hachi Cha':['bnk-saonoi','bnk-yoghurt','bnk-sindy','bnk-neen'] },
-        'รอบที่ 2':{ 'เข้าบ้านผี':['bnk-saonoi','bnk-yoghurt','bnk-praew','bnk-berry'], 'ขายน้ำ Hachi Cha':['cgm-else','cgm-punpon','bnk-mayji','bnk-palmmy'] },
-        'รอบที่ 3':{ 'เข้าบ้านผี':['bnk-khaimook','bnk-neen','bnk-mayji','bnk-palmmy'], 'ขายน้ำ Hachi Cha':['bnk-nammonn','bnk-l','bnk-praew','bnk-berry'] } },
-      '2026-10-28':{ 'รอบที่ 1':{ 'เข้าบ้านผี':['bnk-cartoon','bnk-mint','bnk-grape','bnk-micha'], 'ขายน้ำ Hachi Cha':['bnk-luksorn','bnk-arlee','bnk-rose','bnk-nall'] },
-        'รอบที่ 2':{ 'เข้าบ้านผี':['bnk-luksorn','bnk-arlee','bnk-jew','bnk-patt'], 'ขายน้ำ Hachi Cha':['bnk-cartoon','bnk-mint','bnk-galeya','bnk-niya'] },
-        'รอบที่ 3':{ 'เข้าบ้านผี':['bnk-rose','bnk-nall','bnk-galeya','bnk-niya'], 'ขายน้ำ Hachi Cha':['bnk-grape','bnk-micha','bnk-jew','bnk-patt'] } },
-      '2026-10-29':{ 'รอบที่ 1':{ 'เข้าบ้านผี':['cgm-hongyok','cgm-nisha','cgm-kwan','cgm-emma'], 'ขายน้ำ Hachi Cha':['cgm-lingling','bnk-hoop','bnk-proud','bnk-khaimook'] },
-        'รอบที่ 2':{ 'เข้าบ้านผี':['cgm-lingling','bnk-hoop','bnk-pancake','bnk-fame'], 'ขายน้ำ Hachi Cha':['cgm-kwan','cgm-emma','bnk-mirin','bnk-mail'] },
-        'รอบที่ 3':{ 'เข้าบ้านผี':['bnk-proud','bnk-khaimook','bnk-mirin','bnk-mail'], 'ขายน้ำ Hachi Cha':['cgm-hongyok','cgm-nisha','bnk-pancake','bnk-fame'] } } },
+    rota:{ head:'ตารางเมมเบอร์', where:'MBK Center',
+      kinds:[{ k:'gh', th:'เข้าบ้านผี', en:'Haunted house', c:'#8E5BD0' }, { k:'hc', th:'ขายน้ำ Hachi Cha', en:'Hachi Cha drinks', c:'#2E8C82' }],
+      rounds:[
+      { d:'2026-10-26', k:'gh', n:1, a:'16:00', b:'17:00', ids:['bnk-janry','bnk-blythe','cgm-lookked','cgm-nana'] },
+      { d:'2026-10-26', k:'hc', n:1, a:'16:00', b:'17:00', ids:['bnk-marine','bnk-wawa','bnk-sindy','cgm-prae'] },
+      { d:'2026-10-26', k:'gh', n:2, a:'17:15', b:'18:15', ids:['bnk-marine','bnk-wawa','bnk-inkcha','cgm-prae'] },
+      { d:'2026-10-26', k:'hc', n:2, a:'17:15', b:'18:15', ids:['bnk-janry','bnk-blythe','bnk-emmy','bnk-khowjow'] },
+      { d:'2026-10-26', k:'gh', n:3, a:'18:30', b:'19:30', ids:['bnk-mayji','bnk-marine','bnk-emmy','bnk-khowjow'] },
+      { d:'2026-10-26', k:'hc', n:3, a:'18:30', b:'19:30', ids:['cgm-nana','cgm-lookked','bnk-inkcha','bnk-l'] },
+      { d:'2026-10-27', k:'gh', n:1, a:'16:00', b:'17:00', ids:['bnk-hoop','bnk-palmmy','cgm-else','cgm-punpon'] },
+      { d:'2026-10-27', k:'hc', n:1, a:'16:00', b:'17:00', ids:['bnk-saonoi','bnk-yoghurt','bnk-sindy','bnk-neen'] },
+      { d:'2026-10-27', k:'gh', n:2, a:'17:15', b:'18:15', ids:['bnk-saonoi','bnk-yoghurt','bnk-praew','bnk-berry'] },
+      { d:'2026-10-27', k:'hc', n:2, a:'17:15', b:'18:15', ids:['cgm-else','cgm-punpon','bnk-mayji','bnk-palmmy'] },
+      { d:'2026-10-27', k:'gh', n:3, a:'18:30', b:'19:30', ids:['bnk-khaimook','bnk-neen','bnk-mayji','bnk-palmmy'] },
+      { d:'2026-10-27', k:'hc', n:3, a:'18:30', b:'19:30', ids:['bnk-nammonn','bnk-l','bnk-praew','bnk-berry'] },
+      { d:'2026-10-28', k:'gh', n:1, a:'16:00', b:'17:00', ids:['bnk-cartoon','bnk-mint','bnk-grape','bnk-micha'] },
+      { d:'2026-10-28', k:'hc', n:1, a:'16:00', b:'17:00', ids:['bnk-luksorn','bnk-arlee','bnk-rose','bnk-nall'] },
+      { d:'2026-10-28', k:'gh', n:2, a:'17:15', b:'18:15', ids:['bnk-luksorn','bnk-arlee','bnk-jew','bnk-patt'] },
+      { d:'2026-10-28', k:'hc', n:2, a:'17:15', b:'18:15', ids:['bnk-cartoon','bnk-mint','bnk-galeya','bnk-niya'] },
+      { d:'2026-10-28', k:'gh', n:3, a:'18:30', b:'19:30', ids:['bnk-rose','bnk-nall','bnk-galeya','bnk-niya'] },
+      { d:'2026-10-28', k:'hc', n:3, a:'18:30', b:'19:30', ids:['bnk-grape','bnk-micha','bnk-jew','bnk-patt'] },
+      { d:'2026-10-29', k:'gh', n:1, a:'16:00', b:'17:00', ids:['cgm-hongyok','cgm-nisha','cgm-kwan','cgm-emma'] },
+      { d:'2026-10-29', k:'hc', n:1, a:'16:00', b:'17:00', ids:['cgm-lingling','bnk-hoop','bnk-proud','bnk-khaimook'] },
+      { d:'2026-10-29', k:'gh', n:2, a:'17:15', b:'18:15', ids:['cgm-lingling','bnk-hoop','bnk-pancake','bnk-fame'] },
+      { d:'2026-10-29', k:'hc', n:2, a:'17:15', b:'18:15', ids:['cgm-kwan','cgm-emma','bnk-mirin','bnk-mail'] },
+      { d:'2026-10-29', k:'gh', n:3, a:'18:30', b:'19:30', ids:['bnk-proud','bnk-khaimook','bnk-mirin','bnk-mail'] },
+      { d:'2026-10-29', k:'hc', n:3, a:'18:30', b:'19:30', ids:['cgm-hongyok','cgm-nisha','bnk-pancake','bnk-fame'] }] },
     info:[
       'จำหน่ายบัตรรอบพิเศษ 200 บาท',
       'ตารางสมาชิกตามโปสเตอร์ Member Schedule และ Hachi Cha Schedule แต่ละรอบมีสมาชิก 4 คนต่อกลุ่ม'] },
@@ -12786,11 +12803,7 @@ function renderSlotTable(ev){
     const [, mo, d] = s.date.split('-').map(Number);
     const done = slotTime(s.date, s.until) <= now;
     const on = !done && slotTime(s.date, s.time) <= now;
-    const who = s.members.map(getMember).filter(Boolean).map(m => {
-      const g = getGroup(m.groupId);
-      return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
-        data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span></button>`;
-    }).join('');
+    const who = rotaTiles(s.members);
     return `<div class="slot-row${s.date === iso ? ' is-today' : ''}${done ? ' is-done' : ''}${on ? ' is-on' : ''}">
       <div class="slot-when"><span class="slot-date">${d} ${M[mo-1]}</span><span class="slot-time">${s.time}–${s.until}</span>
         ${on ? '<span class="slot-now">ตอนนี้</span>' : s.date === iso && !done ? '<span class="slot-now">วันนี้</span>' : ''}</div>
@@ -12800,7 +12813,7 @@ function renderSlotTable(ev){
   const sorted = ev.slots.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   const head = `<h3 class="evm-head">${ev.online ? 'ตารางรอบของสมาชิก' : 'ตารางสมาชิกประจำบูธ'}</h3>`;
   const dates = [...new Set(sorted.map(s => s.date))];
-  if(sorted.length <= 12 || dates.length < 2) return `${head}<div class="slot-table">${sorted.map(row).join('')}</div>`;
+  if(sorted.length <= 12 || dates.length < 2) return `${head}<div class="slot-table" data-rota>${sorted.map(row).join('')}</div>`;
   // a long rota goes a day at a time as a table of its own, opening on today
   // or the next day with turns; a gap longer than the usual changeover is a break
   const en = isEN();
@@ -12811,11 +12824,7 @@ function renderSlotTable(ev){
   const cell = s => {
     const done = slotTime(s.date, s.until) <= now;
     const on = !done && slotTime(s.date, s.time) <= now;
-    const who = s.members.map(getMember).filter(Boolean).map(m => {
-      const g = getGroup(m.groupId);
-      return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
-        data-action="open-member" data-id="${m.id}">${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span></button>`;
-    }).join('');
+    const who = rotaTiles(s.members);
     return `<div class="rota-row${done ? ' is-done' : ''}${on ? ' is-on' : ''}">
       <span class="rota-t">${s.time}<small>–${s.until}</small></span>
       <span class="rota-who">${who}${on ? '<span class="slot-now">ตอนนี้</span>' : ''}</span></div>`;
@@ -12826,9 +12835,9 @@ function renderSlotTable(ev){
       ${list.map((s, i) => (i && mins(s.time) - mins(list[i - 1].until) > 5
         ? `<div class="rota-break"><b>พัก</b><span>${list[i - 1].until}–${s.time}</span></div>` : '') + cell(s)).join('')}
     </div>`; };
-  return `${head}<div class="feed-scope slot-days" role="tablist">${dates.map(d =>
+  return `${head}<div data-rota><div class="feed-scope slot-days" role="tablist">${dates.map(d =>
       `<button class="scope-btn${d === pick ? ' is-on' : ''}" role="tab" data-action="slot-day" data-value="${d}">${dayName(d)}</button>`).join('')}</div>
-    ${dates.map(table).join('')}`;
+    ${dates.map(table).join('')}</div>`;
 }
 
 /* A page of its own for a campaign that runs for months: the dates down the
@@ -17406,22 +17415,31 @@ function renderSetlist(ev, head){
 
 /* ev.rota: who is at each stand, round by round — tabs by kind, a tile for each member (her photo, her name over it),
    a tap on a face lights her in every round. { day, where, kinds:[{k,th,en,c}], rounds:[{k,n,a,b,ids}] } */
+const rotaTile = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
+  return `<button class="rt-f${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}">${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}<span data-noloc>${escapeHtml(nickName(m))}</span></button>`; };
+const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.day;
+  root.querySelectorAll('.rt-row').forEach(r => { r.hidden = !((!d || r.dataset.d === d) && (k === 'all' || r.dataset.k === k || (k === 'oshi' && r.dataset.oshi === '1'))); }); };
+const rotaTiles = ids => `<div class="rt-g">${ids.map(rotaTile).join('')}</div>`;
 function renderRota(ev){
   const R = ev.rota, en = isEN(), iso = toYmd(todayStart()), now = Date.now();
-  const at = hm => { const d = parseYmd(R.day); const [h, m] = hm.split(':').map(Number); d.setHours(h, m, 0, 0); return d.getTime(); };
+  const days = [...new Set(R.rounds.map(r => r.d || R.day))].sort(), pick = days.includes(iso) ? iso : days.find(d => d > iso) || days[0];
+  const at = (hm, day) => { const d = parseYmd(day); const [h, m] = hm.split(':').map(Number); d.setHours(h, m, 0, 0); return d.getTime(); };
   const kind = k => R.kinds.find(x => x.k === k), mine = state.oshi || [];
-  const tile = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
-    return `<button class="rt-f${mine.includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}">${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}<span data-noloc>${escapeHtml(nickName(m))}</span></button>`; };
-  const rows = R.rounds.map(r => { const K = kind(r.k), done = R.day < iso || (R.day === iso && at(r.b) <= now), on = R.day === iso && !done && at(r.a) <= now;
-    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-k="${r.k}" data-oshi="${r.ids.some(i => mine.includes(i)) ? 1 : 0}" style="--b:${K.c}">
+  const tile = rotaTile;
+  const rows = R.rounds.map(r => { const K = kind(r.k), D = r.d || R.day, done = D < iso || (D === iso && at(r.b, D) <= now), on = D === iso && !done && at(r.a, D) <= now;
+    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${r.d || R.day}" data-k="${r.k}" data-oshi="${r.ids.some(i => mine.includes(i)) ? 1 : 0}" style="--b:${K.c}">
       <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${en ? 'Round' : 'รอบที่'} ${r.n}</small>${on ? `<em>${en ? 'on now' : 'กำลังจัด'}</em>` : done ? `<em>${en ? 'over' : 'จบแล้ว'}</em>` : ''}</div>
       <div class="rt-g">${r.ids.map(tile).join('')}</div></div>`; }).join('');
+  const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  const dayPills = days.length > 1 ? `<div class="rt-days" role="tablist">${days.map(d => { const x = parseYmd(d); return `<button class="rt-day${d === pick ? ' on' : ''}" data-action="rota-day" data-id="${d}"><small>${WD[x.getDay()]}</small>${x.getDate()} ${M[x.getMonth()]}</button>`; }).join('')}</div>` : '';
   const tab = (k, label, c) => `<button class="rt-tab${k === 'all' ? ' on' : ''}" data-action="rota-tab" data-id="${k}"${c ? ` style="--b:${c}"` : ''}>${label}</button>`;
+  const rowsHtml = rows.replace(/<div class="rt-row([^"]*)" data-d="([^"]+)"/g, (m, c, d) => d === pick ? m : `<div class="rt-row${c}" hidden data-d="${d}"`);
   return `<h3 class="evm-head">${en ? 'Member schedule' : R.head}${R.where ? ` <small class="rt-where">${escapeHtml(R.where)}</small>` : ''}</h3>
-    <div class="rota" data-rota>
+    <div class="rt-box" data-rota data-day="${pick}">
+      ${dayPills}
       <div class="rt-tabs" role="tablist">${tab('all', en ? 'All' : 'ทั้งหมด')}${R.kinds.map(K => tab(K.k, en ? K.en : K.th, K.c)).join('')}${mine.length ? tab('oshi', en ? 'My oshi' : 'โอชิฉัน', '#E4457E') : ''}</div>
       <p class="rt-hint">${en ? 'Tap a face to see every round she is in' : 'แตะหน้าเมมเบอร์เพื่อดูทุกรอบที่เธออยู่'}</p>
-      <div class="rt-list">${rows}</div></div>`;
+      <div class="rt-list">${rowsHtml}</div></div>`;
 }
 /* a row's activity in its own colour (ev.tones = [{ m:'Group Hi-Touch', c:'#E4457E' }]): the name as a chip, the round after it */
 const esTone = (ev, what) => (ev.tones || []).find(t => what.startsWith(t.m)) || null;
@@ -17455,8 +17473,7 @@ function renderSchedule(ev){
   const LU = ev.lineup, luDays = LU ? Object.keys(LU).sort() : [];
   const luOn = luDays.includes(iso) ? iso : luDays.find(d => d > iso) || luDays[0];
   const M = monthsShort(), luLabel = d => { const x = parseYmd(d); return `${x.getDate()} ${M[x.getMonth()]}`; };
-  const luFaces = ids => ids.map(getMember).filter(Boolean).map(m => { const g = getGroup(m.groupId);
-    return `<button class="ev-person${state.oshi.includes(m.id) ? ' is-oshi' : ''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(nickName(m))}</span></button>`; }).join('');
+  const luFaces = ids => ids.some(i => getMember(i)) ? rotaTiles(ids) : '';
   // a part's value is a list of ids, or { label: ids } when it has groups (the Haunted Graveyard: the ghost house, and the drinks stand)
   const LU_GRP = { 'เข้าบ้านผี':['เข้าบ้านผี', 'Haunted house', 'ghost'], 'ขายน้ำ Hachi Cha':['ขายน้ำ Hachi Cha', 'Hachi Cha drinks', 'tea'], 'Hachi Cha':['Hachi Cha', 'Hachi Cha', 'tea'], 'Merchandise':['Merchandise', 'Merchandise', 'ghost'] };
   const luWho = what => luDays.map(d => {
@@ -17471,7 +17488,7 @@ function renderSchedule(ev){
   const luPills = luDays.length > 1 ? `<div class="sl-days es-days" role="tablist">${luDays.map(d => { const x = parseYmd(d);
     return `<button class="sl-day${d === luOn ? ' is-on' : ''}" data-action="es-day" data-value="${d}" role="tab" aria-selected="${d === luOn}">${luLabel(d)}<small>${
       d === iso ? (en ? 'Today' : 'วันนี้') : (en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'])[x.getDay()]}</small></button>`; }).join('')}</div>` : '';
-  const flushBox = () => { if(box){ out += `${luPills}<div class="es-box">${box}</div>`; box = ''; } };
+  const flushBox = () => { if(box){ out += `${luPills}<div class="es-box" data-rota>${box}</div>`; box = ''; } };
   const flushNotes = () => { if(notes){ out += `<ul class="ev-detail">${notes}</ul>`; notes = ''; } };
   for(const r of items){
     if(r.note){ flushBox(); notes += `<li>${escapeHtml(r.note)}</li>`; continue; }
@@ -26727,9 +26744,12 @@ function bindDelegatedEvents(){
     }
     else if(action==='rota-tab'){ const root = el.closest('[data-rota]'), k = el.dataset.id;
       root.querySelectorAll('.rt-tab').forEach(x => x.classList.toggle('on', x === el));
-      root.querySelectorAll('.rt-row').forEach(r => { r.hidden = !(k === 'all' || r.dataset.k === k || (k === 'oshi' && r.dataset.oshi === '1')); }); }
-    else if(action==='rota-hl'){ const root = el.closest('[data-rota]'), same = root.dataset.hl === id; root.dataset.hl = same ? '' : id;
-      root.classList.toggle('has-hl', !same); root.querySelectorAll('.rt-f').forEach(x => x.classList.toggle('hl', !same && x.dataset.id === id)); }
+      root.dataset.k = k; rotaShow(root); }
+    else if(action==='rota-day'){ const root = el.closest('[data-rota]'); root.dataset.day = id; root.querySelectorAll('.rt-day').forEach(x => x.classList.toggle('on', x === el)); rotaShow(root); }
+    else if(action==='rota-hl'){ const root = el.closest('[data-rota]'), same = root.dataset.hl === id;
+      if(same){ root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.rt-f.hl').forEach(x => x.classList.remove('hl')); el.dataset.action = 'open-member'; el.click(); el.dataset.action = 'rota-hl'; return; }
+      root.dataset.hl = id;
+      root.classList.add('has-hl'); root.querySelectorAll('.rt-f').forEach(x => x.classList.toggle('hl', x.dataset.id === id)); }
     else if(action==='slide-to'){ const tr = el.closest('.evm-slides').querySelector('[data-track]'); tr.scrollTo({ left:tr.clientWidth * (+el.dataset.i), behavior:'smooth' }); }
     else if(action==='open-poster'){
       state.geClip = false; state.posterOf = id; renderMain(); pushHistory();
