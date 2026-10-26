@@ -2324,6 +2324,30 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .es-what{ min-width:0; font-size:14px; line-height:1.5; color:var(--ink); }
   .es-st{ display:flex; align-items:center; gap:6px; margin-top:3px; font-size:12px; font-weight:800; color:color-mix(in srgb, var(--c) 72%, var(--ink)); }
   .es-st:empty{ display:none; }
+  .rota{ margin:0 0 6px; }
+  .rt-where{ font-size:12px; font-weight:700; color:var(--ink-soft); margin-left:6px; }
+  .rt-tabs{ display:flex; gap:6px; overflow-x:auto; padding:2px 1px 8px; scrollbar-width:none; }
+  .rt-tabs::-webkit-scrollbar{ display:none; }
+  .rt-tab{ flex:none; padding:7px 13px; border-radius:99px; border:1px solid var(--line); background:var(--card); font:inherit; font-size:13px; font-weight:800; color:var(--ink); box-shadow:0 2px 0 var(--line); cursor:pointer; }
+  .rt-tab:active{ transform:translateY(2px); box-shadow:none; }
+  .rt-tab.on{ background:var(--b, var(--ink)); border-color:var(--b, var(--ink)); color:#fff; }
+  .rt-tab.on:not([style]){ color:var(--paper); }
+  .rt-hint{ margin:0 0 8px; font-size:12px; color:var(--ink-soft); }
+  .rt-row{ margin:0 0 8px; padding:9px 10px 10px; border-radius:14px; background:var(--card); border:1px solid var(--line); border-left:5px solid var(--b); }
+  .rt-row[hidden]{ display:none; }
+  .rt-h{ display:flex; align-items:center; flex-wrap:wrap; gap:4px 8px; margin:0 0 8px; }
+  .rt-h b{ font-size:15px; font-variant-numeric:tabular-nums; }
+  .rt-kind{ padding:1px 9px; border-radius:99px; background:var(--b); color:#fff; font-size:12px; font-weight:800; }
+  .rt-h small{ font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .rt-h em{ margin-left:auto; font-style:normal; font-size:12px; font-weight:800; color:var(--b); }
+  .rt-row.is-done{ opacity:.55; } .rt-row.is-now{ box-shadow:0 0 0 2px var(--b); }
+  .rt-g{ display:grid; grid-template-columns:repeat(auto-fill, minmax(52px, 1fr)); gap:5px; }
+  .rt-f{ position:relative; aspect-ratio:4 / 5; padding:0; border:0; border-radius:11px; overflow:hidden; cursor:pointer; background:var(--c); font:inherit; color:#fff; box-shadow:inset 0 -3px 0 var(--c); -webkit-tap-highlight-color:transparent; }
+  .rt-f img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 18%; }
+  .rt-f::after{ content:''; position:absolute; inset:auto 0 0; height:46%; background:linear-gradient(to top, rgba(0,0,0,.72), transparent); }
+  .rt-f span{ position:absolute; z-index:1; left:3px; right:3px; bottom:4px; font-size:10px; font-weight:800; line-height:1.1; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-shadow:0 1px 2px rgba(0,0,0,.6); }
+  .rt-f.is-oshi{ outline:2.5px solid #FFC83D; outline-offset:-2.5px; }
+  .rota.has-hl .rt-f{ opacity:.25; transition:opacity .15s; } .rota.has-hl .rt-f.hl{ opacity:1; outline:3px solid #FFC83D; outline-offset:-3px; }
   .es-row.has-tone{ box-shadow:inset 4px 0 0 var(--rt); }
   .es-kind{ display:inline-block; padding:1px 10px; margin-right:4px; border-radius:99px; font-size:13px; font-weight:800; white-space:nowrap; color:#fff; background:var(--rt); }
   .es-row.has-tone.is-done .es-kind{ filter:saturate(.5); }
@@ -7476,20 +7500,27 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#52493A', surface:'#EEF3F8', ink:'#34321F', img:'posters/kimi-busking-1030.jpg', w:1500, h:1500, th:'โปสเตอร์', en:'Poster',
       more:[{ img:'posters/kimi-busking-1030-members.jpg', w:1500, h:2000, th:'ตารางเมมเบอร์', en:'Member schedule' }] },
     detail:[
-      '12:00–13:00 Hachi Cha & Merchandise รอบที่ 1',
-      '13:00–14:00 Hachi Cha & Merchandise รอบที่ 2',
-      '13:00–14:00 Group Hi-Touch รอบที่ 1',
-      '14:00–15:00 Hachi Cha & Merchandise รอบที่ 3',
-      '14:30–15:30 Group Hi-Touch รอบที่ 2',
-      '15:00–16:00 Hachi Cha & Merchandise รอบที่ 4',
-      '16:00–17:00 Hachi Cha & Merchandise รอบที่ 5',
-      '16:00–17:00 Group Hi-Touch รอบที่ 3',
+      '12:00–17:00 Group Hi-Touch, Hachi Cha & Merchandise (ตารางเมมเบอร์ด้านล่าง)',
       '14:00 เปิดลงทะเบียนสำหรับผู้ได้รับสิทธิ์',
       '17:30 เริ่มรันคิวสำหรับผู้ได้รับสิทธิ์',
       '18:00 เริ่มเปิดให้เข้าพื้นที่สำหรับผู้ได้รับสิทธิ์',
       '19:00 เริ่มกิจกรรม Busking & Random Play Dance Party'],
-    tones:[{ m:'Group Hi-Touch', c:'#E4457E' }, { m:'Hachi Cha & Merchandise', c:'#2E8C82' }],
-    lineup:{ '2026-10-30':{'Hachi Cha & Merchandise รอบที่ 1':{'Hachi Cha':['cgm-ploen','cgm-namphet','cgm-praifa'],Merchandise:['cgm-prae','cgm-chifa','cgm-ginna']},'Hachi Cha & Merchandise รอบที่ 2':{'Hachi Cha':['cgm-nisha','cgm-else','cgm-punpon'],Merchandise:['bnk-fame','cgm-satangpound','cgm-shenae']},'Hachi Cha & Merchandise รอบที่ 3':{'Hachi Cha':['cgm-valentine','cgm-lookked','cgm-kwan'],Merchandise:['bnk-praew','cgm-emma','cgm-lingling']},'Hachi Cha & Merchandise รอบที่ 4':{'Hachi Cha':['bnk-nall','bnk-mint','bnk-saonoi'],Merchandise:['bnk-jew','bnk-l','bnk-yoghurt']},'Hachi Cha & Merchandise รอบที่ 5':{'Hachi Cha':['bnk-cartoon','bnk-luksorn','bnk-neen'],Merchandise:['cgm-hongyok','bnk-micha','cgm-jingjing']},'Group Hi-Touch รอบที่ 1':['bnk-praew','bnk-l','bnk-arlee','cgm-prae','cgm-lookked','cgm-kwan'],'Group Hi-Touch รอบที่ 2':['bnk-janry','bnk-luksorn','cgm-shenae','cgm-satangpound','cgm-nana','cgm-jingjing','cgm-ginna'],'Group Hi-Touch รอบที่ 3':['bnk-monet','bnk-hoop','bnk-yoghurt','bnk-jew','cgm-lingling','cgm-chifa','cgm-emma']} },
+    rota:{ day:'2026-10-30', head:'ตารางเมมเบอร์', where:'ชั้น 5 The Street Ratchada',
+      kinds:[{ k:'hi', th:'Hi-Touch', en:'Hi-Touch', c:'#E4457E' }, { k:'hc', th:'Hachi Cha', en:'Hachi Cha', c:'#2E8C82' }, { k:'mc', th:'Merchandise', en:'Merchandise', c:'#D9822B' }],
+      rounds:[
+      { k:'hc', n:1, a:'12:00', b:'13:00', ids:['cgm-ploen','cgm-namphet','cgm-praifa'] },
+      { k:'mc', n:1, a:'12:00', b:'13:00', ids:['cgm-prae','cgm-chifa','cgm-ginna'] },
+      { k:'hc', n:2, a:'13:00', b:'14:00', ids:['cgm-nisha','cgm-else','cgm-punpon'] },
+      { k:'mc', n:2, a:'13:00', b:'14:00', ids:['bnk-fame','cgm-satangpound','cgm-shenae'] },
+      { k:'hi', n:1, a:'13:00', b:'14:00', ids:['bnk-praew','bnk-l','bnk-arlee','cgm-prae','cgm-lookked','cgm-kwan'] },
+      { k:'hc', n:3, a:'14:00', b:'15:00', ids:['cgm-valentine','cgm-lookked','cgm-kwan'] },
+      { k:'mc', n:3, a:'14:00', b:'15:00', ids:['bnk-praew','cgm-emma','cgm-lingling'] },
+      { k:'hi', n:2, a:'14:30', b:'15:30', ids:['bnk-janry','bnk-luksorn','cgm-shenae','cgm-satangpound','cgm-nana','cgm-jingjing','cgm-ginna'] },
+      { k:'hc', n:4, a:'15:00', b:'16:00', ids:['bnk-nall','bnk-mint','bnk-saonoi'] },
+      { k:'mc', n:4, a:'15:00', b:'16:00', ids:['bnk-jew','bnk-l','bnk-yoghurt'] },
+      { k:'hc', n:5, a:'16:00', b:'17:00', ids:['bnk-cartoon','bnk-luksorn','bnk-neen'] },
+      { k:'mc', n:5, a:'16:00', b:'17:00', ids:['cgm-hongyok','bnk-micha','cgm-jingjing'] },
+      { k:'hi', n:3, a:'16:00', b:'17:00', ids:['bnk-monet','bnk-hoop','bnk-yoghurt','bnk-jew','cgm-lingling','cgm-chifa','cgm-emma'] }] },
     info:[
       'Part 1: Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ Busking Performance',
       'Part 2: One-Shot Dance Challenge Shooting',
@@ -17373,6 +17404,25 @@ function renderSetlist(ev, head){
     </div>`;
 }
 
+/* ev.rota: who is at each stand, round by round — tabs by kind, a tile for each member (her photo, her name over it),
+   a tap on a face lights her in every round. { day, where, kinds:[{k,th,en,c}], rounds:[{k,n,a,b,ids}] } */
+function renderRota(ev){
+  const R = ev.rota, en = isEN(), iso = toYmd(todayStart()), now = Date.now();
+  const at = hm => { const d = parseYmd(R.day); const [h, m] = hm.split(':').map(Number); d.setHours(h, m, 0, 0); return d.getTime(); };
+  const kind = k => R.kinds.find(x => x.k === k), mine = state.oshi || [];
+  const tile = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
+    return `<button class="rt-f${mine.includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}">${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}<span data-noloc>${escapeHtml(nickName(m))}</span></button>`; };
+  const rows = R.rounds.map(r => { const K = kind(r.k), done = R.day < iso || (R.day === iso && at(r.b) <= now), on = R.day === iso && !done && at(r.a) <= now;
+    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-k="${r.k}" data-oshi="${r.ids.some(i => mine.includes(i)) ? 1 : 0}" style="--b:${K.c}">
+      <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${en ? 'Round' : 'รอบที่'} ${r.n}</small>${on ? `<em>${en ? 'on now' : 'กำลังจัด'}</em>` : done ? `<em>${en ? 'over' : 'จบแล้ว'}</em>` : ''}</div>
+      <div class="rt-g">${r.ids.map(tile).join('')}</div></div>`; }).join('');
+  const tab = (k, label, c) => `<button class="rt-tab${k === 'all' ? ' on' : ''}" data-action="rota-tab" data-id="${k}"${c ? ` style="--b:${c}"` : ''}>${label}</button>`;
+  return `<h3 class="evm-head">${en ? 'Member schedule' : R.head}${R.where ? ` <small class="rt-where">${escapeHtml(R.where)}</small>` : ''}</h3>
+    <div class="rota" data-rota>
+      <div class="rt-tabs" role="tablist">${tab('all', en ? 'All' : 'ทั้งหมด')}${R.kinds.map(K => tab(K.k, en ? K.en : K.th, K.c)).join('')}${mine.length ? tab('oshi', en ? 'My oshi' : 'โอชิฉัน', '#E4457E') : ''}</div>
+      <p class="rt-hint">${en ? 'Tap a face to see every round she is in' : 'แตะหน้าเมมเบอร์เพื่อดูทุกรอบที่เธออยู่'}</p>
+      <div class="rt-list">${rows}</div></div>`;
+}
 /* a row's activity in its own colour (ev.tones = [{ m:'Group Hi-Touch', c:'#E4457E' }]): the name as a chip, the round after it */
 const esTone = (ev, what) => (ev.tones || []).find(t => what.startsWith(t.m)) || null;
 const esWhat = (ev, what) => { const t = esTone(ev, what); return t ? `<span class="es-kind">${escapeHtml(t.m)}</span> ${escapeHtml(what.slice(t.m.length).trim())}` : escapeHtml(what); };
@@ -17538,6 +17588,8 @@ function renderEventModal(){
         ${ev.detail ? `
         <h3 class="evm-head">กำหนดการ</h3>
         ${renderSchedule(ev)}` : ''}
+
+        ${ev.rota ? renderRota(ev) : ''}
 
         ${ev.setlist && !slFolds(ev) ? renderSetlist(ev, true) : ''}
 
@@ -26673,7 +26725,12 @@ function bindDelegatedEvents(){
       leaveOverlays(); state.view = 'tag'; state.tagOf = id;
       render(); pushHistory(); window.scrollTo(0, 0);
     }
-    else if(action==='slide-to'){ const tr = btn.closest('.evm-slides').querySelector('[data-track]'); tr.scrollTo({ left:tr.clientWidth * (+btn.dataset.i), behavior:'smooth' }); }
+    else if(action==='rota-tab'){ const root = el.closest('[data-rota]'), k = el.dataset.id;
+      root.querySelectorAll('.rt-tab').forEach(x => x.classList.toggle('on', x === el));
+      root.querySelectorAll('.rt-row').forEach(r => { r.hidden = !(k === 'all' || r.dataset.k === k || (k === 'oshi' && r.dataset.oshi === '1')); }); }
+    else if(action==='rota-hl'){ const root = el.closest('[data-rota]'), same = root.dataset.hl === id; root.dataset.hl = same ? '' : id;
+      root.classList.toggle('has-hl', !same); root.querySelectorAll('.rt-f').forEach(x => x.classList.toggle('hl', !same && x.dataset.id === id)); }
+    else if(action==='slide-to'){ const tr = el.closest('.evm-slides').querySelector('[data-track]'); tr.scrollTo({ left:tr.clientWidth * (+el.dataset.i), behavior:'smooth' }); }
     else if(action==='open-poster'){
       state.geClip = false; state.posterOf = id; renderMain(); pushHistory();
     }
