@@ -7470,18 +7470,29 @@ const SEED_SCHEDULE = [
     title:'Busking & Random Play Dance Party',
     venue:'Outdoor Area, The Street Ratchada', groups:['bnk48','cgm48'], allMembers:true,
     related:['ev-ge6-single'],
-    poster:{ accent:'#52493A', surface:'#EEF3F8', ink:'#34321F', img:'posters/kimi-busking-1030.jpg', w:1500, h:1500 },
+    poster:{ accent:'#52493A', surface:'#EEF3F8', ink:'#34321F', img:'posters/kimi-busking-1030.jpg', w:1500, h:1500, th:'โปสเตอร์', en:'Poster',
+      more:[{ img:'posters/kimi-busking-1030-members.jpg', w:1500, h:2000, th:'ตารางเมมเบอร์', en:'Member schedule' }] },
     detail:[
-      '12:00–17:00 Group Hi-Touch, Merchandise & Hachi Cha (ชั้น 5)',
+      '12:00–13:00 Hachi Cha & Merchandise รอบที่ 1 (ชั้น 5)',
+      '13:00–14:00 Hachi Cha & Merchandise รอบที่ 2',
+      '13:00–14:00 Group Hi-Touch รอบที่ 1 (ชั้น 5)',
+      '14:00–15:00 Hachi Cha & Merchandise รอบที่ 3',
+      '14:30–15:30 Group Hi-Touch รอบที่ 2',
+      '15:00–16:00 Hachi Cha & Merchandise รอบที่ 4',
+      '16:00–17:00 Hachi Cha & Merchandise รอบที่ 5',
+      '16:00–17:00 Group Hi-Touch รอบที่ 3',
       '14:00 เปิดลงทะเบียนสำหรับผู้ได้รับสิทธิ์',
       '17:30 เริ่มรันคิวสำหรับผู้ได้รับสิทธิ์',
       '18:00 เริ่มเปิดให้เข้าพื้นที่สำหรับผู้ได้รับสิทธิ์',
       '19:00 เริ่มกิจกรรม Busking & Random Play Dance Party'],
+    lineup:{ '2026-10-30':{'Hachi Cha & Merchandise รอบที่ 1':{'Hachi Cha':['cgm-ploen','cgm-namphet','cgm-praifa'],Merchandise:['cgm-prae','cgm-chifa','cgm-ginna']},'Hachi Cha & Merchandise รอบที่ 2':{'Hachi Cha':['cgm-nisha','cgm-else','cgm-punpon'],Merchandise:['bnk-fame','cgm-satangpound','cgm-shenae']},'Hachi Cha & Merchandise รอบที่ 3':{'Hachi Cha':['cgm-valentine','cgm-lookked','cgm-kwan'],Merchandise:['bnk-praew','cgm-emma','cgm-lingling']},'Hachi Cha & Merchandise รอบที่ 4':{'Hachi Cha':['bnk-nall','bnk-mint','bnk-saonoi'],Merchandise:['bnk-jew','bnk-l','bnk-yoghurt']},'Hachi Cha & Merchandise รอบที่ 5':{'Hachi Cha':['bnk-cartoon','bnk-luksorn','bnk-neen'],Merchandise:['cgm-hongyok','bnk-micha','cgm-jingjing']},'Group Hi-Touch รอบที่ 1':['bnk-praew','bnk-l','bnk-arlee','cgm-prae','cgm-lookked','cgm-kwan'],'Group Hi-Touch รอบที่ 2':['bnk-janry','bnk-luksorn','cgm-shenae','cgm-satangpound','cgm-nana','cgm-jingjing','cgm-ginna'],'Group Hi-Touch รอบที่ 3':['bnk-monet','bnk-hoop','bnk-yoghurt','bnk-jew','cgm-lingling','cgm-chifa','cgm-emma']} },
     info:[
       'Part 1: Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ Busking Performance',
       'Part 2: One-Shot Dance Challenge Shooting',
       'Part 3: Random Play Dance Party',
-      'เมมเบอร์ BNK48 และ CGM48 ร่วมงานทั้งหมด · รายชื่อในแต่ละรอบของ Group Hi-Touch, Merchandise & Hachi Cha จะประกาศให้ทราบอีกครั้ง',
+      'เมมเบอร์ BNK48 และ CGM48 ร่วมงานทั้งหมด · รอบ Group Hi-Touch ที่ชั้น 5 รอบละชั่วโมง ส่วน Hachi Cha & Merchandise เมมเบอร์สลับกิจกรรมกันทุก 30 นาที',
+      'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
+      'Dress code: Halloween Theme',
       'ลงทะเบียนผ่านแบบฟอร์ม (QR บนโปสเตอร์) ตั้งแต่วันที่ประกาศถึง 25 ต.ค. 2026 18:00 น. ลงทะเบียนได้ 1 ครั้งเท่านั้น หากซ้ำจะถูกตัดสิทธิ์ทุกกรณี',
       'สิทธิ์เข้าร่วมสุ่มรายชื่อผู้โชคดีตามโซน ประกาศรายชื่อพร้อมเลขลำดับคิว 26 ต.ค. 2026 18:00 น. ผู้ได้รับสิทธิ์นำบัตรประจำตัวประชาชนมายืนยันในวันงาน',
       'ผู้ได้รับสิทธิ์ที่ไม่มาร่วมกิจกรรมจะมีผลต่อการพิจารณาเข้าร่วมกิจกรรมครั้งต่อไป',
@@ -17389,7 +17400,7 @@ function renderSchedule(ev){
   const luFaces = ids => ids.map(getMember).filter(Boolean).map(m => { const g = getGroup(m.groupId);
     return `<button class="ev-person${state.oshi.includes(m.id) ? ' is-oshi' : ''}" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">${renderAvatar(m, 'avatar-sm', g.color)}<span>${escapeHtml(nickName(m))}</span></button>`; }).join('');
   // a part's value is a list of ids, or { label: ids } when it has groups (the Haunted Graveyard: the ghost house, and the drinks stand)
-  const LU_GRP = { 'เข้าบ้านผี':['เข้าบ้านผี', 'Haunted house', 'ghost'], 'ขายน้ำ Hachi Cha':['ขายน้ำ Hachi Cha', 'Hachi Cha drinks', 'tea'] };
+  const LU_GRP = { 'เข้าบ้านผี':['เข้าบ้านผี', 'Haunted house', 'ghost'], 'ขายน้ำ Hachi Cha':['ขายน้ำ Hachi Cha', 'Hachi Cha drinks', 'tea'], 'Hachi Cha':['Hachi Cha', 'Hachi Cha', 'tea'], 'Merchandise':['Merchandise', 'Merchandise', 'ghost'] };
   const luWho = what => luDays.map(d => {
     const key = Object.keys(LU[d]).find(k => what.toLowerCase().includes(k.toLowerCase()));
     const v = key ? LU[d][key] : null, hid = `data-day="${d}"${d === luOn ? '' : ' hidden'}`;
