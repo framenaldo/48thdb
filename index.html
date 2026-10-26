@@ -2324,6 +2324,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .es-what{ min-width:0; font-size:14px; line-height:1.5; color:var(--ink); }
   .es-st{ display:flex; align-items:center; gap:6px; margin-top:3px; font-size:12px; font-weight:800; color:color-mix(in srgb, var(--c) 72%, var(--ink)); }
   .es-st:empty{ display:none; }
+  .es-row.has-tone{ box-shadow:inset 4px 0 0 var(--rt); }
+  .es-kind{ display:inline-block; padding:1px 10px; margin-right:4px; border-radius:99px; font-size:13px; font-weight:800; white-space:nowrap; color:#fff; background:var(--rt); }
+  .es-row.has-tone.is-done .es-kind{ filter:saturate(.5); }
   .es-row.is-done .es-time, .es-row.is-done .es-what{ opacity:.45; }
   .es-row.is-done .es-st{ color:var(--ink-soft); }
   .es-row.is-done .es-st::before{ content:'✓'; }
@@ -7473,9 +7476,9 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#52493A', surface:'#EEF3F8', ink:'#34321F', img:'posters/kimi-busking-1030.jpg', w:1500, h:1500, th:'โปสเตอร์', en:'Poster',
       more:[{ img:'posters/kimi-busking-1030-members.jpg', w:1500, h:2000, th:'ตารางเมมเบอร์', en:'Member schedule' }] },
     detail:[
-      '12:00–13:00 Hachi Cha & Merchandise รอบที่ 1 (ชั้น 5)',
+      '12:00–13:00 Hachi Cha & Merchandise รอบที่ 1',
       '13:00–14:00 Hachi Cha & Merchandise รอบที่ 2',
-      '13:00–14:00 Group Hi-Touch รอบที่ 1 (ชั้น 5)',
+      '13:00–14:00 Group Hi-Touch รอบที่ 1',
       '14:00–15:00 Hachi Cha & Merchandise รอบที่ 3',
       '14:30–15:30 Group Hi-Touch รอบที่ 2',
       '15:00–16:00 Hachi Cha & Merchandise รอบที่ 4',
@@ -7485,12 +7488,14 @@ const SEED_SCHEDULE = [
       '17:30 เริ่มรันคิวสำหรับผู้ได้รับสิทธิ์',
       '18:00 เริ่มเปิดให้เข้าพื้นที่สำหรับผู้ได้รับสิทธิ์',
       '19:00 เริ่มกิจกรรม Busking & Random Play Dance Party'],
+    tones:[{ m:'Group Hi-Touch', c:'#E4457E' }, { m:'Hachi Cha & Merchandise', c:'#2E8C82' }],
     lineup:{ '2026-10-30':{'Hachi Cha & Merchandise รอบที่ 1':{'Hachi Cha':['cgm-ploen','cgm-namphet','cgm-praifa'],Merchandise:['cgm-prae','cgm-chifa','cgm-ginna']},'Hachi Cha & Merchandise รอบที่ 2':{'Hachi Cha':['cgm-nisha','cgm-else','cgm-punpon'],Merchandise:['bnk-fame','cgm-satangpound','cgm-shenae']},'Hachi Cha & Merchandise รอบที่ 3':{'Hachi Cha':['cgm-valentine','cgm-lookked','cgm-kwan'],Merchandise:['bnk-praew','cgm-emma','cgm-lingling']},'Hachi Cha & Merchandise รอบที่ 4':{'Hachi Cha':['bnk-nall','bnk-mint','bnk-saonoi'],Merchandise:['bnk-jew','bnk-l','bnk-yoghurt']},'Hachi Cha & Merchandise รอบที่ 5':{'Hachi Cha':['bnk-cartoon','bnk-luksorn','bnk-neen'],Merchandise:['cgm-hongyok','bnk-micha','cgm-jingjing']},'Group Hi-Touch รอบที่ 1':['bnk-praew','bnk-l','bnk-arlee','cgm-prae','cgm-lookked','cgm-kwan'],'Group Hi-Touch รอบที่ 2':['bnk-janry','bnk-luksorn','cgm-shenae','cgm-satangpound','cgm-nana','cgm-jingjing','cgm-ginna'],'Group Hi-Touch รอบที่ 3':['bnk-monet','bnk-hoop','bnk-yoghurt','bnk-jew','cgm-lingling','cgm-chifa','cgm-emma']} },
     info:[
       'Part 1: Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ Busking Performance',
       'Part 2: One-Shot Dance Challenge Shooting',
       'Part 3: Random Play Dance Party',
-      'เมมเบอร์ BNK48 และ CGM48 ร่วมงานทั้งหมด · รอบ Group Hi-Touch ที่ชั้น 5 รอบละชั่วโมง ส่วน Hachi Cha & Merchandise เมมเบอร์สลับกิจกรรมกันทุก 30 นาที',
+      'เมมเบอร์ BNK48 และ CGM48 ร่วมงานทั้งหมด · Group Hi-Touch, Hachi Cha และ Merchandise จัดที่ชั้น 5 The Street Ratchada ส่วนการแสดงบนเวทีจัดที่ลานกลางแจ้ง',
+      'Hachi Cha & Merchandise เมมเบอร์สลับกิจกรรมกันทุก 30 นาทีในแต่ละรอบ',
       'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
       'Dress code: Halloween Theme',
       'ลงทะเบียนผ่านแบบฟอร์ม (QR บนโปสเตอร์) ตั้งแต่วันที่ประกาศถึง 25 ต.ค. 2026 18:00 น. ลงทะเบียนได้ 1 ครั้งเท่านั้น หากซ้ำจะถูกตัดสิทธิ์ทุกกรณี',
@@ -17368,6 +17373,9 @@ function renderSetlist(ev, head){
     </div>`;
 }
 
+/* a row's activity in its own colour (ev.tones = [{ m:'Group Hi-Touch', c:'#E4457E' }]): the name as a chip, the round after it */
+const esTone = (ev, what) => (ev.tones || []).find(t => what.startsWith(t.m)) || null;
+const esWhat = (ev, what) => { const t = esTone(ev, what); return t ? `<span class="es-kind">${escapeHtml(t.m)}</span> ${escapeHtml(what.slice(t.m.length).trim())}` : escapeHtml(what); };
 function renderSchedule(ev){
   const en = isEN(), iso = toYmd(todayStart()), year = +ev.start.slice(0, 4);
   const live = !ev.cancelled && !ev.postponed && ev.start <= iso && eventLastDay(ev) >= iso;
@@ -17420,11 +17428,12 @@ function renderSchedule(ev){
     flushNotes();
     const gone = !r.from && r.day && r.day < iso;   // a dated row whose day has passed
     const open = r.sl && !!_slOpen[ev.id], tag = r.sl ? 'button' : 'div', st = gone ? (en ? 'Over' : 'จบแล้ว') : '';
-    box += `<${tag} class="es-row${gone ? ' is-done' : ''}${r.sl ? ' has-sl' : ''}"${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}${r.sl
+    const tn = esTone(ev, r.what);
+    box += `<${tag} class="es-row${gone ? ' is-done' : ''}${r.sl ? ' has-sl' : ''}${tn ? ' has-tone' : ''}"${tn ? ` style="--rt:${tn.c}"` : ''}${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}${r.sl
         ? ` data-action="sl-open" data-id="${ev.id}" aria-expanded="${open}" aria-controls="sl-${ev.id}"` : ''}>
       <span class="es-time">${r.a}${r.b ? `–${r.b}` : ''}${r.dayLabel ? `<small>${escapeHtml(r.dayLabel)}</small>` : ''}</span>
       <span class="es-what">${r.sl ? `<span class="es-name">${escapeHtml(r.what)}</span><span class="es-sl-pill">${en ? 'Setlist' : 'เซ็ตลิสต์'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>`
-        : escapeHtml(r.what)}<span class="es-st">${st}</span></span>
+        : esWhat(ev, r.what)}<span class="es-st">${st}</span></span>
       <span class="es-bar"></span></${tag}>`;
     if(LU && !r.day) box += luWho(r.what);
     if(r.sl) box += `<div class="es-sl" id="sl-${ev.id}"${open ? '' : ' hidden'}>${renderSetlist(ev)}</div>`;
