@@ -5672,6 +5672,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
 
   /* --- modal: softer spring in --- */
   .modal-glass-card{ animation:modalPopIn .38s var(--ease-spring); }
+  /* the same sheet drawn again (a live status, a post, a sign-in arriving) must not pop in again */
+  #main.sheet-still .modal-backdrop, #main.sheet-still .modal-glass-card{ animation:none !important; }
 
   @media (prefers-reduced-motion:reduce){
     *, *::before, *::after{
@@ -22947,6 +22949,7 @@ let _lastRenderedView = null, _drawnPage = null;
 // a page as drawn, less what keeps itself fresh in place: the "x minutes ago" and the home page's live vote (gecHomePaint)
 const pageSig = h => h.replace(/(data-ago="[^"]*">)[^<]*/g, '$1').replace(/<button class="gec-teaser is-home[\s\S]*?<\/button>/, '');
 let _sheetKeep = null;
+let _sheetKeyDrawn = null;
 function sheetKeepNow(){
   const was = document.querySelector('#main .is-member-sheet'), sc = was && was.querySelector('.modal-scroll');
   return sc && sc.scrollTop ? { id:was.dataset.mid, top:sc.scrollTop } : null;
@@ -23618,6 +23621,10 @@ function renderMain(){
   // the reader's arrangement is applied after drawing (applyLayoutAll), and dragging a zone moves it on
   // screen without a draw — so while a page is being arranged it is always drawn in full (ค่าเดิม, hiding
   // or adding a zone did nothing on 18 Oct), and a saved arrangement counts as part of the page
+  // the sheet that is open drawn again as the same sheet: its pop-in is not played a second and third time
+  const sheetKey = JSON.stringify([state.selectedEvent, state.selectedId, state.dayOf, state.posterOf, state.bioOf, state.comparePicking, state.compareWith]);
+  main.classList.toggle('sheet-still', sheetKey === _sheetKeyDrawn && !!main.querySelector('.modal-backdrop, .modal-glass-card'));
+  _sheetKeyDrawn = sheetKey;
   const layer = main.querySelector(':scope > .ov-layer'), sig = pageSig(page) + '\u0000' + JSON.stringify(state.layout || null);
   if(layer && !state.layoutEdit && sig === _drawnPage && state.view === _lastRenderedView){
     main.querySelectorAll('[data-ago]').forEach(el => { el.textContent = tlAgo(el.dataset.ago); });
