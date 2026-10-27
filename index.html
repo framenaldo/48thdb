@@ -2340,7 +2340,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-kind{ padding:1px 9px; border-radius:99px; background:var(--b); color:#fff; font-size:12px; font-weight:800; }
   .rt-h small{ font-size:12px; font-weight:700; color:var(--ink-soft); }
   .rt-h em{ margin-left:auto; font-style:normal; font-size:12px; font-weight:800; color:var(--b); }
-  .rt-row.is-done{ opacity:.55; } .rt-row.is-now{ box-shadow:0 0 0 2px var(--b); }
+  .rt-h em{ font-style:normal; } .rt-h em:empty{ display:none; }
+  .rt-row.is-done{ opacity:.55; }
+  /* the round on now: a light running round its frame, the time left in its own colour */
+  @property --rt-a{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
+  @keyframes rtSpin{ to{ --rt-a:360deg; } }
+  .rt-row.is-now{ position:relative; border:2px solid transparent; border-left-width:5px; animation:rtSpin 3.2s linear infinite;
+    background:linear-gradient(color-mix(in srgb, var(--b) 10%, var(--card)), color-mix(in srgb, var(--b) 10%, var(--card))) padding-box,
+      conic-gradient(from var(--rt-a), transparent 0 55%, color-mix(in srgb, var(--b) 40%, #fff) 80%, var(--b) 92%, transparent 100%) border-box;
+    box-shadow:0 0 18px color-mix(in srgb, var(--b) 35%, transparent); }
+  .rt-h em{ color:var(--b); }
+  @media (prefers-reduced-motion:reduce){ .rt-row.is-now{ animation:none; } }
   .rt-g{ display:grid; grid-template-columns:repeat(auto-fill, minmax(52px, 1fr)); gap:5px; }
   .rt-f{ position:relative; aspect-ratio:4 / 5; padding:0; border:0; border-radius:11px; overflow:hidden; cursor:pointer; background:var(--c); font:inherit; color:#fff; box-shadow:inset 0 -3px 0 var(--c); -webkit-tap-highlight-color:transparent; }
   .rt-f img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 18%; }
@@ -17429,8 +17439,8 @@ function renderRota(ev){
   const kind = k => R.kinds.find(x => x.k === k), mine = state.oshi || [];
   const tile = rotaTile;
   const rows = R.rounds.map(r => { const K = kind(r.k), D = r.d || R.day, done = D < iso || (D === iso && at(r.b, D) <= now), on = D === iso && !done && at(r.a, D) <= now;
-    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${r.d || R.day}" data-k="${r.k}" data-oshi="${r.ids.some(i => mine.includes(i)) ? 1 : 0}" style="--b:${K.c}">
-      <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${en ? 'Round' : 'รอบที่'} ${r.n}</small>${on ? `<em>${en ? 'on now' : 'กำลังจัด'}</em>` : done ? `<em>${en ? 'over' : 'จบแล้ว'}</em>` : ''}</div>
+    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${r.d || R.day}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${r.ids.some(i => mine.includes(i)) ? 1 : 0}" style="--b:${K.c}">
+      <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${en ? 'Round' : 'รอบที่'} ${r.n}</small><em></em></div>
       <div class="rt-g">${r.ids.map(tile).join('')}</div></div>`; }).join('');
   const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   const dayPills = days.length > 1 ? `<div class="rt-days" role="tablist">${days.map(d => { const x = parseYmd(d); return `<button class="rt-day${d === pick ? ' on' : ''}" data-action="rota-day" data-id="${d}"><small>${WD[x.getDay()]}</small>${x.getDate()} ${M[x.getMonth()]}</button>`; }).join('')}</div>` : '';
@@ -17512,7 +17522,18 @@ function renderSchedule(ev){
 }
 const schedSpan = ms => { const mins = Math.max(1, Math.ceil(ms / 60000)), h = Math.floor(mins / 60), m = mins % 60, en = isEN();
   return h ? (en ? `${h} h${m ? ` ${m} min` : ''}` : `${h} ชม.${m ? ` ${m} นาที` : ''}`) : (en ? `${m} min` : `${m} นาที`); };
+/* a rota's rounds follow the clock: on now (with the time left and a bar that fills), over, or still to come */
+function rotaTick(){
+  const now = Date.now(), en = isEN();
+  document.querySelectorAll('.rt-row[data-from]').forEach(r => {
+    const a = +r.dataset.from, b = +r.dataset.to, on = now >= a && now < b, done = now >= b;
+    r.classList.toggle('is-now', on); r.classList.toggle('is-done', done);
+    r.querySelector('em').textContent = on ? (en ? `On now · ${schedSpan(b - now)} left` : `กำลังจัด · เหลือ ${schedSpan(b - now)}`) : done ? (en ? 'Over' : 'จบแล้ว') : '';
+    r.style.setProperty('--p', on ? Math.min(100, (now - a) / (b - a) * 100).toFixed(1) + '%' : '0%');
+  });
+}
 function schedTick(){
+  rotaTick();
   const now = Date.now(), en = isEN();
   document.querySelectorAll('.es-box').forEach(box => {
     const rows = [...box.querySelectorAll('.es-row[data-es-from]')];
