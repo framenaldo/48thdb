@@ -27611,6 +27611,25 @@ function registerServiceWorker(){
   });
 }
 
+/* ?dbg=1 — a small log over the page of why it redrew or reloaded, for chasing a flicker on a phone:
+   what loaded it (reload, navigation, or the phone bringing the tab back), how many times this visit it has loaded,
+   and the last redraws with who asked. Nothing is sent anywhere. */
+function dbgOverlay(){
+  const nav = (performance.getEntriesByType('navigation')[0] || {}).type || '?';
+  let loads = 1; try{ loads = (+sessionStorage.getItem('dbg-loads') || 0) + 1; sessionStorage.setItem('dbg-loads', loads); }catch(e){}
+  const log = [], t0 = performance.now();
+  const box = document.createElement('pre');
+  box.style.cssText = 'position:fixed;left:6px;right:6px;bottom:78px;z-index:99999;margin:0;padding:6px 8px;border-radius:10px;background:rgba(0,0,0,.82);color:#9CFFB0;font:10px/1.35 ui-monospace,Menlo,monospace;pointer-events:none;white-space:pre-wrap;max-height:34vh;overflow:hidden';
+  document.body.appendChild(box);
+  const paint = () => { box.textContent = 'load #' + loads + ' · ' + nav + ' · up ' + Math.round((performance.now() - t0) / 1000) + 's · ' + (document.hidden ? 'hidden' : 'visible') + '\n' + log.slice(-9).join('\n'); };
+  const note = (name, extra) => { const who = (new Error().stack || '').split('\n').slice(3, 5).map(x => x.trim().replace(/https?:\/\/[^ ]*\//, '').replace(/^at /, '').slice(0, 34)).join(' < ');
+    log.push(Math.round((performance.now() - t0) / 1000) + 's ' + name + (extra || '') + ' ← ' + who); paint(); };
+  for(const n of ['render', 'renderMain', 'gecHomePaint', 'renderProfileSlot', 'applyTheme']){ const f = window[n]; if(typeof f !== 'function') continue; window[n] = function(...a){ note(n); return f.apply(this, a); }; }
+  addEventListener('pagehide', e => note('pagehide', e.persisted ? ' (kept)' : ' (leaving)'));
+  document.addEventListener('visibilitychange', () => note(document.hidden ? 'tab hidden' : 'tab visible'));
+  addEventListener('error', e => note('error ' + String(e.message).slice(0, 40)));
+  setInterval(paint, 1000); paint();
+}
 // ============================= INIT =============================
 async function init(){
   // EN/TH became the default on 19 Sep 2026. A saved Thai was the old default
@@ -27621,6 +27640,7 @@ async function init(){
   }catch(e){}
   applyDocumentLanguage();
   registerServiceWorker();
+  try{ if(/[?&]dbg=1\b/.test(location.search)) sessionStorage.setItem('dbg-on', '1'); if(/[?&]dbg=0\b/.test(location.search)) sessionStorage.removeItem('dbg-on'); if(sessionStorage.getItem('dbg-on')) dbgOverlay(); }catch(e){}   // stays on for this visit, through a reload and the address being rewritten
   watchForUpdates();
   bindPullToRefresh();
   startClock();

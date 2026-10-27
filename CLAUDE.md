@@ -360,6 +360,12 @@ devices that already hold it keep showing the old picture. `?sw=off` unregisters
 the worker and clears its caches — offer that link before suggesting anyone
 clear browser data.
 
+## Chasing a flicker or a refresh on a phone
+
+Open the site with `?dbg=1` (`dbgOverlay`): a small green log sits over the page — what loaded it (reload / navigate /
+back_forward), how many times this visit it has loaded, and the last redraws with who asked for them. It stays on for
+the visit (sessionStorage `dbg-on`, through a reload); `?dbg=0` turns it off. Nothing is sent anywhere.
+
 ## Before you say it works
 
 Serve the folder (`.claude/launch.json` starts a static server on port 8823) and
