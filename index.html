@@ -6739,7 +6739,7 @@ const SEAT_NOTES = {
    An event lists them as `turns` — plain data, so the calendar and live-check
    scripts can lift the schedule — and they become slots once the page loads. */
 const MYO_TIMES = ['10:00','10:25','10:50','11:15','11:40', '12:15','12:40','13:05','13:30','13:55',
-  '14:30','14:55','15:20','15:45','16:10', '16:45','17:10','17:35','18:00','18:25', '19:00','19:25','19:50','20:15','20:40'];
+  '14:30','14:55','15:20','15:45','16:10', '16:45','17:10','17:35','18:00','18:25', '19:00','19:25','19:50','20:15','20:40', '21:00'];   // the last one is a turn moved to the end of the evening
 const myoSlots = days => days.flatMap(([date, ids, from = 0]) => ids.map((id, i) => {
   const time = MYO_TIMES[from + i], [h, m] = time.split(':').map(Number), end = h * 60 + m + 20;
   return { date, time, until:`${String(end / 60 | 0).padStart(2,'0')}:${String(end % 60).padStart(2,'0')}`, members:[id] };
@@ -7593,7 +7593,8 @@ const SEED_SCHEDULE = [
       'ใช้บัตรกิจกรรมดิจิทัลที่ได้จาก CD Edition หรือ Mini Photobook Edition แบบ Meeting You Online',
       'บัตร 1 ใบ คุยกับเมมเบอร์ได้ประมาณ 10 วินาที และในแต่ละรอบต้องใช้บัตรทั้งหมดในครั้งเดียว แบ่งใช้ไม่ได้',
       'เข้ารอใน Waiting Room ก่อนเวลารอบประมาณ 10 นาที',
-      'Yoghurt ไม่มีรอบใน Round 1 เนื่องจากภารกิจส่วนตัว และจะมีรอบทดแทนใน Round 2'],
+      'Yoghurt ไม่มีรอบใน Round 1 เนื่องจากภารกิจส่วนตัว และจะมีรอบทดแทนใน Round 2',
+      'วันที่ 8 พ.ย. Niya ไม่สามารถเข้าร่วมรอบ 14:55–15:15 ได้เพราะภารกิจด้านการศึกษา จึงเปลี่ยนเป็นรอบ 21:00–21:20 แทน (ประกาศจากผู้จัด)'],
     turns:[
       ['2026-11-05', ['bnk-sindy','bnk-praew','bnk-inkcha'], 20],
       ['2026-11-06', ['cgm-kwan','cgm-chifa','cgm-lingling','cgm-lookked'], 20],
@@ -7602,11 +7603,14 @@ const SEED_SCHEDULE = [
         'bnk-palmmy','bnk-mail','bnk-luksorn','bnk-micha','bnk-nammonn',
         'cgm-ginna','cgm-nisha','cgm-satangpound','cgm-else','cgm-punpon',
         'bnk-l','bnk-emmy','bnk-galeya','bnk-khaimook','cgm-emma']],
+      // Niya's 14:55 turn moved to 21:00 (her studies; the organiser's notice): the others keep theirs
       ['2026-11-08', ['cgm-namphet','cgm-valentine','cgm-lewlew','cgm-praifa','cgm-tara',
         'bnk-arlee','bnk-jew','bnk-mint','bnk-saonoi','bnk-fame',
-        'bnk-wawa','bnk-niya','bnk-blythe','bnk-patt','bnk-rose',
+        'bnk-wawa'], 0],
+      ['2026-11-08', ['bnk-blythe','bnk-patt','bnk-rose',
         'bnk-proud','bnk-nall','bnk-mirin','bnk-mayji','bnk-neen',
-        'bnk-khowjow','bnk-monet','bnk-grape','bnk-marine','cgm-ploen']],
+        'bnk-khowjow','bnk-monet','bnk-grape','bnk-marine','cgm-ploen'], 12],
+      ['2026-11-08', ['bnk-niya'], 25],
     ] },
   { id:'ev-ge6-myo2', logo:'kimi', start:'2026-11-26', end:'2026-11-29', online:'iAM48 Application',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Meeting You Online [Round 2]',
