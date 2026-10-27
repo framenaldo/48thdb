@@ -2342,15 +2342,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-h em{ margin-left:auto; font-style:normal; font-size:12px; font-weight:800; color:var(--b); }
   .rt-h em{ font-style:normal; } .rt-h em:empty{ display:none; }
   .rt-row.is-done{ opacity:.55; }
-  /* the round on now: a light running round its frame, the time left in its own colour */
-  @property --rt-a{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
-  @keyframes rtSpin{ to{ --rt-a:360deg; } }
-  .rt-row.is-now{ position:relative; border:2px solid transparent; border-left-width:5px; animation:rtSpin 3.2s linear infinite;
-    background:linear-gradient(color-mix(in srgb, var(--b) 10%, var(--card)), color-mix(in srgb, var(--b) 10%, var(--card))) padding-box,
-      conic-gradient(from var(--rt-a), transparent 0 55%, color-mix(in srgb, var(--b) 40%, #fff) 80%, var(--b) 92%, transparent 100%) border-box;
+  /* the round on now: a light running round its frame. A big conic square turns behind the card (a transform: it runs on the
+     graphics chip, nothing is repainted per frame) and an inner panel hides all but the 2px rim */
+  @keyframes rtSpin{ to{ transform:translate(-50%, -50%) rotate(360deg); } }
+  .rt-row.is-now{ position:relative; overflow:hidden; isolation:isolate; border-color:transparent; background:transparent;
     box-shadow:0 0 18px color-mix(in srgb, var(--b) 35%, transparent); }
+  .rt-row.is-now::before{ content:''; position:absolute; z-index:-2; left:50%; top:50%; width:170%; aspect-ratio:1; transform:translate(-50%, -50%);
+    background:conic-gradient(transparent 0 55%, color-mix(in srgb, var(--b) 40%, #fff) 80%, var(--b) 92%, transparent 100%); animation:rtSpin 3.2s linear infinite; }
+  .rt-row.is-now::after{ content:''; position:absolute; z-index:-1; inset:2px 2px 2px 3px; border-radius:11px;
+    background:linear-gradient(color-mix(in srgb, var(--b) 10%, var(--card)), color-mix(in srgb, var(--b) 10%, var(--card))), var(--card); }
   .rt-h em{ color:var(--b); }
-  @media (prefers-reduced-motion:reduce){ .rt-row.is-now{ animation:none; } }
+  @media (prefers-reduced-motion:reduce){ .rt-row.is-now::before{ animation:none; } }
   .rt-g{ display:grid; grid-template-columns:repeat(auto-fill, minmax(52px, 1fr)); gap:5px; }
   .rt-f{ position:relative; aspect-ratio:4 / 5; padding:0; border:0; border-radius:11px; overflow:hidden; cursor:pointer; background:var(--c); font:inherit; color:#fff; box-shadow:inset 0 -3px 0 var(--c); -webkit-tap-highlight-color:transparent; }
   .rt-f img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 18%; }
