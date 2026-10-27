@@ -14934,8 +14934,18 @@ function gecHomePaint(){
   if(state.view !== 'feed') return;
   const el = document.querySelector('.gec-teaser.is-home');
   if(!el) return;
-  el.outerHTML = gecHomeTeaser(isEN());
-  odoRun(document.querySelector('.gec-teaser.is-home'));
+  /* every fifteen seconds the figures move; the card itself must not be rebuilt (a new picture each time flashed the card):
+     the numbers are changed in place and anything else only if it differs */
+  const t = document.createElement('div'); t.innerHTML = gecHomeTeaser(isEN());
+  const fresh = t.firstElementChild;
+  if(!fresh || el.className !== fresh.className || el.children.length !== fresh.children.length){
+    el.replaceWith(fresh); odoRun(fresh); return; }
+  [...fresh.children].forEach((c, i) => { const o = el.children[i];
+    if(c.querySelector('.odo')){
+      c.querySelectorAll('.odo').forEach(n => { const m = o.querySelector(`.odo[data-odo="${n.dataset.odo}"]`);
+        if(m && !m.classList.contains('is-rolling') && m.textContent !== n.textContent) m.textContent = n.textContent; });
+    } else if(o.outerHTML !== c.outerHTML) o.replaceWith(c); });
+  odoRun(el);
 }
 // The vote so far, small, at the top of the GE2026 overview; a tap opens the vote tab
 function gecTeaser(en){
