@@ -7691,6 +7691,13 @@ const SEED_SCHEDULE = [
         { img:'posters/shock-me-girls-1120-tickets.jpg', w:1638, h:2048, th:'บัตรและสิทธิประโยชน์', en:'Tickets' },
         { img:'posters/shock-me-girls-1120-seats.jpg', w:1638, h:2048, th:'ผังที่นั่ง', en:'Seat map' }] },
     members:['bnk-monet','bnk-praew','bnk-janry','bnk-marine','bnk-sindy'],
+    seatPlan:{ layout:'major-t6', head:'ผังที่นั่ง Theater 6 และราคาบัตร', zones:[
+      // from the organiser's seat chart (20 seats a row, ten each side of the aisle); seats are drawn at random within the zone bought
+      { id:'P', label:'PREMIUM', sections:['PL', 'PR'], color:'#4F6F5E', price:'2,699', note:'แถว P–N · ที่นั่งสุ่มในโซน', perks:['Official Poster 1 ใบ', 'Postcard 2 ใบ', 'เข็มกลัดไฮโซตัวกลม 2 ลาย', 'Group Shot 5:1 กับสมาชิกทั้ง 5 คน (60 สิทธิ์ต่อรอบ)'] },
+      { id:'C', label:'COLLECTOR', sections:['CL', 'CR'], color:'#6A47D6', price:'1,299', note:'แถว M–I · ที่นั่งสุ่มในโซน', perks:['Official Poster 1 ใบ', 'Postcard 1 ใบ', 'เข็มกลัดไฮโซตัวกลม 1 ลาย'] },
+      { id:'E', label:'ENTRY', sections:['EL', 'ER', 'BL', 'BR'], color:'#F04FE0', price:'599', note:'แถว H–D และ C–B · ที่นั่งสุ่มในโซน', perks:['Official Poster 1 ใบ'] },
+      { id:'V', label:'VIP', sections:['VL', 'VR'], color:'#9A7B55', note:'เก้าอี้ปรับเอน มีที่พักแขนและที่วางแก้ว อยู่ท้ายโรง · ไม่เปิดขาย' }],
+      source:'ผังที่นั่งตามผังของผู้จัด ส่วน VIP วาดคร่าว ๆ ตามรูปโรงจริง ไม่ทราบจำนวนที่นั่ง' },
     price:'599 – 2,699', ticketUrl:'https://app.bnk48.com/performance',
     detail:[
       '10:00 รอบที่ 1 · ลงทะเบียน',
@@ -16006,6 +16013,33 @@ SEAT_LAYOUTS['union-roadshow'] = (() => {
       Z3B:{ level:'floor', pts:SP_RM(0, 11.6, 8, 2.2), at:[4 * SP_M, 12.7 * SP_M], text:'ZONE 3', under:true },
       Z2:{ level:'floor', pts:SP_RM(-2.2, 14.1, 12.4, 2), at:[4 * SP_M, 15.1 * SP_M], text:'ZONE 2', under:true } },
     props,
+  };
+})();
+/* Major Cineplex Sukhumvit, Theater 6 — the Shock Me Girls orientation day. From the organiser's seat chart: twenty seats a row,
+   ten either side of the aisle down the middle; the screen at the top; rows P to N the Premium zone, M to I Collector, a walkway,
+   then H to D and C to B Entry (140 in all, 100 and 60 — the chart's own counts); behind them the VIP recliners, not on sale and
+   only blocked in (the owner's photos of the hall show them). Units are the chart's, scaled; the floor is flat. */
+SEAT_LAYOUTS['major-t6'] = (() => {
+  const px = 19.25, py = 20.3, W = 10 * px, GAP = 56, XR = W + GAP;     // a seat across, a row deep; the half-row width; where the right half starts
+  const sec = (x, y, rows, text) => ({ level:'floor', pts:SP_R(x, y, W, rows * py), at:[x + W / 2, y + rows * py / 2], text, small:true });
+  const grid = (x, y, rows) => ({ o:[x + px / 2, y + py / 2], p:[px, py], g:Array.from({ length:rows }, () => 'xxxxxxxxxx') });
+  const Y = { P:0, C:3 * py, E:3 * py + 5 * py + 35, B:3 * py + 5 * py + 35 + 5 * py + 18 };
+  const S = { PL:[0, Y.P, 3, 'P–N'], PR:[XR, Y.P, 3, 'P–N'], CL:[0, Y.C, 5, 'M–I'], CR:[XR, Y.C, 5, 'M–I'], EL:[0, Y.E, 5, 'H–D'], ER:[XR, Y.E, 5, 'H–D'], BL:[0, Y.B, 2, 'C–B'], BR:[XR, Y.B, 2, 'C–B'] };
+  const sections = {}, seats = {};
+  for(const [k, [x, y, r, t]] of Object.entries(S)){ sections[k] = sec(x, y, r, t); seats[k] = grid(x, y, r); }
+  // behind the last rows, past a walkway: the VIP recliners (wide seats with arms and big cup holders) — not on sale, drawn only as a block, no chairs counted
+  const vipY = Y.B + 2 * py + 34, vipH = 2.6 * py, tall = vipY + vipH;
+  sections.VL = { level:'floor', pts:SP_R(0, vipY, W, vipH), at:[W / 2, vipY + vipH / 2], text:'VIP', small:true };
+  sections.VR = { level:'floor', pts:SP_R(XR, vipY, W, vipH), at:[XR + W / 2, vipY + vipH / 2], text:'VIP', small:true };
+  return {
+    cx:(2 * W + GAP) / 2, cy:tall / 2, w:2 * W + GAP + 60, tightZ:true,
+    levels:{ floor:{ th:'พื้นโรง', en:'Floor', m:0, cap:{ th:['พื้นโรง'], en:['Floor'] } } },
+    captions:[], rules:[],
+    floor:[[-34, -64], [2 * W + GAP + 34, -64], [2 * W + GAP + 34, tall + 30], [-34, tall + 30]],
+    blocks:[
+      { pts:SP_R(8, -46, 2 * W + GAP - 16, 16), h:26, ...SP_WALL, text:'จอภาพยนตร์', at:[(2 * W + GAP) / 2, -38], big:true },       // the screen
+    ],
+    sections, seats,
   };
 })();
 /* Central Chiangmai Airport's Grand Hall (ลานกิจกรรม ชั้น 1), the same zones as
