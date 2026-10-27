@@ -1539,18 +1539,41 @@ DTSTART;VALUE=DATE:20261107
 DTEND;VALUE=DATE:20261109
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-shock-me-girls-orientation@48thdb
+UID:ev-shock-me-girls-orientation-2026-11-20@48thdb
 DTSTAMP:20261120T000000Z
 SUMMARY:SHOCK ME GIRLS: SEMESTER 2 ORIENTATION DAY
-LOCATION:Major Sukhumvit-Ekkamai\, Bangkok
+LOCATION:Major Cineplex Sukhumvit (Theater 6)\, Bangkok
 DESCRIPTION:เมมเบอร์: Monet\, Praew\, Janry\, Marine\, Sind
- y\n• ผู้ร่วมงานตามโปสเตอร์ต
- ารางงาน: Monet\, Praew\, Janry\, Marine\, Sindy และส
- มาชิกอื่น ๆ\n\nhttps://48thdb.com/event/ev-shock-me-gi
- rls-orientation
+ y\n• 10:00 รอบที่ 1 · ลงทะเบียน\n• 11:0
+ 0 รอบที่ 1 · ประตูเปิด\n• 12:00–12:30 
+ รอบที่ 1 · Group Shot 2:1 (Janry+Praew & Marine+Sindy)\n• 1
+ 2:30–13:00 รอบที่ 1 · Group Shot 2:1 (Monet+Praew)\n• 13:
+ 00–13:30 รอบที่ 1 · Group Shot 5:1 (60 สิทธิ์)\
+ n• 13:30–15:00 รอบที่ 1 · ชมภาพยนตร์
+ และกิจกรรม\n• 15:00–15:15 รอบที่ 1 · 
+ Hi-Bye / จบรอบ 1\n• 15:00 รอบที่ 2 · ลงทะ
+ เบียน\n• 16:00 รอบที่ 2 · ประตูเป
+ ิด\n• 17:00–17:30 รอบที่ 2 · Group Shot 2:1 (Janry+Pr
+ aew & Marine+Sindy)\n• 17:30–18:00 รอบที่ 2 · Group Shot 
+ 2:1 (Monet+Praew)\n• 18:00–18:30 รอบที่ 2 · Group Shot 5:
+ 1 (60 สิทธิ์)\n• 18:30–20:00 รอบที่ 2 · ช
+ มภาพยนตร์และกิจกรรม\n• 20:00–20:
+ 15 รอบที่ 2 · Hi-Bye / จบรอบ 2\n• โรงภา
+ พยนตร์ เมเจอร์ ซีนีเพล็กซ์
+  สุขุมวิท (โรง 6)\n• ผู้ร่วมงา
+ น: Monet\, Praew\, Janry\, Marine\, Sindy\n• บัตรเปิด
+ ขาย 31 ต.ค. 2026 12:00 น. ถึง 19 พ.ย. 2026 12:00 น
+ . เฉพาะทาง iAM Application (1 บัญชีซื้อ
+ ได้ 2 ที่นั่ง)\n• ที่นั่งสุ่ม
+ ภายในโซนตามประเภทบัตรที่
+ ซื้อ\n• Group Shot ถ่ายด้วยโทรศัพท
+ ์มือถือของแฟนคลับ โดยเจ้า
+ หน้าที่เป็นผู้ถ่ายให้ ทั้
+ ง 2:1 และ 5:1\n\nhttps://48thdb.com/event/ev-shock-me-girls-orient
+ ation
 URL:https://48thdb.com/event/ev-shock-me-girls-orientation
-DTSTART;VALUE=DATE:20261120
-DTEND;VALUE=DATE:20261121
+DTSTART;TZID=Asia/Bangkok:20261120T100000
+DTEND;TZID=Asia/Bangkok:20261120T201500
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-kimi-roadshow-t21-nov@48thdb
