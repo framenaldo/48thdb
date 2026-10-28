@@ -603,6 +603,20 @@ DTSTART;TZID=Asia/Bangkok:20261022T180000
 DTEND;TZID=Asia/Bangkok:20261022T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-halloween-1029-2026-10-29@48thdb
+DTSTAMP:20261029T000000Z
+SUMMARY:CGM48 Pop Up หลอน
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Lingling\, Chifa\, Praifa\, Valentine
+ \n• เหตุเกิดจากอะไร\n• ครั้ง
+ นี้เป็นเทปที่บันทึกไว้ล่
+ วงหน้า\n\nhttps://48thdb.com/event/ev-cgm48-popup-halloween-10
+ 29
+URL:https://48thdb.com/event/ev-cgm48-popup-halloween-1029
+DTSTART;TZID=Asia/Bangkok:20261029T180000
+DTEND;TZID=Asia/Bangkok:20261029T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:ยกเลิก: CGM48 11th Single "Koi Tsunjatta – Let me kno
