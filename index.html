@@ -7027,6 +7027,13 @@ const SEED_SCHEDULE = [
     related:['ev-cgm48-popup-halloween-1015'],
     poster:{ accent:'#C8141B', surface:'#F6ECEC', ink:'#3A0A0D', img:'posters/cgm48-popup-halloween-1022.jpg', w:1500, h:1500, scene:'night' },
     stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/live/o9LOswUGlOk' } },
+  { id:'ev-cgm48-popup-halloween-1029', start:'2026-10-29', time:'18:00',
+    title:'CGM48 Pop Up หลอน', online:'YouTube CGM48 OFFICIAL', groups:['cgm48'],
+    members:['cgm-lingling','cgm-chifa','cgm-praifa','cgm-valentine'],
+    related:['ev-cgm48-popup-halloween-ontour-1027','ev-cgm48-popup-halloween-1022'],
+    poster:{ accent:'#C8141B', surface:'#F6ECEC', ink:'#3A0A0D', img:'posters/cgm48-popup-halloween-1029.jpg', w:1500, h:1500, scene:'night' },
+    info:['เหตุเกิดจากอะไร','ครั้งนี้เป็นเทปที่บันทึกไว้ล่วงหน้า'],
+    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL/live' } },
   { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27', time:'12:00',
     cancelled:'ยกเลิกการจัดงาน เนื่องจากศูนย์การค้าแฟชั่นไอส์แลนด์ปิดให้บริการชั่วคราว (สถานการณ์น้ำท่วม)',
     title:'CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow',
@@ -12737,6 +12744,7 @@ const FEST_EVENT = {
   'ev-partner-1017':   { word:'Lanna Expo 2026', sub:'JAPAN–THAILAND 140TH ANNIVERSARY' },
   'ev-cgm48-popup-halloween-1015': { word:'POP UP หลอน', sub:'CGM48 · HALLOWEEN', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-cgm48-popup-halloween-1022': { word:'POP UP หลอน', sub:'CGM48 · HALLOWEEN', motif:'spooky', fx:'moon', pal:'blood', own:true },
+  'ev-cgm48-popup-halloween-1029': { word:'POP UP หลอน', sub:'CGM48 · HALLOWEEN', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-kimi-busking-1030': { word:'Busking', sub:'KIMI TO DOKO KA E IKITAI · DANCE PARTY' },
   'ev-mbk-haunted-graveyard-1020': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-mbk-haunted-graveyard-1026': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
@@ -15399,7 +15407,7 @@ const EVENT_ICON = {
   'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
   'ev-getaway-pudthailee':'plane', 'ev-pancake-perfume':'sparkles', 'ev-pancake-captured':'photos',
   'ev-cgm48-popup-live-cnx':'live', 'ev-cgm48-popup-live-0924':'live', 'ev-cgm48-popup-live-0929':'live', 'ev-cgm48-popup-live-1001':'live',
-  'ev-cgm48-popup-live-1006':'live', 'ev-cgm48-popup-halloween-ontour-1020':'live', 'ev-cgm48-popup-halloween-ontour-1027':'live',
+  'ev-cgm48-popup-live-1006':'live', 'ev-cgm48-popup-halloween-ontour-1020':'live', 'ev-cgm48-popup-halloween-ontour-1027':'live', 'ev-cgm48-popup-halloween-1029':'live',
 };
 function eventIconName(ev){
   if(!ev) return '';
