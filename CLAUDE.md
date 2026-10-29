@@ -121,8 +121,9 @@ the Firebase CLI from the owner's machine.
   is drawn on the first paint from the copy the phone kept last time (localStorage: `48thdb-ge` the election
   rounds, `48thdb-tl` the iAM48 posts, `48thdb-gec-home` the vote card's figures), and on a first visit a
   placeholder of the same size holds its place (`is-wait`). A new home section that loads late needs the same.
-- The GE2026 page's hero has no frame: its picture fades out into the page on every side (a mask, so the text stays
-  inside the solid part — mind the padding), the picture drifts slowly, the logo glints, the countdown number breathes,
+- The GE2026 page's hero has no frame or box: the artwork runs edge to edge as the first screen's own backdrop, with
+  no solid colour, and dissolves downward into the page (a mask, top and bottom only, so the text stays inside the
+  solid part — mind the padding; the date pills carry their own dark wash for legibility), the picture drifts slowly, the logo glints, the countdown number breathes,
   and one canvas (`geHeroFx`) draws embers rising and a small firework now and then. It runs only while the hero is on
   screen and the tab visible, and not at all with reduced motion. Not drawn in the slim hero of a live results read-out.
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
