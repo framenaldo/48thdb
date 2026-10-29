@@ -2941,6 +2941,24 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 30px, #000 calc(100% - 90px), transparent 100%);
     mask-image:linear-gradient(to bottom, transparent 0, #000 30px, #000 calc(100% - 90px), transparent 100%); }
   #main:has(.ge-hero){ overflow-x:clip; }
+  @media (min-width:900px){
+    .ge-hero{ margin:0 0 10px; border-radius:0;
+      -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 30px, #000 calc(100% - 90px), transparent 100%), linear-gradient(to right, transparent 0, #000 11%, #000 89%, transparent 100%);
+      -webkit-mask-composite:source-in;
+      mask-image:linear-gradient(to bottom, transparent 0, #000 30px, #000 calc(100% - 90px), transparent 100%), linear-gradient(to right, transparent 0, #000 11%, #000 89%, transparent 100%); mask-composite:intersect; }
+    .ge-hero-in{ padding:56px 24px 96px; gap:18px; }
+    .ge-logo-w{ width:min(560px, 70%); }
+    .ge-hero.is-slim .ge-logo-w{ width:min(300px, 50%); }
+    .ge-key{ padding:10px 20px; font-size:18px; border-radius:16px; } .ge-key small{ font-size:12.5px; }
+    .ge-count-label, .ge-count-unit{ font-size:18px; } .ge-count-num{ font-size:64px; }
+  }
+  /* the live-vote page on a wide screen: the cards in two columns, the intro and the big numbers across both */
+  @media (min-width:1180px){
+    .ge-page:has(.gea.gec){ max-width:1280px; }
+    .ge-page .gea.gec{ column-count:2; column-gap:18px; }
+    .ge-page .gea.gec > *{ break-inside:avoid; margin:0 0 14px; }
+    .ge-page .gea.gec > .gec-about, .ge-page .gea.gec > .gec-big{ column-span:all; }
+  }
   .ge-hero:not(.is-slim) .ge-hero-bg{ animation:geDrift 18s ease-in-out infinite alternate; will-change:transform; }
   @keyframes geDrift{ from{ transform:scale(1) translate3d(0, 0, 0); } to{ transform:scale(1.12) translate3d(-1.5%, -1%, 0); } }
   .ge-fx{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
@@ -2953,7 +2971,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @keyframes geNum{ 0%, 100%{ text-shadow:0 2px 12px rgba(0,0,0,.45); transform:scale(1); } 50%{ text-shadow:0 2px 12px rgba(0,0,0,.45), 0 0 22px rgba(255,200,90,.85); transform:scale(1.07); } }
   @media (prefers-reduced-motion:reduce){ .ge-hero-bg, .ge-glint, .ge-count-num{ animation:none !important; } .ge-fx{ display:none; } }
   .ge-hero-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 30%; opacity:.9; filter:saturate(1.2); }
-  .ge-hero::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(60,4,8,.1), rgba(40,2,6,.5) 70%, rgba(40,2,6,.2)); }
+  .ge-hero::after{ content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse 62% 54% at 50% 60%, rgba(24,2,5,.78), rgba(24,2,5,.42) 55%, transparent 80%), linear-gradient(180deg, rgba(60,4,8,.1), rgba(40,2,6,.45) 70%, rgba(40,2,6,.2)); }
   .ge-hero-in{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:14px; padding:40px 18px 74px; text-align:center; }
   .ge-logo{ height:auto; filter:drop-shadow(0 4px 12px rgba(0,0,0,.55)); }
   .ge-hero.is-slim{ margin-bottom:12px; }
@@ -2965,7 +2984,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .ge-key small{ font-size:10.5px; font-weight:700; opacity:.8; letter-spacing:.04em; }
   .ge-count{ display:flex; align-items:baseline; justify-content:center; gap:8px; flex-wrap:wrap; }
   .ge-count-label{ font-size:14px; font-weight:800; opacity:.95; text-shadow:0 1px 6px rgba(0,0,0,.7); }
-  .ge-count-num{ font-size:44px; font-weight:800; line-height:1; color:#FFD98A; text-shadow:0 2px 12px rgba(0,0,0,.45); }
+  .ge-count-num{ font-size:48px; font-weight:800; line-height:1; color:#FFD98A; text-shadow:0 2px 12px rgba(0,0,0,.6); }
+  .ge-count-unit{ text-shadow:0 1px 6px rgba(0,0,0,.7); }
   .ge-count-unit{ font-size:14px; font-weight:700; opacity:.9; }
   .ge-tabs .sub-tab.active{ background:var(--ge); border-color:var(--ge); color:#fff; }
   /* four tabs on a phone: keep each label on one line */
