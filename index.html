@@ -2955,9 +2955,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* the live-vote page on a wide screen: the cards in two columns, the intro and the big numbers across both */
   @media (min-width:1180px){
     .ge-page:has(.gea.gec){ max-width:1280px; }
-    .ge-page .gea.gec{ column-count:2; column-gap:18px; }
-    .ge-page .gea.gec > *{ break-inside:avoid; margin:0 0 14px; }
-    .ge-page .gea.gec > .gec-about, .ge-page .gea.gec > .gec-big{ column-span:all; }
+    .gec-cols{ display:grid; grid-template-columns:1fr 1fr; gap:0 18px; align-items:start; }
+    .gec-col{ min-width:0; }
   }
   .ge-hero:not(.is-slim) .ge-hero-bg{ animation:geDrift 18s ease-in-out infinite alternate; will-change:transform; }
   @keyframes geDrift{ from{ transform:scale(1) translate3d(0, 0, 0); } to{ transform:scale(1.12) translate3d(-1.5%, -1%, 0); } }
@@ -15172,6 +15171,15 @@ function gecStretchCard(en, pc, o){
     <p class="gec-sub">${en ? `GE2025 ran ${Math.round(L / 24)} days (${dt(d0)} – ${dt(d1)} 2025); this year runs ${Math.round((GEC_POLLS.ge2026.end - GEC_POLLS.ge2026.start) * GEC_BLOCK / 86400)}. It only reached half its final total on day ${Math.floor(half / 24) + 1} of ${Math.round(L / 24)}. That late surge is what the “on last year’s curve” figure assumes will happen again.`
       : `GE2025 เปิดโหวต ${Math.round(L / 24)} วัน (${dt(d0)} – ${dt(d1)} 2025) ปีนี้ ${Math.round((GEC_POLLS.ge2026.end - GEC_POLLS.ge2026.start) * GEC_BLOCK / 86400)} วัน · กว่ายอดจะถึงครึ่งหนึ่งของยอดสุดท้ายต้องรอถึงวันที่ ${Math.floor(half / 24) + 1} จาก ${Math.round(L / 24)} วัน · ตัวเลข “ถ้าเดินตามเส้นปีที่แล้ว” คือสมมติว่าช่วงโค้งสุดท้ายแบบนี้จะเกิดขึ้นอีก`}</p></div>`;
 }
+/* on a wide screen the cards sit in two columns of their own (a card that grows pushes only its own column down);
+   the same card always goes to the same side, so nothing hops across when one opens */
+function gecColumns(cards){
+  const list = cards.filter(Boolean);
+  if(!window.matchMedia || !matchMedia('(min-width:1180px)').matches) return list.join('');
+  const L = [], R = [];
+  list.forEach((c, i) => (i % 2 ? R : L).push(c));
+  return `<div class="gec-cols"><div class="gec-col">${L.join('')}</div><div class="gec-col">${R.join('')}</div></div>`;
+}
 function renderGEChain(){
   const en = isEN();
   gecKick();
@@ -15270,7 +15278,7 @@ function renderGEChain(){
       ${o && o.wallets[w] ? `<span class="gec-tag">${en ? 'voted 2025' : 'เคยโหวต 2025'}</span>` : ''}<b>${gecTok(x[0])}<small class="gec-b">${gecBaht(x[0], en)}</small></b><small>${N(x[1])} ${en ? (x[1] === 1 ? 'vote' : 'votes') : 'ครั้ง'}</small></li>`).join('')}</ol></div>`;
 
   const o3 = o && o.n && o.to >= GEC_POLLS.ge2025.end - 20 ? o : null;
-  return `<section class="gea gec">${head}${gecAboutCard(en)}${big}${money}${gecSupplyCard(en, N, pc)}${gecFeedCard(en, N, pc, hms)}${gecWinCard(en)}${cmp}${gecDailyCard(en, N, d, o3, hNow)}${hourly}${gecStretchCard(en, pc, o3)}${sizes}${top}${renderGECWallet(en, N, hm)}</section>`;
+  return `<section class="gea gec">${head}${gecAboutCard(en)}${big}${gecColumns([money, gecSupplyCard(en, N, pc), gecFeedCard(en, N, pc, hms), gecWinCard(en), cmp, gecDailyCard(en, N, d, o3, hNow), hourly, gecStretchCard(en, pc, o3), sizes, top, renderGECWallet(en, N, hm)])}</section>`;
 }
 // both runs, tokens so far against hours since voting opened, over this year's span
 function gecCurve(d, o, hNow, en){
