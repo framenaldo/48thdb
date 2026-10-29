@@ -4245,6 +4245,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .vis-lists{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; }
   .vis-row{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 8px; font-size:13px; margin:0 0 6px; }
   .vis-row span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .vis-range{ display:flex; gap:6px; margin:0 0 8px; }
+  .vis-range .chip{ font-size:12px; padding:5px 12px; border-radius:99px; cursor:pointer; }
+  .vis-range .chip.is-on{ background:#E4457E; color:#fff; font-weight:800; }
+  .vis-row.is-link{ cursor:pointer; }
+  .vis-row.is-link:active{ opacity:.6; }
   .vis-row em{ font-style:normal; font-weight:800; font-variant-numeric:tabular-nums; }
   .vis-row i{ grid-column:1 / -1; height:6px; border-radius:99px; background:var(--paper-dim); overflow:hidden; }
   .vis-row i b{ display:block; height:100%; border-radius:99px; background:#F3C969; }
@@ -20129,6 +20134,7 @@ function renderFeedbackInbox(){
    Cloudflare Web Analytics and answers only to the owner's sign-in. */
 const VISITS_API = 'https://api.48thdb.com/visits';
 let visitsState = null;     // { at, loading, data, err }
+let visitsItemsRange = '7d';   // the members and events list: '24h' or '7d'
 async function loadVisits(){
   if(!state.isOwner || !fbAuth.currentUser || (visitsState && visitsState.loading)) return;
   visitsState = { ...(visitsState || {}), loading:true, at:Date.now() };
@@ -20224,15 +20230,19 @@ function visitsPages(D){
   const since = D.pagesSince ? new Date(D.pagesSince.replace(' ', 'T') + (/Z|[+-]\d\d:?\d\d$/.test(D.pagesSince) ? '' : 'Z')) : null;
   const M = monthsShort();
   const itemName = ([p, i]) => p === 'member' ? (getMember(i) ? nickName(getMember(i)) : i) : ((SEED_SCHEDULE.find(e => e.id === i) || {}).title || i);
-  const items = (D.pageItems || []).slice(0, 8);
+  const day = visitsItemsRange === '24h', oldWorker = day && !D.pageItemsDay;
+  const items = ((day ? D.pageItemsDay : D.pageItems) || []).slice(0, 8);
   const iTop = Math.max(1, ...items.map(r => r[2]));
-  const row = (label, n, t, cls) => `<div class="vis-row${cls ? ' ' + cls : ''}"><span>${escapeHtml(label)}</span><em>${n.toLocaleString('en-US')}</em><i><b style="width:${(n / t * 100).toFixed(1)}%"></b></i></div>`;
+  const row = (label, n, t, cls, go) => `<div class="vis-row${cls ? ' ' + cls : ''}${go ? ' is-link' : ''}"${go ? ` role="link" tabindex="0" data-action="open-${go[0]}" data-id="${escapeAttr(go[1])}"` : ''}><span>${escapeHtml(label)}</span><em>${n.toLocaleString('en-US')}</em><i><b style="width:${(n / t * 100).toFixed(1)}%"></b></i></div>`;
   const used = rows.filter(r => r[1] > 0), none = rows.filter(r => !r[1]);
   return `<div><p class="vis-h">หน้าที่เปิด · 7 วัน</p>
     ${used.map(([p, n], k) => row(PAGE_NAMES[p] || p, n, top, k === 0 ? 'is-most' : k === used.length - 1 ? 'is-least' : '')).join('')}
     ${none.length ? `<p class="vis-note"><b>ไม่มีใครเปิดเลย:</b> ${none.map(([p]) => escapeHtml(PAGE_NAMES[p] || p)).join(' · ')}</p>` : ''}
     ${since && Date.now() - since.getTime() < 7 * 86400000 ? `<p class="vis-note">เริ่มนับเมื่อ ${since.getDate()} ${M[since.getMonth()]} ยังไม่ครบ 7 วัน</p>` : ''}</div>
-  ${items.length ? `<div><p class="vis-h">สมาชิกและงานที่เปิดดูบ่อย · 7 วัน</p>${items.map(r => row(`${r[0] === 'member' ? '👤' : '📅'} ${itemName(r)}`, r[2], iTop)).join('')}</div>` : ''}`;
+  ${D.pageItems && D.pageItems.length ? `<div><p class="vis-h">สมาชิกและงานที่เปิดดูบ่อย · ${day ? '24 ชั่วโมง' : '7 วัน'}</p>
+    <div class="vis-range">${[['24h', '24 ชม.'], ['7d', '7 วัน']].map(([k, t]) => `<button class="chip${(day ? '24h' : '7d') === k ? ' is-on' : ''}" data-action="vis-range" data-id="${k}">${t}</button>`).join('')}</div>
+    ${oldWorker ? `<p class="vis-note">ต้องอัปเดต Worker ก่อน (wrangler deploy) จึงจะมีตัวเลข 24 ชั่วโมง</p>`
+      : items.length ? items.map(r => row(`${r[0] === 'member' ? '👤' : '📅'} ${itemName(r)}`, r[2], iTop, '', [r[0], r[1]])).join('') : `<p class="vis-note">ยังไม่มีใครเปิดใน 24 ชั่วโมงที่ผ่านมา</p>`}</div>` : ''}`;
 }
 /* ================= MY LAYOUT =================
    Anyone signed in can arrange the site for themselves: move or hide the
@@ -27059,6 +27069,7 @@ function bindDelegatedEvents(){
     else if(action==='fb-rate'){ fbRate(+el.dataset.value); }
     else if(action==='fb-send'){ fbSend(el, el.dataset.value); }
     else if(action==='fb-refresh'){ loadFeedback().then(() => renderMain()); }
+    else if(action==='vis-range'){ visitsItemsRange = id === '24h' ? '24h' : '7d'; renderMain(); }
     else if(action==='visits-refresh'){ if(visitsState) visitsState.at = 0; el.textContent = 'กำลังโหลด…'; loadVisits(); }
     // the logo reloads the home page for real: fresh data, the newest version of the site
     else if(action==='logo-home'){ e.preventDefault(); window.scrollTo(0, 0); location.assign(location.origin + '/'); }

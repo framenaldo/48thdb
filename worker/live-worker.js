@@ -404,15 +404,17 @@ async function hitsSql(env, sql) {
   return (await r.json()).data || [];
 }
 async function hitsSummary(env) {
-  const week = `timestamp > NOW() - INTERVAL '7' DAY`;
-  const [pages, items, since] = await Promise.all([
+  const week = `timestamp > NOW() - INTERVAL '7' DAY`, day = `timestamp > NOW() - INTERVAL '1' DAY`;
+  const [pages, items, itemsDay, since] = await Promise.all([
     hitsSql(env, `SELECT blob1 AS p, SUM(_sample_interval) AS n FROM ${HITS_DATASET} WHERE ${week} GROUP BY p ORDER BY n DESC LIMIT 100`),
     hitsSql(env, `SELECT blob1 AS p, blob2 AS i, SUM(_sample_interval) AS n FROM ${HITS_DATASET} WHERE ${week} AND (blob1 = 'member' OR blob1 = 'event') AND blob2 != '' GROUP BY p, i ORDER BY n DESC LIMIT 20`),
+    hitsSql(env, `SELECT blob1 AS p, blob2 AS i, SUM(_sample_interval) AS n FROM ${HITS_DATASET} WHERE ${day} AND (blob1 = 'member' OR blob1 = 'event') AND blob2 != '' GROUP BY p, i ORDER BY n DESC LIMIT 20`),
     hitsSql(env, `SELECT MIN(timestamp) AS t FROM ${HITS_DATASET}`),
   ]);
   return {
     pages: pages.map((r) => [r.p, Number(r.n)]),                 // [screen, opens] over 7 days
     pageItems: items.map((r) => [r.p, r.i, Number(r.n)]),        // the members and events opened most
+    pageItemsDay: itemsDay.map((r) => [r.p, r.i, Number(r.n)]),  // the same over the last 24 hours
     pagesSince: (since[0] && since[0].t) || null,
   };
 }
