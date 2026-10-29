@@ -2935,14 +2935,28 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .ge-btn:active{ transform:scale(.96); }
   .ge-btn.is-on{ box-shadow:0 0 0 2px var(--paper), 0 0 0 4px #B3121E; }
   .ge-page{ max-width:1040px; margin-inline:auto; }
-  .ge-hero{ position:relative; overflow:hidden; border-radius:22px; margin:4px 0 16px; background:#2A0508; color:#fff; }
+  /* no frame: the picture fades out into the page on every side, so the hero is one piece with what is behind it */
+  .ge-hero{ position:relative; overflow:hidden; border-radius:0; margin:0 0 12px; background:#2A0508; color:#fff;
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 42px), transparent 100%), linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+    -webkit-mask-composite:source-in; mask-image:linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 42px), transparent 100%), linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%); mask-composite:intersect; }
+  .ge-hero:not(.is-slim) .ge-hero-bg{ animation:geDrift 18s ease-in-out infinite alternate; will-change:transform; }
+  @keyframes geDrift{ from{ transform:scale(1) translate3d(0, 0, 0); } to{ transform:scale(1.12) translate3d(-1.5%, -1%, 0); } }
+  .ge-fx{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .ge-logo-w{ position:relative; display:block; width:min(440px, 86%); }
+  .ge-logo-w .ge-logo{ width:100%; }
+  .ge-glint{ position:absolute; inset:0; pointer-events:none; -webkit-mask:var(--logo) center / contain no-repeat; mask:var(--logo) center / contain no-repeat;
+    background:linear-gradient(100deg, transparent 38%, rgba(255,255,255,.9) 50%, transparent 62%) 150% 0 / 250% 100% no-repeat; animation:geGlint 5s ease-in-out infinite; }
+  @keyframes geGlint{ 0%{ background-position:150% 0; } 30%, 100%{ background-position:-60% 0; } }
+  .ge-hero:not(.is-slim) .ge-count-num{ display:inline-block; animation:geNum 2.4s ease-in-out infinite; }
+  @keyframes geNum{ 0%, 100%{ text-shadow:0 2px 12px rgba(0,0,0,.45); transform:scale(1); } 50%{ text-shadow:0 2px 12px rgba(0,0,0,.45), 0 0 22px rgba(255,200,90,.85); transform:scale(1.07); } }
+  @media (prefers-reduced-motion:reduce){ .ge-hero-bg, .ge-glint, .ge-count-num{ animation:none !important; } .ge-fx{ display:none; } }
   .ge-hero-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 30%; opacity:.55; filter:saturate(1.2); }
   .ge-hero::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(60,4,8,.25), rgba(40,2,6,.85)); }
-  .ge-hero-in{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:14px; padding:26px 18px 20px; text-align:center; }
-  .ge-logo{ width:min(440px, 86%); height:auto; filter:drop-shadow(0 4px 12px rgba(0,0,0,.55)); }
+  .ge-hero-in{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:14px; padding:40px 18px 54px; text-align:center; }
+  .ge-logo{ height:auto; filter:drop-shadow(0 4px 12px rgba(0,0,0,.55)); }
   .ge-hero.is-slim{ margin-bottom:12px; }
-  .ge-hero.is-slim .ge-hero-in{ padding:12px 16px; }
-  .ge-hero.is-slim .ge-logo{ width:min(210px, 54%); }
+  .ge-hero.is-slim .ge-hero-in{ padding:18px 16px; }
+  .ge-hero.is-slim .ge-logo-w{ width:min(210px, 54%); }
   .ge-keys{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; }
   .ge-key{ display:flex; flex-direction:column; align-items:center; gap:1px; padding:7px 14px; border-radius:14px; cursor:pointer;
     background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.28); color:#fff; font:inherit; font-size:14px; font-weight:800; }
@@ -4637,8 +4651,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @media (max-width:560px){
     .ge-btn{ padding:0 10px 0 7px; }
     .ge-btn img{ height:19px; }
-    .ge-hero-in{ padding:20px 14px 16px; gap:12px; }
-    .ge-hero.is-slim .ge-hero-in{ padding:10px 14px; }
+    .ge-hero-in{ padding:36px 14px 50px; gap:12px; }
+    .ge-hero.is-slim .ge-hero-in{ padding:16px 14px; }
     .ge-count-num{ font-size:38px; }
   }
   .tlp-btn{
@@ -13406,6 +13420,40 @@ function renderGEPosterViewer(id){
 }
 const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo-v2.webp', red:'#B3121E',
   vote:'ev-election-voting', results:'ev-election-results' };
+/* the hero's embers and the odd small firework on one canvas: it runs only while the picture is on screen and the tab is visible */
+let _geFx = null;
+function geHeroFx(){
+  if(_geFx){ cancelAnimationFrame(_geFx.raf); _geFx.io && _geFx.io.disconnect(); _geFx = null; }
+  const cv = document.querySelector('.ge-fx'); if(!cv) return;
+  try{ if(matchMedia('(prefers-reduced-motion: reduce)').matches) return; }catch(e){}
+  const hero = cv.parentElement, g = cv.getContext('2d'), DPR = Math.min(1.5, devicePixelRatio || 1);
+  let W = 0, H = 0, on = true, last = performance.now(), nextFire = 1800;
+  const size = () => { const r = hero.getBoundingClientRect(); W = r.width; H = r.height; cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); g.setTransform(DPR, 0, 0, DPR, 0, 0); };
+  size();
+  const COL = ['#FFD98A', '#FFB347', '#FF6F8E', '#FFFFFF', '#FF8A3D', '#FFE9B0'];
+  const sparks = [], embers = Array.from({ length:26 }, () => ({ x:Math.random(), y:Math.random(), v:10 + Math.random() * 22, r:.8 + Math.random() * 1.8, ph:Math.random() * 6, a:.35 + Math.random() * .6 }));
+  const burst = (x, y) => { const c = COL[Math.random() * COL.length | 0], c2 = COL[Math.random() * COL.length | 0];
+    for(let i = 0; i < 34; i++){ const a = Math.random() * 6.283, v = 90 * (.35 + Math.random() * .65); sparks.push({ x, y, vx:Math.cos(a) * v, vy:Math.sin(a) * v, life:1.3 + Math.random() * .9, t:0, c:Math.random() < .5 ? c : c2 }); } };
+  const st = { raf:0, io:null };
+  const frame = now => {
+    st.raf = requestAnimationFrame(frame);
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    if(!on || document.hidden || !cv.isConnected) return;
+    g.clearRect(0, 0, W, H); g.globalCompositeOperation = 'lighter';
+    nextFire -= dt * 1000; if(nextFire <= 0){ burst(W * (.12 + Math.random() * .76), H * (.12 + Math.random() * .5)); nextFire = 2200 + Math.random() * 900; }
+    for(let i = sparks.length - 1; i >= 0; i--){ const p = sparks[i]; p.t += dt; if(p.t > p.life){ sparks.splice(i, 1); continue; }
+      const px = p.x, py = p.y; p.vy += 70 * dt; p.vx *= .985; p.vy *= .985; p.x += p.vx * dt; p.y += p.vy * dt;
+      const k = 1 - p.t / p.life; g.globalAlpha = k; g.strokeStyle = p.c; g.lineWidth = 1.6 * k + .4; g.beginPath(); g.moveTo(px - p.vx * dt * 2, py - p.vy * dt * 2); g.lineTo(p.x, p.y); g.stroke(); }
+    g.fillStyle = '#FFC06A';
+    for(const e of embers){ e.y -= e.v * dt / H; e.x += Math.sin(now / 900 + e.ph) * 6 * dt / W; if(e.y < -.02){ e.y = 1.02; e.x = Math.random(); }
+      g.globalAlpha = e.a * (.6 + .4 * Math.sin(now / 300 + e.ph)); g.beginPath(); g.arc(e.x * W, e.y * H, e.r, 0, 6.283); g.fill(); }
+    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  };
+  st.raf = requestAnimationFrame(frame);
+  if('IntersectionObserver' in window){ st.io = new IntersectionObserver(es => { on = es[0].isIntersecting; }); st.io.observe(hero); }
+  addEventListener('resize', () => { if(cv.isConnected) size(); });
+  _geFx = st;
+}
 function renderGEPage(){
   const en = isEN();
   const iso = toYmd(todayStart());
@@ -13438,8 +13486,9 @@ function renderGEPage(){
   const slim = tab === 'results' && !!geLiveRound();
   const hero = `<div class="ge-hero${slim ? ' is-slim' : ''}" style="--ge:${GE_PAGE.red}">
     <img class="ge-hero-bg" src="posters/election-2026.jpg" alt="" aria-hidden="true" decoding="async">
+    ${slim ? '' : '<canvas class="ge-fx" aria-hidden="true"></canvas>'}
     <div class="ge-hero-in">
-      <img class="ge-logo" src="${GE_PAGE.logo}" width="960" height="349" alt="BNK48 & CGM48 Senbatsu General Election 2026">
+      <span class="ge-logo-w"><img class="ge-logo" src="${GE_PAGE.logo}" width="960" height="349" alt="BNK48 & CGM48 Senbatsu General Election 2026">${slim ? '' : `<i class="ge-glint" style="--logo:url(${GE_PAGE.logo})" aria-hidden="true"></i>`}</span>
       ${slim ? '' : `<div class="ge-keys">
         ${vote ? `<button class="ge-key" data-action="open-event" data-id="${vote.id}"><small>${en ? 'Voting' : 'ช่วงโหวต'}</small>${dm(vote.start)} – ${dm(eventLastDay(vote))}</button>` : ''}
         ${results ? `<button class="ge-key" data-action="open-event" data-id="${results.id}"><small>${en ? 'Final results' : 'ประกาศผล'}</small>${dm(results.start)}</button>` : ''}
@@ -23695,6 +23744,7 @@ function renderMain(){
   odoRun(main);
   attachMainEvents();
   startBirthdayFireworks();
+  geHeroFx();
   requestAnimationFrame(bindEdgeFades);   // it measures the chips, which forces a layout; after the rest of this draw there is only one
   bindPosterZoom();
   bindOrgZoom();
