@@ -14217,7 +14217,7 @@ function renderGEHistory(en){
     const rows = (k7.length ? geKami7(k7.map(rowOf).join(''), en, false) : '') + ranks.filter(n => n > GE_KAMI7).map(rowOf).join('');
     return `<section class="gel-band is-${b.tone}">
       <div class="gel-band-h">${b.name}<small>${en ? `Ranks ${b.from}–${b.to}` : `อันดับ ${b.from}–${b.to}`}</small></div>
-      ${b.track ? `<p class="gel-band-song"><span>${en ? 'Sang' : 'ได้ร้อง'}</span><b>♪ ${escapeHtml(b.track)}</b></p>` : ''}
+      ${b.track ? `<p class="gel-band-song"><span>${en ? 'Sang' : 'ได้เพลง'}</span><b>♪ ${escapeHtml(b.track)}</b></p>` : ''}
       <div class="gel-rows">${rows}</div>
     </section>`;
   }).join('');
