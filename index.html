@@ -5184,13 +5184,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .evm-track::-webkit-scrollbar{ display:none; }
   .evm-slide{ flex:0 0 100%; scroll-snap-align:center; scroll-snap-stop:always; width:100%; }
   .evm-slides .evm-poster{ margin:0; }
-  .evm-dots{ display:flex; justify-content:center; gap:8px; margin-top:10px; flex-wrap:wrap; }
-  .evm-dot{ display:inline-flex; align-items:center; gap:6px; height:26px; min-width:26px; padding:0 9px; border-radius:99px; border:1px solid var(--line); background:var(--card); color:var(--ink-soft); font:inherit; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 2px 0 var(--line); }
-  .evm-dot:not(:has(span)){ width:26px; padding:0; justify-content:center; }
-  .evm-dot:not(:has(span))::before{ content:''; width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.5; }
-  .evm-dot:active{ transform:translateY(2px); box-shadow:none; }
-  .evm-dot.on{ background:color-mix(in srgb, var(--poster-accent, var(--brand-a)) 16%, var(--card)); color:var(--ink); border-color:color-mix(in srgb, var(--poster-accent, var(--brand-a)) 55%, var(--line)); }
-  .evm-dot.on::before{ opacity:1; }
+  /* Clear dots in a slim row under the picture; the swipe takes the height of the picture on show (fitTrack), so a short
+     poster beside a tall one leaves no empty room under it. */
+  .evm-track{ align-items:flex-start; }
+  .evm-dots{ display:flex; width:max-content; margin:8px auto 0; align-items:center; gap:2px; padding:3px 5px; border-radius:99px; background:rgba(20,20,28,.2); }
+  .evm-dot{ display:grid; place-items:center; width:20px; height:20px; padding:0; border:0; background:none; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .evm-dot::before{ content:''; width:7px; height:7px; border-radius:99px; background:rgba(255,255,255,.55); box-shadow:0 0 0 .5px rgba(0,0,0,.18); transition:width .25s ease, background .25s ease; }
+  .evm-dot.on::before{ width:18px; background:rgba(255,255,255,.95); }
+  .evm-dot:active::before{ transform:scale(.85); }
   .evm-poster{
     display:block; width:100%; height:auto; margin:0 0 16px;
     border-radius:14px; border:1px solid var(--line);
@@ -17729,13 +17730,23 @@ function schedTick(){
     });
   });
 }
-/* A poster, or several to swipe through: poster.img first, then poster.more = [{ img, w, h, th, en }] (the label shows under it).
+/* A poster, or several to swipe through: poster.img first, then poster.more = [{ img, w, h, th, en }] (the label names its dot).
    Each opens the full-size viewer at its own picture (state.posterOf 'pm:<event>:<n>'). */
 document.addEventListener('scroll', e => {
   const t = e.target; if(!t || !t.matches || !t.matches('[data-track]')) return;
   const i = Math.round(t.scrollLeft / Math.max(1, t.clientWidth));
   t.parentElement.querySelectorAll('.evm-dot').forEach((d, k) => d.classList.toggle('on', k === i));
+  fitTrack(t);
 }, true);
+// The swipe is as tall as the picture on show (by the scroll, so it follows the finger from one height to the next).
+function fitTrack(t){
+  const kids = t.children, step = kids[1] ? kids[1].offsetLeft - kids[0].offsetLeft : t.clientWidth;
+  const x = Math.max(0, t.scrollLeft / Math.max(1, step)), i = Math.min(kids.length - 1, Math.floor(x)), f = x - i;
+  const h = i => kids[i] ? kids[i].offsetHeight : 0, a = h(i), b = h(i + 1) || a;
+  if(a) t.style.height = Math.round(a + (b - a) * f) + 'px';
+}
+document.addEventListener('load', e => { const t = e.target.closest && e.target.closest('[data-track]'); if(t) fitTrack(t); }, true);
+window.addEventListener('resize', () => document.querySelectorAll('[data-track]').forEach(fitTrack));
 function posterSlides(ev){
   const en = isEN(), p = ev.poster, list = [{ img:p.img, w:p.w, h:p.h, th:p.th, en:p.en }, ...(p.more || [])];
   const one = (x, i) => `<button class="evm-poster-btn${list.length > 1 ? ' evm-slide' : ''}" data-action="open-poster" data-id="${i ? `pm:${ev.id}:${i}` : ev.id}"
@@ -17744,7 +17755,7 @@ function posterSlides(ev){
         alt="${en ? 'Poster' : 'โปสเตอร์งาน'} ${escapeAttr(ev.title)}" ${i ? 'loading="lazy"' : 'loading="lazy"'} decoding="async"></button>`;
   if(list.length < 2) return one(list[0], 0);
   return `<div class="evm-slides"><div class="evm-track" data-track>${list.map(one).join('')}</div>
-    <div class="evm-dots" role="tablist">${list.map((x, i) => `<button class="evm-dot${i ? '' : ' on'}" data-action="slide-to" data-i="${i}" role="tab" aria-label="${i + 1} / ${list.length}${x.th ? ' · ' + escapeAttr(en ? (x.en || x.th) : x.th) : ''}">${x.th ? `<span>${escapeHtml(en ? (x.en || x.th) : x.th)}</span>` : ''}</button>`).join('')}</div></div>`;
+    <div class="evm-dots" role="tablist">${list.map((x, i) => `<button class="evm-dot${i ? '' : ' on'}" data-action="slide-to" data-i="${i}" role="tab" aria-label="${i + 1} / ${list.length}${x.th ? ' · ' + escapeAttr(en ? (x.en || x.th) : x.th) : ''}" title="${x.th ? escapeAttr(en ? (x.en || x.th) : x.th) : ''}"></button>`).join('')}</div></div>`;
 }
 function renderEventModal(){
   const ev = SEED_SCHEDULE.find(e => e.id === state.selectedEvent);

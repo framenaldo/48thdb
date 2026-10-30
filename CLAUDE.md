@@ -194,7 +194,7 @@ the Firebase CLI from the owner's machine.
   rounds span days, tabs by kind and "โอชิฉัน", rounds past or on now marked by the clock) — the Busking day and the
   Haunted Graveyard. A roadshow's `lineup` and a booth's `slots` keep their own tables but draw the same tiles.
 - An event can carry more pictures to swipe through under its first: `poster.more = [{ img, w, h, th, en }]`
-  (`posterSlides`; `th`/`en` label each dot, the first by `poster.th`/`poster.en`; each opens the viewer as
+  (`posterSlides`, `fitTrack`: clear dots under it and the swipe takes the shown picture's height; `th`/`en` name each dot for screen readers, the first by `poster.th`/`poster.en`; each opens the viewer as
   `pm:<event>:<n>`). The card and the shop show the first only.
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
