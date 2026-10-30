@@ -1310,7 +1310,7 @@ DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
  b.com/event/ev-kimi-busking-1030
 URL:https://48thdb.com/event/ev-kimi-busking-1030
 DTSTART;TZID=Asia/Bangkok:20261030T120000
-DTEND;TZID=Asia/Bangkok:20261030T210000
+DTEND;TZID=Asia/Bangkok:20261030T235900
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-ge6-handshake@48thdb
