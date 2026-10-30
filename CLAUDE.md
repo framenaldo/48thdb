@@ -125,7 +125,7 @@ the Firebase CLI from the owner's machine.
   no solid colour, and dissolves downward into the page (a mask, top and bottom only, so the text stays inside the
   solid part — mind the padding; the date pills carry their own dark wash for legibility), the picture drifts slowly, the logo glints, the countdown number breathes,
   and one canvas (`geHeroFx`) draws embers rising and a small firework now and then. It runs only while the hero is on
-  screen and the tab visible, and not at all with reduced motion. Not drawn in the slim hero of a live results read-out.
+  screen and the tab visible, and not at all with reduced motion. Not drawn in the slim hero of a live results read-out. That dissolve is for dark mode only: in light mode a dark picture melting into a pale page was just fog, so there it is a clean banner (rounded corners, a soft shadow, no mask).
 - `SEED_ALL_MEMBERS` draws the page immediately; Firebase catches up after and
   redraws only when something actually differs. Keep that first paint fast.
 - `SEED_SCHEDULE` holds events; `TIMELINES` and `GE_PAGE` the election pages.

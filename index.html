@@ -2958,6 +2958,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .gec-cols{ display:grid; grid-template-columns:1fr 1fr; gap:0 18px; align-items:start; }
     .gec-col{ min-width:0; }
   }
+  /* in light mode a dark picture melting into a pale page only turns to fog, so there it is a clean banner with soft
+     corners and a shadow; the dissolve above stays for dark mode, where the page is as dark as the picture */
+  @media (prefers-color-scheme:light){ :root:not([data-theme="dark"]) .ge-hero{ -webkit-mask-image:none; mask-image:none; border-radius:0 0 26px 26px; box-shadow:0 14px 34px rgba(120,20,40,.28); } }
+  :root[data-theme="light"] .ge-hero{ -webkit-mask-image:none; mask-image:none; border-radius:0 0 26px 26px; box-shadow:0 14px 34px rgba(120,20,40,.28); }
+  @media (prefers-color-scheme:light) and (min-width:900px){ :root:not([data-theme="dark"]) .ge-hero{ border-radius:26px; margin-top:6px; } }
+  @media (min-width:900px){ :root[data-theme="light"] .ge-hero{ border-radius:26px; margin-top:6px; } }
   .ge-hero:not(.is-slim) .ge-hero-bg{ animation:geDrift 18s ease-in-out infinite alternate; will-change:transform; }
   @keyframes geDrift{ from{ transform:scale(1) translate3d(0, 0, 0); } to{ transform:scale(1.12) translate3d(-1.5%, -1%, 0); } }
   .ge-fx{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
