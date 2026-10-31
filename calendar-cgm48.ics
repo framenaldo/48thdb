@@ -1163,19 +1163,6 @@ DTSTART;TZID=Asia/Bangkok:20261029T160000
 DTEND;TZID=Asia/Bangkok:20261029T193000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-rama9@48thdb
-DTSTAMP:20261107T000000Z
-SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:Central Rama 9\, Bangkok
-DESCRIPTION:รายละเอียดและเวลายังไ
- ม่ประกาศ\n• รายชื่อสมาชิกแ
- ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
- kimi-roadshow-rama9
-URL:https://48thdb.com/event/ev-kimi-roadshow-rama9
-DTSTART;VALUE=DATE:20261107
-DTEND;VALUE=DATE:20261109
-END:VEVENT
-BEGIN:VEVENT
 UID:ev-kimi-roadshow-t21-nov@48thdb
 DTSTAMP:20261121T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow

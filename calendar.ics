@@ -1544,17 +1544,66 @@ DTSTART;TZID=Asia/Bangkok:20261029T160000
 DTEND;TZID=Asia/Bangkok:20261029T193000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-rama9@48thdb
+UID:ev-kimi-roadshow-rama9-2026-11-07@48thdb
 DTSTAMP:20261107T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:Central Rama 9\, Bangkok
-DESCRIPTION:รายละเอียดและเวลายังไ
- ม่ประกาศ\n• รายชื่อสมาชิกแ
- ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
- kimi-roadshow-rama9
+LOCATION:ลานโปรโมชั่น ชั้น 6\, Central Rama
+  9\, Bangkok
+DESCRIPTION:เมมเบอร์: Fame\, Nall\, Neen\, Proud\, Saonoi\,
+  Wawa\, L\, Berry\, Cartoon\, Mail\, Micha\, Palmmy\n• รอบเว
+ ลาเดียวกันทั้งสองวัน 7 และ 8
+  พ.ย.\n• 12:00–13:00 Free Mini Concert\n• 14:00–15:00 Group Hi
+ -Touch\n• 15:30–16:30 พบสมาชิกที่จุด Merch
+ andise และ Hachi Cha\n• 17:00–18:00 Group Hi-Touch\n• บั
+ ตรเข้าร่วม Group Hi-Touch ได้จากการ
+ ซื้อเข็มกลัดภายในงาน\n• Zone 1 
+ โซนนั่งชมด้านใน ถ่ายด้วยโ
+ ทรศัพท์มือถือเท่านั้น ยกไ
+ ม่เกินระดับศีรษะ\n• Zone 2 โซนช
+ ่างภาพ ใช้กล้องได้ทุกชนิด
+ และใช้อุปกรณ์เสริมได้\n• Zone 
+ 3 โซนรอบนอก ใช้กล้องได้ทุก
+ ชนิด แต่ห้ามใช้ขาตั้ง บันไ
+ ด เก้าอี้\n• Group Hi-Touch ห้ามสวมนา
+ ฬิกาข้อมือ แหวน กำไล หรือถ
+ ือสิ่งของที่อาจเป็นอันตร
+ ายต่อสมาชิก\n• กำหนดการอาจ
+ เปลี่ยนแปลงตามความเหมาะส
+ ม\n\nhttps://48thdb.com/event/ev-kimi-roadshow-rama9
 URL:https://48thdb.com/event/ev-kimi-roadshow-rama9
-DTSTART;VALUE=DATE:20261107
-DTEND;VALUE=DATE:20261109
+DTSTART;TZID=Asia/Bangkok:20261107T120000
+DTEND;TZID=Asia/Bangkok:20261107T180000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-rama9-2026-11-08@48thdb
+DTSTAMP:20261107T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:ลานโปรโมชั่น ชั้น 6\, Central Rama
+  9\, Bangkok
+DESCRIPTION:เมมเบอร์: Fame\, Nall\, Neen\, Proud\, Saonoi\,
+  Wawa\, L\, Berry\, Cartoon\, Mail\, Micha\, Palmmy\n• รอบเว
+ ลาเดียวกันทั้งสองวัน 7 และ 8
+  พ.ย.\n• 12:00–13:00 Free Mini Concert\n• 14:00–15:00 Group Hi
+ -Touch\n• 15:30–16:30 พบสมาชิกที่จุด Merch
+ andise และ Hachi Cha\n• 17:00–18:00 Group Hi-Touch\n• บั
+ ตรเข้าร่วม Group Hi-Touch ได้จากการ
+ ซื้อเข็มกลัดภายในงาน\n• Zone 1 
+ โซนนั่งชมด้านใน ถ่ายด้วยโ
+ ทรศัพท์มือถือเท่านั้น ยกไ
+ ม่เกินระดับศีรษะ\n• Zone 2 โซนช
+ ่างภาพ ใช้กล้องได้ทุกชนิด
+ และใช้อุปกรณ์เสริมได้\n• Zone 
+ 3 โซนรอบนอก ใช้กล้องได้ทุก
+ ชนิด แต่ห้ามใช้ขาตั้ง บันไ
+ ด เก้าอี้\n• Group Hi-Touch ห้ามสวมนา
+ ฬิกาข้อมือ แหวน กำไล หรือถ
+ ือสิ่งของที่อาจเป็นอันตร
+ ายต่อสมาชิก\n• กำหนดการอาจ
+ เปลี่ยนแปลงตามความเหมาะส
+ ม\n\nhttps://48thdb.com/event/ev-kimi-roadshow-rama9
+URL:https://48thdb.com/event/ev-kimi-roadshow-rama9
+DTSTART;TZID=Asia/Bangkok:20261108T120000
+DTEND;TZID=Asia/Bangkok:20261108T180000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-shock-me-girls-orientation-2026-11-20@48thdb
