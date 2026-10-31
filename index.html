@@ -3529,6 +3529,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .hs-spec-p span{ max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:9px; font-weight:700; }
   .hs-spec-p:active .hs-pic{ transform:scale(.92); }
   .hs.is-special .hs-lane{ opacity:.5; }
+  .hs-wait{ margin:12px 0 0; padding:12px 10px; border-radius:16px; background:rgba(20,14,19,.72); border:1px solid rgba(243,217,177,.35); color:#F4ECF1; }
+  .hs-wait > b{ display:block; font-size:14px; }
+  .hs-wait > small{ display:block; margin-top:2px; font-size:11.5px; color:#B9ABB3; }
   .hs.is-reveal .hs-spec{ animation:hs-up .45s cubic-bezier(.2,.8,.2,1) both; }
   @keyframes hs-up{ from{ opacity:0; transform:translateY(-44%); } }
   .hs.is-reveal .hs-spec-p .hs-pic{ animation:hs-drop .6s cubic-bezier(.3,1.45,.55,1) calc(var(--i) * 28ms + .2s) both; }
@@ -17205,10 +17208,14 @@ const HS_ROUNDS = [
   { t:'14:00', to:'15:30', close:'15:15' },
   { t:'15:30', to:'17:00', close:'16:45' },
   { t:'17:00', to:'18:30', close:'18:15' },
-  { t:'19:00', to:'21:00', close:'19:00', special:true },
+  { t:'19:00', to:'21:00', open:'18:30', close:'19:00', special:true },
 ];
 const HS_DAYS = [
-  { date:'2026-10-31', lanes:{
+  { date:'2026-10-31',
+    // the LED board at the Special round (31 Oct): a lane each, and the waiting zone in front of MCC Hall
+    spec:{ lanes:{ 'bnk-hoop':1, 'bnk-luksorn':2, 'bnk-monet':3, 'bnk-fame':4, 'bnk-jew':5, 'bnk-arlee':6, 'bnk-saonoi':7, 'bnk-pancake':8, 'bnk-niya':9, 'bnk-rose':10, 'bnk-yoghurt':11, 'bnk-sindy':12, 'bnk-praew':13, 'bnk-micha':14, 'bnk-mail':15, 'cgm-lookked':16, 'cgm-else':17, 'cgm-prae':18, 'cgm-chifa':19, 'cgm-lewlew':20, 'cgm-satangpound':21, 'cgm-hongyok':22 },
+      wait:['bnk-berry', 'bnk-grape', 'bnk-khaimook', 'bnk-mint', 'bnk-mirin', 'cgm-praifa', 'cgm-punpon', 'cgm-tara'] },
+    lanes:{
     // BIII
     'bnk-fame':[0,0,0,0,4,1], 'bnk-hoop':[0,1,0,1,0,1], 'bnk-janry':[5,0,0,5,0,0], 'bnk-luksorn':[8,0,0,8,0,1],
     'bnk-mail':[0,0,0,0,17,1], 'bnk-marine':[0,6,0,6,0,0], 'bnk-micha':[0,0,0,3,0,1], 'bnk-monet':[18,0,0,0,19,1],
@@ -17260,15 +17267,16 @@ const hsDay = () => HS_DAYS[state.hsDay] || HS_DAYS[0];
 const hsRoundName = (i, en) => HS_ROUNDS[i].special ? (en ? 'Special round' : 'รอบพิเศษ') : `${en ? 'Round' : 'รอบ'} ${i + 1}`;
 /* who is in round ri of a day, by lane — the special round has no lanes yet */
 function hsWho(day, ri){
-  const sp = HS_ROUNDS[ri].special;
+  const sp = HS_ROUNDS[ri].special, sl = sp && day.spec ? day.spec.lanes : null;
   return Object.entries(day.lanes).filter(([id, r]) => r[ri] && getMember(id))
-    .map(([id, r]) => ({ id, lane: sp ? 0 : r[ri] }))
+    .map(([id, r]) => ({ id, lane: sp ? (sl && sl[id]) || 0 : r[ri], wait: !!(sp && day.spec && day.spec.wait.includes(id)) }))
     .sort((a, b) => a.lane - b.lane || getMember(a.id).name.localeCompare(getMember(b.id).name));
 }
 /* every round a member has over the two days */
 function hsRoundsOf(id){
   const out = [];
-  HS_DAYS.forEach((d, di) => (d.lanes[id] || []).forEach((v, ri) => { if(v) out.push({ di, ri, lane: HS_ROUNDS[ri].special ? 0 : v }); }));
+  HS_DAYS.forEach((d, di) => (d.lanes[id] || []).forEach((v, ri) => { if(v){ const sp = HS_ROUNDS[ri].special, sl = sp && d.spec ? d.spec.lanes[id] || 0 : 0;
+    out.push({ di, ri, lane: sp ? sl : v, wait: !!(sp && d.spec && d.spec.wait.includes(id)) }); } }));
   return out;
 }
 const hsMin = s => +s.slice(0, 2) * 60 + +s.slice(3, 5);
@@ -17329,7 +17337,7 @@ function hsTimetable(){
     return `<button class="hs-tt-row${i === ri ? ' on' : ''}${r.special ? ' is-sp' : ''}${st.k === 'done' ? ' is-done' : ''}${st.k === 'live' || st.k === 'shut' ? ' is-now' : ''}${has ? ' has-oshi' : ''}"
       data-action="hs-round" data-value="${i}" aria-pressed="${i === ri}">
       <b>${hsRoundName(i, en)}</b>
-      <span class="hs-tt-when">${r.t}–${r.to}<small>${r.special ? (en ? `queue closes ${r.close}` : `ปิดรับคิว ${r.close} น.`) : (en ? `lanes close ${r.close}` : `ปิดเลน ${r.close} น.`)}</small></span>
+      <span class="hs-tt-when">${r.t}–${r.to}<small>${r.special ? (day.spec ? (en ? `opens ${r.open} · closes ${r.close}` : `เปิด ${r.open} · ปิดรับคิว ${r.close} น.`) : (en ? `queue closes ${r.close}` : `ปิดรับคิว ${r.close} น.`)) : (en ? `lanes close ${r.close}` : `ปิดเลน ${r.close} น.`)}</small></span>
       <span class="hs-tt-st${st.k ? ' is-' + st.k : ''}">${st.t}</span></button>`; }).join('');
   return `<div class="hs-tt-head"><b>${en ? 'Rounds' : 'ตารางรอบ'} · ${x.getDate()} ${monthsShort()[x.getMonth()]}</b>
       <small>${today ? (en ? 'live · follows the clock' : 'เรียลไทม์ตามเวลาจริง') : (en ? 'Thai time' : 'เวลาประเทศไทย')}</small></div>
@@ -17400,12 +17408,20 @@ function renderLanePlan(ev){
       <span class="hs-desk is-shop">MERCHANDISE &amp; HACHICHA</span>
     </div>`;
   // the special round's lanes are given out on the day: its members gather over the hall instead
-  const spec = rd && rd.special ? `<div class="hs-spec">
+  const spec = rd && rd.special && !day.spec ? `<div class="hs-spec">
       <b>${en ? 'Special round' : 'รอบพิเศษ'} ${rd.t}–${rd.to}</b>
       <small>${en ? 'Lanes are announced at the venue' : 'เลนรอบพิเศษประกาศที่หน้างาน'}</small>
       ${who.length ? `<div class="hs-spec-ppl">${who.map((w, k) => { const m = getMember(w.id), g = getGroup(m.groupId) || {};
         return `<button class="hs-spec-p${pick === w.id ? ' is-pick' : ''}" style="--i:${k};--c:${g.color}" data-action="hs-lane" data-id="${w.id}">${face(m, g)}<span>${escapeHtml(m.name)}</span></button>`; }).join('')}</div>`
         : `<small>${en ? 'None of your oshi is in it' : 'โอชิของคุณไม่ได้อยู่ในรอบนี้'}</small>`}
+    </div>` : '';
+
+  // the special round with its board read: the waiting zone in front of MCC Hall
+  const waiting = rd && rd.special && day.spec ? who.filter(w => w.wait) : [];
+  const waitBox = waiting.length ? `<div class="hs-wait">
+      <b>${en ? 'Waiting zone' : 'โซนรอ'}</b><small>${en ? 'In front of MCC Hall · waiting for a lane' : 'ด้านหน้า MCC Hall · รอเข้าเลน'}</small>
+      <div class="hs-spec-ppl">${waiting.map((w, k) => { const m = getMember(w.id), g = getGroup(m.groupId) || {};
+        return `<button class="hs-spec-p${pick === w.id ? ' is-pick' : ''}" style="--i:${k};--c:${g.color}" data-action="hs-lane" data-id="${w.id}">${face(m, g)}<span>${escapeHtml(m.name)}</span></button>`; }).join('')}</div>
     </div>` : '';
 
   // a member tapped: her rounds over both days, each a way back to it
@@ -17416,20 +17432,20 @@ function renderLanePlan(ev){
     pickCard = `<div class="hs-pick" style="--c:${g.color}">
       ${renderAvatar(m, 'avatar-sm hs-pick-face', g.color)}
       <span class="hs-pick-who"><b>${escapeHtml(m.name)}</b><small>${escapeHtml(g.name || '')}</small></span>
-      ${here ? `<span class="hs-pick-no">${here.lane ? `LANE ${here.lane}` : (en ? 'Special' : 'รอบพิเศษ')}</span>` : ''}
+      ${here ? `<span class="hs-pick-no">${here.lane ? `LANE ${here.lane}` : here.wait ? (en ? 'Waiting zone' : 'โซนรอ') : (en ? 'Special' : 'รอบพิเศษ')}</span>` : ''}
       ${mine2.length ? `<div class="hs-pick-day">${mine2.map(h => `<button class="hs-when${h.di === state.hsDay && h.ri === ri ? ' on' : ''}${HS_ROUNDS[h.ri].special ? ' is-sp' : ''}"
-        data-action="hs-when" data-value="${h.di}.${h.ri}"><b>${dayLabel(HS_DAYS[h.di])} · ${hsRoundName(h.ri, en)}</b>${h.lane ? `LANE ${h.lane}` : HS_ROUNDS[h.ri].t}</button>`).join('')}</div>`
+        data-action="hs-when" data-value="${h.di}.${h.ri}"><b>${dayLabel(HS_DAYS[h.di])} · ${hsRoundName(h.ri, en)}</b>${h.lane ? `LANE ${h.lane}` : h.wait ? (en ? 'Waiting zone' : 'โซนรอ') : HS_ROUNDS[h.ri].t}</button>`).join('')}</div>`
         : `<p class="hs-pick-none">${en ? 'No rounds at this event' : 'ไม่มีรอบในงานนี้'}</p>`}
     </div>`;
   }
   // everyone in the round by name, for finding one quickly
   const list = who.length ? `<div class="hs-list">${who.slice().sort((a, b) => getMember(a.id).name.localeCompare(getMember(b.id).name)).map(w => {
     const m = getMember(w.id), g = getGroup(m.groupId) || {};
-    return `<button class="hs-chip${pick === w.id ? ' on' : ''}" style="--c:${g.color}" data-action="hs-lane" data-id="${w.id}">${renderAvatar(m, 'avatar-sm hs-chip-face', g.color)}<span>${escapeHtml(m.name)}</span>${w.lane ? `<b>${w.lane}</b>` : ''}</button>`; }).join('')}</div>`
+    return `<button class="hs-chip${pick === w.id ? ' on' : ''}" style="--c:${g.color}" data-action="hs-lane" data-id="${w.id}">${renderAvatar(m, 'avatar-sm hs-chip-face', g.color)}<span>${escapeHtml(m.name)}</span>${w.lane ? `<b>${w.lane}</b>` : w.wait ? `<b>${en ? 'wait' : 'รอ'}</b>` : ''}</button>`; }).join('')}</div>`
     : rd && osh && mine.size ? `<p class="hs-none">${en ? 'None of your oshi is in this round' : 'รอบนี้ไม่มีโอชิของคุณ'}</p>` : '';
   const back = now && !state.hsFollow ? `<button class="ff-live-back" data-action="hs-live">${en ? 'Back to now' : 'กลับไปตอนนี้'}</button>` : '';
 
-  return `<div class="hs${flat ? ' is-flat' : ''}${rd ? ' is-round' : ''}${rd && rd.special ? ' is-special' : ''}${pick ? ' has-pick' : ''}${reveal ? ' is-reveal' : ''}"
+  return `<div class="hs${flat ? ' is-flat' : ''}${rd ? ' is-round' : ''}${rd && rd.special && !day.spec ? ' is-special' : ''}${pick ? ' has-pick' : ''}${reveal ? ' is-reveal' : ''}"
     style="--yaw:${flat ? 0 : state.hsYaw || 0}deg">
     ${scope}
     <div class="hs-board">
@@ -17454,6 +17470,7 @@ function renderLanePlan(ev){
         </div>
         ${spec}
       </div>
+      ${waitBox}
       <div class="hs-side">${pickCard}${list}</div></div>
       <div class="hs-tt">${hsTimetable()}</div>
       <p class="hs-note">${en ? 'A sketch from the organiser’s plan: <span class="hs-tall">lane 1 at the back, the doors at the bottom</span><span class="hs-wide">lane 1 on the left, the doors on the right</span>. Rounds may change.'
@@ -25229,7 +25246,7 @@ async function drawHSPlanCard(g, sub){
   { const t = sub.ev.title.toUpperCase(); let px = 24; g.font = F(800, px); while(px > 15 && g.measureText(t).width > W - 120){ px--; g.font = F(800, px); }
     shareText(g, t, 60, 86, F(800, px), '#F9A8C6'); }
   shareText(g, `${en ? 'Handshake lanes' : 'ผังเลนจับมือ'} · ${dayWords}`, 60, 140, F(800, 44), '#ffffff');
-  shareText(g, rd ? `${hsRoundName(ri, en)} · ${rd.t}–${rd.to} · ${rd.special ? (en ? `queue closes ${rd.close}` : `ปิดรับคิว ${rd.close} น.`) : (en ? `lanes close ${rd.close}` : `ปิดเลน ${rd.close} น.`)}`
+  shareText(g, rd ? `${hsRoundName(ri, en)} · ${rd.t}–${rd.to} · ${rd.special ? (day.spec ? (en ? `opens ${rd.open} · closes ${rd.close}` : `เปิด ${rd.open} · ปิดรับคิว ${rd.close} น.`) : en ? `queue closes ${rd.close}` : `ปิดรับคิว ${rd.close} น.`) : (en ? `lanes close ${rd.close}` : `ปิดเลน ${rd.close} น.`)}`
     : (en ? 'Every round of the day' : 'ทุกรอบของวัน'), 60, 190, F(700, 28), '#CFC4CA');
   const faces = {};
   const want = [...new Set([...who.map(w => w.id), ...(pick ? [pick] : [])])];
@@ -25248,7 +25265,7 @@ async function drawHSPlanCard(g, sub){
     shareText(g, m.name, 180, y + 54, F(800, 38), '#fff');
     const hers = hsRoundsOf(pick).map(h => `${HS_DAYS[h.di].date === day.date ? '' : (() => { const x = parseYmd(HS_DAYS[h.di].date); return `${x.getDate()} ${M[x.getMonth()]} `; })()}${HS_ROUNDS[h.ri].special ? (en ? 'Sp' : 'พิเศษ') : (en ? 'R' : 'รอบ ') + (h.ri + 1)}${h.lane ? ` L${h.lane}` : ''}`);
     shareText(g, hers.length ? hers.join(' · ') : (en ? 'No rounds' : 'ไม่มีรอบ'), 180, y + 92, F(700, 21), '#B9ABB3');
-    if(here){ const t = here.lane ? `LANE ${here.lane}` : (en ? 'Special' : 'รอบพิเศษ'); g.font = F(900, 30);
+    if(here){ const t = here.lane ? `LANE ${here.lane}` : here.wait ? (en ? 'Waiting zone' : 'โซนรอ') : (en ? 'Special' : 'รอบพิเศษ'); g.font = F(900, 30);
       const tw = g.measureText(t).width + 40; g.fillStyle = c; shareRound(g, W - 76 - tw, y + 34, tw, 46, 23); g.fill();
       shareText(g, t, W - 76 - tw / 2, y + 68, F(900, 30), '#fff', 'center'); }
     y += 132;
@@ -25263,7 +25280,7 @@ async function drawHSPlanCard(g, sub){
       shareText(g, `${r.t}–${r.to}`, 380, yy + rh / 2 - 6, F(800, 34), '#fff');
       shareText(g, r.special ? (en ? `queue closes ${r.close}` : `ปิดรับคิว ${r.close} น.`) : (en ? `lanes close ${r.close}` : `ปิดเลน ${r.close} น.`), 380, yy + rh / 2 + 30, F(700, 22), '#B9ABB3');
       shareText(g, `${n} ${en ? 'members' : 'คน'}`, W - 92, yy + rh / 2 + 4, F(800, 26), '#F2B84B', 'right'); });
-  } else if(rd.special){
+  } else if(rd.special && !day.spec){
     // the special round: lanes on the day, so its members in a grid
     shareText(g, en ? 'Lanes are announced at the venue' : 'เลนรอบพิเศษประกาศที่หน้างาน', W / 2, y + 36, F(700, 26), '#CFC4CA', 'center');
     const cols = 6, cw = (W - 120) / cols, rows = Math.ceil(who.length / cols), ch = Math.min(170, (bottom - y - 70) / Math.max(1, rows)), f = Math.min(110, ch - 44);
