@@ -13943,8 +13943,7 @@ function renderHomeDash(ge){
   // between ผลด่วน 1 and ผลด่วน 2: a word that the next round is close; it goes by itself once round 2 has names or goes live
   const q1 = GE_ROUNDS[0], q2 = GE_ROUNDS[1];
   const soon = q1 && q2 && geHasData(q1.id) && !geHasData(q2.id) && !geIsLive(q2.id) && !((state.geRounds || {})[q2.id] || {}).live
-    ? `<button class="gel-soon" data-action="open-ge-results"><span class="gel-soon-dot"></span><span class="gel-soon-t"><b>${en ? 'Preliminary 2 is coming soon' : 'ผลด่วน 2 ใกล้ประกาศแล้ว'}</b>
-      <small>${en ? 'It will appear here the moment it is read out' : 'ประกาศปุ๊บ ผลจะขึ้นตรงนี้ทันที'}</small></span><span class="gel-soon-go">${en ? 'Round 1 →' : 'ดูผลด่วน 1 →'}</span></button>` : '';
+    ? `<button class="gel-soon" data-action="open-ge-results"><span class="gel-soon-dot"></span><span class="gel-soon-t"><b>${en ? 'Preliminary 2 is coming soon' : 'ผลด่วน 2 ใกล้ประกาศแล้ว'}</b></span><span class="gel-soon-go">${en ? 'Round 1 →' : 'ดูผลด่วน 1 →'}</span></button>` : '';
   return `<section class="feed-block feed-dash${ge || waitGE || (bigKind && bigKinds[bigKind]) ? '' : ' no-ge'}">${soon}<div class="dash">
     ${(() => { const k = ((myLayout().dash || {}).kinds || {}).ge; return k && bigKinds[k] ? bigKinds[k]() : waitGE ? '<span class="dash-ge is-wait" data-tile="ge" aria-hidden="true"></span>' : square; })()}
     ${slot('quiz')}${slot('cal')}${slot('shop')}${slot('gal')}
