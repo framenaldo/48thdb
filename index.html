@@ -4666,6 +4666,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gea-band.is-gold{ --t:#B8862E; } .gea-band.is-silver{ --t:#76828E; } .gea-band.is-bronze{ --t:#9A5733; }
   .gea-band-h{ font-size:12px; font-weight:800; color:var(--t); letter-spacing:.04em; margin:0 2px 8px; }
   .gea-row{ display:grid; grid-template-columns:28px 104px minmax(0,1fr) 30px; gap:6px; align-items:center; margin-bottom:6px; border-radius:12px; }
+  .gea-row.is-nov{ grid-template-columns:28px minmax(0,1fr) 30px; }
   .gea-row.is-ok{ animation:gea-ok 1.2s; }
   @keyframes gea-ok{ 0%{ background:#DDF5E6; } 100%{ background:transparent; } }
   .gea-n{ font-weight:800; text-align:center; color:var(--t); }
@@ -15356,12 +15357,13 @@ function renderGEAdmin(){
   const seg = `<div class="gea-seg">${GE_ROUNDS.map(r => `<button class="${r.id === round.id ? 'is-on' : ''}" data-action="ge-admin-round" data-value="${r.id}">${geRoundLabel(r)}</button>`).join('')}</div>`;
   const toggle = `<button class="gea-switch${doc.live ? ' is-on' : ''}" data-action="ge-live" aria-pressed="${!!doc.live}">
     <span>${en ? 'Live now' : 'ถ่ายทอดสดอยู่'} <small>${en ? '(LIVE badge on the site)' : '(ป้าย LIVE บนเว็บ)'}</small></span><i></i></button>`;
+  const noV = round.id === 'ge2026-q2';   // ผลด่วน 2 is read out by name only, so no votes to type
   const bands = GE_BANDS.slice().reverse().map(b => {
     const rows = [];
     for(let n = b.to; n >= b.from; n--){
       const s = slots[n] || {}, m = s.id && getMember(s.id);
-      rows.push(`<div class="gea-row" data-rank="${n}"><span class="gea-n">${n}</span>
-        <input class="gea-v" inputmode="decimal" autocomplete="off" data-rank="${n}" value="${geVotes(s.v)}" placeholder="${en ? 'Votes' : 'คะแนน'}">
+      rows.push(`<div class="gea-row${noV ? ' is-nov' : ''}" data-rank="${n}"><span class="gea-n">${n}</span>
+        ${noV ? '' : `<input class="gea-v" inputmode="decimal" autocomplete="off" data-rank="${n}" value="${geVotes(s.v)}" placeholder="${en ? 'Votes' : 'คะแนน'}">`}
         <div class="gea-name">${m ? geFace(m, 'gea-face') : ''}<input class="gea-q" autocomplete="off" data-rank="${n}" value="${m ? escapeAttr(m.name) : ''}" placeholder="${en ? 'Name' : 'ชื่อ'}">
           <div class="gea-sug" hidden></div></div>
         ${s.id || s.v != null ? `<button class="gea-x" data-action="ge-clear" data-value="${n}" aria-label="${en ? 'Clear' : 'ล้าง'}">×</button>` : '<span></span>'}</div>`);
@@ -15371,7 +15373,8 @@ function renderGEAdmin(){
   return `<section class="gea">
     <div class="gea-head"><button class="chip" data-action="ge-back">←</button><h2>${en ? 'Live results' : 'รายงานผลสด'}</h2><span class="gea-lock">${en ? 'Owner only' : 'เฉพาะเจ้าของเว็บ'}</span></div>
     <div class="gea-card">${seg}${toggle}</div>
-    <p class="gea-hint">${en ? 'Type the votes and press Enter — they go up at once. Then the name when it is read out; pick from the list and Enter. Photo, team and arrows fill themselves. Anything can be typed over.'
+    <p class="gea-hint">${noV ? (en ? 'This round has no scores. Type the name when it is read out; pick from the list and Enter. Photo, team and arrows fill themselves. Anything can be typed over.'
+      : 'ผลด่วน 2 ไม่มีคะแนน พิมพ์ชื่อตอนเขาประกาศ เลือกจากรายการแล้วกด Enter · รูป ทีม และลูกศรขึ้น/ลงดึงให้เอง · กรอกผิดพิมพ์ทับได้ตลอด') : en ? 'Type the votes and press Enter — they go up at once. Then the name when it is read out; pick from the list and Enter. Photo, team and arrows fill themselves. Anything can be typed over.'
       : 'ใส่คะแนนแล้วกด Enter คะแนนขึ้นเว็บทันที แล้วค่อยพิมพ์ชื่อตอนเขาประกาศ เลือกจากรายการแล้วกด Enter · รูป ทีม และลูกศรขึ้น/ลงดึงให้เอง · กรอกผิดพิมพ์ทับได้ตลอด'}</p>
     <div class="gea-bands">${bands}</div></section>`;
 }
@@ -15457,7 +15460,7 @@ function bindGEAdmin(){
         toast(isEN() ? 'All 36 in: LIVE switched off' : 'ครบ 36 อันดับแล้ว ปิด LIVE ให้อัตโนมัติ');
       }
     }
-    if(n > 1) focusGE(n - 1, 'gea-v');
+    if(n > 1) focusGE(n - 1, round() === 'ge2026-q2' ? 'gea-q' : 'gea-v');
   };
   const suggest = (inp) => {
     const box = inp.parentElement.querySelector('.gea-sug');
