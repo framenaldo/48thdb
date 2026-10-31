@@ -7746,11 +7746,39 @@ const SEED_SCHEDULE = [
     info:[
       'จำหน่ายบัตรรอบพิเศษ 200 บาท',
       'ตารางสมาชิกตามโปสเตอร์ Member Schedule และ Hachi Cha Schedule แต่ละรอบมีสมาชิก 4 คนต่อกลุ่ม'] },
-  { id:'ev-kimi-roadshow-rama9', logo:'kimi', start:'2026-11-07', end:'2026-11-08', tba:true,
+  { id:'ev-kimi-roadshow-rama9', logo:'kimi', start:'2026-11-07', end:'2026-11-08', time:'12:00',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
-    venue:'Central Rama 9, Bangkok', groups:['bnk48','cgm48'],
+    venue:'ลานโปรโมชั่น ชั้น 6, Central Rama 9, Bangkok', groups:['bnk48'],
     related:['ev-ge6-single','ev-kimi-roadshow-mbk'],
-    info:['รายชื่อสมาชิกและเวลารอประกาศ'] },
+    poster:{ accent:'#5A5638', surface:'#EEF3F5', ink:'#34321F', img:'posters/kimi-roadshow-rama9.jpg', w:1363, h:2048, th:'โปสเตอร์', en:'Poster',
+      more:[{ img:'posters/kimi-roadshow-rama9-2.jpg', w:1500, h:1500, th:'Free Mini Concert', en:'Free Mini Concert' },
+            { img:'posters/kimi-roadshow-rama9-3.jpg', w:1500, h:1500, th:'กำหนดการ', en:'Schedule' },
+            { img:'posters/kimi-roadshow-rama9-4.jpg', w:1500, h:1500, th:'กฎติกาและผังโซน', en:'Rules & zones' }] },
+    members:['bnk-fame','bnk-khowjow','bnk-nall','bnk-neen','bnk-saonoi','bnk-wawa','bnk-l','bnk-berry','bnk-cartoon','bnk-mail','bnk-micha','bnk-palmmy'],
+    seatPlan:{ layout:'rama9-roadshow', head:'ผังโซน (จำลอง)',
+      source:'ผังจำลองจากผังโซนที่ผู้จัดประกาศ วาดตามตำแหน่งของแต่ละโซน ไม่ได้ตามสัดส่วนจริงและไม่ใช่ผังทางการ',
+      zones:[
+        { id:'Z1', label:'Zone 1', sections:['Z1'], color:'#5A5240', note:'โซนนั่งชมด้านใน ถ่ายด้วยโทรศัพท์มือถือเท่านั้น ยกไม่เกินระดับศีรษะ' },
+        { id:'Z2', label:'Zone 2', sections:['Z2'], color:'#72AB52', note:'โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้' },
+        { id:'Z3', label:'Zone 3', sections:['Z3L', 'Z3B', 'Z3R'], color:'#63A3D3', note:'โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้' }] },
+    detail:[
+      'รอบเวลาเดียวกันทั้งสองวัน 7 และ 8 พ.ย.',
+      '12:00–13:00 Free Mini Concert',
+      '14:00–15:00 Group Hi-Touch',
+      '15:30–16:30 พบสมาชิกที่จุด Merchandise และ Hachi Cha',
+      '17:00–18:00 Group Hi-Touch'],
+    lineup:{
+      '2026-11-07':{ 'Mini Concert':['bnk-fame','bnk-khowjow','bnk-nall','bnk-neen','bnk-saonoi','bnk-wawa'],
+        'Group Hi-Touch':['bnk-fame','bnk-khowjow','bnk-nall','bnk-neen','bnk-saonoi','bnk-wawa'] },
+      '2026-11-08':{ 'Mini Concert':['bnk-l','bnk-berry','bnk-cartoon','bnk-mail','bnk-micha','bnk-palmmy'],
+        'Group Hi-Touch':['bnk-l','bnk-berry','bnk-cartoon','bnk-mail','bnk-micha','bnk-palmmy'] } },
+    info:[
+      'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
+      'Zone 1 โซนนั่งชมด้านใน ถ่ายด้วยโทรศัพท์มือถือเท่านั้น ยกไม่เกินระดับศีรษะ',
+      'Zone 2 โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้',
+      'Zone 3 โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้',
+      'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก',
+      'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
   { id:'ev-shock-me-girls-orientation', start:'2026-11-20', time:'10:00', until:'20:15',
     sales:{ from:'2026-10-31T12:00', to:'2026-11-19T12:00' },
     title:'SHOCK ME GIRLS: SEMESTER 2 ORIENTATION DAY',
@@ -7798,17 +7826,17 @@ const SEED_SCHEDULE = [
   { id:'ev-kimi-roadshow-t21-nov', logo:'kimi', start:'2026-11-21', end:'2026-11-22', tba:true,
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'Terminal21 Rama 3, Bangkok', groups:['bnk48','cgm48'],
-    related:['ev-ge6-single','ev-kimi-roadshow-mbk'],
+    related:['ev-ge6-single','ev-kimi-roadshow-rama9'],
     info:['รายชื่อสมาชิกและเวลารอประกาศ'] },
   { id:'ev-kimi-roadshow-phitsanulok', logo:'kimi', start:'2026-11-21', end:'2026-11-22', tba:true,
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'Central Phitsanulok, Phitsanulok', groups:['bnk48','cgm48'],
-    related:['ev-ge6-single','ev-kimi-roadshow-mbk'],
+    related:['ev-ge6-single','ev-kimi-roadshow-rama9'],
     info:['รายชื่อสมาชิกและเวลารอประกาศ'] },
   { id:'ev-kimi-roadshow-bigc-rajdamri', logo:'kimi', start:'2026-11-28', end:'2026-11-29', tba:true,
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'Big C Rajdamri, Bangkok', groups:['bnk48','cgm48'],
-    related:['ev-ge6-single','ev-kimi-roadshow-mbk'],
+    related:['ev-ge6-single','ev-kimi-roadshow-rama9'],
     info:['รายชื่อสมาชิกและเวลารอประกาศ'] },
 ];
 SEED_SCHEDULE.forEach(e => {
@@ -16265,6 +16293,23 @@ SEAT_LAYOUTS['mbk-roadshow'] = (() => {
       Z2:{ level:'floor', pts:SP_RM(-2.1, 14.6, W + 4.2, 1.8), at:[W / 2 * SP_M, 15.5 * SP_M], text:'ZONE 2', under:true } },
     // a metre's walkway in front, then eight rows either side of the aisle
     props:spChairs('Z1', [...SP_FIVE(0.3, 0.55), ...SP_FIVE(4.25, 0.55)], 5.2, 8, 0.9),
+  };
+})();
+SEAT_LAYOUTS['rama9-roadshow'] = (() => {
+  const W = 10;   // the organiser's zone chart redrawn as a sketch: the zones' order and shape, not their size
+  return {
+    cx:W / 2 * SP_M, cy:4.4 * SP_M, w:(W + 6.6) * SP_M, tightZ:true,
+    levels:{ floor:{ th:'พื้น', en:'Floor', m:0, cap:{ th:['พื้น'], en:['Floor'] } } },
+    captions:[], rules:[],
+    floor:SP_RM(-3.3, -1, W + 6.6, 10.9),
+    blocks:[
+      { pts:SP_RM(0, 0, W, 1.2), h:0.7 * SP_M, text:'STAGE', at:[W / 2 * SP_M, 0.6 * SP_M], big:true } ],
+    sections:{
+      Z1:{ level:'floor', pts:SP_RM(0, 1.35, W, 3.9), at:[W / 2 * SP_M, 1.4 * SP_M], text:'ZONE 1', under:true, labelTop:true, small:true },
+      Z3L:{ level:'floor', pts:SP_RM(-1.6, 1.35, 1.5, 5.7), at:[-0.85 * SP_M, 4.2 * SP_M], text:'3', under:true },
+      Z3R:{ level:'floor', pts:SP_RM(W + 0.1, 1.35, 1.5, 5.7), at:[(W + 0.85) * SP_M, 4.2 * SP_M], text:'3', under:true },
+      Z3B:{ level:'floor', pts:SP_RM(0, 5.35, W, 1.7), at:[W / 2 * SP_M, 6.2 * SP_M], text:'ZONE 3', under:true },
+      Z2:{ level:'floor', pts:SP_RM(-1.6, 7.15, W + 3.2, 1.65), at:[W / 2 * SP_M, 7.97 * SP_M], text:'ZONE 2', under:true } },
   };
 })();
 /* how many chairs a section has, and a zone (0 when the hall has no chairs drawn) */
