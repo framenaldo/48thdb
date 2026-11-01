@@ -17242,7 +17242,11 @@ const HS_DAYS = [
     'cgm-namphet':[0,20,0,0,0,0], 'cgm-praifa':[0,19,0,0,0,1], 'cgm-punpon':[0,0,20,0,0,1], 'cgm-satangpound':[0,5,0,0,5,1],
     'cgm-shenae':[0,0,7,0,7,0], 'cgm-tara':[20,0,0,20,0,1], 'cgm-valentine':[17,0,0,19,0,0],
   } },
-  { date:'2026-11-01', lanes:{
+  { date:'2026-11-01',
+    // the LED board at the Special round (1 Nov)
+    spec:{ lanes:{ 'bnk-janry':1, 'bnk-marine':2, 'bnk-patt':3, 'bnk-wawa':4, 'bnk-emmy':5, 'bnk-l':6, 'bnk-palmmy':7, 'bnk-blythe':8, 'bnk-nall':9, 'bnk-galeya':10, 'bnk-inkcha':11, 'bnk-khowjow':12, 'bnk-nammonn':13, 'bnk-neen':14, 'cgm-ploen':15, 'cgm-nana':16, 'cgm-lingling':17, 'cgm-jingjing':18, 'cgm-kwan':19, 'cgm-nisha':20, 'cgm-shenae':21, 'cgm-emma':22 },
+      wait:['bnk-cartoon', 'bnk-mayji', 'bnk-proud', 'cgm-ginna', 'cgm-valentine', 'cgm-namphet'] },
+    lanes:{
     // BIII
     'bnk-fame':[2,0,2,0,0,0], 'bnk-hoop':[1,0,1,0,0,0], 'bnk-janry':[0,5,0,5,0,1], 'bnk-luksorn':[0,7,0,0,6,0],
     'bnk-mail':[7,0,0,7,0,0], 'bnk-marine':[0,6,0,6,0,1], 'bnk-micha':[0,3,0,3,0,0], 'bnk-monet':[0,2,0,2,0,0],
