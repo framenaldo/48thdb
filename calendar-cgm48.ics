@@ -424,6 +424,19 @@ DTSTART;TZID=Asia/Bangkok:20261029T180000
 DTEND;TZID=Asia/Bangkok:20261029T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-live-1103-2026-11-03@48thdb
+DTSTAMP:20261103T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Pop Up Live
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Kwan\, Shenae\, Jingjing\, Ginna\n•
+  ครั้งนี้เป็นเทปที่บันทึก
+ ไว้ล่วงหน้า\n\nhttps://48thdb.com/event/ev-cgm48-pop
+ up-live-1103
+URL:https://48thdb.com/event/ev-cgm48-popup-live-1103
+DTSTART;TZID=Asia/Bangkok:20261103T180000
+DTEND;TZID=Asia/Bangkok:20261103T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:ยกเลิก: CGM48 11th Single "Koi Tsunjatta – Let me kno
