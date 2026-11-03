@@ -230,6 +230,24 @@ DTSTART;TZID=Asia/Bangkok:20260920T120000
 DTEND;TZID=Asia/Bangkok:20260920T180000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-anotherdot-1104@48thdb
+DTSTAMP:20261104T000000Z
+SUMMARY:งานแถลงข่าวเปิดตัว AnotherDot
+LOCATION:SCBX NEXT TECH\, Siam Paragon
+DESCRIPTION:เมมเบอร์: Wawa\, Blythe\, Arlee\, Fame\, Niya\,
+  Janry\, Pancake\, Praew\, Hoop\, Marine\n• BNK48 ร่วมงาน
+ แถลงข่าวเปิดตัว AnotherDot แพลตฟ
+ อร์มชวนครีเอเตอร์ทั่วประ
+ เทศไทยร่วมงานกับแบรนด์แล
+ ะเอเจนซี่ชั้นนำ\n• ศิลปิน BNK4
+ 8 ร่วมงาน: Wawa\, Blythe\, Arlee\, Fame\, Niya\, Janry\, Pan
+ cake\, Praew\, Hoop และ Marine\n\nhttps://48thdb.com/event/ev-anothe
+ rdot-1104
+URL:https://48thdb.com/event/ev-anotherdot-1104
+DTSTART;VALUE=DATE:20261104
+DTEND;VALUE=DATE:20261105
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-mbk-haunted-graveyard-1020-2026-10-20@48thdb
 DTSTAMP:20261020T000000Z
 SUMMARY:ป่าช้าสยองขวัญ
