@@ -450,7 +450,7 @@ DTSTART;TZID=Asia/Bangkok:20261027T180000
 DTEND;TZID=Asia/Bangkok:20261027T200000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-anotherdot-1104@48thdb
+UID:ev-anotherdot-1104-2026-11-04@48thdb
 DTSTAMP:20261104T000000Z
 SUMMARY:งานแถลงข่าวเปิดตัว AnotherDot
 LOCATION:SCBX NEXT TECH\, Siam Paragon
@@ -464,8 +464,8 @@ DESCRIPTION:เมมเบอร์: Wawa\, Blythe\, Arlee\, Fame\, Niya\,
  cake\, Praew\, Hoop และ Marine\n\nhttps://48thdb.com/event/ev-anothe
  rdot-1104
 URL:https://48thdb.com/event/ev-anotherdot-1104
-DTSTART;VALUE=DATE:20261104
-DTEND;VALUE=DATE:20261105
+DTSTART;TZID=Asia/Bangkok:20261104T130000
+DTEND;TZID=Asia/Bangkok:20261104T160000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-mbk-haunted-graveyard-1020-2026-10-20@48thdb
