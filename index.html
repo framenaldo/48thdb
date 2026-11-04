@@ -7115,6 +7115,15 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#5E6B3A', surface:'#F2F5EC', ink:'#3A3828', img:'posters/cgm48-popup-live-1103.jpg', w:1080, h:1080 },
     info:['ครั้งนี้เป็นเทปที่บันทึกไว้ล่วงหน้า'],
     stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://youtu.be/jlIsPR4ML0Y' } },
+  // a tape recorded beforehand, shown on YouTube; no stream link was given, so it points at the channel's live page
+  { id:'ev-cgm48-popup-live-1105', logo:'kimi', start:'2026-11-05', time:'18:00',
+    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Pop Up Live',
+    online:'YouTube CGM48 OFFICIAL', groups:['cgm48'],
+    members:['cgm-hongyok','cgm-emma','cgm-chifa','cgm-punpon'],
+    related:['ev-cgm48-popup-live-1103','ev-cgm48-popup-halloween-1029'],
+    poster:{ accent:'#5E6B3A', surface:'#F2F5EC', ink:'#3A3828', img:'posters/cgm48-popup-live-1105.jpg', w:1080, h:1080 },
+    info:['ครั้งนี้เป็นเทปที่บันทึกไว้ล่วงหน้า'],
+    stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL/live' } },
   { id:'ev-roadshow-fashionisland', start:'2026-09-26', end:'2026-09-27', time:'12:00',
     cancelled:'ยกเลิกการจัดงาน เนื่องจากศูนย์การค้าแฟชั่นไอส์แลนด์ปิดให้บริการชั่วคราว (สถานการณ์น้ำท่วม)',
     title:'CGM48 11th Single "Koi Tsunjatta – Let me know!" Roadshow',
@@ -15570,7 +15579,7 @@ const EVENT_ICON = {
   'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
   'ev-getaway-pudthailee':'plane', 'ev-pancake-perfume':'sparkles', 'ev-pancake-captured':'photos',
   'ev-cgm48-popup-live-cnx':'live', 'ev-cgm48-popup-live-0924':'live', 'ev-cgm48-popup-live-0929':'live', 'ev-cgm48-popup-live-1001':'live',
-  'ev-cgm48-popup-live-1006':'live', 'ev-cgm48-popup-halloween-ontour-1020':'live', 'ev-cgm48-popup-halloween-ontour-1027':'live', 'ev-cgm48-popup-halloween-1029':'live', 'ev-cgm48-popup-live-1103':'live',
+  'ev-cgm48-popup-live-1006':'live', 'ev-cgm48-popup-halloween-ontour-1020':'live', 'ev-cgm48-popup-halloween-ontour-1027':'live', 'ev-cgm48-popup-halloween-1029':'live', 'ev-cgm48-popup-live-1103':'live', 'ev-cgm48-popup-live-1105':'live',
 };
 function eventIconName(ev){
   if(!ev) return '';
