@@ -3969,12 +3969,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-l{ margin-top:auto; font-size:12px; font-weight:800; line-height:1.15; } .dash-l small{ display:block; font-size:10px; font-weight:600; line-height:1.2; color:var(--ink-soft); }
   .dash-t.is-shop{ --c:#E4457E; }
   .dash-t.is-pic{ position:relative; }
-  .dash-strip{ flex:1; align-self:stretch; min-height:0; display:flex; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
-  .dash-strip::-webkit-scrollbar{ display:none; }
-  .dash-sl{ position:relative; flex:0 0 100%; scroll-snap-align:start; display:flex; align-items:flex-end; cursor:pointer; }
+  .dash-strip{ flex:1; align-self:stretch; min-height:0; position:relative; }
+  .dash-sl{ position:absolute; inset:0; display:flex; align-items:flex-end; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  .dash-sl.on{ opacity:1; pointer-events:auto; }
   .dash-sl img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .dash-sl small{ position:relative; width:100%; padding:22px 8px 14px; color:#fff; font-size:10.5px; font-weight:700; line-height:1.2; background:linear-gradient(transparent, rgba(0,0,0,.72));
+  .dash-sl small{ position:relative; width:100%; padding:20px 8px 14px; color:#fff; font-size:11px; font-weight:800; line-height:1.2; background:linear-gradient(transparent, rgba(0,0,0,.72));
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  @media (prefers-reduced-motion:reduce){ .dash-sl{ transition:none; } }
   .dash-badge{ position:absolute; left:6px; top:30px; z-index:1; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:800; color:#fff; background:rgba(0,0,0,.5); }
   .dash-dots{ position:absolute; left:0; right:0; bottom:5px; display:flex; justify-content:center; gap:4px; pointer-events:none; }
   .dash-dots i{ width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.5); } .dash-dots i.on{ background:#fff; }
@@ -13972,8 +13973,8 @@ function renderHomeDash(ge){
       <span class="dash-i">${icon}</span><b class="dash-big">${big}</b><span class="dash-l">${label}${small ? `<small>${small}</small>` : ''}</span></button>`;
   // a poster in a tile is a slide: tapping it opens that event; the strip swipes sideways, the dots follow
   const dashSlide = (e, label) => `<span class="dash-sl" data-action="open-event" data-id="${escapeAttr(e.id)}"><img src="${escapeAttr(e.poster.img.replace(/\.[a-z]+$/i, '-s.jpg'))}" alt="" loading="lazy" decoding="async"><small>${label}</small></span>`;
-  // the strip carries a copy of its first slide at the end, so it can run on round and round (dashTick jumps back unseen)
-  const dashStrip = slides => `<span class="dash-strip" data-n="${slides.length}">${slides.join('')}${slides.length > 1 ? slides[0].replace('class="dash-sl"', 'class="dash-sl" aria-hidden="true"') : ''}</span>`;
+  // the slides sit one over the other and fade, one after another; a tap opens the one showing (dashTick)
+  const dashStrip = slides => `<span class="dash-strip" data-n="${slides.length}">${slides.map((h, k) => k ? h : h.replace('class="dash-sl"', 'class="dash-sl on"')).join('')}</span>`;
   const dashDots = n => `<span class="dash-dots" aria-hidden="true">${Array.from({ length:n }, (_, k) => `<i${k ? '' : ' class="on"'}></i>`).join('')}</span>`;
   const calPics = SEED_SCHEDULE.filter(e => !e.period && !e.cancelled && !e.shop && e.poster && e.poster.img && e.start <= wk && eventLastDay(e) >= iso)
     .sort((x, y) => (x.start > iso ? x.start : iso).localeCompare(y.start > iso ? y.start : iso) || x.start.localeCompare(y.start)).slice(0, 8);
@@ -14028,11 +14029,11 @@ function renderHomeDash(ge){
   const kinds = {
     quiz: sl => renderQuizTile(sl),
     cal: sl => calPics.length ? `<button class="dash-t is-cal is-pic" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h" data-action="nav" data-view="calendar">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
-      <span class="dash-badge" data-action="nav" data-view="calendar">${week} ${en ? 'events' : 'งาน'}</span>${dashStrip(calPics.map(e => { const n = dayN(e.start), w = n <= 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : `${+e.start.slice(8)} ${M[+e.start.slice(5, 7) - 1]}`; return dashSlide(e, `${w} · ${escapeHtml(eventShortName(e))}`); }))}${calPics.length > 1 ? dashDots(calPics.length) : ''}</button>`
+      <span class="dash-badge" data-action="nav" data-view="calendar">${week} ${en ? 'events' : 'งาน'}</span>${dashStrip(calPics.map(e => { const n = dayN(e.start), w = n <= 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : `${+e.start.slice(8)} ${M[+e.start.slice(5, 7) - 1]}`; return dashSlide(e, w); }))}${calPics.length > 1 ? dashDots(calPics.length) : ''}</button>`
       : `<button class="dash-t is-cal" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
       <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>`,
     shop: sl => shopPics.length ? `<button class="dash-t is-shop is-pic" data-tile="${sl}" data-kind="shop" data-action="nav-shop">
-      ${dashStrip(shopPics.map(e => dashSlide(e, escapeHtml(e.shop.name || e.title))))}
+      ${dashStrip(shopPics.map(e => dashSlide(e, `${en ? 'until' : 'ปิด'} ${+String(e.shop.to).slice(8, 10)} ${M[+String(e.shop.to).slice(5, 7) - 1]}`)))}
       <span class="dash-badge" data-action="nav-shop">${en ? 'Shop' : 'ร้านค้า'}${shops > 1 ? ` · ${shops}` : ''}</span>${shopPics.length > 1 ? dashDots(shopPics.length) : ''}</button>`
       : tile(`data-tile="${sl}" data-kind="shop" data-action="nav-shop"`, 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด')),
     gal: sl => `<button class="dash-t is-gal" data-tile="${sl}" data-kind="gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
@@ -27025,30 +27026,19 @@ function bindEdgeFades(){
   });
 }
 
-/* The slides in a dashboard tile: the dots follow a swipe (scroll does not bubble, so listen while it travels down),
-   the strip moves on by itself every few seconds and runs round — it carries a copy of its first slide at the end and
-   jumps back to the real one once it has settled there. It rests while the reader swipes, when it is off screen, the tab
-   is hidden or motion is reduced. */
-document.addEventListener('scroll', e => {
-  const t = e.target; if(!t || !t.classList || !t.classList.contains('dash-strip')) return;
-  const n = +t.dataset.n || 1, k = Math.round(t.scrollLeft / Math.max(1, t.clientWidth));
-  t.parentNode.querySelectorAll('.dash-dots i').forEach((x, i) => x.classList.toggle('on', i === k % n));
-  clearTimeout(t._wrap);
-  t._wrap = setTimeout(() => { if(k >= n && n > 1) t.scrollTo({ left:0, behavior:'instant' }); }, 160);
-}, true);
-['pointerdown', 'wheel', 'touchstart'].forEach(ev => document.addEventListener(ev, e => {
-  const t = e.target && e.target.closest && e.target.closest('.dash-strip'); if(t) t._rest = Date.now() + 9000;
-}, { capture:true, passive:true }));
+/* The slides in a dashboard tile fade one into the next by themselves every few seconds and run round; a tap opens the one
+   showing. They rest when the tile is off screen, the tab is hidden or motion is reduced. */
 setInterval(() => {
   if(document.hidden || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
   const now = Date.now(), vh = innerHeight;
   document.querySelectorAll('.dash-strip').forEach((t, idx) => {
-    const n = +t.dataset.n || 1; if(n < 2 || now < (t._rest || 0)) return;
-    const r = t.getBoundingClientRect(); if(r.bottom < 0 || r.top > vh || !t.clientWidth) return;
-    if(now < (t._due || (t._due = now + 2500 + idx * 1700))) return;      // the tiles take turns rather than all moving at once
+    const n = +t.dataset.n || 1; if(n < 2) return;
+    const r = t.getBoundingClientRect(); if(r.bottom < 0 || r.top > vh) return;
+    if(now < (t._due || (t._due = now + 2500 + idx * 1700))) return;      // the tiles take turns rather than all changing at once
     t._due = now + 4200;
-    const k = Math.round(t.scrollLeft / t.clientWidth);
-    t.scrollTo({ left:(k + 1) * t.clientWidth, behavior:'smooth' });
+    const sl = t.querySelectorAll('.dash-sl'), k = ([...sl].findIndex(x => x.classList.contains('on')) + 1) % n;
+    sl.forEach((x, i) => x.classList.toggle('on', i === k));
+    t.parentNode.querySelectorAll('.dash-dots i').forEach((x, i) => x.classList.toggle('on', i === k));
   });
 }, 700);
 function bindScrollPressGuard(){
