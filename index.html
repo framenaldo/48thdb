@@ -4855,6 +4855,21 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .qz-pct{ position:absolute; right:-10px; bottom:6px; min-width:58px; padding:5px 10px; border-radius:999px; font-size:20px; font-weight:800; color:#fff;
     background:linear-gradient(135deg, var(--brand-a), var(--brand-b)); border:3px solid var(--card); box-shadow:0 4px 12px rgba(228, 69, 126, .3); }
   .qz-pct small{ font-size:12px; }
+  /* the eight ทักษา colours round her, as on the share card; on a fresh result they swing in, she pops up, the % counts up */
+  .qz-best-pic{ margin:20px 0 10px; }
+  .qz-orbit{ position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; }
+  .qz-orbit i{ position:absolute; width:14px; height:14px; margin:-7px; border-radius:50%; background:var(--o); border:2.5px solid var(--card);
+    transform:rotate(var(--a)) translateY(-97px); }
+  .qz-best.is-reveal .qz-orbit{ animation:qz-orbit-in 1.2s cubic-bezier(.2,.8,.2,1) both; }
+  .qz-best.is-reveal .qz-pic{ animation:qz-pop .7s .1s cubic-bezier(.2,.9,.3,1.25) both; }
+  .qz-best.is-reveal .qz-pct{ animation:qz-pop .5s .55s cubic-bezier(.2,.9,.3,1.4) both; }
+  .qz-best.is-reveal :is(.qz-name, .qz-sub, .qz-chips, .qz-why){ animation:qz-up .5s both; }
+  .qz-best.is-reveal .qz-name{ animation-delay:.7s; } .qz-best.is-reveal .qz-sub{ animation-delay:.8s; }
+  .qz-best.is-reveal .qz-chips{ animation-delay:.9s; } .qz-best.is-reveal .qz-why{ animation-delay:1.05s; }
+  @keyframes qz-orbit-in{ 0%{ transform:rotate(-200deg) scale(.35); opacity:0; } 60%{ opacity:1; } 100%{ transform:none; opacity:1; } }
+  @keyframes qz-pop{ 0%{ transform:scale(.5); opacity:0; } 100%{ transform:none; opacity:1; } }
+  @keyframes qz-up{ 0%{ transform:translateY(10px); opacity:0; } 100%{ transform:none; opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .qz-best.is-reveal *{ animation:none !important; } }
   .qz-name{ margin:12px 0 0; font-size:26px; font-weight:800; letter-spacing:-.01em; }
   .qz-sub{ margin:2px 0 10px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
   .qz-chips{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
@@ -4997,6 +5012,42 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     color:var(--fest-ink); opacity:.72;
   }
   .evm-fest-sub.is-long{ font-size:11.5px; letter-spacing:.16em; text-indent:.16em; padding:0 8px; line-height:1.5; }
+  .evm-fest.is-play :is(.evm-fest-word, .evm-fest-img){ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
+  .evm-fest.is-play .evm-fest-sub{ animation:fest-sub .8s .9s cubic-bezier(.2,.8,.2,1) both; }
+  .evm-fest.is-play .evm-fest-face{ animation:qz-pop .55s cubic-bezier(.2,.9,.3,1.3) both; }
+  .evm-fest.is-play .evm-fest-face:nth-child(1){ animation-delay:1.05s; } .evm-fest.is-play .evm-fest-face:nth-child(2){ animation-delay:1.15s; }
+  .evm-fest.is-play .evm-fest-face:nth-child(3){ animation-delay:1.25s; } .evm-fest.is-play .evm-fest-face:nth-child(4){ animation-delay:1.35s; }
+  .evm-fest.is-play .evm-fest-face:nth-child(5){ animation-delay:1.45s; } .evm-fest.is-play .evm-fest-face:nth-child(6){ animation-delay:1.55s; }
+  .evm-fest.is-play .evm-fest-face:nth-child(n+7){ animation-delay:1.65s; }
+  .evm-fest.is-play .evm-fest-deco{ animation:fest-deco-in .9s both; }
+  .evm-fest.is-play .evm-fest-deco > *{ animation:fest-drift 7s ease-in-out infinite alternate; }
+  .evm-fest.is-play .evm-fest-deco > :nth-child(2n){ animation-duration:9s; animation-delay:-3s; }
+  .evm-fest.is-play .evm-fest-deco > :nth-child(3n){ animation-duration:11s; animation-delay:-5s; }
+  .evm-fest.is-play .evm-fest-rays{ animation:fest-spin 60s linear infinite; }
+  @keyframes fest-write{ 0%{ clip-path:inset(-20% 100% -40% -10%); opacity:.2; } 100%{ clip-path:inset(-20% -10% -40% -10%); opacity:1; } }
+  @keyframes fest-sub{ 0%{ opacity:0; letter-spacing:.9em; } 100%{ opacity:.72; } }
+  @keyframes fest-deco-in{ 0%{ opacity:0; transform:scale(1.08); } 100%{ opacity:1; transform:none; } }
+  @keyframes fest-drift{ 0%{ translate:0 0; } 100%{ translate:6px -9px; } }
+  @keyframes fest-spin{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .evm-fest.is-play *{ animation:none !important; } }
+  /* งานถัดไป on the home page's head card */
+  .cd-next{ display:flex; align-items:center; gap:8px; width:100%; margin:9px 0 0; padding:7px 8px 7px 12px; border-radius:16px; font:inherit; color:var(--ink); text-align:left; cursor:pointer;
+    background:color-mix(in srgb, var(--card) 70%, transparent); border:1px solid var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.06); transition:transform .1s; }
+  .cd-next:active{ transform:translateY(2px); box-shadow:none; }
+  .cd-k{ flex:none; font-size:10.5px; font-weight:800; letter-spacing:.06em; color:var(--bnk); }
+  .cd-t{ flex:1; min-width:0; font-size:13px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cd-clock{ flex:none; display:flex; align-items:center; gap:3px; font-variant-numeric:tabular-nums; }
+  .cd-clock > i{ font-style:normal; font-weight:800; color:var(--ink-soft); font-size:12px; }
+  .cd-days{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin-right:3px; }
+  .cd-days:empty{ display:none; }
+  .cd-cell{ display:flex; gap:2px; }
+  .cd-cell b{ display:grid; place-items:center; width:17px; height:24px; border-radius:5px; font-size:14px; font-weight:800; color:#fff;
+    background:linear-gradient(180deg, #2A2236 0 50%, #1C1726 50% 100%); box-shadow:inset 0 -1px 0 rgba(255,255,255,.06), 0 1px 0 rgba(0,0,0,.25); }
+  .cd-cell b.is-flip{ animation:cd-flip .45s cubic-bezier(.3,.6,.3,1); transform-origin:50% 50%; }
+  @keyframes cd-flip{ 0%{ transform:perspective(120px) rotateX(-90deg); } 100%{ transform:none; } }
+  .bd-balloon{ position:absolute; width:26px !important; height:32px !important; margin-left:-13px; border-radius:50% 50% 48% 48% / 56% 56% 44% 44% !important;
+    background:radial-gradient(circle at 34% 30%, rgba(255,255,255,.7), transparent 32%), var(--c) !important; opacity:0; }
+  .bd-balloon::after{ content:''; position:absolute; left:50%; top:100%; width:1px; height:34px; background:rgba(120,110,130,.7); }
   .evm-fest.is-bare{ padding-bottom:20px; }
   /* the script's tails (p, y, g) would dip into the line under it; the birthday one keeps its tuck */
   .evm-fest:not(.is-birthday) .evm-fest-sub{ margin-top:7px; }
@@ -13031,6 +13082,13 @@ function renderEventBanner(ev){
   </div>`;
 }
 const renderBirthdayBanner = renderEventBanner;
+/* an event sheet's banner plays in as it opens (not on a redraw of the same sheet): the word writes
+   itself across, the line under it settles, the faces pop up one by one, and the scatter keeps
+   drifting slowly while the sheet is open */
+function bannerPlay(root){
+  if(document.getElementById('main').classList.contains('sheet-still') || geLessMotion()) return;
+  root.querySelectorAll('.evm-fest').forEach(b => b.classList.add('is-play'));
+}
 
 /** Who is at the booth when: one row per slot, today's picked out, finished
     ones dimmed. Tapping a name opens that member. */
@@ -13957,11 +14015,11 @@ function geAnimate(root){
   root.querySelectorAll('.is-burst').forEach(el => { el.classList.remove('is-burst'); geBurst(el); });
 }
 // a short burst of gold from the middle of the row that just named No. 1
-function geBurst(el){
+function geBurst(el, colors){
   const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
   const box = document.createElement('div'); box.className = 'ge-burst'; box.setAttribute('aria-hidden', 'true');
   document.body.appendChild(box);
-  const COLORS = ['#F3C969', '#FFE29A', '#D4A73E', '#E4457E', '#ffffff'];
+  const COLORS = colors || ['#F3C969', '#FFE29A', '#D4A73E', '#E4457E', '#ffffff'];
   for(let i = 0; i < 46; i++){
     const p = document.createElement('i');
     p.style.left = cx + 'px'; p.style.top = cy + 'px'; p.style.background = COLORS[i % COLORS.length];
@@ -18748,7 +18806,7 @@ function qzMatchCard(r, rank){
     ${renderAvatar(m, 'qz-run-pic', g.color)}<span class="qz-run-t"><b>${escapeHtml(nickName(m))}</b><small>${escapeHtml(why[0] || trait)}</small></span><span class="qz-run-pct">${r.pct}%</span></button>`;
   return `<article class="qz-best" style="--c:${g.color}">
     <p class="qz-best-h">${en ? 'The member your stars favour most' : 'เมมเบอร์ที่ดวงถูกโฉลกกับคุณที่สุด'}</p>
-    <button class="qz-best-pic" data-action="open-member" data-id="${m.id}" aria-label="${escapeAttr(nickName(m))}">${renderAvatar(m, 'qz-pic', g.color)}<span class="qz-pct">${r.pct}<small>%</small></span></button>
+    <button class="qz-best-pic" data-action="open-member" data-id="${m.id}" aria-label="${escapeAttr(nickName(m))}"><span class="qz-orbit" aria-hidden="true">${QZ_WHEEL.map((n, i) => `<i style="--a:${i * 45}deg;--o:${QZ_COLOURS[n][2]}"></i>`).join('')}</span>${renderAvatar(m, 'qz-pic', g.color)}<span class="qz-pct" data-to="${r.pct}">${r.pct}<small>%</small></span></button>
     <h2 class="qz-name">${escapeHtml(nickName(m))}</h2>
     <p class="qz-sub">${escapeHtml(g.name)}${m.gen ? ` · ${en ? 'Gen ' + m.gen : 'รุ่น ' + m.gen}` : ''}</p>
     <div class="qz-chips">${qzChips(r.her, en)}</div>
@@ -18879,7 +18937,7 @@ function quizAction(action, id){
     quizKeepBirth({ iso, night: !!(was && was.iso === iso && was.night) }); q.step = 1; }
   else if(action === 'quiz-night'){ const iso = quizDate(); if(iso) quizKeepBirth({ iso, night: id === '1' }); }
   else if(action === 'quiz-pick'){ const [el, emo] = String(id).split('|'); q.ans[q.step - 1] = el; if(emo) q.emo = emo; q.step++; }
-  else if(action === 'quiz-group'){ q.group = id; q.step = last + 1;
+  else if(action === 'quiz-group'){ q.group = id; q.step = last + 1; _qzReveal = true;
     try{ localStorage.setItem(QZ_DONE + '-' + q.mode, JSON.stringify({ ans: q.ans, emo: q.emo || null, group: id, birth: q.birth || null })); }catch(e){} }
   else if(action === 'quiz-back'){ q.step = Math.max(q.mode === 'quiz' ? 1 : 0, q.step - 1); }
   else if(action === 'quiz-again'){ _quiz = { mode: q.mode, step: q.mode === 'quiz' ? 1 : 0, ans: [], birth: qzBirth() }; }
@@ -18888,6 +18946,23 @@ function quizAction(action, id){
   // the next question where the last one was, or the result from its top
   const card = document.querySelector('#main .qz-card, #main .qz-result');
   if(card && card.getBoundingClientRect().top < 70) scrollPageTo(Math.max(0, card.getBoundingClientRect().top + window.scrollY - 80));
+  if(_qzReveal){ _qzReveal = false; qzReveal(); }
+}
+/* a result just reached, not one reopened: play it in once */
+let _qzReveal = false;
+function qzReveal(){
+  const best = document.querySelector('#main .qz-best'); if(!best) return;
+  if(geLessMotion()) return;
+  best.classList.add('is-reveal');
+  const pc = best.querySelector('.qz-pct[data-to]'); if(!pc) return;
+  const to = +pc.dataset.to, t0 = performance.now() + 550, dur = 1100;
+  const step = now => {
+    const p = Math.min(1, Math.max(0, (now - t0) / dur)), v = Math.round(to * (1 - Math.pow(1 - p, 3)));
+    if(!pc.isConnected) return;
+    pc.firstChild.nodeValue = String(v);
+    if(p < 1) requestAnimationFrame(step);
+  };
+  pc.firstChild.nodeValue = '0'; requestAnimationFrame(step);
 }
 
 function renderSearch(){
@@ -19118,6 +19193,7 @@ function renderFeed(){
         <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></span>
       </div>
       <div class="feed-title-row sr-only"><h1 class="feed-title">วันนี้ที่ 48</h1></div>
+      ${renderNextCountdown()}
       ${(() => { const sum = feedSummary(nowOn); return state.oshi.length || sum ? `<div class="feed-head-foot">
         ${state.oshi.length ? `
         <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
@@ -19274,6 +19350,75 @@ function renderBrowse(){
 }
 
 
+/* งานถัดไป: the next event to start in the coming week, counting down like an airport board.
+   The digits are not in the page's markup (it would differ every second and make every sheet
+   rebuild the page under it); cdTick fills them as the page is drawn and every second after. */
+function nextCountdownEvent(){
+  const now = Date.now(), iso = toYmd(todayStart()), lim = toYmd(new Date(now + 7 * 864e5));
+  let best = null, at = Infinity;
+  for(const e of SEED_SCHEDULE){
+    if(e.period || e.shop || e.cancelled || !e.time || e.start < iso || e.start > lim) continue;
+    if(filteringByOshi() && !hasMyOshi(e)) continue;
+    const t = slotTime(e.start, e.time); if(t > now && t < at){ at = t; best = e; }
+  }
+  return best ? { e:best, at } : null;
+}
+function renderNextCountdown(){
+  const n = nextCountdownEvent(); if(!n) return '';
+  const en = isEN(), cell = k => `<span class="cd-cell" data-cd="${k}"><b>0</b><b>0</b></span>`;
+  return `<button class="cd-next" data-action="open-event" data-id="${n.e.id}" data-cd-at="${n.at}">
+    <span class="cd-k">${en ? 'Next up' : 'งานถัดไป'}</span>
+    <span class="cd-t" data-noloc>${escapeHtml(eventShortName(n.e))}</span>
+    <span class="cd-clock" aria-hidden="true"><span class="cd-days" data-cd="d"></span>${cell('h')}<i>:</i>${cell('m')}<i>:</i>${cell('s')}</span>
+  </button>`;
+}
+let _cdTimer = 0;
+function cdTick(){
+  const el = document.querySelector('#main .cd-next[data-cd-at]');
+  if(!el){ clearInterval(_cdTimer); _cdTimer = 0; return; }
+  if(!_cdTimer) _cdTimer = setInterval(cdTick, 1000);
+  if(document.hidden) return;
+  let left = Math.max(0, Math.floor((+el.dataset.cdAt - Date.now()) / 1000));
+  if(!left){ clearInterval(_cdTimer); _cdTimer = 0; renderMain(); return; }
+  const d = Math.floor(left / 86400); left %= 86400;
+  const v = { h:Math.floor(left / 3600), m:Math.floor(left / 60) % 60, s:left % 60 }, en = isEN();
+  const dd = el.querySelector('[data-cd="d"]'), dt = d ? (en ? d + 'd' : d + ' วัน') : '';
+  if(dd.textContent !== dt) dd.textContent = dt;
+  const still = geLessMotion();
+  for(const k of ['h', 'm', 's']){
+    const txt = String(v[k]).padStart(2, '0');
+    el.querySelectorAll(`[data-cd="${k}"] b`).forEach((b, i) => {
+      if(b.textContent === txt[i]) return;
+      b.textContent = txt[i];
+      if(!still){ b.classList.remove('is-flip'); void b.offsetWidth; b.classList.add('is-flip'); }
+    });
+  }
+  el.setAttribute('aria-label', `${en ? 'Next up' : 'งานถัดไป'} ${el.querySelector('.cd-t').textContent} ${dt} ${v.h}:${String(v.m).padStart(2,'0')}:${String(v.s).padStart(2,'0')}`);
+}
+/* her birthday: opening her sheet that day throws confetti in her group's colour and lets a few
+   balloons go up past her picture, once per opening */
+function sheetBirthdayFx(root){
+  const sh = root.querySelector('.is-member-sheet'); if(!sh || document.getElementById('main').classList.contains('sheet-still')) return;
+  const m = getMember(sh.dataset.mid); if(!m || !m.birthday || m.graduated || geLessMotion()) return;
+  if(m.birthday.slice(5) !== toYmd(todayStart()).slice(5)) return;
+  const pic = sh.querySelector('.detail-avatar'); if(!pic) return;
+  const c = getGroup(m.groupId).color;
+  setTimeout(() => {
+    if(!pic.isConnected) return;
+    geBurst(pic, [c, '#F3C969', '#FFFFFF', '#FFE29A', c]);
+    const r = pic.getBoundingClientRect(), box = document.createElement('div');
+    box.className = 'ge-burst'; box.setAttribute('aria-hidden', 'true'); document.body.appendChild(box);
+    [c, '#F3C969', '#E4457E', '#2E8C82', c, '#FFFFFF'].forEach((col, i) => {
+      const b = document.createElement('i'); b.className = 'bd-balloon'; b.style.setProperty('--c', col);
+      b.style.left = (r.left + r.width / 2 + (i - 2.5) * 34) + 'px'; b.style.top = (r.bottom + 40) + 'px';
+      box.appendChild(b);
+      b.animate([{ transform:'translateY(0) rotate(-6deg)', opacity:0 }, { opacity:1, offset:.12 },
+        { transform:`translate(${(i % 2 ? 1 : -1) * 18}px, ${-r.bottom - 160}px) rotate(6deg)`, opacity:.9 }],
+        { duration:3200 + i * 260, delay:i * 140, easing:'cubic-bezier(.3,.1,.4,1)', fill:'forwards' });
+    });
+    setTimeout(() => box.remove(), 5200);
+  }, 350);
+}
 function renderDetailModal(){
   const m = getMember(state.selectedId);
   if(!m) return '';
@@ -24040,6 +24185,7 @@ function renderMain(){
     localize(layer);
     syncBodyScrollLock();
     geAnimate(layer); odoRun(layer);
+    sheetBirthdayFx(layer); bannerPlay(layer); cdTick();
     bindPosterZoom();
     applyPageMeta();
     FEST.sync();
@@ -24077,6 +24223,7 @@ function renderMain(){
   if(state.view === 'timeline' && state.geTab === 'songs') addBoxShareButtons(main);
   geAnimate(main);
   odoRun(main);
+  sheetBirthdayFx(main); bannerPlay(main); cdTick();
   attachMainEvents();
   startBirthdayFireworks();
   geHeroFx();
@@ -26869,6 +27016,52 @@ function openCalendarSheet(){
 }
 
 let _shareUrl = null;
+/* Any share card as a short clip for a story: the card eases in from a little closer, a band of
+   light passes over it twice, then it holds — drawn on a canvas and recorded as it plays (about
+   five seconds, made while the sheet is open). Only where the browser can record a canvas. */
+function cardClipType(){
+  if(typeof MediaRecorder === 'undefined' || !HTMLCanvasElement.prototype.captureStream) return null;
+  for(const t of ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'])
+    try{ if(MediaRecorder.isTypeSupported(t)) return t; }catch(e){}
+  return null;
+}
+const cardClipOk = () => !!cardClipType();
+async function makeCardClip(blob){
+  const type = cardClipType(); if(!type) throw new Error('no recorder');
+  const img = await createImageBitmap(blob);
+  const k = Math.min(1, 1080 / img.width), W = Math.round(img.width * k / 2) * 2, H = Math.round(img.height * k / 2) * 2;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  const ease = x => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
+  const shine = (t, a, b) => {                              // a diagonal band of light between a and b seconds
+    const p = (t - a) / (b - a); if(p <= 0 || p >= 1) return;
+    const x = -W * .6 + p * W * 2.2;
+    const gr = g.createLinearGradient(x - W * .25, 0, x + W * .25, H * .35);
+    gr.addColorStop(0, 'rgba(255,240,210,0)'); gr.addColorStop(.5, 'rgba(255,240,210,.32)'); gr.addColorStop(1, 'rgba(255,240,210,0)');
+    g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore();
+  };
+  const DUR = 5;
+  const frame = t => {
+    const z = 1.12 - .12 * ease(t / .9) + .025 * Math.max(0, t - .9) / (DUR - .9);
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    g.save(); g.globalAlpha = ease(t / .5);
+    g.translate(W / 2, H / 2); g.scale(z, z); g.drawImage(img, -W / 2, -H / 2, W, H); g.restore();
+    shine(t, 1.0, 2.0); shine(t, 3.0, 3.9);
+  };
+  frame(0);
+  const stream = cv.captureStream(30), rec = new MediaRecorder(stream, { mimeType:type, videoBitsPerSecond:6e6 }), parts = [];
+  rec.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
+  const done = new Promise((ok, no) => { rec.onstop = ok; rec.onerror = no; });
+  rec.start(250);
+  const t0 = performance.now();
+  await new Promise(res => {
+    const step = () => { const t = (performance.now() - t0) / 1000; frame(Math.min(t, DUR)); t < DUR ? requestAnimationFrame(step) : res(); };
+    requestAnimationFrame(step);
+  });
+  rec.stop(); await done; stream.getTracks().forEach(x => x.stop());
+  const base = type.split(';')[0];
+  return { blob:new Blob(parts, { type:base }), type:base, ext:base === 'video/mp4' ? 'mp4' : 'webm' };
+}
 async function openShareSheet(given){
   const en = isEN();
   const sub = given || shareSubject();
@@ -26881,6 +27074,7 @@ async function openShareSheet(given){
       ${sub.kind === 'stats' ? `<div class="share-cats">${STATS_TABS.map(t => `<button class="share-cat${t.id === sub.cat ? ' is-on' : ''}" data-share="cat" data-cat="${t.id}">${t.label}</button>`).join('')}</div>` : ''}
       <div class="share-preview is-loading"><span>${en ? 'Making the card…' : 'กำลังสร้างการ์ด…'}</span></div>
       <div class="share-actions">
+        ${!sub.clip && cardClipOk() ? `<button class="share-act is-clip" data-share="mclip" disabled><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg><span>${en ? 'Making a clip…' : 'กำลังทำคลิป…'}</span></button>` : ''}
         ${sub.clip ? `<button class="share-act is-clip" data-share="clip" disabled><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg><span>${en ? 'Getting the clip…' : 'กำลังเตรียมคลิป…'}</span></button>` : ''}
         <button class="share-act is-main" data-share="image" disabled>${ICONS.share}<span>${en ? 'Share image' : 'แชร์รูป'}</span></button>
         <button class="share-act" data-share="save" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg><span>${sub.orig ? (en ? 'Save the poster' : 'บันทึกโปสเตอร์') : (en ? 'Save image' : 'บันทึกรูป')}</span></button>
@@ -26889,7 +27083,7 @@ async function openShareSheet(given){
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
-  let blob = null, clip = null, orig = null;
+  let blob = null, clip = null, orig = null, mclip = null;
   /* a poster's original, fetched as the sheet opens so a tap can save it at once */
   if(sub.orig) fetch(sub.orig).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(v => {
     orig = v; const sb = el.querySelector('[data-share="save"]'); if(sb && blob) sb.disabled = false;
@@ -26904,12 +27098,14 @@ async function openShareSheet(given){
       cb.disabled = false; cb.querySelector('span').textContent = en ? 'Share the spinning clip' : 'แชร์คลิปโปสเตอร์หมุน';
     }).catch(() => { cb.querySelector('span').textContent = en ? 'Clip unavailable' : 'โหลดคลิปไม่สำเร็จ'; });
   }
+  const clip0 = () => clip;
   el.addEventListener('click', async e => {
     const b = e.target.closest('[data-share]'); if(!b) return;
     const act = b.dataset.share;
     if(act === 'close') return closeShareSheet();
     if(act === 'link') return shareCurrent(sub.title, sub.link);
-    if(act === 'clip'){
+    if(act === 'clip' || act === 'mclip'){
+      const clip = act === 'clip' ? clip0() : mclip;
       if(!clip) return;
       try{
         if(navigator.canShare && navigator.canShare({ files:[clip] })){ await navigator.share({ files:[clip], title:sub.title, text:sub.link }); return; }
@@ -26942,7 +27138,9 @@ async function openShareSheet(given){
   let ticket = 0;
   const paint = async () => {
     const mine = ++ticket;
-    blob = null;
+    blob = null; mclip = null;
+    const mb = el.querySelector('[data-share="mclip"]');
+    if(mb){ mb.disabled = true; mb.querySelector('span').textContent = en ? 'Making a clip…' : 'กำลังทำคลิป…'; }
     const pv = el.querySelector('.share-preview');
     pv.classList.add('is-loading');
     el.querySelectorAll('[data-share="image"], [data-share="save"]').forEach(x => x.disabled = true);
@@ -26954,7 +27152,12 @@ async function openShareSheet(given){
       _shareUrl = URL.createObjectURL(blob);
       pv.classList.remove('is-loading');
       pv.innerHTML = `<img src="${_shareUrl}" alt="${escapeAttr(sub.title)}">`;
-      el.querySelectorAll('.share-act[disabled]').forEach(x => { if(!(x.dataset.share === 'save' && sub.orig && !orig) && x.dataset.share !== 'clip') x.disabled = false; });
+      el.querySelectorAll('.share-act[disabled]').forEach(x => { if(!(x.dataset.share === 'save' && sub.orig && !orig) && x.dataset.share !== 'clip' && x.dataset.share !== 'mclip') x.disabled = false; });
+      if(mb) makeCardClip(blob).then(f => {
+        if(!el.isConnected || mine !== ticket) return;
+        mclip = new File([f.blob], sub.file.replace(/[^\w.-]+/g, '-') + '.' + f.ext, { type:f.type });
+        mb.disabled = false; mb.querySelector('span').textContent = en ? 'Share as a clip' : 'แชร์เป็นคลิป';
+      }).catch(() => { if(mine === ticket) mb.remove(); });
     }catch(err){
       pv.classList.remove('is-loading');
       pv.innerHTML = `<span>${en ? 'Could not make the card — the link still works.' : 'สร้างการ์ดไม่สำเร็จ แชร์ลิงก์ได้ตามปกติ'}</span>`;
