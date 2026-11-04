@@ -4081,6 +4081,16 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gec-err{ margin:8px 2px 0; font-size:12px; font-weight:700; color:#B3121E; }
   .gec-big{ text-align:center; padding:16px 14px; }
   .gec-k{ margin:0; font-size:12.5px; font-weight:800; color:var(--ink-soft); }
+  .adm-menu{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin:0 0 12px; }
+  .adm-btn{ position:relative; display:flex; align-items:center; gap:9px; min-width:0; padding:10px 11px; text-align:left; font:inherit; color:var(--ink); cursor:pointer;
+    background:var(--card, var(--surface)); border:1.5px solid var(--line, rgba(128,128,128,.28)); border-radius:16px; box-shadow:0 2px 0 var(--line, rgba(128,128,128,.28)); }
+  .adm-btn:active{ transform:translateY(2px); box-shadow:none; }
+  .adm-btn.is-on{ border-color:var(--accent, #E4457E); box-shadow:0 2px 0 var(--accent, #E4457E); background:color-mix(in srgb, var(--accent, #E4457E) 12%, transparent); }
+  .adm-ic{ flex:none; font-size:20px; line-height:1; }
+  .adm-t{ min-width:0; display:flex; flex-direction:column; gap:1px; } .adm-t b{ font-size:13.5px; line-height:1.2; } .adm-t small{ font-size:11px; color:var(--ink-soft); line-height:1.2; }
+  .adm-n{ position:absolute; top:-6px; right:-4px; min-width:20px; height:20px; padding:0 6px; border-radius:99px; background:#E0243A; color:#fff; font-size:11.5px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .adm-panel{ margin:0 0 18px; padding-top:2px; }
+  .adm-panel .pd-fold{ pointer-events:none; } .adm-panel .pd-caret{ display:none; }
   .pd-fold{ display:flex; align-items:center; gap:8px; padding:4px 0; border:0; background:none; color:inherit; font:inherit; cursor:pointer; }
   .pd-fold .section-label{ margin:0; }
   .pd-caret{ display:inline-block; transition:transform .2s; transform:rotate(-90deg); color:var(--ink-soft); }
@@ -21157,7 +21167,7 @@ async function loadSignups(){
 }
 /* The owner's stat cards on the profile fold shut (closed until opened; kept on this device). */
 const ADMIN_OPEN_LS = '48thdb-admin-open';
-function adminOpen(k){ try{ return !!(JSON.parse(localStorage.getItem(ADMIN_OPEN_LS) || '{}')[k]); }catch(e){ return false; } }
+function adminOpen(k){ if(state.adminTab === k) return true; try{ return !!(JSON.parse(localStorage.getItem(ADMIN_OPEN_LS) || '{}')[k]); }catch(e){ return false; } }
 function adminFold(k, title, open){
   return `<button class="pd-fold" data-action="admin-fold" data-id="${k}" aria-expanded="${open}"><span class="section-label">${title}</span><span class="pd-caret${open ? ' is-open' : ''}" aria-hidden="true">▾</span></button>`;
 }
@@ -21245,6 +21255,25 @@ function renderVisitsCard(){
   </div>`;
 }
 
+/* The owner's tools on the profile, as one menu: a button for each, and only the one picked opens below. */
+function renderAdminHub(){
+  if(!state.isOwner) return '';
+  const items = [
+    { k:'visits',   ic:'📊', th:'ผู้เข้าชมเว็บ',       sub:'ตัวเลขคนเข้า',           html:renderVisitsCard },
+    { k:'signups',  ic:'👥', th:'สมาชิกเว็บ',          sub:'บัญชีที่สมัคร',          html:renderSignupsCard },
+    { k:'flash',    ic:'📣', th:'ประกาศบนป้ายไฟ',     sub:'ขึ้นป้าย LED ทุกเครื่อง', html:renderFlashComposer },
+    { k:'pending',  ic:'✅', th:'รอตรวจ',               sub:'การแก้ไขของคนอื่น',      html:renderPendingQueue, n:(state.pending || []).length },
+    { k:'bios',     ic:'📝', th:'ประวัติย่อที่เตรียมไว้', sub:'นำเข้าทีเดียวหลายคน',  html:renderBioImport },
+    { k:'feedback', ic:'💬', th:'ความคิดเห็น',          sub:'จากคนใช้เว็บ',           html:renderFeedbackInbox, n:(state.feedback || []).length },
+    { k:'theme',    ic:'🎨', th:'ธีมตามฤดูกาล',        sub:'เปิด/ปิดให้ทุกคน',       html:renderSiteThemeCard },
+  ];
+  const cur = items.find(i => i.k === state.adminTab);
+  return `<h3 class="section-label">เครื่องมือแอดมิน</h3>
+    <div class="adm-menu">${items.map(i => `<button class="adm-btn${cur === i ? ' is-on' : ''}" data-action="admin-tab" data-id="${i.k}" aria-expanded="${cur === i}">
+      <span class="adm-ic" aria-hidden="true">${i.ic}</span><span class="adm-t"><b>${i.th}</b><small>${i.sub}</small></span>${i.n ? `<span class="adm-n">${i.n}</span>` : ''}</button>`).join('')}</div>
+    ${cur ? `<div class="adm-panel">${cur.html()}</div>` : ''}`;
+}
+
 function renderProfile(){
   const loggedIn = state.account && state.account.loggedIn;
   const kamiMember = state.kamiOshi ? getMember(state.kamiOshi) : null;
@@ -21274,14 +21303,8 @@ function renderProfile(){
 
   return `
   ${accountBlock}
-  ${renderVisitsCard()}
-  ${renderSignupsCard()}
-  ${renderFlashComposer()}
-  ${renderPendingQueue()}
-  ${renderBioImport()}
-  ${renderFeedbackInbox()}
+  ${renderAdminHub()}
   ${renderMyStyleCard()}
-  ${renderSiteThemeCard()}
   <div class="lay-zones" data-page="profile">
   <section class="lay-z" data-zone="kami">
   <h3 class="section-label">Kami Oshi ของคุณ</h3>
@@ -27295,6 +27318,10 @@ function bindDelegatedEvents(){
       state.hsReveal = state.hsDay !== d || state.hsRound !== r;
       state.hsDay = d; state.hsRound = r; state.hsFollow = false; state.hsHold = false;
       hsPaint();
+    }
+    else if(action==='admin-tab'){
+      state.adminTab = state.adminTab === id ? '' : id;
+      renderMain();
     }
     else if(action==='admin-fold'){
       let o = {}; try{ o = JSON.parse(localStorage.getItem(ADMIN_OPEN_LS) || '{}'); }catch(e){}
