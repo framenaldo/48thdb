@@ -13972,6 +13972,8 @@ function renderHomeDash(ge){
       <span class="dash-i">${icon}</span><b class="dash-big">${big}</b><span class="dash-l">${label}${small ? `<small>${small}</small>` : ''}</span></button>`;
   // a poster in a tile is a slide: tapping it opens that event; the strip swipes sideways, the dots follow
   const dashSlide = (e, label) => `<span class="dash-sl" data-action="open-event" data-id="${escapeAttr(e.id)}"><img src="${escapeAttr(e.poster.img.replace(/\.[a-z]+$/i, '-s.jpg'))}" alt="" loading="lazy" decoding="async"><small>${label}</small></span>`;
+  // the strip carries a copy of its first slide at the end, so it can run on round and round (dashTick jumps back unseen)
+  const dashStrip = slides => `<span class="dash-strip" data-n="${slides.length}">${slides.join('')}${slides.length > 1 ? slides[0].replace('class="dash-sl"', 'class="dash-sl" aria-hidden="true"') : ''}</span>`;
   const dashDots = n => `<span class="dash-dots" aria-hidden="true">${Array.from({ length:n }, (_, k) => `<i${k ? '' : ' class="on"'}></i>`).join('')}</span>`;
   const calPics = SEED_SCHEDULE.filter(e => !e.period && !e.cancelled && !e.shop && e.poster && e.poster.img && e.start <= wk && eventLastDay(e) >= iso)
     .sort((x, y) => (x.start > iso ? x.start : iso).localeCompare(y.start > iso ? y.start : iso) || x.start.localeCompare(y.start)).slice(0, 8);
@@ -14026,11 +14028,11 @@ function renderHomeDash(ge){
   const kinds = {
     quiz: sl => renderQuizTile(sl),
     cal: sl => calPics.length ? `<button class="dash-t is-cal is-pic" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h" data-action="nav" data-view="calendar">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
-      <span class="dash-badge" data-action="nav" data-view="calendar">${week} ${en ? 'events' : 'งาน'}</span><span class="dash-strip">${calPics.map(e => { const n = dayN(e.start), w = n <= 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : `${+e.start.slice(8)} ${M[+e.start.slice(5, 7) - 1]}`; return dashSlide(e, `${w} · ${escapeHtml(eventShortName(e))}`); }).join('')}</span>${calPics.length > 1 ? dashDots(calPics.length) : ''}</button>`
+      <span class="dash-badge" data-action="nav" data-view="calendar">${week} ${en ? 'events' : 'งาน'}</span>${dashStrip(calPics.map(e => { const n = dayN(e.start), w = n <= 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : `${+e.start.slice(8)} ${M[+e.start.slice(5, 7) - 1]}`; return dashSlide(e, `${w} · ${escapeHtml(eventShortName(e))}`); }))}${calPics.length > 1 ? dashDots(calPics.length) : ''}</button>`
       : `<button class="dash-t is-cal" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
       <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>`,
     shop: sl => shopPics.length ? `<button class="dash-t is-shop is-pic" data-tile="${sl}" data-kind="shop" data-action="nav-shop">
-      <span class="dash-strip">${shopPics.map(e => dashSlide(e, escapeHtml(e.shop.name || e.title))).join('')}</span>
+      ${dashStrip(shopPics.map(e => dashSlide(e, escapeHtml(e.shop.name || e.title))))}
       <span class="dash-badge" data-action="nav-shop">${en ? 'Shop' : 'ร้านค้า'}${shops > 1 ? ` · ${shops}` : ''}</span>${shopPics.length > 1 ? dashDots(shopPics.length) : ''}</button>`
       : tile(`data-tile="${sl}" data-kind="shop" data-action="nav-shop"`, 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด')),
     gal: sl => `<button class="dash-t is-gal" data-tile="${sl}" data-kind="gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
@@ -27023,12 +27025,32 @@ function bindEdgeFades(){
   });
 }
 
-/* the dots under a tile's slides follow its swipe (scroll does not bubble, so listen while it travels down) */
+/* The slides in a dashboard tile: the dots follow a swipe (scroll does not bubble, so listen while it travels down),
+   the strip moves on by itself every few seconds and runs round — it carries a copy of its first slide at the end and
+   jumps back to the real one once it has settled there. It rests while the reader swipes, when it is off screen, the tab
+   is hidden or motion is reduced. */
 document.addEventListener('scroll', e => {
   const t = e.target; if(!t || !t.classList || !t.classList.contains('dash-strip')) return;
-  const dots = t.parentNode.querySelectorAll('.dash-dots i'), k = Math.round(t.scrollLeft / Math.max(1, t.clientWidth));
-  dots.forEach((x, i) => x.classList.toggle('on', i === k));
+  const n = +t.dataset.n || 1, k = Math.round(t.scrollLeft / Math.max(1, t.clientWidth));
+  t.parentNode.querySelectorAll('.dash-dots i').forEach((x, i) => x.classList.toggle('on', i === k % n));
+  clearTimeout(t._wrap);
+  t._wrap = setTimeout(() => { if(k >= n && n > 1) t.scrollTo({ left:0, behavior:'instant' }); }, 160);
 }, true);
+['pointerdown', 'wheel', 'touchstart'].forEach(ev => document.addEventListener(ev, e => {
+  const t = e.target && e.target.closest && e.target.closest('.dash-strip'); if(t) t._rest = Date.now() + 9000;
+}, { capture:true, passive:true }));
+setInterval(() => {
+  if(document.hidden || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  const now = Date.now(), vh = innerHeight;
+  document.querySelectorAll('.dash-strip').forEach((t, idx) => {
+    const n = +t.dataset.n || 1; if(n < 2 || now < (t._rest || 0)) return;
+    const r = t.getBoundingClientRect(); if(r.bottom < 0 || r.top > vh || !t.clientWidth) return;
+    if(now < (t._due || (t._due = now + 2500 + idx * 1700))) return;      // the tiles take turns rather than all moving at once
+    t._due = now + 4200;
+    const k = Math.round(t.scrollLeft / t.clientWidth);
+    t.scrollTo({ left:(k + 1) * t.clientWidth, behavior:'smooth' });
+  });
+}, 700);
 function bindScrollPressGuard(){
   let t;
   const mark = ()=>{
