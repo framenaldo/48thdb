@@ -10840,12 +10840,12 @@ function renderProfileSlot(){
   const initial = state.account.name ? state.account.name[0].toUpperCase() : '?';
   slot.innerHTML = `
     <div class="profile-slot-wrap">
-      <button class="mini-avatar-btn" data-action="toggle-profile-menu">${accountAvatar()}${state.isOwner && state.pending.length ? `<span class="pd-dot">${state.pending.length}</span>` : ''}</button>
+      <button class="mini-avatar-btn" data-action="toggle-profile-menu">${accountAvatar()}${pendingNew() ? `<span class="pd-dot">${pendingNew()}</span>` : ''}</button>
       ${state.profileMenuOpen ? `
       <div class="profile-dropdown">
         <div class="dropdown-name">${escapeHtml(state.account.name)}</div>
         <div class="dropdown-email">${escapeHtml(state.account.email)}</div>
-        <button data-action="nav" data-view="profile">ดูโปรไฟล์${state.isOwner && state.pending.length ? ` · รอตรวจ ${state.pending.length}` : ''}</button>
+        <button data-action="nav" data-view="profile">ดูโปรไฟล์${pendingNew() ? ` · รอตรวจ ${pendingNew()}` : ''}</button>
         <button data-action="nav" data-view="editprofile">แก้ไขข้อมูลส่วนตัว</button>
         <button data-action="sign-out" class="danger">ออกจากระบบ</button>
       </div>` : ''}
@@ -21259,6 +21259,8 @@ function renderVisitsCard(){
 const ADMIN_SEEN_LS = '48thdb-admin-seen';
 const adminSeen = () => { try{ return JSON.parse(localStorage.getItem(ADMIN_SEEN_LS) || '{}'); }catch(e){ return {}; } };
 const adminNew = (k, ids) => { const seen = new Set(adminSeen()[k] || []); return ids.filter(id => !seen.has(id)).length; };
+/* the owner's new items waiting for review (the dot on the avatar and the profile menu use it too) */
+const pendingNew = () => state.isOwner ? adminNew('pending', (state.pending || []).map(x => x.id)) : 0;
 function adminMarkSeen(k, ids){ const o = adminSeen(); o[k] = ids; try{ localStorage.setItem(ADMIN_SEEN_LS, JSON.stringify(o)); }catch(e){} }
 /* The owner's tools on the profile, as one menu: a button for each, and only the one picked opens below. */
 function renderAdminHub(){
@@ -27328,7 +27330,7 @@ function bindDelegatedEvents(){
     }
     else if(action==='admin-tab'){
       state.adminTab = state.adminTab === id ? '' : id;
-      renderMain();
+      render();                                   // the header's dot counts the same unseen items
     }
     else if(action==='admin-fold'){
       let o = {}; try{ o = JSON.parse(localStorage.getItem(ADMIN_OPEN_LS) || '{}'); }catch(e){}
