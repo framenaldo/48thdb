@@ -4065,6 +4065,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gec-err{ margin:8px 2px 0; font-size:12px; font-weight:700; color:#B3121E; }
   .gec-big{ text-align:center; padding:16px 14px; }
   .gec-k{ margin:0; font-size:12.5px; font-weight:800; color:var(--ink-soft); }
+  .pd-fold{ display:flex; align-items:center; gap:8px; padding:4px 0; border:0; background:none; color:inherit; font:inherit; cursor:pointer; }
+  .pd-fold .section-label{ margin:0; }
+  .pd-caret{ display:inline-block; transition:transform .2s; transform:rotate(-90deg); color:var(--ink-soft); }
+  .pd-caret.is-open{ transform:none; }
   .odo{ font-variant-numeric:tabular-nums; }
   .odo.is-rolling{ display:inline-flex; align-items:flex-start; vertical-align:bottom; }
   .odo-d{ display:inline-block; height:1.2em; line-height:1.2em; overflow:hidden; }
@@ -13722,6 +13726,8 @@ function listenGE(){
       try{ localStorage.setItem(GE_LS, JSON.stringify({ at:Date.now(), rounds:next })); }catch(e){}
       if(tickerSpeedMine != null && +((next.ticker || {}).speed) === tickerSpeedMine) tickerSpeedMine = null;
       syncTicker();
+      { const on = !!(next.theme && next.theme.on); let was = null; try{ was = localStorage.getItem(FEST.SITE_LS); localStorage.setItem(FEST.SITE_LS, on ? '1' : '0'); }catch(e){}
+        if(was !== null && (was === '1') !== on && document.getElementById('main')){ renderMain(); return; } }
       if(!document.getElementById('main')) return;
       if(state.selectedId || state.selectedEvent || state.posterOf || state.editingId) return;
       // the owner mid-entry keeps their cursor; the page catches up after
@@ -21087,10 +21093,26 @@ async function loadSignups(){
   }
   if(state.view === 'profile') renderMain();
 }
+/* The owner's stat cards on the profile fold shut (closed until opened; kept on this device). */
+const ADMIN_OPEN_LS = '48thdb-admin-open';
+function adminOpen(k){ try{ return !!(JSON.parse(localStorage.getItem(ADMIN_OPEN_LS) || '{}')[k]); }catch(e){ return false; } }
+function adminFold(k, title, open){
+  return `<button class="pd-fold" data-action="admin-fold" data-id="${k}" aria-expanded="${open}"><span class="section-label">${title}</span><span class="pd-caret${open ? ' is-open' : ''}" aria-hidden="true">▾</span></button>`;
+}
+/* The owner's switch for the seasonal themes: one flag, ge/theme, that every visitor follows. */
+function renderSiteThemeCard(){
+  if(!state.isOwner) return '';
+  const en = isEN(), on = FEST.siteOn();
+  return `<h3 class="section-label">${en ? 'Seasonal themes' : 'ธีมตามฤดูกาล'}</h3>
+    <div class="gea-card"><button class="gea-switch${on ? ' is-on' : ''}" data-action="site-theme" aria-pressed="${on}">
+      <span>${en ? 'Show themes on the site' : 'เปิดธีมให้ทุกคน'} <small>${en ? '(owner only · everyone sees it at once)' : '(เฉพาะแอดมิน · ทุกคนเห็นทันที)'}</small></span><i></i></button></div>`;
+}
 function renderSignupsCard(){
   if(!state.isOwner) return '';
-  if(!signupsState || (!signupsState.loading && Date.now() - signupsState.at > 120000)) setTimeout(loadSignups, 0);
-  const head = `<div class="pd-head"><h3 class="section-label">สมาชิกเว็บ</h3><button class="chip chip-link" data-action="signups-refresh">รีเฟรช</button></div>`;
+  const open = adminOpen('signups');
+  if(open && (!signupsState || (!signupsState.loading && Date.now() - signupsState.at > 120000))) setTimeout(loadSignups, 0);
+  const head = `<div class="pd-head">${adminFold('signups', 'สมาชิกเว็บ', open)}${open ? '<button class="chip chip-link" data-action="signups-refresh">รีเฟรช</button>' : ''}</div>`;
+  if(!open) return head;
   const S = signupsState || { loading:true };
   if(S.err === 'rules') return head + `<div class="vis-card"><p class="vis-note">ยังอ่านไม่ได้ — ต้อง deploy กฎ Firestore ชุดใหม่ก่อน (ส่วน <code>signups</code> ใน firebase-rules/firestore.rules):</p>
     <ol class="vis-setup"><li>ในเทอร์มินัล: <code>cd ~/Downloads/48thdb-deploy-package/firebase-rules && firebase deploy --only firestore:rules --project thdatabase</code></li></ol></div>`;
@@ -21116,8 +21138,10 @@ function renderSignupsCard(){
 }
 function renderVisitsCard(){
   if(!state.isOwner) return '';
-  if(!visitsState || (!visitsState.loading && Date.now() - visitsState.at > 120000)) setTimeout(loadVisits, 0);
-  const head = `<div class="pd-head"><h3 class="section-label">ผู้เข้าชมเว็บ</h3><button class="chip chip-link" data-action="visits-refresh">รีเฟรช</button></div>`;
+  const open = adminOpen('visits');
+  if(open && (!visitsState || (!visitsState.loading && Date.now() - visitsState.at > 120000))) setTimeout(loadVisits, 0);
+  const head = `<div class="pd-head">${adminFold('visits', 'ผู้เข้าชมเว็บ', open)}${open ? '<button class="chip chip-link" data-action="visits-refresh">รีเฟรช</button>' : ''}</div>`;
+  if(!open) return head;
   const V = visitsState || { loading:true };
   if(V.err === 'no-token') return head + `<div class="vis-card"><p class="vis-note">ยังไม่ได้ต่อกับ Cloudflare Web Analytics — ทำครั้งเดียว:</p>
     <ol class="vis-setup"><li>สร้างโทเค็นที่ dash.cloudflare.com/profile/api-tokens → Create Token → Custom token → สิทธิ์ <b>Account · Account Analytics · Read</b></li>
@@ -21195,6 +21219,7 @@ function renderProfile(){
   ${renderBioImport()}
   ${renderFeedbackInbox()}
   ${renderMyStyleCard()}
+  ${renderSiteThemeCard()}
   <div class="lay-zones" data-page="profile">
   <section class="lay-z" data-zone="kami">
   <h3 class="section-label">Kami Oshi ของคุณ</h3>
@@ -23663,11 +23688,14 @@ const FEST = (() => {
   /* days no birthday takes: the GE results are read out on 14 Nov, Proud's birthday */
   const FIRM = { '2026-11-14': 'ge' };
   /* today's theme: a member's birthday first, then the calendar; null outside them all */
-  /* The seasons are switched off for now: the page keeps its everyday look. Everything below stays in
-     place; set ENABLED to true to bring them back (or open any page with ?fest=on to preview them). */
-  const ENABLED = false, PREVIEW = /[?&]fest=on\b/.test(location.search);
+  /* The seasons are off unless the owner switches them on (profile page, kept in Firestore ge/theme so
+     every visitor follows; a copy in localStorage paints the first frame). Everything below stays in
+     place; any page opened with ?fest=on previews them. */
+  const PREVIEW = /[?&]fest=on\b/.test(location.search), SITE_LS = '48thdb-fest-site';
+  const siteOn = () => { const g = (state.geRounds || {}).theme; if(g && typeof g.on === 'boolean') return g.on;
+    try{ return localStorage.getItem(SITE_LS) === '1'; }catch(e){ return false; } };
   function today(){
-    if(!ENABLED && !PREVIEW) return null;
+    if(!siteOn() && !PREVIEW) return null;
     const iso = thaiToday(), md = iso.slice(5);
     if(FIRM[iso]) return { id: FIRM[iso] };
     const bd = activeMembers().filter(m => m.birthday && m.birthday.slice(5) === md);
@@ -23785,7 +23813,7 @@ const FEST = (() => {
     return `<button class="fest-pill${faces ? ' has-faces' : ''}" data-action="fest-off" aria-label="${en ? 'Turn the theme off' : 'ปิดธีม'}" title="${escapeAttr((en ? th.en : th.name) + who + (en ? ' · turn the theme off' : ' · กดเพื่อปิดธีม'))}">
       ${faces}<span class="fest-w fw-${t.id}" data-noloc>${word}</span><span class="fest-x" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></button>`;
   }
-  return { sync, row, setOff, today };
+  return { sync, row, setOff, today, siteOn, SITE_LS };
 })();
 
 function renderMain(){
@@ -27190,6 +27218,21 @@ function bindDelegatedEvents(){
       state.hsReveal = state.hsDay !== d || state.hsRound !== r;
       state.hsDay = d; state.hsRound = r; state.hsFollow = false; state.hsHold = false;
       hsPaint();
+    }
+    else if(action==='admin-fold'){
+      let o = {}; try{ o = JSON.parse(localStorage.getItem(ADMIN_OPEN_LS) || '{}'); }catch(e){}
+      o[id] = !o[id]; try{ localStorage.setItem(ADMIN_OPEN_LS, JSON.stringify(o)); }catch(e){}
+      renderMain();
+    }
+    else if(action==='site-theme'){
+      if(!state.isOwner) return;
+      const next = !FEST.siteOn();
+      state.geRounds = Object.assign({}, state.geRounds, { theme: { on: next } });
+      try{ localStorage.setItem(FEST.SITE_LS, next ? '1' : '0'); }catch(e){}
+      renderMain();
+      fbDb.collection('ge').doc('theme').set({ on: next, at: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true })
+        .then(() => toast(next ? 'เปิดธีมให้ทุกคนแล้ว' : 'ปิดธีมแล้ว ทุกคนกลับเป็นหน้าปกติ'))
+        .catch(() => toast('บันทึกไม่ได้ (Firestore ไม่ยอมให้เขียน)'));
     }
     else if(action==='fest-off' || action==='fest-on'){ FEST.setOff(action === 'fest-off'); renderMain(); }
     else if(action==='hs-live'){ state.hsFollow = true; state.hsHold = false; state.hsReveal = true; hsPaint(); }
