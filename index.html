@@ -2992,6 +2992,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .ge-count-num{ font-size:48px; font-weight:800; line-height:1; color:#FFD98A; text-shadow:0 2px 12px rgba(0,0,0,.6); }
   .ge-count-unit{ text-shadow:0 1px 6px rgba(0,0,0,.7); }
   .ge-count-unit{ font-size:14px; font-weight:700; opacity:.9; }
+  /* the countdown, as a film's: wide-set white figures with a faint glow, their names small and spaced under them */
+  .ge-cd{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:4px; color:#fff; }
+  .ge-cd-k{ font-size:12px; font-weight:800; letter-spacing:.32em; text-indent:.32em; text-transform:uppercase; opacity:.8; text-shadow:0 1px 6px rgba(0,0,0,.8); }
+  .ge-cd-row{ display:flex; align-items:flex-start; justify-content:center; gap:clamp(6px, 2.4vw, 16px); }
+  .ge-cd-row > i{ font-style:normal; font-size:clamp(26px, 8vw, 46px); font-weight:500; line-height:1.28; opacity:.55; }
+  .ge-cd-u{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .ge-cd-u b{ font-size:clamp(34px, 10.5vw, 60px); font-weight:600; line-height:1; letter-spacing:.14em; margin-right:-.14em;
+    font-variant-numeric:tabular-nums; color:#F7F4EE; text-shadow:0 0 18px rgba(255,236,210,.35), 0 2px 10px rgba(0,0,0,.75); }
+  .ge-cd-u small{ font-size:clamp(9px, 2.6vw, 11px); font-weight:700; letter-spacing:.3em; margin-right:-.3em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+  .ge-cd-sub{ font-size:12px; font-weight:700; letter-spacing:.12em; opacity:.7; text-shadow:0 1px 6px rgba(0,0,0,.8); }
+  @media (min-width:720px){ .ge-cd-k{ font-size:14px; } .ge-cd-sub{ font-size:14px; } }
   .ge-tabs .sub-tab.active{ background:var(--ge); border-color:var(--ge); color:#fff; }
   /* four tabs on a phone: keep each label on one line */
   @media (max-width:560px){ .ge-tabs .sub-tab{ padding:9px 4px; font-size:12.5px; white-space:nowrap; } }
@@ -13631,7 +13642,9 @@ function renderGEPosterViewer(id){
   </div>`;
 }
 const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo-v2.webp', red:'#B3121E',
-  vote:'ev-election-voting', results:'ev-election-results' };
+  vote:'ev-election-voting', results:'ev-election-results', voteOpen:'12:00', voteClose:'21:00' };
+// a Thai wall-clock time as a moment, wherever the reader is
+const thaiMs = (iso, hhmm) => { const [y, mo, d] = iso.split('-').map(Number), [h, mi] = (hhmm || '00:00').split(':').map(Number); return Date.UTC(y, mo - 1, d, h - 7, mi || 0); };
 /* the hero's embers and the odd small firework on one canvas: it runs only while the picture is on screen and the tab is visible */
 let _geFx = null;
 function geHeroFx(){
@@ -13683,14 +13696,19 @@ function renderGEPage(){
   const inDays = n => n === 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : (en ? `in ${n} days` : `ในอีก ${n} วัน`);
 
   // where the campaign stands
-  let phase, big, sub;
-  if(vote && iso < vote.start){ phase = en ? 'Voting opens in' : 'เปิดโหวตในอีก'; big = daysTo(vote.start); sub = dm(vote.start); }
-  else if(vote && iso <= eventLastDay(vote)){ phase = en ? 'Voting closes in' : 'ปิดโหวตในอีก'; big = daysTo(eventLastDay(vote)); sub = dm(eventLastDay(vote)); }
-  else if(results && iso <= results.start){ phase = en ? 'Final results in' : 'ประกาศผลในอีก'; big = daysTo(results.start); sub = dm(results.start); }
-  const countdown = phase ? `<div class="ge-count">
-      <span class="ge-count-label">${big === 0 ? phase.replace(/ in$|ในอีก$/, '') : phase}</span>
-      <span class="ge-count-num">${big === 0 ? (en ? 'Today' : 'วันนี้') : big}</span>
-      <span class="ge-count-unit">${big === 0 ? sub : (en ? `days · ${sub}` : `วัน · ${sub}`)}</span></div>`
+  // to the second, like a film's countdown: days, hours, minutes, seconds in a row, their names
+  // small underneath. The digits are filled in by cdTick, not written here (see renderNextCountdown).
+  let phase, at, sub;
+  const now = Date.now(), at1 = vote && thaiMs(vote.start, GE_PAGE.voteOpen), at2 = vote && thaiMs(eventLastDay(vote), GE_PAGE.voteClose),
+    at3 = results && thaiMs(results.start, results.time || '00:00');
+  if(vote && now < at1){ phase = en ? 'Voting opens in' : 'เปิดโหวตใน'; at = at1; sub = `${dm(vote.start)} · ${GE_PAGE.voteOpen}${en ? '' : ' น.'}`; }
+  else if(vote && now < at2){ phase = en ? 'Voting closes in' : 'ปิดโหวตใน'; at = at2; sub = `${dm(eventLastDay(vote))} · ${GE_PAGE.voteClose}${en ? '' : ' น.'}`; }
+  else if(results && now < at3){ phase = en ? 'Final results in' : 'ประกาศผลใน'; at = at3; sub = `${dm(results.start)} · ${results.time}${en ? '' : ' น.'}`; }
+  const unit = (k, l) => `<span class="ge-cd-u"><b data-u="${k}">--</b><small>${l}</small></span>`;
+  const countdown = phase ? `<div class="ge-cd" data-at="${at}">
+      <span class="ge-cd-k">${phase}</span>
+      <span class="ge-cd-row">${unit('d', en ? 'Days' : 'วัน')}<i>:</i>${unit('h', en ? 'Hours' : 'ชั่วโมง')}<i>:</i>${unit('m', en ? 'Minutes' : 'นาที')}<i>:</i>${unit('s', en ? 'Seconds' : 'วินาที')}</span>
+      <span class="ge-cd-sub">${sub}</span></div>`
     : `<div class="ge-count"><span class="ge-count-label">${en ? 'The results are in' : 'ประกาศผลแล้ว'}</span></div>`;
 
   // while a round is read out, the results tab puts them first: the hero shrinks to
@@ -19374,10 +19392,18 @@ function renderNextCountdown(){
 }
 let _cdTimer = 0;
 function cdTick(){
-  const el = document.querySelector('#main .cd-next[data-cd-at]');
-  if(!el){ clearInterval(_cdTimer); _cdTimer = 0; return; }
+  const el = document.querySelector('#main .cd-next[data-cd-at]'), ge = document.querySelector('#main .ge-cd[data-at]');
+  if(!el && !ge){ clearInterval(_cdTimer); _cdTimer = 0; return; }
   if(!_cdTimer) _cdTimer = setInterval(cdTick, 1000);
   if(document.hidden) return;
+  if(ge){
+    let left = Math.max(0, Math.floor((+ge.dataset.at - Date.now()) / 1000));
+    if(!left){ clearInterval(_cdTimer); _cdTimer = 0; renderMain(); return; }
+    const v = { d:Math.floor(left / 86400), h:Math.floor(left / 3600) % 24, m:Math.floor(left / 60) % 60, s:left % 60 };
+    for(const k in v){ const b = ge.querySelector(`[data-u="${k}"]`), t = String(v[k]).padStart(2, '0'); if(b && b.textContent !== t) b.textContent = t; }
+    ge.setAttribute('aria-label', `${ge.querySelector('.ge-cd-k').textContent} ${v.d} : ${v.h} : ${v.m} : ${v.s}`);
+  }
+  if(!el) return;
   let left = Math.max(0, Math.floor((+el.dataset.cdAt - Date.now()) / 1000));
   if(!left){ clearInterval(_cdTimer); _cdTimer = 0; renderMain(); return; }
   const d = Math.floor(left / 86400); left %= 86400;
