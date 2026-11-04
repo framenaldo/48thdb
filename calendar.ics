@@ -450,6 +450,24 @@ DTSTART;TZID=Asia/Bangkok:20261027T180000
 DTEND;TZID=Asia/Bangkok:20261027T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-anotherdot-1104-2026-11-04@48thdb
+DTSTAMP:20261104T000000Z
+SUMMARY:งานแถลงข่าวเปิดตัว AnotherDot
+LOCATION:SCBX NEXT TECH\, Siam Paragon
+DESCRIPTION:เมมเบอร์: Wawa\, Blythe\, Arlee\, Fame\, Niya\,
+  Janry\, Pancake\, Praew\, Hoop\, Marine\n• BNK48 ร่วมงาน
+ แถลงข่าวเปิดตัว AnotherDot แพลตฟ
+ อร์มชวนครีเอเตอร์ทั่วประ
+ เทศไทยร่วมงานกับแบรนด์แล
+ ะเอเจนซี่ชั้นนำ\n• ศิลปิน BNK4
+ 8 ร่วมงาน: Wawa\, Blythe\, Arlee\, Fame\, Niya\, Janry\, Pan
+ cake\, Praew\, Hoop และ Marine\n\nhttps://48thdb.com/event/ev-anothe
+ rdot-1104
+URL:https://48thdb.com/event/ev-anotherdot-1104
+DTSTART;TZID=Asia/Bangkok:20261104T130000
+DTEND;TZID=Asia/Bangkok:20261104T160000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-mbk-haunted-graveyard-1020-2026-10-20@48thdb
 DTSTAMP:20261020T000000Z
 SUMMARY:ป่าช้าสยองขวัญ
@@ -615,6 +633,19 @@ DESCRIPTION:เมมเบอร์: Lingling\, Chifa\, Praifa\, Valentine
 URL:https://48thdb.com/event/ev-cgm48-popup-halloween-1029
 DTSTART;TZID=Asia/Bangkok:20261029T180000
 DTEND;TZID=Asia/Bangkok:20261029T200000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-cgm48-popup-live-1103-2026-11-03@48thdb
+DTSTAMP:20261103T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Pop Up Live
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Kwan\, Shenae\, Jingjing\, Ginna\n•
+  ครั้งนี้เป็นเทปที่บันทึก
+ ไว้ล่วงหน้า\n\nhttps://48thdb.com/event/ev-cgm48-pop
+ up-live-1103
+URL:https://48thdb.com/event/ev-cgm48-popup-live-1103
+DTSTART;TZID=Asia/Bangkok:20261103T180000
+DTEND;TZID=Asia/Bangkok:20261103T200000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
