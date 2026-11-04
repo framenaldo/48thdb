@@ -3968,6 +3968,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-big{ font-size:24px; line-height:1; margin-top:2px; font-variant-numeric:tabular-nums; }
   .dash-l{ margin-top:auto; font-size:12px; font-weight:800; line-height:1.15; } .dash-l small{ display:block; font-size:10px; font-weight:600; line-height:1.2; color:var(--ink-soft); }
   .dash-t.is-shop{ --c:#E4457E; }
+  .dash-t.is-pic{ position:relative; }
+  .dash-strip{ flex:1; align-self:stretch; min-height:0; display:flex; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
+  .dash-strip::-webkit-scrollbar{ display:none; }
+  .dash-sl{ position:relative; flex:0 0 100%; scroll-snap-align:start; display:flex; align-items:flex-end; cursor:pointer; }
+  .dash-sl img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .dash-sl small{ position:relative; width:100%; padding:22px 8px 14px; color:#fff; font-size:10.5px; font-weight:700; line-height:1.2; background:linear-gradient(transparent, rgba(0,0,0,.72));
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dash-badge{ position:absolute; left:6px; top:30px; z-index:1; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:800; color:#fff; background:rgba(0,0,0,.5); }
+  .dash-dots{ position:absolute; left:0; right:0; bottom:5px; display:flex; justify-content:center; gap:4px; pointer-events:none; }
+  .dash-dots i{ width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.5); } .dash-dots i.on{ background:#fff; }
+  .dash-t.is-cal.is-pic{ padding:0; overflow:hidden; } .dash-t.is-cal.is-pic .dash-cal-h{ margin:0; position:relative; z-index:1; }
   .dash-t.is-pic{ padding:0; justify-content:flex-end; border:0; overflow:hidden; }
   .dash-t.is-pic img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .dash-t.is-pic .dash-l{ position:relative; width:100%; margin:0; padding:22px 9px 8px; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.72)); }
@@ -13959,9 +13970,14 @@ function renderHomeDash(ge){
   const mem = activeMembers(), nb = mem.filter(m => m.groupId === 'bnk48').length;
   const tile = (attrs, cls, icon, big, label, small) => `<button class="dash-t ${cls}" ${attrs}>
       <span class="dash-i">${icon}</span><b class="dash-big">${big}</b><span class="dash-l">${label}${small ? `<small>${small}</small>` : ''}</span></button>`;
+  // a poster in a tile is a slide: tapping it opens that event; the strip swipes sideways, the dots follow
+  const dashSlide = (e, label) => `<span class="dash-sl" data-action="open-event" data-id="${escapeAttr(e.id)}"><img src="${escapeAttr(e.poster.img.replace(/\.[a-z]+$/i, '-s.jpg'))}" alt="" loading="lazy" decoding="async"><small>${label}</small></span>`;
+  const dashDots = n => `<span class="dash-dots" aria-hidden="true">${Array.from({ length:n }, (_, k) => `<i${k ? '' : ' class="on"'}></i>`).join('')}</span>`;
+  const calPics = SEED_SCHEDULE.filter(e => !e.period && !e.cancelled && !e.shop && e.poster && e.poster.img && e.start <= wk && eventLastDay(e) >= iso)
+    .sort((x, y) => (x.start > iso ? x.start : iso).localeCompare(y.start > iso ? y.start : iso) || x.start.localeCompare(y.start)).slice(0, 8);
   const shopOpen = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open'), shops = shopOpen.length;
-  // the tile shows the poster of the open shop that closes first (a small copy), the name under it
-  const shopPick = shopOpen.filter(e => e.poster && e.poster.img).sort((x, y) => String(x.shop.to).localeCompare(String(y.shop.to)))[0];
+  // the tile slides through the posters of the open shops (small copies), the one that closes first leading
+  const shopPics = shopOpen.filter(e => e.poster && e.poster.img).sort((x, y) => String(x.shop.to).localeCompare(String(y.shop.to))).slice(0, 8);
   const room = GALLERY[GALLERY.length - 1], cover = room && room.items[0] ? `${room.dir}${room.items[0].f}-s.jpg` : '';
   const square = ge ? (({ round, told, hhmm, top }) => `<button class="dash-ge" data-tile="ge" data-action="open-ge-results">
       <span class="dash-ge-top"><b>${geRoundLabel(round)}</b>${hhmm ? `<small>${en ? 'Updated' : 'อัปเดต'} ${hhmm}${en ? '' : ' น.'}</small>` : ''}</span>
@@ -14009,10 +14025,13 @@ function renderHomeDash(ge){
   const days = (() => { const big = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results); return big ? Math.round((new Date(big.start + 'T00:00:00Z') - new Date(iso + 'T00:00:00Z')) / 86400000) : -1; })();
   const kinds = {
     quiz: sl => renderQuizTile(sl),
-    cal: sl => `<button class="dash-t is-cal" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
+    cal: sl => calPics.length ? `<button class="dash-t is-cal is-pic" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h" data-action="nav" data-view="calendar">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
+      <span class="dash-badge" data-action="nav" data-view="calendar">${week} ${en ? 'events' : 'งาน'}</span><span class="dash-strip">${calPics.map(e => { const n = dayN(e.start), w = n <= 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : `${+e.start.slice(8)} ${M[+e.start.slice(5, 7) - 1]}`; return dashSlide(e, `${w} · ${escapeHtml(eventShortName(e))}`); }).join('')}</span>${calPics.length > 1 ? dashDots(calPics.length) : ''}</button>`
+      : `<button class="dash-t is-cal" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
       <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>`,
-    shop: sl => shopPick ? `<button class="dash-t is-shop is-pic" data-tile="${sl}" data-kind="shop" data-action="nav-shop"><img src="${escapeAttr(shopPick.poster.img.replace(/\.[a-z]+$/i, '-s.jpg'))}" alt="" loading="lazy" decoding="async">
-      <span class="dash-l">${en ? 'Shop' : 'ร้านค้า'}<small>${escapeHtml(shopPick.shop.name || shopPick.title)}</small></span></button>`
+    shop: sl => shopPics.length ? `<button class="dash-t is-shop is-pic" data-tile="${sl}" data-kind="shop" data-action="nav-shop">
+      <span class="dash-strip">${shopPics.map(e => dashSlide(e, escapeHtml(e.shop.name || e.title))).join('')}</span>
+      <span class="dash-badge" data-action="nav-shop">${en ? 'Shop' : 'ร้านค้า'}${shops > 1 ? ` · ${shops}` : ''}</span>${shopPics.length > 1 ? dashDots(shopPics.length) : ''}</button>`
       : tile(`data-tile="${sl}" data-kind="shop" data-action="nav-shop"`, 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด')),
     gal: sl => `<button class="dash-t is-gal" data-tile="${sl}" data-kind="gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
       <span class="dash-l">${en ? 'Gallery' : 'แกลเลอรี'}<small>${room ? escapeHtml(room.title) : ''}</small></span></button>`,
@@ -27004,6 +27023,12 @@ function bindEdgeFades(){
   });
 }
 
+/* the dots under a tile's slides follow its swipe (scroll does not bubble, so listen while it travels down) */
+document.addEventListener('scroll', e => {
+  const t = e.target; if(!t || !t.classList || !t.classList.contains('dash-strip')) return;
+  const dots = t.parentNode.querySelectorAll('.dash-dots i'), k = Math.round(t.scrollLeft / Math.max(1, t.clientWidth));
+  dots.forEach((x, i) => x.classList.toggle('on', i === k));
+}, true);
 function bindScrollPressGuard(){
   let t;
   const mark = ()=>{
