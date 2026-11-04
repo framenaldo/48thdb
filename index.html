@@ -3968,6 +3968,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-big{ font-size:24px; line-height:1; margin-top:2px; font-variant-numeric:tabular-nums; }
   .dash-l{ margin-top:auto; font-size:12px; font-weight:800; line-height:1.15; } .dash-l small{ display:block; font-size:10px; font-weight:600; line-height:1.2; color:var(--ink-soft); }
   .dash-t.is-shop{ --c:#E4457E; }
+  .dash-t.is-pic{ padding:0; justify-content:flex-end; border:0; overflow:hidden; }
+  .dash-t.is-pic img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .dash-t.is-pic .dash-l{ position:relative; width:100%; margin:0; padding:22px 9px 8px; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.72)); }
+  .dash-t.is-pic .dash-l small{ color:rgba(255,255,255,.88); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
   .dash-t.is-gal{ padding:0; justify-content:flex-end; border:0; }
   .dash-t.is-gal img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .dash-t.is-gal .dash-l{ position:relative; width:100%; margin:0; padding:18px 9px 8px; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.65)); }
@@ -13955,7 +13959,9 @@ function renderHomeDash(ge){
   const mem = activeMembers(), nb = mem.filter(m => m.groupId === 'bnk48').length;
   const tile = (attrs, cls, icon, big, label, small) => `<button class="dash-t ${cls}" ${attrs}>
       <span class="dash-i">${icon}</span><b class="dash-big">${big}</b><span class="dash-l">${label}${small ? `<small>${small}</small>` : ''}</span></button>`;
-  const shops = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
+  const shopOpen = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open'), shops = shopOpen.length;
+  // the tile shows the poster of the open shop that closes first (a small copy), the name under it
+  const shopPick = shopOpen.filter(e => e.poster && e.poster.img).sort((x, y) => String(x.shop.to).localeCompare(String(y.shop.to)))[0];
   const room = GALLERY[GALLERY.length - 1], cover = room && room.items[0] ? `${room.dir}${room.items[0].f}-s.jpg` : '';
   const square = ge ? (({ round, told, hhmm, top }) => `<button class="dash-ge" data-tile="ge" data-action="open-ge-results">
       <span class="dash-ge-top"><b>${geRoundLabel(round)}</b>${hhmm ? `<small>${en ? 'Updated' : 'อัปเดต'} ${hhmm}${en ? '' : ' น.'}</small>` : ''}</span>
@@ -14005,7 +14011,9 @@ function renderHomeDash(ge){
     quiz: sl => renderQuizTile(sl),
     cal: sl => `<button class="dash-t is-cal" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
       <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>`,
-    shop: sl => tile(`data-tile="${sl}" data-kind="shop" data-action="nav-shop"`, 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด')),
+    shop: sl => shopPick ? `<button class="dash-t is-shop is-pic" data-tile="${sl}" data-kind="shop" data-action="nav-shop"><img src="${escapeAttr(shopPick.poster.img.replace(/\.[a-z]+$/i, '-s.jpg'))}" alt="" loading="lazy" decoding="async">
+      <span class="dash-l">${en ? 'Shop' : 'ร้านค้า'}<small>${escapeHtml(shopPick.shop.name || shopPick.title)}</small></span></button>`
+      : tile(`data-tile="${sl}" data-kind="shop" data-action="nav-shop"`, 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด')),
     gal: sl => `<button class="dash-t is-gal" data-tile="${sl}" data-kind="gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
       <span class="dash-l">${en ? 'Gallery' : 'แกลเลอรี'}<small>${room ? escapeHtml(room.title) : ''}</small></span></button>`,
     // the rest of the site, each a way in with a number or a face on it (none of them is on the home page already)
