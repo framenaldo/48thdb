@@ -23653,7 +23653,11 @@ const FEST = (() => {
   /* days no birthday takes: the GE results are read out on 14 Nov, Proud's birthday */
   const FIRM = { '2026-11-14': 'ge' };
   /* today's theme: a member's birthday first, then the calendar; null outside them all */
+  /* The seasons are switched off for now: the page keeps its everyday look. Everything below stays in
+     place; set ENABLED to true to bring them back (or open any page with ?fest=on to preview them). */
+  const ENABLED = false, PREVIEW = /[?&]fest=on\b/.test(location.search);
   function today(){
+    if(!ENABLED && !PREVIEW) return null;
     const iso = thaiToday(), md = iso.slice(5);
     if(FIRM[iso]) return { id: FIRM[iso] };
     const bd = activeMembers().filter(m => m.birthday && m.birthday.slice(5) === md);

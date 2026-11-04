@@ -95,6 +95,7 @@ the Firebase CLI from the owner's machine.
   the language passes leave it as written. Search engines read the bio from
   the static /m/<id> pages, so rerun `node scripts/make-member-pages.mjs`
   after bios change.
+- **Seasons are switched off** (4 Nov 2026, the owner's word): `ENABLED` is false in the `FEST` block, so the page wears its everyday look and the header pill is empty. All the theme code is kept; set `ENABLED` to true to bring it back, or open any page with `?fest=on` to preview. What follows describes how the themes work when on.
 - **Seasons on the home page** (`FEST`): by the Thai date the home page wears a
   theme — Kimi to Doko ka e Ikitai to 23 Oct, Halloween 24 Oct – 1 Nov, the GE
   results night 2–15 Nov, Yi Peng 16–30 Nov (Loy Krathong 24 Nov 2026), winter in
