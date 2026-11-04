@@ -5297,6 +5297,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .sp:not(.is-flat) .sp-map > svg, .sp.is-zoomed .sp-map > svg{ cursor:grab; }
   .sp:not(.is-flat) .sp-map > svg:active, .sp.is-zoomed .sp-map > svg:active{ cursor:grabbing; }
   .sp .sp-floor{ fill:rgba(255,255,255,.035); stroke:rgba(255,255,255,.09); stroke-width:1; }
+  /* depth: the floor lit from the stage, a soft shadow beside every block, a lit edge on the stage */
+  .sp .sp-floor-glow{ fill:url(#sp-glow); pointer-events:none; }
+  .sp .sp-shadow{ fill:rgba(0,0,0,.34); pointer-events:none; }
+  .sp .sp-stage-edge{ fill:none; stroke:rgba(240,108,155,.8); stroke-width:1.6; stroke-linejoin:round; pointer-events:none; }
   .sp .sp-block .sp-top{ stroke:rgba(255,255,255,.12); stroke-width:1; }
   .sp .sp-dark-t{ fill:#D8CCD3; font-size:13px; font-weight:800; letter-spacing:2px; text-anchor:middle; pointer-events:none; }
   .sp .sp-stage{ fill:#fff; font-size:26px; letter-spacing:3px; }
@@ -16435,7 +16439,7 @@ function spShade(hex, f){
    quickly as it turns: each chair a seat and a back, facing the stage (the
    back on the far side from it). The sides that face us are drawn, then the
    tops; seats first, then backs, so a nearer back hides the seat behind it. */
-function spChairsSvg(S, base, colour, P, sp, s, c){
+function spChairsSvg(S, base, colour, P, sp, s, c, lod){
   const [px, py] = S.p, w = px * .74, f = n => Math.round(n * 10) / 10;
   // laid flat, as the organiser prints it: a ring a chair
   if(sp <= .01){
@@ -16458,10 +16462,14 @@ function spChairsSvg(S, base, colour, P, sp, s, c){
     }
     return q([[x0, y0, base + z1], [x1, y0, base + z1], [x1, y1, base + z1], [x0, y1, base + z1]]);
   };
+  // while the hall is moving a whole run of chairs is drawn as one strip (a tenth of the shapes);
+  // the single chairs come back as soon as it settles
   S.g.forEach((row, r) => { for(let k = 0; k < row.length; k++){ if(row[k] !== 'x') continue;
-    const cx = S.o[0] + k * px, cy = S.o[1] + r * py, x0 = cx - w / 2, x1 = cx + w / 2;
+    let k1 = k; if(lod) while(row[k1 + 1] === 'x') k1++;
+    const cy = S.o[1] + r * py, x0 = S.o[0] + k * px - w / 2, x1 = S.o[0] + k1 * px + w / 2;
     seatTop += box(x0, cy - py * .34, x1, cy + py * .12, 3, 'seat');
     backTop += box(x0, cy + py * .12, x1, cy + py * .3, 7, 'back');
+    k = k1;
   } });
   const top = '#F7F3EF';
   return `<g class="sp-chairs">${sides.map(sd => `<path d="${sd.seat}" fill="${sd.fill}"/>`).join('')}<path class="sp-chair-top" d="${seatTop}" fill="${top}"/>${
@@ -16503,8 +16511,16 @@ function spScene(ev, st){
     return `<text class="${cls}" x="${f1(q[0])}" y="${f1(q[1] + (cls.includes('is-small') ? 7 : 10))}"${fill ? ` fill="${fill}"` : ''}>${text}</text>`;
   };
   const items = [];
+  // a soft shadow on the floor beside every block, away from the light behind the stage,
+  // so the hall sits on the floor rather than floating above it (3D only, ground level only)
+  if(sp > .01){
+    const shade = (pts, k) => items.push({ d:-2e6, svg:`<polygon class="sp-shadow" points="${poly(pts.map(p => P(p[0] + 4 * k, p[1] + 7 * k, 0)))}"/>` });
+    for(const b of L.blocks) if(!b.z0) shade(b.pts, Math.min(2.2, 0.5 + b.h / 30));
+    for(const sec of Object.values(L.sections)) shade(sec.pts, 0.6);
+  }
   for(const b of L.blocks)
     items.push({ d:depthOf(b.pts), svg:`<g class="sp-block">${prism(b.pts, b.h, b.top || '#060406', b.side || '#3a3139', b.z0 || 0)}${
+      b.text === 'STAGE' && sp > .01 ? `<polygon class="sp-stage-edge" points="${poly(b.pts.map(p => P(p[0], p[1], (b.z0 || 0) + b.h)))}"/>` : ''}${
       b.text ? label(b.at, (b.z0 || 0) + b.h, b.text, b.big ? 'sp-dark-t sp-stage' : 'sp-dark-t') : ''}</g>` });
   const liftOf = z => z && st.pick === z.id ? SP_LIFT * st.lift : 0;
   for(const [name, sec] of Object.entries(L.sections)){
@@ -16514,7 +16530,7 @@ function spScene(ev, st){
     const out = z.off;                               // drawn for the hall's sake, not on sale here
     const open = `<g class="sp-sec${st.pick === z.id ? ' is-on' : ''}${out ? ' is-out' : ''}"${out ? '' :
       ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}"`} style="--z:${z.color}">`;
-    const chairs = L.seats && L.seats[name] ? spChairsSvg(L.seats[name], h, z.color, P, sp, s, c) : '';
+    const chairs = L.seats && L.seats[name] ? spChairsSvg(L.seats[name], h, z.color, P, sp, s, c, st.lod) : '';
     const text = label(sec.at, h + (chairs ? 7 : 0), sec.text || name, (sec.small ? 'is-small' : '') + (chairs ? ' on-seats' : ''), spInk(z.color));
     // a floor zone lies under whatever stands on it (`under`); its name can sit on top of all (`labelTop`)
     items.push({ d:sec.under ? -1e6 + depthOf(sec.pts) : depthOf(sec.pts), svg:`${open}${prism(sec.pts, h, z.color, z.color)}${chairs}${sec.labelTop ? '' : text}</g>` });
@@ -16534,7 +16550,7 @@ function spScene(ev, st){
       L.captions.map(([lv, x, y]) => { const a = P(x, y, 0), lines = L.levels[lv].cap[isEN() ? 'en' : 'th'];
         return `<text class="sp-cap" x="${f1(a[0])}" y="${f1(a[1] - (lines.length - 1) * 9 + 5)}">${
           lines.map((t, i) => `<tspan x="${f1(a[0])}"${i ? ' dy="18"' : ''}>${t}</tspan>`).join('')}</text>`; }).join('')
-    : `<polygon class="sp-floor" points="${poly(L.floor.map(p => P(p[0], p[1], 0)))}"/>`;
+    : `<polygon class="sp-floor" points="${poly(L.floor.map(p => P(p[0], p[1], 0)))}"/><polygon class="sp-floor-glow" points="${poly(L.floor.map(p => P(p[0], p[1], 0)))}"/>`;
   return { svg: under + items.map(i => i.svg).join('') };
 }
 /* How much room the hall takes when tipped back by `pitch`, over the turns a
@@ -16578,14 +16594,19 @@ const spVbAttr = v => [v.vx, v.vy, v.vw, v.vh].map(n => Math.round(n * 10) / 10)
    the floor seats get a sheet's thickness so they still read as blocks */
 const spHeight = (L, sec) => Math.max(2, (sec.m != null ? sec.m : L.levels[sec.level].m) * SP_PER_M);
 function spState(box){
-  if(!box._sp) box._sp = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0, anchor:null };
+  if(!box._sp) box._sp = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0, anchor:null, lod:false };
   return box._sp;
 }
-function spDraw(box){
+/* quick: the hall is moving, so chairs are drawn in runs; a moment after the last quick
+   frame it is drawn once more in full, chair by chair */
+function spDraw(box, quick){
   const ev = SEED_SCHEDULE.find(e => e.id === box.dataset.ev);
   const svg = box.querySelector('.sp-map > svg');
   if(!ev || !svg) return;
   const st = spState(box), flat = box.classList.contains('is-flat');
+  clearTimeout(box._spSettle);
+  st.lod = !!quick && !flat;
+  if(st.lod) box._spSettle = setTimeout(() => spDraw(box), 150);
   const v = spViewBox(SEAT_LAYOUTS[ev.seatPlan.layout], st, flat);
   st.view = v;
   svg.setAttribute('viewBox', spVbAttr(v));
@@ -16603,7 +16624,7 @@ function spTween(box, key, to, ms, ease = t => 1 - (1 - t) ** 3){
     if(runs[key] !== id) return;                   // a newer move of the same value took over
     const t = Math.min(1, (now - t0) / ms);
     st[key] = from + (to - from) * ease(t);
-    spDraw(box);
+    spDraw(box, true);
     if(t < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
@@ -16647,7 +16668,7 @@ function renderSeatPlan(ev){
           <button data-action="seat-zoom" data-id="reset" title="คืนมุมมองเดิม" aria-label="คืนมุมมองเดิม"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button>
         </span>
       </div>
-      <svg viewBox="${spVbAttr(v)}" style="aspect-ratio:${Math.round(v.frame.w)} / ${Math.round(v.frame.h)}" aria-hidden="true" focusable="false"><g class="sp-scene">${svg}</g><g class="sp-fx"></g></svg>
+      <svg viewBox="${spVbAttr(v)}" style="aspect-ratio:${Math.round(v.frame.w)} / ${Math.round(v.frame.h)}" aria-hidden="true" focusable="false"><defs><radialGradient id="sp-glow" cx="50%" cy="6%" r="80%"><stop offset="0" stop-color="#F06C9B" stop-opacity=".2"/><stop offset=".5" stop-color="#F06C9B" stop-opacity=".05"/><stop offset="1" stop-color="#F06C9B" stop-opacity="0"/></radialGradient></defs><g class="sp-scene">${svg}</g><g class="sp-fx"></g></svg>
       <p class="sp-hint"><span class="is-3d">ลากหรือบิดสองนิ้วเพื่อหมุน · ถ่างนิ้วเพื่อซูม</span><span class="is-2d">ถ่างนิ้วเพื่อซูม</span></p>
     </div>
     <div class="sp-side">
@@ -16709,9 +16730,25 @@ function pickSeatZone(el){
   spDraw(box);
   const fx = box.querySelector('.sp-fx'), read = box.querySelector('.sp-pick');
   fx.innerHTML = '';
+  // with a mouse the view eases in on the zone and back out when it is let go; on a touch screen
+  // it stays put, since a zoomed hall takes the finger away from scrolling the page
+  const glide = matchMedia('(pointer:fine)').matches;
   if(off){
+    if(glide && st.zoom > 1.02){ spTween(box, 'zoom', 1, 480); spTween(box, 'px', 0, 480); spTween(box, 'py', 0, 480); }
     read.textContent = spIdle(ev.seatPlan); localize(read);
     return;
+  }
+  if(glide){
+    const zz = ev.seatPlan.zones.find(x => x.id === zone), flat = box.classList.contains('is-flat');
+    const ps = zz.sections.map(n => L.sections[n]).filter(Boolean);
+    if(ps.length){
+      const th = st.yaw * Math.PI / 180, ph = st.pitch * Math.PI / 180, b = spBounds(L, st.pitch, flat);
+      const m = ps.reduce((a, q) => [a[0] + q.at[0] / ps.length, a[1] + q.at[1] / ps.length], [0, 0]);
+      const dx = m[0] - L.cx, dy = m[1] - L.cy;
+      const X = dx * Math.cos(th) - dy * Math.sin(th), V = (dx * Math.sin(th) + dy * Math.cos(th)) * Math.cos(ph);
+      spTween(box, 'zoom', Math.max(st.zoom, 1.3), 520);
+      spTween(box, 'px', (X - b.cx) * .9, 520); spTween(box, 'py', (V - b.cy) * .9, 520);
+    }
   }
   // the zone rises out of the hall, a little past and back
   spTween(box, 'lift', 1, 420, t => 1 + 2.2 * (t - 1) ** 3 + 1.2 * (t - 1) ** 2);
@@ -16774,6 +16811,7 @@ document.addEventListener('pointerdown', e => {
   const runs = box._spT || (box._spT = {});
   ['yaw', 'pitch', 'zoom', 'px', 'py'].forEach(k => { runs[k] = (runs[k] || 0) + 1; });
   spBaseline(spG);
+  spG.lastT = 0; spG.vy = null; spG.lastYaw = spState(box).yaw;
 });
 document.addEventListener('pointermove', e => {
   const g = spG, p = g && g.pts.get(e.pointerId);
@@ -16808,18 +16846,40 @@ document.addEventListener('pointermove', e => {
       // the side facing us follows the hand, as a turntable does: drag right, it turns right
       st.yaw = s0.yaw - dx * .35;
       if(p.mouse) st.pitch = spClamp(s0.pitch - dy * .25, SP_TILT);
+      // how fast the hall is being turned, for the glide after the hand lets go
+      const dt = e.timeStamp - (g.lastT || e.timeStamp);
+      if(dt > 0){ const v = (st.yaw - g.lastYaw) / dt; g.vy = g.vy == null ? v : g.vy * .6 + v * .4; }
+      g.lastT = e.timeStamp; g.lastYaw = st.yaw;
     } else return;
   }
   if(!g.moved){ g.moved = true; g.box.querySelector('.sp-fx').innerHTML = ''; }
-  if(!g.raf) g.raf = requestAnimationFrame(() => { g.raf = 0; spDraw(g.box); });
+  if(!g.raf) g.raf = requestAnimationFrame(() => { g.raf = 0; spDraw(g.box, true); });
 });
 function spLift(e){
   const g = spG;
   if(!g || !g.pts.has(e.pointerId)) return;
   g.pts.delete(e.pointerId);
   if(g.moved && e.type === 'pointerup'){ spSwallowClick = true; setTimeout(() => { spSwallowClick = false; }, 0); }
+  // a turn that ends in motion carries on a little and slows to a stop, like a turntable
+  const st = spState(g.box);
+  if(g.moved && e.type === 'pointerup' && g.pts.size === 0 && g.vy != null && Math.abs(g.vy) > .03
+     && e.timeStamp - g.lastT < 90 && st.zoom <= 1.02 && !g.box.classList.contains('is-flat')) spFling(g.box, g.vy);
   if(g.pts.size) spBaseline(g);                     // carry on with the finger still down
   else spG = null;
+}
+function spFling(box, v){
+  if(spCalm()) return;
+  const st = spState(box), runs = box._spT || (box._spT = {}), id = runs.yaw = (runs.yaw || 0) + 1;
+  v = Math.max(-1.2, Math.min(1.2, v));            // degrees per millisecond, kept sane
+  let last = performance.now();
+  const step = now => {
+    if(runs.yaw !== id) return;                    // a hand, or a tween, took over
+    const dt = Math.min(48, now - last); last = now;
+    st.yaw += v * dt; v *= Math.exp(-dt / 320);
+    spDraw(box, true);
+    if(Math.abs(v) > .004) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 document.addEventListener('pointerup', spLift);
 document.addEventListener('pointercancel', spLift);
@@ -16838,7 +16898,7 @@ document.addEventListener('wheel', e => {
   const at = spPointAt(g, e.clientX, e.clientY);
   st.zoom = spClamp(st.zoom * Math.exp(-e.deltaY * .01), SP_ZOOM);
   st.anchor = { ...at, fx:(e.clientX - g.rect.left) / g.rect.width, fy:(e.clientY - g.rect.top) / g.rect.height };
-  spDraw(box);
+  spDraw(box, true);
 }, { passive:false });
 
 function renderEventLinkEditor(ev){
