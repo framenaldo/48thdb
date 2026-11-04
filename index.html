@@ -21255,6 +21255,11 @@ function renderVisitsCard(){
   </div>`;
 }
 
+/* A number on a menu button counts only what the owner has not yet looked at: opening the tool marks what is in it as seen. */
+const ADMIN_SEEN_LS = '48thdb-admin-seen';
+const adminSeen = () => { try{ return JSON.parse(localStorage.getItem(ADMIN_SEEN_LS) || '{}'); }catch(e){ return {}; } };
+const adminNew = (k, ids) => { const seen = new Set(adminSeen()[k] || []); return ids.filter(id => !seen.has(id)).length; };
+function adminMarkSeen(k, ids){ const o = adminSeen(); o[k] = ids; try{ localStorage.setItem(ADMIN_SEEN_LS, JSON.stringify(o)); }catch(e){} }
 /* The owner's tools on the profile, as one menu: a button for each, and only the one picked opens below. */
 function renderAdminHub(){
   if(!state.isOwner) return '';
@@ -21262,12 +21267,14 @@ function renderAdminHub(){
     { k:'visits',   ic:'📊', th:'ผู้เข้าชมเว็บ',       sub:'ตัวเลขคนเข้า',           html:renderVisitsCard },
     { k:'signups',  ic:'👥', th:'สมาชิกเว็บ',          sub:'บัญชีที่สมัคร',          html:renderSignupsCard },
     { k:'flash',    ic:'📣', th:'ประกาศบนป้ายไฟ',     sub:'ขึ้นป้าย LED ทุกเครื่อง', html:renderFlashComposer },
-    { k:'pending',  ic:'✅', th:'รอตรวจ',               sub:'การแก้ไขของคนอื่น',      html:renderPendingQueue, n:(state.pending || []).length },
+    { k:'pending',  ic:'✅', th:'รอตรวจ',               sub:'การแก้ไขของคนอื่น',      html:renderPendingQueue, ids:() => (state.pending || []).map(x => x.id) },
     { k:'bios',     ic:'📝', th:'ประวัติย่อที่เตรียมไว้', sub:'นำเข้าทีเดียวหลายคน',  html:renderBioImport },
-    { k:'feedback', ic:'💬', th:'ความคิดเห็น',          sub:'จากคนใช้เว็บ',           html:renderFeedbackInbox, n:(state.feedback || []).length },
+    { k:'feedback', ic:'💬', th:'ความคิดเห็น',          sub:'จากคนใช้เว็บ',           html:renderFeedbackInbox, ids:() => (state.feedback || []).map(x => x.id) },
     { k:'theme',    ic:'🎨', th:'ธีมตามฤดูกาล',        sub:'เปิด/ปิดให้ทุกคน',       html:renderSiteThemeCard },
   ];
   const cur = items.find(i => i.k === state.adminTab);
+  if(cur && cur.ids) adminMarkSeen(cur.k, cur.ids());
+  items.forEach(i => { i.n = i.ids && i !== cur ? adminNew(i.k, i.ids()) : 0; });
   return `<h3 class="section-label">เครื่องมือแอดมิน</h3>
     <div class="adm-menu">${items.map(i => `<button class="adm-btn${cur === i ? ' is-on' : ''}" data-action="admin-tab" data-id="${i.k}" aria-expanded="${cur === i}">
       <span class="adm-ic" aria-hidden="true">${i.ic}</span><span class="adm-t"><b>${i.th}</b><small>${i.sub}</small></span>${i.n ? `<span class="adm-n">${i.n}</span>` : ''}</button>`).join('')}</div>
