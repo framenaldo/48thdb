@@ -20648,8 +20648,8 @@ const DASH_KINDS = [{ k:'quiz', th:'หาโอชิจากดวง', en:'F
   { k:'gal', th:'แกลเลอรี', en:'Gallery' }, { k:'members', th:'สมาชิกทั้งหมด', en:'All members' }, { k:'work', th:'ซิงเกิลและอัลบั้ม', en:'Songs & albums' },
   { k:'stats', th:'สถิติ', en:'Stats' }, { k:'org', th:'วงและทีม · ผังวง', en:'Groups & org chart' }, { k:'ge', th:'หน้า GE2026', en:'GE2026 page' },
   { k:'me', th:'โอชิของฉัน', en:'My oshi' }, { k:'rand', th:'เมมเบอร์ประจำวัน', en:'Member of the day' }, { k:'ask', th:'ถาม 48thDb (ค้นหาด้วยคำถาม)', en:'Ask 48thDb' }];
-// the member of the day took the shop's tile (the shop is a ☰ menu entry too); the reader can put it back
-const DASH_DEFAULT = { shop:'rand' };
+// the member of the day took the shop's tile and the shop took the gallery's (the owner's word, 5 Nov; the gallery is a ☰ menu entry too); the reader can put either back
+const DASH_DEFAULT = { shop:'rand', gal:'shop' };
 const DASH_BIG = [{ k:'ge', th:'ผลด่วนเลือกตั้ง', en:'Election results' }, { k:'rand', th:'เมมเบอร์ประจำวัน', en:'Member of the day' }, { k:'oshi', th:'โอชิของฉัน', en:'My oshi' },
   { k:'hub', th:'GE2026 · นับถอยหลัง', en:'GE2026 · countdown' }, { k:'mosaic', th:'สมาชิกทั้งหมด', en:'All members' }, { k:'works', th:'ผลงานล่าสุด', en:'Latest releases' }, { k:'quiz', th:'หาโอชิจากดวง', en:'Find your oshi' }];
 const DASH_TILES = [{ k:'ge', th:'ผลด่วน', en:'Results' }, { k:'quiz', th:'หาโอชิ', en:'Find your oshi' }, { k:'cal', th:'ปฏิทิน', en:'Calendar' },
