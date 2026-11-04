@@ -541,6 +541,42 @@ DTEND;VALUE=DATE:20261019
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-bday-tee-khaimook-2027@48thdb
+DTSTAMP:20261106T000000Z
+SUMMARY:Pre-Order: Khaimook's Birthday T-Shirt
+DESCRIPTION:เมมเบอร์: Khaimook\n• เสื้อวั
+ นเกิดที่ Khaimook ออกแบบเอง สำหร
+ ับวันเกิดครบ 23 ปี 5 ม.ค. 2027 (ชุด
+ เดือนมกราคม)\n• พรีออเดอร์เ
+ ท่านั้น 6 พ.ย. 12:00 – 20 พ.ย. 2026 23:59 น. ท
+ าง iAM48 Application\n• ส่งสินค้า 15 ธ.ค. 2026
+  เป็นต้นไป\n• ภาพสินค้าใช้เ
+ พื่อการโฆษณาเท่านั้น\n\nhttps://48
+ thdb.com/event/ev-bday-tee-khaimook-2027
+URL:https://48thdb.com/event/ev-bday-tee-khaimook-2027
+DTSTART;VALUE=DATE:20261106
+DTEND;VALUE=DATE:20261121
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-bday-tee-janry-2027@48thdb
+DTSTAMP:20261106T000000Z
+SUMMARY:Pre-Order: Janry's Birthday T-Shirt
+DESCRIPTION:เมมเบอร์: Janry\n• เสื้อวัน
+ เกิดที่ Janry ออกแบบเอง สำหรับ
+ วันเกิดครบ 19 ปี 3 ม.ค. 2027 (ชุดเด
+ ือนมกราคม)\n• พรีออเดอร์เท่
+ านั้น 6 พ.ย. 12:00 – 20 พ.ย. 2026 23:59 น. ทาง
+  iAM48 Application\n• ส่งสินค้า 15 ธ.ค. 2026 เ
+ ป็นต้นไป\n• ภาพสินค้าใช้เพ
+ ื่อการโฆษณาเท่านั้น\n\nhttps://48thd
+ b.com/event/ev-bday-tee-janry-2027
+URL:https://48thdb.com/event/ev-bday-tee-janry-2027
+DTSTART;VALUE=DATE:20261106
+DTEND;VALUE=DATE:20261121
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-ge6-bundle@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:Ticket Bundle: Journey of Dreams + Final Results
