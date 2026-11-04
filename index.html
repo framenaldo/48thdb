@@ -2994,14 +2994,18 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .ge-count-unit{ font-size:14px; font-weight:700; opacity:.9; }
   /* the countdown, as a film's: wide-set white figures with a faint glow, their names small and spaced under them */
   .ge-cd{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:4px; color:#fff; }
-  .ge-cd-k{ font-size:12px; font-weight:800; letter-spacing:.32em; text-indent:.32em; text-transform:uppercase; opacity:.8; text-shadow:0 1px 6px rgba(0,0,0,.8); }
+  /* Thai is never letter-spaced: Safari pulls its vowels and tone marks off their letters */
+  .ge-cd-k{ font-size:13px; font-weight:800; opacity:.8; text-shadow:0 1px 6px rgba(0,0,0,.8); }
+  .ge-cd.is-en .ge-cd-k{ font-size:12px; letter-spacing:.32em; text-indent:.32em; text-transform:uppercase; }
+  .ge-cd.is-en .ge-cd-u small{ letter-spacing:.3em; margin-right:-.3em; }
+  .ge-cd.is-en .ge-cd-sub{ letter-spacing:.12em; }
   .ge-cd-row{ display:flex; align-items:flex-start; justify-content:center; gap:clamp(6px, 2.4vw, 16px); }
   .ge-cd-row > i{ font-style:normal; font-size:clamp(26px, 8vw, 46px); font-weight:500; line-height:1.28; opacity:.55; }
   .ge-cd-u{ display:flex; flex-direction:column; align-items:center; gap:6px; }
   .ge-cd-u b{ font-size:clamp(34px, 10.5vw, 60px); font-weight:600; line-height:1; letter-spacing:.14em; margin-right:-.14em;
     font-variant-numeric:tabular-nums; color:#F7F4EE; text-shadow:0 0 18px rgba(255,236,210,.35), 0 2px 10px rgba(0,0,0,.75); }
-  .ge-cd-u small{ font-size:clamp(9px, 2.6vw, 11px); font-weight:700; letter-spacing:.3em; margin-right:-.3em; text-transform:uppercase; color:rgba(255,255,255,.55); }
-  .ge-cd-sub{ font-size:12px; font-weight:700; letter-spacing:.12em; opacity:.7; text-shadow:0 1px 6px rgba(0,0,0,.8); }
+  .ge-cd-u small{ font-size:clamp(10px, 2.9vw, 12px); font-weight:700; text-transform:uppercase; color:rgba(255,255,255,.6); }
+  .ge-cd-sub{ font-size:12px; font-weight:700; opacity:.7; text-shadow:0 1px 6px rgba(0,0,0,.8); }
   @media (min-width:720px){ .ge-cd-k{ font-size:14px; } .ge-cd-sub{ font-size:14px; } }
   .ge-tabs .sub-tab.active{ background:var(--ge); border-color:var(--ge); color:#fff; }
   /* four tabs on a phone: keep each label on one line */
@@ -13705,7 +13709,7 @@ function renderGEPage(){
   else if(vote && now < at2){ phase = en ? 'Voting closes in' : 'ปิดโหวตใน'; at = at2; sub = `${dm(eventLastDay(vote))} · ${GE_PAGE.voteClose}${en ? '' : ' น.'}`; }
   else if(results && now < at3){ phase = en ? 'Final results in' : 'ประกาศผลใน'; at = at3; sub = `${dm(results.start)} · ${results.time}${en ? '' : ' น.'}`; }
   const unit = (k, l) => `<span class="ge-cd-u"><b data-u="${k}">--</b><small>${l}</small></span>`;
-  const countdown = phase ? `<div class="ge-cd" data-at="${at}">
+  const countdown = phase ? `<div class="ge-cd${en ? ' is-en' : ''}" data-at="${at}">
       <span class="ge-cd-k">${phase}</span>
       <span class="ge-cd-row">${unit('d', en ? 'Days' : 'วัน')}<i>:</i>${unit('h', en ? 'Hours' : 'ชั่วโมง')}<i>:</i>${unit('m', en ? 'Minutes' : 'นาที')}<i>:</i>${unit('s', en ? 'Seconds' : 'วินาที')}</span>
       <span class="ge-cd-sub">${sub}</span></div>`
