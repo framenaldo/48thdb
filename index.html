@@ -6091,6 +6091,106 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .fest-faces{ flex:none; display:flex; }
   .fest-face{ width:30px !important; height:30px !important; border-radius:50% !important; box-shadow:0 0 0 2px #fff; }
   .fest-faces .fest-face + .fest-face{ margin-left:-10px; }
+
+  /* A preview of the finished look, only on a device that opened ?ui=v2 (?ui=v1 turns it off); nobody else sees it */
+  /* UI v2 — the same site, finished more carefully: deeper light, finer edges, one glow per thing */
+  :root[data-ui="v2"]{
+    --u2-edge:rgba(255,255,255,.10);
+    --u2-hi:inset 0 1px 0 rgba(255,255,255,.09);
+    --u2-drop:0 3px 0 rgba(0,0,0,.22), 0 18px 34px -16px rgba(0,0,0,.55);
+    --u2-glow-p:rgba(228,69,126,.45); --u2-glow-t:rgba(46,140,130,.45);
+  }
+  :root[data-ui="v2"][data-theme="light"]{
+    --u2-edge:rgba(28,19,41,.08);
+    --u2-hi:inset 0 1px 0 rgba(255,255,255,.9);
+    --u2-drop:0 3px 0 rgba(28,19,41,.08), 0 16px 30px -18px rgba(92,40,80,.35);
+    --u2-glow-p:rgba(228,69,126,.28); --u2-glow-t:rgba(46,140,130,.26);
+  }
+
+  /* the page: two slow pools of colour behind everything */
+  :root[data-ui="v2"] body::before{
+    content:""; position:fixed; inset:-20vh -20vw; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(40vmax 34vmax at 12% 6%, var(--u2-glow-p), transparent 70%),
+      radial-gradient(42vmax 36vmax at 95% 62%, var(--u2-glow-t), transparent 70%);
+    opacity:.55;
+  }
+
+  /* section headings: bigger, the bar becomes a lit capsule */
+  :root[data-ui="v2"] .section-label{ font-size:19px; font-weight:800; letter-spacing:-.01em; }
+  :root[data-ui="v2"] .section-label::before{
+    width:5px !important; border-radius:999px;
+    box-shadow:0 0 12px rgba(255,127,176,.65), 0 0 20px rgba(67,217,174,.35);
+  }
+
+  /* every framed card: a hairline that catches light on top, a deeper soft drop under the hard one */
+  :root[data-ui="v2"] :is(.tl-card,.dash-t,.feed-head,.page-share-btn,.dash-ge,.gec-teaser){
+    box-shadow:var(--u2-hi), var(--u2-drop);
+  }
+  :root[data-ui="v2"] :is(.tl-card,.dash-t,.feed-head){ border-color:var(--u2-edge); }
+  :root[data-ui="v2"] :is(.tl-card,.dash-t,.dash-ge,.gec-teaser,.page-share-btn,.ev-card.is-openable){
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  :root[data-ui="v2"] :is(.tl-card,.dash-t,.dash-ge,.gec-teaser,.page-share-btn):active{
+    transform:translateY(2px) scale(.985); box-shadow:var(--u2-hi), 0 1px 0 rgba(0,0,0,.22);
+  }
+
+  /* the vote card: a gold figure that shines, a red that glows from inside */
+  :root[data-ui="v2"] .gec-teaser{
+    box-shadow:inset 0 1px 0 rgba(255,210,160,.22), inset 0 0 0 1px rgba(255,140,120,.16),
+               0 4px 0 rgba(90,10,18,.5), 0 22px 40px -14px rgba(179,18,30,.6);
+  }
+  :root[data-ui="v2"] .gec-t-v{
+    color:#F6C65E; font-variant-numeric:tabular-nums; letter-spacing:-.02em;
+    text-shadow:0 1px 0 rgba(255,240,200,.35), 0 0 18px rgba(242,185,76,.45);
+  }
+  :root[data-ui="v2"] .gec-t-poster{ box-shadow:0 10px 24px -6px rgba(0,0,0,.6), 0 0 0 1px rgba(255,220,170,.25); }
+
+  /* results square: the top three get rings, gold silver bronze */
+  :root[data-ui="v2"] .dash-ge{
+    box-shadow:inset 0 1px 0 rgba(255,200,180,.18), inset 0 0 0 1px rgba(255,120,120,.12),
+               0 4px 0 rgba(0,0,0,.3), 0 20px 36px -14px rgba(179,18,30,.55);
+  }
+  :root[data-ui="v2"] .dash-r .dash-face{ box-shadow:0 0 0 2px #E9C46A, 0 0 12px rgba(233,196,106,.45); }
+  :root[data-ui="v2"] .dash-r:nth-child(2) .dash-face{ box-shadow:0 0 0 2px #C9D2DC, 0 0 10px rgba(201,210,220,.35); }
+  :root[data-ui="v2"] .dash-r:nth-child(3) .dash-face{ box-shadow:0 0 0 2px #D39A6A, 0 0 10px rgba(211,154,106,.35); }
+
+  /* picture tiles: an inner frame so posters sit in the card, labels over a soft fade */
+  :root[data-ui="v2"] .dash-t.is-pic{ overflow:hidden; }
+  :root[data-ui="v2"] .dash-t.is-pic::after{
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), inset 0 -60px 50px -30px rgba(0,0,0,.55);
+  }
+  :root[data-ui="v2"] .dash-q-face{ box-shadow:0 0 0 2px rgba(255,255,255,.9), 0 4px 10px rgba(0,0,0,.35); }
+
+  /* iAM48 cards: a pink hairline along the top, as if lit */
+  :root[data-ui="v2"] .tl-card{ background-image:linear-gradient(180deg, rgba(228,69,126,.10), transparent 42%); }
+
+  /* header: the search reads as a lit glass field */
+  :root[data-ui="v2"] .top input{
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 6px 18px -10px rgba(0,0,0,.6);
+    border-color:var(--u2-edge);
+  }
+  :root[data-ui="v2"] .feed-today{ box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
+
+  /* bottom menu: the current tab is a lit pink-to-teal capsule */
+  :root[data-ui="v2"] .glass-nav{
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 18px 40px -10px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+  }
+  :root[data-ui="v2"] .glass-nav :is(a,button)[aria-current="page"],
+  :root[data-ui="v2"] .glass-nav :is(a,button).is-on,
+  :root[data-ui="v2"] .glass-nav :is(a,button).active{
+    background:linear-gradient(135deg, rgba(228,69,126,.95), rgba(46,140,130,.9)) !important;
+    color:#fff !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px -4px rgba(228,69,126,.6);
+  }
+  :root[data-ui="v2"] .glass-nav :is(a,button)[aria-current="page"] svg,
+  :root[data-ui="v2"] .glass-nav :is(a,button).is-on svg,
+  :root[data-ui="v2"] .glass-nav :is(a,button).active svg{ stroke:#fff; color:#fff; }
+
+  /* event cards on the home page */
+  :root[data-ui="v2"] .ev-card.is-openable:not(.is-done){ box-shadow:var(--u2-hi), var(--u2-drop); }
+  :root[data-ui="v2"] .ev-poster-img{ box-shadow:0 8px 18px -8px rgba(0,0,0,.6); }
 </style>
 <script>
   /* Runs before first paint: follow the OS. A tap on the switch holds only for this visit (sessionStorage). */
@@ -6098,6 +6198,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     var t; try{ localStorage.removeItem('48thdb-theme'); t = sessionStorage.getItem('48thdb-theme'); }catch(e){}
     if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t;
+  })();
+  (function(){
+    var m = location.search.match(/[?&]ui=(v[12])\b/), u;
+    try{ if(m) localStorage.setItem('48thdb-ui', m[1]); u = localStorage.getItem('48thdb-ui'); }catch(e){}
+    if(u === 'v2') document.documentElement.dataset.ui = 'v2';
   })();
 </script>
 </head>
