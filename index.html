@@ -5128,6 +5128,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .evm-fest.is-play [data-wr-t].wr-wipe{ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
   .evm-fest-imgw.is-writing > img{ visibility:hidden; }
   .evm-fest-imgw.is-writing .evm-glint{ display:none; }
+  /* Shock Me Girls: the same tilted, white-edged logo as before, written by the pen when it opens */
+  .evm-fest-imgw.is-plain{ width:min(240px, 66%); margin:2px auto 6px; transform:rotate(-3deg); }
+  .evm-fest-imgw.is-plain .evm-fest-img{ filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff); }
+  .evm-fest-imgw.is-plain .wr-cv{ filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff); }
   .song-logo.is-writing{ -webkit-mask:none; mask:none; background:transparent; }
   /* a Latin word, letter by letter */
   .evm-fest.is-play .evm-fest-word.has-wl{ animation:none; }
@@ -13179,8 +13183,8 @@ const FEST_EVENT = {
   'ev-anotherdot-1104': { word:'AnotherDot', sub:'BNK48 · PRESS LAUNCH', motif:'sparkles', pal:'sky' },
   'ev-mbk-haunted-graveyard-1020': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-mbk-haunted-graveyard-1026': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
-  'ev-shock-me-girls-x-takeover': { word:'X Takeover', sub:'X TAKEOVER · 7–8 PM', motif:'bolts', img:'logos/shock-me-girls.png' },
-  'ev-shock-me-girls-orientation': { word:'Shock Me Girls', sub:'SEMESTER 2 · ORIENTATION DAY', motif:'bolts', img:'logos/shock-me-girls.png' },
+  'ev-shock-me-girls-x-takeover': { word:'X Takeover', sub:'X TAKEOVER · 7–8 PM', motif:'bolts', img:'logos/shock-me-girls.png', tm:'logos/shock-me-girls-t.png' },
+  'ev-shock-me-girls-orientation': { word:'Shock Me Girls', sub:'SEMESTER 2 · ORIENTATION DAY', motif:'bolts', img:'logos/shock-me-girls.png', tm:'logos/shock-me-girls-t.png' },
   'ev-cgm48-popup-halloween-ontour-1020': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-cgm48-popup-halloween-ontour-1027': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
 };
@@ -13300,7 +13304,7 @@ function renderEventBanner(ev){
     ${K.fx === 'bunting' ? renderFestBunting() : ''}
     ${K.fx === 'moon' ? '<span class="evm-fest-moon" aria-hidden="true"></span><span class="evm-fest-drip" aria-hidden="true"></span>' : ''}
     <span class="evm-fest-deco" aria-hidden="true">${renderFestDeco(K.motif)}</span>
-    ${K.img && K.glint ? `<span class="evm-fest-imgw${K.blend ? ' is-screen' : ''}" style="--logo:url('${escapeAttr(K.shape || K.img)}')"${K.tm ? ` data-wr-t="${escapeAttr(K.tm)}"` : ''}><img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async"><i class="evm-glint" aria-hidden="true"></i></span>`
+    ${K.img && (K.glint || (K.tm && fxNew())) ? `<span class="evm-fest-imgw${K.blend ? ' is-screen' : ''}${K.glint ? '' : ' is-plain'}" style="--logo:url('${escapeAttr(K.shape || K.img)}')"${K.tm ? ` data-wr-t="${escapeAttr(K.tm)}"` : ''}><img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">${K.glint ? '<i class="evm-glint" aria-hidden="true"></i>' : ''}</span>`
       : K.img ? `<img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">`
       : K.song ? renderSongLogo(K.song, 'evm-fest-song', true)
       : festWordHtml(K.word)}
