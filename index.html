@@ -6195,9 +6195,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      first redraws are done, then rises in once — instead of text and boxes jumping as they land */
   html.boot #main, html.boot .site-foot{ opacity:0; animation:boot-safe 0s 1.6s forwards; }
   @keyframes boot-safe{ to{ opacity:1; } }
-  html.booted #main{ animation:boot-in .6s cubic-bezier(.16,1,.3,1) both; }
+  html.booted #main{ animation:boot-in .45s ease-out both; }
   html.booted .site-foot{ animation:boot-fade .6s ease-out .15s both; }
-  @keyframes boot-in{ from{ opacity:0; transform:translate3d(0,18px,0); } to{ opacity:1; transform:none; } }
+  @keyframes boot-in{ from{ opacity:0; } to{ opacity:1; } }
   @keyframes boot-fade{ from{ opacity:0; } to{ opacity:1; } }
   @media (prefers-reduced-motion:reduce){ html.booted #main{ animation:boot-fade .25s ease-out both; } }
 </style>
@@ -24415,7 +24415,8 @@ function bindReveal(arrived){
   document.querySelectorAll(REVEAL_SEL).forEach(el => {
     if(el.closest('.modal-backdrop, .poster-viewer') || el.parentElement.closest('.rv')) return;
     const r = el.getBoundingClientRect();
-    if(!r.height || (!arrived && r.top < fold)) return;
+    // what is already on screen when a page is drawn stays put (rising in on arrival read as the text jumping); only what is scrolled to rises
+    if(!r.height || r.top < fold) return;
     el.classList.add('rv');
     _revealIO.observe(el);
   });
