@@ -3944,31 +3944,37 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .set-seg button{ display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; border:0; border-radius:11px; font:inherit; font-size:13px; font-weight:700;
     color:var(--ink-soft); background:none; cursor:pointer; } .set-seg svg{ width:15px; height:15px; }
   .set-seg button.is-on{ background:var(--card); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.12); cursor:default; }
-  .filter-bar.mb-bar{ flex-direction:column; flex-wrap:nowrap; align-items:stretch; gap:10px; }
+  /* the members page's controls: one framed panel, groups on top, tools under a hairline */
+  .filter-bar.mb-bar{ flex-direction:column; flex-wrap:nowrap; align-items:stretch; gap:0;
+    padding:10px; margin:0 0 14px; border:1px solid var(--line); border-radius:20px;
+    background:color-mix(in srgb, var(--card) 82%, transparent); box-shadow:0 4px 14px rgba(var(--shadow-rgb),.08); }
   .mb-row{ display:flex; align-items:center; gap:8px; min-width:0; }
-  .mb-chips{ display:flex; gap:8px; flex:1 1 auto; min-width:0; overflow-x:auto; scrollbar-width:none; padding:2px 1px; }
-  .mb-chips::-webkit-scrollbar{ display:none; }
-  .mb-chips .pill{ flex:none; white-space:nowrap; padding:7px 15px; }
-  .mb-add{ flex:none; padding:8px 16px; font-size:13px; box-shadow:0 2px 8px rgba(192,138,46,.28); }
-  .mb-tools{ padding:6px; border-radius:16px; background:var(--paper-dim); border:1px solid var(--line); }
-  .mb-tools .pill{ flex:none; white-space:nowrap; background:var(--card); border:1px solid var(--line); padding:6px 14px; }
+  .mb-seg{ display:flex; gap:3px; padding:3px; border-radius:15px; background:var(--paper-dim); border:1px solid var(--line); flex:none; }
+  .mb-seg .pill{ flex:none; white-space:nowrap; border:0; background:transparent; padding:6px 13px; border-radius:12px; color:var(--ink-soft); font-weight:600; }
+  .mb-seg .pill[style*="background"]{ box-shadow:0 2px 6px rgba(var(--shadow-rgb),.18); }
+  .mb-bar .pill-grad{ flex:none; white-space:nowrap; padding:7px 12px; }
+  .mb-add{ flex:none; margin-left:auto; padding:8px 16px; font-size:13px; box-shadow:0 2px 8px rgba(192,138,46,.28); }
+  .mb-tools{ margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
+  .mb-tools .pill{ flex:none; white-space:nowrap; padding:6px 14px; }
   .mb-tools .pill.adv-on{ background:var(--ink); color:var(--paper); border-color:transparent; }
   .mb-tools select.filter-select{ flex:1 1 0; min-width:0; text-overflow:ellipsis; }
-  .mb-tools .count-tag{ flex:none; margin-left:2px; padding:0 6px; font-weight:600; white-space:nowrap; }
-  .mb-active{ flex-wrap:wrap; }
+  .mb-tools .count-tag{ flex:none; margin-left:auto; padding:5px 10px; border-radius:12px; background:var(--paper-dim); font-weight:700; color:var(--ink); white-space:nowrap; }
+  .mb-active{ flex-wrap:wrap; margin-top:10px; }
   .mb-active .gen-filter-chip{ margin-left:0; }
   @media (max-width:560px){
+    .filter-bar.mb-bar{ padding:8px; }
+    .mb-row{ gap:6px; }
     .mb-add-t{ display:none; }
-    .mb-add{ width:38px; height:38px; padding:0; font-size:22px; line-height:1; display:flex; align-items:center; justify-content:center; }
-    .mb-chips{ gap:5px; padding-right:6px; }
-    .mb-chips .pill{ padding:7px 8px; font-size:12.5px; }
-    .mb-chips .pill-grad{ gap:4px; }
-    .mb-chips .pill-grad .grad-cap{ width:13px; height:13px; }
-    .mb-add{ margin-left:-2px; }
+    .mb-add{ width:34px; height:34px; padding:0; font-size:21px; line-height:1; display:flex; align-items:center; justify-content:center; }
+    .mb-seg .pill{ padding:6px 8px; font-size:12.5px; }
+    .mb-bar .pill-grad{ padding:6px 8px; font-size:12.5px; gap:4px; }
+    .mb-bar .pill-grad .grad-cap{ width:13px; height:13px; }
+    .mb-tools{ margin-top:8px; padding-top:8px; }
+    .mb-tools .pill{ padding:6px 11px; }
+    .mb-tools .count-tag{ padding:5px 7px; }
   }
   @media (min-width:700px){
-    .mb-tools{ align-self:flex-start; }
-    .mb-tools select.filter-select{ flex:0 0 auto; min-width:130px; }
+    .mb-tools select.filter-select{ flex:0 0 auto; min-width:140px; }
   }
   /* the home page's dashboard: the results as a square, four small tiles beside it */
   .dash{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; }
@@ -19136,10 +19142,8 @@ function renderBrowse(){
   ${renderMembersTabs()}
   <div class="filter-bar mb-bar">
     <div class="mb-row">
-      <div class="mb-chips">
-        ${renderGroupPills()}
-        ${renderGraduatedPill()}
-      </div>
+      <div class="mb-seg">${renderGroupPills()}</div>
+      ${renderGraduatedPill()}
       <button class="btn-add mb-add" data-action="add-new" aria-label="เพิ่มสมาชิก">+<span class="mb-add-t"> เพิ่มสมาชิก</span></button>
     </div>
     <div class="mb-row mb-tools">
