@@ -2992,6 +2992,21 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .ge-count-num{ font-size:48px; font-weight:800; line-height:1; color:#FFD98A; text-shadow:0 2px 12px rgba(0,0,0,.6); }
   .ge-count-unit{ text-shadow:0 1px 6px rgba(0,0,0,.7); }
   .ge-count-unit{ font-size:14px; font-weight:700; opacity:.9; }
+  /* the countdown, as a film's: wide-set white figures with a faint glow, their names small and spaced under them */
+  .ge-cd{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:4px; color:#fff; }
+  /* Thai is never letter-spaced: Safari pulls its vowels and tone marks off their letters */
+  .ge-cd-k{ font-size:13px; font-weight:800; opacity:.8; text-shadow:0 1px 6px rgba(0,0,0,.8); }
+  .ge-cd.is-en .ge-cd-k{ font-size:12px; letter-spacing:.32em; text-indent:.32em; text-transform:uppercase; }
+  .ge-cd.is-en .ge-cd-u small{ letter-spacing:.3em; margin-right:-.3em; }
+  .ge-cd.is-en .ge-cd-sub{ letter-spacing:.12em; }
+  .ge-cd-row{ display:flex; align-items:flex-start; justify-content:center; gap:clamp(6px, 2.4vw, 16px); }
+  .ge-cd-row > i{ font-style:normal; font-size:clamp(26px, 8vw, 46px); font-weight:500; line-height:1.28; opacity:.55; }
+  .ge-cd-u{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .ge-cd-u b{ font-size:clamp(34px, 10.5vw, 60px); font-weight:600; line-height:1; letter-spacing:.14em; margin-right:-.14em;
+    font-variant-numeric:tabular-nums; color:#F7F4EE; text-shadow:0 0 18px rgba(255,236,210,.35), 0 2px 10px rgba(0,0,0,.75); }
+  .ge-cd-u small{ font-size:clamp(10px, 2.9vw, 12px); font-weight:700; text-transform:uppercase; color:rgba(255,255,255,.6); }
+  .ge-cd-sub{ font-size:12px; font-weight:700; opacity:.7; text-shadow:0 1px 6px rgba(0,0,0,.8); }
+  @media (min-width:720px){ .ge-cd-k{ font-size:14px; } .ge-cd-sub{ font-size:14px; } }
   .ge-tabs .sub-tab.active{ background:var(--ge); border-color:var(--ge); color:#fff; }
   /* four tabs on a phone: keep each label on one line */
   @media (max-width:560px){ .ge-tabs .sub-tab{ padding:9px 4px; font-size:12.5px; white-space:nowrap; } }
@@ -3999,6 +4014,22 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-big{ font-size:24px; line-height:1; margin-top:2px; font-variant-numeric:tabular-nums; }
   .dash-l{ margin-top:auto; font-size:12px; font-weight:800; line-height:1.15; } .dash-l small{ display:block; font-size:10px; font-weight:600; line-height:1.2; color:var(--ink-soft); }
   .dash-t.is-shop{ --c:#E4457E; }
+  .dash-t.is-pic{ position:relative; }
+  .dash-strip{ flex:1; align-self:stretch; min-height:0; position:relative; }
+  .dash-sl{ position:absolute; inset:0; display:flex; align-items:flex-end; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  .dash-sl.on{ opacity:1; pointer-events:auto; }
+  .dash-sl img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .dash-sl small{ position:relative; width:100%; padding:20px 8px 14px; color:#fff; font-size:11px; font-weight:800; line-height:1.2; background:linear-gradient(transparent, rgba(0,0,0,.72));
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  @media (prefers-reduced-motion:reduce){ .dash-sl{ transition:none; } }
+  .dash-badge{ position:absolute; left:6px; top:30px; z-index:1; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:800; color:#fff; background:rgba(0,0,0,.5); }
+  .dash-dots{ position:absolute; left:0; right:0; bottom:5px; display:flex; justify-content:center; gap:4px; pointer-events:none; }
+  .dash-dots i{ width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.5); } .dash-dots i.on{ background:#fff; }
+  .dash-t.is-cal.is-pic{ padding:0; overflow:hidden; } .dash-t.is-cal.is-pic .dash-cal-h{ margin:0; position:relative; z-index:1; }
+  .dash-t.is-pic{ padding:0; justify-content:flex-end; border:0; overflow:hidden; }
+  .dash-t.is-pic img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .dash-t.is-pic .dash-l{ position:relative; width:100%; margin:0; padding:22px 9px 8px; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.72)); }
+  .dash-t.is-pic .dash-l small{ color:rgba(255,255,255,.88); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
   .dash-t.is-gal{ padding:0; justify-content:flex-end; border:0; }
   .dash-t.is-gal img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .dash-t.is-gal .dash-l{ position:relative; width:100%; margin:0; padding:18px 9px 8px; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.65)); }
@@ -4096,6 +4127,16 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gec-err{ margin:8px 2px 0; font-size:12px; font-weight:700; color:#B3121E; }
   .gec-big{ text-align:center; padding:16px 14px; }
   .gec-k{ margin:0; font-size:12.5px; font-weight:800; color:var(--ink-soft); }
+  .adm-menu{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin:0 0 12px; }
+  .adm-btn{ position:relative; display:flex; align-items:center; gap:9px; min-width:0; padding:10px 11px; text-align:left; font:inherit; color:var(--ink); cursor:pointer;
+    background:var(--card, var(--surface)); border:1.5px solid var(--line, rgba(128,128,128,.28)); border-radius:16px; box-shadow:0 2px 0 var(--line, rgba(128,128,128,.28)); }
+  .adm-btn:active{ transform:translateY(2px); box-shadow:none; }
+  .adm-btn.is-on{ border-color:var(--accent, #E4457E); box-shadow:0 2px 0 var(--accent, #E4457E); background:color-mix(in srgb, var(--accent, #E4457E) 12%, transparent); }
+  .adm-ic{ flex:none; font-size:20px; line-height:1; }
+  .adm-t{ min-width:0; display:flex; flex-direction:column; gap:1px; } .adm-t b{ font-size:13.5px; line-height:1.2; } .adm-t small{ font-size:11px; color:var(--ink-soft); line-height:1.2; }
+  .adm-n{ position:absolute; top:-6px; right:-4px; min-width:20px; height:20px; padding:0 6px; border-radius:99px; background:#E0243A; color:#fff; font-size:11.5px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .adm-panel{ margin:0 0 18px; padding-top:2px; }
+  .adm-panel .pd-fold{ pointer-events:none; } .adm-panel .pd-caret{ display:none; }
   .pd-fold{ display:flex; align-items:center; gap:8px; padding:4px 0; border:0; background:none; color:inherit; font:inherit; cursor:pointer; }
   .pd-fold .section-label{ margin:0; }
   .pd-caret{ display:inline-block; transition:transform .2s; transform:rotate(-90deg); color:var(--ink-soft); }
@@ -4860,6 +4901,21 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .qz-pct{ position:absolute; right:-10px; bottom:6px; min-width:58px; padding:5px 10px; border-radius:999px; font-size:20px; font-weight:800; color:#fff;
     background:linear-gradient(135deg, var(--brand-a), var(--brand-b)); border:3px solid var(--card); box-shadow:0 4px 12px rgba(228, 69, 126, .3); }
   .qz-pct small{ font-size:12px; }
+  /* the eight ทักษา colours round her, as on the share card; on a fresh result they swing in, she pops up, the % counts up */
+  .qz-best-pic{ margin:20px 0 10px; }
+  .qz-orbit{ position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; }
+  .qz-orbit i{ position:absolute; width:14px; height:14px; margin:-7px; border-radius:50%; background:var(--o); border:2.5px solid var(--card);
+    transform:rotate(var(--a)) translateY(-97px); }
+  .qz-best.is-reveal .qz-orbit{ animation:qz-orbit-in 1.2s cubic-bezier(.2,.8,.2,1) both; }
+  .qz-best.is-reveal .qz-pic{ animation:qz-pop .7s .1s cubic-bezier(.2,.9,.3,1.25) both; }
+  .qz-best.is-reveal .qz-pct{ animation:qz-pop .5s .55s cubic-bezier(.2,.9,.3,1.4) both; }
+  .qz-best.is-reveal :is(.qz-name, .qz-sub, .qz-chips, .qz-why){ animation:qz-up .5s both; }
+  .qz-best.is-reveal .qz-name{ animation-delay:.7s; } .qz-best.is-reveal .qz-sub{ animation-delay:.8s; }
+  .qz-best.is-reveal .qz-chips{ animation-delay:.9s; } .qz-best.is-reveal .qz-why{ animation-delay:1.05s; }
+  @keyframes qz-orbit-in{ 0%{ transform:rotate(-200deg) scale(.35); opacity:0; } 60%{ opacity:1; } 100%{ transform:none; opacity:1; } }
+  @keyframes qz-pop{ 0%{ transform:scale(.5); opacity:0; } 100%{ transform:none; opacity:1; } }
+  @keyframes qz-up{ 0%{ transform:translateY(10px); opacity:0; } 100%{ transform:none; opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .qz-best.is-reveal *{ animation:none !important; } }
   .qz-name{ margin:12px 0 0; font-size:26px; font-weight:800; letter-spacing:-.01em; }
   .qz-sub{ margin:2px 0 10px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
   .qz-chips{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
@@ -5002,6 +5058,42 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     color:var(--fest-ink); opacity:.72;
   }
   .evm-fest-sub.is-long{ font-size:11.5px; letter-spacing:.16em; text-indent:.16em; padding:0 8px; line-height:1.5; }
+  .evm-fest.is-play :is(.evm-fest-word, .evm-fest-img){ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
+  .evm-fest.is-play .evm-fest-sub{ animation:fest-sub .8s .9s cubic-bezier(.2,.8,.2,1) both; }
+  .evm-fest.is-play .evm-fest-face{ animation:qz-pop .55s cubic-bezier(.2,.9,.3,1.3) both; }
+  .evm-fest.is-play .evm-fest-face:nth-child(1){ animation-delay:1.05s; } .evm-fest.is-play .evm-fest-face:nth-child(2){ animation-delay:1.15s; }
+  .evm-fest.is-play .evm-fest-face:nth-child(3){ animation-delay:1.25s; } .evm-fest.is-play .evm-fest-face:nth-child(4){ animation-delay:1.35s; }
+  .evm-fest.is-play .evm-fest-face:nth-child(5){ animation-delay:1.45s; } .evm-fest.is-play .evm-fest-face:nth-child(6){ animation-delay:1.55s; }
+  .evm-fest.is-play .evm-fest-face:nth-child(n+7){ animation-delay:1.65s; }
+  .evm-fest.is-play .evm-fest-deco{ animation:fest-deco-in .9s both; }
+  .evm-fest.is-play .evm-fest-deco > *{ animation:fest-drift 7s ease-in-out infinite alternate; }
+  .evm-fest.is-play .evm-fest-deco > :nth-child(2n){ animation-duration:9s; animation-delay:-3s; }
+  .evm-fest.is-play .evm-fest-deco > :nth-child(3n){ animation-duration:11s; animation-delay:-5s; }
+  .evm-fest.is-play .evm-fest-rays{ animation:fest-spin 60s linear infinite; }
+  @keyframes fest-write{ 0%{ clip-path:inset(-20% 100% -40% -10%); opacity:.2; } 100%{ clip-path:inset(-20% -10% -40% -10%); opacity:1; } }
+  @keyframes fest-sub{ 0%{ opacity:0; letter-spacing:.9em; } 100%{ opacity:.72; } }
+  @keyframes fest-deco-in{ 0%{ opacity:0; transform:scale(1.08); } 100%{ opacity:1; transform:none; } }
+  @keyframes fest-drift{ 0%{ translate:0 0; } 100%{ translate:6px -9px; } }
+  @keyframes fest-spin{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .evm-fest.is-play *{ animation:none !important; } }
+  /* งานถัดไป on the home page's head card */
+  .cd-next{ display:flex; align-items:center; gap:8px; width:100%; margin:9px 0 0; padding:7px 8px 7px 12px; border-radius:16px; font:inherit; color:var(--ink); text-align:left; cursor:pointer;
+    background:color-mix(in srgb, var(--card) 70%, transparent); border:1px solid var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.06); transition:transform .1s; }
+  .cd-next:active{ transform:translateY(2px); box-shadow:none; }
+  .cd-k{ flex:none; font-size:10.5px; font-weight:800; letter-spacing:.06em; color:var(--bnk); }
+  .cd-t{ flex:1; min-width:0; font-size:13px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cd-clock{ flex:none; display:flex; align-items:center; gap:3px; font-variant-numeric:tabular-nums; }
+  .cd-clock > i{ font-style:normal; font-weight:800; color:var(--ink-soft); font-size:12px; }
+  .cd-days{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin-right:3px; }
+  .cd-days:empty{ display:none; }
+  .cd-cell{ display:flex; gap:2px; }
+  .cd-cell b{ display:grid; place-items:center; width:17px; height:24px; border-radius:5px; font-size:14px; font-weight:800; color:#fff;
+    background:linear-gradient(180deg, #2A2236 0 50%, #1C1726 50% 100%); box-shadow:inset 0 -1px 0 rgba(255,255,255,.06), 0 1px 0 rgba(0,0,0,.25); }
+  .cd-cell b.is-flip{ animation:cd-flip .45s cubic-bezier(.3,.6,.3,1); transform-origin:50% 50%; }
+  @keyframes cd-flip{ 0%{ transform:perspective(120px) rotateX(-90deg); } 100%{ transform:none; } }
+  .bd-balloon{ position:absolute; width:26px !important; height:32px !important; margin-left:-13px; border-radius:50% 50% 48% 48% / 56% 56% 44% 44% !important;
+    background:radial-gradient(circle at 34% 30%, rgba(255,255,255,.7), transparent 32%), var(--c) !important; opacity:0; }
+  .bd-balloon::after{ content:''; position:absolute; left:50%; top:100%; width:1px; height:34px; background:rgba(120,110,130,.7); }
   .evm-fest.is-bare{ padding-bottom:20px; }
   /* the script's tails (p, y, g) would dip into the line under it; the birthday one keeps its tuck */
   .evm-fest:not(.is-birthday) .evm-fest-sub{ margin-top:7px; }
@@ -5302,6 +5394,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .sp:not(.is-flat) .sp-map > svg, .sp.is-zoomed .sp-map > svg{ cursor:grab; }
   .sp:not(.is-flat) .sp-map > svg:active, .sp.is-zoomed .sp-map > svg:active{ cursor:grabbing; }
   .sp .sp-floor{ fill:rgba(255,255,255,.035); stroke:rgba(255,255,255,.09); stroke-width:1; }
+  /* depth: the floor lit from the stage, a soft shadow beside every block, a lit edge on the stage */
+  .sp .sp-floor-glow{ fill:url(#sp-glow); pointer-events:none; }
+  .sp .sp-shadow{ fill:rgba(0,0,0,.34); pointer-events:none; }
+  .sp .sp-stage-edge{ fill:none; stroke:rgba(240,108,155,.8); stroke-width:1.6; stroke-linejoin:round; pointer-events:none; }
   .sp .sp-block .sp-top{ stroke:rgba(255,255,255,.12); stroke-width:1; }
   .sp .sp-dark-t{ fill:#D8CCD3; font-size:13px; font-weight:800; letter-spacing:2px; text-anchor:middle; pointer-events:none; }
   .sp .sp-stage{ fill:#fff; font-size:26px; letter-spacing:3px; }
@@ -6092,6 +6188,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .fest-faces{ flex:none; display:flex; }
   .fest-face{ width:30px !important; height:30px !important; border-radius:50% !important; box-shadow:0 0 0 2px #fff; }
   .fest-faces .fest-face + .fest-face{ margin-left:-10px; }
+
 </style>
 <script>
   /* Runs before first paint: follow the OS. A tap on the switch holds only for this visit (sessionStorage). */
@@ -7425,6 +7522,29 @@ const SEED_SCHEDULE = [
     info:['เสื้อวันเกิดที่ Lewlew ออกแบบเอง สำหรับวันเกิดครบ 20 ปี 24 ธ.ค. 2026 (ชุดเดือนธันวาคม)',
       'พรีออเดอร์เท่านั้น 3 ต.ค. 12:00 – 18 ต.ค. 2026 23:59 น. ทาง iAM48 Application',
       'ส่งสินค้า 17 พ.ย. 2026 เป็นต้นไป',
+      'ภาพสินค้าใช้เพื่อการโฆษณาเท่านั้น'] },
+  /* January 2027 birthday T-shirts, same shop, one event each (the owner sells them apart). */
+  { id:'ev-bday-tee-khaimook-2027', start:'2026-11-06', end:'2026-11-20', period:true, bar:"Pre-Order: Khaimook's Birthday T-Shirt",
+    title:"Khaimook's Birthday T-Shirt 2027",
+    shop:{ name:"Khaimook's Birthday T-Shirt", kind:'เสื้อวันเกิด',
+      price:'480 บาท', from:'2026-11-06T12:00', to:'2026-11-20T23:59',
+      deliver:'15 ธ.ค. 2026 เป็นต้นไป', shopName:'iAM Shop' },
+    groups:['bnk48'], members:['bnk-khaimook'], price:'480', related:['ev-bday-tee-janry-2027'],
+    poster:{ accent:'#9B5BB5', surface:'#F7F0FA', ink:'#3E1F4D', img:'posters/bday-tee-khaimook-2027.jpg', w:1500, h:1500 },
+    info:['เสื้อวันเกิดที่ Khaimook ออกแบบเอง สำหรับวันเกิดครบ 23 ปี 5 ม.ค. 2027 (ชุดเดือนมกราคม)',
+      'พรีออเดอร์เท่านั้น 6 พ.ย. 12:00 – 20 พ.ย. 2026 23:59 น. ทาง iAM48 Application',
+      'ส่งสินค้า 15 ธ.ค. 2026 เป็นต้นไป',
+      'ภาพสินค้าใช้เพื่อการโฆษณาเท่านั้น'] },
+  { id:'ev-bday-tee-janry-2027', start:'2026-11-06', end:'2026-11-20', period:true, bar:"Pre-Order: Janry's Birthday T-Shirt",
+    title:"Janry's Birthday T-Shirt 2027",
+    shop:{ name:"Janry's Birthday T-Shirt", kind:'เสื้อวันเกิด',
+      price:'480 บาท', from:'2026-11-06T12:00', to:'2026-11-20T23:59',
+      deliver:'15 ธ.ค. 2026 เป็นต้นไป', shopName:'iAM Shop' },
+    groups:['bnk48'], members:['bnk-janry'], price:'480', related:['ev-bday-tee-khaimook-2027'],
+    poster:{ accent:'#9B5BB5', surface:'#F7F0FA', ink:'#3E1F4D', img:'posters/bday-tee-janry-2027.jpg', w:1500, h:1500 },
+    info:['เสื้อวันเกิดที่ Janry ออกแบบเอง สำหรับวันเกิดครบ 19 ปี 3 ม.ค. 2027 (ชุดเดือนมกราคม)',
+      'พรีออเดอร์เท่านั้น 6 พ.ย. 12:00 – 20 พ.ย. 2026 23:59 น. ทาง iAM48 Application',
+      'ส่งสินค้า 15 ธ.ค. 2026 เป็นต้นไป',
       'ภาพสินค้าใช้เพื่อการโฆษณาเท่านั้น'] },
   { id:'ev-ge6-bundle', start:'2026-09-26', end:'2026-10-10', period:true, bar:'Ticket Bundle: Journey of Dreams + Final Results',
     sales:{ from:'2026-09-26T12:00', to:'2026-10-10T21:00' },
@@ -10822,12 +10942,12 @@ function renderProfileSlot(){
   const initial = state.account.name ? state.account.name[0].toUpperCase() : '?';
   slot.innerHTML = `
     <div class="profile-slot-wrap">
-      <button class="mini-avatar-btn" data-action="toggle-profile-menu">${accountAvatar()}${state.isOwner && state.pending.length ? `<span class="pd-dot">${state.pending.length}</span>` : ''}</button>
+      <button class="mini-avatar-btn" data-action="toggle-profile-menu">${accountAvatar()}${pendingNew() ? `<span class="pd-dot">${pendingNew()}</span>` : ''}</button>
       ${state.profileMenuOpen ? `
       <div class="profile-dropdown">
         <div class="dropdown-name">${escapeHtml(state.account.name)}</div>
         <div class="dropdown-email">${escapeHtml(state.account.email)}</div>
-        <button data-action="nav" data-view="profile">ดูโปรไฟล์${state.isOwner && state.pending.length ? ` · รอตรวจ ${state.pending.length}` : ''}</button>
+        <button data-action="nav" data-view="profile">ดูโปรไฟล์${pendingNew() ? ` · รอตรวจ ${pendingNew()}` : ''}</button>
         <button data-action="nav" data-view="editprofile">แก้ไขข้อมูลส่วนตัว</button>
         <button data-action="sign-out" class="danger">ออกจากระบบ</button>
       </div>` : ''}
@@ -13008,6 +13128,13 @@ function renderEventBanner(ev){
   </div>`;
 }
 const renderBirthdayBanner = renderEventBanner;
+/* an event sheet's banner plays in as it opens (not on a redraw of the same sheet): the word writes
+   itself across, the line under it settles, the faces pop up one by one, and the scatter keeps
+   drifting slowly while the sheet is open */
+function bannerPlay(root){
+  if(document.getElementById('main').classList.contains('sheet-still') || geLessMotion()) return;
+  root.querySelectorAll('.evm-fest').forEach(b => b.classList.add('is-play'));
+}
 
 /** Who is at the booth when: one row per slot, today's picked out, finished
     ones dimmed. Tapping a name opens that member. */
@@ -13550,7 +13677,9 @@ function renderGEPosterViewer(id){
   </div>`;
 }
 const GE_PAGE = { key:'ge2026', logo:'posters/ge2026-logo-v2.webp', red:'#B3121E',
-  vote:'ev-election-voting', results:'ev-election-results' };
+  vote:'ev-election-voting', results:'ev-election-results', voteOpen:'12:00', voteClose:'21:00' };
+// a Thai wall-clock time as a moment, wherever the reader is
+const thaiMs = (iso, hhmm) => { const [y, mo, d] = iso.split('-').map(Number), [h, mi] = (hhmm || '00:00').split(':').map(Number); return Date.UTC(y, mo - 1, d, h - 7, mi || 0); };
 /* the hero's embers and the odd small firework on one canvas: it runs only while the picture is on screen and the tab is visible */
 let _geFx = null;
 function geHeroFx(){
@@ -13602,14 +13731,19 @@ function renderGEPage(){
   const inDays = n => n === 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : (en ? `in ${n} days` : `ในอีก ${n} วัน`);
 
   // where the campaign stands
-  let phase, big, sub;
-  if(vote && iso < vote.start){ phase = en ? 'Voting opens in' : 'เปิดโหวตในอีก'; big = daysTo(vote.start); sub = dm(vote.start); }
-  else if(vote && iso <= eventLastDay(vote)){ phase = en ? 'Voting closes in' : 'ปิดโหวตในอีก'; big = daysTo(eventLastDay(vote)); sub = dm(eventLastDay(vote)); }
-  else if(results && iso <= results.start){ phase = en ? 'Final results in' : 'ประกาศผลในอีก'; big = daysTo(results.start); sub = dm(results.start); }
-  const countdown = phase ? `<div class="ge-count">
-      <span class="ge-count-label">${big === 0 ? phase.replace(/ in$|ในอีก$/, '') : phase}</span>
-      <span class="ge-count-num">${big === 0 ? (en ? 'Today' : 'วันนี้') : big}</span>
-      <span class="ge-count-unit">${big === 0 ? sub : (en ? `days · ${sub}` : `วัน · ${sub}`)}</span></div>`
+  // to the second, like a film's countdown: days, hours, minutes, seconds in a row, their names
+  // small underneath. The digits are filled in by cdTick, not written here (see renderNextCountdown).
+  let phase, at, sub;
+  const now = Date.now(), at1 = vote && thaiMs(vote.start, GE_PAGE.voteOpen), at2 = vote && thaiMs(eventLastDay(vote), GE_PAGE.voteClose),
+    at3 = results && thaiMs(results.start, results.time || '00:00');
+  if(vote && now < at1){ phase = en ? 'Voting opens in' : 'เปิดโหวตใน'; at = at1; sub = `${dm(vote.start)} · ${GE_PAGE.voteOpen}${en ? '' : ' น.'}`; }
+  else if(vote && now < at2){ phase = en ? 'Voting closes in' : 'ปิดโหวตใน'; at = at2; sub = `${dm(eventLastDay(vote))} · ${GE_PAGE.voteClose}${en ? '' : ' น.'}`; }
+  else if(results && now < at3){ phase = en ? 'Final results in' : 'ประกาศผลใน'; at = at3; sub = `${dm(results.start)} · ${results.time}${en ? '' : ' น.'}`; }
+  const unit = (k, l) => `<span class="ge-cd-u"><b data-u="${k}">--</b><small>${l}</small></span>`;
+  const countdown = phase ? `<div class="ge-cd${en ? ' is-en' : ''}" data-at="${at}">
+      <span class="ge-cd-k">${phase}</span>
+      <span class="ge-cd-row">${unit('d', en ? 'Days' : 'วัน')}<i>:</i>${unit('h', en ? 'Hours' : 'ชั่วโมง')}<i>:</i>${unit('m', en ? 'Minutes' : 'นาที')}<i>:</i>${unit('s', en ? 'Seconds' : 'วินาที')}</span>
+      <span class="ge-cd-sub">${sub}</span></div>`
     : `<div class="ge-count"><span class="ge-count-label">${en ? 'The results are in' : 'ประกาศผลแล้ว'}</span></div>`;
 
   // while a round is read out, the results tab puts them first: the hero shrinks to
@@ -13934,11 +14068,11 @@ function geAnimate(root){
   root.querySelectorAll('.is-burst').forEach(el => { el.classList.remove('is-burst'); geBurst(el); });
 }
 // a short burst of gold from the middle of the row that just named No. 1
-function geBurst(el){
+function geBurst(el, colors){
   const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
   const box = document.createElement('div'); box.className = 'ge-burst'; box.setAttribute('aria-hidden', 'true');
   document.body.appendChild(box);
-  const COLORS = ['#F3C969', '#FFE29A', '#D4A73E', '#E4457E', '#ffffff'];
+  const COLORS = colors || ['#F3C969', '#FFE29A', '#D4A73E', '#E4457E', '#ffffff'];
   for(let i = 0; i < 46; i++){
     const p = document.createElement('i');
     p.style.left = cx + 'px'; p.style.top = cy + 'px'; p.style.background = COLORS[i % COLORS.length];
@@ -13963,7 +14097,16 @@ function renderHomeDash(ge){
   const mem = activeMembers(), nb = mem.filter(m => m.groupId === 'bnk48').length;
   const tile = (attrs, cls, icon, big, label, small) => `<button class="dash-t ${cls}" ${attrs}>
       <span class="dash-i">${icon}</span><b class="dash-big">${big}</b><span class="dash-l">${label}${small ? `<small>${small}</small>` : ''}</span></button>`;
-  const shops = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
+  // a poster in a tile is a slide: tapping it opens that event; the strip swipes sideways, the dots follow
+  const dashSlide = (e, label) => `<span class="dash-sl" data-action="open-event" data-id="${escapeAttr(e.id)}"><img src="${escapeAttr(e.poster.img.replace(/\.[a-z]+$/i, '-s.jpg'))}" alt="" loading="lazy" decoding="async"><small>${label}</small></span>`;
+  // the slides sit one over the other and fade, one after another; a tap opens the one showing (dashTick)
+  const dashStrip = slides => `<span class="dash-strip" data-n="${slides.length}">${slides.map((h, k) => k ? h : h.replace('class="dash-sl"', 'class="dash-sl on"')).join('')}</span>`;
+  const dashDots = n => `<span class="dash-dots" aria-hidden="true">${Array.from({ length:n }, (_, k) => `<i${k ? '' : ' class="on"'}></i>`).join('')}</span>`;
+  const calPics = SEED_SCHEDULE.filter(e => !e.period && !e.cancelled && !e.shop && e.poster && e.poster.img && e.start <= wk && eventLastDay(e) >= iso)
+    .sort((x, y) => (x.start > iso ? x.start : iso).localeCompare(y.start > iso ? y.start : iso) || x.start.localeCompare(y.start)).slice(0, 8);
+  const shopOpen = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open'), shops = shopOpen.length;
+  // the tile slides through the posters of the open shops (small copies), the one that closes first leading
+  const shopPics = shopOpen.filter(e => e.poster && e.poster.img).sort((x, y) => String(x.shop.to).localeCompare(String(y.shop.to))).slice(0, 8);
   const room = GALLERY[GALLERY.length - 1], cover = room && room.items[0] ? `${room.dir}${room.items[0].f}-s.jpg` : '';
   const square = ge ? (({ round, told, hhmm, top }) => `<button class="dash-ge" data-tile="ge" data-action="open-ge-results">
       <span class="dash-ge-top"><b>${geRoundLabel(round)}</b>${hhmm ? `<small>${en ? 'Updated' : 'อัปเดต'} ${hhmm}${en ? '' : ' น.'}</small>` : ''}</span>
@@ -14011,9 +14154,14 @@ function renderHomeDash(ge){
   const days = (() => { const big = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results); return big ? Math.round((new Date(big.start + 'T00:00:00Z') - new Date(iso + 'T00:00:00Z')) / 86400000) : -1; })();
   const kinds = {
     quiz: sl => renderQuizTile(sl),
-    cal: sl => `<button class="dash-t is-cal" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
+    cal: sl => calPics.length ? `<button class="dash-t is-cal is-pic" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h" data-action="nav" data-view="calendar">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
+      <span class="dash-badge" data-action="nav" data-view="calendar">${week} ${en ? 'events' : 'งาน'}</span>${dashStrip(calPics.map(e => { const n = dayN(e.start), w = n <= 0 ? (en ? 'today' : 'วันนี้') : n === 1 ? (en ? 'tomorrow' : 'พรุ่งนี้') : `${+e.start.slice(8)} ${M[+e.start.slice(5, 7) - 1]}`; return dashSlide(e, w); }))}${calPics.length > 1 ? dashDots(calPics.length) : ''}</button>`
+      : `<button class="dash-t is-cal" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
       <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>`,
-    shop: sl => tile(`data-tile="${sl}" data-kind="shop" data-action="nav-shop"`, 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด')),
+    shop: sl => shopPics.length ? `<button class="dash-t is-shop is-pic" data-tile="${sl}" data-kind="shop" data-action="nav-shop">
+      ${dashStrip(shopPics.map(e => dashSlide(e, `${en ? 'until' : 'ปิด'} ${+String(e.shop.to).slice(8, 10)} ${M[+String(e.shop.to).slice(5, 7) - 1]}`)))}
+      <span class="dash-badge" data-action="nav-shop">${en ? 'Shop' : 'ร้านค้า'}${shops > 1 ? ` · ${shops}` : ''}</span>${shopPics.length > 1 ? dashDots(shopPics.length) : ''}</button>`
+      : tile(`data-tile="${sl}" data-kind="shop" data-action="nav-shop"`, 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด')),
     gal: sl => `<button class="dash-t is-gal" data-tile="${sl}" data-kind="gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
       <span class="dash-l">${en ? 'Gallery' : 'แกลเลอรี'}<small>${room ? escapeHtml(room.title) : ''}</small></span></button>`,
     // the rest of the site, each a way in with a number or a face on it (none of them is on the home page already)
@@ -16265,7 +16413,7 @@ SEAT_LAYOUTS['major-t6'] = (() => {
     floor:[[-34, -64], [2 * W + GAP + 34, -64], [2 * W + GAP + 34, tall + 30], [-34, tall + 30]],
     blocks:[
       { pts:SP_R(0, vipY, W, vipH), h:4, ...dark }, { pts:SP_R(XR, vipY, W, vipH), h:4, ...dark },
-      { pts:SP_R(8, -46, 2 * W + GAP - 16, 16), h:26, ...SP_WALL, text:'จอภาพยนตร์', at:[(2 * W + GAP) / 2, -38], big:true },       // the screen
+      { pts:SP_R(8, -40, 2 * W + GAP - 16, 8), h:170, ...SP_WALL, text:'จอภาพยนตร์', at:[(2 * W + GAP) / 2, -36], big:true },       // the screen, tall and thin as a cinema's
     ],
     sections, seats,
   };
@@ -16403,7 +16551,7 @@ function spShade(hex, f){
    quickly as it turns: each chair a seat and a back, facing the stage (the
    back on the far side from it). The sides that face us are drawn, then the
    tops; seats first, then backs, so a nearer back hides the seat behind it. */
-function spChairsSvg(S, base, colour, P, sp, s, c){
+function spChairsSvg(S, base, colour, P, sp, s, c, lod){
   const [px, py] = S.p, w = px * .74, f = n => Math.round(n * 10) / 10;
   // laid flat, as the organiser prints it: a ring a chair
   if(sp <= .01){
@@ -16426,10 +16574,14 @@ function spChairsSvg(S, base, colour, P, sp, s, c){
     }
     return q([[x0, y0, base + z1], [x1, y0, base + z1], [x1, y1, base + z1], [x0, y1, base + z1]]);
   };
+  // while the hall is moving a whole run of chairs is drawn as one strip (a tenth of the shapes);
+  // the single chairs come back as soon as it settles
   S.g.forEach((row, r) => { for(let k = 0; k < row.length; k++){ if(row[k] !== 'x') continue;
-    const cx = S.o[0] + k * px, cy = S.o[1] + r * py, x0 = cx - w / 2, x1 = cx + w / 2;
+    let k1 = k; if(lod) while(row[k1 + 1] === 'x') k1++;
+    const cy = S.o[1] + r * py, x0 = S.o[0] + k * px - w / 2, x1 = S.o[0] + k1 * px + w / 2;
     seatTop += box(x0, cy - py * .34, x1, cy + py * .12, 3, 'seat');
     backTop += box(x0, cy + py * .12, x1, cy + py * .3, 7, 'back');
+    k = k1;
   } });
   const top = '#F7F3EF';
   return `<g class="sp-chairs">${sides.map(sd => `<path d="${sd.seat}" fill="${sd.fill}"/>`).join('')}<path class="sp-chair-top" d="${seatTop}" fill="${top}"/>${
@@ -16471,8 +16623,16 @@ function spScene(ev, st){
     return `<text class="${cls}" x="${f1(q[0])}" y="${f1(q[1] + (cls.includes('is-small') ? 7 : 10))}"${fill ? ` fill="${fill}"` : ''}>${text}</text>`;
   };
   const items = [];
+  // a soft shadow on the floor beside every block, away from the light behind the stage,
+  // so the hall sits on the floor rather than floating above it (3D only, ground level only)
+  if(sp > .01){
+    const shade = (pts, k) => items.push({ d:-2e6, svg:`<polygon class="sp-shadow" points="${poly(pts.map(p => P(p[0] + 4 * k, p[1] + 7 * k, 0)))}"/>` });
+    for(const b of L.blocks) if(!b.z0) shade(b.pts, Math.min(2.2, 0.5 + b.h / 30));
+    for(const sec of Object.values(L.sections)) shade(sec.pts, 0.6);
+  }
   for(const b of L.blocks)
     items.push({ d:depthOf(b.pts), svg:`<g class="sp-block">${prism(b.pts, b.h, b.top || '#060406', b.side || '#3a3139', b.z0 || 0)}${
+      b.text === 'STAGE' && sp > .01 ? `<polygon class="sp-stage-edge" points="${poly(b.pts.map(p => P(p[0], p[1], (b.z0 || 0) + b.h)))}"/>` : ''}${
       b.text ? label(b.at, (b.z0 || 0) + b.h, b.text, b.big ? 'sp-dark-t sp-stage' : 'sp-dark-t') : ''}</g>` });
   const liftOf = z => z && st.pick === z.id ? SP_LIFT * st.lift : 0;
   for(const [name, sec] of Object.entries(L.sections)){
@@ -16482,7 +16642,7 @@ function spScene(ev, st){
     const out = z.off;                               // drawn for the hall's sake, not on sale here
     const open = `<g class="sp-sec${st.pick === z.id ? ' is-on' : ''}${out ? ' is-out' : ''}"${out ? '' :
       ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}"`} style="--z:${z.color}">`;
-    const chairs = L.seats && L.seats[name] ? spChairsSvg(L.seats[name], h, z.color, P, sp, s, c) : '';
+    const chairs = L.seats && L.seats[name] ? spChairsSvg(L.seats[name], h, z.color, P, sp, s, c, st.lod) : '';
     const text = label(sec.at, h + (chairs ? 7 : 0), sec.text || name, (sec.small ? 'is-small' : '') + (chairs ? ' on-seats' : ''), spInk(z.color));
     // a floor zone lies under whatever stands on it (`under`); its name can sit on top of all (`labelTop`)
     items.push({ d:sec.under ? -1e6 + depthOf(sec.pts) : depthOf(sec.pts), svg:`${open}${prism(sec.pts, h, z.color, z.color)}${chairs}${sec.labelTop ? '' : text}</g>` });
@@ -16502,7 +16662,7 @@ function spScene(ev, st){
       L.captions.map(([lv, x, y]) => { const a = P(x, y, 0), lines = L.levels[lv].cap[isEN() ? 'en' : 'th'];
         return `<text class="sp-cap" x="${f1(a[0])}" y="${f1(a[1] - (lines.length - 1) * 9 + 5)}">${
           lines.map((t, i) => `<tspan x="${f1(a[0])}"${i ? ' dy="18"' : ''}>${t}</tspan>`).join('')}</text>`; }).join('')
-    : `<polygon class="sp-floor" points="${poly(L.floor.map(p => P(p[0], p[1], 0)))}"/>`;
+    : `<polygon class="sp-floor" points="${poly(L.floor.map(p => P(p[0], p[1], 0)))}"/><polygon class="sp-floor-glow" points="${poly(L.floor.map(p => P(p[0], p[1], 0)))}"/>`;
   return { svg: under + items.map(i => i.svg).join('') };
 }
 /* How much room the hall takes when tipped back by `pitch`, over the turns a
@@ -16546,14 +16706,19 @@ const spVbAttr = v => [v.vx, v.vy, v.vw, v.vh].map(n => Math.round(n * 10) / 10)
    the floor seats get a sheet's thickness so they still read as blocks */
 const spHeight = (L, sec) => Math.max(2, (sec.m != null ? sec.m : L.levels[sec.level].m) * SP_PER_M);
 function spState(box){
-  if(!box._sp) box._sp = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0, anchor:null };
+  if(!box._sp) box._sp = { yaw:SP_YAW, pitch:SP_PITCH, pick:'', lift:0, zoom:1, px:0, py:0, anchor:null, lod:false };
   return box._sp;
 }
-function spDraw(box){
+/* quick: the hall is moving, so chairs are drawn in runs; a moment after the last quick
+   frame it is drawn once more in full, chair by chair */
+function spDraw(box, quick){
   const ev = SEED_SCHEDULE.find(e => e.id === box.dataset.ev);
   const svg = box.querySelector('.sp-map > svg');
   if(!ev || !svg) return;
   const st = spState(box), flat = box.classList.contains('is-flat');
+  clearTimeout(box._spSettle);
+  st.lod = !!quick && !flat;
+  if(st.lod) box._spSettle = setTimeout(() => spDraw(box), 150);
   const v = spViewBox(SEAT_LAYOUTS[ev.seatPlan.layout], st, flat);
   st.view = v;
   svg.setAttribute('viewBox', spVbAttr(v));
@@ -16571,7 +16736,7 @@ function spTween(box, key, to, ms, ease = t => 1 - (1 - t) ** 3){
     if(runs[key] !== id) return;                   // a newer move of the same value took over
     const t = Math.min(1, (now - t0) / ms);
     st[key] = from + (to - from) * ease(t);
-    spDraw(box);
+    spDraw(box, true);
     if(t < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
@@ -16615,7 +16780,7 @@ function renderSeatPlan(ev){
           <button data-action="seat-zoom" data-id="reset" title="คืนมุมมองเดิม" aria-label="คืนมุมมองเดิม"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button>
         </span>
       </div>
-      <svg viewBox="${spVbAttr(v)}" style="aspect-ratio:${Math.round(v.frame.w)} / ${Math.round(v.frame.h)}" aria-hidden="true" focusable="false"><g class="sp-scene">${svg}</g><g class="sp-fx"></g></svg>
+      <svg viewBox="${spVbAttr(v)}" style="aspect-ratio:${Math.round(v.frame.w)} / ${Math.round(v.frame.h)}" aria-hidden="true" focusable="false"><defs><radialGradient id="sp-glow" cx="50%" cy="6%" r="80%"><stop offset="0" stop-color="#F06C9B" stop-opacity=".2"/><stop offset=".5" stop-color="#F06C9B" stop-opacity=".05"/><stop offset="1" stop-color="#F06C9B" stop-opacity="0"/></radialGradient></defs><g class="sp-scene">${svg}</g><g class="sp-fx"></g></svg>
       <p class="sp-hint"><span class="is-3d">ลากหรือบิดสองนิ้วเพื่อหมุน · ถ่างนิ้วเพื่อซูม</span><span class="is-2d">ถ่างนิ้วเพื่อซูม</span></p>
     </div>
     <div class="sp-side">
@@ -16677,9 +16842,25 @@ function pickSeatZone(el){
   spDraw(box);
   const fx = box.querySelector('.sp-fx'), read = box.querySelector('.sp-pick');
   fx.innerHTML = '';
+  // with a mouse the view eases in on the zone and back out when it is let go; on a touch screen
+  // it stays put, since a zoomed hall takes the finger away from scrolling the page
+  const glide = matchMedia('(pointer:fine)').matches;
   if(off){
+    if(glide && st.zoom > 1.02){ spTween(box, 'zoom', 1, 480); spTween(box, 'px', 0, 480); spTween(box, 'py', 0, 480); }
     read.textContent = spIdle(ev.seatPlan); localize(read);
     return;
+  }
+  if(glide){
+    const zz = ev.seatPlan.zones.find(x => x.id === zone), flat = box.classList.contains('is-flat');
+    const ps = zz.sections.map(n => L.sections[n]).filter(Boolean);
+    if(ps.length){
+      const th = st.yaw * Math.PI / 180, ph = st.pitch * Math.PI / 180, b = spBounds(L, st.pitch, flat);
+      const m = ps.reduce((a, q) => [a[0] + q.at[0] / ps.length, a[1] + q.at[1] / ps.length], [0, 0]);
+      const dx = m[0] - L.cx, dy = m[1] - L.cy;
+      const X = dx * Math.cos(th) - dy * Math.sin(th), V = (dx * Math.sin(th) + dy * Math.cos(th)) * Math.cos(ph);
+      spTween(box, 'zoom', Math.max(st.zoom, 1.3), 520);
+      spTween(box, 'px', (X - b.cx) * .9, 520); spTween(box, 'py', (V - b.cy) * .9, 520);
+    }
   }
   // the zone rises out of the hall, a little past and back
   spTween(box, 'lift', 1, 420, t => 1 + 2.2 * (t - 1) ** 3 + 1.2 * (t - 1) ** 2);
@@ -16742,6 +16923,7 @@ document.addEventListener('pointerdown', e => {
   const runs = box._spT || (box._spT = {});
   ['yaw', 'pitch', 'zoom', 'px', 'py'].forEach(k => { runs[k] = (runs[k] || 0) + 1; });
   spBaseline(spG);
+  spG.lastT = 0; spG.vy = null; spG.lastYaw = spState(box).yaw;
 });
 document.addEventListener('pointermove', e => {
   const g = spG, p = g && g.pts.get(e.pointerId);
@@ -16776,18 +16958,40 @@ document.addEventListener('pointermove', e => {
       // the side facing us follows the hand, as a turntable does: drag right, it turns right
       st.yaw = s0.yaw - dx * .35;
       if(p.mouse) st.pitch = spClamp(s0.pitch - dy * .25, SP_TILT);
+      // how fast the hall is being turned, for the glide after the hand lets go
+      const dt = e.timeStamp - (g.lastT || e.timeStamp);
+      if(dt > 0){ const v = (st.yaw - g.lastYaw) / dt; g.vy = g.vy == null ? v : g.vy * .6 + v * .4; }
+      g.lastT = e.timeStamp; g.lastYaw = st.yaw;
     } else return;
   }
   if(!g.moved){ g.moved = true; g.box.querySelector('.sp-fx').innerHTML = ''; }
-  if(!g.raf) g.raf = requestAnimationFrame(() => { g.raf = 0; spDraw(g.box); });
+  if(!g.raf) g.raf = requestAnimationFrame(() => { g.raf = 0; spDraw(g.box, true); });
 });
 function spLift(e){
   const g = spG;
   if(!g || !g.pts.has(e.pointerId)) return;
   g.pts.delete(e.pointerId);
   if(g.moved && e.type === 'pointerup'){ spSwallowClick = true; setTimeout(() => { spSwallowClick = false; }, 0); }
+  // a turn that ends in motion carries on a little and slows to a stop, like a turntable
+  const st = spState(g.box);
+  if(g.moved && e.type === 'pointerup' && g.pts.size === 0 && g.vy != null && Math.abs(g.vy) > .03
+     && e.timeStamp - g.lastT < 90 && st.zoom <= 1.02 && !g.box.classList.contains('is-flat')) spFling(g.box, g.vy);
   if(g.pts.size) spBaseline(g);                     // carry on with the finger still down
   else spG = null;
+}
+function spFling(box, v){
+  if(spCalm()) return;
+  const st = spState(box), runs = box._spT || (box._spT = {}), id = runs.yaw = (runs.yaw || 0) + 1;
+  v = Math.max(-1.2, Math.min(1.2, v));            // degrees per millisecond, kept sane
+  let last = performance.now();
+  const step = now => {
+    if(runs.yaw !== id) return;                    // a hand, or a tween, took over
+    const dt = Math.min(48, now - last); last = now;
+    st.yaw += v * dt; v *= Math.exp(-dt / 320);
+    spDraw(box, true);
+    if(Math.abs(v) > .004) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 document.addEventListener('pointerup', spLift);
 document.addEventListener('pointercancel', spLift);
@@ -16806,7 +17010,7 @@ document.addEventListener('wheel', e => {
   const at = spPointAt(g, e.clientX, e.clientY);
   st.zoom = spClamp(st.zoom * Math.exp(-e.deltaY * .01), SP_ZOOM);
   st.anchor = { ...at, fx:(e.clientX - g.rect.left) / g.rect.width, fy:(e.clientY - g.rect.top) / g.rect.height };
-  spDraw(box);
+  spDraw(box, true);
 }, { passive:false });
 
 function renderEventLinkEditor(ev){
@@ -18655,7 +18859,7 @@ function qzMatchCard(r, rank){
     ${renderAvatar(m, 'qz-run-pic', g.color)}<span class="qz-run-t"><b>${escapeHtml(nickName(m))}</b><small>${escapeHtml(why[0] || trait)}</small></span><span class="qz-run-pct">${r.pct}%</span></button>`;
   return `<article class="qz-best" style="--c:${g.color}">
     <p class="qz-best-h">${en ? 'The member your stars favour most' : 'เมมเบอร์ที่ดวงถูกโฉลกกับคุณที่สุด'}</p>
-    <button class="qz-best-pic" data-action="open-member" data-id="${m.id}" aria-label="${escapeAttr(nickName(m))}">${renderAvatar(m, 'qz-pic', g.color)}<span class="qz-pct">${r.pct}<small>%</small></span></button>
+    <button class="qz-best-pic" data-action="open-member" data-id="${m.id}" aria-label="${escapeAttr(nickName(m))}"><span class="qz-orbit" aria-hidden="true">${QZ_WHEEL.map((n, i) => `<i style="--a:${i * 45}deg;--o:${QZ_COLOURS[n][2]}"></i>`).join('')}</span>${renderAvatar(m, 'qz-pic', g.color)}<span class="qz-pct" data-to="${r.pct}">${r.pct}<small>%</small></span></button>
     <h2 class="qz-name">${escapeHtml(nickName(m))}</h2>
     <p class="qz-sub">${escapeHtml(g.name)}${m.gen ? ` · ${en ? 'Gen ' + m.gen : 'รุ่น ' + m.gen}` : ''}</p>
     <div class="qz-chips">${qzChips(r.her, en)}</div>
@@ -18786,7 +18990,7 @@ function quizAction(action, id){
     quizKeepBirth({ iso, night: !!(was && was.iso === iso && was.night) }); q.step = 1; }
   else if(action === 'quiz-night'){ const iso = quizDate(); if(iso) quizKeepBirth({ iso, night: id === '1' }); }
   else if(action === 'quiz-pick'){ const [el, emo] = String(id).split('|'); q.ans[q.step - 1] = el; if(emo) q.emo = emo; q.step++; }
-  else if(action === 'quiz-group'){ q.group = id; q.step = last + 1;
+  else if(action === 'quiz-group'){ q.group = id; q.step = last + 1; _qzReveal = true;
     try{ localStorage.setItem(QZ_DONE + '-' + q.mode, JSON.stringify({ ans: q.ans, emo: q.emo || null, group: id, birth: q.birth || null })); }catch(e){} }
   else if(action === 'quiz-back'){ q.step = Math.max(q.mode === 'quiz' ? 1 : 0, q.step - 1); }
   else if(action === 'quiz-again'){ _quiz = { mode: q.mode, step: q.mode === 'quiz' ? 1 : 0, ans: [], birth: qzBirth() }; }
@@ -18795,6 +18999,23 @@ function quizAction(action, id){
   // the next question where the last one was, or the result from its top
   const card = document.querySelector('#main .qz-card, #main .qz-result');
   if(card && card.getBoundingClientRect().top < 70) scrollPageTo(Math.max(0, card.getBoundingClientRect().top + window.scrollY - 80));
+  if(_qzReveal){ _qzReveal = false; qzReveal(); }
+}
+/* a result just reached, not one reopened: play it in once */
+let _qzReveal = false;
+function qzReveal(){
+  const best = document.querySelector('#main .qz-best'); if(!best) return;
+  if(geLessMotion()) return;
+  best.classList.add('is-reveal');
+  const pc = best.querySelector('.qz-pct[data-to]'); if(!pc) return;
+  const to = +pc.dataset.to, t0 = performance.now() + 550, dur = 1100;
+  const step = now => {
+    const p = Math.min(1, Math.max(0, (now - t0) / dur)), v = Math.round(to * (1 - Math.pow(1 - p, 3)));
+    if(!pc.isConnected) return;
+    pc.firstChild.nodeValue = String(v);
+    if(p < 1) requestAnimationFrame(step);
+  };
+  pc.firstChild.nodeValue = '0'; requestAnimationFrame(step);
 }
 
 function renderSearch(){
@@ -19025,6 +19246,7 @@ function renderFeed(){
         <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></span>
       </div>
       <div class="feed-title-row sr-only"><h1 class="feed-title">วันนี้ที่ 48</h1></div>
+      ${renderNextCountdown()}
       ${(() => { const sum = feedSummary(nowOn); return state.oshi.length || sum ? `<div class="feed-head-foot">
         ${state.oshi.length ? `
         <div class="feed-scope" role="group" aria-label="ขอบเขตที่แสดง">
@@ -19187,6 +19409,83 @@ function renderBrowse(){
 }
 
 
+/* งานถัดไป: the next event to start in the coming week, counting down like an airport board.
+   The digits are not in the page's markup (it would differ every second and make every sheet
+   rebuild the page under it); cdTick fills them as the page is drawn and every second after. */
+function nextCountdownEvent(){
+  const now = Date.now(), iso = toYmd(todayStart()), lim = toYmd(new Date(now + 7 * 864e5));
+  let best = null, at = Infinity;
+  for(const e of SEED_SCHEDULE){
+    if(e.period || e.shop || e.cancelled || !e.time || e.start < iso || e.start > lim) continue;
+    if(filteringByOshi() && !hasMyOshi(e)) continue;
+    const t = slotTime(e.start, e.time); if(t > now && t < at){ at = t; best = e; }
+  }
+  return best ? { e:best, at } : null;
+}
+function renderNextCountdown(){
+  const n = nextCountdownEvent(); if(!n) return '';
+  const en = isEN(), cell = k => `<span class="cd-cell" data-cd="${k}"><b>0</b><b>0</b></span>`;
+  return `<button class="cd-next" data-action="open-event" data-id="${n.e.id}" data-cd-at="${n.at}">
+    <span class="cd-k">${en ? 'Next up' : 'งานถัดไป'}</span>
+    <span class="cd-t" data-noloc>${escapeHtml(eventShortName(n.e))}</span>
+    <span class="cd-clock" aria-hidden="true"><span class="cd-days" data-cd="d"></span>${cell('h')}<i>:</i>${cell('m')}<i>:</i>${cell('s')}</span>
+  </button>`;
+}
+let _cdTimer = 0;
+function cdTick(){
+  const el = document.querySelector('#main .cd-next[data-cd-at]'), ge = document.querySelector('#main .ge-cd[data-at]');
+  if(!el && !ge){ clearInterval(_cdTimer); _cdTimer = 0; return; }
+  if(!_cdTimer) _cdTimer = setInterval(cdTick, 1000);
+  if(document.hidden) return;
+  if(ge){
+    let left = Math.max(0, Math.floor((+ge.dataset.at - Date.now()) / 1000));
+    if(!left){ clearInterval(_cdTimer); _cdTimer = 0; renderMain(); return; }
+    const v = { d:Math.floor(left / 86400), h:Math.floor(left / 3600) % 24, m:Math.floor(left / 60) % 60, s:left % 60 };
+    for(const k in v){ const b = ge.querySelector(`[data-u="${k}"]`), t = String(v[k]).padStart(2, '0'); if(b && b.textContent !== t) b.textContent = t; }
+    ge.setAttribute('aria-label', `${ge.querySelector('.ge-cd-k').textContent} ${v.d} : ${v.h} : ${v.m} : ${v.s}`);
+  }
+  if(!el) return;
+  let left = Math.max(0, Math.floor((+el.dataset.cdAt - Date.now()) / 1000));
+  if(!left){ clearInterval(_cdTimer); _cdTimer = 0; renderMain(); return; }
+  const d = Math.floor(left / 86400); left %= 86400;
+  const v = { h:Math.floor(left / 3600), m:Math.floor(left / 60) % 60, s:left % 60 }, en = isEN();
+  const dd = el.querySelector('[data-cd="d"]'), dt = d ? (en ? d + 'd' : d + ' วัน') : '';
+  if(dd.textContent !== dt) dd.textContent = dt;
+  const still = geLessMotion();
+  for(const k of ['h', 'm', 's']){
+    const txt = String(v[k]).padStart(2, '0');
+    el.querySelectorAll(`[data-cd="${k}"] b`).forEach((b, i) => {
+      if(b.textContent === txt[i]) return;
+      b.textContent = txt[i];
+      if(!still){ b.classList.remove('is-flip'); void b.offsetWidth; b.classList.add('is-flip'); }
+    });
+  }
+  el.setAttribute('aria-label', `${en ? 'Next up' : 'งานถัดไป'} ${el.querySelector('.cd-t').textContent} ${dt} ${v.h}:${String(v.m).padStart(2,'0')}:${String(v.s).padStart(2,'0')}`);
+}
+/* her birthday: opening her sheet that day throws confetti in her group's colour and lets a few
+   balloons go up past her picture, once per opening */
+function sheetBirthdayFx(root){
+  const sh = root.querySelector('.is-member-sheet'); if(!sh || document.getElementById('main').classList.contains('sheet-still')) return;
+  const m = getMember(sh.dataset.mid); if(!m || !m.birthday || m.graduated || geLessMotion()) return;
+  if(m.birthday.slice(5) !== toYmd(todayStart()).slice(5)) return;
+  const pic = sh.querySelector('.detail-avatar'); if(!pic) return;
+  const c = getGroup(m.groupId).color;
+  setTimeout(() => {
+    if(!pic.isConnected) return;
+    geBurst(pic, [c, '#F3C969', '#FFFFFF', '#FFE29A', c]);
+    const r = pic.getBoundingClientRect(), box = document.createElement('div');
+    box.className = 'ge-burst'; box.setAttribute('aria-hidden', 'true'); document.body.appendChild(box);
+    [c, '#F3C969', '#E4457E', '#2E8C82', c, '#FFFFFF'].forEach((col, i) => {
+      const b = document.createElement('i'); b.className = 'bd-balloon'; b.style.setProperty('--c', col);
+      b.style.left = (r.left + r.width / 2 + (i - 2.5) * 34) + 'px'; b.style.top = (r.bottom + 40) + 'px';
+      box.appendChild(b);
+      b.animate([{ transform:'translateY(0) rotate(-6deg)', opacity:0 }, { opacity:1, offset:.12 },
+        { transform:`translate(${(i % 2 ? 1 : -1) * 18}px, ${-r.bottom - 160}px) rotate(6deg)`, opacity:.9 }],
+        { duration:3200 + i * 260, delay:i * 140, easing:'cubic-bezier(.3,.1,.4,1)', fill:'forwards' });
+    });
+    setTimeout(() => box.remove(), 5200);
+  }, 350);
+}
 function renderDetailModal(){
   const m = getMember(state.selectedId);
   if(!m) return '';
@@ -20662,8 +20961,8 @@ const DASH_KINDS = [{ k:'quiz', th:'หาโอชิจากดวง', en:'F
   { k:'gal', th:'แกลเลอรี', en:'Gallery' }, { k:'members', th:'สมาชิกทั้งหมด', en:'All members' }, { k:'work', th:'ซิงเกิลและอัลบั้ม', en:'Songs & albums' },
   { k:'stats', th:'สถิติ', en:'Stats' }, { k:'org', th:'วงและทีม · ผังวง', en:'Groups & org chart' }, { k:'ge', th:'หน้า GE2026', en:'GE2026 page' },
   { k:'me', th:'โอชิของฉัน', en:'My oshi' }, { k:'rand', th:'เมมเบอร์ประจำวัน', en:'Member of the day' }, { k:'ask', th:'ถาม 48thDb (ค้นหาด้วยคำถาม)', en:'Ask 48thDb' }];
-// the member of the day took the shop's tile (the shop is a ☰ menu entry too); the reader can put it back
-const DASH_DEFAULT = { shop:'rand' };
+// the member of the day took the shop's tile and the shop took the gallery's (the owner's word, 5 Nov; the gallery is a ☰ menu entry too); the reader can put either back
+const DASH_DEFAULT = { shop:'rand', gal:'shop' };
 const DASH_BIG = [{ k:'ge', th:'ผลด่วนเลือกตั้ง', en:'Election results' }, { k:'rand', th:'เมมเบอร์ประจำวัน', en:'Member of the day' }, { k:'oshi', th:'โอชิของฉัน', en:'My oshi' },
   { k:'hub', th:'GE2026 · นับถอยหลัง', en:'GE2026 · countdown' }, { k:'mosaic', th:'สมาชิกทั้งหมด', en:'All members' }, { k:'works', th:'ผลงานล่าสุด', en:'Latest releases' }, { k:'quiz', th:'หาโอชิจากดวง', en:'Find your oshi' }];
 const DASH_TILES = [{ k:'ge', th:'ผลด่วน', en:'Results' }, { k:'quiz', th:'หาโอชิ', en:'Find your oshi' }, { k:'cal', th:'ปฏิทิน', en:'Calendar' },
@@ -21141,7 +21440,7 @@ async function loadSignups(){
 }
 /* The owner's stat cards on the profile fold shut (closed until opened; kept on this device). */
 const ADMIN_OPEN_LS = '48thdb-admin-open';
-function adminOpen(k){ try{ return !!(JSON.parse(localStorage.getItem(ADMIN_OPEN_LS) || '{}')[k]); }catch(e){ return false; } }
+function adminOpen(k){ if(state.adminTab === k) return true; try{ return !!(JSON.parse(localStorage.getItem(ADMIN_OPEN_LS) || '{}')[k]); }catch(e){ return false; } }
 function adminFold(k, title, open){
   return `<button class="pd-fold" data-action="admin-fold" data-id="${k}" aria-expanded="${open}"><span class="section-label">${title}</span><span class="pd-caret${open ? ' is-open' : ''}" aria-hidden="true">▾</span></button>`;
 }
@@ -21229,6 +21528,34 @@ function renderVisitsCard(){
   </div>`;
 }
 
+/* A number on a menu button counts only what the owner has not yet looked at: opening the tool marks what is in it as seen. */
+const ADMIN_SEEN_LS = '48thdb-admin-seen';
+const adminSeen = () => { try{ return JSON.parse(localStorage.getItem(ADMIN_SEEN_LS) || '{}'); }catch(e){ return {}; } };
+const adminNew = (k, ids) => { const seen = new Set(adminSeen()[k] || []); return ids.filter(id => !seen.has(id)).length; };
+/* the owner's new items waiting for review (the dot on the avatar and the profile menu use it too) */
+const pendingNew = () => state.isOwner ? adminNew('pending', (state.pending || []).map(x => x.id)) : 0;
+function adminMarkSeen(k, ids){ const o = adminSeen(); o[k] = ids; try{ localStorage.setItem(ADMIN_SEEN_LS, JSON.stringify(o)); }catch(e){} }
+/* The owner's tools on the profile, as one menu: a button for each, and only the one picked opens below. */
+function renderAdminHub(){
+  if(!state.isOwner) return '';
+  const items = [
+    { k:'visits',   ic:'📊', th:'ผู้เข้าชมเว็บ',       sub:'ตัวเลขคนเข้า',           html:renderVisitsCard },
+    { k:'signups',  ic:'👥', th:'สมาชิกเว็บ',          sub:'บัญชีที่สมัคร',          html:renderSignupsCard },
+    { k:'flash',    ic:'📣', th:'ประกาศบนป้ายไฟ',     sub:'ขึ้นป้าย LED ทุกเครื่อง', html:renderFlashComposer },
+    { k:'pending',  ic:'✅', th:'รอตรวจ',               sub:'การแก้ไขของคนอื่น',      html:renderPendingQueue, ids:() => (state.pending || []).map(x => x.id) },
+    { k:'bios',     ic:'📝', th:'ประวัติย่อที่เตรียมไว้', sub:'นำเข้าทีเดียวหลายคน',  html:renderBioImport },
+    { k:'feedback', ic:'💬', th:'ความคิดเห็น',          sub:'จากคนใช้เว็บ',           html:renderFeedbackInbox, ids:() => (state.feedback || []).map(x => x.id) },
+    { k:'theme',    ic:'🎨', th:'ธีมตามฤดูกาล',        sub:'เปิด/ปิดให้ทุกคน',       html:renderSiteThemeCard },
+  ];
+  const cur = items.find(i => i.k === state.adminTab);
+  if(cur && cur.ids) adminMarkSeen(cur.k, cur.ids());
+  items.forEach(i => { i.n = i.ids && i !== cur ? adminNew(i.k, i.ids()) : 0; });
+  return `<h3 class="section-label">เครื่องมือแอดมิน</h3>
+    <div class="adm-menu">${items.map(i => `<button class="adm-btn${cur === i ? ' is-on' : ''}" data-action="admin-tab" data-id="${i.k}" aria-expanded="${cur === i}">
+      <span class="adm-ic" aria-hidden="true">${i.ic}</span><span class="adm-t"><b>${i.th}</b><small>${i.sub}</small></span>${i.n ? `<span class="adm-n">${i.n}</span>` : ''}</button>`).join('')}</div>
+    ${cur ? `<div class="adm-panel">${cur.html()}</div>` : ''}`;
+}
+
 function renderProfile(){
   const loggedIn = state.account && state.account.loggedIn;
   const kamiMember = state.kamiOshi ? getMember(state.kamiOshi) : null;
@@ -21258,14 +21585,8 @@ function renderProfile(){
 
   return `
   ${accountBlock}
-  ${renderVisitsCard()}
-  ${renderSignupsCard()}
-  ${renderFlashComposer()}
-  ${renderPendingQueue()}
-  ${renderBioImport()}
-  ${renderFeedbackInbox()}
+  ${renderAdminHub()}
   ${renderMyStyleCard()}
-  ${renderSiteThemeCard()}
   <div class="lay-zones" data-page="profile">
   <section class="lay-z" data-zone="kami">
   <h3 class="section-label">Kami Oshi ของคุณ</h3>
@@ -23931,6 +24252,7 @@ function renderMain(){
     localize(layer);
     syncBodyScrollLock();
     geAnimate(layer); odoRun(layer);
+    sheetBirthdayFx(layer); bannerPlay(layer); cdTick();
     bindPosterZoom();
     applyPageMeta();
     FEST.sync();
@@ -23968,6 +24290,7 @@ function renderMain(){
   if(state.view === 'timeline' && state.geTab === 'songs') addBoxShareButtons(main);
   geAnimate(main);
   odoRun(main);
+  sheetBirthdayFx(main); bannerPlay(main); cdTick();
   attachMainEvents();
   startBirthdayFireworks();
   geHeroFx();
@@ -26760,6 +27083,52 @@ function openCalendarSheet(){
 }
 
 let _shareUrl = null;
+/* Any share card as a short clip for a story: the card eases in from a little closer, a band of
+   light passes over it twice, then it holds — drawn on a canvas and recorded as it plays (about
+   five seconds, made while the sheet is open). Only where the browser can record a canvas. */
+function cardClipType(){
+  if(typeof MediaRecorder === 'undefined' || !HTMLCanvasElement.prototype.captureStream) return null;
+  for(const t of ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'])
+    try{ if(MediaRecorder.isTypeSupported(t)) return t; }catch(e){}
+  return null;
+}
+const cardClipOk = () => !!cardClipType();
+async function makeCardClip(blob){
+  const type = cardClipType(); if(!type) throw new Error('no recorder');
+  const img = await createImageBitmap(blob);
+  const k = Math.min(1, 1080 / img.width), W = Math.round(img.width * k / 2) * 2, H = Math.round(img.height * k / 2) * 2;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  const ease = x => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
+  const shine = (t, a, b) => {                              // a diagonal band of light between a and b seconds
+    const p = (t - a) / (b - a); if(p <= 0 || p >= 1) return;
+    const x = -W * .6 + p * W * 2.2;
+    const gr = g.createLinearGradient(x - W * .25, 0, x + W * .25, H * .35);
+    gr.addColorStop(0, 'rgba(255,240,210,0)'); gr.addColorStop(.5, 'rgba(255,240,210,.32)'); gr.addColorStop(1, 'rgba(255,240,210,0)');
+    g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore();
+  };
+  const DUR = 5;
+  const frame = t => {
+    const z = 1.12 - .12 * ease(t / .9) + .025 * Math.max(0, t - .9) / (DUR - .9);
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    g.save(); g.globalAlpha = ease(t / .5);
+    g.translate(W / 2, H / 2); g.scale(z, z); g.drawImage(img, -W / 2, -H / 2, W, H); g.restore();
+    shine(t, 1.0, 2.0); shine(t, 3.0, 3.9);
+  };
+  frame(0);
+  const stream = cv.captureStream(30), rec = new MediaRecorder(stream, { mimeType:type, videoBitsPerSecond:6e6 }), parts = [];
+  rec.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
+  const done = new Promise((ok, no) => { rec.onstop = ok; rec.onerror = no; });
+  rec.start(250);
+  const t0 = performance.now();
+  await new Promise(res => {
+    const step = () => { const t = (performance.now() - t0) / 1000; frame(Math.min(t, DUR)); t < DUR ? requestAnimationFrame(step) : res(); };
+    requestAnimationFrame(step);
+  });
+  rec.stop(); await done; stream.getTracks().forEach(x => x.stop());
+  const base = type.split(';')[0];
+  return { blob:new Blob(parts, { type:base }), type:base, ext:base === 'video/mp4' ? 'mp4' : 'webm' };
+}
 async function openShareSheet(given){
   const en = isEN();
   const sub = given || shareSubject();
@@ -26772,6 +27141,7 @@ async function openShareSheet(given){
       ${sub.kind === 'stats' ? `<div class="share-cats">${STATS_TABS.map(t => `<button class="share-cat${t.id === sub.cat ? ' is-on' : ''}" data-share="cat" data-cat="${t.id}">${t.label}</button>`).join('')}</div>` : ''}
       <div class="share-preview is-loading"><span>${en ? 'Making the card…' : 'กำลังสร้างการ์ด…'}</span></div>
       <div class="share-actions">
+        ${!sub.clip && cardClipOk() ? `<button class="share-act is-clip" data-share="mclip" disabled><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg><span>${en ? 'Making a clip…' : 'กำลังทำคลิป…'}</span></button>` : ''}
         ${sub.clip ? `<button class="share-act is-clip" data-share="clip" disabled><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg><span>${en ? 'Getting the clip…' : 'กำลังเตรียมคลิป…'}</span></button>` : ''}
         <button class="share-act is-main" data-share="image" disabled>${ICONS.share}<span>${en ? 'Share image' : 'แชร์รูป'}</span></button>
         <button class="share-act" data-share="save" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg><span>${sub.orig ? (en ? 'Save the poster' : 'บันทึกโปสเตอร์') : (en ? 'Save image' : 'บันทึกรูป')}</span></button>
@@ -26780,7 +27150,7 @@ async function openShareSheet(given){
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
-  let blob = null, clip = null, orig = null;
+  let blob = null, clip = null, orig = null, mclip = null;
   /* a poster's original, fetched as the sheet opens so a tap can save it at once */
   if(sub.orig) fetch(sub.orig).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(v => {
     orig = v; const sb = el.querySelector('[data-share="save"]'); if(sb && blob) sb.disabled = false;
@@ -26795,12 +27165,14 @@ async function openShareSheet(given){
       cb.disabled = false; cb.querySelector('span').textContent = en ? 'Share the spinning clip' : 'แชร์คลิปโปสเตอร์หมุน';
     }).catch(() => { cb.querySelector('span').textContent = en ? 'Clip unavailable' : 'โหลดคลิปไม่สำเร็จ'; });
   }
+  const clip0 = () => clip;
   el.addEventListener('click', async e => {
     const b = e.target.closest('[data-share]'); if(!b) return;
     const act = b.dataset.share;
     if(act === 'close') return closeShareSheet();
     if(act === 'link') return shareCurrent(sub.title, sub.link);
-    if(act === 'clip'){
+    if(act === 'clip' || act === 'mclip'){
+      const clip = act === 'clip' ? clip0() : mclip;
       if(!clip) return;
       try{
         if(navigator.canShare && navigator.canShare({ files:[clip] })){ await navigator.share({ files:[clip], title:sub.title, text:sub.link }); return; }
@@ -26833,7 +27205,9 @@ async function openShareSheet(given){
   let ticket = 0;
   const paint = async () => {
     const mine = ++ticket;
-    blob = null;
+    blob = null; mclip = null;
+    const mb = el.querySelector('[data-share="mclip"]');
+    if(mb){ mb.disabled = true; mb.querySelector('span').textContent = en ? 'Making a clip…' : 'กำลังทำคลิป…'; }
     const pv = el.querySelector('.share-preview');
     pv.classList.add('is-loading');
     el.querySelectorAll('[data-share="image"], [data-share="save"]').forEach(x => x.disabled = true);
@@ -26845,7 +27219,12 @@ async function openShareSheet(given){
       _shareUrl = URL.createObjectURL(blob);
       pv.classList.remove('is-loading');
       pv.innerHTML = `<img src="${_shareUrl}" alt="${escapeAttr(sub.title)}">`;
-      el.querySelectorAll('.share-act[disabled]').forEach(x => { if(!(x.dataset.share === 'save' && sub.orig && !orig) && x.dataset.share !== 'clip') x.disabled = false; });
+      el.querySelectorAll('.share-act[disabled]').forEach(x => { if(!(x.dataset.share === 'save' && sub.orig && !orig) && x.dataset.share !== 'clip' && x.dataset.share !== 'mclip') x.disabled = false; });
+      if(mb) makeCardClip(blob).then(f => {
+        if(!el.isConnected || mine !== ticket) return;
+        mclip = new File([f.blob], sub.file.replace(/[^\w.-]+/g, '-') + '.' + f.ext, { type:f.type });
+        mb.disabled = false; mb.querySelector('span').textContent = en ? 'Share as a clip' : 'แชร์เป็นคลิป';
+      }).catch(() => { if(mine === ticket) mb.remove(); });
     }catch(err){
       pv.classList.remove('is-loading');
       pv.innerHTML = `<span>${en ? 'Could not make the card — the link still works.' : 'สร้างการ์ดไม่สำเร็จ แชร์ลิงก์ได้ตามปกติ'}</span>`;
@@ -27010,6 +27389,21 @@ function bindEdgeFades(){
   });
 }
 
+/* The slides in a dashboard tile fade one into the next by themselves every few seconds and run round; a tap opens the one
+   showing. They rest when the tile is off screen, the tab is hidden or motion is reduced. */
+setInterval(() => {
+  if(document.hidden || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  const now = Date.now(), vh = innerHeight;
+  document.querySelectorAll('.dash-strip').forEach((t, idx) => {
+    const n = +t.dataset.n || 1; if(n < 2) return;
+    const r = t.getBoundingClientRect(); if(r.bottom < 0 || r.top > vh) return;
+    if(now < (t._due || (t._due = now + 2500 + idx * 1700))) return;      // the tiles take turns rather than all changing at once
+    t._due = now + 4200;
+    const sl = t.querySelectorAll('.dash-sl'), k = ([...sl].findIndex(x => x.classList.contains('on')) + 1) % n;
+    sl.forEach((x, i) => x.classList.toggle('on', i === k));
+    t.parentNode.querySelectorAll('.dash-dots i').forEach((x, i) => x.classList.toggle('on', i === k));
+  });
+}, 700);
 function bindScrollPressGuard(){
   let t;
   const mark = ()=>{
@@ -27264,6 +27658,10 @@ function bindDelegatedEvents(){
       state.hsReveal = state.hsDay !== d || state.hsRound !== r;
       state.hsDay = d; state.hsRound = r; state.hsFollow = false; state.hsHold = false;
       hsPaint();
+    }
+    else if(action==='admin-tab'){
+      state.adminTab = state.adminTab === id ? '' : id;
+      render();                                   // the header's dot counts the same unseen items
     }
     else if(action==='admin-fold'){
       let o = {}; try{ o = JSON.parse(localStorage.getItem(ADMIN_OPEN_LS) || '{}'); }catch(e){}

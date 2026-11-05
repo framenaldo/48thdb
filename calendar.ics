@@ -648,6 +648,19 @@ DTSTART;TZID=Asia/Bangkok:20261103T180000
 DTEND;TZID=Asia/Bangkok:20261103T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-live-1105-2026-11-05@48thdb
+DTSTAMP:20261105T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Pop Up Live
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Hongyok\, Emma\, Chifa\, Punpon\n• 
+ ครั้งนี้เป็นเทปที่บันทึก
+ ไว้ล่วงหน้า\n\nhttps://48thdb.com/event/ev-cgm48-pop
+ up-live-1105
+URL:https://48thdb.com/event/ev-cgm48-popup-live-1105
+DTSTART;TZID=Asia/Bangkok:20261105T180000
+DTEND;TZID=Asia/Bangkok:20261105T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-roadshow-fashionisland-2026-09-26@48thdb
 DTSTAMP:20260926T000000Z
 SUMMARY:ยกเลิก: CGM48 11th Single "Koi Tsunjatta – Let me kno
@@ -987,6 +1000,42 @@ DESCRIPTION:เมมเบอร์: Lewlew\n• เสื้อวัน
 URL:https://48thdb.com/event/ev-bday-tee-lewlew-2026
 DTSTART;VALUE=DATE:20261003
 DTEND;VALUE=DATE:20261019
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-bday-tee-khaimook-2027@48thdb
+DTSTAMP:20261106T000000Z
+SUMMARY:Pre-Order: Khaimook's Birthday T-Shirt
+DESCRIPTION:เมมเบอร์: Khaimook\n• เสื้อวั
+ นเกิดที่ Khaimook ออกแบบเอง สำหร
+ ับวันเกิดครบ 23 ปี 5 ม.ค. 2027 (ชุด
+ เดือนมกราคม)\n• พรีออเดอร์เ
+ ท่านั้น 6 พ.ย. 12:00 – 20 พ.ย. 2026 23:59 น. ท
+ าง iAM48 Application\n• ส่งสินค้า 15 ธ.ค. 2026
+  เป็นต้นไป\n• ภาพสินค้าใช้เ
+ พื่อการโฆษณาเท่านั้น\n\nhttps://48
+ thdb.com/event/ev-bday-tee-khaimook-2027
+URL:https://48thdb.com/event/ev-bday-tee-khaimook-2027
+DTSTART;VALUE=DATE:20261106
+DTEND;VALUE=DATE:20261121
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-bday-tee-janry-2027@48thdb
+DTSTAMP:20261106T000000Z
+SUMMARY:Pre-Order: Janry's Birthday T-Shirt
+DESCRIPTION:เมมเบอร์: Janry\n• เสื้อวัน
+ เกิดที่ Janry ออกแบบเอง สำหรับ
+ วันเกิดครบ 19 ปี 3 ม.ค. 2027 (ชุดเด
+ ือนมกราคม)\n• พรีออเดอร์เท่
+ านั้น 6 พ.ย. 12:00 – 20 พ.ย. 2026 23:59 น. ทาง
+  iAM48 Application\n• ส่งสินค้า 15 ธ.ค. 2026 เ
+ ป็นต้นไป\n• ภาพสินค้าใช้เพ
+ ื่อการโฆษณาเท่านั้น\n\nhttps://48thd
+ b.com/event/ev-bday-tee-janry-2027
+URL:https://48thdb.com/event/ev-bday-tee-janry-2027
+DTSTART;VALUE=DATE:20261106
+DTEND;VALUE=DATE:20261121
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
