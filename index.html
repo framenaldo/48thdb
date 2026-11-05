@@ -3967,6 +3967,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .mb-seg{ display:flex; gap:3px; padding:3px; border-radius:15px; background:var(--paper-dim); border:1px solid var(--line); flex:none; }
   .mb-seg .pill{ flex:none; white-space:nowrap; border:0; background:transparent; padding:6px 13px; border-radius:12px; color:var(--ink-soft); font-weight:600; }
   .mb-seg .pill[style*="background"]{ box-shadow:0 2px 6px rgba(var(--shadow-rgb),.18); }
+  .mb-seg .subtab{ flex:none; white-space:nowrap; border:0; background:transparent; padding:6px 13px; border-radius:12px; color:var(--ink-soft); }
+  .mb-seg .subtab.active{ background:var(--ink); color:var(--paper); box-shadow:0 2px 6px rgba(var(--shadow-rgb),.18); }
+  .mb-seg-fill{ flex:1 1 auto; } .mb-seg-fill .subtab{ flex:1 1 0; }
+  .mb-seg-scroll{ flex:0 1 auto; min-width:0; overflow-x:auto; scrollbar-width:none; } .mb-seg-scroll::-webkit-scrollbar{ display:none; }
+  .mb-bar .page-share-btn{ flex:none; margin-left:auto; }
   .mb-bar .pill-grad{ flex:none; white-space:nowrap; padding:7px 12px; }
   .mb-add{ flex:none; margin-left:auto; padding:8px 16px; font-size:13px; box-shadow:0 2px 8px rgba(192,138,46,.28); }
   .mb-tools{ margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
@@ -3987,6 +3992,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .mb-tools{ margin-top:8px; padding-top:8px; }
     .mb-tools .pill{ padding:6px 11px; }
     .mb-tools .count-tag{ padding:5px 7px; }
+    .mb-seg .subtab{ padding:6px 9px; font-size:12.5px; }
+    .mb-bar .page-share-btn{ width:34px; padding:0; justify-content:center; }
+    .mb-bar .page-share-btn span{ display:none; }
   }
   @media (min-width:700px){
     .mb-tools select.filter-select{ flex:0 0 auto; min-width:140px; }
@@ -22283,12 +22291,14 @@ function renderStats(){
              : state.statsTab==='lives'     ? renderStatsLives()
              : renderStatsOverview();
   return `
-  <div class="filter-bar stats-bar">
-    <div class="subtab-bar">
-      ${STATS_TABS.map(t=>`<button class="subtab ${state.statsTab===t.id?'active':''}"
-        data-action="stats-tab" data-value="${t.id}">${t.label}</button>`).join('')}
+  <div class="filter-bar mb-bar stats-bar">
+    <div class="mb-row">
+      <div class="mb-seg mb-seg-scroll">
+        ${STATS_TABS.map(t=>`<button class="subtab ${state.statsTab===t.id?'active':''}"
+          data-action="stats-tab" data-value="${t.id}">${t.label}</button>`).join('')}
+      </div>
+      <button class="page-share-btn" data-action="share" title="แชร์สถิติ" aria-label="แชร์สถิติ">${ICONS.share}<span>แชร์</span></button>
     </div>
-    <button class="page-share-btn" data-action="share" title="แชร์สถิติ" aria-label="แชร์สถิติ">${ICONS.share}<span>แชร์</span></button>
   </div>
   ${body}`;
 }
@@ -23191,17 +23201,19 @@ function renderDiscography(){
       <span><b>${en ? c.en : c.th}</b><small>${n[c.id] || 0}</small></span></button>`).join('')}</div>`;
   const head = `<h2 class="section-label wk-head">${en ? 'Works' : 'ผลงาน'}</h2>${cats}`;
   return cat === 'music' ? head + renderMusicWorks()
-    : head + `<div class="filter-bar">${renderGroupPills()}</div>${renderMediaCat(cat)}`;
+    : head + `<div class="filter-bar mb-bar"><div class="mb-row"><div class="mb-seg">${renderGroupPills()}</div></div></div>${renderMediaCat(cat)}`;
 }
 
 function renderMusicWorks(){
   const inGroup = x => state.groupFilter==='all' || workGroups(x).includes(state.groupFilter);
   const tabBar = `
-  <div class="filter-bar">
-    ${renderGroupPills()}
-    <div class="subtab-bar disc-tabs" style="margin-left:auto;">
-      ${DISC_TABS.map(t=>`<button class="subtab ${state.discTab===t.id?'active':''}"
-        data-action="disc-tab" data-value="${t.id}">${t.label}</button>`).join('')}
+  <div class="filter-bar mb-bar">
+    <div class="mb-row"><div class="mb-seg">${renderGroupPills()}</div></div>
+    <div class="mb-row mb-tools disc-tabs">
+      <div class="mb-seg mb-seg-fill">
+        ${DISC_TABS.map(t=>`<button class="subtab ${state.discTab===t.id?'active':''}"
+          data-action="disc-tab" data-value="${t.id}">${t.label}</button>`).join('')}
+      </div>
     </div>
   </div>`;
 
