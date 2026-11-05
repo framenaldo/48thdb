@@ -178,6 +178,13 @@ the Firebase CLI from the owner's machine.
   A roadshow's banner word is TT Ricordi Allegria from Adobe Fonts (kit
   `umx5wsc`, its stylesheet fetched only when a roadshow banner is drawn; the
   script stays as the fallback).
+- Events dressed like Shock Me Girls (`evScene`, `FX2_EVENT`, `data-fx` on the root, on for everyone; `?fx=off`
+  turns it off on one device): the release's own lettering on the banner, the sheet in its artwork's colours, only a
+  little movement. Kimi to Doko's roadshows, pop-ups and Meeting You Online wear its sky (scene `kimi`, clouds drifting
+  across the whole sheet) and the wavy lettering lifted off the Busking poster (`SONG_LOGOS.kimiwavy`; the title line
+  then drops its own logo); Journey of Dreams its gold logo cut from the poster (`logos/journey-of-dreams.png`), the
+  results night the GE2026 logo, both with a passing shine (`glint`). A new one needs official art — not shapes drawn
+  in CSS: six drawn ones (train, embers, hearts…) were previewed and rejected.
 - A work in the Works page can carry `watch: [{svc, url}]` for a streaming service that still has it (`STREAM_NAME`, `STREAM_LOGO` (a service shows its name as text until its logo files are in `streaming/`; Prime Video's wordmark is `streaming/prime-wordmark.svg`; a small spot falls back to the name unless `STREAM_ICON` has the service); the owner's logo files in `streaming/` — `<svc>-wordmark.png` on a long button, `<svc>-n.png` in a round icon on a member's row); when the title leaves that service, take the entry out. It can carry `yt` (a trailer, a first episode, a live; not kept where `film` is set — the owner wants only the whole film there), `film` (the whole film, from the owner) and `chan` (a channel of its own, e.g. `@theskaxbnk4868`) on its SEED_MEDIA row, the id of a video
   on the groups' own YouTube channels (BNK48, CGM48, BNK48 and CGM48): a trailer for a
   film, the full live for a concert or election, the first episode of a show. They were
