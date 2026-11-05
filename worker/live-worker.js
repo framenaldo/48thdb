@@ -250,6 +250,9 @@ async function iamRecent(env) {
  * asked for. The gift senders' pictures on the page are fans' — never kept. */
 const TL_KEY = 'tl-v1', TL_CACHE = 'https://live.state/tl-v1', MAIN_CRON = '*/5 * * * *', PUSH_CRON = '4-59/5 * * * *';
 const TL_STEP = 16, TL_FAR = [30, 60, 100, 200], TL_KEEP = 120, TL_KEEP_MS = 7 * 86400000;
+// far behind (the cron stopped firing for most of a day once, 3–4 Nov 2026): twice the step a run until caught up,
+// still well inside the free plan's 50 requests a run
+const TL_CATCHUP = 32, TL_BEHIND = 64, TL_STALE_MS = 15 * 60000;
 const TL_URL = (n) => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
 
 export function tlText(h) {
@@ -296,12 +299,12 @@ async function tlScan(env) {
   const topWas = st.top || 0;
   ahead = Math.max(ahead, topWas, ...st.posts.map((p) => p.n));
   if (!st.max) { if (!ahead) return { skipped: 'no-start' }; st.max = ahead - 60; }
-  const from = st.max, now = Date.now();
-  const asks = [...Array(TL_STEP).keys()].map((i) => from + 1 + i).concat(TL_FAR.map((d) => from + d));
+  const from = st.max, now = Date.now(), step = ahead - from > TL_BEHIND ? TL_CATCHUP : TL_STEP;
+  const asks = [...Array(step).keys()].map((i) => from + 1 + i).concat(TL_FAR.map((d) => from + d));
   const got = await Promise.all(asks.map((n) => tlProbe(n, now).catch((e) => ({ n, failed: true, status: String((e && e.message) || e).slice(0, 60) }))));
   // a number that keeps failing (an error page, a refusal) is given up after three runs, so it cannot hold the walk forever
   st.fails = st.fails || {};
-  for (const r of got) if (r.failed && r.n <= from + TL_STEP) { st.fails[r.n] = (st.fails[r.n] || 0) + 1; if (st.fails[r.n] >= 3) { r.failed = false; r.gone = true; } }
+  for (const r of got) if (r.failed && r.n <= from + step) { st.fails[r.n] = (st.fails[r.n] || 0) + 1; if (st.fails[r.n] >= 3) { r.failed = false; r.gone = true; } }
   for (const k of Object.keys(st.fails)) if (+k <= from) delete st.fails[k];
   st.last = { at: new Date(now).toISOString(), answers: got.reduce((o, r) => { const k = r.post ? 'post' : r.gone ? '404' : String(r.status || 'failed'); o[k] = (o[k] || 0) + 1; return o; }, {}) };
   const ids = await iamIds(env).catch(() => ({}));
@@ -317,10 +320,10 @@ async function tlScan(env) {
   }
   // settled: everything up to the highest post in the window; and when the
   // sequence is known to run further, the whole window — unless a number in it failed to answer
-  const failed = got.find((r) => r.failed && r.n <= from + TL_STEP);
-  let max = Math.max(from, Math.min(seen, from + TL_STEP));
-  if (ahead > from + TL_STEP && !failed) max = from + TL_STEP;
-  else if (ahead > from && !failed) max = Math.max(max, Math.min(ahead, from + TL_STEP));
+  const failed = got.find((r) => r.failed && r.n <= from + step);
+  let max = Math.max(from, Math.min(seen, from + step));
+  if (ahead > from + step && !failed) max = from + step;
+  else if (ahead > from && !failed) max = Math.max(max, Math.min(ahead, from + step));
   if (failed) max = Math.min(max, failed.n - 1);
   st.max = Math.max(from, max);
   st.top = Math.max(topWas, ahead);
@@ -896,7 +899,14 @@ export default {
     }
     if (url.pathname === '/timeline') {
       try {
-        return new Response(JSON.stringify(await tlRecent(env)), { headers: { ...JSON_HEADERS, 'cache-control': 'public, max-age=60' } });
+        const body = await tlRecent(env);
+        // a stand-in for the cron: if the walk has not run for a quarter of an hour, a visitor's request runs it
+        // once (one at a time per data centre, by a short-lived mark in its cache)
+        if (!body.checked || Date.now() - Date.parse(body.checked) > TL_STALE_MS) {
+          const lock = 'https://live.state/tl-run';
+          if (!(await readCache(lock))) { await writeCache(lock, { at: Date.now() }, 240); ctx.waitUntil(tlScan(env).catch(() => {})); }
+        }
+        return new Response(JSON.stringify(body), { headers: { ...JSON_HEADERS, 'cache-control': 'public, max-age=60' } });
       } catch (err) {
         return new Response(JSON.stringify({ error: String((err && err.message) || err), posts: [] }), { status: 502, headers: JSON_HEADERS });
       }
