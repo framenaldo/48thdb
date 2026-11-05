@@ -676,13 +676,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-fx="new"] .is-scene-kimi :is(.ev-open, .today-hero-open){ color:var(--c-text); }
   :root[data-theme="dark"][data-fx="new"] .is-scene-kimi :is(.evm-price, .evm-logo, .slot-date, .ev-starts){ color:var(--ink); }
   /* its clouds drift across the top of the banner, slowly */
-  :root[data-fx="new"] .is-scene-kimi .evm-fest::after{ content:''; position:absolute; z-index:-1; top:0; left:0; width:200%; height:140px; pointer-events:none;
+  :root[data-fx="new"] .is-scene-kimi .evm-fest::after{ content:''; position:absolute; z-index:-1; top:0; left:0; width:200%; height:170px; pointer-events:none;
     background:
-      radial-gradient(14% 30px at 10% 40px, rgba(255,255,255,.9), rgba(255,255,255,0) 72%),
-      radial-gradient(10% 22px at 34% 88px, rgba(255,255,255,.75), rgba(255,255,255,0) 72%),
-      radial-gradient(16% 34px at 60% 54px, rgba(255,255,255,.9), rgba(255,255,255,0) 72%),
-      radial-gradient(11% 24px at 84% 100px, rgba(255,255,255,.7), rgba(255,255,255,0) 72%);
-    animation:kimi-sky 70s linear infinite; }
+      radial-gradient(22% 30px at 24% 46px, rgba(255,255,255,.85), rgba(255,255,255,0) 100%),
+      radial-gradient(18% 24px at 72% 98px, rgba(255,255,255,.7), rgba(255,255,255,0) 100%);
+    background-size:50% 100%; background-repeat:repeat-x;
+    -webkit-mask:linear-gradient(180deg, #000 60%, transparent); mask:linear-gradient(180deg, #000 60%, transparent);
+    animation:kimi-sky 80s linear infinite; will-change:transform; }
   @keyframes kimi-sky{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
   @media (prefers-reduced-motion: reduce){ :root[data-fx="new"] .is-scene-kimi .evm-fest::after{ animation:none; } }
   /* Fame's Airline Fanmeet: the airline's own look — sky and cloud, an airmail stripe along the top, white planes crossing — in either mode */
@@ -5114,8 +5114,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* a logo with its own shine: a soft band of light crosses it as it opens and now and then after */
   .evm-fest-imgw{ position:relative; display:block; width:min(290px, 80%); margin:4px auto 8px; }
   .evm-fest-imgw .evm-fest-img{ width:100%; margin:0; transform:none; }
-  .evm-fest-imgw.is-screen{ width:min(320px, 88%); mix-blend-mode:screen; }
-  .evm-fest-imgw.is-screen .evm-fest-img{ -webkit-mask:radial-gradient(closest-side, #000 72%, transparent); mask:radial-gradient(closest-side, #000 72%, transparent); }
+  .evm-fest-imgw .evm-fest-img{ filter:drop-shadow(0 3px 8px rgba(0,0,0,.45)); }
   .evm-glint{ position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen;
     -webkit-mask:var(--logo) center/contain no-repeat; mask:var(--logo) center/contain no-repeat;
     background:linear-gradient(105deg, transparent 42%, rgba(255,246,220,.95) 50%, transparent 58%) 160% 0 / 300% 100% no-repeat; }
@@ -13258,13 +13257,12 @@ function evScene(ev){
   return (ev.poster && ev.poster.scene) || '';
 }
 const FX2_EVENT = {
-  // the poster's own crop of the logo, its black melting into the banner (screen), so the gold keeps the poster's
-  // edges; the cut-out (Adobe) only shapes the shine that crosses it
-  'ev-concert-2026': { img:'logos/journey-of-dreams-art.jpg', shape:'logos/journey-of-dreams.png', sub:'CONCERT', glint:true, blend:true },
+  // the gold logo cut from the poster (Adobe), its edge pulled in a pixel so it stays crisp on the dark red
+  'ev-concert-2026': { img:'logos/journey-of-dreams.png', sub:'CONCERT', glint:true },
 };
 function renderEventBanner(ev){
   const k = festKind(ev);
-  const dress = !fxNew() ? {} : FX2_EVENT[ev.id] || (evScene(ev) === 'kimi' ? { song:'kimi', fx:'', sub:k === 'popup' ? 'POP UP LIVE' : 'ROADSHOW' } : {});
+  const dress = !fxNew() ? {} : FX2_EVENT[ev.id] || (evScene(ev) === 'kimi' ? { song:'kimiwavy', fx:'', sub:k === 'popup' ? 'POP UP LIVE' : 'ROADSHOW' } : {});
   const own = { ...(FEST_EVENT[ev.id] || {}), ...(ev.fest || {}), ...dress };
   const K = { ...FEST_KINDS[k], ...own }, en = isEN();
   if(k === 'roadshow') festTypekit();
@@ -13527,6 +13525,9 @@ function renderTimelinePage(inHub){
 const SONG_LOGOS = {
   kimi: { src:'logos/kimi-to-doko-ka-e-ikitai-v2.svg', png:'logos/kimi-to-doko-ka-e-ikitai-v2.png',
     ratio: 841.89 / 347.07, alt:'Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ' },
+  // the hand-drawn, wavy lettering the later posters use, lifted off the 30 Oct Busking poster by its dark ink
+  kimiwavy: { src:'logos/kimi-to-doko-ka-e-ikitai-wavy.png', png:'logos/kimi-to-doko-ka-e-ikitai-wavy.png',
+    ratio: 1104 / 458, alt:'Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ' },
 };
 function renderSongLogo(key, cls){
   const l = SONG_LOGOS[key];
@@ -18346,7 +18347,7 @@ function renderEventModal(){
             ? `<span class="evm-price">${ICONS.ticket}<span class="evm-amount">${escapeHtml(ev.price)} บาท</span></span>`
             : ''}
         </div>
-        ${ev.logo ? renderSongLogo(ev.logo, 'evm-logo') : ''}
+        ${ev.logo && evScene(ev) !== 'kimi' ? renderSongLogo(ev.logo, 'evm-logo') : ''}
         <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
         <hr class="evm-rule">
         ${ev.venue ? `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.venue)}"
