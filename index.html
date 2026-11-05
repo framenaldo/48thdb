@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <base href="/">   <!-- every address in the page is from the root, so /works/film finds its pictures and data -->
+<script>/* the page's content waits, unseen, until its fonts and first redraws have settled, then rises in once (bootReveal) */
+document.documentElement.classList.add('boot');</script>
 <script>/* /gallery/ and /gallery are the same page; without the slash, relative addresses stay at the root */
 if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.replaceState(null, '', location.pathname.replace(/\/+$/, '') + location.search + location.hash);</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -6189,6 +6191,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .fest-face{ width:30px !important; height:30px !important; border-radius:50% !important; box-shadow:0 0 0 2px #fff; }
   .fest-faces .fest-face + .fest-face{ margin-left:-10px; }
 
+  /* opening the site: the page under the header is held back until the fonts are in and the
+     first redraws are done, then rises in once — instead of text and boxes jumping as they land */
+  html.boot #main, html.boot .site-foot{ opacity:0; animation:boot-safe 0s 1.6s forwards; }
+  @keyframes boot-safe{ to{ opacity:1; } }
+  html.booted #main{ animation:boot-in .6s cubic-bezier(.16,1,.3,1) both; }
+  html.booted .site-foot{ animation:boot-fade .6s ease-out .15s both; }
+  @keyframes boot-in{ from{ opacity:0; transform:translate3d(0,18px,0); } to{ opacity:1; transform:none; } }
+  @keyframes boot-fade{ from{ opacity:0; } to{ opacity:1; } }
+  @media (prefers-reduced-motion:reduce){ html.booted #main{ animation:boot-fade .25s ease-out both; } }
 </style>
 <script>
   /* Runs before first paint: follow the OS. A tap on the switch holds only for this visit (sessionStorage). */
@@ -23538,6 +23549,22 @@ function render(){
   const menu = app.querySelector('.lang-menu');
   if(menu && menu.getBoundingClientRect().left < 8) menu.classList.add('is-left');
   renderMain();
+  if(!bootReveal.done) bootReveal();
+}
+/* once per visit: wait for the fonts (at most until ~650 ms after the page began, at least two frames),
+   then let the content rise in; the class comes off after, so later redraws do not replay it */
+function bootReveal(){
+  bootReveal.done = true;
+  const root = document.documentElement;
+  const left = Math.max(0, 650 - performance.now());
+  const fonts = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+  const go = () => requestAnimationFrame(() => requestAnimationFrame(() => {
+    if(!root.classList.contains('boot')) return;
+    root.classList.remove('boot'); root.classList.add('booted');
+    setTimeout(() => root.classList.remove('booted'), 900);
+  }));
+  const wait = ms => new Promise(ok => setTimeout(ok, ms));
+  Promise.race([Promise.all([fonts, wait(Math.max(0, 280 - performance.now()))]), wait(left)]).then(go, go);
 }
 function syncBodyScrollLock(){
   const shouldLock = !!state.selectedId || !!state.selectedEvent || !!state.dayOf;
