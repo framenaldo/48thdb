@@ -753,8 +753,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   }
   /* the election results sheet: the price pill took the poster's red and sank into it, so it is a light pill with dark lettering */
   .is-scene-ember .evm-price:not(.is-closed),
-  :root[data-theme="dark"] .is-scene-ember .evm-price:not(.is-closed){
+  :root[data-theme="dark"] .is-scene-ember .evm-price:not(.is-closed),
+  :root[data-theme="dark"] .is-postered.is-scene-ember .evm-price.is-link:not(.is-closed){
     background:#FFE7BD; border-color:#FFE7BD; color:#4A150F; }
+  .is-scene-ember .evm-price:not(.is-closed) :is(.evm-amount, svg){ color:#4A150F; }
   :root[data-theme="dark"] .is-postered .evm-price.is-link,
   :root[data-theme="dark"] .is-postered .evm-closed{ color:#fff; }
   :root[data-theme="dark"] .is-postered .evm-closed{ background:#B84545; }
