@@ -23541,14 +23541,25 @@ function syncTicker(){
 function render(){
   const app = document.getElementById('app');
   _sheetKeep = sheetKeepNow();
-  app.innerHTML = renderHeader() + '<div id="ticker-slot"></div><div id="nav-container"></div><main id="main"></main>'
+  /* a redraw of the whole site (sign-in settling, the language) keeps the page and the ticker it already
+     shows: renderMain then rebuilds the page only if it has changed, so a sign-in that changes nothing
+     on it no longer blanks and redraws every picture a few seconds after the site opens */
+  const oldMain = document.getElementById('main'), oldTicker = document.getElementById('ticker-slot');
+  // and a header that would come out the same is not drawn again either: for a frame it measured short and the page jumped
+  const shell = renderHeader(), shellKey = shell + state.lang, keepShell = oldMain && shellKey === render._shell;
+  render._shell = shellKey;
+  if(!keepShell){
+  app.innerHTML = shell + '<div id="ticker-slot"></div><div id="nav-container"></div><main id="main"></main>'
     // Said once, under everything: this is a fan's database, not the groups'.
     + '<footer class="site-foot"><p><span>48thdb.com เป็นเว็บไซต์ฐานข้อมูลที่จัดทำขึ้นโดยแฟนคลับ</span> · <a href="/privacy">นโยบายความเป็นส่วนตัว</a></p></footer>';
+  if(oldMain){ document.getElementById('main').replaceWith(oldMain); if(oldTicker) document.getElementById('ticker-slot').replaceWith(oldTicker); }
+  }
   watchTopH();
   renderProfileSlot();
   const menu = app.querySelector('.lang-menu');
   if(menu && menu.getBoundingClientRect().left < 8) menu.classList.add('is-left');
   renderMain();
+  if(oldMain && !keepShell){ [...app.children].forEach(el => { if(el !== oldMain) localize(el); }); syncTicker(); }
   if(!bootReveal.done) bootReveal();
 }
 /* once per visit: wait for the fonts (at most until ~650 ms after the page began, at least two frames),
@@ -23560,6 +23571,7 @@ function bootReveal(){
   const fonts = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
   const go = () => requestAnimationFrame(() => requestAnimationFrame(() => {
     if(!root.classList.contains('boot')) return;
+    const m = document.getElementById('main'); if(m) m.classList.remove('view-fade-in');
     root.classList.remove('boot'); root.classList.add('booted');
     setTimeout(() => root.classList.remove('booted'), 900);
   }));
@@ -23581,7 +23593,47 @@ function syncBodyScrollLock(){
   }
 }
 
-let _lastRenderedView = null, _drawnPage = null;
+let _lastRenderedView = null, _drawnPage = null, _drawnSrc = null;
+const MORPH_VIEWS = new Set(['feed', 'timeline', 'browse', 'discography', 'stats', 'calendar', 'shop', 'groups', 'single', 'tag']);
+/* Bring what is on screen (drawn from oldSrc, since touched by the page's own set-up) to newSrc, keeping every
+   element whose source did not change. Gives up (false) when the screen no longer lines up with its source. */
+let _morphLang = null, _morphSameLang = false;
+function morphMain(main, oldSrc, newSrc){
+  const A = document.createElement('template'), B = document.createElement('template');
+  A.innerHTML = oldSrc; B.innerHTML = newSrc;
+  const live = [...main.children].filter(el => !el.classList.contains('ov-layer'));
+  return morphKids(main, live, A.content, B.content, 0, main.querySelector(':scope > .ov-layer'));
+}
+function shallowSig(el){
+  let t = el.tagName;
+  for(const at of el.attributes) t += ' ' + at.name + '=' + at.value;
+  for(const n of el.childNodes) if(n.nodeType === 3 && n.nodeValue.trim()) t += '|' + n.nodeValue.trim();
+  return t;
+}
+function morphKids(parent, live, oldP, newP, depth, before){
+  const oldK = [...oldP.children], newK = [...newP.children];
+  if(oldK.length !== live.length) return false;
+  if([...oldP.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim()) || [...newP.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim())) return false;
+  const oldHtml = oldK.map(el => el.outerHTML), used = new Set(), out = [];
+  newK.forEach((n, i) => {
+    const h = n.outerHTML;
+    let j = oldHtml[i] === h && !used.has(i) ? i : oldHtml.findIndex((x, k) => x === h && !used.has(k));
+    if(j >= 0){ used.add(j); out.push(live[j]); return; }
+    const o = oldK[i], l = live[i];
+    // the home page's vote card changes its figures in place (gecHomePaint), never by being drawn again
+    if(o && l && !used.has(i) && _morphSameLang && n.matches('.gec-teaser.is-home') && o.matches('.gec-teaser.is-home') && l.matches('.gec-teaser.is-home')){ used.add(i); out.push(l); return; }
+    if(o && !used.has(i) && depth < 6 && shallowSig(o) === shallowSig(n) && morphKids(l, [...l.children], o, n, depth + 1, null)){ used.add(i); out.push(l); return; }
+    out.push(document.importNode(n, true));
+  });
+  live.forEach((l, k) => { if(!used.has(k)) l.remove(); });
+  let ref = before || null;
+  for(let i = out.length - 1; i >= 0; i--){
+    const el = out[i];
+    if(el.nextElementSibling !== ref || el.parentNode !== parent) parent.insertBefore(el, ref);
+    ref = el;
+  }
+  return true;
+}
 // a page as drawn, less what keeps itself fresh in place: the "x minutes ago" and the home page's live vote (gecHomePaint)
 const pageSig = h => h.replace(/(data-ago="[^"]*">)[^<]*/g, '$1').replace(/<button class="gec-teaser is-home[\s\S]*?<\/button>/, '');
 let _sheetKeep = null;
@@ -24268,7 +24320,7 @@ function renderMain(){
   const sheetKey = JSON.stringify([state.selectedEvent, state.selectedId, state.dayOf, state.posterOf, state.bioOf, state.comparePicking, state.compareWith]);
   main.classList.toggle('sheet-still', sheetKey === _sheetKeyDrawn && !!main.querySelector('.modal-backdrop, .modal-glass-card'));
   _sheetKeyDrawn = sheetKey;
-  const layer = main.querySelector(':scope > .ov-layer'), sig = pageSig(page) + '\u0000' + JSON.stringify(state.layout || null);
+  const layer = main.querySelector(':scope > .ov-layer'), sig = pageSig(page) + '\u0000' + JSON.stringify(state.layout || null) + state.lang;
   if(layer && !state.layoutEdit && sig === _drawnPage && state.view === _lastRenderedView){
     main.querySelectorAll('[data-ago]').forEach(el => { el.textContent = tlAgo(el.dataset.ago); });
     layer.innerHTML = over;
@@ -24289,7 +24341,15 @@ function renderMain(){
     return;
   }
   _drawnPage = sig;
-  main.innerHTML = page + `<div class="ov-layer">${over}</div>`;
+  /* the same page drawn again in the background (the reader's sign-in, an election update, new iAM48 posts):
+     only what changed is swapped and everything else stays as it is on screen — rebuilding all of it made
+     every picture and card blink a second or two after the site had opened */
+  const oldSrc = _drawnSrc; _drawnSrc = page;
+  _morphSameLang = _morphLang === state.lang; _morphLang = state.lang;
+  const morphLayer = state.view === _lastRenderedView && MORPH_VIEWS.has(state.view) && !state.layoutEdit && oldSrc
+    && main.querySelector(':scope > .ov-layer');
+  if(morphLayer && morphMain(main, oldSrc, page)){ morphLayer.innerHTML = over; if(state.view === 'feed') gecHomePaint(); }
+  else main.innerHTML = page + `<div class="ov-layer">${over}</div>`;
   _hsShown = !!main.querySelector('.modal-scroll .hs');
   if(keep && keep.id === state.selectedId){ const ns = main.querySelector('.is-member-sheet .modal-scroll'); if(ns) ns.scrollTop = keep.top; }
   paintSheetGrads(main);
@@ -24301,6 +24361,8 @@ function renderMain(){
     // the fade restarts by forcing a layout in between; on the first draw there is nothing to restart, and that layout (the whole page) would be paid twice
     if(_lastRenderedView !== null){ main.classList.remove('view-fade-in'); void main.offsetWidth; }
     main.classList.add('view-fade-in');
+    // taken off once played, so nothing later (the opening rise ending, the page kept through a redraw) plays it again
+    clearTimeout(main._vf); main._vf = setTimeout(() => main.classList.remove('view-fade-in'), 260);
     _lastRenderedView = state.view;
   }
   _drawnDay = toYmd(new Date());
@@ -24432,9 +24494,13 @@ function attachMainEvents(){
   const bodyWrap = document.getElementById('table-body-wrap');
   const theadTrack = document.getElementById('thead-track');
   if(bodyWrap && theadTrack){
-    bodyWrap.addEventListener('scroll', ()=>{
-      theadTrack.style.transform = `translateX(${-bodyWrap.scrollLeft}px)`;
-    }, {passive:true});
+    // a redraw that keeps the table (morphMain) must not stack a second listener on it
+    bodyWrap._thead = theadTrack;
+    theadTrack.style.transform = `translateX(${-bodyWrap.scrollLeft}px)`;
+    if(!bodyWrap._synced){ bodyWrap._synced = true;
+      bodyWrap.addEventListener('scroll', ()=>{
+        bodyWrap._thead.style.transform = `translateX(${-bodyWrap.scrollLeft}px)`;
+      }, {passive:true}); }
   }
   /* Forgot password: Firebase mails a link to set a new one. It answers the
      same whether or not the address has an account, so the message says "if". */
@@ -27406,6 +27472,7 @@ function goBack(fallback){
    scroll position can say. */
 function bindEdgeFades(){
   document.querySelectorAll('.bday-next').forEach(row => {
+    if(row._edge) return; row._edge = true;   // kept through a redraw: already watched
     const sync = () => {
       const max = row.scrollWidth - row.clientWidth;
       row.classList.toggle('fade-start', row.scrollLeft > 4);
