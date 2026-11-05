@@ -28693,6 +28693,12 @@ async function init(){
     }
     listenGE();   // the results need nothing below; started first, the dashboard has them sooner
     state.isOwner = await checkOwner();
+    // the owner sees the dressed-up events wherever they are signed in, the Home Screen app included
+    // (it keeps its own storage, so a ?fx=new opened in Safari never reaches it); ?fx=off still turns it off
+    if(state.isOwner && !/[?&]fx=off\b/.test(location.search)){
+      let off = false; try{ off = localStorage.getItem('48thdb-fx') === 'off'; }catch(e){}
+      if(!off && document.documentElement.dataset.fx !== 'new'){ document.documentElement.dataset.fx = 'new'; try{ localStorage.setItem('48thdb-fx', 'new'); }catch(e){} }
+    }
     // the shared list and the reader's own data do not wait on the owner-only reads below
     const sharedP = loadMembers().catch(() => null), oshiP = loadOshiData();
     await loadPending();
