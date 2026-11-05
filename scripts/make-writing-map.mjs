@@ -41,7 +41,7 @@ const r = await send('Runtime.evaluate', { awaitPromise: true, returnByValue: tr
   const bandOf = k => { const cy = (k.start / w) | 0; let b = 0; for(const y of bands) if(cy > y) b++; return b; };
   big.forEach(k => { k.band = bandOf(k); k.sx = k.start % w; k.sy = (k.start / w) | 0; });
   // BANDFIX='[[x,y,band]]': a piece that contains the point x,y is moved to that line (where reading order and position disagree)
-  for(const [fx, fy, fb] of ${process.env.BANDFIX || '[]'}) for(const k of big) if(fx >= k.x0 && fx <= k.x1 && fy >= k.y0 && fy <= k.y1 && comp[fy * w + fx] === k.id) k.band = fb;
+  for(const [fx, fy, fb] of ${process.env.BANDFIX || '[]'}) { const hit = big.filter(k => fx >= k.x0 && fx <= k.x1 && fy >= k.y0 && fy <= k.y1).sort((a, b) => a.area - b.area)[0]; if(hit) hit.band = fb; }
   big.sort((a, b) => a.band - b.band || a.sx - b.sx || a.sy - b.sy);
   // distance along each piece from its start (Dijkstra, diagonals cost more), laid end to end
   const T = new Float32Array(N).fill(-1); const GAP = 24, OVERLAP = +(${+OVL});
