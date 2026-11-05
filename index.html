@@ -5339,7 +5339,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      part of the page, so it is fetched only when this sheet is opened and the
      page itself stays the size it was. */
   .evm-slides{ margin:0 0 16px; }
-  .evm-track{ display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; border-radius:14px; }
+  .evm-track{ display:flex; gap:10px; overflow-x:auto; overflow-y:hidden; transition:height .28s cubic-bezier(.2,.8,.2,1); scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; border-radius:14px; }
   .evm-track::-webkit-scrollbar{ display:none; }
   .evm-slide{ flex:0 0 100%; scroll-snap-align:center; scroll-snap-stop:always; width:100%; }
   .evm-slides .evm-poster{ margin:0; }
@@ -18148,18 +18148,21 @@ function schedTick(){
 }
 /* A poster, or several to swipe through: poster.img first, then poster.more = [{ img, w, h, th, en }] (the label names its dot).
    Each opens the full-size viewer at its own picture (state.posterOf 'pm:<event>:<n>'). */
+const trackStep = t => { const k = t.children; return k[1] ? k[1].offsetLeft - k[0].offsetLeft : t.clientWidth; };
+/* While a finger moves the pictures only the dots follow; the height is set once the swipe has come to rest.
+   Changing it under the finger made the browser lay the sheet out every frame and the snap lose its place. */
 document.addEventListener('scroll', e => {
   const t = e.target; if(!t || !t.matches || !t.matches('[data-track]')) return;
-  const i = Math.round(t.scrollLeft / Math.max(1, t.clientWidth));
-  t.parentElement.querySelectorAll('.evm-dot').forEach((d, k) => d.classList.toggle('on', k === i));
-  fitTrack(t);
+  if(!t._raf) t._raf = requestAnimationFrame(() => { t._raf = 0;
+    const i = Math.round(t.scrollLeft / Math.max(1, trackStep(t)));
+    if(t._dot !== i){ t._dot = i; t.parentElement.querySelectorAll('.evm-dot').forEach((d, k) => d.classList.toggle('on', k === i)); } });
+  clearTimeout(t._rest); t._rest = setTimeout(() => fitTrack(t), 140);
 }, true);
-// The swipe is as tall as the picture on show (by the scroll, so it follows the finger from one height to the next).
+// The swipe is as tall as the picture on show, eased from one height to the next.
 function fitTrack(t){
-  const kids = t.children, step = kids[1] ? kids[1].offsetLeft - kids[0].offsetLeft : t.clientWidth;
-  const x = Math.max(0, t.scrollLeft / Math.max(1, step)), i = Math.min(kids.length - 1, Math.floor(x)), f = x - i;
-  const h = i => kids[i] ? kids[i].offsetHeight : 0, a = h(i), b = h(i + 1) || a;
-  if(a) t.style.height = Math.round(a + (b - a) * f) + 'px';
+  const kids = t.children, i = Math.min(kids.length - 1, Math.max(0, Math.round(t.scrollLeft / Math.max(1, trackStep(t)))));
+  const h = kids[i] ? kids[i].offsetHeight : 0;
+  if(h && t.style.height !== h + 'px') t.style.height = h + 'px';
 }
 document.addEventListener('load', e => { const t = e.target.closest && e.target.closest('[data-track]'); if(t) fitTrack(t); }, true);
 window.addEventListener('resize', () => document.querySelectorAll('[data-track]').forEach(fitTrack));
@@ -23652,7 +23655,12 @@ let _lastRenderedView = null, _drawnPage = null, _drawnSrc = null;
 const MORPH_VIEWS = new Set(['feed', 'timeline', 'browse', 'discography', 'stats', 'calendar', 'shop', 'groups', 'single', 'tag']);
 /* Bring what is on screen (drawn from oldSrc, since touched by the page's own set-up) to newSrc, keeping every
    element whose source did not change. Gives up (false) when the screen no longer lines up with its source. */
-let _morphLang = null, _morphSameLang = false;
+let _morphLang = null, _morphSameLang = false, _drawnOver = null;
+function morphSheet(layer, oldSrc, newSrc){
+  const A = document.createElement('template'), B = document.createElement('template');
+  A.innerHTML = oldSrc; B.innerHTML = newSrc;
+  return morphKids(layer, [...layer.children], A.content, B.content, 0, null);
+}
 function morphMain(main, oldSrc, newSrc){
   const A = document.createElement('template'), B = document.createElement('template');
   A.innerHTML = oldSrc; B.innerHTML = newSrc;
@@ -24378,7 +24386,11 @@ function renderMain(){
   const layer = main.querySelector(':scope > .ov-layer'), sig = pageSig(page) + '\u0000' + JSON.stringify(state.layout || null) + state.lang;
   if(layer && !state.layoutEdit && sig === _drawnPage && state.view === _lastRenderedView){
     main.querySelectorAll('[data-ago]').forEach(el => { el.textContent = tlAgo(el.dataset.ago); });
-    layer.innerHTML = over;
+    /* the same sheet drawn again (the clock, a background update) keeps what has not changed — a swipe through the
+       posters, a scrolled list — instead of being rebuilt and thrown back to its first picture */
+    const sameSheet = main.classList.contains('sheet-still') && _drawnOver != null;
+    if(!(sameSheet && over === _drawnOver) && !(sameSheet && morphSheet(layer, _drawnOver, over))) layer.innerHTML = over;
+    _drawnOver = over;
     _hsShown = !!layer.querySelector('.modal-scroll .hs');
     if(keep && keep.id === state.selectedId){ const ns = layer.querySelector('.is-member-sheet .modal-scroll'); if(ns) ns.scrollTop = keep.top; }
     paintSheetGrads(layer);
@@ -24403,6 +24415,7 @@ function renderMain(){
   _morphSameLang = _morphLang === state.lang; _morphLang = state.lang;
   const morphLayer = state.view === _lastRenderedView && MORPH_VIEWS.has(state.view) && !state.layoutEdit && oldSrc
     && main.querySelector(':scope > .ov-layer');
+  _drawnOver = over;
   if(morphLayer && morphMain(main, oldSrc, page)){ morphLayer.innerHTML = over; if(state.view === 'feed') gecHomePaint(); }
   else main.innerHTML = page + `<div class="ov-layer">${over}</div>`;
   _hsShown = !!main.querySelector('.modal-scroll .hs');
@@ -27700,7 +27713,7 @@ function bindDelegatedEvents(){
       if(same){ root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.rt-f.hl').forEach(x => x.classList.remove('hl')); el.dataset.action = 'open-member'; el.click(); el.dataset.action = 'rota-hl'; return; }
       root.dataset.hl = id;
       root.classList.add('has-hl'); root.querySelectorAll('.rt-f').forEach(x => x.classList.toggle('hl', x.dataset.id === id)); }
-    else if(action==='slide-to'){ const tr = el.closest('.evm-slides').querySelector('[data-track]'); tr.scrollTo({ left:tr.clientWidth * (+el.dataset.i), behavior:'smooth' }); }
+    else if(action==='slide-to'){ const tr = el.closest('.evm-slides').querySelector('[data-track]'); tr.scrollTo({ left:trackStep(tr) * (+el.dataset.i), behavior:'smooth' }); }
     else if(action==='open-poster'){
       state.geClip = false; state.posterOf = id; renderMain(); pushHistory();
     }
