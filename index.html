@@ -5096,6 +5096,68 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @keyframes fest-drift{ 0%{ translate:0 0; } 100%{ translate:6px -9px; } }
   @keyframes fest-spin{ to{ transform:rotate(360deg); } }
   @media (prefers-reduced-motion: reduce){ .evm-fest.is-play *{ animation:none !important; } }
+  /* each kind's own motion behind its banner (renderBannerFx) — a preview, only with ?fx=new for now */
+  .bfx{ display:none; }
+  :root[data-fx="new"] .bfx{ display:block; position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none; border-radius:inherit;
+    -webkit-mask:linear-gradient(180deg, #000 0, #000 calc(100% - 90px), transparent 100%); mask:linear-gradient(180deg, #000 0, #000 calc(100% - 90px), transparent 100%); }
+  .bfx > *{ position:absolute; display:block; }
+  /* the single's train: a morning sky, clouds drifting, a train running along a line above the word now and then */
+  :root[data-fx="new"] .has-bfx-train{ padding-top:44px; --fest-ink:#1F3B63; }
+  :root[data-fx="new"] .has-bfx-train .evm-fest-bunting{ display:none; }
+  :root[data-fx="new"] .evm-fest.has-bfx-train :is(.evm-fest-word, .evm-fest-sub){ color:#1F3B63; text-shadow:0 2px 0 rgba(255,255,255,.65); }
+  :root[data-fx="new"] .evm-fest.has-bfx-train .evm-fest-sub{ opacity:.85; }
+  :root[data-fx="new"] .modal-glass-card:has(.has-bfx-train) :is(.modal-share-btn, .modal-close-btn){ background:rgba(31,59,99,.6); color:#fff; border-color:rgba(255,255,255,.35); }
+  .bfx-sky{ inset:0; background:linear-gradient(180deg, #8ECDF2 0%, #BFE4F8 45%, #E8F6FD 80%); }
+  .bfx-cloud{ top:var(--cy, 30%); left:-140px; width:84px; height:24px; border-radius:999px; background:#fff; opacity:.9;
+    box-shadow:18px -10px 0 3px #fff, 44px -3px 0 0 #fff; animation:bfx-cloud var(--ct, 46s) linear var(--cd, 0s) infinite; }
+  .bfx-c0{ --cy:12%; --ct:52s; --cd:-8s; } .bfx-c1{ --cy:46%; --ct:40s; --cd:-26s; transform:scale(.7); } .bfx-c2{ --cy:70%; --ct:60s; --cd:-40s; opacity:.7; }
+  .bfx-rail{ left:0; right:0; top:37px; height:2px; background:repeating-linear-gradient(90deg, rgba(31,59,99,.45) 0 7px, transparent 7px 12px); }
+  .bfx-run{ top:15px; right:-170px; width:120px; height:24px; color:#2B4C7E; animation:bfx-train 11s linear 1.2s infinite; }
+  .bfx-loco{ display:block; width:120px; height:24px; }
+  .bfx-puff{ position:absolute; left:10px; top:-4px; width:8px; height:8px; border-radius:50%; background:#fff;
+    box-shadow:-9px -7px 0 1px rgba(255,255,255,.8), -20px -12px 0 2px rgba(255,255,255,.55); animation:bfx-puff 1.2s ease-out infinite; }
+  @keyframes bfx-cloud{ to{ translate:calc(100vw + 300px) 0; } }
+  @keyframes bfx-train{ 0%{ translate:0 0; } 62%{ translate:calc(-100vw - 360px) 0; } 100%{ translate:calc(-100vw - 360px) 0; } }
+  @keyframes bfx-puff{ 0%{ opacity:.9; transform:scale(.6); } 100%{ opacity:0; transform:translate(10px, -8px) scale(1.3); } }
+  /* the results night: embers rising through the gold, and a burst as it opens (bannerPlay) */
+  .bfx-ember{ bottom:-8px; left:var(--x); width:var(--s); height:var(--s); border-radius:50%; background:#FFC46B; opacity:0;
+    box-shadow:0 0 6px 2px rgba(255,150,60,.6); animation:bfx-rise var(--t) linear var(--d) infinite; }
+  @keyframes bfx-rise{ 0%{ opacity:0; transform:translate(0, 0); } 12%{ opacity:1; } 70%{ opacity:.8; } 100%{ opacity:0; transform:translate(18px, -300px); } }
+  /* the concert: two lights sweeping over the stage, stars twinkling, a glint across the title */
+  :root[data-fx="new"] .has-bfx-spot .evm-fest-beams{ display:none; }
+  .bfx-beam{ top:-30px; width:140px; height:360px; transform-origin:50% 0; opacity:.55;
+    background:linear-gradient(180deg, rgba(255,236,200,.85), rgba(255,236,200,0) 80%); clip-path:polygon(44% 0, 56% 0, 100% 100%, 0 100%); }
+  .bfx-b0{ left:4%; animation:bfx-sweep 5.5s ease-in-out infinite alternate; } .bfx-b1{ right:4%; animation:bfx-sweep 6.5s ease-in-out -2s infinite alternate-reverse; }
+  .bfx-star{ left:var(--x); top:var(--y); width:4px; height:4px; border-radius:50%; background:#fff; box-shadow:0 0 6px #fff; animation:bfx-twinkle 2.6s ease-in-out var(--d) infinite; }
+  @keyframes bfx-sweep{ 0%{ transform:rotate(-28deg); } 100%{ transform:rotate(22deg); } }
+  @keyframes bfx-twinkle{ 0%, 100%{ opacity:.15; transform:scale(.6); } 50%{ opacity:1; transform:none; } }
+  :root[data-fx="new"] .has-bfx-spot.is-play .evm-fest-word{
+    background:linear-gradient(100deg, var(--fest-ink) 42%, #fff 50%, var(--fest-ink) 58%) 120% 0 / 300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:none; filter:drop-shadow(0 2px 0 rgba(0,0,0,.3));
+    animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both, bfx-glint 1.6s 1.4s ease-in-out both; }
+  @keyframes bfx-glint{ from{ background-position:120% 0; } to{ background-position:-20% 0; } }
+  /* Heart to Heart: hearts rising, the title beating */
+  .bfx-heart{ bottom:-24px; left:var(--x); width:var(--s); height:var(--s); color:#FF8DB8; opacity:0; filter:drop-shadow(0 0 6px rgba(255,120,170,.6)); animation:bfx-float var(--t) ease-in var(--d) infinite; }
+  .bfx-heart svg{ display:block; width:100%; height:100%; }
+  @keyframes bfx-float{ 0%{ opacity:0; transform:translate(0, 0) scale(.6); } 15%{ opacity:.85; } 50%{ transform:translate(9px, -130px) scale(.9); } 100%{ opacity:0; transform:translate(-6px, -280px) scale(1.1); } }
+  :root[data-fx="new"] .has-bfx-hearts.is-play .evm-fest-word{ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both, bfx-beat 2.6s 1.5s ease-in-out infinite; }
+  @keyframes bfx-beat{ 0%, 40%, 100%{ transform:none; } 10%{ transform:scale(1.06); } 20%{ transform:none; } 30%{ transform:scale(1.04); } }
+  /* Meeting You Online: dandelion seeds and petals carried across on the wind */
+  .bfx-seed{ left:-20px; top:var(--y); width:10px; height:10px; border-radius:50%; opacity:0;
+    background:radial-gradient(circle, #fff 28%, rgba(255,255,255,.45) 55%, transparent 70%); animation:bfx-drift var(--t) linear var(--d) infinite; }
+  .bfx-seed.is-petal{ width:9px; height:6px; border-radius:60% 0; background:#F7A8C8; }
+  @keyframes bfx-drift{ 0%{ opacity:0; transform:translate(0, 0) rotate(0); } 10%{ opacity:.95; } 50%{ transform:translate(48vw, 26px) rotate(200deg); }
+    90%{ opacity:.9; } 100%{ opacity:0; transform:translate(calc(100vw + 40px), -12px) rotate(380deg); } }
+  /* Shock Me Girls: a flash of pink lightning as the sheet opens, and the bolts flicker now and then */
+  .bfx-flash{ inset:0; opacity:0; background:radial-gradient(circle at 72% 18%, rgba(255,255,255,.95), rgba(240,111,210,.55) 38%, transparent 72%); }
+  :root[data-fx="new"] .is-play .bfx-flash{ animation:bfx-flash 1.1s .05s ease-out both; }
+  :root[data-fx="new"] .has-bfx-flash .evm-fest-deco .cfs{ animation:bfx-zap 3.8s steps(1) infinite; }
+  :root[data-fx="new"] .has-bfx-flash .evm-fest-deco .cfs:nth-child(2n){ animation-delay:-1.7s; }
+  @keyframes bfx-flash{ 0%{ opacity:0; } 7%{ opacity:1; } 15%{ opacity:.15; } 23%{ opacity:.85; } 100%{ opacity:0; } }
+  @keyframes bfx-zap{ 0%, 88%, 100%{ opacity:.85; } 90%{ opacity:.15; } 93%{ opacity:1; } 95%{ opacity:.3; } }
+  @media (prefers-reduced-motion: reduce){
+    .bfx *, .has-bfx-flash .evm-fest-deco .cfs{ animation:none !important; }
+    .bfx-ember, .bfx-heart, .bfx-seed, .bfx-flash, .bfx-run{ display:none !important; }
+  }
   /* งานถัดไป on the home page's head card */
   .cd-next{ display:flex; align-items:center; gap:8px; width:100%; margin:9px 0 0; padding:7px 8px 7px 12px; border-radius:16px; font:inherit; color:var(--ink); text-align:left; cursor:pointer;
     background:color-mix(in srgb, var(--card) 70%, transparent); border:1px solid var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.06); transition:transform .1s; }
@@ -6225,6 +6287,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     var t; try{ localStorage.removeItem('48thdb-theme'); t = sessionStorage.getItem('48thdb-theme'); }catch(e){}
     if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t;
+  })();
+  /* a preview of the event banners' own motion, only on a device that opened ?fx=new (?fx=off ends it) */
+  (function(){
+    var m = location.search.match(/[?&]fx=(new|off)\b/), u;
+    try{ if(m) localStorage.setItem('48thdb-fx', m[1]); u = localStorage.getItem('48thdb-fx'); }catch(e){}
+    if(u === 'new') document.documentElement.dataset.fx = 'new';
   })();
 </script>
 </head>
@@ -13215,9 +13283,10 @@ function renderEventBanner(ev){
   if(people.length && people.length <= 3) faces = `<span class="evm-fest-faces">${people.map(m => face(m, '')).join('')}</span>`;
   else if(people.length && people.length <= 8) faces = `<span class="evm-fest-faces is-mid">${people.map(m => face(m, ' is-mid')).join('')}</span>`;
   // more than fit: none at all — the line-up is listed further down the sheet
-  const long = sub.length > 18;
+  const long = sub.length > 18, bfx = bannerFxKind(ev, k);
   return `
-  <div class="evm-fest is-${k}${own.own ? ` pal-${K.pal}` : ev.poster ? ' is-postered' : ` pal-${K.pal}`}${faces ? '' : ' is-bare'}${K.word.length > 8 ? ' is-wide' : ''}${K.word.length > 13 ? ' is-longword' : ''}" aria-hidden="false">
+  <div class="evm-fest is-${k}${own.own ? ` pal-${K.pal}` : ev.poster ? ' is-postered' : ` pal-${K.pal}`}${faces ? '' : ' is-bare'}${K.word.length > 8 ? ' is-wide' : ''}${K.word.length > 13 ? ' is-longword' : ''}${bfx ? ` has-bfx-${bfx}` : ''}" aria-hidden="false">
+    ${renderBannerFx(bfx)}
     ${K.fx === 'beams' ? '<span class="evm-fest-beams" aria-hidden="true"><i></i><i></i></span>' : ''}
     ${K.fx === 'rays' ? '<span class="evm-fest-rays" aria-hidden="true"></span>' : ''}
     ${K.fx === 'bunting' ? renderFestBunting() : ''}
@@ -13229,12 +13298,49 @@ function renderEventBanner(ev){
   </div>`;
 }
 const renderBirthdayBanner = renderEventBanner;
+/* each kind of event its own motion behind the banner, like Shock Me Girls' paper: the single's train
+   across the sky for its roadshows and pop-ups, embers for the results night, sweeping lights for the
+   concert, hearts for Heart to Heart, seeds on the wind for Meeting You Online, a flash of lightning
+   for Shock Me Girls. Few pieces, transform and opacity only, and only while the sheet is open. */
+function bannerFxKind(ev, k){
+  const sc = ev.poster && ev.poster.scene;
+  if(sc === 'paper') return 'flash';
+  if(sc === 'meadow' || (k === 'online' && ev.logo === 'kimi')) return 'seeds';
+  if(ev.logo === 'kimi' && (k === 'roadshow' || k === 'popup')) return 'train';
+  if(k === 'results') return 'embers';
+  if(ev.id === 'ev-concert-2026') return 'spot';
+  if(k === 'heart') return 'hearts';
+  return '';
+}
+const BFX_TRAIN = `<svg class="bfx-loco" viewBox="0 0 150 30" aria-hidden="true"><g fill="currentColor">
+  <path d="M4 8h30c6 0 10 4 11 9l1 5H4z"/><rect x="50" y="8" width="44" height="14" rx="3"/><rect x="98" y="8" width="44" height="14" rx="3"/>
+  <rect x="47" y="15" width="3" height="2"/><rect x="94" y="15" width="4" height="2"/></g>
+  <g fill="#fff" opacity=".85"><rect x="10" y="11" width="8" height="5" rx="1"/><rect x="21" y="11" width="8" height="5" rx="1"/>
+  ${[55, 66, 77, 103, 114, 125].map(x => `<rect x="${x}" y="11" width="8" height="5" rx="1"/>`).join('')}</g>
+  <g fill="currentColor">${[12, 30, 60, 84, 108, 132].map(x => `<circle cx="${x}" cy="25" r="3"/>`).join('')}</g></svg>`;
+function renderBannerFx(type){
+  if(!type) return '';
+  const n = (k, f) => Array.from({ length:k }, (_, i) => f(i)).join('');
+  const heart = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.2 0 3.7 1.3 5.2 3 1.5-1.7 3-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>';
+  const inner = {
+    train: `<i class="bfx-sky"></i>${n(3, i => `<i class="bfx-cloud bfx-c${i}"></i>`)}<i class="bfx-rail"></i><span class="bfx-run">${BFX_TRAIN}<i class="bfx-puff"></i></span>`,
+    embers: n(12, i => `<i class="bfx-ember" style="--x:${(i * 37) % 100}%;--d:${(i * .53) % 4}s;--t:${3.2 + (i % 4) * .6}s;--s:${3 + (i % 3)}px"></i>`),
+    spot: `<i class="bfx-beam bfx-b0"></i><i class="bfx-beam bfx-b1"></i><i class="bfx-sheen"></i>${n(8, i => `<i class="bfx-star" style="--x:${(i * 29 + 7) % 96}%;--y:${(i * 17 + 9) % 70}%;--d:${(i * .4) % 3}s"></i>`)}`,
+    hearts: n(13, i => `<i class="bfx-heart" style="--x:${(i * 41 + 5) % 96}%;--d:${(i * .7) % 5}s;--t:${4.5 + (i % 3)}s;--s:${10 + (i % 3) * 5}px">${heart}</i>`),
+    seeds: n(10, i => `<i class="bfx-seed${i % 3 ? '' : ' is-petal'}" style="--y:${(i * 23 + 6) % 80}%;--d:${(i * .9) % 8}s;--t:${8 + (i % 4) * 2}s"></i>`),
+    flash: `<i class="bfx-flash"></i>`,
+  }[type] || '';
+  return `<span class="bfx bfx-${type}" aria-hidden="true">${inner}</span>`;
+}
 /* an event sheet's banner plays in as it opens (not on a redraw of the same sheet): the word writes
    itself across, the line under it settles, the faces pop up one by one, and the scatter keeps
    drifting slowly while the sheet is open */
 function bannerPlay(root){
   if(document.getElementById('main').classList.contains('sheet-still') || geLessMotion()) return;
   root.querySelectorAll('.evm-fest').forEach(b => b.classList.add('is-play'));
+  // the results night opens with a burst of gold over its word
+  if(document.documentElement.dataset.fx === 'new') root.querySelectorAll('.has-bfx-embers .evm-fest-word, .has-bfx-embers .evm-fest-img').forEach(w =>
+    setTimeout(() => w.isConnected && geBurst(w, ['#F3C969', '#FFE29A', '#D4A73E', '#FFFFFF', '#E4457E']), 900));
 }
 
 /** Who is at the booth when: one row per slot, today's picked out, finished
