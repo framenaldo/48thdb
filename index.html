@@ -655,6 +655,36 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .is-scene-paper .evm-fest-deco .cfs.cfi1, .is-scene-paper .evm-fest-deco .cfs.cfi4{ color:#2B1B2E; opacity:.55; }
   .is-scene-paper :is(.ev-open, .today-hero-open){ color:var(--c-text); }
   :root[data-theme="dark"] .is-scene-paper :is(.evm-price, .evm-logo, .slot-date, .ev-starts){ color:var(--ink); }
+  /* Kimi to Doko ka e Ikitai's roadshows and pop-ups (?fx=new): the single's sky — blue with soft cloud at the top,
+     white in the middle, a hint of its meadow at the foot — olive ink like its posters, in either mode */
+  html:root[data-fx="new"] :is(.modal-glass-card.is-postered, .ev-card.is-themed, .today-hero.is-themed).is-scene-kimi{
+    --sheet-bg:#F5F9FB; --sheet-ink:#3B3826; --pc:#5E5A3A;
+    --ink:#3B3826; --ink-soft:#6B6650; --paper:#FFFFFF; --paper-dim:#EEF5F8; --card:#FFFFFF; --glass-card:#FFFFFF;
+    --glass-edge:rgba(94,90,58,.28); --line:rgba(94,90,58,.16); --c-text:#5E5A3A;
+    background:
+      radial-gradient(38% 34px at 18% 46px, rgba(255,255,255,.95), rgba(255,255,255,0) 72%),
+      radial-gradient(30% 26px at 70% 30px, rgba(255,255,255,.85), rgba(255,255,255,0) 72%),
+      radial-gradient(44% 40px at 92% 96px, rgba(255,255,255,.8), rgba(255,255,255,0) 72%),
+      linear-gradient(180deg, #93C6EA 0, #BFDDF2 120px, #E8F3FA 260px, #FFFFFF 420px, #FFFFFF 78%, #EEF3DA 93%, #D3DFA8 100%);
+    color:var(--ink); border:1px solid rgba(94,90,58,.32); box-shadow:0 6px 20px rgba(70,120,160,.2); }
+  :root[data-fx="new"] .is-scene-kimi .evm-fest::before{ display:none; }
+  :root[data-fx="new"] .is-scene-kimi .evm-fest, :root[data-theme="dark"][data-fx="new"] .is-scene-kimi .evm-fest{ --fest-a:#BFDDF2; --fest-b:#FFFFFF; --fest-ink:#4F4A2E; }
+  :root[data-fx="new"] .is-scene-kimi .evm-fest-sub{ color:#4F4A2E; opacity:.8; }
+  :root[data-fx="new"] .is-scene-kimi :is(.evm-fest-name){ background:#fff; color:#4F4A2E; }
+  :root[data-fx="new"] .is-scene-kimi .evm-fest-deco .cfs{ color:#5E7FA8; opacity:.55; }
+  :root[data-fx="new"] .is-scene-kimi .evm-fest-deco .cfs.cfi0, :root[data-fx="new"] .is-scene-kimi .evm-fest-deco .cfs.cfi2{ color:#7A7448; opacity:.5; }
+  :root[data-fx="new"] .is-scene-kimi :is(.ev-open, .today-hero-open){ color:var(--c-text); }
+  :root[data-theme="dark"][data-fx="new"] .is-scene-kimi :is(.evm-price, .evm-logo, .slot-date, .ev-starts){ color:var(--ink); }
+  /* its clouds drift across the top of the banner, slowly */
+  :root[data-fx="new"] .is-scene-kimi .evm-fest::after{ content:''; position:absolute; z-index:-1; top:0; left:0; width:200%; height:140px; pointer-events:none;
+    background:
+      radial-gradient(14% 30px at 10% 40px, rgba(255,255,255,.9), rgba(255,255,255,0) 72%),
+      radial-gradient(10% 22px at 34% 88px, rgba(255,255,255,.75), rgba(255,255,255,0) 72%),
+      radial-gradient(16% 34px at 60% 54px, rgba(255,255,255,.9), rgba(255,255,255,0) 72%),
+      radial-gradient(11% 24px at 84% 100px, rgba(255,255,255,.7), rgba(255,255,255,0) 72%);
+    animation:kimi-sky 70s linear infinite; }
+  @keyframes kimi-sky{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce){ :root[data-fx="new"] .is-scene-kimi .evm-fest::after{ animation:none; } }
   /* Fame's Airline Fanmeet: the airline's own look — sky and cloud, an airmail stripe along the top, white planes crossing — in either mode */
   .modal-glass-card.is-postered.is-scene-airline, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-airline,
   .ev-card.is-themed.is-scene-airline, :root[data-theme="dark"] .ev-card.is-themed.is-scene-airline,
@@ -5078,7 +5108,21 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     color:var(--fest-ink); opacity:.72;
   }
   .evm-fest-sub.is-long{ font-size:11.5px; letter-spacing:.16em; text-indent:.16em; padding:0 8px; line-height:1.5; }
-  .evm-fest.is-play :is(.evm-fest-word, .evm-fest-img){ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
+  .evm-fest.is-play :is(.evm-fest-word, .evm-fest-img, .evm-fest-song){ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
+  .evm-fest.is-play .evm-fest-imgw .evm-fest-img{ animation:none; }
+  .evm-fest.is-play .evm-fest-imgw{ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
+  /* a logo with its own shine: a soft band of light crosses it as it opens and now and then after */
+  .evm-fest-imgw{ position:relative; display:block; width:min(290px, 80%); margin:4px auto 8px; }
+  .evm-fest-imgw .evm-fest-img{ width:100%; margin:0; transform:none; }
+  .evm-fest-imgw.is-screen{ width:min(320px, 88%); mix-blend-mode:screen; }
+  .evm-fest-imgw.is-screen .evm-fest-img{ -webkit-mask:radial-gradient(closest-side, #000 72%, transparent); mask:radial-gradient(closest-side, #000 72%, transparent); }
+  .evm-glint{ position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen;
+    -webkit-mask:var(--logo) center/contain no-repeat; mask:var(--logo) center/contain no-repeat;
+    background:linear-gradient(105deg, transparent 42%, rgba(255,246,220,.95) 50%, transparent 58%) 160% 0 / 300% 100% no-repeat; }
+  .evm-fest.is-play .evm-glint{ animation:fest-glint 9s 1.3s ease-in-out infinite; }
+  @keyframes fest-glint{ 0%{ background-position:160% 0; } 16%, 100%{ background-position:-60% 0; } }
+  /* the single's lettering, in the olive ink of its posters */
+  .evm-fest-song{ width:min(260px, 74%); margin:2px auto 4px; color:var(--fest-ink); }
   .evm-fest.is-play .evm-fest-sub{ animation:fest-sub .8s .9s cubic-bezier(.2,.8,.2,1) both; }
   .evm-fest.is-play .evm-fest-face{ animation:qz-pop .55s cubic-bezier(.2,.9,.3,1.3) both; }
   .evm-fest.is-play .evm-fest-face:nth-child(1){ animation-delay:1.05s; } .evm-fest.is-play .evm-fest-face:nth-child(2){ animation-delay:1.15s; }
@@ -6225,6 +6269,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     var t; try{ localStorage.removeItem('48thdb-theme'); t = sessionStorage.getItem('48thdb-theme'); }catch(e){}
     if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t;
+  })();
+  /* a preview of the events dressed like Shock Me Girls, only on a device that opened ?fx=new (?fx=off ends it) */
+  (function(){
+    var m = location.search.match(/[?&]fx=(new|off)\b/), u;
+    try{ if(m) localStorage.setItem('48thdb-fx', m[1]); u = localStorage.getItem('48thdb-fx'); }catch(e){}
+    if(u === 'new') document.documentElement.dataset.fx = 'new';
   })();
 </script>
 </head>
@@ -12935,7 +12985,7 @@ function renderEventCard(ev, todayIso){
         width="${ev.poster.w || 1200}" height="${ev.poster.h || 1200}" onerror="this.onerror=null;this.src='${escapeAttr(img)}'">
     </div>` : '';
   return `
-  <article class="ev-card${isNow?' is-now':''}${done?' is-done':''}${ev.cancelled?' is-cancelled':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}${ev.poster&&ev.poster.scene?` is-scene-${ev.poster.scene}`:''}${img?' has-poster':''}" style="--c:${accent}${theme}"
+  <article class="ev-card${isNow?' is-now':''}${done?' is-done':''}${ev.cancelled?' is-cancelled':''}${hasMore?' is-openable':''}${ev.poster?' is-themed':''}${ev.poster&&evScene(ev)?` is-scene-${evScene(ev)}`:''}${img?' has-poster':''}" style="--c:${accent}${theme}"
     ${hasMore ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     ${poster}
     <div class="ev-date">
@@ -13042,7 +13092,7 @@ function renderTodayHero(ev, todayIso){
   if(rota && rota.current) people.sort((a, b) => rota.current.members.includes(b.id) - rota.current.members.includes(a.id));
   const open = eventHasMore(ev);
   return `
-  <article class="today-hero${open ? ' is-openable' : ''}${ev.poster ? ' is-themed' : ''}${ev.poster && ev.poster.scene ? ` is-scene-${ev.poster.scene}` : ''}" style="--c:${accent}${ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : ''}"
+  <article class="today-hero${open ? ' is-openable' : ''}${ev.poster ? ' is-themed' : ''}${ev.poster && evScene(ev) ? ` is-scene-${evScene(ev)}` : ''}" style="--c:${accent}${ev.poster ? `; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}` : ''}"
     ${open ? `data-action="open-event" data-id="${ev.id}"` : ''}>
     <div class="today-hero-top">
       <div class="today-hero-body">
@@ -13199,9 +13249,24 @@ function renderFestBunting(){
 let _festTk = false;
 const festTypekit = () => { if(_festTk || typeof document === 'undefined') return; _festTk = true;
   const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://use.typekit.net/umx5wsc.css'; document.head.appendChild(l); };
+/* Dressed like Shock Me Girls: the release's own lettering on the banner and the sheet in its
+   artwork's colours, moving only a little — a preview behind ?fx=new for now. The single's
+   roadshows and pop-ups wear its sky; Journey of Dreams its gold logo, cut from the poster. */
+const fxNew = () => document.documentElement.dataset.fx === 'new';
+function evScene(ev){
+  if(fxNew() && ev.logo === 'kimi' && /Roadshow|Pop Up Live/i.test(ev.title || '')) return 'kimi';
+  return (ev.poster && ev.poster.scene) || '';
+}
+const FX2_EVENT = {
+  // the poster's own crop of the logo, its black melting into the banner (screen), so the gold keeps the poster's
+  // edges; the cut-out (Adobe) only shapes the shine that crosses it
+  'ev-concert-2026': { img:'logos/journey-of-dreams-art.jpg', shape:'logos/journey-of-dreams.png', sub:'CONCERT', glint:true, blend:true },
+};
 function renderEventBanner(ev){
-  const own = { ...(FEST_EVENT[ev.id] || {}), ...(ev.fest || {}) };
-  const k = festKind(ev), K = { ...FEST_KINDS[k], ...own }, en = isEN();
+  const k = festKind(ev);
+  const dress = !fxNew() ? {} : FX2_EVENT[ev.id] || (evScene(ev) === 'kimi' ? { song:'kimi', fx:'', sub:k === 'popup' ? 'POP UP LIVE' : 'ROADSHOW' } : {});
+  const own = { ...(FEST_EVENT[ev.id] || {}), ...(ev.fest || {}), ...dress };
+  const K = { ...FEST_KINDS[k], ...own }, en = isEN();
   if(k === 'roadshow') festTypekit();
   const sub = own.sub != null ? own.sub : (k === 'birthday' || k === 'tee' ? K.sub : festRelease(ev) || K.sub);
   // who is on: the birthday girls; else the line-up, the viewer's oshi first
@@ -13223,7 +13288,10 @@ function renderEventBanner(ev){
     ${K.fx === 'bunting' ? renderFestBunting() : ''}
     ${K.fx === 'moon' ? '<span class="evm-fest-moon" aria-hidden="true"></span><span class="evm-fest-drip" aria-hidden="true"></span>' : ''}
     <span class="evm-fest-deco" aria-hidden="true">${renderFestDeco(K.motif)}</span>
-    ${K.img ? `<img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">` : `<span class="evm-fest-word" data-noloc>${escapeHtml(K.word)}</span>`}
+    ${K.img && K.glint ? `<span class="evm-fest-imgw${K.blend ? ' is-screen' : ''}" style="--logo:url('${escapeAttr(K.shape || K.img)}')"><img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async"><i class="evm-glint" aria-hidden="true"></i></span>`
+      : K.img ? `<img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">`
+      : K.song ? renderSongLogo(K.song, 'evm-fest-song')
+      : `<span class="evm-fest-word" data-noloc>${escapeHtml(K.word)}</span>`}
     ${sub ? `<span class="evm-fest-sub${long ? ' is-long' : ''}" data-noloc>${escapeHtml(sub)}</span>` : ''}
     ${faces}
   </div>`;
@@ -18248,7 +18316,7 @@ function renderEventModal(){
   if(wantsGrad && !POSTER_GRADS) posterGrads();
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&ev.poster.scene?` is-scene-${ev.poster.scene}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}${grad?' has-grad':''}${ev.lanePlan?' has-lanes':''}"${wantsGrad && !grad ? ` data-grad-src="${escapeAttr(ev.poster.img)}"` : ''} data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}${grad?`; --sheet-grad:${grad.light}; --sheet-grad-d:${grad.dark}`:''}">
+    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&evScene(ev)?` is-scene-${evScene(ev)}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}${grad?' has-grad':''}${ev.lanePlan?' has-lanes':''}"${wantsGrad && !grad ? ` data-grad-src="${escapeAttr(ev.poster.img)}"` : ''} data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}${grad?`; --sheet-grad:${grad.light}; --sheet-grad-d:${grad.dark}`:''}">
       <button class="modal-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
