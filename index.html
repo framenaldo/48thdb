@@ -3944,7 +3944,32 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .set-seg button{ display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; border:0; border-radius:11px; font:inherit; font-size:13px; font-weight:700;
     color:var(--ink-soft); background:none; cursor:pointer; } .set-seg svg{ width:15px; height:15px; }
   .set-seg button.is-on{ background:var(--card); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.12); cursor:default; }
-  .filter-bar > .btn-add{ order:-1; }
+  .filter-bar.mb-bar{ flex-direction:column; flex-wrap:nowrap; align-items:stretch; gap:10px; }
+  .mb-row{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .mb-chips{ display:flex; gap:8px; flex:1 1 auto; min-width:0; overflow-x:auto; scrollbar-width:none; padding:2px 1px; }
+  .mb-chips::-webkit-scrollbar{ display:none; }
+  .mb-chips .pill{ flex:none; white-space:nowrap; padding:7px 15px; }
+  .mb-add{ flex:none; padding:8px 16px; font-size:13px; box-shadow:0 2px 8px rgba(192,138,46,.28); }
+  .mb-tools{ padding:6px; border-radius:16px; background:var(--paper-dim); border:1px solid var(--line); }
+  .mb-tools .pill{ flex:none; white-space:nowrap; background:var(--card); border:1px solid var(--line); padding:6px 14px; }
+  .mb-tools .pill.adv-on{ background:var(--ink); color:var(--paper); border-color:transparent; }
+  .mb-tools select.filter-select{ flex:1 1 0; min-width:0; text-overflow:ellipsis; }
+  .mb-tools .count-tag{ flex:none; margin-left:2px; padding:0 6px; font-weight:600; white-space:nowrap; }
+  .mb-active{ flex-wrap:wrap; }
+  .mb-active .gen-filter-chip{ margin-left:0; }
+  @media (max-width:560px){
+    .mb-add-t{ display:none; }
+    .mb-add{ width:38px; height:38px; padding:0; font-size:22px; line-height:1; display:flex; align-items:center; justify-content:center; }
+    .mb-chips{ gap:5px; padding-right:6px; }
+    .mb-chips .pill{ padding:7px 8px; font-size:12.5px; }
+    .mb-chips .pill-grad{ gap:4px; }
+    .mb-chips .pill-grad .grad-cap{ width:13px; height:13px; }
+    .mb-add{ margin-left:-2px; }
+  }
+  @media (min-width:700px){
+    .mb-tools{ align-self:flex-start; }
+    .mb-tools select.filter-select{ flex:0 0 auto; min-width:130px; }
+  }
   /* the home page's dashboard: the results as a square, four small tiles beside it */
   .dash{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; }
   .dash > button{ font:inherit; text-align:left; cursor:pointer; border-radius:18px; transition:transform .12s ease, box-shadow .12s ease; }
@@ -19109,24 +19134,32 @@ function renderBrowse(){
   const teamsAvailable = state.groupFilter==='all' ? TEAMS : getTeamsForGroup(state.groupFilter);
   return `
   ${renderMembersTabs()}
-  <div class="filter-bar">
-    <button class="btn-add" data-action="add-new">+ เพิ่มสมาชิก</button>
-    ${renderGroupPills()}
-    ${renderGraduatedPill()}
-    ${(()=>{ const n=activeAdvCount();
-      return `<button class="pill ${n?'adv-on':''}" data-action="toggle-adv">ตัวกรอง${n?' · '+n:''}</button>`; })()}
-    <select class="filter-select" id="team-filter">
-      <option value="all">ทุกทีม</option>
-      ${teamsAvailable.map(t=>`<option value="${t.id}" ${state.teamFilter===t.id?'selected':''}>${t.name}</option>`).join('')}
-    </select>
-    <select class="filter-select" id="sort-filter">
-      <option value="name" ${state.sortBy==='name'?'selected':''}>เรียงตามชื่อ</option>
-      <option value="age" ${state.sortBy==='age'?'selected':''}>เรียงตามอายุ</option>
-      <option value="gen" ${state.sortBy==='gen'?'selected':''}>เรียงตามรุ่น</option>
-    </select>
-    <span class="count-tag">${list.length} คน</span>
-    ${state.genFilter!=='all' ? `<button class="gen-filter-chip" data-action="clear-gen-filter">รุ่น ${state.genFilter} \u2715</button>` : ''}
-    ${state.captainFilter!=='all' ? `<button class="gen-filter-chip" data-action="clear-gen-filter">${CAPTAIN_LABELS[state.captainFilter]} \u2715</button>` : ''}
+  <div class="filter-bar mb-bar">
+    <div class="mb-row">
+      <div class="mb-chips">
+        ${renderGroupPills()}
+        ${renderGraduatedPill()}
+      </div>
+      <button class="btn-add mb-add" data-action="add-new" aria-label="เพิ่มสมาชิก">+<span class="mb-add-t"> เพิ่มสมาชิก</span></button>
+    </div>
+    <div class="mb-row mb-tools">
+      ${(()=>{ const n=activeAdvCount();
+        return `<button class="pill mb-adv ${n?'adv-on':''}" data-action="toggle-adv">ตัวกรอง${n?' · '+n:''}</button>`; })()}
+      <select class="filter-select" id="team-filter">
+        <option value="all">ทุกทีม</option>
+        ${teamsAvailable.map(t=>`<option value="${t.id}" ${state.teamFilter===t.id?'selected':''}>${t.name}</option>`).join('')}
+      </select>
+      <select class="filter-select" id="sort-filter">
+        <option value="name" ${state.sortBy==='name'?'selected':''}>เรียงตามชื่อ</option>
+        <option value="age" ${state.sortBy==='age'?'selected':''}>เรียงตามอายุ</option>
+        <option value="gen" ${state.sortBy==='gen'?'selected':''}>เรียงตามรุ่น</option>
+      </select>
+      <span class="count-tag">${list.length} คน</span>
+    </div>
+    ${(state.genFilter!=='all' || state.captainFilter!=='all') ? `<div class="mb-row mb-active">
+      ${state.genFilter!=='all' ? `<button class="gen-filter-chip" data-action="clear-gen-filter">รุ่น ${state.genFilter} \u2715</button>` : ''}
+      ${state.captainFilter!=='all' ? `<button class="gen-filter-chip" data-action="clear-gen-filter">${CAPTAIN_LABELS[state.captainFilter]} \u2715</button>` : ''}
+    </div>` : ''}
   </div>
   ${renderAdvFilters()}
   ${state.showGraduated ? `<div class="grad-note"><span class="grad-cap">${ICONS.cap}</span>สมาชิกที่จบการศึกษาไปแล้ว — ไม่แสดงในรายชื่อหลัก แต่ค้นหาเจอได้ตลอด</div>` : ''}
