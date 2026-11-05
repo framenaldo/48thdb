@@ -661,11 +661,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --sheet-bg:#F5F9FB; --sheet-ink:#3B3826; --pc:#5E5A3A;
     --ink:#3B3826; --ink-soft:#6B6650; --paper:#FFFFFF; --paper-dim:#EEF5F8; --card:#FFFFFF; --glass-card:#FFFFFF;
     --glass-edge:rgba(94,90,58,.28); --line:rgba(94,90,58,.16); --c-text:#5E5A3A;
-    background:
-      radial-gradient(38% 34px at 18% 46px, rgba(255,255,255,.95), rgba(255,255,255,0) 72%),
-      radial-gradient(30% 26px at 70% 30px, rgba(255,255,255,.85), rgba(255,255,255,0) 72%),
-      radial-gradient(44% 40px at 92% 96px, rgba(255,255,255,.8), rgba(255,255,255,0) 72%),
-      linear-gradient(180deg, #93C6EA 0, #BFDDF2 120px, #E8F3FA 260px, #FFFFFF 420px, #FFFFFF 78%, #EEF3DA 93%, #D3DFA8 100%);
+    background:linear-gradient(180deg, #93C6EA 0, #BFDDF2 120px, #E8F3FA 260px, #FFFFFF 420px, #FFFFFF 78%, #EEF3DA 93%, #D3DFA8 100%);
     color:var(--ink); border:1px solid rgba(94,90,58,.32); box-shadow:0 6px 20px rgba(70,120,160,.2); }
   :root[data-fx="new"] .is-scene-kimi .evm-fest::before{ display:none; }
   :root[data-fx="new"] .is-scene-kimi .evm-fest, :root[data-theme="dark"][data-fx="new"] .is-scene-kimi .evm-fest{ --fest-a:#BFDDF2; --fest-b:#FFFFFF; --fest-ink:#4F4A2E; }
@@ -676,7 +672,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-fx="new"] .is-scene-kimi :is(.ev-open, .today-hero-open){ color:var(--c-text); }
   :root[data-theme="dark"][data-fx="new"] .is-scene-kimi :is(.evm-price, .evm-logo, .slot-date, .ev-starts){ color:var(--ink); }
   /* its clouds drift across the top of the banner, slowly */
-  :root[data-fx="new"] .is-scene-kimi .evm-fest::after{ content:''; position:absolute; z-index:-1; top:0; left:0; width:200%; height:170px; pointer-events:none;
+  html:root[data-fx="new"] .modal-glass-card.is-postered.is-scene-kimi{ isolation:isolate; }
+  :root[data-fx="new"] .modal-glass-card.is-postered.is-scene-kimi::after{ content:''; position:absolute; z-index:-1; top:0; left:0; width:200%; height:190px; pointer-events:none;
     background:
       radial-gradient(22% 30px at 24% 46px, rgba(255,255,255,.85), rgba(255,255,255,0) 100%),
       radial-gradient(18% 24px at 72% 98px, rgba(255,255,255,.7), rgba(255,255,255,0) 100%);
@@ -684,7 +681,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     -webkit-mask:linear-gradient(180deg, #000 60%, transparent); mask:linear-gradient(180deg, #000 60%, transparent);
     animation:kimi-sky 80s linear infinite; will-change:transform; }
   @keyframes kimi-sky{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
-  @media (prefers-reduced-motion: reduce){ :root[data-fx="new"] .is-scene-kimi .evm-fest::after{ animation:none; } }
+  @media (prefers-reduced-motion: reduce){ :root[data-fx="new"] .modal-glass-card.is-scene-kimi::after{ animation:none !important; } }
   /* Fame's Airline Fanmeet: the airline's own look — sky and cloud, an airmail stripe along the top, white planes crossing — in either mode */
   .modal-glass-card.is-postered.is-scene-airline, :root[data-theme="dark"] .modal-glass-card.is-postered.is-scene-airline,
   .ev-card.is-themed.is-scene-airline, :root[data-theme="dark"] .ev-card.is-themed.is-scene-airline,
