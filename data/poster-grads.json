@@ -154,5 +154,9 @@
  "posters/ruamnamjai-16.jpg": {
   "light": "linear-gradient(180deg, hsl(57 19% 91%) 0%, hsl(64 21% 87%) 17%, hsl(85 8% 89%) 33%, hsl(186 51% 86%) 50%, hsl(18 17% 88%) 67%, hsl(57 15% 88%) 83%, hsl(86 33% 92%) 100%)",
   "dark": "linear-gradient(180deg, hsl(57 13% 18%) 0%, hsl(64 14% 17%) 17%, hsl(85 5% 18%) 33%, hsl(186 35% 16%) 50%, hsl(18 12% 17%) 67%, hsl(57 11% 17%) 83%, hsl(86 23% 19%) 100%)"
+ },
+ "posters/shock-me-girls-x-takeover.jpg": {
+  "light": "linear-gradient(180deg, hsl(317 40% 93%) 0%, hsl(318 47% 92%) 17%, hsl(319 46% 92%) 33%, hsl(320 41% 92%) 50%, hsl(317 30% 92%) 67%, hsl(319 49% 91%) 83%, hsl(319 52% 92%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(317 28% 20%) 0%, hsl(318 33% 19%) 17%, hsl(319 32% 19%) 33%, hsl(320 29% 19%) 50%, hsl(317 21% 19%) 67%, hsl(319 35% 18%) 83%, hsl(319 35% 19%) 100%)"
  }
 }

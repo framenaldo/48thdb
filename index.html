@@ -2355,6 +2355,24 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     background:linear-gradient(color-mix(in srgb, var(--b) 10%, var(--card)), color-mix(in srgb, var(--b) 10%, var(--card))), var(--card); }
   .rt-h em{ color:var(--b); }
   @media (prefers-reduced-motion:reduce){ .rt-row.is-now::before{ animation:none; } }
+  /* an X account taken over: one card an evening, and a black pill to the account */
+  .xt-row{ display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:6px; margin:4px 0 12px; }
+  .xt-card{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:5px 4px 7px; border:1.5px solid var(--line); border-radius:14px; background:var(--card); font:inherit; color:var(--ink); cursor:pointer; min-width:0; position:relative; box-shadow:0 2px 0 var(--line); transition:transform .12s; }
+  .xt-card:active{ transform:translateY(2px); box-shadow:none; }
+  .xt-ph{ width:100%; aspect-ratio:4 / 5; border-radius:10px; overflow:hidden; background:var(--c); margin-bottom:3px; }
+  .xt-ph img{ width:100%; height:100%; object-fit:cover; object-position:50% 18%; display:block; }
+  .xt-card b{ font-size:12px; font-weight:800; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .xt-card small{ font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .xt-card em{ position:absolute; top:-8px; left:50%; transform:translateX(-50%); font-style:normal; font-size:9.5px; font-weight:800; white-space:nowrap; padding:2px 7px; border-radius:999px; background:#E85BC6; color:#fff; }
+  .xt-card.is-now{ border-color:#E85BC6; box-shadow:0 0 0 2px #E85BC6; }
+  .xt-card.is-next{ border-color:#E85BC6; }
+  .xt-card.is-done{ opacity:.45; }
+  .x-follow{ display:flex; align-items:center; gap:11px; padding:10px 16px 10px 10px; border-radius:999px; background:#0F0F10; color:#fff; text-decoration:none; box-shadow:0 3px 0 #000, 0 6px 16px rgba(0,0,0,.18); transition:transform .12s, box-shadow .12s; margin:0 0 6px; }
+  .x-follow:active{ transform:translateY(3px); box-shadow:0 0 0 #000, 0 2px 6px rgba(0,0,0,.18); }
+  .x-follow img{ width:34px; height:34px; border-radius:10px; box-shadow:0 0 0 1px rgba(255,255,255,.25); }
+  .x-follow span{ display:flex; flex-direction:column; line-height:1.2; flex:1; min-width:0; }
+  .x-follow b{ font-size:15px; } .x-follow small{ font-size:11.5px; opacity:.7; }
+  .x-follow i{ font-style:normal; font-size:18px; opacity:.8; }
   .rt-g{ display:grid; grid-template-columns:repeat(auto-fill, minmax(52px, 1fr)); gap:5px; }
   .rt-f{ position:relative; aspect-ratio:4 / 5; padding:0; border:0; border-radius:11px; overflow:hidden; cursor:pointer; background:var(--c); font:inherit; color:#fff; box-shadow:inset 0 -3px 0 var(--c); -webkit-tap-highlight-color:transparent; }
   .rt-f img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 18%; }
@@ -7977,6 +7995,17 @@ const SEED_SCHEDULE = [
       'Zone 3 โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้',
       'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก',
       'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
+  { id:'ev-shock-me-girls-x-takeover', start:'2026-11-06', end:'2026-11-10', time:'19:00', until:'20:00',
+    title:'SHOCK ME GIRLS: X TAKEOVER', short:'X Takeover',
+    online:'X @SHOCKMEGIRLS', groups:['bnk48'],
+    poster:{ accent:'#E85BC6', surface:'#FFFFFF', ink:'#2B1B2E', scene:'paper', img:'posters/shock-me-girls-x-takeover.jpg', w:1638, h:2048 },
+    members:['bnk-janry','bnk-marine','bnk-praew','bnk-monet','bnk-sindy'],
+    // not an event to go to: each evening one of the series' cast posts from the series' own X account
+    takeover:{ handle:'SHOCKMEGIRLS', url:'https://x.com/SHOCKMEGIRLS', a:'19:00', b:'20:00',
+      days:[{ d:'2026-11-06', id:'bnk-janry' }, { d:'2026-11-07', id:'bnk-marine' }, { d:'2026-11-08', id:'bnk-praew' },
+        { d:'2026-11-09', id:'bnk-monet' }, { d:'2026-11-10', id:'bnk-sindy' }] },
+    info:['นักแสดง Shock Me Girls ผลัดกันเข้ามาเล่นบัญชี X ของซีรีส์วันละคน ช่วง 19:00–20:00'],
+    related:['ev-shock-me-girls-orientation'] },
   { id:'ev-shock-me-girls-orientation', start:'2026-11-20', time:'10:00', until:'20:15',
     sales:{ from:'2026-10-31T12:00', to:'2026-11-19T12:00' },
     title:'SHOCK ME GIRLS: SEMESTER 2 ORIENTATION DAY',
@@ -13029,6 +13058,7 @@ const FEST_EVENT = {
   'ev-anotherdot-1104': { word:'AnotherDot', sub:'BNK48 · PRESS LAUNCH', motif:'sparkles', pal:'sky' },
   'ev-mbk-haunted-graveyard-1020': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-mbk-haunted-graveyard-1026': { word:'ป่าช้าสยองขวัญ', sub:'MBK CENTER · THE HAUNTED GRAVEYARD', motif:'spooky', fx:'moon', pal:'blood', own:true },
+  'ev-shock-me-girls-x-takeover': { word:'X Takeover', sub:'X TAKEOVER · 7–8 PM', motif:'bolts', img:'logos/shock-me-girls.png' },
   'ev-shock-me-girls-orientation': { word:'Shock Me Girls', sub:'SEMESTER 2 · ORIENTATION DAY', motif:'bolts', img:'logos/shock-me-girls.png' },
   'ev-cgm48-popup-halloween-ontour-1020': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-cgm48-popup-halloween-ontour-1027': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
@@ -15743,6 +15773,7 @@ function bindGEAdmin(){
 const EV_ICONS = {
   token:     '<img src="posters/ge6-token.png" width="196" height="196" alt="" decoding="async">',
   myo:       '<img src="logos/myo.svg" width="100" height="100" alt="" decoding="async">',
+  xlogo:     '<img src="logos/x.svg" width="100" height="100" alt="" decoding="async">',
   trophy:    '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22"/><path d="M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
   mic:       '<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4M9 21h6"/>',
   handshake: '<path d="m11 17 1.6 1.6a1.4 1.4 0 0 0 2-2"/><path d="m13.6 14.4 2.4 2.4a1.4 1.4 0 0 0 2-2l-3.7-3.7a2.8 2.8 0 0 0-4 0l-.8.8a1.4 1.4 0 1 1-2-2L10.2 7a5.5 5.5 0 0 1 6.7-.8l.4.2a2 2 0 0 0 1.3.3L21 6.4"/><path d="M3 6.4 2.2 14l6 6a1.4 1.4 0 0 0 2-2"/><path d="M3 5.6h7"/>',
@@ -15761,6 +15792,7 @@ const EV_ICONS = {
 /* Which face belongs to which outing. Anything without one falls back to its
    tag or its theme, and otherwise simply has none. */
 const EVENT_ICON = {
+  'ev-shock-me-girls-x-takeover':'xlogo',
   'ev-election-voting':'token', 'ev-election-results':'trophy', 'ev-election-fanfest':'sparkles',
   'ev-ge6-single':'disc', 'ev-ge6-photoset':'photos', 'ev-ge6-handshake':'handshake',
   'ev-ge6-myo1':'myo', 'ev-ge6-myo2':'myo', 'ev-concert-2026':'mic', 'ev-ge6-live-talk-1026':'live', 'ev-ge6-heart':'heart',
@@ -17977,6 +18009,23 @@ const rotaTile = id => { const m = getMember(id); if(!m) return ''; const g = ge
 const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.day;
   root.querySelectorAll('.rt-row').forEach(r => { r.hidden = !((!d || r.dataset.d === d) && (k === 'all' || r.dataset.k === k || (k === 'oshi' && r.dataset.oshi === '1'))); }); };
 const rotaTiles = ids => `<div class="rt-g">${ids.map(rotaTile).join('')}</div>`;
+/* A takeover of an X account: who posts each evening, today's lit, and the way to the account itself */
+function renderTakeover(ev){
+  const T = ev.takeover, en = isEN(), iso = toYmd(todayStart()), now = Date.now();
+  const at = (hm, day) => { const d = parseYmd(day); const [h, m] = hm.split(':').map(Number); d.setHours(h, m, 0, 0); return d.getTime(); };
+  const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  const next = T.days.find(x => at(T.b, x.d) > now);
+  const cards = T.days.map(x => { const m = getMember(x.id); if(!m) return ''; const g = getGroup(m.groupId), day = parseYmd(x.d);
+    const done = at(T.b, x.d) <= now, on = !done && at(T.a, x.d) <= now, isNext = !on && next === x;
+    return `<button class="xt-card${done ? ' is-done' : ''}${on ? ' is-now' : ''}${isNext ? ' is-next' : ''}" data-action="open-member" data-id="${m.id}" style="--c:${g.color}">
+      <span class="xt-ph">${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}</span>
+      <b data-noloc>${escapeHtml(nickName(m))}</b><small>${WD[day.getDay()]} ${day.getDate()} ${M[day.getMonth()]}</small>
+      ${on ? `<em>${en ? 'On now' : 'กำลังเล่นอยู่'}</em>` : isNext ? `<em>${x.d === iso ? (en ? 'Tonight' : 'คืนนี้') : (en ? 'Next' : 'คนถัดไป')}</em>` : ''}</button>`; }).join('');
+  return `<h3 class="evm-head">${en ? 'Who posts when' : 'ใครเล่นวันไหน'} <small class="rt-where">${T.a}–${T.b}</small></h3>
+    <div class="xt-row">${cards}</div>
+    <a class="x-follow" href="${escapeAttr(T.url)}" target="_blank" rel="noopener noreferrer">
+      <img src="logos/x.svg" width="28" height="28" alt="" decoding="async"><span><b>@${escapeHtml(T.handle)}</b><small>${en ? 'Open on X' : 'เปิดบัญชีบน X'}</small></span><i aria-hidden="true">↗</i></a>`;
+}
 function renderRota(ev){
   const R = ev.rota, en = isEN(), iso = toYmd(todayStart()), now = Date.now();
   const days = [...new Set(R.rounds.map(r => r.d || R.day))].sort(), pick = days.includes(iso) ? iso : days.find(d => d > iso) || days[0];
@@ -18185,6 +18234,7 @@ function renderEventModal(){
         ${renderSchedule(ev)}` : ''}
 
         ${ev.rota ? renderRota(ev) : ''}
+        ${ev.takeover ? renderTakeover(ev) : ''}
 
         ${ev.setlist && !slFolds(ev) ? renderSetlist(ev, true) : ''}
 
