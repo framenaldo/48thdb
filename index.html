@@ -14199,7 +14199,8 @@ function renderHomeDash(ge){
   const tile = (attrs, cls, icon, big, label, small) => `<button class="dash-t ${cls}" ${attrs}>
       <span class="dash-i">${icon}</span><b class="dash-big">${big}</b><span class="dash-l">${label}${small ? `<small>${small}</small>` : ''}</span></button>`;
   // a poster in a tile is a slide: tapping it opens that event; the strip swipes sideways, the dots follow
-  const dashSlide = (e, label) => `<span class="dash-sl" data-action="open-event" data-id="${escapeAttr(e.id)}"><img src="${escapeAttr(e.poster.img.replace(/\.[a-z]+$/i, '-s.jpg'))}" alt="" loading="lazy" decoding="async"><small>${label}</small></span>`;
+  // a calendar slide opens its event; a shop slide (go=false) leaves the tap to the tile, which opens the shop page (the owner's word, 5 Nov)
+  const dashSlide = (e, label, go = true) => `<span class="dash-sl"${go ? ` data-action="open-event" data-id="${escapeAttr(e.id)}"` : ''}><img src="${escapeAttr(e.poster.img.replace(/\.[a-z]+$/i, '-s.jpg'))}" alt="" loading="lazy" decoding="async"><small>${label}</small></span>`;
   // the slides sit one over the other and fade, one after another; a tap opens the one showing (dashTick)
   const dashStrip = slides => `<span class="dash-strip" data-n="${slides.length}">${slides.map((h, k) => k ? h : h.replace('class="dash-sl"', 'class="dash-sl on"')).join('')}</span>`;
   const dashDots = n => `<span class="dash-dots" aria-hidden="true">${Array.from({ length:n }, (_, k) => `<i${k ? '' : ' class="on"'}></i>`).join('')}</span>`;
@@ -14260,7 +14261,7 @@ function renderHomeDash(ge){
       : `<button class="dash-t is-cal" data-tile="${sl}" data-kind="cal" data-action="nav" data-view="calendar"><span class="dash-cal-h">${WD[d.getUTCDay()]} ${d.getUTCDate()} ${M[d.getUTCMonth()]}</span>
       <b class="dash-big">${week}</b><span class="dash-l">${en ? 'events' : 'งาน'}<small>${en ? 'next 7 days' : 'ใน 7 วันนี้'}</small></span></button>`,
     shop: sl => shopPics.length ? `<button class="dash-t is-shop is-pic" data-tile="${sl}" data-kind="shop" data-action="nav-shop">
-      ${dashStrip(shopPics.map(e => dashSlide(e, `${en ? 'until' : 'ปิด'} ${+String(e.shop.to).slice(8, 10)} ${M[+String(e.shop.to).slice(5, 7) - 1]}`)))}
+      ${dashStrip(shopPics.map(e => dashSlide(e, `${en ? 'until' : 'ปิด'} ${+String(e.shop.to).slice(8, 10)} ${M[+String(e.shop.to).slice(5, 7) - 1]}`, false)))}
       <span class="dash-badge" data-action="nav-shop">${en ? 'Shop' : 'ร้านค้า'}${shops > 1 ? ` · ${shops}` : ''}</span>${shopPics.length > 1 ? dashDots(shopPics.length) : ''}</button>`
       : tile(`data-tile="${sl}" data-kind="shop" data-action="nav-shop"`, 'is-shop', ICONS.shop, shops || '–', en ? 'Shop' : 'ร้านค้า', shops ? (en ? 'open now' : 'ร้านเปิดอยู่') : (en ? 'none open' : 'ยังไม่มีร้านเปิด')),
     gal: sl => `<button class="dash-t is-gal" data-tile="${sl}" data-kind="gal" data-action="nav-gallery">${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
