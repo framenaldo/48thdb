@@ -6315,7 +6315,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-call b{ display:block; font-size:13px; } .meow-call small{ display:block; font-size:11px; color:var(--ink-soft); }
   .meow-poked{ animation:meowPoke .6s ease-out; transform-origin:50% 100%; }
   @keyframes meowPoke{ 0%{ transform:none; } 20%{ transform:rotate(-7deg) translateX(-2px); } 45%{ transform:rotate(5deg) translateX(2px); } 70%{ transform:rotate(-2deg); } 100%{ transform:none; } }
-  .meow-toy{ position:absolute; left:0; top:0; padding:0; border:0; background:none; cursor:pointer; pointer-events:auto; -webkit-tap-highlight-color:transparent; }
+  .meow-toy{ position:absolute; left:0; top:0; padding:0; border:0; background:none; cursor:grab; pointer-events:auto; touch-action:none; -webkit-tap-highlight-color:transparent; }
+  .meow-toy.is-drag{ cursor:grabbing; z-index:2; filter:drop-shadow(0 6px 4px rgba(0,0,0,.35)); }
   .meow-toy canvas{ display:block; image-rendering:pixelated; }
   .meow-traits{ display:flex; flex-wrap:wrap; gap:4px 10px; margin:-4px 0 8px; font-size:12px; color:var(--ink-soft); }
   .meow-traits span{ white-space:nowrap; }
@@ -29276,7 +29277,9 @@ function meowDo(a, w){
 const MEOW_TOYS = [['ball', 'บอล', 'Ball'], ['mouse', 'หนูของเล่น', 'Toy mouse'], ['box', 'กล่อง', 'Box'], ['bed', 'เบาะนอน', 'Cushion'], ['nip', 'กัญชาแมว', 'Catnip']];
 let _meowToyEls = [], _meowPlacing = '', _meowTray = null;
 function meowToysHere(){ return ((_meow && _meow.toys) || []).filter(o => o.page === state.view); }
+let _meowToyDragging = null;
 function meowToysPaint(){
+  if(_meowToyDragging) return;   // not while one is in the reader's hand: the redraw would drop it
   _meowToyEls.forEach(el => el.remove()); _meowToyEls = [];
   if(!_meowPage || !_meow || !_meow.pet || _meow.home || !meowHere()) return;
   const docH = document.documentElement.scrollHeight, s = _meowWalk ? _meowWalk.s : 3;
@@ -29291,11 +29294,41 @@ function meowToysPaint(){
     const xx = Math.max(B.l, Math.min(B.r - size, x - size / 2));
     el.style.transform = `translate(${xx.toFixed(0)}px, ${(B.y - size + s * 2).toFixed(0)}px)`;
     el.toy = o; el.L = best; el.xOn = xx - B.l + size / 2;
-    el.addEventListener('click', e => { e.stopPropagation(); const w = _meowWalk;
+    meowToyDrag(el);
+    el.addEventListener('click', e => { e.stopPropagation(); if(el._dragT && performance.now() - el._dragT < 400) return; const w = _meowWalk;
       if(o.k === 'water'){ if(w && w.mode === 'ledge') meowFillBowl(w); return; }   // a tap on the bowl fills it
       if(w && w.mode === 'ledge' && w.awake()){ w.queue = meowToyPlan(w, el); w.next(); } });
     _meowPage.insertBefore(el, _meowPage.firstChild); _meowToyEls.push(el);
   }
+}
+/* a toy or her water bowl can be picked up and put down somewhere else, like her: drag it to the top of another card */
+function meowToyDrag(el){
+  el.addEventListener('pointerdown', e => {
+    if(e.button > 0) return;
+    const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(el.style.transform); if(!m) return;
+    const sx = e.clientX, sy = e.clientY, ox = +m[1], oy = +m[2], size = el.offsetWidth || 36; let drag = false;
+    try{ el.setPointerCapture(e.pointerId); }catch(x){}
+    const move = ev => {
+      if(!drag && Math.hypot(ev.clientX - sx, ev.clientY - sy) < 6) return;
+      if(!drag){ drag = true; _meowToyDragging = el; el.classList.add('is-drag'); }
+      el.style.transform = `translate(${(ox + ev.clientX - sx).toFixed(0)}px, ${(oy + ev.clientY - sy).toFixed(0)}px) scale(1.15)`;
+    };
+    const up = ev => {
+      el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
+      if(!drag) return;
+      _meowToyDragging = null; el._dragT = performance.now(); el.classList.remove('is-drag');
+      const w = _meowWalk, x = ox + ev.clientX - sx + size / 2, y = oy + ev.clientY - sy + size, L = w && w.ledgeUnder(x, y + 20), B = L && meowLedgeBox(L);
+      if(B && ev.type === 'pointerup'){
+        const o = el.toy.k === 'water' ? _meow.bowl : el.toy, docH = document.documentElement.scrollHeight;
+        if(o){ o.fx = x / innerWidth; o.fy = B.y / docH; meowSave(); }
+      }
+      meowToysPaint();   // put down on the card under it, or back where it was
+      // a ball or a mouse that moved catches her eye
+      const k = el.toy.k, nw = _meowToyEls.find(z => z.toy === el.toy || (k === 'water' && z.toy.k === 'water'));
+      if(nw && w && w.mode === 'ledge' && w.awake() && w.act !== 'sleep' && (k === 'ball' || k === 'mouse') && Math.random() < .3 + meowT(w.pet, 'play') * .5){ w.queue = [{ act:'watch', dur:.8, faceX:() => { const q = nw.getBoundingClientRect(); return q.left + q.width / 2 + scrollX; } }, ...meowToyPlan(w, nw)]; w.next(); }
+    };
+    el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  });
 }
 function meowToyPlan(w, el){
   const p = w.pet, o = el.toy, en = isEN(), t = (a, b) => en ? b : a, rx = el.xOn - w.cw / 2, go = { act:'go', L:el.L, rx, spd:1.15 };
