@@ -6315,6 +6315,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-call b{ display:block; font-size:13px; } .meow-call small{ display:block; font-size:11px; color:var(--ink-soft); }
   .meow-toy{ position:absolute; left:0; top:0; padding:0; border:0; background:none; cursor:pointer; pointer-events:auto; -webkit-tap-highlight-color:transparent; }
   .meow-toy canvas{ display:block; image-rendering:pixelated; }
+  .meow-traits{ display:flex; flex-wrap:wrap; gap:4px 10px; margin:-4px 0 8px; font-size:12px; color:var(--ink-soft); }
+  .meow-traits span{ white-space:nowrap; }
   .meow-tray{ position:fixed; left:50%; transform:translateX(-50%); bottom:calc(var(--nav-h, 84px) + 12px); z-index:30; width:min(380px, calc(100% - 24px)); padding:12px 14px 12px;
     border-radius:18px; border:1.5px solid var(--line); background:var(--card); color:var(--ink); box-shadow:0 4px 0 rgba(var(--shadow-rgb),.16); }
   .meow-tray-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; } .meow-tray-h b{ font-size:15px; }
@@ -27999,10 +28001,44 @@ function meowColor(B, ch, x, y, col, g){
 }
 const _meowSpr = new Map();
 // a sprite as a canvas, 24×18 pixels; one canvas per look, reused
-// her build from her weight (wt, 50 = just right): too many meals she did not need make her rounder; play slims her down
-const meowWt = p => p && p.wt != null ? p.wt : 50;
-const meowBuild = p => { const w = meowWt(p); return w >= 85 ? 2 : w >= 68 ? 1 : w < 30 ? -1 : 0; };
-const MEOW_BUILD_NAMES = { '-1':['ผอม', 'Slim'], 0:['หุ่นดี', 'Fit'], 1:['อวบ', 'Chubby'], 2:['อ้วนกลม', 'Round'] };
+/* her body as a real cat's: an ideal weight for her breed and sex (adult kg, female / male, from breed guides; a house cat
+   is about 3.5–4.6), scaled down while she grows, plus the fat she has put on (pet.fat, kg). Food she did not need adds to it at
+   about 7,700 kcal a kilo, so it creeps up over weeks of extra wet treats, not overnight; play and an active nature take it off
+   just as slowly. Her build follows weight against ideal: under 0.88 thin, to 1.1 ideal, to 1.25 a bit heavy, to 1.45 overweight. */
+const MEOW_KG = { _:[3.6, 4.6], persian:[3.8, 4.8], himalayan:[3.8, 4.8], mainecoon:[5, 7], ragdoll:[5, 7], british:[4.3, 6], russian:[3.5, 4.8], siamese:[3.2, 4.3],
+  khaomanee:[3.2, 4.2], korat:[3, 4.2], suphalak:[3.2, 4.3], konja:[3.3, 4.4], sphynx:[3.4, 4.4], fold:[3.6, 4.8], bengal:[4.2, 5.6], abyssinian:[3.2, 4.3],
+  amshort:[4, 5.5], munchkin:[2.6, 3.4], bobtail:[3, 4] };
+const MEOW_KG_STAGE = { baby:.3, child:.5, teen:.8, adult:1, elder:.95 };
+const meowIdeal = p => (MEOW_KG[p.sp] || MEOW_KG._)[p.sex === 'm' ? 1 : 0] * (p.born ? MEOW_KG_STAGE[meowStage(p)[0]] || 1 : 1);
+const meowKg = p => Math.max(meowIdeal(p) * .7, meowIdeal(p) + (p.fat || 0));
+const meowBuild = p => { if(!p || !p.born || p.fat == null) return 0; const r = meowKg(p) / meowIdeal(p); return r >= 1.38 ? 2 : r >= 1.18 ? 1 : r < .88 ? -1 : 0; };
+const MEOW_SHAPES = [[.88, 'ผอม', 'Thin'], [1.1, 'หุ่นดี', 'Ideal'], [1.25, 'ท้วม', 'A bit heavy'], [1.45, 'อ้วน', 'Overweight'], [9, 'อ้วนมาก', 'Obese']];
+const meowShape = p => MEOW_SHAPES.find(x => meowKg(p) / meowIdeal(p) < x[0]);
+function meowGain(p, kcal){ const i = meowIdeal(p); p.fat = Math.max(-.25 * i, Math.min(.8 * i, (p.fat || 0) + kcal / 7700)); }
+/* her nature: each cat its own (act, play, love, food, cur, bite, vocal, 0..1), drawn once at adoption with her breed's leanings:
+   orange cats lean greedy and nibbly, Siamese talk, Ragdolls and Persians laze, Bengals and Abyssinians never stop.
+   Sex: calico and tortoiseshell are female (a male is about 1 in 3,000), orange ones mostly male. */
+const MEOW_BIAS = { orange:{ food:.25, bite:.35 }, saddleo:{ food:.2, bite:.3 }, biorange:{ food:.2, bite:.25 }, tortie:{ bite:.15, love:-.1 }, siamese:{ vocal:.45, love:.2 },
+  khaomanee:{ vocal:.25 }, korat:{ love:.2 }, suphalak:{ vocal:.2, act:.1 }, ragdoll:{ act:-.25, love:.3 }, persian:{ act:-.3, play:-.15 }, himalayan:{ act:-.25 },
+  british:{ act:-.2, love:-.1 }, bengal:{ act:.3, play:.3, cur:.2 }, abyssinian:{ act:.3, play:.25, cur:.25 }, mainecoon:{ love:.2, play:.1 }, sphynx:{ love:.3, vocal:.1 },
+  munchkin:{ play:.25 }, bobtail:{ play:.2 }, fold:{ act:-.1, love:.1 } };
+const MEOW_TRAIT_NAMES = { act:[['พลังเหลือ', 'Full of beans'], ['ขี้เซา', 'Sleepyhead']], play:[['ขี้เล่น', 'Playful'], ['เรียบร้อย', 'Calm']], love:[['ขี้อ้อน', 'Cuddly'], ['รักสันโดษ', 'Independent']],
+  food:[['ตะกละ', 'Greedy'], ['กินยาก', 'Picky']], cur:[['ช่างสำรวจ', 'Curious'], null], bite:[['ขี้งับ', 'Nibbler'], null], vocal:[['ช่างพูด', 'Chatty'], null] };
+function meowGenes(p){
+  if(!p) return;
+  if(!p.sex){ const r = Math.random(); p.sex = /^(calico|tortie)$/.test(p.sp) ? (r < 1 / 3000 ? 'm' : 'f') : /^(orange|saddleo|biorange)$/.test(p.sp) ? (r < .8 ? 'm' : 'f') : (r < .5 ? 'm' : 'f'); }
+  if(!p.trait){ const b = MEOW_BIAS[p.sp] || {}, t = {};
+    for(const k of ['act', 'play', 'love', 'food', 'cur', 'bite', 'vocal']) t[k] = +Math.max(0, Math.min(1, .2 + Math.random() * .6 + (b[k] || 0) - (k === 'bite' || k === 'vocal' ? .15 : 0))).toFixed(2);
+    p.trait = t; }
+  if(p.fat == null) p.fat = 0;
+  delete p.wt;
+}
+const meowT = (p, k, d = .5) => p && p.trait && p.trait[k] != null ? p.trait[k] : d;
+function meowTraits(p){
+  const out = [];
+  for(const [k, [hi, lo]] of Object.entries(MEOW_TRAIT_NAMES)){ const v = meowT(p, k); if(hi && v >= .68) out.push([v - .5, hi]); if(lo && v <= .3) out.push([.5 - v, lo]); }
+  return out.sort((a, b) => b[0] - a[0]).slice(0, 2).map(x => x[1]);
+}
 // rounder: the belly hangs a pixel lower where nothing is under it, and the back end rounds out a pixel (twice when very round)
 function meowFatten(g, n){
   const H = g.length, W = g[0].length;
@@ -28084,6 +28120,7 @@ function meowAdvance(to = meowNow()){
     const step = Math.min(MEOW_HR, to - t), h = step / MEOW_HR, sl = meowAsleep(p, t);
     p.full = meowClamp(p.full - 3 * h); p.fun = meowClamp(p.fun - 2.5 * h); p.clean = meowClamp(p.clean - 1.5 * h);
     p.energy = meowClamp(p.energy + (sl ? 12 : -5) * h);
+    if(p.fat != null){ if(p.fat > 0) meowGain(p, -meowT(p, 'act') * 25 * h / 24); if(p.full <= 0) meowGain(p, -60 * h / 24); }
     t += step;
     if(p.asleep && p.energy >= 100 && !meowNight(t)) p.asleep = false;
     if(p.full <= 0){ if(p.zeroAt == null) p.zeroAt = t; } else p.zeroAt = null;
@@ -28108,7 +28145,7 @@ function meowDaily(){
   if(!_meow) return;
   const d = meowDay(meowNow());
   if(_meow.day !== d){ const first = !_meow.day; _meow.day = d; _meow.opens = 0;
-    const q = _meow.pet; if(q){ const w = meowWt(q); q.wt = w > 50 ? w - 3 : w < 50 ? Math.min(50, w + 2) : 50; q.lazy = Math.random() < .3; } if(_meow.pet && !first){ _meow.snacks = Math.min(99, (_meow.snacks || 0) + 3); setTimeout(() => meowSay(isEN() ? '+3 snacks for coming back' : 'กลับมาแล้ว! ได้ขนม 3 ชิ้น', 3200), 2500); } meowSave(); }
+    const q = _meow.pet; if(q){ q.lazy = Math.random() < .12 + (1 - meowT(q, 'act')) * .3; } if(_meow.pet && !first){ _meow.snacks = Math.min(99, (_meow.snacks || 0) + 3); setTimeout(() => meowSay(isEN() ? '+3 snacks for coming back' : 'กลับมาแล้ว! ได้ขนม 3 ชิ้น', 3200), 2500); } meowSave(); }
 }
 document.addEventListener('click', e => {
   const a = e.target.closest && e.target.closest('[data-action="open-event"], [data-action="open-member"]');
@@ -28557,21 +28594,23 @@ class MeowRoamer extends MeowWalker {
     const tired = p.energy < 30, hungry = p.full < 25;
     this.cur = Math.min(1, this.cur + .04);
     // like a real cat she mostly rests: long naps, a lot of loafing, only short spells of going about; some days she hardly gets up
-    const lazy = p.lazy ? 2.6 : 1, go = p.lazy ? .35 : 1;
+    const A = meowT(p, 'act'), PL = meowT(p, 'play'), LV = meowT(p, 'love'), CU = meowT(p, 'cur'), BT = meowT(p, 'bite', .3), VO = meowT(p, 'vocal', .3);
+    const lazy = (p.lazy ? 2.6 : 1) * (1.6 - A), go = (p.lazy ? .35 : 1) * (.4 + A * 1.2);
     const toys = _meowToyEls.filter(el => el.isConnected && el.L && this.near(meowLedgeBox(el.L), .9));
     const pick = meowWeighted([
-      ['explore', others.length ? (.3 + this.cur * .7) * go : 0],
-      ['inspect', pois.length ? (.45 + this.cur * .5) * go : 0],
-      ['toy', toys.length && !tired ? .7 * go + (p.fun < 40 ? .8 : 0) : 0],
+      ['explore', others.length ? (.3 + this.cur * .7) * go * (.4 + CU * 1.2) : 0],
+      ['inspect', pois.length ? (.45 + this.cur * .5) * go * (.4 + CU * 1.2) : 0],
+      ['toy', toys.length && !tired ? (.7 * go + (p.fun < 40 ? .8 : 0)) * (.4 + PL * 1.4) : 0],
+      ['chew', BT > .55 ? (BT - .4) * 1.4 : 0],
       ['nap', (tired ? 4 : .9) * lazy], ['groom', p.clean < 60 ? 1.4 : .5],
       ['stretch', .3], ['yawn', tired ? .6 : .2], ['loaf', (tired ? 1.6 : 1.2) * lazy], ['watch', .35], ['wander', .3 * go],
-      ['zoom', p.fun > 65 && p.energy > 55 && others.length > 1 ? .28 : 0],
+      ['zoom', p.fun > 65 && p.energy > 55 && others.length > 1 ? .28 * PL * 2 * A * 1.5 : 0],
       ['user', mouse ? 1.6 : 0],
       ['hungry', hungry && now - (this.hungryAt || -1e9) > 120 ? 2.5 : 0],
       ['away', edgeNear && !tired && this.cur > .7 && now - this.born > 90 && now - (this.backAt || 0) > 150 ? .1 : 0],
-      ['front', .7 + (mouse ? .5 : 0)], ['blink', .22 + (p.bond || 0) / 200], ['meow', .25], ['beckon', .12],
-      ['scratch', .35], ['knead', tired ? .5 : .28], ['roll', .2 + (p.bond || 0) / 250], ['lookback', .3], ['reach', .18],
-      ['spin', p.fun > 60 ? .12 : .03], ['sneeze', .05], ['box', .1],
+      ['front', (.7 + (mouse ? .5 : 0)) * (.5 + LV)], ['blink', (.22 + (p.bond || 0) / 200) * (.4 + LV * 1.2)], ['meow', .25 * (.4 + VO * 2.6)], ['beckon', .12 * (.5 + LV)],
+      ['scratch', .35], ['knead', (tired ? .5 : .28) * (.5 + LV)], ['roll', (.2 + (p.bond || 0) / 250) * (.5 + LV)], ['lookback', .3], ['reach', .18 * (.5 + PL)],
+      ['spin', (p.fun > 60 ? .12 : .03) * (.4 + PL * 1.4)], ['sneeze', .05], ['box', .1 * (.5 + PL)],
     ]);
     const rxOn = L => { const B = meowLedgeBox(L); return B ? Math.random() * Math.max(0, B.r - B.l - this.cw) : 0; };
     switch(pick){
@@ -28595,6 +28634,12 @@ class MeowRoamer extends MeowWalker {
         return [{ act:'go', L, rx:rxOn(L), spd:.8 }, { act:'knead', dur:meowRand(2, 4) }, { act:'loaf', dur:2 }, { act:'sleep', dur:meowRand(90, 420) * (p.lazy ? 1.6 : 1) }, { act:'stretch', dur:1.8 }, { act:'yawn', dur:1.3 }, { act:'shake', dur:.4 }];
       }
       case 'toy': return meowToyPlan(this, meowPick(toys));
+      // a nibbler gnaws: the corner of a card, or a toy if one is about
+      case 'chew': {
+        const t2 = toys.find(el => el.toy.k === 'mouse' || el.toy.k === 'ball');
+        if(t2 && Math.random() < .5) return [{ act:'go', L:t2.L, rx:t2.xOn - this.cw * .7, spd:1 }, { act:'chew', dur:meowRand(2, 4) }, { act:'say', text:t('งับ ๆ', 'Nom nom'), soft:true }, { act:'sit', dur:2 }];
+        return [{ act:'walk', x:Math.random() < .5 ? 0 : 1e4, spd:.9 }, { act:'chew', dur:meowRand(2, 4) }, { act:'say', text:meowPick(en ? ['Nom…', 'This card tastes nice'] : ['งับ ๆ', 'การ์ดนี้อร่อยดี']), soft:true }, { act:'lookback', dur:1.2 }, { act:'sit', dur:2 }];
+      }
       case 'groom': return [{ act:'groom', dur:meowRand(3, 5) }, { act:'sit', dur:1.5 }];
       case 'stretch': return [{ act:'stretch', dur:1.8 }];
       case 'yawn': return [{ act:'yawn', dur:1.4 }, { act:'sit', dur:2 }];
@@ -28605,7 +28650,7 @@ class MeowRoamer extends MeowWalker {
         const out = [{ act:'stalk', dur:.6 }];
         for(let i = 0; i < 3; i++){ const L = meowPick(others); out.push({ act:'go', L, rx:rxOn(L), spd:2.4 }); }
         out.push({ act:'stand', dur:1 }, { act:'groom', dur:2 });
-        p.fun = meowClamp(p.fun + 3); p.wt = Math.max(20, meowWt(p) - .5);
+        p.fun = meowClamp(p.fun + 3); meowGain(p, -10);
         return out;
       }
       case 'user': {
@@ -28863,6 +28908,7 @@ class MeowRoamer extends MeowWalker {
     if(a === 'stretch') return ['stretch', 'shut', 1];
     if(a === 'yawn') return ['sit', T > .25 && T < this.dur - .3 ? 'yawn' : 'blink', 0];
     if(a === 'sniff') return ['eat1', 'shut', tail];
+    if(a === 'chew') return ['eat' + (1 + Math.floor(T / .16) % 2), 'shut', 0];
     if(a === 'stalk') return ['loaf', 'open', 1];
     if(a === 'watch') return ['sit', blink ? 'blink' : 'open', tail];
     if(a === 'front') return ['front', blink ? 'blink' : 'open', 0];
@@ -28954,7 +29000,7 @@ function meowMount(){
   const p = _meow.pet;
   if(!p || _meow.home){ meowRingClose(); if(_meowCall) _meowCall.hidden = true; if(_meowWalk){ _meowRun.delete(_meowWalk); _meowWalk.remove(); _meowWalk = null; } if(_meowBug) _meowBug.die(); if(_meowLayer) _meowLayer.hidden = true; if(_meowPage) _meowPage.hidden = true; return; }
   meowAdvance();
-  if(!p.page){ p.page = state.view; meowSave(); }
+  if(!p.page || !p.trait || !p.sex || p.fat == null){ meowGenes(p); if(!p.page) p.page = state.view; meowSave(); }
   if(!_meowLayer){
     _meowLayer = document.createElement('div'); _meowLayer.className = 'meow-walk';
     _meowBubble = document.createElement('div'); _meowBubble.className = 'meow-say'; _meowBubble.setAttribute('aria-live', 'polite');
@@ -28996,15 +29042,19 @@ function meowMount(){
       onDraw:w => { meowBubblePos(w); if(_meowRing) meowRingPos(w); } });
     meowRun(_meowWalk);
     // a cat is often found asleep: about a third of visits she is napping already
-    if(!MEOW_STILL && !meowAsleep(p, meowNow()) && Math.random() < (p.lazy ? .55 : .33)) _meowWalk.queue = [{ act:'sleep', dur:meowRand(60, 300), pose:meowPick(['sleep', 'curl', 'curl']) }, { act:'stretch', dur:1.8 }, { act:'yawn', dur:1.3 }]; if(_meowWalk.mode === 'ledge') _meowWalk.next();
+    if(!MEOW_STILL && !meowAsleep(p, meowNow()) && Math.random() < (p.lazy ? .55 : .2 + (1 - meowT(p, 'act')) * .3)) _meowWalk.queue = [{ act:'sleep', dur:meowRand(60, 300), pose:meowPick(['sleep', 'curl', 'curl']) }, { act:'stretch', dur:1.8 }, { act:'yawn', dur:1.3 }]; if(_meowWalk.mode === 'ledge') _meowWalk.next();
   } else { _meowWalk.key = ''; _meowWalk.resize(); if(_meowWalk.mode === 'ledge'){ _meowWalk.queue = []; _meowWalk.next(); } }
 }
 function meowPurr(host, w){
   const p = _meow.pet;
   if(meowAsleep(p, meowNow())){ meowFx(host, w, 'z', 'z'); return; }
   p.bond = Math.min(100, (p.bond || 0) + 1); meowSave();
+  const en = isEN(), BT = meowT(p, 'bite', .3), LV = meowT(p, 'love');
+  if(w.mode === 'ledge' && Math.random() < BT * .3){ w.plan([{ act:'bat', dur:.7 }, { act:'say', text:en ? 'Nip!' : 'งับ!' }, { act:'purr', dur:1.5 }]); meowFx(host, w, '!'); return; }
+  if(w.mode === 'ledge' && LV < .3 && (p.petT || 0) > meowNow() - 60e3 && Math.random() < .5){ w.plan([{ act:'say', text:en ? 'That’s enough~' : 'พอแล้ว~' }, { act:'walk', x:Math.random() < .5 ? 0 : 1e4 }, { act:'loaf', dur:10 }]); p.petT = meowNow(); return; }
+  p.petT = meowNow();
   if(w.mode === 'ledge') w.plan([{ act:'purr', dur:2.2 }]);
-  for(let i = 0; i < 3; i++) setTimeout(() => meowFx(host, w, '♥'), i * 150);
+  for(let i = 0; i < 2 + Math.round(LV * 2); i++) setTimeout(() => meowFx(host, w, '♥'), i * 150);
 }
 /* she lives on one page at a time: the page (view) she is on is kept with her; on any other page she is not there,
    and a paw in the corner says where she is and brings her over. A tap on her opens a ring of things to do with her
@@ -29075,11 +29125,13 @@ function meowRingPos(w){
   });
 }
 // can she eat now? not when full, not again right after a meal
-function meowWontEat(p){ const now = meowNow(); return p.full >= 85 ? 'full' : p.lastMeal && now - p.lastMeal < 20 * 60e3 ? 'soon' : ''; }
+// a greedy cat takes more and sooner, a picky one less
+function meowWontEat(p){ const now = meowNow(), g = meowT(p, 'food'); return p.full >= 75 + g * 20 ? 'full' : p.lastMeal && now - p.lastMeal < (g > .75 ? 8 : 20) * 60e3 ? 'soon' : ''; }
 function meowEats(p, f){
-  const extra = p.full > 55;   // not hungry, eats anyway: that is what puts weight on
+  const wet = (f.cost || 0) > 0, hungry = p.full < 40;
+  // food beyond what she needs is what puts weight on, wet treats most of all
+  meowGain(p, hungry ? (wet ? 25 : 0) : (wet ? 90 + 30 * f.cost : 60));
   p.full = meowClamp(p.full + f.full); p.fun = meowClamp(p.fun + (f.fun || 0)); p.zeroAt = null; p.lastMeal = meowNow();
-  if(extra) p.wt = Math.min(100, meowWt(p) + 4 + (f.cost || 0) * 2);
 }
 const meowRefuseText = (why, en) => why === 'full' ? (en ? 'I’m full~' : 'อิ่มแล้ว ไม่กินแล้ว~') : (en ? 'I just ate…' : 'เพิ่งกินไปเองนะ…');
 // doing something with her right where she is (the same as the buttons in her home)
@@ -29094,8 +29146,8 @@ function meowDo(a, w){
     meowEats(p, f); w.plan([{ act:'eat', dur:3.6 }, { act:'groom', dur:2 }]); w.say(t('ง่ำ ง่ำ', 'Nom nom'));
   }
   if(a === 'pet'){ meowPurr(_meowLayer, w); w.say(meowNeed(p) || [t('เกาคางหน่อยสิ', 'Scratch my chin'), t('ครืด… ครืด…', 'Purr… purr…'), t('เมี้ยว~', 'Meow~')][Math.floor(Math.random() * 3)]); return; }
-  if(a === 'ball'){ p.fun = meowClamp(p.fun + 18); p.wt = Math.max(20, meowWt(p) - 1); w.plan([{ act:'bat', dur:3 }, { act:'sit', dur:1.5 }]); w.say(t('ตะปบ! ตะปบ!', 'Pounce!')); }
-  if(a === 'wand'){ p.fun = meowClamp(p.fun + 20); p.wt = Math.max(20, meowWt(p) - 1.5); w.plan([{ act:'wand', dur:3.6 }, { act:'sit', dur:1.5 }]); w.say(t('จับให้ได้!', 'Got it!')); }
+  if(a === 'ball'){ p.fun = meowClamp(p.fun + 18); meowGain(p, -15); w.plan([{ act:'bat', dur:3 }, { act:'sit', dur:1.5 }]); w.say(t('ตะปบ! ตะปบ!', 'Pounce!')); }
+  if(a === 'wand'){ p.fun = meowClamp(p.fun + 20); meowGain(p, -20); w.plan([{ act:'wand', dur:3.6 }, { act:'sit', dur:1.5 }]); w.say(t('จับให้ได้!', 'Got it!')); }
   if(a === 'toys'){ meowToyTray(); return; }
   if(a === 'bath'){ p.clean = 100; w.plan([{ act:'brush', dur:2.6 }]); fx('✦', 6); w.say(t('ขนฟูนุ่มแล้ว', 'All fluffy now')); }
   p.bond = Math.min(100, (p.bond || 0) + 1); meowSave();
@@ -29126,7 +29178,7 @@ function meowToysPaint(){
 }
 function meowToyPlan(w, el){
   const p = w.pet, o = el.toy, en = isEN(), t = (a, b) => en ? b : a, rx = el.xOn - w.cw / 2, go = { act:'go', L:el.L, rx, spd:1.15 };
-  const fun = n => ({ act:'fn', fn:() => { p.fun = meowClamp(p.fun + n); p.wt = Math.max(20, meowWt(p) - n / 10); meowSave(); } });
+  const fun = n => ({ act:'fn', fn:() => { p.fun = meowClamp(p.fun + n); meowGain(p, -n * 1.5); meowSave(); } });
   if(o.k === 'ball') return [{ ...go, rx:rx - w.cw * .35 }, { act:'stalk', dur:.7 }, { act:'bat', dur:meowRand(2.5, 4) }, fun(10), { act:'sit', dur:2 }, { act:'groom', dur:2 }];
   if(o.k === 'mouse') return [{ ...go, rx:rx - w.cw * .4 }, { act:'stalk', dur:1.2 }, { act:'bat', dur:2 }, { act:'say', text:t('จับได้แล้ว!', 'Got it!'), soft:true }, fun(8), { act:'front', dur:2 }];
   if(o.k === 'box') return [go, { act:'fn', fn:() => { el.style.visibility = 'hidden'; } }, { act:'box', dur:meowRand(12, 45) }, { act:'fn', fn:() => { el.style.visibility = ''; } }, fun(6), { act:'sit', dur:1.5 }];
@@ -29171,7 +29223,7 @@ function meowEdgeTick(w, dt){
   const can = p && w.dc && !MEOW_STILL && !_meowSheet && (w.mode === 'ledge' || w.mode === 'climb') && !meowAsleep(p, meowNow());
   if(!can || w.visible()){ w.edgeT = meowRand(1.5, 3); return; }
   w.edgeT = (w.edgeT == null ? 2 : w.edgeT) - dt; if(w.edgeT > 0) return;
-  const hungry = p.full < 25; w.edgeT = hungry ? meowRand(4, 7) : meowRand(6, 11);
+  const hungry = p.full < 25, k = 1.3 - meowT(p, 'vocal', .3) * .8; w.edgeT = (hungry ? meowRand(4, 7) : meowRand(6, 11)) * k;
   if(!_meowEdge){ _meowEdge = document.createElement('div'); _meowEdge.className = 'meow-edge'; _meowEdge.setAttribute('aria-hidden', 'true'); (_meowLayer || document.body).appendChild(_meowEdge); }
   const en = isEN(), list = MEOW_SOUNDS[(en ? 'en' : 'th') + (hungry ? 'H' : '')], up = w.dc.y < scrollY, band = meowBand(), txt = list[Math.floor(Math.random() * list.length)];
   _meowEdge.innerHTML = up ? `<i>▲</i>${txt}` : `${txt}<i>▼</i>`;
@@ -29259,8 +29311,9 @@ function meowSheetPaint(){
   const A = [['feed', t('ให้อาหาร', 'Feed')], ['ball', t('บอล', 'Ball')], ['wand', t('ไม้ตกแมว', 'Wand')], ['nip', t('กัญชาแมว', 'Catnip')],
     ['bath', t('แปรงขน', 'Brush')], ['box', t('กล่อง', 'Box')], ['pet', t('ลูบหัว', 'Pet')], ['sleep', sleeping ? t('ปลุก', 'Wake') : t('นอน', 'Sleep')]];
   el.innerHTML = head(t('บ้านของเหมียว', 'Her home')) + `
-    <div class="meow-head" data-noloc><b>${escapeHtml(p.name)}</b><span>${en ? B.en : B.th} · ${en ? st[2] : st[1]} · ${t(`อายุ ${meowAge(p)} วัน`, `${meowAge(p)} days old`)} · ${MEOW_BUILD_NAMES[meowBuild(p)][en ? 1 : 0]}</span>
+    <div class="meow-head" data-noloc><b>${escapeHtml(p.name)}</b><span>${en ? B.en : B.th} · ${en ? st[2] : st[1]} · ${t(`อายุ ${meowAge(p)} วัน`, `${meowAge(p)} days old`)}</span>
       <span class="meow-snack" title="${t('ขนม', 'Snacks')}">🍪 ${_meow.snacks || 0}</span></div>
+    <div class="meow-traits" data-noloc><span>${p.sex === 'm' ? t('ตัวผู้', 'Male') : t('ตัวเมีย', 'Female')}</span><span>${meowKg(p).toFixed(1)} ${t('กก.', 'kg')} · ${meowShape(p)[en ? 2 : 1]}</span>${meowTraits(p).length ? `<span>${t('นิสัย', 'Nature')}: ${meowTraits(p).map(x => x[en ? 1 : 0]).join(' · ')}</span>` : ''}</div>
     <div class="meow-room${sleeping || meowNight(meowNow()) ? ' is-night' : ''}"><span class="meow-win"></span><span class="meow-prop" data-meow-prop="bowl" style="left:8px"></span><div class="meow-stage"></div></div>
     <div class="meow-stats">${bars.map(([k, th, v, c]) => `<div class="meow-stat${v < 25 ? ' is-low' : ''}"><span>${th}</span><em>${Math.round(v)}</em><span class="meow-bar"><i style="--v:${v}%;--c:${c}"></i></span></div>`).join('')}</div>
     <div class="meow-acts">${A.map(([k, th]) => `<button class="meow-act" data-meow-a="${k}"${sleeping && k !== 'sleep' ? ' disabled' : ''}${k === 'feed' && S.tray ? ' aria-pressed="true"' : ''}><span data-meow-ic="${k}"></span>${th}</button>`).join('')}</div>
