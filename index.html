@@ -6276,6 +6276,72 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @keyframes boot-in{ from{ opacity:0; } to{ opacity:1; } }
   @keyframes boot-fade{ from{ opacity:0; } to{ opacity:1; } }
   @media (prefers-reduced-motion:reduce){ html.booted #main{ animation:boot-fade .25s ease-out both; } }
+  /* ---- เหมียว: a pixel cat that walks the top of the menu bar on every page (MEOW_*, meowInit) ---- */
+  .meow-walk{ position:fixed; z-index:29; left:0; width:0; height:0; pointer-events:none; }
+  .meow-cat{ position:absolute; left:0; bottom:0; padding:0; border:0; background:none; cursor:pointer; pointer-events:auto; touch-action:manipulation;
+    transform-origin:50% 100%; will-change:transform; -webkit-tap-highlight-color:transparent; }
+  .meow-cat canvas, .meow-px{ display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
+  .meow-cat:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; border-radius:6px; }
+  .meow-say{ position:absolute; left:0; bottom:0; max-width:190px; padding:5px 9px; border-radius:12px 12px 12px 4px; background:var(--card); color:var(--ink);
+    border:1.5px solid var(--line); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.1); font-size:12px; font-weight:600; line-height:1.35; white-space:normal; width:max-content;
+    pointer-events:none; opacity:0; transition:opacity .25s; }
+  .meow-say.on{ opacity:1; }
+  .meow-say.is-left{ border-radius:12px 12px 4px 12px; }
+  .meow-fx{ position:absolute; left:0; bottom:0; pointer-events:none; font-size:14px; line-height:1; animation:meowUp 1.3s ease-out forwards; }
+  .meow-fx.z{ font:800 12px/1 ui-monospace,Menlo,monospace; color:var(--ink-soft); animation-duration:2.4s; }
+  @keyframes meowUp{ 0%{ opacity:0; transform:translateY(0) scale(.7); } 18%{ opacity:1; transform:scale(1); } 100%{ opacity:0; transform:translate(6px,-34px) scale(1.05); } }
+  /* the sheet: her home */
+  .meow-sheet .share-panel{ padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
+  .meow-room{ position:relative; height:132px; margin:0 0 10px; border-radius:16px; overflow:hidden; border:1.5px solid var(--line); isolation:isolate;
+    background:linear-gradient(#FFE2EE 0 70%, #F2CDB7 70% 72%, #F6DACA 72%); }
+  :root[data-theme="dark"] .meow-room{ background:linear-gradient(#2B2140 0 70%, #4A3A55 70% 72%, #3A2E44 72%); }
+  .meow-room.is-night{ background:linear-gradient(#211A47 0 70%, #3E3264 70% 72%, #2F2850 72%); }
+  .meow-room .meow-win{ position:absolute; left:14px; top:12px; width:56px; height:42px; border:3px solid #fff; border-radius:6px; background:linear-gradient(#9FD6FF, #E6F6FF); box-shadow:0 2px 0 rgba(0,0,0,.08); }
+  .meow-room.is-night .meow-win{ background:linear-gradient(#17122F, #3F2F68); }
+  .meow-room .meow-win::before{ content:''; position:absolute; left:50%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:#fff; }
+  .meow-room .meow-prop{ position:absolute; bottom:26%; }
+  .meow-room .meow-stage{ position:absolute; left:0; right:0; bottom:16%; height:0; }
+  .meow-room .meow-stage .meow-cat{ pointer-events:auto; }
+  .meow-head{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin:-2px 0 8px; }
+  .meow-head b{ font-size:20px; }
+  .meow-head span{ font-size:12.5px; color:var(--ink-soft); }
+  .meow-head .meow-snack{ margin-left:auto; padding:3px 10px; border-radius:99px; background:var(--paper-dim, var(--card)); border:1px solid var(--line); font-weight:800; font-size:13px; color:var(--ink); }
+  .meow-stats{ display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; margin:0 0 12px; }
+  .meow-stat{ display:grid; grid-template-columns:1fr auto; gap:3px; font-size:12.5px; font-weight:700; }
+  .meow-stat em{ font-style:normal; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .meow-bar{ grid-column:1 / -1; height:8px; border-radius:2px; background:var(--line); overflow:hidden; }
+  .meow-bar i{ display:block; height:100%; width:var(--v); background:var(--c);
+    background-image:repeating-linear-gradient(90deg, transparent 0 6px, rgba(255,255,255,.35) 6px 8px); transition:width .5s; }
+  .meow-stat.is-low em{ color:#D2364F; }
+  .meow-acts{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:7px; margin:0 0 10px; }
+  .meow-act{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 2px 7px; border-radius:14px; border:1px solid var(--line); background:var(--card);
+    color:var(--ink); font:inherit; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 3px 0 rgba(var(--shadow-rgb),.1); transition:transform .12s, box-shadow .12s; }
+  .meow-act:active{ transform:translateY(2px); box-shadow:none; }
+  .meow-act:disabled{ opacity:.4; pointer-events:none; }
+  .meow-act[aria-pressed="true"]{ border-color:#E4457E; background:color-mix(in srgb, #E4457E 12%, var(--card)); }
+  .meow-act canvas{ width:28px; height:28px; }
+  .meow-foods{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:7px; margin:0 0 10px; padding:10px; border-radius:14px; background:var(--paper-dim, var(--card)); }
+  .meow-foods .meow-act small{ font-weight:600; font-size:10.5px; color:var(--ink-soft); }
+  .meow-grid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:7px; margin:0 0 12px; }
+  .meow-breed{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 2px 6px; border-radius:14px; border:1.5px solid var(--line); background:var(--card); color:var(--ink);
+    font:inherit; font-size:11.5px; font-weight:700; line-height:1.25; cursor:pointer; box-shadow:0 2px 0 rgba(var(--shadow-rgb),.08); }
+  .meow-breed[aria-pressed="true"]{ border-color:#E4457E; background:color-mix(in srgb, #E4457E 10%, var(--card)); }
+  .meow-breed canvas{ width:48px; height:36px; }
+  .meow-sws{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; }
+  .meow-sw{ width:30px; height:30px; border-radius:50%; border:2px solid rgba(0,0,0,.1); background:var(--c); cursor:pointer; padding:0; }
+  .meow-sw[aria-pressed="true"]{ outline:3px solid #E4457E; outline-offset:2px; }
+  .meow-boxb{ display:block; margin:6px auto 4px; padding:0; border:0; background:none; cursor:pointer; touch-action:manipulation; }
+  .meow-boxb canvas{ width:168px; height:126px; }
+  .meow-boxb.wob canvas{ animation:meowWob .3s ease-in-out; }
+  @keyframes meowWob{ 25%{ transform:rotate(-6deg); } 70%{ transform:rotate(5deg); } }
+  .meow-count{ text-align:center; font-weight:800; font-size:20px; font-variant-numeric:tabular-nums; }
+  .meow-count small{ font-weight:500; font-size:13px; color:var(--ink-soft); }
+  .meow-prog{ height:10px; margin:6px 0 4px; border-radius:2px; background:var(--line); overflow:hidden; }
+  .meow-prog i{ display:block; height:100%; width:var(--v); background:#E4457E; transition:width .15s; }
+  .meow-name{ width:100%; padding:11px 14px; border-radius:14px; border:1.5px solid var(--line); background:var(--paper); color:var(--ink); font:600 17px var(--font, inherit); text-align:center; }
+  .meow-name:focus{ outline:none; border-color:#E4457E; }
+  .meow-sugs{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:10px 0 12px; }
+  .meow-h{ margin:4px 0 8px; font-size:13px; font-weight:800; color:var(--ink-soft); }
 </style>
 <script>
   /* Runs before first paint: follow the OS. A tap on the switch holds only for this visit (sessionStorage). */
@@ -10912,7 +10978,7 @@ async function loadOshiData(){
   try{
     const doc = await fbDb.collection('users').doc(fbAuth.currentUser.uid).get();
     const d = doc.exists ? doc.data() : {};
-    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null, layout:d.layout||null};
+    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null, layout:d.layout||null, meow:d.meow||null};
   }catch(e){ return {oshi:[], kamiOshi:null}; }
 }
 async function saveOshiData(){
@@ -11047,6 +11113,7 @@ function renderSetMenu(){
       ${isInstalledApp() ? '' : `<button class="set-go is-quiz" data-action="install-app"><span class="set-gi">${ICONS.install}</span><span class="set-two">${en ? 'Add to Home Screen' : 'เพิ่มเว็บไว้หน้าโฮม'}<small>${en ? 'Opens like an app, in one tap' : 'เปิดเหมือนแอป แตะเดียวเข้าเลย'}</small></span></button>`}
       ${pushShown() ? `<button class="set-go is-quiz" data-action="open-push"><span class="set-gi">${ICONS.bell}</span><span class="set-two">${en ? 'Event reminders' : 'แจ้งเตือนงาน'}<small>${pushPrefs() ? (en ? 'On' : 'เปิดอยู่') : (en ? 'about 30 minutes before it starts' : 'เตือนก่อนงานเริ่มราว 30 นาที')}</small></span></button>` : ''}
       <button class="set-go is-quiz" data-action="nav-quiz"><span class="set-gi">${ICONS.star}</span>${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</button>
+      <button class="set-go is-quiz" data-action="open-meow"><span class="set-gi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 20V8l-1-5 5 3h6l5-3-1 5v12Z"/><path d="M9 12h.01M15 12h.01M11 15h2"/></svg></span><span class="set-two">${en ? 'My cat' : 'เหมียวของฉัน'}<small>${typeof _meow !== 'undefined' && _meow && _meow.pet ? escapeHtml(_meow.pet.name) : (en ? 'Adopt a pixel cat' : 'รับแมวพิกเซลมาเลี้ยง')}</small></span></button>
     </div>
     <div class="set-h">${en ? 'Look' : 'หน้าตา'}</div>
     <div class="set-seg">${['light', 'dark'].map(t => `<button class="${state.theme === t ? 'is-on' : ''}" ${state.theme === t ? 'disabled' : 'data-action="toggle-theme"'}>${t === 'dark' ? ICONS.moon : ICONS.sun}${t === 'dark' ? (en ? 'Dark' : 'มืด') : (en ? 'Light' : 'สว่าง')}</button>`).join('')}</div>
@@ -27621,6 +27688,572 @@ function closeShareSheet(){
   if(_shareUrl){ URL.revokeObjectURL(_shareUrl); _shareUrl = null; }
 }
 
+/* ============================= เหมียว =============================
+   A pixel cat of the reader's own. She walks along the top of the menu bar on every page (on the left rail's
+   screens, along the foot of the page), sits, loafs, sleeps from 23:00 to 07:00 Thai time on the bar, and a tap
+   opens her home: four needs that run down by the hour (อิ่ม สนุก ขนนุ่ม พลัง), food, play, a brush, a box.
+   Adopted from a box knocked 48 times, then named. Kept on the device (localStorage MEOW_KEY) and, signed in, in
+   users/<uid>.meow. Snacks come from using the site: three a day for coming back, one for each event or member
+   opened (three a day). She never dies in this round; three days hungry and she is poorly until fed.
+   Sprites are 24×18 grids of letters drawn by meowSprite: o outline, b body, h head, H forehead, t tail, f feet,
+   l belly, m muzzle, e/E eyes, n nose, p inner ear, k blush, c collar, g bell, x/y box. A breed is a palette and a
+   pattern laid over those letters (meowColor). */
+const MEOW_KEY = '48thdb-meow';
+const MEOW_INK = '#2B1E2C';
+const MEOW_BREEDS = {
+  orange:   { th:'แมวส้ม', en:'Orange tabby', coat:'#F6A65C', light:'#FFF0DC', dark:'#D2702C', pat:'tabby', eye:'#7DB33F', nose:'#E98A8A', socks:true },
+  calico:   { th:'สามสี', en:'Calico', coat:'#FFF9F2', light:'#FFFFFF', dark:'#3F363C', p2:'#F2A457', pat:'calico', eye:'#E0A12A', nose:'#F59AA8' },
+  cow:      { th:'แมววัว', en:'Tuxedo', coat:'#FFFFFF', light:'#FFFFFF', dark:'#2F2A2E', pat:'cow', eye:'#7DB33F', nose:'#F59AA8' },
+  siamese:  { th:'วิเชียรมาศ', en:'Siamese', coat:'#F5E6D0', light:'#FFF8EE', dark:'#5A3D30', pat:'points', eye:'#3E9BDB', nose:'#4E362C', thai:true },
+  khaomanee:{ th:'ขาวมณี', en:'Khao Manee', coat:'#FFFDF8', light:'#FFFFFF', dark:'#E6DCD2', pat:'solid', eye:'#3E9BDB', eye2:'#E8B52A', nose:'#F7A6B4', thai:true },
+  korat:    { th:'สีสวาด', en:'Korat', coat:'#A5B0C4', light:'#CDD5E2', dark:'#7B869C', pat:'solid', eye:'#7DC043', nose:'#77748C', thai:true },
+  suphalak: { th:'ศุภลักษณ์', en:'Suphalak', coat:'#B9784C', light:'#D9A57C', dark:'#8A5232', pat:'solid', eye:'#E0A12A', nose:'#86523F', thai:true },
+  konja:    { th:'โกนจา', en:'Konja', coat:'#3A333F', light:'#4F4656', dark:'#26202A', pat:'solid', eye:'#F6C945', nose:'#221D26', thai:true, ink:'#120E15' },
+  fold:     { th:'สก็อตติชโฟลด์', en:'Scottish Fold', coat:'#D3CDCA', light:'#F3F0EE', dark:'#9E9591', pat:'solid', eye:'#E08A2C', nose:'#E39AA2', ears:'fold' },
+  persian:  { th:'เปอร์เซีย', en:'Persian', coat:'#FFF0DF', light:'#FFFFFF', dark:'#E8CFB8', pat:'solid', eye:'#E08A2C', nose:'#EE9E9E', tail:'fluff' },
+  mainecoon:{ th:'เมนคูน', en:'Maine Coon', coat:'#B58A62', light:'#F2E2CE', dark:'#674731', pat:'tabby', eye:'#B5AE38', nose:'#B1715C', tail:'fluff' },
+  ragdoll:  { th:'แร็กดอลล์', en:'Ragdoll', coat:'#FAF2E6', light:'#FFFFFF', dark:'#86736A', pat:'rag', eye:'#3E9BDB', nose:'#C69AA0', tail:'fluff' },
+  sphynx:   { th:'สฟิงซ์', en:'Sphynx', coat:'#F0C5B4', light:'#F8DCD0', dark:'#C99583', pat:'solid', eye:'#8DC04E', nose:'#D88C8C' },
+};
+const MEOW_COLLARS = ['#E4457E', '#2E8C82', '#DC4148', '#3E9BDB', '#8B68D6', '#E2A524', '#35C29B', '#3A4A8A'];
+const MEOW_STAGES = [['baby', 'ลูกเหมียว', 'Kitten', 0], ['child', 'เหมียวเด็ก', 'Young cat', 3], ['teen', 'เหมียววัยรุ่น', 'Teen cat', 10], ['adult', 'เหมียวผู้ใหญ่', 'Grown cat', 30], ['elder', 'เหมียวสูงวัย', 'Old cat', 150]];
+const MEOW_FOODS = [
+  { k:'kibble', th:'อาหารเม็ด', en:'Kibble', cost:0, full:30, fun:0 },
+  { k:'platu', th:'ปลาทู', en:'Mackerel', cost:1, full:25, fun:10 },
+  { k:'lick', th:'ขนมแมวเลีย', en:'Lickable treat', cost:1, full:10, fun:25 },
+  { k:'tuna', th:'ทูน่า', en:'Tuna', cost:2, full:40, fun:15 },
+];
+const MEOW_HR = 36e5, MEOW_D = 24 * MEOW_HR;
+
+/* ---- the sprites ---- */
+const MEOW_W = 24, MEOW_H = 18;
+const MEOW_HEAD = {
+  top:  ['.o.....o.', 'opo...opo', 'ohhooohho', 'ohHHHHHho'],
+  fold: ['.........', '.ooo.ooo.', 'opphhhppo', 'ohHHHHHho'],
+  eyes: { open:['ohehhhEho', 'ohehhhEho'], blink:['ohhhhhhho', 'ohoohooho'], happy:['ohehhhEho', 'oehehEhEo'], shut:['ohhhhhhho', 'ohoohooho'] },
+  low:  { open:'ohmmnmmho', happy:'okmmnmmko', eat:'ohmmommho' },
+  collar:'.occgcco.',
+};
+const MEOW_BODY = ['..oooooooooo..', '.obbbbbbbbbbo.', 'obbbbbbbbbbbbo', 'obbbbbbbbbbbbo', '.ollllllllllo.', '..oooooooooo..'];
+const MEOW_SIT = ['......oooooo....', '.....obbbbbbo...', '....obbbbbbbbo..', '...obbbbbbbbbbo.', '..obbbbbbbbbbbo.', '.obbbbbbbbbbbbo.', '.obbbbbbbbbbbbo.', '.ollllbbbbbbbbo.', '..oooooooooooo..'];
+const MEOW_TAIL = {
+  up:   ['.o..', 'oto.', 'oto.', 'oto.', 'otto', '.ott', '..ot'],
+  swish:['....', 'oo..', 'oto.', 'oto.', 'otto', '.ott', '..ot'],
+  fluff:['.oo..', 'otto.', 'otto.', 'otto.', 'ottto', '.ottt', '..ott'],
+  fluff2:['.....', 'ooo..', 'otto.', 'otto.', 'ottto', '.ottt', '..ott'],
+  ground:['.ooo', 'ottt', '.ooo'],
+  sit:  ['oo....', 'oto...', 'oto...', 'otto..', '.ottt.', '..ooo.'],
+};
+const MEOW_LEG1 = ['ofo', 'ofo', 'ofo', 'ooo'], MEOW_LEG2 = ['ofofo', 'ofofo', 'ofofo', 'ooooo'];
+function meowGrid(){ return Array.from({ length:MEOW_H }, () => Array(MEOW_W).fill('.')); }
+function meowPut(g, rows, x0, y0){
+  rows.forEach((r, y) => { for(let x = 0; x < r.length; x++){ const ch = r[x]; if(ch === '.' || ch === ' ') continue;
+    const X = x0 + x, Y = y0 + y; if(X >= 0 && X < MEOW_W && Y >= 0 && Y < MEOW_H) g[Y][X] = ch; } });
+}
+function meowHead(B, eyes = 'open', low){
+  const top = B.ears === 'fold' ? MEOW_HEAD.fold : MEOW_HEAD.top;
+  const e = MEOW_HEAD.eyes[eyes] || MEOW_HEAD.eyes.open;
+  return [top[0], top[1], top[2], top[3], e[0], e[1], MEOW_HEAD.low[low || (eyes === 'happy' ? 'happy' : 'open')], MEOW_HEAD.collar];
+}
+// pose: stand walk1 walk2 sit bat loaf sleep eat1 eat2 box; eyes: open blink happy shut; tail: 0/1 (a swish)
+function meowPose(B, pose, eyes, tail){
+  const g = meowGrid(), fl = B.tail === 'fluff', T = k => MEOW_TAIL[fl ? (k === 'up' ? 'fluff' : k === 'swish' ? 'fluff2' : k) : k];
+  const standing = pose === 'stand' || pose === 'walk1' || pose === 'walk2' || pose === 'eat1' || pose === 'eat2';
+  if(standing){
+    meowPut(g, T(tail ? 'swish' : 'up'), 0, 2);
+    meowPut(g, MEOW_BODY, 2, 8);
+    if(pose === 'walk1'){ meowPut(g, MEOW_LEG1, 2, 14); meowPut(g, MEOW_LEG1, 6, 14); meowPut(g, MEOW_LEG2, 11, 14); }
+    else if(pose === 'walk2'){ meowPut(g, MEOW_LEG2, 3, 14); meowPut(g, MEOW_LEG1, 10, 14); meowPut(g, MEOW_LEG1, 14, 14); }
+    else { meowPut(g, MEOW_LEG2, 3, 14); meowPut(g, MEOW_LEG2, 11, 14); }
+    if(pose === 'eat1' || pose === 'eat2') meowPut(g, meowHead(B, 'shut', pose === 'eat2' ? 'eat' : 'open'), 15, pose === 'eat2' ? 10 : 9);
+    else meowPut(g, meowHead(B, eyes), 13, 4);
+  } else if(pose === 'sit' || pose === 'bat'){
+    meowPut(g, MEOW_TAIL.sit, 0, 11);
+    meowPut(g, MEOW_SIT, 4, 9);
+    if(pose === 'bat'){ meowPut(g, MEOW_LEG1, 15, 13); meowPut(g, ['ooo', 'ofo', 'ofo', 'ofo'], 19, 8); }
+    else meowPut(g, MEOW_LEG2, 15, 13);
+    meowPut(g, meowHead(B, eyes), 11, 1);
+  } else if(pose === 'loaf' || pose === 'sleep'){
+    meowPut(g, MEOW_TAIL.ground, 0, 15);
+    meowPut(g, MEOW_BODY, 2, 12);
+    meowPut(g, meowHead(B, pose === 'sleep' ? 'shut' : eyes), 13, pose === 'sleep' ? 9 : 7);
+  } else if(pose === 'box'){
+    meowPut(g, meowHead(B, eyes), 8, 3);
+    const box = ['oooooooooooooooooo', 'oyyyyyyyyyyyyyyyyo', 'oxxxxxxxxxxxxxxxxo', 'oxxxxxxxxxxxxxxxxo', 'oxxxxxxkxkxxxxxxxo', 'oxxxxxxxkxxxxxxxxo', 'oxxxxxxxxxxxxxxxxo', 'oooooooooooooooooo'];
+    meowPut(g, box, 3, 10);
+    meowPut(g, ['ofo', 'ooo'], 9, 9); meowPut(g, ['ofo', 'ooo'], 14, 9);
+  }
+  return g;
+}
+const _meowHash = (x, y, s) => { const v = Math.sin(x * 127.1 + y * 311.7 + s * 74.7) * 43758.5453; return v - Math.floor(v); };
+function meowColor(B, ch, x, y, col){
+  const coat = B.coat, light = B.light, dark = B.dark;
+  const blob = (cw, chh, s) => _meowHash(Math.floor((x + s) / cw), Math.floor((y + s * 2) / chh), s);
+  const furry = ch === 'b' || ch === 'h' || ch === 'H' || ch === 't';
+  if(ch === 'o') return B.ink || MEOW_INK;
+  if(ch === 'e') return B.eye; if(ch === 'E') return B.eye2 || B.eye;
+  if(ch === 'n') return B.nose; if(ch === 'p') return '#F7A1B5'; if(ch === 'k') return '#FF8FB0';
+  if(ch === 'c') return col || '#E4457E'; if(ch === 'g') return '#F5C542';
+  if(ch === 'x') return '#DDA86A'; if(ch === 'y') return '#B98552';
+  if(ch === 'l' || ch === 'm') return B.pat === 'points' && ch === 'm' ? dark : B.pat === 'rag' && ch === 'm' ? light : light;
+  if(ch === 'f') return B.socks || B.pat === 'cow' || B.pat === 'calico' || B.pat === 'rag' ? light : B.pat === 'points' ? dark : coat;
+  if(!furry) return coat;
+  switch(B.pat){
+    case 'tabby': if((ch === 'b' || ch === 't') && x % 3 === 0) return dark; if(ch === 'H' && x % 2 === 0) return dark; return coat;
+    case 'calico': { const v = blob(3, 3, 3); return v < .3 ? dark : v < .62 ? B.p2 : coat; }
+    case 'cow': return blob(4, 3, 7) < .4 || ch === 'H' && x % 4 !== 1 ? dark : coat;
+    case 'points': return ch === 't' || ch === 'H' ? dark : ch === 'h' ? (x % 2 ? coat : B.light) : coat;
+    case 'rag': return ch === 't' || ch === 'H' ? dark : coat;
+    default: return coat;
+  }
+}
+const _meowSpr = new Map();
+// a sprite as a canvas, 24×18 pixels; one canvas per look, reused
+function meowSprite(pet, pose, eyes = 'open', tail = 0){
+  const key = pet.sp + pet.col + pose + eyes + tail;
+  let c = _meowSpr.get(key); if(c) return c;
+  const B = MEOW_BREEDS[pet.sp] || MEOW_BREEDS.orange, g = meowPose(B, pose, eyes, tail);
+  c = document.createElement('canvas'); c.width = MEOW_W; c.height = MEOW_H;
+  const x2 = c.getContext('2d');
+  for(let y = 0; y < MEOW_H; y++) for(let x = 0; x < MEOW_W; x++){ const ch = g[y][x]; if(ch === '.') continue; x2.fillStyle = meowColor(B, ch, x, y, pet.col); x2.fillRect(x, y, 1, 1); }
+  if(_meowSpr.size > 160) _meowSpr.clear();
+  _meowSpr.set(key, c); return c;
+}
+// little pixel things: the actions' icons, the food, the bowl (12×12 letters)
+const MEOW_PIX = {
+  feed:['............', '....aaaa....', '...abaabaa..', '..aaaabaaaa.', 'qqqqqqqqqqqq', 'qppppppppppq', '.qppppppppq.', '..qqqqqqqq..'],
+  ball:['....qqqq....', '..qqppppqq..', '.qppwwppppq.', '.qpwwpppppq.', 'qppwpppppppq', 'qppppppppppq', '.qppppppppq.', '.qppppppppq.', '..qqppppqq..', '....qqqq....'],
+  wand:['.........aa.', '........abba', '.........aa.', '........q...', '.......q....', '......q.....', '.....q......', '....q.......', '...q........', '..q.........'],
+  nip: ['....g..g....', '...ggggggg..', '..ggGggGgg..', '...gggggg...', '.gg..gg..gg.', 'gGgg.gg.gGgg', '.ggg.gg.ggg.', '.....gg.....', '.....gg.....'],
+  bath:['..pppppppp..', '.pqqqqqqqqp.', '.pqqqqqqqqp.', '..pppppppp..', '...w.w.w.w..', '...w.w.w.w..', '....bbbb....', '....bbbb....', '....bbbb....'],
+  box: ['.y........y.', '..yyyyyyyy..', 'oooooooooooo', 'oyyyyyyyyyyo', 'oxxxxxxxxxxo', 'oxxxxkkxxxxo', 'oxxxxxkxxxxo', 'oxxxxxxxxxxo', 'oooooooooooo'],
+  pet: ['............', '..pp....pp..', '.pppp..pppp.', 'pppppppppppp', 'pppppppppppp', '.pppppppppp.', '..pppppppp..', '...pppppp...', '....pppp....', '.....pp.....'],
+  sleep:['...uuuu.....', '..uu........', '.uu.........', '.uu.........', '.uu.........', '.uuu.....u..', '..uuuu.uuu..', '....uuuu....'],
+  kibble:['..a..b..a...', '.aaabbbaaa..', 'qqqqqqqqqqqq', 'qppppppppppq', '.qppppppppq.', '..qqqqqqqq..'],
+  platu:['............', '.s.......ss.', 'sss.ssssssss', 'ssssssssssws', 'sss.ssssssss', '.s.......ss.'],
+  lick:['....yyyy....', '....ypyy....', '....yyyy....', '....yyyy....', '....yyyy....', '....yyyy....', '.....yy.....'],
+  tuna:['..rrrrrrrr..', '.rwwwwwwwwr.', '.rrrrrrrrrr.', '.uuuuuuuuuu.', '.uuwwwwwwuu.', '.uuuuuuuuuu.', '..uuuuuuuu..'],
+  bowl:['..a..b..a...', '.aaabbbaaa..', 'qqqqqqqqqqqq', 'qppppppppppq', '.qppppppppq.', '..qqqqqqqq..'],
+};
+const MEOW_PIXC = { a:'#E9A25A', b:'#B8712F', p:'#FF9EBE', q:'#B4486F', w:'#FFFFFF', g:'#4FA45A', G:'#2F7A3B', o:MEOW_INK, x:'#DDA86A', y:'#E9C34A', k:'#E4457E', u:'#7C5CC8', s:'#9FB4C8', r:'#3E7FA6' };
+function meowPix(k, size = 12){
+  const rows = MEOW_PIX[k]; if(!rows) return null;
+  const c = document.createElement('canvas'); c.width = size; c.height = size; c.className = 'meow-px';
+  const g = c.getContext('2d'), y0 = Math.floor((size - rows.length) / 2);
+  rows.forEach((r, y) => { for(let x = 0; x < r.length; x++){ const ch = r[x], col = MEOW_PIXC[ch]; if(!col) continue; g.fillStyle = col; g.fillRect(x, y0 + y, 1, 1); } });
+  return c;
+}
+
+/* ---- her life: the numbers, by the clock ---- */
+let _meow = null;
+function meowNow(){ return Date.now(); }
+function meowThaiHour(t){ return (new Date(t).getUTCHours() + 7) % 24; }
+function meowNight(t){ const h = meowThaiHour(t); return h >= 23 || h < 7; }
+function meowDay(t){ return new Date(t + 7 * MEOW_HR).toISOString().slice(0, 10); }
+const meowClamp = v => Math.max(0, Math.min(100, v));
+function meowLoad(){
+  try{ const s = JSON.parse(localStorage.getItem(MEOW_KEY) || 'null'); if(s && typeof s === 'object') return s; }catch(e){}
+  return { v:1, pet:null, snacks:3, day:'', opens:0, home:false, saved:0 };
+}
+let _meowPush = 0;
+function meowSave(){
+  if(!_meow) return;
+  _meow.saved = meowNow();
+  try{ localStorage.setItem(MEOW_KEY, JSON.stringify(_meow)); }catch(e){}
+  clearTimeout(_meowPush);
+  _meowPush = setTimeout(() => {
+    try{ if(typeof fbAuth !== 'undefined' && fbAuth.currentUser) fbDb.collection('users').doc(fbAuth.currentUser.uid).set({ meow:_meow }, { merge:true }).catch(() => {}); }catch(e){}
+  }, 4000);
+}
+// a copy kept with the account wins when it is newer than the device's
+function meowFromAccount(m){
+  if(!m || typeof m !== 'object' || !(m.saved > ((_meow && _meow.saved) || 0))) return;
+  _meow = m; try{ localStorage.setItem(MEOW_KEY, JSON.stringify(m)); }catch(e){}
+  meowMount();
+}
+const meowAsleep = (p, t) => p.asleep || (meowNight(t) && !(p.awakeUntil > t));
+function meowAdvance(to = meowNow()){
+  const p = _meow && _meow.pet; if(!p || to <= p.at) return;
+  let t = p.at;
+  while(t < to){
+    const step = Math.min(MEOW_HR, to - t), h = step / MEOW_HR, sl = meowAsleep(p, t);
+    p.full = meowClamp(p.full - 3 * h); p.fun = meowClamp(p.fun - 2.5 * h); p.clean = meowClamp(p.clean - 1.5 * h);
+    p.energy = meowClamp(p.energy + (sl ? 12 : -5) * h);
+    t += step;
+    if(p.asleep && p.energy >= 100 && !meowNight(t)) p.asleep = false;
+    if(p.full <= 0){ if(p.zeroAt == null) p.zeroAt = t; } else p.zeroAt = null;
+  }
+  p.at = to;
+}
+const meowAge = p => Math.max(0, Math.floor((meowNow() - p.born) / MEOW_D));
+const meowStage = p => MEOW_STAGES.reduce((s, x) => meowAge(p) >= x[3] ? x : s, MEOW_STAGES[0]);
+const meowSick = p => p.zeroAt != null && p.at - p.zeroAt >= 3 * MEOW_D;
+function meowNeed(p){
+  const en = isEN();
+  if(meowAsleep(p, meowNow())) return '';
+  if(meowSick(p)) return en ? 'Not feeling well… hungry for days.' : 'ไม่ค่อยสบาย… หิวมาหลายวันแล้ว';
+  if(p.full < 25) return en ? 'Hungry! Meow.' : 'หิวแล้ววว เมี้ยว';
+  if(p.clean < 30) return en ? 'My fur is all tangled.' : 'ขนพันกันแล้ว แปรงให้หน่อย';
+  if(p.fun < 25) return en ? 'Bored. Play with me?' : 'เบื่อจัง เล่นด้วยกันหน่อย';
+  if(p.energy < 20) return en ? 'So sleepy…' : 'ง่วงจัง…';
+  return '';
+}
+// three snacks for coming back each day; one for each event or member opened, three a day
+function meowDaily(){
+  if(!_meow) return;
+  const d = meowDay(meowNow());
+  if(_meow.day !== d){ const first = !_meow.day; _meow.day = d; _meow.opens = 0; if(_meow.pet && !first){ _meow.snacks = Math.min(99, (_meow.snacks || 0) + 3); setTimeout(() => meowSay(isEN() ? '+3 snacks for coming back' : 'กลับมาแล้ว! ได้ขนม 3 ชิ้น', 3200), 2500); } meowSave(); }
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('[data-action="open-event"], [data-action="open-member"]');
+  if(!a || !_meow || !_meow.pet) return;
+  meowDaily();
+  if((_meow.opens || 0) < 3){ _meow.opens = (_meow.opens || 0) + 1; _meow.snacks = Math.min(99, (_meow.snacks || 0) + 1); meowSave(); }
+}, true);
+
+/* ---- one cat that moves: the walker. It lives in a track (a width in CSS pixels) and is drawn as a canvas ---- */
+const MEOW_STILL = (() => { try{ return matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } })();
+class MeowWalker {
+  constructor(host, opt = {}){
+    this.host = host; this.o = opt; this.x = opt.x != null ? opt.x : 40; this.dir = 1; this.act = 'sit'; this.T = 0; this.dur = 2; this.y = 0;
+    this.queue = []; this.key = '';
+    this.btn = document.createElement('button'); this.btn.className = 'meow-cat'; this.btn.type = 'button';
+    this.cv = document.createElement('canvas'); this.cv.width = MEOW_W; this.cv.height = MEOW_H; this.btn.appendChild(this.cv);
+    host.appendChild(this.btn);
+    this.btn.addEventListener('click', e => { e.stopPropagation(); opt.onTap && opt.onTap(this); });
+    this.resize(); this.next();
+  }
+  get pet(){ return _meow && _meow.pet; }
+  scale(){ const st = this.pet ? meowStage(this.pet)[0] : 'adult'; const big = innerWidth >= 1024 ? 1 : 0; return (this.o.scale || 0) + (st === 'baby' || st === 'child' ? 2 : 3) + big; }
+  resize(){ this.w = this.o.width ? this.o.width() : 300; const s = this.scale(); this.s = s; this.cv.style.width = MEOW_W * s + 'px'; this.cv.style.height = MEOW_H * s + 'px';
+    this.x = Math.max(0, Math.min(this.w - MEOW_W * s, this.x)); this.btn.setAttribute('aria-label', this.pet ? this.pet.name : 'เหมียว'); }
+  plan(steps){ this.queue = steps.slice(); this.next(); }
+  next(){
+    const p = this.pet, s = this.s, max = Math.max(0, this.w - MEOW_W * s);
+    this.T = 0; this.y = 0;
+    let step = this.queue.shift();
+    if(!step){
+      if(!p){ step = { act:'sit', dur:3 }; }
+      else if(meowAsleep(p, meowNow())) step = { act:'sleep', dur:30 };
+      else if(MEOW_STILL) step = { act:Math.random() < .5 ? 'sit' : 'loaf', dur:8 };
+      else {
+        const r = Math.random(), tired = p.energy < 20;
+        if(r < (tired ? .2 : .5)) step = { act:'walk', x:Math.random() * max };
+        else if(r < .65) step = { act:'sit', dur:3 + Math.random() * 5 };
+        else if(r < .8) step = { act:'loaf', dur:4 + Math.random() * 6 };
+        else if(r < .88 && !tired) step = { act:'jump' };
+        else step = { act:tired ? 'sleep' : 'stand', dur:tired ? 12 : 2 + Math.random() * 2 };
+      }
+    }
+    this.act = step.act; this.dur = step.dur || 2;
+    if(step.act === 'walk'){ this.tx = Math.max(0, Math.min(max, step.x != null ? step.x : Math.random() * max)); if(Math.abs(this.tx - this.x) < 4){ this.act = 'sit'; this.dur = 2; } else this.dir = this.tx > this.x ? 1 : -1; }
+    if(step.act === 'jump'){ this.dur = .7; this.jx = Math.max(0, Math.min(max, this.x + this.dir * (14 + Math.random() * 18) * s)); if(Math.abs(this.jx - this.x) < 2){ this.dir *= -1; this.jx = Math.max(0, Math.min(max, this.x + this.dir * 20 * s)); } this.sx = this.x; }
+    if(step.face) this.dir = step.face;
+    this.draw();
+  }
+  tick(dt){
+    this.T += dt;
+    if(this.act === 'walk'){
+      const sp = 16 * this.s * (this.pet && this.pet.energy < 20 ? .6 : 1), d = this.tx - this.x;
+      if(Math.abs(d) <= sp * dt){ this.x = this.tx; this.next(); return; }
+      this.x += Math.sign(d) * sp * dt; this.dir = Math.sign(d);
+    } else if(this.act === 'jump'){
+      const k = Math.min(1, this.T / this.dur); this.x = this.sx + (this.jx - this.sx) * k; this.y = Math.sin(k * Math.PI) * 9 * this.s;
+      if(k >= 1){ this.y = 0; this.next(); return; }
+    } else if(this.T >= this.dur){ this.next(); return; }
+    this.draw();
+  }
+  look(){
+    const T = this.T, a = this.act, blink = (T % 3.4) > 3.25;
+    const tail = Math.floor(T / .9) % 2;
+    if(a === 'walk') return ['walk' + (1 + Math.floor(T / .2) % 2), 'open', tail];
+    if(a === 'jump') return ['walk1', 'open', 1];
+    if(a === 'eat') return ['eat' + (1 + Math.floor(T / .35) % 2), 'shut', 0];
+    if(a === 'sleep') return ['sleep', 'shut', 0];
+    if(a === 'purr' || a === 'brush') return ['sit', 'happy', tail];
+    if(a === 'bat') return [Math.floor(T / .3) % 2 ? 'bat' : 'sit', 'open', 0];
+    if(a === 'wand') return [Math.floor(T / .25) % 2 ? 'bat' : 'walk1', 'open', 1];
+    if(a === 'nip') return [Math.floor(T / .5) % 2 ? 'loaf' : 'sit', 'happy', tail];
+    if(a === 'box') return ['box', blink ? 'blink' : 'open', 0];
+    if(a === 'loaf') return ['loaf', T % 6 > 4 ? 'shut' : blink ? 'blink' : 'open', 0];
+    if(a === 'stand') return ['stand', blink ? 'blink' : 'open', tail];
+    return ['sit', blink ? 'blink' : 'open', tail];
+  }
+  draw(){
+    if(!this.pet){ this.btn.hidden = true; return; }
+    this.btn.hidden = false;
+    const [pose, eyes, tail] = this.look(), key = this.pet.sp + this.pet.col + pose + eyes + tail;
+    if(key !== this.key){ this.key = key; const g = this.cv.getContext('2d'); g.clearRect(0, 0, MEOW_W, MEOW_H); g.drawImage(meowSprite(this.pet, pose, eyes, tail), 0, 0); }
+    const nip = this.act === 'nip' ? Math.sin(this.T * 6) * 6 : 0;
+    this.btn.style.transform = `translate3d(${this.x.toFixed(1)}px, ${(-this.y).toFixed(1)}px, 0) scaleX(${this.dir})${nip ? ` rotate(${nip.toFixed(1)}deg)` : ''}`;
+    if(this.o.onDraw) this.o.onDraw(this);
+  }
+  // where her head is, for a speech bubble or a heart
+  headX(){ return this.x + (this.dir > 0 ? MEOW_W * .72 : MEOW_W * .28) * this.s; }
+  remove(){ this.btn.remove(); }
+}
+const _meowRun = new Set();
+let _meowRaf = 0, _meowLast = 0;
+function meowLoop(t){
+  const dt = Math.min(.05, (t - (_meowLast || t)) / 1000); _meowLast = t;
+  if(!document.hidden) _meowRun.forEach(w => w.tick(dt));
+  _meowRaf = _meowRun.size ? requestAnimationFrame(meowLoop) : 0;
+}
+function meowRun(w){ _meowRun.add(w); if(!_meowRaf){ _meowLast = 0; _meowRaf = requestAnimationFrame(meowLoop); } }
+
+/* ---- on every page: the track along the top of the menu bar ---- */
+let _meowWalk = null, _meowLayer = null, _meowBubble = null, _meowSayT = 0;
+function meowTrack(){
+  const nav = document.querySelector('.glass-nav'), r = nav && nav.getBoundingClientRect();
+  if(!r || !r.width) return { left:12, bottom:12, width:Math.max(120, innerWidth - 24) };
+  if(r.height > r.width){ const left = r.right + 10; return { left, bottom:Math.max(6, (innerHeight - document.documentElement.clientHeight) + 6), width:Math.max(120, innerWidth - left - 12), floor:true }; }
+  return { left:r.left + 14, bottom:innerHeight - r.top - 1, width:Math.max(80, r.width - 28) };
+}
+function meowPlace(){
+  if(!_meowLayer) return;
+  const t = meowTrack();
+  _meowLayer.style.left = t.left + 'px'; _meowLayer.style.bottom = t.bottom + 'px'; _meowLayer.style.width = t.width + 'px';
+  _meowLayer._w = t.width;
+  if(_meowWalk) _meowWalk.resize();
+}
+function meowSay(text, ms = 2600){
+  if(!_meowBubble || !_meowWalk || !text) return;
+  _meowBubble.textContent = text; _meowBubble.classList.add('on');
+  clearTimeout(_meowSayT); _meowSayT = setTimeout(() => _meowBubble.classList.remove('on'), ms);
+  meowBubblePos(_meowWalk);
+}
+function meowBubblePos(w){
+  if(!_meowBubble || !_meowBubble.classList.contains('on')) return;
+  const hx = w.headX(), bw = _meowBubble.offsetWidth, left = hx + bw > (_meowLayer._w || 300) + 8;
+  _meowBubble.classList.toggle('is-left', left);
+  _meowBubble.style.transform = `translate(${(left ? hx - bw : hx - 4).toFixed(0)}px, ${(-(MEOW_H * w.s + 6 + w.y)).toFixed(0)}px)`;
+}
+function meowFx(host, w, html, cls = ''){
+  const el = document.createElement('span'); el.className = 'meow-fx ' + cls; el.textContent = html;
+  el.style.left = (w.headX() + (Math.random() * 16 - 8)).toFixed(0) + 'px'; el.style.bottom = (MEOW_H * w.s - 4 + w.y).toFixed(0) + 'px';
+  host.appendChild(el); setTimeout(() => el.remove(), 2500);
+}
+function meowMount(){
+  if(!_meow) _meow = meowLoad();
+  const p = _meow.pet;
+  if(!p || _meow.home){ if(_meowWalk){ _meowRun.delete(_meowWalk); _meowWalk.remove(); _meowWalk = null; } if(_meowLayer) _meowLayer.hidden = true; return; }
+  meowAdvance();
+  if(!_meowLayer){
+    _meowLayer = document.createElement('div'); _meowLayer.className = 'meow-walk';
+    _meowBubble = document.createElement('div'); _meowBubble.className = 'meow-say'; _meowBubble.setAttribute('aria-live', 'polite');
+    _meowLayer.appendChild(_meowBubble);
+    document.body.appendChild(_meowLayer);
+    addEventListener('resize', () => { clearTimeout(meowPlace._t); meowPlace._t = setTimeout(meowPlace, 120); });
+    if(window.visualViewport) visualViewport.addEventListener('resize', () => { clearTimeout(meowPlace._t); meowPlace._t = setTimeout(meowPlace, 120); });
+    // the menu bar moves when the page changes size or the rail comes in; check where it is now and then
+    setInterval(() => { if(!document.hidden) meowPlace(); }, 2000);
+    setInterval(() => { if(!document.hidden && _meow && _meow.pet){ meowAdvance(); meowDaily(); } }, 60000);
+  }
+  _meowLayer.hidden = false;
+  meowPlace();
+  if(!_meowWalk){
+    _meowWalk = new MeowWalker(_meowLayer, { width:() => _meowLayer._w || 300, x:Math.random() * 120,
+      onTap:w => { meowPurr(_meowLayer, w); setTimeout(openMeowSheet, 450); },
+      onDraw:w => meowBubblePos(w) });
+    meowRun(_meowWalk);
+  } else { _meowWalk.key = ''; _meowWalk.resize(); _meowWalk.next(); }
+}
+function meowPurr(host, w){
+  const p = _meow.pet, en = isEN();
+  if(meowAsleep(p, meowNow())){ meowFx(host, w, 'z', 'z'); return; }
+  p.bond = Math.min(100, (p.bond || 0) + 1); meowSave();
+  w.plan([{ act:'purr', dur:2.2 }]);
+  for(let i = 0; i < 3; i++) setTimeout(() => meowFx(host, w, '♥'), i * 150);
+}
+function meowInit(){
+  _meow = meowLoad();
+  meowDaily();
+  meowMount();
+  if(_meow.pet && !_meow.home){
+    const p = _meow.pet, en = isEN();
+    setTimeout(() => meowSay(meowAsleep(p, meowNow()) ? (en ? 'Zzz…' : 'ครอก… ฟี้…') : meowNeed(p) || (en ? `Meow~ I'm ${p.name}` : `เมี้ยว~`), 3000), 1500);
+  }
+}
+
+/* ---- her home: the sheet ---- */
+let _meowSheet = null;
+function closeMeowSheet(){
+  if(!_meowSheet) return;
+  if(_meowSheet.walker){ _meowRun.delete(_meowSheet.walker); }
+  _meowSheet.el.remove(); _meowSheet = null;
+}
+function openMeowSheet(){
+  closeShareSheet(); closeMeowSheet();
+  if(!_meow) _meow = meowLoad();
+  const el = document.createElement('div'); el.className = 'share-sheet meow-sheet';
+  _meowSheet = { el, tray:false, step:_meow.pet ? 'home' : 'pick', hs:{ sp:'orange', col:'#E4457E', taps:0, name:'' } };
+  document.body.appendChild(el);
+  meowSheetPaint();
+  requestAnimationFrame(() => el.classList.add('show'));
+  el.addEventListener('click', meowSheetClick);
+}
+function meowSheetPaint(){
+  const S = _meowSheet; if(!S) return;
+  const en = isEN(), t = (th, e) => en ? e : th, el = S.el, p = _meow.pet;
+  if(S.walker){ _meowRun.delete(S.walker); S.walker = null; }
+  const head = title => `<div class="share-back" data-share="close"></div><div class="share-panel" role="dialog" aria-label="${escapeAttr(title)}">
+    <div class="share-head"><b>${escapeHtml(title)}</b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>`;
+  if(S.step === 'pick'){
+    el.innerHTML = head(t('รับเหมียวมาเลี้ยง', 'Adopt a cat')) + `
+      <p class="lay-sheet-note">${t('เลือกสายพันธุ์กับสีปลอกคอ น้องจะมาในกล่อง ต้องเคาะ 48 ครั้งตามเลขวง แล้วตั้งชื่อ', 'Pick a breed and a collar. She comes in a box: knock 48 times, then name her.')}</p>
+      <div class="meow-h">${t('สายพันธุ์', 'Breed')}</div>
+      <div class="meow-grid">${Object.entries(MEOW_BREEDS).map(([k, B]) => `<button class="meow-breed" data-meow-sp="${k}" aria-pressed="${S.hs.sp === k}"><span data-meow-spr="${k}"></span>${en ? B.en : B.th}</button>`).join('')}</div>
+      <div class="meow-h">${t('ปลอกคอ', 'Collar')}</div>
+      <div class="meow-sws">${MEOW_COLLARS.map(c => `<button class="meow-sw" data-meow-col="${c}" style="--c:${c}" aria-pressed="${S.hs.col === c}" aria-label="${c}"></button>`).join('')}</div>
+      <button class="lay-row" data-meow="box"><span><b>${t('ไปที่กล่อง', 'To the box')}</b></span><i>›</i></button></div>`;
+    el.querySelectorAll('[data-meow-spr]').forEach(s => { const src = meowSprite({ sp:s.dataset.meowSpr, col:S.hs.col }, 'sit'), c = document.createElement('canvas');
+      c.width = MEOW_W; c.height = MEOW_H; c.className = 'meow-px'; c.getContext('2d').drawImage(src, 0, 0); s.replaceWith(c); });
+    return;
+  }
+  if(S.step === 'box'){
+    const n = S.hs.taps;
+    el.innerHTML = head(t('กล่องใบใหม่', 'A new box')) + `
+      <p class="lay-sheet-note">${t(`${MEOW_BREEDS[S.hs.sp].th} อยู่ในกล่อง เคาะเบา ๆ ให้ออกมา`, `A ${MEOW_BREEDS[S.hs.sp].en} is in the box. Knock gently.`)}</p>
+      <button class="meow-boxb" data-meow="knock" aria-label="${t('เคาะกล่อง', 'Knock')}"><span data-meow-box></span></button>
+      <div class="meow-prog"><i style="--v:${(n / 48 * 100).toFixed(1)}%"></i></div>
+      <div class="meow-count">${n} <small>/ 48 ${t('ครั้ง', 'knocks')}</small></div></div>`;
+    meowBoxPaint();
+    return;
+  }
+  if(S.step === 'name'){
+    const sugs = ['โมจิ', 'ข้าวปั้น', 'ขนมปัง', 'ส้มโอ', 'ทองหยอด', 'มะลิ'];
+    el.innerHTML = head(t('ออกมาแล้ว!', 'She is out!')) + `
+      <div class="meow-room"><span class="meow-win"></span><div class="meow-stage"></div></div>
+      <p class="lay-sheet-note">${t('ลูกเหมียวตัวนี้ชื่ออะไรดี', 'What is her name?')}</p>
+      <input class="meow-name" id="meow-name" maxlength="12" value="${escapeAttr(S.hs.name)}" placeholder="${t('ชื่อเหมียว', 'Name')}" autocomplete="off">
+      <div class="meow-sugs">${sugs.map(s => `<button class="chip" data-meow-sug="${s}">${s}</button>`).join('')}</div>
+      <button class="lay-row" data-meow="named"><span><b>${t('ตั้งชื่อนี้', 'Use this name')}</b></span><i>✓</i></button></div>`;
+    const keep = _meow.pet;
+    _meow.pet = { sp:S.hs.sp, col:S.hs.col, born:meowNow(), at:meowNow(), full:80, fun:80, clean:100, energy:100, bond:0, name:'' };
+    meowSheetStage([{ act:'box', dur:1e9 }]);
+    _meow.pet = keep;
+    S.preview = { sp:S.hs.sp, col:S.hs.col };
+    return;
+  }
+  // home
+  meowAdvance();
+  const st = meowStage(p), sleeping = meowAsleep(p, meowNow()), B = MEOW_BREEDS[p.sp] || MEOW_BREEDS.orange;
+  const bars = [['full', t('อิ่ม', 'Full'), p.full, '#F2A93B'], ['fun', t('สนุก', 'Fun'), p.fun, '#E4457E'], ['clean', t('ขนนุ่ม', 'Fluffy'), p.clean, '#4FA9DE'], ['energy', t('พลัง', 'Energy'), p.energy, '#2E8C82']];
+  const A = [['feed', t('ให้อาหาร', 'Feed')], ['ball', t('บอล', 'Ball')], ['wand', t('ไม้ตกแมว', 'Wand')], ['nip', t('กัญชาแมว', 'Catnip')],
+    ['bath', t('แปรงขน', 'Brush')], ['box', t('กล่อง', 'Box')], ['pet', t('ลูบหัว', 'Pet')], ['sleep', sleeping ? t('ปลุก', 'Wake') : t('นอน', 'Sleep')]];
+  el.innerHTML = head(t('บ้านของเหมียว', 'Her home')) + `
+    <div class="meow-head" data-noloc><b>${escapeHtml(p.name)}</b><span>${en ? B.en : B.th} · ${en ? st[2] : st[1]} · ${t(`อายุ ${meowAge(p)} วัน`, `${meowAge(p)} days old`)}</span>
+      <span class="meow-snack" title="${t('ขนม', 'Snacks')}">🍪 ${_meow.snacks || 0}</span></div>
+    <div class="meow-room${sleeping || meowNight(meowNow()) ? ' is-night' : ''}"><span class="meow-win"></span><span class="meow-prop" data-meow-prop="bowl" style="left:8px"></span><div class="meow-stage"></div></div>
+    <div class="meow-stats">${bars.map(([k, th, v, c]) => `<div class="meow-stat${v < 25 ? ' is-low' : ''}"><span>${th}</span><em>${Math.round(v)}</em><span class="meow-bar"><i style="--v:${v}%;--c:${c}"></i></span></div>`).join('')}</div>
+    <div class="meow-acts">${A.map(([k, th]) => `<button class="meow-act" data-meow-a="${k}"${sleeping && k !== 'sleep' ? ' disabled' : ''}${k === 'feed' && S.tray ? ' aria-pressed="true"' : ''}><span data-meow-ic="${k}"></span>${th}</button>`).join('')}</div>
+    ${S.tray && !sleeping ? `<div class="meow-foods">${MEOW_FOODS.map(f => `<button class="meow-act" data-meow-food="${f.k}"><span data-meow-ic="${f.k}"></span>${en ? f.en : f.th}<small>${f.cost ? t(`ขนม ${f.cost}`, `${f.cost} snack${f.cost > 1 ? 's' : ''}`) : t('ฟรี', 'free')}</small></button>`).join('')}</div>` : ''}
+    <p class="lay-sheet-note">${t('ได้ขนมวันละ 3 ชิ้นเมื่อกลับมาเข้าเว็บ และอีกชิ้นทุกครั้งที่เปิดดูงานหรือเมมเบอร์ (วันละ 3) · ช่วง 23:00–07:00 น้องนอน', 'Three snacks a day for coming back, one more for each event or member you open (three a day). She sleeps 23:00–07:00.')}</p>
+    <button class="lay-row" data-meow="home"><span>${_meow.home ? t('ให้น้องออกมาเดินเล่นบนเว็บ', 'Let her walk the site') : t('ให้น้องอยู่บ้าน ไม่เดินบนเว็บ', 'Keep her home, off the pages')}</span></button>
+    <p class="lay-sheet-note">${state.account && state.account.loggedIn ? t('เก็บไว้กับบัญชีของคุณ เปิดเครื่องไหนก็เจอน้อง', 'Kept with your account, on every device.') : t('เก็บไว้ในเครื่องนี้ เข้าสู่ระบบแล้วน้องจะตามไปทุกเครื่อง', 'Kept on this device. Sign in and she follows you to every device.')}</p></div>`;
+  el.querySelectorAll('[data-meow-ic]').forEach(s => { const c = meowPix(s.dataset.meowIc); if(c) s.replaceWith(c); });
+  const bowl = el.querySelector('[data-meow-prop="bowl"]'); if(bowl){ const c = meowPix('bowl'); c.style.width = '36px'; c.style.height = '36px'; bowl.appendChild(c); }
+  meowSheetStage(sleeping ? [{ act:'sleep', dur:1e9 }] : null);
+  const need = meowNeed(p); if(need) setTimeout(() => meowSheetSay(need), 300);
+}
+function meowSheetStage(plan){
+  const S = _meowSheet, stage = S && S.el.querySelector('.meow-stage'); if(!stage) return;
+  const w = new MeowWalker(stage, { width:() => stage.clientWidth || 300, scale:1, x:(stage.clientWidth || 300) / 2 - 40,
+    onTap:w2 => { if(_meow.pet && S.step === 'home'){ meowSheetAct('pet'); } } });
+  S.walker = w;
+  if(plan) w.plan(plan);
+  meowRun(w);
+}
+function meowSheetSay(text){
+  const S = _meowSheet, room = S && S.el.querySelector('.meow-room'), w = S && S.walker; if(!room || !w) return;
+  let b = room.querySelector('.meow-say'); if(!b){ b = document.createElement('div'); b.className = 'meow-say'; room.appendChild(b); }
+  b.textContent = text; b.classList.add('on'); b.style.bottom = 'auto'; b.style.top = '8px'; b.style.left = 'auto'; b.style.right = '10px';
+  clearTimeout(b._t); b._t = setTimeout(() => b.classList.remove('on'), 2600);
+}
+function meowBoxPaint(into){
+  const S = _meowSheet, slot = into || (S && S.el.querySelector('[data-meow-box]')); if(!slot) return;
+  const c = into || document.createElement('canvas'); c.width = MEOW_W; c.height = MEOW_H; c.className = 'meow-px';
+  const g = c.getContext('2d'), n = S.hs.taps; g.clearRect(0, 0, MEOW_W, MEOW_H);
+  const rows = ['....................', '....................', '....................', '..y..............y..', '...yyyyyyyyyyyyyy...', '.oooooooooooooooooo.', '.oyyyyyyyyyyyyyyyyo.', '.oxxxxxxxxxxxxxxxxo.',
+    '.oxxxxxxxxxxxxxxxxo.', '.oxxxxxxkkxkkxxxxxo.', '.oxxxxxxkkkkkxxxxxo.', '.oxxxxxxxkkkxxxxxxo.', '.oxxxxxxxxkxxxxxxxo.', '.oxxxxxxxxxxxxxxxxo.', '.oxxxxxxxxxxxxxxxxo.', '.oooooooooooooooooo.'];
+  // cracks: the box's seam opens as the knocks add up; at the end two ears peek out
+  if(n >= 16) rows[6] = rows[6].slice(0, 9) + 'oo' + rows[6].slice(11);
+  if(n >= 32){ rows[4] = '...yyyy......yyyy...'; }
+  if(n >= 44){ rows[3] = '.......o...o........'; rows[4] = '...yyyopo.opoyyy....'; }
+  rows.forEach((r, y) => { for(let x = 0; x < r.length; x++){ const col = MEOW_PIXC[r[x]] || (r[x] === 'p' ? '#F7A1B5' : null); if(!col) continue; g.fillStyle = col; g.fillRect(x + 2, y + 1, 1, 1); } });
+  if(!into) slot.replaceWith(c);
+}
+function meowSheetAct(a){
+  const S = _meowSheet, p = _meow.pet, w = S && S.walker; if(!p || !w) return;
+  const en = isEN(), t = (th, e) => en ? e : th, room = S.el.querySelector('.meow-room');
+  if(a === 'feed'){ S.tray = !S.tray; meowSheetPaint(); return; }
+  if(a === 'sleep'){
+    if(meowAsleep(p, meowNow())){ p.asleep = false; if(meowNight(meowNow())) p.awakeUntil = meowNow() + 3 * MEOW_HR; meowSave(); meowSheetPaint(); meowSheetSay(t('งัวเงีย… ตื่นแล้ว', 'Yawn… awake.')); }
+    else { p.asleep = true; p.awakeUntil = 0; S.tray = false; meowSave(); meowSheetPaint(); }
+    meowMount(); return;
+  }
+  if(meowAsleep(p, meowNow())) return;
+  const fx = (ch, n = 3) => { for(let i = 0; i < n; i++) setTimeout(() => meowFx(room.querySelector('.meow-stage'), w, ch), i * 150); };
+  if(a === 'pet'){ p.bond = Math.min(100, (p.bond || 0) + 1); w.plan([{ act:'purr', dur:2.4 }]); fx('♥'); meowSheetSay(meowNeed(p) || [t('เกาคางหน่อยสิ', 'Scratch my chin'), t('ครืด… ครืด…', 'Purr… purr…'), t('เมี้ยว~', 'Meow~')][Math.floor(Math.random() * 3)]); }
+  if(a === 'ball'){ p.fun = meowClamp(p.fun + 18); w.plan([{ act:'bat', dur:3 }]); meowSheetSay(t('ตะปบ! ตะปบ!', 'Pounce!')); }
+  if(a === 'wand'){ p.fun = meowClamp(p.fun + 20); w.plan([{ act:'wand', dur:3.6 }]); meowSheetSay(t('จับให้ได้!', 'Got it!')); }
+  if(a === 'nip'){ p.fun = meowClamp(p.fun + 25); w.plan([{ act:'nip', dur:5 }]); fx('✿', 4); meowSheetSay(t('กลิ่นอะไรเนี่ย… ฟิน~', 'What is that smell… bliss~')); }
+  if(a === 'box'){ p.fun = meowClamp(p.fun + 12); w.plan([{ act:'box', dur:6 }]); meowSheetSay(t('กล่องคือบ้านของแมว', 'A box is a cat’s home')); }
+  if(a === 'bath'){ p.clean = 100; w.plan([{ act:'brush', dur:2.6 }]); fx('✦', 6); meowSheetSay(t('ขนฟูนุ่มแล้ว', 'All fluffy now')); }
+  p.bond = Math.min(100, (p.bond || 0) + 1);
+  meowSave(); meowSheetBars();
+}
+function meowSheetBars(){
+  const S = _meowSheet, p = _meow.pet; if(!S || !p) return;
+  const vals = [p.full, p.fun, p.clean, p.energy];
+  S.el.querySelectorAll('.meow-stat').forEach((s, i) => { s.querySelector('em').textContent = Math.round(vals[i]); s.querySelector('i').style.setProperty('--v', vals[i] + '%'); s.classList.toggle('is-low', vals[i] < 25); });
+  const sn = S.el.querySelector('.meow-snack'); if(sn) sn.textContent = '🍪 ' + (_meow.snacks || 0);
+}
+function meowSheetClick(e){
+  const S = _meowSheet; if(!S) return;
+  const en = isEN(), t = (th, x) => en ? x : th;
+  if(e.target.closest('[data-share="close"]')){ closeMeowSheet(); return; }
+  const sp = e.target.closest('[data-meow-sp]'); if(sp){ S.hs.sp = sp.dataset.meowSp; meowSheetPaint(); return; }
+  const col = e.target.closest('[data-meow-col]'); if(col){ S.hs.col = col.dataset.meowCol; meowSheetPaint(); return; }
+  const sug = e.target.closest('[data-meow-sug]'); if(sug){ const i = S.el.querySelector('#meow-name'); if(i) i.value = sug.dataset.meowSug; return; }
+  const act = e.target.closest('[data-meow-a]'); if(act){ meowSheetAct(act.dataset.meowA); return; }
+  const food = e.target.closest('[data-meow-food]');
+  if(food){
+    const f = MEOW_FOODS.find(x => x.k === food.dataset.meowFood), p = _meow.pet, w = S.walker;
+    if(p.full >= 97){ meowSheetSay(t('อิ่มแล้ว! ไว้ค่อยกินนะ', 'Full! Later.')); return; }
+    if(f.cost > (_meow.snacks || 0)){ meowSheetSay(t('ขนมไม่พอ อาหารเม็ดก็อร่อยนะ', 'Not enough snacks. Kibble is nice too.')); return; }
+    _meow.snacks -= f.cost; S.tray = false;
+    p.full = meowClamp(p.full + f.full); p.fun = meowClamp(p.fun + f.fun); p.zeroAt = null; p.bond = Math.min(100, (p.bond || 0) + 1);
+    meowSave(); meowSheetPaint();
+    const w2 = S.walker; if(w2){ w2.x = 40; w2.plan([{ act:'eat', face:-1, dur:3.6 }]); }
+    meowSheetSay(f.k === 'kibble' ? t('ง่ำ ง่ำ', 'Nom nom') : t('ว้าว ' + f.th + '!', 'Wow, ' + f.en.toLowerCase() + '!'));
+    return;
+  }
+  const b = e.target.closest('[data-meow]'); if(!b) return;
+  const k = b.dataset.meow;
+  if(k === 'box'){ S.step = 'box'; S.hs.taps = 0; meowSheetPaint(); return; }
+  if(k === 'knock'){
+    S.hs.taps++;
+    if(S.hs.taps >= 48){ S.step = 'name'; meowSheetPaint(); return; }
+    const cv = b.querySelector('canvas'); b.classList.remove('wob'); void b.offsetWidth; b.classList.add('wob');
+    if([16, 32, 44].includes(S.hs.taps)) meowBoxPaint(cv);
+    S.el.querySelector('.meow-prog i').style.setProperty('--v', (S.hs.taps / 48 * 100).toFixed(1) + '%');
+    S.el.querySelector('.meow-count').innerHTML = `${S.hs.taps} <small>/ 48 ${t('ครั้ง', 'knocks')}</small>`;
+    return;
+  }
+  if(k === 'named'){
+    const name = ((S.el.querySelector('#meow-name') || {}).value || '').trim().slice(0, 12) || 'โมจิ', now = meowNow();
+    _meow.pet = { name, sp:S.hs.sp, col:S.hs.col, born:now, at:now, full:80, fun:80, clean:100, energy:100, bond:0, asleep:false, zeroAt:null };
+    _meow.home = false; _meow.day = meowDay(now); _meow.snacks = Math.max(3, _meow.snacks || 0);
+    meowSave(); S.step = 'home'; meowSheetPaint(); meowMount();
+    setTimeout(() => meowSheetSay(t(`เมี้ยว! ฉันชื่อ${name}`, `Meow! I'm ${name}`)), 400);
+    return;
+  }
+  if(k === 'home'){ _meow.home = !_meow.home; meowSave(); meowMount(); meowSheetPaint(); return; }
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && _meowSheet) closeMeowSheet(); });
+setTimeout(() => { try{ meowInit(); }catch(e){ console.warn('meow', e); } }, 900);
+
 function navSnapshot(){
   const snap = {};
   NAV_KEYS.forEach(k => snap[k] = state[k]);
@@ -28352,6 +28985,7 @@ function bindDelegatedEvents(){
       renderMain(); replaceHistory();
     }
     else if(action==='open-push'){ state.setMenuOpen = false; render(); openPushSheet(); }
+    else if(action==='open-meow'){ state.setMenuOpen = false; render(); openMeowSheet(); }
     else if(action==='install-app'){ state.setMenuOpen = false; render(); installApp(); }
     else if(action==='toggle-theme'){
       applyTheme(state.theme==='dark' ? 'light' : 'dark');
@@ -28822,6 +29456,7 @@ async function init(){
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;
     if(state.account && oshiData.avatar) state.account.avatar = oshiData.avatar;
+    if(state.account && oshiData.meow) meowFromAccount(oshiData.meow);
     // the reader's own arrangement; a guest or someone signed out gets the site as it comes
     const lay = state.account ? (oshiData.layout || null) : null;
     if(JSON.stringify(lay) !== JSON.stringify(_authKnown ? state.layout : _bootLayout)) changed = true;
