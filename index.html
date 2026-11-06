@@ -6313,6 +6313,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-call:active{ transform:translateY(2px); box-shadow:none; }
   .meow-call canvas{ width:30px; height:23px; }
   .meow-call b{ display:block; font-size:13px; } .meow-call small{ display:block; font-size:11px; color:var(--ink-soft); }
+  .meow-poked{ animation:meowPoke .6s ease-out; transform-origin:50% 100%; }
+  @keyframes meowPoke{ 0%{ transform:none; } 20%{ transform:rotate(-7deg) translateX(-2px); } 45%{ transform:rotate(5deg) translateX(2px); } 70%{ transform:rotate(-2deg); } 100%{ transform:none; } }
   .meow-toy{ position:absolute; left:0; top:0; padding:0; border:0; background:none; cursor:pointer; pointer-events:auto; -webkit-tap-highlight-color:transparent; }
   .meow-toy canvas{ display:block; image-rendering:pixelated; }
   .meow-traits{ display:flex; flex-wrap:wrap; gap:4px 10px; margin:-4px 0 8px; font-size:12px; color:var(--ink-soft); }
@@ -28358,6 +28360,24 @@ function meowRoute(from, to, ch){
   return out;
 }
 // the floor to stand on to look at a thing: the thing itself when it is wide enough, else the card it sits in
+/* everything else on the page is hers to meddle with: buttons and links she paws (they give a little wobble), pictures
+   she stares at, pats or naps on, and things that move or blink — the news ticker, live badges, clocks — that she
+   watches and chatters at. Found fresh, on screen, each time she wonders what to do. */
+const MEOW_MOVE_SEL = '.ticker-run, .live-chip, .gec-live, .gel-live, .today-live, .ff-live-clock, .ff-live-row';
+function meowThings(){
+  const root = document.getElementById('main') || document.querySelector('main'), out = [], band = meowBand();
+  if(!root) return out;
+  const vis = r => r.width > 8 && r.height > 8 && r.bottom > band.top + 10 && r.top < band.bottom - 10 && r.left > -4 && r.right < innerWidth + 4;
+  let n = 0;
+  for(const el of root.querySelectorAll('button, a[href], .chip, [data-action]')){
+    if(n > 40) break; if(el.closest('.ov-layer, .share-sheet, .meow-tray, .meow-ring, .meow-toy, .meow-cat')) continue;
+    const r = el.getBoundingClientRect(); if(!vis(r) || r.width > 220 || r.height > 70) continue; n++; out.push({ el, kind:'btn' }); }
+  for(const el of root.querySelectorAll('img')){ if(el.closest('.ov-layer, .share-sheet')) continue; const r = el.getBoundingClientRect(); if(vis(r) && r.width >= 70 && r.height >= 50) out.push({ el, kind:'img' }); }
+  for(const el of document.querySelectorAll(MEOW_MOVE_SEL)){ const r = el.getBoundingClientRect(); if(vis(r) || (el.matches('.ticker-run') && r.width)) out.push({ el, kind:'move' }); }
+  return out;
+}
+// a little knock: the thing she paws wobbles, as if it nearly went over the edge
+function meowPoke(el){ if(!el || !el.isConnected || MEOW_STILL) return; el.classList.remove('meow-poked'); void el.offsetWidth; el.classList.add('meow-poked'); setTimeout(() => el.classList.remove('meow-poked'), 700); }
 function meowPoiLedge(el, cw){
   const r = el.getBoundingClientRect();
   if(r.width >= cw + 8 && r.height >= 28) return { el, pad:2 };
@@ -28602,6 +28622,7 @@ class MeowRoamer extends MeowWalker {
       ['inspect', pois.length ? (.45 + this.cur * .5) * go * (.4 + CU * 1.2) : 0],
       ['toy', toys.length && !tired ? (.7 * go + (p.fun < 40 ? .8 : 0)) * (.4 + PL * 1.4) : 0],
       ['chew', BT > .55 ? (BT - .4) * 1.4 : 0],
+      ['poke', !tired ? (.5 + CU * .6 + PL * .6) * go : 0],
       ['nap', (tired ? 4 : .9) * lazy], ['groom', p.clean < 60 ? 1.4 : .5],
       ['stretch', .3], ['yawn', tired ? .6 : .2], ['loaf', (tired ? 1.6 : 1.2) * lazy], ['watch', .35], ['wander', .3 * go],
       ['zoom', p.fun > 65 && p.energy > 55 && others.length > 1 ? .28 * PL * 2 * A * 1.5 : 0],
@@ -28634,6 +28655,21 @@ class MeowRoamer extends MeowWalker {
         return [{ act:'go', L, rx:rxOn(L), spd:.8 }, { act:'knead', dur:meowRand(2, 4) }, { act:'loaf', dur:2 }, { act:'sleep', dur:meowRand(90, 420) * (p.lazy ? 1.6 : 1) }, { act:'stretch', dur:1.8 }, { act:'yawn', dur:1.3 }, { act:'shake', dur:.4 }];
       }
       case 'toy': return meowToyPlan(this, meowPick(toys));
+      case 'poke': {
+        const things = meowThings(); if(!things.length) return [{ act:'watch', dur:3 }];
+        const T2 = meowPick(things), el = T2.el, r = el.getBoundingClientRect(), cx = r.left + r.width / 2 + scrollX;
+        const L = T2.kind === 'move' && el.matches('.ticker-run') ? this.ledge : (meowPoiLedge(el, this.cw) || this.ledgeUnder(cx, r.top + scrollY) || this.ledge), B = meowLedgeBox(L);
+        if(!B) return [{ act:'watch', dur:3 }];
+        const side = Math.random() < .5 ? -1 : 1, rx = Math.max(0, Math.min(B.r - B.l - this.cw, cx - B.l - this.cw / 2 + side * this.cw * .45)), face = () => { const q = el.getBoundingClientRect(); return q.left + q.width / 2 + scrollX; };
+        const go = { act:'go', L, rx, spd:1.05 };
+        if(T2.kind === 'btn') return [go, { act:'watch', dur:1, faceX:face }, { act:'stalk', dur:.6 }, { act:'bat', dur:.9, faceX:face }, { act:'fn', fn:() => meowPoke(el) }, ...(Math.random() < .35 ? [{ act:'say', text:meowPick(en ? ['Does this button do anything?', 'Boop.', 'It moved!'] : ['ปุ่มนี้กดได้ไหมนะ', 'แตะ ๆ', 'มันขยับด้วย!']), soft:true }] : []), { act:'sit', dur:meowRand(1.5, 3), faceX:face }];
+        if(T2.kind === 'move') return [...(L === this.ledge ? [] : [go]), { act:'watch', dur:1.2, faceX:face }, { act:'chatter', dur:meowRand(1, 2), faceX:face }, ...(Math.random() < .4 ? [{ act:'say', text:meowPick(en ? ['What’s moving?', 'Got to catch it…'] : ['อะไรวิ่งน่ะ', 'ต้องจับให้ได้…']), soft:true }] : []), { act:'watch', dur:meowRand(2, 4), faceX:face }];
+        // a picture: stare at it, pat it, or (sleepy) curl up on the card it is in
+        const k = Math.random();
+        if(k < (1 - A) * .35) return [{ ...go, rx:Math.random() * Math.max(0, B.r - B.l - this.cw) }, { act:'knead', dur:2.5 }, { act:'sleep', dur:meowRand(60, 240), pose:'curl' }, { act:'stretch', dur:1.8 }];
+        if(k < .6) return [go, { act:'watch', dur:meowRand(2.5, 5), faceX:face }, ...(Math.random() < .35 ? [{ act:'say', text:meowPick(en ? ['Who’s this?', 'Pretty…'] : ['ใครเนี่ย', 'สวยจัง…']), soft:true }] : []), { act:'sit', dur:2 }];
+        return [go, { act:'watch', dur:1, faceX:face }, { act:'bat', dur:1.2, faceX:face }, { act:'fn', fn:() => meowPoke(el.closest('button, a, [data-action]') || el) }, { act:'sit', dur:2 }];
+      }
       // a nibbler gnaws: the corner of a card, or a toy if one is about
       case 'chew': {
         const t2 = toys.find(el => el.toy.k === 'mouse' || el.toy.k === 'ball');
@@ -29200,6 +29236,17 @@ function meowToyTray(){
     row.querySelectorAll('.meow-tray-b').forEach(x => x.classList.toggle('on', x === b)); });
   document.body.appendChild(el); _meowTray = el;
 }
+// the reader types: she comes to see, and now and then walks over the keyboard
+let _meowTypeAt = 0;
+document.addEventListener('input', e => {
+  const w = _meowWalk, el = e.target; if(!w || !el || !/^(INPUT|TEXTAREA)$/.test(el.tagName) || el.closest('.meow-sheet')) return;
+  const now = meowSec(); if(now - _meowTypeAt < 25 || !meowHere() || w.mode !== 'ledge' || !w.awake() || w.busy() || MEOW_STILL) return;
+  _meowTypeAt = now; const r = el.getBoundingClientRect(), x = r.left + r.width / 2 + scrollX, L = w.ledgeUnder(x, r.bottom + scrollY) || w.ledge, B = meowLedgeBox(L); if(!B) return;
+  const en = isEN();
+  w.queue = [{ act:'go', L, rx:Math.max(0, Math.min(B.r - B.l - w.cw, x - B.l - w.cw / 2)), spd:1.2 }, { act:'watch', dur:2, faceX:() => x },
+    ...(Math.random() < .45 ? [{ act:'say', text:meowPick(en ? ['asdfghjkl', 'Let me type too', ';;;;;;;'] : ['ฟฟฟฟหกดเ', 'ขอพิมพ์ด้วย', 'จจจจจจ']) }] : []), { act:'sit', dur:3 }];
+  w.next();
+}, true);
 function meowToyTrayClose(){ _meowPlacing = ''; if(_meowTray){ _meowTray.remove(); _meowTray = null; } }
 // while a toy is in hand, the next tap on the page puts it down (and does nothing else)
 document.addEventListener('click', e => {
