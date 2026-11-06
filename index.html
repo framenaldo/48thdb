@@ -27703,7 +27703,7 @@ function closeShareSheet(){
    users/<uid>.meow. Snacks come from using the site: three a day for coming back, one for each event or member
    opened (three a day). She never dies in this round; three days hungry and she is poorly until fed.
    Sprites are 24×18 grids of letters drawn by meowSprite: o outline, b body, h head, H forehead, t tail, f feet,
-   l belly, m muzzle, e/E eyes, n nose, p inner ear, k blush, c collar, g bell, x/y box. A breed is a palette and a
+   l belly, d far leg (a shade darker than f), m muzzle, e/E eyes, n nose, p inner ear, k blush, c collar, g bell, x/y box. A breed is a palette and a
    pattern laid over those letters (meowColor). */
 const MEOW_KEY = '48thdb-meow';
 const MEOW_INK = '#2B1E2C';
@@ -27800,7 +27800,29 @@ function meowFrontHead(B, eyes = 'open'){
 const MEOW_UPHEAD = (B, eyes) => meowHead(B, eyes).slice().reverse();
 // pose: stand walk1 walk2 sit bat lick stretch loaf sleep eat1 eat2 box front front-wave1/2 belly curl scratch1/2
 //   knead1/2 arch reach lookback; eyes: open blink happy shut yawn meow; tail: 0/1 (a swish)
+/* the stretch (a play bow) is drawn on its own: rump up, head low and joined to the shoulders, thin front legs reaching, far hind leg
+   darker (letter d, the same colour as f, a shade down). Helpers: mfill a row of letters, moutline the edge, mhead the head, mtail the tail. */
+function mfill(g, y, x0, x1, ch){ for(let x = x0; x <= x1; x++) if(y >= 0 && y < MEOW_H && x >= 0 && x < MEOW_W) g[y][x] = ch; }
+function moutline(g){
+  const add = []; for(let y = 0; y < MEOW_H; y++) for(let x = 0; x < MEOW_W; x++){ if(g[y][x] !== '.') continue;
+    if((y > 0 && g[y - 1][x] !== '.' && g[y - 1][x] !== 'o') || (y < MEOW_H - 1 && g[y + 1][x] !== '.' && g[y + 1][x] !== 'o') || (x > 0 && g[y][x - 1] !== '.' && g[y][x - 1] !== 'o') || (x < MEOW_W - 1 && g[y][x + 1] !== '.' && g[y][x + 1] !== 'o')) add.push([x, y]); }
+  for(const [x, y] of add) g[y][x] = 'o';
+}
+function mhead(g, B, eyes, x, y){ meowHead(B, eyes).forEach((r, j) => { for(let i = 0; i < r.length; i++){ if(r[i] !== '.' && x + i >= 0 && x + i < MEOW_W && y + j >= 0 && y + j < MEOW_H) g[y + j][x + i] = r[i]; } }); }
+function mtail(g, B, pts){ const fl = B.tail === 'fluff', stub = B.tail === 'bob'; (stub ? pts.slice(0, 2) : pts).forEach(([x, y]) => { g[y][x] = 't'; if(fl && x + 1 < MEOW_W && g[y][x + 1] === '.') g[y][x + 1] = 't'; }); }
+function meowStretch(B, eyes, tail){
+  const g = meowGrid(), up = tail ? 1 : 0;
+  {   // a play bow: rump high, back sloping down to the shoulders, head low and joined to them, front legs reaching, tail up
+    mtail(g, B, up ? [[3, 4], [3, 3], [2, 2], [2, 1], [3, 0]] : [[3, 4], [2, 3], [2, 2], [2, 1], [2, 0]]);
+    mfill(g, 4, 4, 8, 'b'); mfill(g, 5, 3, 9, 'b'); mfill(g, 6, 3, 10, 'b'); mfill(g, 7, 3, 11, 'b'); mfill(g, 8, 3, 13, 'b'); mfill(g, 9, 3, 14, 'b'); mfill(g, 10, 3, 14, 'b');
+    mfill(g, 11, 9, 11, 'l'); mfill(g, 11, 12, 15, 'b'); mfill(g, 12, 9, 12, 'l'); mfill(g, 12, 13, 15, 'b'); mfill(g, 13, 10, 15, 'b'); mfill(g, 14, 11, 15, 'b'); mfill(g, 15, 11, 14, 'b');
+    for(let y = 11; y <= 16; y++){ mfill(g, y, 4, 5, 'f'); g[y][6] = 'o'; mfill(g, y, 7, 8, 'd'); }   // hind legs, the far one darker
+    mfill(g, 16, 10, 22, 'f');                                                                        // front legs reaching along the ground
+    moutline(g); mhead(g, B, eyes === 'open' ? 'happy' : eyes, 14, 8); return g;
+  }
+}
 function meowPose(B, pose, eyes, tail){
+  if(pose === 'stretch') return meowStretch(B, eyes, tail);
   const g = meowPoseRaw(B, pose, eyes, tail);
   // short legs: the standing poses come down two pixels on stubby legs
   if(B.legs === 'short' && /^(stand|walk1|walk2)$/.test(pose)){
@@ -27910,6 +27932,7 @@ function meowColor(B, ch, x, y, col, g){
   const blob = (cw, chh, s) => _meowHash(Math.floor((x + s) / cw), Math.floor((y + s * 2) / chh), s);
   const furry = ch === 'b' || ch === 'h' || ch === 'H' || ch === 't';
   if(ch === 'o') return B.ink || MEOW_INK;
+  if(ch === 'd'){ const c = meowColor(B, 'f', x, y, col, g); return '#' + [1, 3, 5].map(i => Math.round(parseInt(c.slice(i, i + 2), 16) * [.86, .8, .84][(i - 1) / 2]).toString(16).padStart(2, '0')).join(''); }   // the far leg, a shade down
   if(ch === 'e') return B.eye; if(ch === 'E') return B.eye2 || B.eye;
   if(ch === 'n') return B.nose; if(ch === 'p') return '#F7A1B5'; if(ch === 'k') return '#FF8FB0';
   if(ch === 'c') return col || '#E4457E'; if(ch === 'g') return '#F5C542';
