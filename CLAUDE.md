@@ -273,7 +273,7 @@ the tops of the cards over the whole page, nearest her first, and the page's foo
 what she wants (explore, sniff a member's name — her oshi gets hearts —, nap, groom, zoomies, come to the mouse, ask
 for food, wander off the screen) and `meowRoute` finds the way: hops, drops off a card's end, climbs up a card's side,
 or up the screen's edge. Jumps and falls are under gravity. She notices a moving mouse, a tap near her, a butterfly
-(`MeowBug`), and can be dragged and dropped; one tap pets her, a second opens her home. A new page: she leaps in onto a
+(`MeowBug`), and can be dragged and dropped; one tap pets her and opens a ring of buttons around her (`meowRingOpen`: feed kibble, ball, wand, brush, pet, and 🏠 for her home), done right there on the page (`meowDo`). She lives on **one page at a time**: `pet.page` keeps the view she is on (set on first mount); on any other view she is not drawn and a paw pill in the corner says where she is and brings her over (`meowHere`, `meowCallPaint`, `meowBringHere`; "เรียกน้องมาตรงนี้" in her home does the same). When she is off the screen, every 6–11 s (4–7 hungry) a meow — only cat sounds, never words — shows at the top or bottom edge on her side, with an arrow (`meowEdgeTick`). A new page: she leaps in onto a
 card in view (`reenter`). Some 30 looks (front-facing sit, slow blink, beckon, belly roll, knead, ear scratch, arch,
 reach, look back, tail chase, sneeze, curl or belly-up sleep, hanging off an edge, flips). Night 23:00–07:00 she sleeps
 where she is. Reduced motion: she only sits and loafs. Pixel art only. Island, friends and the rainbow bridge are not

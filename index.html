@@ -6291,6 +6291,29 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-bug{ position:absolute; left:0; top:0; pointer-events:none; will-change:transform; }
   .meow-fx{ position:absolute; left:0; bottom:0; pointer-events:none; font-size:14px; line-height:1; animation:meowUp 1.3s ease-out forwards; }
   .meow-fx.z{ font:800 12px/1 ui-monospace,Menlo,monospace; color:var(--ink-soft); animation-duration:2.4s; }
+  /* her ring of things to do, around her when tapped; her meow at the edge of the screen; the paw to bring her to this page */
+  .meow-ring{ position:absolute; left:0; top:0; width:0; height:0; z-index:2; pointer-events:none; }
+  .meow-rb{ position:absolute; left:0; top:0; width:44px; height:44px; margin:-22px 0 0 -22px; padding:0; border-radius:50%; border:1.5px solid var(--line);
+    background:var(--card); color:var(--ink); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.14); display:flex; align-items:center; justify-content:center; cursor:pointer;
+    pointer-events:auto; transform:scale(.3); opacity:0; transition:transform .22s cubic-bezier(.34,1.56,.64,1), opacity .15s; -webkit-tap-highlight-color:transparent; }
+  .meow-rb.on{ transform:scale(1); opacity:1; }
+  .meow-rb:active{ transform:scale(.92) translateY(2px); box-shadow:none; }
+  .meow-rb .meow-px{ width:26px; height:26px; }
+  .meow-rb small{ position:absolute; bottom:100%; margin-bottom:1px; font-size:10.5px; font-weight:700; white-space:nowrap; color:var(--ink);
+    text-shadow:0 0 3px var(--card), 0 0 3px var(--card), 0 0 2px var(--card); }
+  .meow-rb.is-home{ width:34px; height:34px; margin:-17px 0 0 -17px; font-size:15px; }
+  .meow-edge{ position:absolute; left:0; top:0; padding:5px 11px; border-radius:99px; background:var(--card); color:var(--ink); border:1.5px solid var(--pink);
+    box-shadow:0 3px 0 rgba(var(--shadow-rgb),.12); font-size:13px; font-weight:700; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .25s; }
+  .meow-edge.on{ opacity:1; }
+  .meow-edge i{ font-style:normal; color:var(--pink); margin:0 3px; font-size:11px; }
+  .meow-call{ position:fixed; right:12px; bottom:calc(var(--nav-h, 84px) + 14px); z-index:29; display:flex; align-items:center; gap:8px; padding:7px 14px 7px 9px;
+    border-radius:99px; border:2px solid var(--pink); background:var(--card); color:var(--ink); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.16); cursor:pointer; text-align:left;
+    font:inherit; line-height:1.25; -webkit-tap-highlight-color:transparent; }
+  .meow-call[hidden]{ display:none; }
+  .meow-call:active{ transform:translateY(2px); box-shadow:none; }
+  .meow-call canvas{ width:30px; height:23px; }
+  .meow-call b{ display:block; font-size:13px; } .meow-call small{ display:block; font-size:11px; color:var(--ink-soft); }
+  @media (prefers-reduced-motion:reduce){ .meow-rb{ transition:none; } }
   @keyframes meowUp{ 0%{ opacity:0; transform:translateY(0) scale(.7); } 18%{ opacity:1; transform:scale(1); } 100%{ opacity:0; transform:translate(6px,-34px) scale(1.05); } }
   /* the sheet: her home */
   .meow-sheet .share-panel{ padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
@@ -28601,6 +28624,10 @@ class MeowRoamer extends MeowWalker {
 
   /* ---- each frame ---- */
   tick(dt){
+    // she is on another page: not here at all; back on hers, she is sitting about somewhere on screen
+    if(!meowHere()){ if(!this.gone){ this.gone = true; this.btn.hidden = true; meowRingClose(); if(_meowBubble) _meowBubble.classList.remove('on'); if(_meowEdge) _meowEdge.classList.remove('on'); } meowCallPaint(); return; }
+    if(this.gone){ this.gone = false; meowCallPaint(); this.reenter(null, true); return; }
+    meowEdgeTick(this, dt);
     this.T += dt; this.fxT += dt;
     if(this.tw){ this.tw.t += dt; if(this.tw.t >= this.tw.d) this.tw = null; }
     if(this.squash > 0) this.squash = Math.max(0, this.squash - dt * 1.4);
@@ -28691,7 +28718,7 @@ class MeowRoamer extends MeowWalker {
   goAway(){ this.mode = 'away'; this.awayT = meowRand(20, 60); this.queue = []; this.btn.hidden = true; if(_meowBubble) _meowBubble.classList.remove('on'); }
   tickAway(dt){ this.awayT -= dt; if(this.awayT <= 0) this.reenter(); }
   // she comes (back) onto the screen: a leap in from the side onto a card in view
-  reenter(say){
+  reenter(say, quiet){
     _meowLedges = meowScanLedges(this.cw, null);
     const vis = this.onScreen(), L = vis.length ? meowPick(vis) : this.base(), B = meowLedgeBox(L); if(!B) return;
     const left = Math.random() < .5;
@@ -28699,7 +28726,7 @@ class MeowRoamer extends MeowWalker {
     this.vx = left ? -this.cw : innerWidth; this.vy = Math.max(scrollY + 40, B.y - 60); this.dir = left ? 1 : -1;
     const bm = Math.max(0, B.r - B.l - this.cw), lx = Math.max(0, Math.min(bm, (left ? 30 : bm - 30) + meowRand(-20, 20)));
     this.launch(B.l + lx, B.y, L);
-    this.onLand = w => { w.queue = [{ act:'say', text:say || (isEN() ? 'I’m back~' : 'มาแล้ว~'), soft:!say }, { act:'front', dur:2 }]; };
+    this.onLand = w => { w.queue = quiet ? [{ act:'sit', dur:2 }] : [{ act:'say', text:say || (isEN() ? 'I’m back~' : 'มาแล้ว~'), soft:!say }, { act:'front', dur:2 }]; };
   }
   catchBug(){
     const g = _meowBug, p = this.pet, en = isEN(); if(!g || !g.alive) return;
@@ -28713,7 +28740,7 @@ class MeowRoamer extends MeowWalker {
   }
   // the reader touched the page somewhere: she looks, and if she is free she may go and see
   noticeTap(x, y){
-    if(this.mode !== 'ledge' || !this.awake() || MEOW_STILL) return;
+    if(this.mode !== 'ledge' || !this.awake() || MEOW_STILL || !meowHere()) return;
     x += scrollX; y += scrollY;
     const b = this.box(); if(!b || Math.abs(y - b.y) > innerHeight * .7) return;
     if(this.idle() || this.act === 'groom') this.dir = x > b.l + this.rx + this.cw / 2 ? 1 : -1;
@@ -28859,14 +28886,14 @@ class MeowBug {
 }
 function meowBugMaybe(force){
   const w = _meowWalk, p = _meow && _meow.pet;
-  if(!w || !p || _meowBug || MEOW_STILL || document.hidden || w.mode !== 'ledge' || !w.visible() || !w.awake() || (!force && Math.random() > .14)) return;
+  if(!w || !p || _meowBug || MEOW_STILL || document.hidden || !meowHere() || w.mode !== 'ledge' || !w.visible() || !w.awake() || (!force && Math.random() > .14)) return;
   _meowBug = new MeowBug(_meowPage || _meowLayer, w.s); meowRun(_meowBug);
   if(w.idle() || w.act === 'groom' || w.act === 'sleep'){ w.queue = []; w.T = w.dur; }
 }
 
 function meowPlace(){ if(_meowWalk){ _meowWalk.resize(); } }
 function meowSay(text, ms = 2600){
-  if(!_meowBubble || !_meowWalk || !text || _meowWalk.mode === 'away') return;
+  if(!_meowBubble || !_meowWalk || !text || _meowWalk.mode === 'away' || !meowHere()) return;
   _meowBubble.textContent = text; _meowBubble.classList.add('on');
   clearTimeout(_meowSayT); _meowSayT = setTimeout(() => _meowBubble.classList.remove('on'), ms);
   meowBubblePos(_meowWalk);
@@ -28889,8 +28916,9 @@ function meowFx(host, w, html, cls = ''){
 function meowMount(){
   if(!_meow) _meow = meowLoad();
   const p = _meow.pet;
-  if(!p || _meow.home){ if(_meowWalk){ _meowRun.delete(_meowWalk); _meowWalk.remove(); _meowWalk = null; } if(_meowBug) _meowBug.die(); if(_meowLayer) _meowLayer.hidden = true; if(_meowPage) _meowPage.hidden = true; return; }
+  if(!p || _meow.home){ meowRingClose(); if(_meowCall) _meowCall.hidden = true; if(_meowWalk){ _meowRun.delete(_meowWalk); _meowWalk.remove(); _meowWalk = null; } if(_meowBug) _meowBug.die(); if(_meowLayer) _meowLayer.hidden = true; if(_meowPage) _meowPage.hidden = true; return; }
   meowAdvance();
+  if(!p.page){ p.page = state.view; meowSave(); }
   if(!_meowLayer){
     _meowLayer = document.createElement('div'); _meowLayer.className = 'meow-walk';
     _meowBubble = document.createElement('div'); _meowBubble.className = 'meow-say'; _meowBubble.setAttribute('aria-live', 'polite');
@@ -28910,7 +28938,8 @@ function meowMount(){
     }, { passive:true });
     addEventListener('pointermove', e => { if(e.pointerType !== 'mouse') return; _meowPtr.x = e.clientX; _meowPtr.y = e.clientY; _meowPtr.t = meowSec(); _meowPtr.fine = true; }, { passive:true });
     addEventListener('pointerdown', e => {
-      if(!_meowWalk || (e.target.closest && e.target.closest('.meow-cat, .share-sheet'))) return;
+      if(_meowRing && !(e.target.closest && e.target.closest('.meow-ring, .meow-cat'))) meowRingClose();
+      if(!_meowWalk || (e.target.closest && e.target.closest('.meow-cat, .share-sheet, .meow-ring, .meow-call'))) return;
       _meowWalk.noticeTap(e.clientX, e.clientY);
     }, { passive:true });
     setInterval(() => { if(!document.hidden && performance.now() - _meowScrolling > 600) meowPlace(); }, 4000);
@@ -28922,13 +28951,13 @@ function meowMount(){
     _meowWalk = new MeowRoamer(_meowLayer, {
       onTap:w => {
         const now = meowSec(); if(now - (w.dragAt || 0) < .5) return;
-        // a tap pets her; a second tap soon after opens her home
-        if(now - (w.tapAt || -1e9) < 2.6){ w.tapAt = -1e9; setTimeout(openMeowSheet, 150); return; }
-        w.tapAt = now; meowPurr(_meowLayer, w);
-        let tip = null; try{ tip = localStorage.getItem('48thdb-meow-tip'); localStorage.setItem('48thdb-meow-tip', '1'); }catch(e){}
-        if(!tip) setTimeout(() => meowSay(isEN() ? 'Tap again to visit my home · drag to carry me' : 'แตะอีกทีไปบ้านหนู · ลากเพื่ออุ้มได้นะ', 3600), 500);
+        // a tap pets her and opens the ring of things to do with her here; with the ring open, a tap pets her again
+        if(_meowRing){ meowPurr(_meowLayer, w); return; }
+        meowPurr(_meowLayer, w); meowRingOpen(w);
+        let tip = null; try{ tip = localStorage.getItem('48thdb-meow-tip2'); localStorage.setItem('48thdb-meow-tip2', '1'); }catch(e){}
+        if(!tip) setTimeout(() => meowSay(isEN() ? 'Pick something to do with me · drag to carry me' : 'เลือกเล่นกับหนูได้เลย · ลากเพื่ออุ้มได้นะ', 3600), 500);
       },
-      onDraw:w => meowBubblePos(w) });
+      onDraw:w => { meowBubblePos(w); if(_meowRing) meowRingPos(w); } });
     meowRun(_meowWalk);
   } else { _meowWalk.key = ''; _meowWalk.resize(); if(_meowWalk.mode === 'ledge'){ _meowWalk.queue = []; _meowWalk.next(); } }
 }
@@ -28938,6 +28967,106 @@ function meowPurr(host, w){
   p.bond = Math.min(100, (p.bond || 0) + 1); meowSave();
   if(w.mode === 'ledge') w.plan([{ act:'purr', dur:2.2 }]);
   for(let i = 0; i < 3; i++) setTimeout(() => meowFx(host, w, '♥'), i * 150);
+}
+/* she lives on one page at a time: the page (view) she is on is kept with her; on any other page she is not there,
+   and a paw in the corner says where she is and brings her over. A tap on her opens a ring of things to do with her
+   right there on the page; when she is off the screen, now and then a meow at its edge shows which way she is. */
+const MEOW_PAGE_NAMES = { quiz:['หาโอชิจากดวง', 'Oshi quiz'], groups:['ประวัติวง', 'Groups'], single:['ผลงาน', 'Works'], tag:['แท็ก', 'Tag'], results:['ผล GE2026', 'GE2026 results'] };
+function meowPageName(v){
+  const n = (typeof NAV_CATALOG !== 'undefined' && NAV_CATALOG.find(o => o.view === v && !o.fav)) || null, en = isEN();
+  if(n) return en ? n.en : n.th;
+  const m = MEOW_PAGE_NAMES[v]; return m ? (en ? m[1] : m[0]) : (en ? 'another page' : 'อีกหน้าหนึ่ง');
+}
+function meowHere(){ const p = _meow && _meow.pet; return !p || !p.page || p.page === state.view; }
+let _meowCall = null;
+function meowCallPaint(){
+  const p = _meow && _meow.pet, show = !!(p && !_meow.home && _meowWalk && !meowHere());
+  if(!show){ if(_meowCall) _meowCall.hidden = true; return; }
+  if(!_meowCall){
+    _meowCall = document.createElement('button'); _meowCall.type = 'button'; _meowCall.className = 'meow-call';
+    _meowCall.addEventListener('click', () => meowBringHere());
+    document.body.appendChild(_meowCall);
+  }
+  const key = p.page + '|' + state.view + '|' + p.sp + p.col + '|' + (isEN() ? 'en' : 'th');
+  if(_meowCall.dataset.k !== key){
+    _meowCall.dataset.k = key; const en = isEN();
+    _meowCall.innerHTML = `<span><b>${en ? 'Bring her here' : 'พาน้องมาอยู่หน้านี้'}</b><small>${escapeHtml(p.name)} ${en ? 'is on' : 'อยู่หน้า'}${en ? ' ' : ''}${escapeHtml(meowPageName(p.page))}</small></span>`;
+    const c = document.createElement('canvas'); c.width = MEOW_W; c.height = MEOW_H; c.className = 'meow-px'; c.getContext('2d').drawImage(meowSprite(p, 'loaf', 'open', 0), 0, 0); _meowCall.prepend(c);
+  }
+  _meowCall.hidden = false;
+}
+function meowBringHere(say){
+  const p = _meow && _meow.pet; if(!p) return;
+  p.page = state.view; meowSave(); meowCallPaint();
+  if(_meowWalk){ _meowWalk.gone = false; _meowWalk.reenter(say || (isEN() ? 'Here I am~' : 'มาแล้ว~ เรียกหนูเหรอ')); }
+}
+// the ring
+let _meowRing = null;
+const MEOW_RING = [['feed', 'ให้อาหาร', 'Feed'], ['ball', 'บอล', 'Ball'], ['wand', 'ไม้ตกแมว', 'Wand'], ['bath', 'แปรงขน', 'Brush'], ['pet', 'ลูบหัว', 'Pet']];
+function meowRingClose(){
+  if(!_meowRing) return; const r = _meowRing; _meowRing = null; clearTimeout(r.t);
+  r.el.querySelectorAll('.meow-rb').forEach(b => b.classList.remove('on')); setTimeout(() => r.el.remove(), 200);
+}
+function meowRingOpen(w){
+  meowRingClose();
+  const p = _meow.pet, en = isEN(), asleep = meowAsleep(p, meowNow()), el = document.createElement('div'); el.className = 'meow-ring';
+  const items = asleep ? [] : MEOW_RING;
+  for(const [k, th, e] of items){ const b = document.createElement('button'); b.type = 'button'; b.className = 'meow-rb'; b.dataset.k = k; b.setAttribute('aria-label', en ? e : th);
+    const c = meowPix(k === 'feed' ? 'kibble' : k, 12); if(c) b.appendChild(c); b.insertAdjacentHTML('beforeend', `<small>${en ? e : th}</small>`); el.appendChild(b); }
+  const h = document.createElement('button'); h.type = 'button'; h.className = 'meow-rb is-home'; h.dataset.k = 'home'; h.textContent = '🏠'; h.setAttribute('aria-label', en ? 'Her home' : 'บ้านของน้อง'); el.appendChild(h);
+  el.addEventListener('click', e => { const b = e.target.closest('.meow-rb'); if(!b) return; e.stopPropagation(); const k = b.dataset.k; meowRingClose();
+    if(k === 'home'){ setTimeout(openMeowSheet, 120); return; } meowDo(k, w); });
+  (w.layerEl() || _meowLayer).appendChild(el);
+  _meowRing = { el, w, t:setTimeout(meowRingClose, 6500) };
+  meowRingPos(w);
+  requestAnimationFrame(() => el.querySelectorAll('.meow-rb').forEach((b, i) => setTimeout(() => b.classList.add('on'), i * 35)));
+}
+function meowRingPos(w){
+  const r = _meowRing; if(!r || r.w !== w) return;
+  if(w.mode !== 'ledge' || w.gone){ meowRingClose(); return; }
+  const d = w.dc; if(!d) return;
+  const band = meowBand(), [ox, oy] = w.off(), cx = d.x + ox, cy = d.y + oy - w.ch * .3, R = 92;
+  const below = cy - R - 30 < (w.sp === 'page' ? scrollY : 0) + band.top;   // too near the top of the screen: the ring goes under her
+  const lo = (w.sp === 'page' ? scrollX : 0) + 26, hi = (w.sp === 'page' ? scrollX : 0) + innerWidth - 26;
+  r.el.style.transform = `translate(${cx.toFixed(0)}px, ${cy.toFixed(0)}px)`;
+  const bs = [...r.el.children], n = bs.length - 1;
+  bs.forEach((b, i) => {
+    if(b.dataset.k === 'home'){ const sx = cx > (lo + hi) / 2 ? -1 : 1; b.style.left = (sx * (w.cw * .5 + 30)) + 'px'; b.style.top = (below ? -10 : w.ch * .35) + 'px'; return; }
+    const a = (-160 + (n > 1 ? i * 140 / (n - 1) : 70)) * Math.PI / 180, x = Math.cos(a) * R, y = Math.sin(a) * R * (below ? -1 : 1) + (below ? w.ch * .55 : 0);
+    b.style.left = Math.max(lo - cx, Math.min(hi - cx, x)).toFixed(0) + 'px'; b.style.top = y.toFixed(0) + 'px';
+  });
+}
+// doing something with her right where she is (the same as the buttons in her home)
+function meowDo(a, w){
+  const p = _meow.pet, en = isEN(), t = (th, e) => en ? e : th; if(!p || !w) return;
+  if(meowAsleep(p, meowNow())) return;
+  const fx = (ch, n = 3) => { for(let i = 0; i < n; i++) setTimeout(() => meowFx(_meowLayer, w, ch), i * 150); };
+  if(a === 'feed'){
+    const f = MEOW_FOODS[0];
+    if(p.full >= 97){ w.say(t('อิ่มแล้ว! ไว้ค่อยกินนะ', 'Full! Later.')); return; }
+    p.full = meowClamp(p.full + f.full); p.zeroAt = null; w.plan([{ act:'eat', dur:3.6 }, { act:'groom', dur:2 }]); w.say(t('ง่ำ ง่ำ', 'Nom nom'));
+  }
+  if(a === 'pet'){ meowPurr(_meowLayer, w); w.say(meowNeed(p) || [t('เกาคางหน่อยสิ', 'Scratch my chin'), t('ครืด… ครืด…', 'Purr… purr…'), t('เมี้ยว~', 'Meow~')][Math.floor(Math.random() * 3)]); return; }
+  if(a === 'ball'){ p.fun = meowClamp(p.fun + 18); w.plan([{ act:'bat', dur:3 }, { act:'sit', dur:1.5 }]); w.say(t('ตะปบ! ตะปบ!', 'Pounce!')); }
+  if(a === 'wand'){ p.fun = meowClamp(p.fun + 20); w.plan([{ act:'wand', dur:3.6 }, { act:'sit', dur:1.5 }]); w.say(t('จับให้ได้!', 'Got it!')); }
+  if(a === 'bath'){ p.clean = 100; w.plan([{ act:'brush', dur:2.6 }]); fx('✦', 6); w.say(t('ขนฟูนุ่มแล้ว', 'All fluffy now')); }
+  p.bond = Math.min(100, (p.bond || 0) + 1); meowSave();
+}
+// a meow at the edge of the screen, on the side she is, while she is out of sight
+const MEOW_SOUNDS = { th:['เมี้ยว~', 'แง้ว!', 'เมี้ยว?', 'มรรร~', 'เมี้ยวว'], en:['Meow~', 'Mew!', 'Mrrp?', 'Mrrr~', 'Meoww'], thH:['เมี้ยววว!', 'เมี้ยว! เมี้ยว!', 'แง้วววว'], enH:['Meowww!', 'Meow! Meow!', 'Mrraow!'] };
+let _meowEdge = null, _meowEdgeT = 0;
+function meowEdgeTick(w, dt){
+  const p = _meow.pet;
+  const can = p && w.dc && !MEOW_STILL && !_meowSheet && (w.mode === 'ledge' || w.mode === 'climb') && !meowAsleep(p, meowNow());
+  if(!can || w.visible()){ w.edgeT = meowRand(1.5, 3); return; }
+  w.edgeT = (w.edgeT == null ? 2 : w.edgeT) - dt; if(w.edgeT > 0) return;
+  const hungry = p.full < 25; w.edgeT = hungry ? meowRand(4, 7) : meowRand(6, 11);
+  if(!_meowEdge){ _meowEdge = document.createElement('div'); _meowEdge.className = 'meow-edge'; _meowEdge.setAttribute('aria-hidden', 'true'); (_meowLayer || document.body).appendChild(_meowEdge); }
+  const en = isEN(), list = MEOW_SOUNDS[(en ? 'en' : 'th') + (hungry ? 'H' : '')], up = w.dc.y < scrollY, band = meowBand(), txt = list[Math.floor(Math.random() * list.length)];
+  _meowEdge.innerHTML = up ? `<i>▲</i>${txt}` : `${txt}<i>▼</i>`;
+  const bw = _meowEdge.offsetWidth || 90, bh = _meowEdge.offsetHeight || 28, x = Math.max(8, Math.min(innerWidth - bw - 8, w.dc.x - scrollX - bw / 2)), y = up ? band.top + 6 : band.bottom - bh - 10;
+  _meowEdge.style.transform = `translate(${x.toFixed(0)}px, ${y.toFixed(0)}px)`; _meowEdge.classList.add('on');
+  clearTimeout(_meowEdgeT); _meowEdgeT = setTimeout(() => _meowEdge && _meowEdge.classList.remove('on'), 2400);
 }
 function meowInit(){
   _meow = meowLoad();
@@ -29128,7 +29257,7 @@ function meowSheetClick(e){
     return;
   }
   if(k === 'home'){ _meow.home = !_meow.home; meowSave(); meowMount(); meowSheetPaint(); return; }
-  if(k === 'call'){ closeMeowSheet(); if(_meowWalk) setTimeout(() => _meowWalk.reenter(t('มาแล้ว~ เรียกหนูเหรอ', 'Here I am~')), 250); return; }
+  if(k === 'call'){ closeMeowSheet(); setTimeout(() => meowBringHere(t('มาแล้ว~ เรียกหนูเหรอ', 'Here I am~')), 250); return; }
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && _meowSheet) closeMeowSheet(); });
 setTimeout(() => { try{ meowInit(); }catch(e){ console.warn('meow', e); } }, 900);
