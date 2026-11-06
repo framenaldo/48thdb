@@ -260,19 +260,22 @@ back unasked.
 
 ## เหมียว (the pixel cat)
 
-A reader's own pixel cat (`MEOW_*`, `meowInit`; adopt from ☰ "เหมียวของฉัน": 13 breeds, a box knocked 48 times, a
-name). Needs อิ่ม/สนุก/ขนนุ่ม/พลัง run down by the hour; snacks come from coming back and opening events/members.
-Kept in localStorage `48thdb-meow` and `users/<uid>.meow`. On every page she lives on her own (`MeowRoamer`): her
-floors are the tops of the cards on screen, member chips and the menu bar (`meowScanLedges`); `think()` weighs what
-she wants (explore, sniff a member's name — her oshi gets hearts —, nap, groom, zoomies, come to the mouse, ask for
-food, wander off the screen for a while) and `meowRoute` finds the way: hops, drops off a card's end, climbs up a
-card's side, or up the edge of the screen when nothing reaches. Jumps and falls are under gravity and land on
-whatever is below. She notices a moving mouse, a tap on the page, a fling of the scroll, a butterfly (`MeowBug`),
-and can be dragged and dropped; one tap pets her, a second opens her home. Some 30 looks (front-facing sit, slow blink,
-beckon, belly roll, knead, ear scratch, arch, reach, look back, tail chase, sneeze, curl or belly-up sleep, hanging off an
-edge, a flip in zoomies). On a card she is drawn in a layer that is part of the page (`_meowPage`, `space()`), so the
-browser scrolls her with it — moving her by script each frame lagged on phones; on the menu bar she is in the fixed layer. Night 23:00–07:00 she sleeps on the
-menu bar. Reduced motion: she only sits and loafs. Pixel art only. Island, friends and the rainbow bridge are not
+A reader's own pixel cat (`MEOW_*`, `meowInit`; adopt from ☰ "เหมียวของฉัน": 35 looks in `MEOW_BREEDS` grouped as
+Thai cats, coats and breeds (`MEOW_GROUPS`) — a breed is a palette, a pattern drawn per pixel by `meowColor` (tabby,
+calico, cow, points, saddle "สะพายเป้", bicolor, tortie, mask, spots, ticked, classic…) and optional shape (`legs:'short'`,
+`tail:'bob'|'fluff'`, `ears:'fold'`); a box knocked 48 times, a name). Old pets keep their key, so never rename one.
+Needs อิ่ม/สนุก/ขนนุ่ม/พลัง run down by the hour; snacks come from coming back and opening events/members.
+Kept in localStorage `48thdb-meow` and `users/<uid>.meow`. On every page she lives on her own (`MeowRoamer`) **in the
+page itself**: her coordinates are page coordinates (`meowLedgeBox`), her layer scrolls with the page (`_meowPage`), and
+scrolling never moves or drops her — the reader scrolls to find her (or "เรียกน้องมาตรงนี้" in her home). Her floors are
+the tops of the cards over the whole page, nearest her first, and the page's foot (`meowScanLedges`); `think()` weighs
+what she wants (explore, sniff a member's name — her oshi gets hearts —, nap, groom, zoomies, come to the mouse, ask
+for food, wander off the screen) and `meowRoute` finds the way: hops, drops off a card's end, climbs up a card's side,
+or up the screen's edge. Jumps and falls are under gravity. She notices a moving mouse, a tap near her, a butterfly
+(`MeowBug`), and can be dragged and dropped; one tap pets her, a second opens her home. A new page: she leaps in onto a
+card in view (`reenter`). Some 30 looks (front-facing sit, slow blink, beckon, belly roll, knead, ear scratch, arch,
+reach, look back, tail chase, sneeze, curl or belly-up sleep, hanging off an edge, flips). Night 23:00–07:00 she sleeps
+where she is. Reduced motion: she only sits and loafs. Pixel art only. Island, friends and the rainbow bridge are not
 built (they would need Firestore rules from the owner's machine).
 
 ## หาโอชิจากดวง (/quiz)
