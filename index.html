@@ -27769,7 +27769,7 @@ const MEOW_HEAD = {
   collar:'.occgcco.',
 };
 const MEOW_BODY = ['..oooooooooo..', '.obbbbbbbbbbo.', 'obbbbbbbbbbbbo', 'obbbbbbbbbbbbo', '.ollllllllllo.', '..oooooooooo..'];
-const MEOW_SIT = ['......oooooo....', '.....obbbbbbo...', '....obbbbbbbbo..', '...obbbbbbbbbbo.', '..obbbbbbbbbbbo.', '.obbbbbbbbbbbbo.', '.obbbbbbbbbbbbo.', '.ollllbbbbbbbbo.', '..oooooooooooo..'];
+const MEOW_SIT = ['......oooooo....', '.....obbbbbbo...', '.....obbbbbbbo..', '....obbbbbbbbbo.', '....obbbbbbbbbo.', '..obbbbbbbbbbbo.', '.obbbbbbbbbbbbo.', '.ollllbbbbbbbbo.', '..oooooooooooo..'];   // a straight back, then the round of the haunch
 const MEOW_TAIL = {
   up:   ['.o..', 'oto.', 'oto.', 'oto.', 'otto', '.ott', '..ot'],
   swish:['....', 'oo..', 'oto.', 'oto.', 'otto', '.ott', '..ot'],
@@ -27852,9 +27852,10 @@ function meowPoseRaw(B, pose, eyes, tail){
   } else if(pose === 'sit' || pose === 'bat' || pose === 'lick'){
     meowPut(g, MEOW_TAIL.sit, 0, 11);
     meowPut(g, MEOW_SIT, 4, 9);
-    if(pose === 'bat'){ meowPut(g, MEOW_LEG1, 15, 13); meowPut(g, ['ooo', 'ofo', 'ofo', 'ofo'], 19, 8); }
-    else if(pose === 'lick') meowPut(g, MEOW_LEG1, 15, 13);
-    else meowPut(g, MEOW_LEG2, 15, 13);
+    // no front legs: she sits with just two small feet peeking out under her chest (one when a paw is up)
+    if(pose === 'bat'){ meowPut(g, ['offo', 'oooo'], 16, 16); meowPut(g, ['ooo', 'ofo', 'ofo', 'ofo'], 19, 8); }
+    else if(pose === 'lick') meowPut(g, ['offo', 'oooo'], 16, 16);
+    else meowPut(g, ['offooffo', 'oooooooo'], 12, 16);
     meowPut(g, meowHead(B, eyes), 11, 1);
     if(pose === 'lick') meowPut(g, ['ooo', 'ofo', 'ofo', 'ofo', 'ofo'], 17, 6);
   } else if(pose === 'stretch'){
@@ -27889,7 +27890,7 @@ function meowPoseRaw(B, pose, eyes, tail){
   } else if(pose === 'scratch1' || pose === 'scratch2'){
     meowPut(g, MEOW_TAIL.sit, 0, 11);
     meowPut(g, MEOW_SIT, 4, 9);
-    meowPut(g, MEOW_LEG2, 15, 13);
+    meowPut(g, ['offooffo', 'oooooooo'], 12, 16);
     meowPut(g, meowHead(B, eyes), 11, 1);
     meowPut(g, ['....oo', '...ofo', '..ofo.', '.ofo..', 'ofo...', 'oo....'], 8, pose === 'scratch1' ? 3 : 5);
   } else if(pose === 'knead1' || pose === 'knead2'){
@@ -27916,7 +27917,7 @@ function meowPoseRaw(B, pose, eyes, tail){
     // sitting, looking back over her shoulder
     meowPut(g, MEOW_TAIL.sit, 0, 11);
     meowPut(g, MEOW_SIT, 4, 9);
-    meowPut(g, MEOW_LEG2, 15, 13);
+    meowPut(g, ['offooffo', 'oooooooo'], 12, 16);
     meowPut(g, meowHead(B, eyes).map(r => r.split('').reverse().join('')), 4, 1);
   } else if(pose === 'box'){
     meowPut(g, meowHead(B, eyes), 8, 3);

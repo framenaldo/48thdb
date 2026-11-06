@@ -259,7 +259,7 @@ home page (สรุปวันนี้) was tried and taken off at the owner'
 back unasked.
 
 ## เหมียว (the pixel cat)
-The stretch pose is drawn by `meowStretch` (rump up, head low and joined to the shoulders, thin reaching front legs; the far hind leg is letter `d`, a shade darker than `f`), not from the shared pose tables. The owner chose it over the older stretch and kept the older sit and belly-up (a taller redrawn sit and a redrawn belly-up were tried and turned down); 16/32-bit versions were tried and turned down too. Change a pose only when the owner says it is unclear, and show old beside new first.
+The stretch pose is drawn by `meowStretch` (rump up, head low and joined to the shoulders, thin reaching front legs; the far hind leg is letter `d`, a shade darker than `f`), not from the shared pose tables. The owner chose it over the older stretch and kept the older belly-up; her sit keeps the old body but has a straighter back and no front legs, only two small feet peeking out under the chest (`MEOW_SIT`, the `'offooffo'` feet; one foot when a paw is up) — a taller redrawn sit and a redrawn belly-up were tried and turned down; 16/32-bit versions were tried and turned down too. Change a pose only when the owner says it is unclear, and show old beside new first.
 
 A reader's own pixel cat (`MEOW_*`, `meowInit`; adopt from ☰ "เหมียวของฉัน": 35 looks in `MEOW_BREEDS` grouped as
 Thai cats, coats and breeds (`MEOW_GROUPS`) — a breed is a palette, a pattern drawn per pixel by `meowColor` (tabby,
