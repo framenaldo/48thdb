@@ -6277,7 +6277,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @keyframes boot-fade{ from{ opacity:0; } to{ opacity:1; } }
   @media (prefers-reduced-motion:reduce){ html.booted #main{ animation:boot-fade .25s ease-out both; } }
   /* ---- เหมียว: a pixel cat that walks the top of the menu bar on every page (MEOW_*, meowInit) ---- */
-  .meow-walk{ position:fixed; z-index:29; left:0; width:0; height:0; pointer-events:none; }
+  .meow-walk{ position:fixed; z-index:29; left:0; top:0; width:0; height:0; pointer-events:none; }
   .meow-cat{ position:absolute; left:0; bottom:0; padding:0; border:0; background:none; cursor:pointer; pointer-events:auto; touch-action:manipulation;
     transform-origin:50% 100%; will-change:transform; -webkit-tap-highlight-color:transparent; }
   .meow-cat canvas, .meow-px{ display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
@@ -28002,21 +28002,150 @@ function meowLoop(t){
 }
 function meowRun(w){ _meowRun.add(w); if(!_meowRaf){ _meowLast = 0; _meowRaf = requestAnimationFrame(meowLoop); } }
 
-/* ---- on every page: the track along the top of the menu bar ---- */
-let _meowWalk = null, _meowLayer = null, _meowBubble = null, _meowSayT = 0;
-function meowTrack(){
-  const nav = document.querySelector('.glass-nav'), r = nav && nav.getBoundingClientRect();
-  if(!r || !r.width) return { left:12, bottom:12, width:Math.max(120, innerWidth - 24) };
-  if(r.height > r.width){ const left = r.right + 10; return { left, bottom:Math.max(6, (innerHeight - document.documentElement.clientHeight) + 6), width:Math.max(120, innerWidth - left - 12), floor:true }; }
-  return { left:r.left + 14, bottom:innerHeight - r.top - 1, width:Math.max(80, r.width - 28) };
+/* ---- on every page: she roams. Her floors are the top edges of the cards on screen and the menu bar (on the
+   left rail's screens, the foot of the screen); she walks along one, sits, and now and then jumps to another in
+   reach. A card carries her as the page scrolls; when it leaves the screen she jumps down to the menu bar. ---- */
+let _meowWalk = null, _meowLayer = null, _meowBubble = null, _meowSayT = 0, _meowLedges = [], _meowLedgeT = 0;
+const MEOW_LEDGE_SEL = 'main .card, main [class*="-card"], main .feed-block > *, main .dash > *, main .today-hero, main section > .ev-card, #main .ev-card';
+function meowBand(){
+  // what the header covers at the top, and where the menu bar starts at the bottom
+  const head = document.querySelector('header.top'), hr = head && head.getBoundingClientRect();
+  const nav = document.querySelector('.glass-nav'), nr = nav && nav.getBoundingClientRect();
+  const sticky = head && /sticky|fixed/.test(getComputedStyle(head).position);
+  const top = (sticky && hr && hr.bottom > 0 ? hr.bottom : 0) + 8;
+  const rail = nr && nr.height > nr.width;
+  const bottom = nr && nr.width && !rail ? nr.top : innerHeight;
+  return { top, bottom, nav:nr && nr.width && !rail ? nav : null, rail, railRight:rail ? nr.right : 0 };
 }
-function meowPlace(){
-  if(!_meowLayer) return;
-  const t = meowTrack();
-  _meowLayer.style.left = t.left + 'px'; _meowLayer.style.bottom = t.bottom + 'px'; _meowLayer.style.width = t.width + 'px';
-  _meowLayer._w = t.width;
-  if(_meowWalk) _meowWalk.resize();
+function meowScanLedges(catW){
+  const b = meowBand(), out = [];
+  if(b.nav){ const r = b.nav.getBoundingClientRect(); out.push({ el:b.nav, pad:14 }); }
+  else out.push({ el:null, floor:true, l:b.railRight + 10, r:innerWidth - 10 });
+  // anything that looks like a card: a box with its own rounded frame or fill, wide enough to stand on
+  const root = document.getElementById('main') || document.querySelector('main'); if(!root) return out;
+  const els = root.querySelectorAll(MEOW_LEDGE_SEL + ', ' + (root.id ? '#main' : 'main') + ' > * > *, ' + (root.id ? '#main' : 'main') + ' > * > * > *');
+  const seen = new Set();
+  for(const el of els){
+    if(out.length > 30) break;
+    if(seen.has(el) || el.closest('.ov-layer, .share-sheet, .modal-backdrop')) continue;
+    seen.add(el);
+    const r = el.getBoundingClientRect();
+    if(r.width < catW + 24 || r.height < 28) continue;
+    if(r.top < b.top + MEOW_H * 3 || r.top > b.bottom - 30) continue;
+    if(!el.matches(MEOW_LEDGE_SEL)){ const cs = getComputedStyle(el); if(parseFloat(cs.borderTopLeftRadius) < 8 || (cs.backgroundColor === 'rgba(0, 0, 0, 0)' && cs.backgroundImage === 'none' && parseFloat(cs.borderTopWidth) < 1)) continue; }
+    if(r.left < b.railRight - 2 || r.right > innerWidth + 2) continue;
+    // one floor per edge: skip an element whose top sits on one already taken
+    if(out.some(o => o.el && o.el !== b.nav && Math.abs(o.el.getBoundingClientRect().top - r.top) < 6 && o.el.getBoundingClientRect().left < r.right && o.el.getBoundingClientRect().right > r.left)) continue;
+    out.push({ el, pad:6 });
+  }
+  return out;
 }
+function meowLedgeBox(L){
+  if(!L) return null;
+  if(L.floor){ return { l:L.l, r:L.r, y:innerHeight - 6 - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sab')) || 0) }; }
+  if(!L.el || !L.el.isConnected) return null;
+  const r = L.el.getBoundingClientRect(); if(!r.width) return null;
+  return { l:r.left + L.pad, r:r.right - L.pad, y:r.top + 1 };
+}
+class MeowRoamer extends MeowWalker {
+  resize(){
+    const s = this.scale(); this.s = s; this.cw = MEOW_W * s; this.ch = MEOW_H * s;
+    this.cv.style.width = this.cw + 'px'; this.cv.style.height = this.ch + 'px';
+    this.btn.style.top = '0'; this.btn.style.bottom = 'auto';
+    this.btn.setAttribute('aria-label', this.pet ? this.pet.name : 'เหมียว');
+    _meowLedges = meowScanLedges(this.cw);
+    if(!this.ledge){ this.ledge = _meowLedges[0]; this.rx = Math.random() * 100; }
+  }
+  box(){ return meowLedgeBox(this.ledge); }
+  next(){
+    const p = this.pet; this.T = 0; this.hop = 0;
+    let step = this.queue.shift();
+    const box = this.box();
+    if(!box){ this.fall(); return; }
+    const max = Math.max(0, box.r - box.l - this.cw);
+    if(!step){
+      if(!p) step = { act:'sit', dur:3 };
+      else if(meowAsleep(p, meowNow())){
+        // bedtime is on the menu bar
+        if(!this.ledge || this.ledge.el !== _meowLedges[0].el || this.ledge.floor !== _meowLedges[0].floor){ this.jumpTo(_meowLedges[0]); return; }
+        step = { act:'sleep', dur:30 };
+      }
+      else if(MEOW_STILL) step = { act:Math.random() < .5 ? 'sit' : 'loaf', dur:8 };
+      else {
+        const r = Math.random(), tired = p.energy < 20;
+        if(r < .32) step = { act:'walk', x:Math.random() * max };
+        else if(r < (tired ? .4 : .66)){ if(this.tryJump()) return; step = { act:'walk', x:Math.random() * max }; }
+        else if(r < .72) step = { act:'sit', dur:3 + Math.random() * 5 };
+        else if(r < .86) step = { act:'loaf', dur:4 + Math.random() * 6 };
+        else step = { act:tired ? 'sleep' : 'stand', dur:tired ? 12 : 2 + Math.random() * 2 };
+      }
+    }
+    this.act = step.act; this.dur = step.dur || 2;
+    if(step.act === 'walk'){ this.tx = Math.max(0, Math.min(max, step.x != null ? step.x : Math.random() * max)); if(Math.abs(this.tx - this.rx) < 4){ this.act = 'sit'; this.dur = 2; } else this.dir = this.tx > this.rx ? 1 : -1; }
+    if(step.act === 'jump'){ this.act = 'sit'; this.dur = .5; }
+    if(step.face) this.dir = step.face;
+    this.draw();
+  }
+  // a floor in reach: not too far up or down, not too far across
+  tryJump(){
+    const b = this.box(); if(!b) return false;
+    const cx = b.l + this.rx + this.cw / 2;
+    const opts = _meowLedges.filter(L => !(L.el && L.el === this.ledge.el) && !(L.floor && this.ledge.floor)).map(L => ({ L, B:meowLedgeBox(L) })).filter(o => o.B && o.B.r - o.B.l > this.cw + 8
+      && Math.abs(o.B.y - b.y) < 300 && Math.abs(o.B.y - b.y) > 12 && cx > o.B.l - 220 && cx < o.B.r + 220);
+    if(!opts.length) return false;
+    this.jumpTo(opts[Math.floor(Math.random() * opts.length)].L);
+    return true;
+  }
+  jumpTo(L, fall){
+    const b = this.box(), B = meowLedgeBox(L); if(!B){ this.ledge = _meowLedges[0]; return; }
+    const x0 = b ? b.l + this.rx : this.vx || 0, y0 = b ? b.y : this.vy || B.y;
+    const max = Math.max(0, B.r - B.l - this.cw), cx = x0 - B.l;
+    const rx = Math.max(0, Math.min(max, cx + (Math.random() * 60 - 30)));
+    this.J = { x0, y0, L, rx, up:Math.max(0, y0 - B.y), fall:!!fall };
+    this.dur = .45 + Math.min(.6, Math.hypot(B.l + rx - x0, B.y - y0) / 700);
+    this.act = 'jump'; this.T = 0;
+    const tx = B.l + rx; if(Math.abs(tx - x0) > 2) this.dir = tx > x0 ? 1 : -1;
+    this.draw();
+  }
+  fall(){ _meowLedges = meowScanLedges(this.cw); this.jumpTo(_meowLedges[0], true); }
+  tick(dt){
+    this.T += dt;
+    if(this.act === 'jump'){
+      const J = this.J, B = meowLedgeBox(J.L);
+      if(!B){ this.fall(); return; }
+      const k = Math.min(1, this.T / this.dur), tx = B.l + J.rx;
+      const arc = J.fall ? 10 : 26 + J.up * .35;
+      this.vx = J.x0 + (tx - J.x0) * k; this.vy = J.y0 + (B.y - J.y0) * k - arc * 4 * k * (1 - k);
+      if(k >= 1){ this.ledge = J.L; this.rx = J.rx; this.J = null; this.queue = []; this.act = 'sit'; this.dur = .4 + Math.random(); this.T = 0; }
+      this.draw(); return;
+    }
+    const b = this.box(), band = meowBand();
+    // the floor scrolled away under her, or went: down to the menu bar
+    if(!b || (this.ledge && this.ledge.el && this.ledge.el !== band.nav && (b.y < band.top + this.ch * .6 || b.y > band.bottom - 10))){ this.fall(); return; }
+    const max = Math.max(0, b.r - b.l - this.cw);
+    if(this.rx > max) this.rx = max;
+    if(this.act === 'walk'){
+      const sp = 16 * this.s * (this.pet && this.pet.energy < 20 ? .6 : 1), d = this.tx - this.rx;
+      if(Math.abs(d) <= sp * dt){ this.rx = this.tx; this.vx = b.l + this.rx; this.vy = b.y; this.next(); return; }
+      this.rx += Math.sign(d) * sp * dt; this.dir = Math.sign(d);
+    } else if(this.T >= this.dur){ this.vx = b.l + this.rx; this.vy = b.y; this.next(); return; }
+    this.vx = b.l + this.rx; this.vy = b.y;
+    this.draw();
+  }
+  draw(){
+    if(!this.pet){ this.btn.hidden = true; return; }
+    this.btn.hidden = false;
+    const [pose, eyes, tail] = this.look(), key = this.pet.sp + this.pet.col + pose + eyes + tail;
+    if(key !== this.key){ this.key = key; const g = this.cv.getContext('2d'); g.clearRect(0, 0, MEOW_W, MEOW_H); g.drawImage(meowSprite(this.pet, pose, eyes, tail), 0, 0); }
+    const x = this.vx != null ? this.vx : 0, y = (this.vy != null ? this.vy : innerHeight) - this.ch;
+    this.btn.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scaleX(${this.dir})`;
+    this.x = x; this.y = 0;
+    if(this.o.onDraw) this.o.onDraw(this);
+  }
+  look(){ if(this.act === 'jump') return [this.J && this.T / this.dur > .8 ? 'stand' : 'walk1', 'open', 1]; return super.look(); }
+  headX(){ return (this.vx || 0) + (this.dir > 0 ? MEOW_W * .72 : MEOW_W * .28) * this.s; }
+}
+function meowPlace(){ if(_meowWalk){ _meowWalk.resize(); } }
 function meowSay(text, ms = 2600){
   if(!_meowBubble || !_meowWalk || !text) return;
   _meowBubble.textContent = text; _meowBubble.classList.add('on');
@@ -28025,13 +28154,15 @@ function meowSay(text, ms = 2600){
 }
 function meowBubblePos(w){
   if(!_meowBubble || !_meowBubble.classList.contains('on')) return;
-  const hx = w.headX(), bw = _meowBubble.offsetWidth, left = hx + bw > (_meowLayer._w || 300) + 8;
+  const hx = w.headX(), bw = _meowBubble.offsetWidth, bh = _meowBubble.offsetHeight, left = hx + bw > innerWidth - 8;
   _meowBubble.classList.toggle('is-left', left);
-  _meowBubble.style.transform = `translate(${(left ? hx - bw : hx - 4).toFixed(0)}px, ${(-(MEOW_H * w.s + 6 + w.y)).toFixed(0)}px)`;
+  _meowBubble.style.transform = `translate(${(left ? hx - bw : hx - 4).toFixed(0)}px, ${((w.vy || 0) - w.ch - 6 - bh).toFixed(0)}px)`;
 }
 function meowFx(host, w, html, cls = ''){
   const el = document.createElement('span'); el.className = 'meow-fx ' + cls; el.textContent = html;
-  el.style.left = (w.headX() + (Math.random() * 16 - 8)).toFixed(0) + 'px'; el.style.bottom = (MEOW_H * w.s - 4 + w.y).toFixed(0) + 'px';
+  el.style.left = (w.headX() + (Math.random() * 16 - 8)).toFixed(0) + 'px';
+  if(w instanceof MeowRoamer){ el.style.bottom = 'auto'; el.style.top = ((w.vy || 0) - w.ch - 4).toFixed(0) + 'px'; }
+  else el.style.bottom = (MEOW_H * w.s - 4 + w.y).toFixed(0) + 'px';
   host.appendChild(el); setTimeout(() => el.remove(), 2500);
 }
 function meowMount(){
@@ -28042,18 +28173,20 @@ function meowMount(){
   if(!_meowLayer){
     _meowLayer = document.createElement('div'); _meowLayer.className = 'meow-walk';
     _meowBubble = document.createElement('div'); _meowBubble.className = 'meow-say'; _meowBubble.setAttribute('aria-live', 'polite');
+    _meowBubble.style.top = '0'; _meowBubble.style.bottom = 'auto';
     _meowLayer.appendChild(_meowBubble);
     document.body.appendChild(_meowLayer);
-    addEventListener('resize', () => { clearTimeout(meowPlace._t); meowPlace._t = setTimeout(meowPlace, 120); });
-    if(window.visualViewport) visualViewport.addEventListener('resize', () => { clearTimeout(meowPlace._t); meowPlace._t = setTimeout(meowPlace, 120); });
-    // the menu bar moves when the page changes size or the rail comes in; check where it is now and then
-    setInterval(() => { if(!document.hidden) meowPlace(); }, 2000);
+    const again = () => { clearTimeout(meowPlace._t); meowPlace._t = setTimeout(meowPlace, 150); };
+    addEventListener('resize', again);
+    if(window.visualViewport) visualViewport.addEventListener('resize', again);
+    // the cards on screen change as the page scrolls or redraws: look for floors again now and then
+    addEventListener('scroll', () => { clearTimeout(_meowLedgeT); _meowLedgeT = setTimeout(meowPlace, 250); }, { passive:true });
+    setInterval(() => { if(!document.hidden) meowPlace(); }, 4000);
     setInterval(() => { if(!document.hidden && _meow && _meow.pet){ meowAdvance(); meowDaily(); } }, 60000);
   }
   _meowLayer.hidden = false;
-  meowPlace();
   if(!_meowWalk){
-    _meowWalk = new MeowWalker(_meowLayer, { width:() => _meowLayer._w || 300, x:Math.random() * 120,
+    _meowWalk = new MeowRoamer(_meowLayer, {
       onTap:w => { meowPurr(_meowLayer, w); setTimeout(openMeowSheet, 450); },
       onDraw:w => meowBubblePos(w) });
     meowRun(_meowWalk);
@@ -28254,7 +28387,6 @@ function meowSheetClick(e){
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && _meowSheet) closeMeowSheet(); });
 setTimeout(() => { try{ meowInit(); }catch(e){ console.warn('meow', e); } }, 900);
-
 function navSnapshot(){
   const snap = {};
   NAV_KEYS.forEach(k => snap[k] = state[k]);
