@@ -6278,6 +6278,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @media (prefers-reduced-motion:reduce){ html.booted #main{ animation:boot-fade .25s ease-out both; } }
   /* ---- เหมียว: a pixel cat that walks the top of the menu bar on every page (MEOW_*, meowInit) ---- */
   .meow-walk{ position:fixed; z-index:29; left:0; top:0; width:0; height:0; pointer-events:none; }
+  .meow-walk.meow-page{ position:absolute; }   /* on a card she lives in the page itself, so the browser scrolls her with it */
   .meow-cat{ position:absolute; left:0; bottom:0; padding:0; border:0; background:none; cursor:pointer; pointer-events:auto; touch-action:manipulation;
     transform-origin:50% 100%; will-change:transform; -webkit-tap-highlight-color:transparent; }
   .meow-cat canvas, .meow-px{ display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
@@ -27754,10 +27755,19 @@ function meowPut(g, rows, x0, y0){
 }
 function meowHead(B, eyes = 'open', low){
   const top = B.ears === 'fold' ? MEOW_HEAD.fold : MEOW_HEAD.top;
-  const e = MEOW_HEAD.eyes[eyes === 'yawn' ? 'shut' : eyes] || MEOW_HEAD.eyes.open;
-  return [top[0], top[1], top[2], top[3], e[0], e[1], MEOW_HEAD.low[low || (eyes === 'yawn' ? 'eat' : eyes === 'happy' ? 'happy' : 'open')], MEOW_HEAD.collar];
+  const e = MEOW_HEAD.eyes[eyes === 'yawn' ? 'shut' : eyes === 'meow' ? 'open' : eyes] || MEOW_HEAD.eyes.open;
+  return [top[0], top[1], top[2], top[3], e[0], e[1], MEOW_HEAD.low[low || (eyes === 'yawn' || eyes === 'meow' ? 'eat' : eyes === 'happy' ? 'happy' : 'open')], MEOW_HEAD.collar];
 }
-// pose: stand walk1 walk2 sit bat lick stretch loaf sleep eat1 eat2 box; eyes: open blink happy shut yawn; tail: 0/1 (a swish)
+// her face from the front, 13 wide
+function meowFrontHead(B, eyes = 'open'){
+  const fold = B.ears === 'fold';
+  const e = eyes === 'open' || eyes === 'meow' ? ['ohhehhhhhEhho', 'ohhehhhhhEhho'] : eyes === 'blink' ? ['ohhhhhhhhhhho', 'ohhehhhhhEhho'] : ['ohhhhhhhhhhho', 'ohoohhhhhooho'];
+  return [fold ? '.............' : '.o.........o.', fold ? '..oo.....oo..' : 'opo.......opo', fold ? 'ohppoooooppho' : 'ohhooooooohho', 'ohHHHHHHHHHho', e[0], e[1],
+    eyes === 'happy' || eyes === 'shut' ? 'okhhhmnmhhhko' : 'ohhhhmnmhhhho', eyes === 'meow' || eyes === 'yawn' ? '.ohhmmommhho.' : '.ohhmmmmmhho.', '..occcgccco..'];
+}
+const MEOW_UPHEAD = (B, eyes) => meowHead(B, eyes).slice().reverse();
+// pose: stand walk1 walk2 sit bat lick stretch loaf sleep eat1 eat2 box front front-wave1/2 belly curl scratch1/2
+//   knead1/2 arch reach lookback; eyes: open blink happy shut yawn meow; tail: 0/1 (a swish)
 function meowPose(B, pose, eyes, tail){
   const g = meowGrid(), fl = B.tail === 'fluff', T = k => MEOW_TAIL[fl ? (k === 'up' ? 'fluff' : k === 'swish' ? 'fluff2' : k) : k];
   const standing = pose === 'stand' || pose === 'walk1' || pose === 'walk2' || pose === 'eat1' || pose === 'eat2';
@@ -27788,6 +27798,56 @@ function meowPose(B, pose, eyes, tail){
     meowPut(g, MEOW_TAIL.ground, 0, 15);
     meowPut(g, MEOW_BODY, 2, 12);
     meowPut(g, meowHead(B, pose === 'sleep' ? 'shut' : eyes), 13, pose === 'sleep' ? 9 : 7);
+  } else if(pose === 'front' || pose === 'front-wave1' || pose === 'front-wave2'){
+    // sitting, facing the reader
+    const wave = pose !== 'front';
+    meowPut(g, ['...oo', '..oto', '..oto', '.ooto', 'ottto', 'ooooo'], 17, 10);
+    meowPut(g, meowFrontHead(B, eyes), 5, 1);
+    meowPut(g, ['.obblllllbbo.', 'obbblllllbbbo', 'obbblllllbbbo', 'obbblllllbbbo', wave ? 'obboffobbbbbo' : 'obboffoffobbo', '..ooooooooo..'], 5, 10);
+    if(wave) meowPut(g, ['ooo', 'ofo', 'ofo', 'ofo', 'ofo', 'oo.'], 17, pose === 'front-wave1' ? 3 : 5);
+  } else if(pose === 'belly'){
+    // rolled over, paws in the air
+    meowPut(g, MEOW_TAIL.ground, 0, 14);
+    const leg = ['ooo', 'ofo', 'ofo', 'ofo', 'ofo'];
+    meowPut(g, leg, 3, 7); meowPut(g, leg, 6, 8); meowPut(g, leg, 11, 7); meowPut(g, leg, 14, 8);
+    meowPut(g, ['..oooooooooo..', '.ollllllllllo.', 'obbbbbbbbbbbbo', 'obbbbbbbbbbbbo', '.obbbbbbbbbbo.', '..oooooooooo..'], 2, 11);
+    meowPut(g, MEOW_UPHEAD(B, eyes), 14, 10);
+  } else if(pose === 'curl'){
+    // a sleeping doughnut, tail round the front
+    meowPut(g, ['.....oooooo.....', '...oobbbbbboo...', '..obbbbbbbbbbo..', '.obbbbbbbbbbbbo.', 'obbbbbbbbbbbbbbo', 'obbbbbbbbbbbbbbo', 'otttttttttbbbbbo', '.oooooooooooooo.'], 2, 10);
+    meowPut(g, meowHead(B, 'shut'), 12, 8);
+  } else if(pose === 'scratch1' || pose === 'scratch2'){
+    meowPut(g, MEOW_TAIL.sit, 0, 11);
+    meowPut(g, MEOW_SIT, 4, 9);
+    meowPut(g, MEOW_LEG2, 15, 13);
+    meowPut(g, meowHead(B, eyes), 11, 1);
+    meowPut(g, ['....oo', '...ofo', '..ofo.', '.ofo..', 'ofo...', 'oo....'], 8, pose === 'scratch1' ? 3 : 5);
+  } else if(pose === 'knead1' || pose === 'knead2'){
+    // making biscuits: front paws pressing in turn
+    meowPut(g, MEOW_TAIL.ground, 0, 15);
+    meowPut(g, MEOW_BODY, 2, 12);
+    meowPut(g, meowHead(B, eyes), 13, 7);
+    const up = ['ofo', 'ofo', 'ooo'], dn = ['ofo', 'ooo'];
+    if(pose === 'knead1'){ meowPut(g, up, 15, 14); meowPut(g, dn, 19, 16); } else { meowPut(g, dn, 15, 16); meowPut(g, up, 19, 14); }
+  } else if(pose === 'arch'){
+    // startled: back up, tail puffed, standing tall
+    meowPut(g, MEOW_TAIL.fluff, 0, 0);
+    const leg = ['ofo', 'ofo', 'ofo', 'ofo', 'ofo', 'ooo'];
+    meowPut(g, leg, 3, 12); meowPut(g, leg, 6, 12); meowPut(g, leg, 10, 12); meowPut(g, leg, 13, 12);
+    meowPut(g, ['....oooooo....', '..oobbbbbboo..', '.obbbbbbbbbbo.', 'obbbbbbbbbbbbo', 'obbbbbbbbbbbbo', '.ollllllllllo.', '..oooooooooo..'], 2, 6);
+    meowPut(g, meowHead(B, eyes), 13, 5);
+  } else if(pose === 'reach'){
+    // up on her hind legs, paws high
+    meowPut(g, MEOW_TAIL.sit, 0, 11);
+    meowPut(g, MEOW_SIT, 4, 9);
+    meowPut(g, meowHead(B, eyes), 11, 2);
+    meowPut(g, ['ooo', 'ofo', 'ofo', 'ofo', 'ofo', 'ofo'], 19, 1); meowPut(g, ['ooo', 'ofo', 'ofo', 'ofo', 'ofo'], 21, 4);
+  } else if(pose === 'lookback'){
+    // sitting, looking back over her shoulder
+    meowPut(g, MEOW_TAIL.sit, 0, 11);
+    meowPut(g, MEOW_SIT, 4, 9);
+    meowPut(g, MEOW_LEG2, 15, 13);
+    meowPut(g, meowHead(B, eyes).map(r => r.split('').reverse().join('')), 4, 1);
   } else if(pose === 'box'){
     meowPut(g, meowHead(B, eyes), 8, 3);
     const box = ['oooooooooooooooooo', 'oyyyyyyyyyyyyyyyyo', 'oxxxxxxxxxxxxxxxxo', 'oxxxxxxxxxxxxxxxxo', 'oxxxxxxkxkxxxxxxxo', 'oxxxxxxxkxxxxxxxxo', 'oxxxxxxxxxxxxxxxxo', 'oooooooooooooooooo'];
@@ -28015,7 +28075,7 @@ function meowRun(w){ _meowRun.add(w); if(!_meowRaf){ _meowLast = 0; _meowRaf = r
 /* ---- on every page: she roams. Her floors are the top edges of the cards on screen and the menu bar (on the
    left rail's screens, the foot of the screen); she walks along one, sits, and now and then jumps to another in
    reach. A card carries her as the page scrolls; when it leaves the screen she jumps down to the menu bar. ---- */
-let _meowWalk = null, _meowLayer = null, _meowBubble = null, _meowSayT = 0, _meowLedges = [], _meowLedgeT = 0, _meowPois = [];
+let _meowPage = null, _meowWalk = null, _meowLayer = null, _meowBubble = null, _meowSayT = 0, _meowLedges = [], _meowLedgeT = 0, _meowPois = [];
 const MEOW_LEDGE_SEL = 'main .card, main [class*="-card"], main .feed-block > *, main .dash > *, main .today-hero, main section > .ev-card, #main .ev-card';
 const MEOW_POI_SEL = '[data-action="open-member"][data-id], [data-action="open-event"][data-id]';
 let _meowBandC = null, _meowBandT = 0;
@@ -28075,7 +28135,7 @@ function meowLedgeBox(L){
    gravity and lands on whatever is under her. Sometimes she wanders off the screen for a while. ---- */
 const MEOW_G = 2600;   // px/s² at scale 3
 const _meowPtr = { x:-1, y:-1, t:-1e9, fine:false };
-let _meowBug = null, _meowSaidAt = -1e9, _meowScrollY = 0, _meowScrollT = 0;
+let _meowBug = null, _meowSaidAt = -1e9, _meowScrollY = 0, _meowScrollT = 0, _meowScrolling = 0;
 const meowSec = () => performance.now() / 1000;
 const meowRand = (a, b) => a + Math.random() * (b - a);
 const meowPick = a => a[Math.floor(Math.random() * a.length)];
@@ -28155,13 +28215,14 @@ class MeowRoamer extends MeowWalker {
   box(){ return meowLedgeBox(this.ledge); }
   awake(){ return this.pet && !meowAsleep(this.pet, meowNow()); }
   busy(){ return this.mode !== 'ledge' || this.act === 'walk' || this.queue.some(s => s.act === 'go' || s.act === 'hop' || s.act === 'climb' || s.act === 'wall'); }
-  idle(){ return this.mode === 'ledge' && /^(sit|watch|stand|loaf)$/.test(this.act); }
+  idle(){ return this.mode === 'ledge' && /^(sit|watch|stand|loaf|front|lookback|knead)$/.test(this.act); }
   // the shown position eases from where she was drawn when she changes how she moves
   snap(d = .18){ if(this.dc) this.tw = { x:this.dc.x, y:this.dc.y, r:this.dc.r, t:0, d }; }
   say(text, soft){ if(!text) return; const n = meowSec(); if(soft && n - _meowSaidAt < 28) return; _meowSaidAt = n; meowSay(text); }
   plan(steps){ this.queue = steps.slice(); if(this.mode === 'ledge') this.next(); }
   next(){
-    this.T = 0; this.free = false;
+    if(this.act === 'hang' || this.act === 'roll' || this.act === 'spin') this.snap(.2);
+    this.T = 0; this.free = false; this.low = false; this.sneezed = false;
     if(this.mode !== 'ledge') return;
     const b = this.box(); if(!b){ this.fall(); return; }
     for(let guard = 0; guard < 14; guard++){
@@ -28190,7 +28251,7 @@ class MeowRoamer extends MeowWalker {
       case 'walk': {
         const x = Math.max(0, Math.min(max, st.x != null ? st.x : Math.random() * max));
         if(Math.abs(x - this.rx) < 3) return false;
-        this.act = 'walk'; this.tx = x; this.spd = st.spd || 1; this.dir = x > this.rx ? 1 : -1; this.draw(); return true;
+        this.act = 'walk'; this.tx = x; this.spd = st.spd || 1; this.low = !!st.low; this.dir = x > this.rx ? 1 : -1; this.draw(); return true;
       }
       case 'exit': {
         const vx = b.l + this.rx, left = st.side ? st.side < 0 : vx < innerWidth / 2;
@@ -28201,6 +28262,8 @@ class MeowRoamer extends MeowWalker {
       case 'wall': return this.startWall(st, b, max);
       case 'pounce': return this.startPounce(st);
       default:
+        if(st.act === 'sleep' && (st.pose || !this.sleepPose || Math.random() < .3)) this.sleepPose = st.pose || meowPick(['sleep', 'sleep', 'curl', 'curl', 'belly']);
+        if(st.act === 'blink') setTimeout(() => { if(this.act === 'blink') meowFx(_meowLayer, this, '♥'); }, 1300);
         this.act = st.act; this.dur = st.dur || 2;
         if(st.face) this.dir = st.face;
         if(st.faceX != null){ const fx = typeof st.faceX === 'function' ? st.faceX() : st.faceX; if(fx != null) this.dir = fx > b.l + this.rx + this.cw / 2 ? 1 : -1; }
@@ -28226,6 +28289,8 @@ class MeowRoamer extends MeowWalker {
     lx = Math.max(0, Math.min(bm, lx));
     this.vx = cx; this.vy = b.y;
     this.launch(B.l + lx, B.y, st.L);
+    this.flip = (st.spd || 1) > 2 && Math.random() < .45;
+    this.fromY = b.y;
     return true;
   }
   startClimb(st, b, max){
@@ -28257,7 +28322,7 @@ class MeowRoamer extends MeowWalker {
     if(Math.abs(dx) > 2) this.dir = dx > 0 ? 1 : -1;
   }
   air(ux, uy, aim, crouch){
-    this.snap(.08);
+    this.snap(.08); this.flip = false;
     this.mode = 'air'; this.ux = ux; this.uy = uy; this.aim = aim; this.crouch = crouch || 0; this.act = 'jump'; this.T = 0; this.ledge = null;
     for(const L of _meowLedges.concat(aim ? [aim] : [])){ const B = meowLedgeBox(L); L._rel = B ? this.vy - B.y : null; }
     this.draw();
@@ -28291,8 +28356,14 @@ class MeowRoamer extends MeowWalker {
     this.rx = Math.max(0, Math.min(max, this.vx - B.l)); this.vx = B.l + this.rx; this.vy = B.y;
     this.squash = hard ? .3 : .18; this.aim = null; this.uy = 0; this.pouncing = false;
     if(missed) this.queue = [];
+    const up = this.fromY != null && this.fromY - B.y > this.ch * 1.2; this.fromY = null;
     if(this.onLand){ const f = this.onLand; this.onLand = null; f(this); }
-    else if(hard && !this.queue.length) this.queue.unshift({ act:'stand', dur:.45 });
+    else if(up && !missed && Math.random() < .14){
+      // only just made it: hanging on by her front paws, scrambling up
+      this.queue.unshift({ act:'hang', dur:meowRand(.9, 1.5) }, { act:'shake', dur:.4 });
+      if(Math.random() < .5) this.queue.splice(1, 0, { act:'say', text:isEN() ? 'Phew!' : 'เกือบไป!', soft:true });
+    }
+    else if(hard && !this.queue.length) this.queue.unshift({ act:'shake', dur:.45 });
     this.memo(L);
     this.next();
   }
@@ -28333,6 +28404,9 @@ class MeowRoamer extends MeowWalker {
       ['user', mouse ? 1.6 : 0],
       ['hungry', hungry && now - (this.hungryAt || -1e9) > 120 ? 2.5 : 0],
       ['away', !tired && this.cur > .7 && now - this.born > 90 && now - (this.backAt || 0) > 150 ? .1 : 0],
+      ['front', .7 + (mouse ? .5 : 0)], ['blink', .22 + (p.bond || 0) / 200], ['meow', .25], ['beckon', .12],
+      ['scratch', .35], ['knead', tired ? .5 : .28], ['roll', .2 + (p.bond || 0) / 250], ['lookback', .3], ['reach', .18],
+      ['spin', p.fun > 60 ? .12 : .03], ['sneeze', .05], ['box', .1],
     ]);
     const rxOn = L => { const B = meowLedgeBox(L); return B ? Math.random() * Math.max(0, B.r - B.l - this.cw) : 0; };
     switch(pick){
@@ -28352,7 +28426,7 @@ class MeowRoamer extends MeowWalker {
       case 'nap': {
         const cards = _meowLedges.filter(L => L.el && !meowSame(L, base) && meowLedgeBox(L));
         const L = cards.length ? meowWeighted(cards.map(c => [c, this.favScore(c)])) : this.ledge;
-        return [{ act:'go', L, rx:rxOn(L), spd:.8 }, { act:'loaf', dur:3 }, { act:'sleep', dur:meowRand(25, 60) }, { act:'stretch', dur:1.8 }, { act:'yawn', dur:1.3 }];
+        return [{ act:'go', L, rx:rxOn(L), spd:.8 }, { act:'knead', dur:meowRand(2, 4) }, { act:'loaf', dur:2 }, { act:'sleep', dur:meowRand(25, 60) }, { act:'stretch', dur:1.8 }, { act:'yawn', dur:1.3 }, { act:'shake', dur:.4 }];
       }
       case 'groom': return [{ act:'groom', dur:meowRand(3, 5) }, { act:'sit', dur:1.5 }];
       case 'stretch': return [{ act:'stretch', dur:1.8 }];
@@ -28371,6 +28445,18 @@ class MeowRoamer extends MeowWalker {
         const L = this.ledgeUnder(_meowPtr.x, _meowPtr.y) || this.ledge, B = meowLedgeBox(L);
         return [{ act:'go', L, rx:B ? _meowPtr.x - B.l - this.cw / 2 : null, spd:1.3 }, { act:'watch', dur:3, faceX:() => _meowPtr.x }, { act:'say', text:t('เมี้ยว~', 'Meow~'), soft:true }];
       }
+      case 'front': return [{ act:'front', dur:meowRand(3, 7) }];
+      case 'blink': return [{ act:'front', dur:1 }, { act:'blink', dur:2.8 }, { act:'front', dur:1.5 }];
+      case 'meow': return [{ act:'meow', dur:1.4 }, { act:'say', text:meowPick(en ? ['Meow~', 'Mrrp?', 'Mew!'] : ['เมี้ยว~', 'เหมียว?', 'แง้ว!']), soft:true }, { act:'front', dur:2 }];
+      case 'beckon': return [{ act:'beckon', dur:3.2 }, { act:'say', text:t('มานี่มา~ โชคดีนะ', 'Come here~ good luck'), soft:true }, { act:'front', dur:1.5 }];
+      case 'scratch': return [{ act:'scratch', dur:meowRand(1.2, 2) }, { act:'shake', dur:.4 }, { act:'sit', dur:1.5 }];
+      case 'knead': return [{ act:'knead', dur:meowRand(4, 7) }, { act:'loaf', dur:meowRand(2, 5) }];
+      case 'roll': return [{ act:'loaf', dur:.8 }, { act:'roll', dur:meowRand(2.5, 4) }, { act:'loaf', dur:1 }, { act:'shake', dur:.4 }];
+      case 'lookback': return [{ act:'lookback', dur:meowRand(1.5, 3) }, { act:'sit', dur:1 }];
+      case 'reach': return [{ act:'reach', dur:1.6 }, { act:'sit', dur:1.2 }];
+      case 'spin': return [{ act:'lookback', dur:.8 }, { act:'spin', dur:meowRand(1.2, 2) }, { act:'stand', dur:.6 }, { act:'say', text:t('งง… หางใครเนี่ย', 'Dizzy… whose tail?'), soft:true }];
+      case 'sneeze': return [{ act:'sneeze', dur:1.3 }, { act:'say', text:t('ฮัดชิ่ว!', 'Achoo!'), soft:true }, { act:'shake', dur:.4 }];
+      case 'box': return [{ act:'box', dur:meowRand(5, 9) }, { act:'say', text:t('กล่องนี้ของหนู', 'This box is mine'), soft:true }];
       case 'hungry':
         this.hungryAt = now;
         return [{ act:'go', L:base, rx:rxOn(base) }, { act:'bat', dur:1.2 }, { act:'say', text:meowNeed(p) }, { act:'sit', dur:3 }];
@@ -28398,7 +28484,7 @@ class MeowRoamer extends MeowWalker {
     this.hunts = (this.hunts || 0) + 1;
     if(this.hunts === 1) this.say(en ? 'A butterfly!' : 'ผีเสื้อ!');
     const L = this.ledgeUnder(bug.x, bug.y + this.ch) || this.ledge, B = meowLedgeBox(L);
-    return [{ act:'go', L, rx:B ? bug.x - B.l - this.cw / 2 : null, spd:2 }, { act:'stalk', dur:meowRand(.8, 1.5), faceX:() => _meowBug && _meowBug.x },
+    return [{ act:'go', L, rx:B ? bug.x - B.l - this.cw / 2 : null, spd:2 }, ...(Math.random() < .5 ? [{ act:'chatter', dur:meowRand(.6, 1.2), faceX:() => _meowBug && _meowBug.x }] : []), { act:'stalk', dur:meowRand(.8, 1.5), faceX:() => _meowBug && _meowBug.x },
       { act:'fn', fn:w => { const g = _meowBug, b = w.box(); if(!g || !g.alive || !b) return;
         const dy = b.y - g.y, dx = g.x - (b.l + w.rx + w.cw / 2);
         if(dy > 0 && dy < w.ch * 4.5 && Math.abs(dx) < 260) w.queue.unshift({ act:'pounce', x:g.x, y:g.y }); } }];
@@ -28443,7 +28529,9 @@ class MeowRoamer extends MeowWalker {
       }
       if(a === 'watch' && this.fxT > 2.2){ this.fxT = 0; if(!(_meowPtr.fine && now - _meowPtr.t < 1.5) && Math.random() < .6) this.dir *= -1; }
     }
-    if(a === 'sleep' && this.fxT > 2.8){ this.fxT = 0; meowFx(_meowLayer, this, 'z', 'z'); }
+    if(a === 'sleep' && this.fxT > 2.8){ this.fxT = 0; meowFx(_meowLayer, this, 'z', 'z'); if(Math.random() < .15) this.squash = .08; }
+    if(a === 'spin' && Math.floor(this.T / .16) !== this.spinK){ this.spinK = Math.floor(this.T / .16); this.dir *= -1; }
+    if(a === 'sneeze' && this.T > .6 && !this.sneezed){ this.sneezed = true; this.squash = .3; meowFx(_meowLayer, this, '✲'); }
     this.vx = b.l + this.rx; this.vy = b.y;
     this.draw();
   }
@@ -28520,7 +28608,7 @@ class MeowRoamer extends MeowWalker {
     if(!this.idle() || this.busy() || Math.random() > .3) return;
     const L = this.ledgeUnder(x, y); if(!L) return;
     const B = meowLedgeBox(L);
-    this.queue = [{ act:'say', text:isEN() ? 'What’s that?' : 'อะไรน่ะ?', soft:true }, { act:'go', L, rx:x - B.l - this.cw / 2, spd:1.6 }, { act:'sniff', dur:1.2 }, { act:'sit', dur:2 }];
+    this.queue = [{ act:'say', text:isEN() ? 'What’s that?' : 'อะไรน่ะ?', soft:true }, { act:'go', L, rx:x - B.l - this.cw / 2, spd:1.6 }, { act:'sniff', dur:1.2 }, Math.random() < .5 ? { act:'front', dur:2 } : { act:'lookback', dur:1.5 }, { act:'sit', dur:1.5 }];
     this.next();
   }
   // the page flung fast under her: she holds on, or loses her footing
@@ -28529,7 +28617,7 @@ class MeowRoamer extends MeowWalker {
     const now = meowSec(); if(now - (this.flingAt || 0) < 2) return; this.flingAt = now;
     meowFx(_meowLayer, this, '!');
     if(Math.random() < .3){ this.fall(); return; }
-    this.queue = [{ act:'loaf', dur:.9 }].concat(this.queue.filter(s => s.act !== 'sleep')); this.next();
+    this.queue = (Math.random() < .5 ? [{ act:'arch', dur:.9 }, { act:'shake', dur:.4 }] : [{ act:'loaf', dur:.9 }]).concat(this.queue.filter(s => s.act !== 'sleep')); this.next();
   }
   // picked up by the scruff and carried; let go, she falls with whatever throw the hand gave her
   bindDrag(){
@@ -28555,9 +28643,25 @@ class MeowRoamer extends MeowWalker {
     this.air(Math.max(-900, Math.min(900, this.hvx * .5)), Math.max(-1100, Math.min(500, this.hvy * .5)), null, 0); this.act = 'fall';
     this.onLand = w => { w.queue = Math.random() < .5 ? [{ act:'stand', dur:.4 }, { act:'groom', dur:2.2 }] : [{ act:'stand', dur:.5 }]; };
   }
+  // where she is drawn: on a card (or jumping between cards, or up a card's side) she sits in a layer that is part
+  // of the page, so the browser itself scrolls her with the card — smooth, with nothing to catch up each frame.
+  // On the menu bar, up the screen's edge or carried, she is in the fixed layer. Carried, she stays where she is:
+  // moving the button would drop the pointer's hold.
+  space(){
+    if(this.mode === 'held' || !_meowPage) return this.sp || 'fix';
+    const card = L => !!L && !!L.el && L.el !== meowBand().nav;
+    if(this.mode === 'ledge') return card(this.ledge) ? 'page' : 'fix';
+    if(this.mode === 'climb') return this.cl && !this.cl.scr ? 'page' : 'fix';
+    if(this.mode === 'air') return this.aim ? (card(this.aim) ? 'page' : 'fix') : (this.sp || 'fix');
+    return 'fix';
+  }
+  layerEl(){ return this.sp === 'page' && _meowPage ? _meowPage : _meowLayer; }
+  off(){ return this.sp === 'page' ? [scrollX, scrollY] : [0, 0]; }
   draw(){
     if(!this.pet || this.mode === 'away'){ this.btn.hidden = true; return; }
     this.btn.hidden = false;
+    const sp = this.space();
+    if(sp !== this.sp){ this.sp = sp; const L = this.layerEl(); if(L && this.btn.parentNode !== L){ L.appendChild(this.btn); if(_meowBubble) L.appendChild(_meowBubble); } }
     const [pose, eyes, tail] = this.look(), key = this.pet.sp + this.pet.col + pose + eyes + tail;
     if(key !== this.key){ this.key = key; const g = this.cv.getContext('2d'); g.clearRect(0, 0, MEOW_W, MEOW_H); g.drawImage(meowSprite(this.pet, pose, eyes, tail), 0, 0); }
     let cx, cy, rot = 0, dir = this.dir, sx = 1, sy = 1;
@@ -28568,11 +28672,23 @@ class MeowRoamer extends MeowWalker {
       if(this.mode === 'air' && this.crouch <= 0) rot = dir * Math.max(-22, Math.min(22, this.uy * .016));
       if(this.act === 'stalk' || (this.mode === 'air' && this.crouch > 0)) rot = Math.sin(this.T * 22) * 2.5;
       if(this.act === 'nip') rot = Math.sin(this.T * 6) * 6;
+      const A = this.act, T = this.T;
+      if(A === 'roll') rot = Math.sin(T * 4) * 12;
+      if(A === 'shake') rot = Math.sin(T * 42) * 9;
+      if(A === 'arch') rot = Math.sin(T * 50) * 1.5;
+      if(A === 'scratch') rot = -dir * 5;
+      if(A === 'spin') rot = Math.sin(T * 9) * 6;
+      if(A === 'sleep' && this.sleepPose !== 'belly') sy = 1 + Math.sin(T * 1.6) * .025;   // breathing
+      if(A === 'walk' && this.low){ sy = .86; sx = 1.06; cy += this.ch * .07; }
+      if(A === 'hang'){ rot = -90 * dir; dir = 1; cy = (this.vy || 0) + this.cw / 2 - this.ch * .25; rot += Math.sin(T * 30) * 3; if(this.dir < 0){ rot = 90; dir = -1; } }
+      if(this.mode === 'air' && this.flip && this.crouch <= 0){ const f = Math.min(360, this.T * 760); rot = f >= 360 ? 0 : dir * f; }
       if(this.squash > 0){ sy = 1 - this.squash * .8; sx = 1 + this.squash * .45; cy += this.ch * (1 - sy) / 2; }
     }
     if(this.tw){ const k = this.tw.t / this.tw.d, e = k * (2 - k); cx = this.tw.x + (cx - this.tw.x) * e; cy = this.tw.y + (cy - this.tw.y) * e; rot = this.tw.r + (rot - this.tw.r) * e; }
     this.dc = { x:cx, y:cy, r:rot };
-    this.btn.style.transform = `translate3d(${(cx - this.cw / 2).toFixed(1)}px, ${(cy - this.ch / 2).toFixed(1)}px, 0) rotate(${rot.toFixed(1)}deg) scale(${(dir * sx).toFixed(3)}, ${sy.toFixed(3)})`;
+    const [ox, oy] = this.off();
+    const tf = `translate3d(${(cx - this.cw / 2 + ox).toFixed(1)}px, ${(cy - this.ch / 2 + oy).toFixed(1)}px, 0) rotate(${rot.toFixed(1)}deg) scale(${(dir * sx).toFixed(3)}, ${sy.toFixed(3)})`;
+    if(tf !== this.tf){ this.tf = tf; this.btn.style.transform = tf; }
     this.x = cx - this.cw / 2; this.y = 0;
     if(this.o.onDraw) this.o.onDraw(this);
   }
@@ -28588,6 +28704,22 @@ class MeowRoamer extends MeowWalker {
     if(a === 'sniff') return ['eat1', 'shut', tail];
     if(a === 'stalk') return ['loaf', 'open', 1];
     if(a === 'watch') return ['sit', blink ? 'blink' : 'open', tail];
+    if(a === 'front') return ['front', blink ? 'blink' : 'open', 0];
+    if(a === 'blink') return ['front', T > .8 && T < 2 ? 'shut' : T > .6 && T < 2.2 ? 'blink' : 'open', 0];
+    if(a === 'meow') return ['front', T > .3 && T < 1 ? 'meow' : 'open', 0];
+    if(a === 'beckon') return ['front-wave' + (1 + Math.floor(T / .35) % 2), 'happy', 0];
+    if(a === 'scratch') return ['scratch' + (1 + Math.floor(T / .11) % 2), 'happy', 0];
+    if(a === 'knead') return ['knead' + (1 + Math.floor(T / .4) % 2), T % 5 > 3.5 ? 'shut' : 'happy', 0];
+    if(a === 'roll') return ['belly', 'happy', 0];
+    if(a === 'sleep') return [this.sleepPose || 'sleep', 'shut', 0];
+    if(a === 'arch') return ['arch', 'meow', 1];
+    if(a === 'reach') return ['reach', 'open', 0];
+    if(a === 'lookback') return ['lookback', blink ? 'blink' : 'open', tail];
+    if(a === 'spin') return ['walk' + (1 + Math.floor(T / .1) % 2), 'open', 1];
+    if(a === 'shake') return ['stand', 'shut', Math.floor(T / .08) % 2];
+    if(a === 'sneeze') return ['sit', T < .55 ? 'blink' : T < .8 ? 'meow' : 'shut', 0];
+    if(a === 'chatter') return ['sit', Math.floor(T / .09) % 2 ? 'meow' : 'open', 1];
+    if(a === 'hang') return ['walk' + (1 + Math.floor(T / .09) % 2), 'open', 1];
     return super.look();
   }
   headX(){ const d = this.dc || { x:0 }; return this.mode === 'climb' ? d.x : d.x + this.dir * this.cw * .22; }
@@ -28642,21 +28774,21 @@ function meowBubblePos(w){
   if(!_meowBubble || !_meowBubble.classList.contains('on')) return;
   const hx = w.headX(), hy = w.headY ? w.headY() : 0, bw = _meowBubble.offsetWidth, bh = _meowBubble.offsetHeight, left = hx + bw > innerWidth - 8;
   _meowBubble.classList.toggle('is-left', left);
-  const x = Math.max(4, Math.min(innerWidth - bw - 4, left ? hx - bw : hx - 4)), y = Math.max(4, hy - 8 - bh);
-  _meowBubble.style.transform = `translate(${x.toFixed(0)}px, ${y.toFixed(0)}px)`;
+  const x = Math.max(4, Math.min(innerWidth - bw - 4, left ? hx - bw : hx - 4)), y = Math.max(4, hy - 8 - bh), [ox, oy] = w.off ? w.off() : [0, 0];
+  _meowBubble.style.transform = `translate(${(x + ox).toFixed(0)}px, ${(y + oy).toFixed(0)}px)`;
 }
 function meowFx(host, w, html, cls = ''){
   if(!host || !w) return;
   const el = document.createElement('span'); el.className = 'meow-fx ' + cls; el.textContent = html;
   el.style.left = (w.headX() + (Math.random() * 16 - 8)).toFixed(0) + 'px';
-  if(w instanceof MeowRoamer){ el.style.bottom = 'auto'; el.style.top = (w.headY() - 14).toFixed(0) + 'px'; }
+  if(w instanceof MeowRoamer){ const [ox, oy] = w.off(); host = w.layerEl() || host; el.style.left = (w.headX() + ox + (Math.random() * 16 - 8)).toFixed(0) + 'px'; el.style.bottom = 'auto'; el.style.top = (w.headY() - 14 + oy).toFixed(0) + 'px'; }
   else el.style.bottom = (MEOW_H * w.s - 4 + w.y).toFixed(0) + 'px';
   host.appendChild(el); setTimeout(() => el.remove(), 2500);
 }
 function meowMount(){
   if(!_meow) _meow = meowLoad();
   const p = _meow.pet;
-  if(!p || _meow.home){ if(_meowWalk){ _meowRun.delete(_meowWalk); _meowWalk.remove(); _meowWalk = null; } if(_meowBug) _meowBug.die(); if(_meowLayer) _meowLayer.hidden = true; return; }
+  if(!p || _meow.home){ if(_meowWalk){ _meowRun.delete(_meowWalk); _meowWalk.remove(); _meowWalk = null; } if(_meowBug) _meowBug.die(); if(_meowLayer) _meowLayer.hidden = true; if(_meowPage) _meowPage.hidden = true; return; }
   meowAdvance();
   if(!_meowLayer){
     _meowLayer = document.createElement('div'); _meowLayer.className = 'meow-walk';
@@ -28664,6 +28796,8 @@ function meowMount(){
     _meowBubble.style.top = '0'; _meowBubble.style.bottom = 'auto';
     _meowLayer.appendChild(_meowBubble);
     document.body.appendChild(_meowLayer);
+    _meowPage = document.createElement('div'); _meowPage.className = 'meow-walk meow-page';
+    document.body.appendChild(_meowPage);
     const again = () => { clearTimeout(meowPlace._t); meowPlace._t = setTimeout(meowPlace, 150); };
     addEventListener('resize', again);
     if(window.visualViewport) visualViewport.addEventListener('resize', again);
@@ -28672,6 +28806,7 @@ function meowMount(){
     addEventListener('scroll', () => {
       const now = performance.now(), v = (scrollY - _meowScrollY) / Math.max(8, now - _meowScrollT) * 1000; _meowScrollY = scrollY; _meowScrollT = now;
       if(_meowWalk && Math.abs(v) > 2600) _meowWalk.noticeFling(v);
+      _meowScrolling = now;
       clearTimeout(_meowLedgeT); _meowLedgeT = setTimeout(meowPlace, 250);
     }, { passive:true });
     addEventListener('pointermove', e => { if(e.pointerType !== 'mouse') return; _meowPtr.x = e.clientX; _meowPtr.y = e.clientY; _meowPtr.t = meowSec(); _meowPtr.fine = true; }, { passive:true });
@@ -28679,11 +28814,11 @@ function meowMount(){
       if(!_meowWalk || (e.target.closest && e.target.closest('.meow-cat, .share-sheet'))) return;
       _meowWalk.noticeTap(e.clientX, e.clientY);
     }, { passive:true });
-    setInterval(() => { if(!document.hidden) meowPlace(); }, 4000);
+    setInterval(() => { if(!document.hidden && performance.now() - _meowScrolling > 600) meowPlace(); }, 4000);
     setInterval(() => { if(!document.hidden && _meow && _meow.pet){ meowAdvance(); meowDaily(); } }, 60000);
     setInterval(() => meowBugMaybe(), 20000);
   }
-  _meowLayer.hidden = false;
+  _meowLayer.hidden = false; _meowPage.hidden = false;
   if(!_meowWalk){
     _meowWalk = new MeowRoamer(_meowLayer, {
       onTap:w => {

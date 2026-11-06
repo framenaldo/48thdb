@@ -268,7 +268,10 @@ she wants (explore, sniff a member's name — her oshi gets hearts —, nap, gro
 food, wander off the screen for a while) and `meowRoute` finds the way: hops, drops off a card's end, climbs up a
 card's side, or up the edge of the screen when nothing reaches. Jumps and falls are under gravity and land on
 whatever is below. She notices a moving mouse, a tap on the page, a fling of the scroll, a butterfly (`MeowBug`),
-and can be dragged and dropped; one tap pets her, a second opens her home. Night 23:00–07:00 she sleeps on the
+and can be dragged and dropped; one tap pets her, a second opens her home. Some 30 looks (front-facing sit, slow blink,
+beckon, belly roll, knead, ear scratch, arch, reach, look back, tail chase, sneeze, curl or belly-up sleep, hanging off an
+edge, a flip in zoomies). On a card she is drawn in a layer that is part of the page (`_meowPage`, `space()`), so the
+browser scrolls her with it — moving her by script each frame lagged on phones; on the menu bar she is in the fixed layer. Night 23:00–07:00 she sleeps on the
 menu bar. Reduced motion: she only sits and loafs. Pixel art only. Island, friends and the rainbow bridge are not
 built (they would need Firestore rules from the owner's machine).
 
