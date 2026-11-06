@@ -29036,6 +29036,7 @@ function meowMount(){
   const p = _meow.pet;
   if(!p || _meow.home){ meowRingClose(); if(_meowCall) _meowCall.hidden = true; if(_meowWalk){ _meowRun.delete(_meowWalk); _meowWalk.remove(); _meowWalk = null; } if(_meowBug) _meowBug.die(); if(_meowLayer) _meowLayer.hidden = true; if(_meowPage) _meowPage.hidden = true; return; }
   meowAdvance();
+  if(p.asleep){ p.asleep = false; meowSave(); }   // the old "sleep" button is gone; she sleeps on her own now
   if(!p.page || !p.trait || !p.sex || p.fat == null){ meowGenes(p); if(!p.page) p.page = state.view; meowSave(); }
   if(!_meowLayer){
     _meowLayer = document.createElement('div'); _meowLayer.className = 'meow-walk';
@@ -29081,9 +29082,23 @@ function meowMount(){
     if(!MEOW_STILL && !meowAsleep(p, meowNow()) && Math.random() < (p.lazy ? .55 : .2 + (1 - meowT(p, 'act')) * .3)) _meowWalk.queue = [{ act:'sleep', dur:meowRand(60, 300), pose:meowPick(['sleep', 'curl', 'curl']) }, { act:'stretch', dur:1.8 }, { act:'yawn', dur:1.3 }]; if(_meowWalk.mode === 'ledge') _meowWalk.next();
   } else { _meowWalk.key = ''; _meowWalk.resize(); if(_meowWalk.mode === 'ledge'){ _meowWalk.queue = []; _meowWalk.next(); } }
 }
+/* she sleeps when she wants to — no one can put her to bed or get her up. A stroke while she sleeps may wake her (more
+   likely the cuddlier she is, less at night); mostly she sleeps on. Woken at night she stays up a little, then dozes off again. */
+function meowNudge(p){
+  const night = meowNight(meowNow()), k = .12 + meowT(p, 'love') * .25 - (night ? .08 : 0) + (p.energy > 85 ? .1 : 0);
+  if(Math.random() >= k) return false;
+  p.asleep = false; if(night) p.awakeUntil = meowNow() + meowRand(.5, 1.5) * MEOW_HR;
+  meowSave(); return true;
+}
 function meowPurr(host, w){
   const p = _meow.pet;
-  if(meowAsleep(p, meowNow())){ meowFx(host, w, 'z', 'z'); return; }
+  if(meowAsleep(p, meowNow())){
+    if(meowNudge(p)){ if(w.plan) w.plan([{ act:'yawn', dur:1.4 }, { act:'stretch', dur:1.8 }, { act:'sit', dur:2 }]); if(w.say) w.say(isEN() ? 'Mm… awake' : 'งัวเงีย… ตื่นแล้ว'); return; }
+    meowFx(host, w, 'z', 'z'); if(w.say && Math.random() < .3) w.say(isEN() ? 'Zzz… (still asleep)' : 'ครอก… ฟี้… (ยังหลับอยู่)', true); return;
+  }
+  if(w.mode === 'ledge' && w.act === 'sleep'){   // a daytime nap: she may wake for it, or just twitch an ear
+    if(Math.random() < .2 + meowT(p, 'love') * .3){ w.plan([{ act:'yawn', dur:1.3 }, { act:'purr', dur:2 }]); } else { meowFx(host, w, 'z', 'z'); return; }
+  }
   p.bond = Math.min(100, (p.bond || 0) + 1); meowSave();
   const en = isEN(), BT = meowT(p, 'bite', .3), LV = meowT(p, 'love');
   if(w.mode === 'ledge' && Math.random() < BT * .3){ w.plan([{ act:'bat', dur:.7 }, { act:'say', text:en ? 'Nip!' : 'งับ!' }, { act:'purr', dur:1.5 }]); meowFx(host, w, '!'); return; }
@@ -29356,16 +29371,16 @@ function meowSheetPaint(){
   const st = meowStage(p), sleeping = meowAsleep(p, meowNow()), B = MEOW_BREEDS[p.sp] || MEOW_BREEDS.orange;
   const bars = [['full', t('อิ่ม', 'Full'), p.full, '#F2A93B'], ['fun', t('สนุก', 'Fun'), p.fun, '#E4457E'], ['clean', t('ขนนุ่ม', 'Fluffy'), p.clean, '#4FA9DE'], ['energy', t('พลัง', 'Energy'), p.energy, '#2E8C82']];
   const A = [['feed', t('ให้อาหาร', 'Feed')], ['ball', t('บอล', 'Ball')], ['wand', t('ไม้ตกแมว', 'Wand')], ['nip', t('กัญชาแมว', 'Catnip')],
-    ['bath', t('แปรงขน', 'Brush')], ['box', t('กล่อง', 'Box')], ['pet', t('ลูบหัว', 'Pet')], ['sleep', sleeping ? t('ปลุก', 'Wake') : t('นอน', 'Sleep')]];
+    ['bath', t('แปรงขน', 'Brush')], ['box', t('กล่อง', 'Box')], ['pet', t('ลูบหัว', 'Pet')]];   // no sleep button: she sleeps when she wants to
   el.innerHTML = head(t('บ้านของเหมียว', 'Her home')) + `
     <div class="meow-head" data-noloc><b>${escapeHtml(p.name)}</b><span>${en ? B.en : B.th} · ${en ? st[2] : st[1]} · ${t(`อายุ ${meowAge(p)} วัน`, `${meowAge(p)} days old`)}</span>
       <span class="meow-snack" title="${t('ขนม', 'Snacks')}">🍪 ${_meow.snacks || 0}</span></div>
     <div class="meow-traits" data-noloc><span>${p.sex === 'm' ? t('ตัวผู้', 'Male') : t('ตัวเมีย', 'Female')}</span><span>${meowKg(p).toFixed(1)} ${t('กก.', 'kg')} · ${meowShape(p)[en ? 2 : 1]}</span>${meowTraits(p).length ? `<span>${t('นิสัย', 'Nature')}: ${meowTraits(p).map(x => x[en ? 1 : 0]).join(' · ')}</span>` : ''}</div>
     <div class="meow-room${sleeping || meowNight(meowNow()) ? ' is-night' : ''}"><span class="meow-win"></span><span class="meow-prop" data-meow-prop="bowl" style="left:8px"></span><div class="meow-stage"></div></div>
     <div class="meow-stats">${bars.map(([k, th, v, c]) => `<div class="meow-stat${v < 25 ? ' is-low' : ''}"><span>${th}</span><em>${Math.round(v)}</em><span class="meow-bar"><i style="--v:${v}%;--c:${c}"></i></span></div>`).join('')}</div>
-    <div class="meow-acts">${A.map(([k, th]) => `<button class="meow-act" data-meow-a="${k}"${sleeping && k !== 'sleep' ? ' disabled' : ''}${k === 'feed' && S.tray ? ' aria-pressed="true"' : ''}><span data-meow-ic="${k}"></span>${th}</button>`).join('')}</div>
+    <div class="meow-acts">${A.map(([k, th]) => `<button class="meow-act" data-meow-a="${k}"${sleeping && k !== 'pet' ? ' disabled' : ''}${k === 'feed' && S.tray ? ' aria-pressed="true"' : ''}><span data-meow-ic="${k}"></span>${th}</button>`).join('')}</div>
     ${S.tray && !sleeping ? `<div class="meow-foods">${MEOW_FOODS.map(f => `<button class="meow-act" data-meow-food="${f.k}"><span data-meow-ic="${f.k}"></span>${en ? f.en : f.th}<small>${f.cost ? t(`ขนม ${f.cost}`, `${f.cost} snack${f.cost > 1 ? 's' : ''}`) : t('ฟรี', 'free')}</small></button>`).join('')}</div>` : ''}
-    <p class="lay-sheet-note">${t('ได้ขนมวันละ 3 ชิ้นเมื่อกลับมาเข้าเว็บ และอีกชิ้นทุกครั้งที่เปิดดูงานหรือเมมเบอร์ (วันละ 3) · ช่วง 23:00–07:00 น้องนอน', 'Three snacks a day for coming back, one more for each event or member you open (three a day). She sleeps 23:00–07:00.')}</p>
+    <p class="lay-sheet-note">${t('ได้ขนมวันละ 3 ชิ้นเมื่อกลับมาเข้าเว็บ และอีกชิ้นทุกครั้งที่เปิดดูงานหรือเมมเบอร์ (วันละ 3) · น้องนอนเมื่ออยากนอน กลางคืน 23:00–07:00 ส่วนใหญ่หลับ ลูบตอนหลับอาจตื่นหรือไม่ก็ได้', 'Three snacks a day for coming back, one more for each event or member you open (three a day). She sleeps when she likes, mostly 23:00–07:00; a stroke while she sleeps may or may not wake her.')}</p>
     ${_meow.home || sleeping ? '' : `<button class="lay-row" data-meow="call"><span><b>${t('เรียกน้องมาตรงนี้', 'Call her here')}</b><small>${t('น้องเดินเล่นอยู่ที่ไหนสักแห่งในหน้า กดแล้วน้องจะกระโดดมาหา', 'She roams the whole page; she will leap over to you')}</small></span><i>›</i></button>`}
     <button class="lay-row" data-meow="home"><span>${_meow.home ? t('ให้น้องออกมาเดินเล่นบนเว็บ', 'Let her walk the site') : t('ให้น้องอยู่บ้าน ไม่เดินบนเว็บ', 'Keep her home, off the pages')}</span></button>
     <p class="lay-sheet-note">${state.account && state.account.loggedIn ? t('เก็บไว้กับบัญชีของคุณ เปิดเครื่องไหนก็เจอน้อง', 'Kept with your account, on every device.') : t('เก็บไว้ในเครื่องนี้ เข้าสู่ระบบแล้วน้องจะตามไปทุกเครื่อง', 'Kept on this device. Sign in and she follows you to every device.')}</p></div>`;
@@ -29410,7 +29425,10 @@ function meowSheetAct(a){
     else { p.asleep = true; p.awakeUntil = 0; S.tray = false; meowSave(); meowSheetPaint(); }
     meowMount(); return;
   }
-  if(meowAsleep(p, meowNow())) return;
+  if(meowAsleep(p, meowNow())){
+    if(a === 'pet'){ if(meowNudge(p)){ meowSheetPaint(); meowSheetSay(t('งัวเงีย… ตื่นแล้ว', 'Mm… awake')); meowMount(); } else { meowFx(room.querySelector('.meow-stage'), w, 'z', 'z'); meowSheetSay(t('ครอก… ฟี้… ยังหลับอยู่', 'Zzz… still asleep')); } }
+    return;
+  }
   const fx = (ch, n = 3) => { for(let i = 0; i < n; i++) setTimeout(() => meowFx(room.querySelector('.meow-stage'), w, ch), i * 150); };
   if(a === 'pet'){ p.bond = Math.min(100, (p.bond || 0) + 1); w.plan([{ act:'purr', dur:2.4 }]); fx('♥'); meowSheetSay(meowNeed(p) || [t('เกาคางหน่อยสิ', 'Scratch my chin'), t('ครืด… ครืด…', 'Purr… purr…'), t('เมี้ยว~', 'Meow~')][Math.floor(Math.random() * 3)]); }
   if(a === 'ball'){ p.fun = meowClamp(p.fun + 18); w.plan([{ act:'bat', dur:3 }]); meowSheetSay(t('ตะปบ! ตะปบ!', 'Pounce!')); }
