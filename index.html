@@ -11049,7 +11049,7 @@ async function loadOshiData(){
   try{
     const doc = await fbDb.collection('users').doc(fbAuth.currentUser.uid).get();
     const d = doc.exists ? doc.data() : {};
-    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null, layout:d.layout||null, meow:d.meow||null};
+    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null, layout:d.layout||null, meow:d.meow||null, quiz:d.quiz||null};
   }catch(e){ return {oshi:[], kamiOshi:null}; }
 }
 async function saveOshiData(){
@@ -19086,7 +19086,34 @@ function renderAskBlock(q, total){
    ไฟ, จันทร์ พฤหัส ดิน, อังคาร ราหู ลม, พุธ ศุกร์ น้ำ) and her sign's. Only
    good reasons are ever printed about a member. */
 let _quiz = { step:0, ans:[] };
-const QZ_KEY = '48thdb-quiz-birth', QZ_LAST = '48thdb-quiz-last', QZ_DONE = '48thdb-quiz-done';
+const QZ_KEY = '48thdb-quiz-birth', QZ_LAST = '48thdb-quiz-last', QZ_DONE = '48thdb-quiz-done', QZ_AT = '48thdb-quiz-at';
+/* The quiz is kept with the account when the reader is signed in (`users/<uid>.quiz`: the birthday, the last match and the finished
+   answers of both tabs, stamped), so a new device opens on the result they already have and nothing is asked twice. A guest's stays on
+   the device. Whichever copy is newer wins after sign-in; a missing one is filled from the other; nothing goes up before the account's
+   copy has been read. */
+const qzCloudKeys = () => [QZ_KEY, QZ_LAST, QZ_DONE + '-birth', QZ_DONE + '-quiz'];
+let _qzCloudRead = false, _qzPush = 0;
+function quizStamp(){ try{ localStorage.setItem(QZ_AT, String(Date.now())); }catch(e){} clearTimeout(_qzPush); _qzPush = setTimeout(quizPushNow, 2500); }
+function quizPushNow(){
+  const u = typeof fbAuth !== 'undefined' && fbAuth.currentUser;
+  if(!u || !state.account || !state.account.loggedIn || !_qzCloudRead) return;
+  const q = {}; try{ qzCloudKeys().forEach(k => { const v = localStorage.getItem(k); if(v) q[k] = v; }); q.at = Number(localStorage.getItem(QZ_AT)) || Date.now(); }catch(e){ return; }
+  if(Object.keys(q).length < 2) return;
+  fbDb.collection('users').doc(u.uid).set({ quiz:q }, { merge:true }).catch(e => { try{ console.warn('quiz sync', e); }catch(x){} });
+}
+// returns true when the account's copy changed what this device holds (so the page is drawn again)
+function quizFromAccount(c){
+  _qzCloudRead = true;
+  let lat = 0, has = false; try{ lat = Number(localStorage.getItem(QZ_AT)) || 0; has = qzCloudKeys().some(k => localStorage.getItem(k)); }catch(e){}
+  if(!c || typeof c !== 'object'){ if(has){ if(!lat) try{ localStorage.setItem(QZ_AT, String(Date.now())); }catch(e){} quizPushNow(); } return false; }
+  if(!has || (c.at || 0) > lat){
+    let n = 0; try{ qzCloudKeys().forEach(k => { if(typeof c[k] === 'string'){ localStorage.setItem(k, c[k]); n++; } }); localStorage.setItem(QZ_AT, String(c.at || Date.now())); }catch(e){}
+    if(n && !(typeof _quiz !== 'undefined' && _quiz.step > 0 && _quiz.ans && _quiz.ans.length)){ _quiz = { step:0, ans:[] }; }   // not in the middle of answering: start from what is kept
+    return n > 0;
+  }
+  if(lat > (c.at || 0)) quizPushNow();
+  return false;
+}
 const QZ_DAYS = [
   { th:'อาทิตย์', en:'Sunday', c:'#E5484D', n:1, el:'F', tr:['มั่นใจ เป็นผู้นำ ใจกว้าง', 'confident, a leader, big-hearted'] },
   { th:'จันทร์', en:'Monday', c:'#D9A400', n:2, el:'E', tr:['อ่อนโยน ช่างเอาใจ พูดเก่ง', 'gentle, caring, a good talker'] },
@@ -19404,7 +19431,7 @@ function renderQuiz(){
     const list = qzResults(), me = mode === 'birth' && q.birth ? qzRead(q.birth.iso, q.birth.night) : null, top = list[0] ? list[0].top : 'F', fan = QZ_FAN[top].slice();
     const grid = (QZ_QUESTIONS.find(x => x.grid) || {}).grid;
     if(q.emo && grid && grid[top].includes(q.emo)) fan[0] = q.emo;
-    if(list[0]) try{ localStorage.setItem(QZ_LAST, JSON.stringify({ id: list[0].m.id, pct: list[0].pct })); }catch(e){}
+    if(list[0]){ try{ const was = localStorage.getItem(QZ_LAST), now = JSON.stringify({ id: list[0].m.id, pct: list[0].pct }); if(was !== now){ localStorage.setItem(QZ_LAST, now); quizStamp(); } }catch(e){} }
     const resEv = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results), dayOpen = !!resEv && toYmd(todayStart()) <= resEv.start;
     body = `${mode === 'quiz' ? `<div class="qz-fan"><span class="qz-fan-emo" aria-hidden="true">${fan[0]}</span><span><small>${en ? 'You are' : 'คุณคือ'}</small><b>${en ? fan[3] : fan[1]}</b><em>${en ? fan[4] : fan[2]}</em></span></div>` : ''}
       ${me ? `<div class="qz-me is-result"><span>${en ? 'You:' : 'ดวงคุณ:'}</span>${qzChips(me, en)}</div>` : ''}
@@ -19426,7 +19453,7 @@ function quizDate(){
   if(t.getUTCMonth() !== m - 1) return null;            // 31 February
   return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
-function quizKeepBirth(b){ _quiz.birth = b; try{ localStorage.setItem(QZ_KEY, JSON.stringify(b)); }catch(e){} }
+function quizKeepBirth(b){ _quiz.birth = b; try{ localStorage.setItem(QZ_KEY, JSON.stringify(b)); }catch(e){} quizStamp(); }
 function quizShare(){
   const list = qzResults();
   if(!list[0]) return;
@@ -19449,7 +19476,7 @@ function quizAction(action, id){
   else if(action === 'quiz-night'){ const iso = quizDate(); if(iso) quizKeepBirth({ iso, night: id === '1' }); }
   else if(action === 'quiz-pick'){ const [el, emo] = String(id).split('|'); q.ans[q.step - 1] = el; if(emo) q.emo = emo; q.step++; }
   else if(action === 'quiz-group'){ q.group = id; q.step = last + 1; _qzReveal = true;
-    try{ localStorage.setItem(QZ_DONE + '-' + q.mode, JSON.stringify({ ans: q.ans, emo: q.emo || null, group: id, birth: q.birth || null })); }catch(e){} }
+    try{ localStorage.setItem(QZ_DONE + '-' + q.mode, JSON.stringify({ ans: q.ans, emo: q.emo || null, group: id, birth: q.birth || null })); }catch(e){} quizStamp(); }
   else if(action === 'quiz-back'){ q.step = Math.max(q.mode === 'quiz' ? 1 : 0, q.step - 1); }
   else if(action === 'quiz-again'){ _quiz = { mode: q.mode, step: q.mode === 'quiz' ? 1 : 0, ans: [], birth: qzBirth() }; }
   else if(action === 'quiz-share'){ quizShare(); return; }
@@ -31181,7 +31208,7 @@ async function init(){
     if(user && !user.isAnonymous){
       state.account = { name: user.displayName || user.email || 'ผู้ใช้', email: user.email || '', loggedIn:true, uid:user.uid,
         photo: user.photoURL || null };
-      noteSignup(user); _meowCloudRead = false;
+      noteSignup(user); _meowCloudRead = false; _qzCloudRead = false;
     } else {
       state.account = null;
     }
@@ -31223,7 +31250,7 @@ async function init(){
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;
     if(state.account && oshiData.avatar) state.account.avatar = oshiData.avatar;
-    if(state.account && state.account.loggedIn) meowFromAccount(oshiData.meow || null);
+    if(state.account && state.account.loggedIn){ meowFromAccount(oshiData.meow || null); if(quizFromAccount(oshiData.quiz || null)) changed = true; }
     // the reader's own arrangement; a guest or someone signed out gets the site as it comes
     const lay = state.account ? (oshiData.layout || null) : null;
     if(JSON.stringify(lay) !== JSON.stringify(_authKnown ? state.layout : _bootLayout)) changed = true;

@@ -281,8 +281,7 @@ built (they would need Firestore rules from the owner's machine).
 
 ## หาโอชิจากดวง (/quiz)
 
-A horoscope quiz, reached from the ☰ menu (`renderQuiz`, view `quiz`). The
-reader's birthday (kept in localStorage only, never sent) against each current
+A horoscope quiz, reached from the ☰ menu (`renderQuiz`, view `quiz`). reader's birthday (kept in localStorage; for a signed-in reader also in their own `users/<uid>.quiz` — the birthday, last match and finished answers of both tabs, stamped, newer copy wins after sign-in, `quizFromAccount` / `quizStamp`; a guest's stays on the device; the rules let only that account read it) against each current
 member's by three systems Thai fans know: the birth weekday by ทักษา (คู่มิตร
 1–5 2–4 3–6 7–8, คู่สมพล 1–6 2–8 3–5 4–7, คู่ศัตรู 1–3 2–5 4–8 6–7, 8 = ราหู =
 Wednesday after 18:00 — members' Wednesdays count as by day), ราศีแบบไทย
