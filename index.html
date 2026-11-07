@@ -4170,15 +4170,21 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gea-hint{ font-size:12px; color:var(--ink-soft); line-height:1.55; margin:10px 4px; }
   /* โหวตบนบล็อกเชน (owner only) */
   /* the hourly volume card: the last 48 hours as bars with the day's busiest and quietest hour (the part of the coin-market preview the owner kept) */
+  /* the glass follows the reader's light or dark: dark dims the scene and keeps white ink on smoked glass; light brightens the scene and
+     puts dark ink on frosted white glass (the owner: the backgrounds looked the same in both modes, 8 Nov) */
+  html{ --g-ink:#1B1426; --g-soft:rgba(27,20,38,.7); --g-line:rgba(27,20,38,.18); --g-card:rgba(255,255,255,.38); --g-hover:rgba(255,255,255,.55); --g-shadow:none;
+    --g-wash1:rgba(255,250,253,.34); --g-wash2:rgba(255,250,253,.58); --pane-tint:rgba(255,255,255,.30); --g-chip:rgba(255,255,255,.5); --g-sticky:rgba(255,255,255,.9); }
+  :root[data-theme="dark"]{ --g-ink:#fff; --g-soft:rgba(255,255,255,.76); --g-line:rgba(255,255,255,.22); --g-card:rgba(255,255,255,.07); --g-hover:rgba(255,255,255,.14); --g-shadow:0 1px 7px rgba(0,0,0,.42);
+    --g-wash1:rgba(8,5,14,.46); --g-wash2:rgba(8,5,14,.72); --pane-tint:rgba(24,16,40,.2); --g-chip:rgba(255,255,255,.18); --g-sticky:rgba(48,22,44,.9); }
   /* ---- the Works page as a CD shop, for everyone (?cdshop=off turns it off on one device). A drawn
      shop wall behind the page (bg/cd-shop.jpg, from scripts/cdshop), and the lists as panes of liquid glass: one blurred pane per list,
      not per row, so a phone scrolls them without a cost. ---- */
   html[data-cdshop="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(rgba(14,9,20,.30), rgba(14,9,20,.52)), url(bg/cd-shop-7.jpg) center top / cover no-repeat; }
-  html[data-cdshop="1"] .wk-head{ color:#fff; text-shadow:0 2px 14px rgba(0,0,0,.6); }
+    background:linear-gradient(var(--g-wash1), var(--g-wash2)), url(bg/cd-shop-7.jpg) center top / cover no-repeat; }
+  html[data-cdshop="1"] .wk-head{ color:var(--g-ink); text-shadow:var(--g-shadow); }
   html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list, html[data-cdshop="1"] .wk-cats, html[data-cdshop="1"] .gal-teaser{
-    position:relative; border-radius:26px; color:#fff; text-shadow:0 1px 7px rgba(0,0,0,.42); --ink:#fff; --ink-soft:rgba(255,255,255,.74); --line:rgba(255,255,255,.22); --paper-dim:rgba(255,255,255,.14); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08);
-    background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), rgba(26,18,44,.14);
+    position:relative; border-radius:26px; color:var(--g-ink); text-shadow:var(--g-shadow); --ink:var(--g-ink); --ink-soft:var(--g-soft); --line:var(--g-line); --paper-dim:var(--g-hover); --card:var(--g-card); --glass-card:var(--g-card);
+    background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), var(--pane-tint);
     -webkit-backdrop-filter:blur(13px) saturate(1.6) brightness(1.05); backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);
     border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
     box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.14), inset 0 0 28px rgba(255,255,255,.08), 0 20px 44px rgba(0,0,0,.38); }
@@ -4188,52 +4194,52 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* the glint across a pane's top left, like light on curved glass */
   html[data-cdshop="1"] .disc-col::after, html[data-cdshop="1"] .mw-list::after, html[data-cdshop="1"] .wk-cats::after{ content:''; position:absolute; left:10px; top:6px; width:46%; height:34%; border-radius:26px 60% 60% 40%;
     background:radial-gradient(120% 100% at 0 0, rgba(255,255,255,.22), rgba(255,255,255,0) 70%); pointer-events:none; }
-  html[data-cdshop="1"] .disc-col .section-label, html[data-cdshop="1"] .mw-sort{ color:#fff; text-shadow:0 1px 8px rgba(0,0,0,.4); }
-  html[data-cdshop="1"] .disc-col .timeline-title, html[data-cdshop="1"] .mw-list .timeline-title{ color:#fff; }
+  html[data-cdshop="1"] .disc-col .section-label, html[data-cdshop="1"] .mw-sort{ color:var(--g-ink); text-shadow:var(--g-shadow); }
+  html[data-cdshop="1"] .disc-col .timeline-title, html[data-cdshop="1"] .mw-list .timeline-title{ color:var(--g-ink); }
   html[data-cdshop="1"] .disc-col .timeline-year, html[data-cdshop="1"] .disc-col .single-meta, html[data-cdshop="1"] .mw-list .timeline-year, html[data-cdshop="1"] .mw-list .single-meta,
-  html[data-cdshop="1"] .disc-col .title-alt, html[data-cdshop="1"] .mw-list .title-alt{ color:rgba(255,255,255,.72); }
-  html[data-cdshop="1"] .wk-cat{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.26); color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 3px 0 rgba(0,0,0,.25); }
+  html[data-cdshop="1"] .disc-col .title-alt, html[data-cdshop="1"] .mw-list .title-alt{ color:var(--g-soft); }
+  html[data-cdshop="1"] .wk-cat{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.26); color:var(--g-ink); box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 3px 0 rgba(0,0,0,.25); }
   html[data-cdshop="1"] .wk-cat.is-on{ background:rgba(255,255,255,.88); color:#1B1426; }
   html[data-cdshop="1"] .wk-cat small{ color:inherit; opacity:.75; }
   html[data-cdshop="1"] .wk-cat.is-on svg{ color:#E4457E; }
-  html[data-cdshop="1"] .mw-sort{ background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.34); box-shadow:inset 0 1px 0 rgba(255,255,255,.45); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); color:#fff; }
-  html[data-cdshop="1"] .mw-sort small{ color:rgba(255,255,255,.8); }
+  html[data-cdshop="1"] .mw-sort{ background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.34); box-shadow:inset 0 1px 0 rgba(255,255,255,.45); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); color:var(--g-ink); }
+  html[data-cdshop="1"] .mw-sort small{ color:var(--g-soft); }
   html[data-cdshop="1"] .filter-bar .chip, html[data-cdshop="1"] .filter-bar button{ -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
-  html[data-cdshop="1"] .cds-off{ display:inline-block; margin:0 0 10px; padding:4px 12px; border-radius:99px; border:1.5px solid rgba(255,255,255,.4); background:rgba(255,255,255,.14); color:#fff; font:inherit; font-size:11.5px; font-weight:800; cursor:pointer; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+  html[data-cdshop="1"] .cds-off{ display:inline-block; margin:0 0 10px; padding:4px 12px; border-radius:99px; border:1.5px solid rgba(255,255,255,.4); background:rgba(255,255,255,.14); color:var(--g-ink); font:inherit; font-size:11.5px; font-weight:800; cursor:pointer; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
   html[data-cdshop="1"] .cds-off:active{ transform:translateY(2px); }
   @media (max-width:760px){ html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list, html[data-cdshop="1"] .wk-cats, html[data-cdshop="1"] .gal-teaser{ -webkit-backdrop-filter:blur(9px) saturate(1.5); backdrop-filter:blur(9px) saturate(1.5); } }
   /* ---- the calendar on a cork notice board, for everyone (?board=off turns it off on one device). The groups' own event
      posters pinned up behind the page (bg/cork-board-1.jpg, from scripts/board), the month and the list as panes of the same liquid
      glass as the Works page: one blurred pane each; the days and rows inside are only tinted. ---- */
   html[data-board="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(rgba(24,14,6,.16), rgba(24,14,6,.38)), url(bg/cork-board-1.jpg) center top / cover no-repeat; }
+    background:linear-gradient(var(--g-wash1), var(--g-wash2)), url(bg/cork-board-1.jpg) center top / cover no-repeat; }
   html[data-board="1"] .calp > .feed-head, html[data-board="1"] .calp-board, html[data-board="1"] .calp-agenda{
-    position:relative; border-radius:26px; color:#fff; text-shadow:0 1px 7px rgba(0,0,0,.42); --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.22); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.14);
-    background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), rgba(34,20,14,.16);
+    position:relative; border-radius:26px; color:var(--g-ink); text-shadow:var(--g-shadow); --ink:var(--g-ink); --ink-soft:var(--g-soft); --line:var(--g-line); --card:var(--g-card); --glass-card:var(--g-card); --paper-dim:var(--g-hover);
+    background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), var(--pane-tint);
     -webkit-backdrop-filter:blur(13px) saturate(1.6) brightness(1.05); backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);
     border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
     box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.14), inset 0 0 28px rgba(255,255,255,.08), 0 20px 44px rgba(0,0,0,.35); }
   html[data-board="1"] .calp-agenda{ padding:12px; }
-  html[data-board="1"] .calp > .feed-head .feed-title{ color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.35); }
-  html[data-board="1"] .calp > .feed-head .feed-today{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.38); }
+  html[data-board="1"] .calp > .feed-head .feed-title{ color:var(--g-ink); text-shadow:var(--g-shadow); }
+  html[data-board="1"] .calp > .feed-head .feed-today{ background:rgba(255,255,255,.16); color:var(--g-ink); border-color:rgba(255,255,255,.38); }
   html[data-board="1"] .calp-cell:not(.is-empty){ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.18); }
   html[data-board="1"] .calp-cell.is-today{ border-color:#FF8FB8; box-shadow:0 0 0 1px #FF8FB8 inset; }
   html[data-board="1"] .calp-cell[data-weekend] .calp-num{ color:#FFB3CF; }
-  html[data-board="1"] .calp-item{ color:#fff; }
+  html[data-board="1"] .calp-item{ color:var(--g-ink); }
   html[data-board="1"] .calp-ag-row{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.18); }
-  html[data-board="1"] .calp-bar, html[data-board="1"] .calp > .section-label, html[data-board="1"] .calp-legend{ color:#fff; text-shadow:0 1px 10px rgba(0,0,0,.55); }
-  html[data-board="1"] .calp-subscribe, html[data-board="1"] .calp-bar button{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.4); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+  html[data-board="1"] .calp-bar, html[data-board="1"] .calp > .section-label, html[data-board="1"] .calp-legend{ color:var(--g-ink); text-shadow:var(--g-shadow); }
+  html[data-board="1"] .calp-subscribe, html[data-board="1"] .calp-bar button{ background:rgba(255,255,255,.16); color:var(--g-ink); border-color:rgba(255,255,255,.4); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
   @media (max-width:760px){ html[data-board="1"] .calp > .feed-head, html[data-board="1"] .calp-board, html[data-board="1"] .calp-agenda{ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
   /* ---- the members page on a gallery wall and the shop at a merch booth, for everyone (?wall=off / ?booth=off turns one off on a
      device). Drawn backgrounds from scripts/scenes with the members' own photos (bg/photo-wall-2.jpg,
      bg/merch-booth-3.jpg) and the same liquid-glass panes: one blurred pane per block, what is inside only tinted. The members
      table's sticky name column keeps a nearly solid tint, or the cells scrolled under it would show through. ---- */
   html[data-wall="1"] body::before, html[data-booth="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background-position:center top; background-size:cover; background-repeat:no-repeat; }
-  html[data-wall="1"] body::before{ background-image:linear-gradient(rgba(18,8,16,.22), rgba(18,8,16,.5)), url(bg/photo-wall-2.jpg); }
-  html[data-booth="1"] body::before{ background-image:linear-gradient(rgba(30,14,20,.18), rgba(30,14,20,.42)), url(bg/merch-booth-3.jpg); }
-  html[data-wall="1"]{ --pane-tint:rgba(40,16,36,.18); } html[data-booth="1"]{ --pane-tint:rgba(52,20,34,.18); }
+  html[data-wall="1"] body::before{ background-image:linear-gradient(var(--g-wash1), var(--g-wash2)), url(bg/photo-wall-2.jpg); }
+  html[data-booth="1"] body::before{ background-image:linear-gradient(var(--g-wash1), var(--g-wash2)), url(bg/merch-booth-3.jpg); }
+  
   html[data-wall="1"] .filter-bar.mb-bar, html[data-wall="1"] .table-wrap, html[data-wall="1"] .thead-sticky-outer, html[data-booth="1"] .shop > .feed-head, html[data-booth="1"] .shop-grid{
-    position:relative; border-radius:24px; color:#fff; text-shadow:0 1px 7px rgba(0,0,0,.42); --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.2); --card:rgba(255,255,255,.06); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.12);
+    position:relative; border-radius:24px; color:var(--g-ink); text-shadow:var(--g-shadow); --ink:var(--g-ink); --ink-soft:var(--g-soft); --line:var(--g-line); --card:var(--g-card); --glass-card:var(--g-card); --paper-dim:var(--g-hover);
     background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), var(--pane-tint);
     -webkit-backdrop-filter:blur(13px) saturate(1.6) brightness(1.05); backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);
     border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
@@ -4241,35 +4247,34 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-wall="1"] .filter-bar.mb-bar{ padding:10px 12px; }
   html[data-wall="1"] .table-wrap{ margin:0; width:100%; border-radius:0 0 24px 24px; overflow-y:hidden; }
   html[data-wall="1"] .thead-sticky-outer{ position:sticky; margin:0; width:100%; border-radius:24px 24px 0 0; z-index:15; }
-  html[data-wall="1"] .mb-seg .pill[style*="background"]{ color:#1B1426 !important; }
   html[data-wall="1"] .dtable .row{ background:transparent; }
-  html[data-wall="1"] .dtable .cell.sticky-name{ background:rgba(48,22,44,.9); }
+  html[data-wall="1"] .dtable .cell.sticky-name{ background:var(--g-sticky); }
   html[data-wall="1"] .dtable .row.head .cell.sticky-name{ background:transparent; }
-  html[data-wall="1"] .sub-tab{ background:rgba(255,255,255,.14); color:#fff; border-color:rgba(255,255,255,.36); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+  html[data-wall="1"] .sub-tab{ background:rgba(255,255,255,.14); color:var(--g-ink); border-color:rgba(255,255,255,.36); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
   html[data-wall="1"] .sub-tab.active{ background:rgba(255,255,255,.9); color:#1B1426; }
   html[data-booth="1"] .shop-grid{ padding:14px; }
   html[data-booth="1"] .shop-card{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.2); }
   html[data-booth="1"] .shop > .feed-head{ padding:16px 18px; }
-  html[data-booth="1"] .shop > .feed-head .feed-title{ color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.35); }
-  html[data-booth="1"] .shop > .feed-head .feed-today{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.38); }
+  html[data-booth="1"] .shop > .feed-head .feed-title{ color:var(--g-ink); text-shadow:var(--g-shadow); }
+  html[data-booth="1"] .shop > .feed-head .feed-today{ background:rgba(255,255,255,.16); color:var(--g-ink); border-color:rgba(255,255,255,.38); }
   @media (max-width:760px){ html[data-wall="1"] .filter-bar.mb-bar, html[data-wall="1"] .table-wrap, html[data-booth="1"] .shop > .feed-head, html[data-booth="1"] .shop-grid{ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
   /* ---- the stats page on a stage LED wall and the profile on a fan's desk, for everyone (?stage=off / ?desk=off turns one off on a
      device): drawn backgrounds from scripts/scenes (bg/stage-wall-1.jpg, bg/fan-desk-1.jpg) behind one liquid-glass pane
      per top-level block of the page, whatever it holds; cards inside are only tinted. ---- */
   html[data-stage="1"] body::before, html[data-desk="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background-position:center top; background-size:cover; background-repeat:no-repeat; }
-  html[data-stage="1"] body::before{ background-image:linear-gradient(rgba(6,4,12,.18), rgba(6,4,12,.5)), url(bg/stage-wall-1.jpg); }
-  html[data-desk="1"] body::before{ background-image:linear-gradient(rgba(30,16,8,.16), rgba(30,16,8,.42)), url(bg/fan-desk-1.jpg); }
-  html[data-stage="1"]{ --pane-tint:rgba(18,12,40,.2); } html[data-desk="1"]{ --pane-tint:rgba(46,26,16,.18); }
+  html[data-stage="1"] body::before{ background-image:linear-gradient(var(--g-wash1), var(--g-wash2)), url(bg/stage-wall-1.jpg); }
+  html[data-desk="1"] body::before{ background-image:linear-gradient(var(--g-wash1), var(--g-wash2)), url(bg/fan-desk-1.jpg); }
+  
   html[data-stage="1"] #main > :not(.ov-layer):not(script), html[data-desk="1"] #main > :not(.ov-layer):not(.app-version):not(script){
-    position:relative; border-radius:24px; color:#fff; text-shadow:0 1px 7px rgba(0,0,0,.42); --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.2); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.12);
+    position:relative; border-radius:24px; color:var(--g-ink); text-shadow:var(--g-shadow); --ink:var(--g-ink); --ink-soft:var(--g-soft); --line:var(--g-line); --card:var(--g-card); --glass-card:var(--g-card); --paper-dim:var(--g-hover);
     background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), var(--pane-tint);
     -webkit-backdrop-filter:blur(13px) saturate(1.6) brightness(1.05); backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);
     border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
     box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.14), inset 0 0 28px rgba(255,255,255,.08), 0 20px 44px rgba(0,0,0,.35); padding:14px; margin-bottom:16px; }
   html[data-desk="1"] .account-card, html[data-desk="1"] .meow-adopt, html[data-desk="1"] .lay-sheet-note{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.2); }
   html[data-stage="1"] .stat-cell, html[data-stage="1"] .group-card, html[data-desk="1"] .fb-card{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.2); }
-  html[data-desk="1"] .section-label, html[data-stage="1"] .section-label{ color:#fff; }
-  html[data-stage="1"] .subtab, html[data-stage="1"] .page-share-btn{ background:rgba(255,255,255,.14); color:#fff; border-color:rgba(255,255,255,.36); }
+  html[data-desk="1"] .section-label, html[data-stage="1"] .section-label{ color:var(--g-ink); }
+  html[data-stage="1"] .subtab, html[data-stage="1"] .page-share-btn{ background:rgba(255,255,255,.14); color:var(--g-ink); border-color:rgba(255,255,255,.36); }
   html[data-stage="1"] .subtab.active{ background:rgba(255,255,255,.9); color:#1B1426; }
   @media (max-width:760px){ html[data-stage="1"] #main > :not(.ov-layer), html[data-desk="1"] #main > :not(.ov-layer){ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
   /* ---- the home page's backdrop (a preview: only with ?home=on, off with ?home=off): the other pages' scenes blurred into a field of
@@ -4284,7 +4289,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     -webkit-backdrop-filter:blur(14px) saturate(1.5); backdrop-filter:blur(14px) saturate(1.5); box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 6px 16px rgba(0,0,0,.12); }
   /* chips and links inside a dressed pane: the light-mode pastel chip (pale pink, white text from the pane's --ink) was unreadable */
   :is(html[data-cdshop="1"], html[data-board="1"], html[data-wall="1"], html[data-booth="1"], html[data-stage="1"], html[data-desk="1"]) :is(.chip, .chip-link, .mw-more, .mw-and){
-    background:rgba(255,255,255,.18); color:#fff; border-color:rgba(255,255,255,.42); box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.2); }
+    background:var(--g-chip); color:var(--g-ink); border-color:var(--g-line); box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.2); }
   :is(html[data-cdshop="1"], html[data-board="1"], html[data-wall="1"], html[data-booth="1"], html[data-stage="1"], html[data-desk="1"]) :is(.chip, .chip-link, .mw-more, .mw-and) *{ color:inherit; }
   .gec-vc .gec-stats4{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin:6px 0 10px; } @media (min-width:760px){ .gec-vc .gec-stats4{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
   .gec-vc .gec-stats4 div{ padding:8px 10px; border-radius:12px; background:var(--paper-dim); } .gec-vc .gec-stats4 small{ display:block; font-size:11px; font-weight:800; color:var(--ink-soft); }
@@ -28633,9 +28638,21 @@ function meowScanLedges(catW, nearY){
   return out;
 }
 // a floor's span and height in page coordinates: she lives in the page, so the page's scrolling never moves her
+/* The page's natural height: what the page itself draws, not her layer. Her floor used to be the document's scrollHeight, which
+   counts anything she has put near the foot (her own box, a toy, the water bowl, a mouse's hole) — so each measure could sit a few
+   pixels lower than the last and the page grew without end while the reader scrolled (8 Nov 2026). Now the floor comes from the
+   page, and her layer is clipped to that height, so nothing of hers can ever lengthen the page. */
+function meowDocH(){
+  const m = document.getElementById('main') || document.querySelector('main'), b = m ? m.getBoundingClientRect().bottom + scrollY : 0;
+  return Math.max(innerHeight, Math.round(b) + 150);
+}
+function meowFitPage(){
+  if(!_meowPage) return;
+  _meowPage.style.width = document.documentElement.clientWidth + 'px'; _meowPage.style.height = meowDocH() + 'px'; _meowPage.style.overflow = 'hidden';
+}
 function meowLedgeBox(L){
   if(!L) return null;
-  if(L.floor) return { l:L.l, r:L.r, y:document.documentElement.scrollHeight - 8 };
+  if(L.floor) return { l:L.l, r:L.r, y:meowDocH() - 8 };
   if(!L.el || !L.el.isConnected) return null;
   const r = L.el.getBoundingClientRect(); if(!r.width) return null;
   return { l:r.left + L.pad + scrollX, r:r.right - L.pad + scrollX, y:r.top + 1 + scrollY };
@@ -29176,7 +29193,7 @@ class MeowRoamer extends MeowWalker {
       if(this.uy <= 0 || rel < 0) continue;
       if(meowSame(L, base) || (was != null && was <= 2 && mid >= B.l - 4 && mid <= B.r + 4)){ this.land(L, B); return; }
     }
-    if(this.vy > document.documentElement.scrollHeight + 100){ const B = meowLedgeBox(base); if(B){ this.vy = B.y; this.land(base, B); return; } }
+    if(this.vy > meowDocH() + 100){ const B = meowLedgeBox(base); if(B){ this.vy = B.y; this.land(base, B); return; } }
     this.draw();
   }
   tickClimb(dt){
@@ -29540,7 +29557,7 @@ function meowPopCheck(){
   if(!pop || !_meowPeek){ if(w && w.btn.style.visibility === 'hidden') w.btn.style.visibility = ''; }
 }
 
-function meowPlace(){ if(_meowWalk){ _meowWalk.resize(); if(_meowSpotWant) meowSpotRestore(_meowWalk); meowToysPaint(); } }
+function meowPlace(){ meowFitPage(); if(_meowWalk){ _meowWalk.resize(); if(_meowSpotWant) meowSpotRestore(_meowWalk); meowToysPaint(); } }
 function meowSay(text, ms = 2600){
   if(!_meowBubble || !_meowWalk || !text || _meowWalk.mode === 'away' || !meowHere()) return;
   _meowBubble.textContent = text; _meowBubble.classList.add('on');
@@ -29576,7 +29593,7 @@ function meowMount(){
     _meowLayer.appendChild(_meowBubble);
     document.body.appendChild(_meowLayer);
     _meowPage = document.createElement('div'); _meowPage.className = 'meow-walk meow-page';
-    document.body.appendChild(_meowPage);
+    document.body.appendChild(_meowPage); meowFitPage();
     const again = () => { clearTimeout(meowPlace._t); meowPlace._t = setTimeout(meowPlace, 150); };
     addEventListener('resize', again);
     if(window.visualViewport) visualViewport.addEventListener('resize', again);
@@ -29795,7 +29812,7 @@ function meowFillBowl(w){
   if(!bw || bw.page !== state.view){
     const B = meowLedgeBox(w.ledge), me = w.box(), size = 12 * w.s; if(!B || !me) return;
     const x = Math.max(B.l + size / 2, Math.min(B.r - size / 2, w.dir > 0 ? me.r + size * .6 : me.l - size * .6));
-    bw = _meow.bowl = { page:state.view, fx:x / innerWidth, fy:B.y / document.documentElement.scrollHeight, lvl:0, at:0 };
+    bw = _meow.bowl = { page:state.view, fx:x / innerWidth, fy:B.y / meowDocH(), lvl:0, at:0 };
   }
   bw.lvl = 100; bw.at = meowNow(); meowSave(); meowToysPaint();
   const el = _meowToyEls.find(z => z.toy && z.toy.k === 'water'), W = p.water == null ? 80 : p.water;
@@ -29862,7 +29879,7 @@ function meowToysPaint(){
   if(_meowToyDragging) return;   // not while one is in the reader's hand: the redraw would drop it
   _meowToyEls.forEach(el => el.remove()); _meowToyEls = [];
   if(!_meowPage || !_meow || !_meow.pet || _meow.home || !meowHere()) return;
-  const docH = document.documentElement.scrollHeight, s = _meowWalk ? _meowWalk.s : 3;
+  const docH = meowDocH(), s = _meowWalk ? _meowWalk.s : 3;
   const bw = _meow.bowl, all = [...meowToysHere(), ...(bw && bw.page === state.view ? [{ k:'water', fx:bw.fx, fy:bw.fy }] : [])];
   for(const o of all){
     const x = o.fx * innerWidth, y = o.fy * docH; let best = null, bd = 1e9;
@@ -29899,7 +29916,7 @@ function meowToyDrag(el){
       _meowToyDragging = null; el._dragT = performance.now(); el.classList.remove('is-drag');
       const w = _meowWalk, x = ox + ev.clientX - sx + size / 2, y = oy + ev.clientY - sy + size, L = w && w.ledgeUnder(x, y + 20), B = L && meowLedgeBox(L);
       if(B && ev.type === 'pointerup'){
-        const o = el.toy.k === 'water' ? _meow.bowl : el.toy, docH = document.documentElement.scrollHeight;
+        const o = el.toy.k === 'water' ? _meow.bowl : el.toy, docH = meowDocH();
         if(o){ o.fx = x / innerWidth; o.fy = B.y / docH; meowSave(); }
       }
       meowToysPaint();   // put down on the card under it, or back where it was
@@ -29953,7 +29970,7 @@ document.addEventListener('click', e => {
   const w = _meowWalk; if(!w){ meowToyTrayClose(); return; }
   const x = e.clientX + scrollX, y = e.clientY + scrollY, L = w.ledgeUnder(x, y + 30), B = L && meowLedgeBox(L);
   if(!B){ const n = _meowTray && _meowTray.querySelector('.meow-tray-n'); if(n) n.textContent = isEN() ? 'Tap closer to the top of a card' : 'แตะใกล้ขอบบนของการ์ดอีกนิด'; return; }
-  const k = _meowPlacing, here = meowToysHere(), docH = document.documentElement.scrollHeight;
+  const k = _meowPlacing, here = meowToysHere(), docH = meowDocH();
   _meow.toys = (_meow.toys || []).filter(o => o.page !== state.view || here.slice(-3).includes(o));
   _meow.toys.push({ k, page:state.view, fx:x / innerWidth, fy:B.y / docH, at:meowNow() });
   meowSave(); meowToyTrayClose(); meowToysPaint();
