@@ -1,11 +1,12 @@
 <!doctype html><meta charset="utf-8"><body style="margin:0;background:#000"><canvas id="c" width="1920" height="1200"></canvas>
 <script>
 /* A drawn CD shop wall for the Works page (not a photo): dark wood, slanted display shelves of jewel cases, price tags, warm
-   ceiling spots. The covers are the groups' own MV thumbnails (from their YouTube channels, cropped square) when make.mjs hands
-   them in, else invented ones. Seeded, so it comes out the same each time. */
+   ceiling spots. The covers are the groups' real CD covers (the owner's folder Documents/48TH/web/cover) — or their MV thumbnails —
+   when make.mjs hands them in, else invented ones; each centre-cut square, shuffled so the same cover never stands next to itself.
+   Seeded, so it comes out the same each time. */
 window.drawScene = async (urls = []) => {
 const imgs = (await Promise.all(urls.map(u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; })))).filter(Boolean);
-let ci = 0;
+let ci = 0, dealt = false;
 let seed = 48; const R = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296, rr = (a, b) => a + R() * (b - a), pick = a => a[Math.floor(R() * a.length)];
 const W = 1920, H = 1200, c = document.getElementById('c'), g = c.getContext('2d');
 const hsl = (h, s, l, a = 1) => `hsla(${h},${s}%,${l}%,${a})`;
@@ -19,7 +20,14 @@ const STYLES = ['sun', 'stripes', 'portrait', 'grad', 'lines', 'dots', 'band'];
 const PAL = [[338, 80, 58], [172, 52, 38], [265, 55, 55], [42, 85, 55], [205, 70, 50], [12, 80, 55], [150, 45, 40], [310, 60, 50], [0, 0, 12], [0, 0, 92], [28, 70, 48]];
 function art(x, y, s) {
   // a real cover: the picture inside the 16:9 frame of a 480×360 thumbnail, cut square from its middle
-  if (imgs.length) { const im = imgs[ci++ % imgs.length]; g.drawImage(im, 105, 45, 270, 270, x, y, s, s); return; }
+  if (imgs.length) {
+    // a seeded shuffle the first time, then they are dealt out round after round
+    if (!dealt) { dealt = true; for (let i = imgs.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [imgs[i], imgs[j]] = [imgs[j], imgs[i]]; } }
+    const im = imgs[ci++ % imgs.length], iw = im.naturalWidth, ih = im.naturalHeight;
+    if (iw === 480 && ih === 360) g.drawImage(im, 105, 45, 270, 270, x, y, s, s);   // a YouTube thumbnail: the picture inside its letterbox
+    else { const k = Math.min(iw, ih); g.drawImage(im, (iw - k) / 2, (ih - k) / 2, k, k, x, y, s, s); }
+    return;
+  }
   const [h, sa, l] = pick(PAL), [h2] = pick(PAL), st = pick(STYLES);
   const gr = g.createLinearGradient(x, y, x + s, y + s); gr.addColorStop(0, hsl(h, sa, Math.min(85, l + 18))); gr.addColorStop(1, hsl(h2, sa, Math.max(14, l - 14))); g.fillStyle = gr; g.fillRect(x, y, s, s);
   g.save(); g.beginPath(); g.rect(x, y, s, s); g.clip();

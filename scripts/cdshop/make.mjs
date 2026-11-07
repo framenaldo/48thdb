@@ -1,4 +1,4 @@
-// node scripts/cdshop/make.mjs [folder of MV thumbnails <video id>.jpg]  → bg/cd-shop-2.jpg (a new name each time it changes: the service worker serves images stale-first) (1920×1200); needs Google Chrome on this Mac.
+// node scripts/cdshop/make.mjs [folder of covers: the owner's CD covers in ~/Documents/48TH/web/cover, or MV thumbnails]  → bg/cd-shop-3.jpg (a new name each time it changes: the service worker serves images stale-first) (1920×1200); needs Google Chrome on this Mac.
 // The thumbnails are the groups' own MVs (ids in data/youtube.json), fetched once with
 //   mkdir -p /tmp/cdthumbs && cd /tmp/cdthumbs && node -e "console.log(Object.keys(require('<repo>/data/youtube.json').videos).join('\\n'))" | xargs -P 12 -I{} curl -s -o {}.jpg https://i.ytimg.com/vi/{}/hqdefault.jpg
 // and are not kept in the repo; without a folder the covers are invented.
@@ -13,11 +13,18 @@ let tab; for (let i = 0; i < 100 && !tab; i++) { try { tab = (await (await fetch
 const ws = new WebSocket(tab.webSocketDebuggerUrl); await new Promise(r => ws.addEventListener('open', r));
 let seq = 0; const wait = new Map(); ws.addEventListener('message', e => { const m = JSON.parse(e.data); if (m.id && wait.has(m.id)) { wait.get(m.id)(m); wait.delete(m.id); } });
 const send = (method, params = {}) => new Promise(res => { const id = ++seq; wait.set(id, res); ws.send(JSON.stringify({ id, method, params })); });
-const dir = process.argv[2], urls = dir ? readdirSync(dir).filter(f => /\.jpe?g$/i.test(f)).sort().map(f => 'data:image/jpeg;base64,' + readFileSync(join(dir, f)).toString('base64')) : [];
+const MIME = { jpg:'jpeg', jpeg:'jpeg', png:'png', webp:'webp' };
+const dir = process.argv[2], urls = dir ? readdirSync(dir).filter(f => /\.(jpe?g|png|webp)$/i.test(f)).sort()
+  .map(f => `data:image/${MIME[f.split('.').pop().toLowerCase()]};base64,` + readFileSync(join(dir, f)).toString('base64')) : [];
+console.log(urls.length, 'covers');
 await send('Page.navigate', { url:'file://' + join(here, 'scene.html') + '?wait' });
 await sleep(500);
-await send('Runtime.evaluate', { expression:`drawScene(${JSON.stringify(urls)})`, awaitPromise:true });
+// handed in one at a time: a single message with every picture in it was too big for the browser to take
+await send('Runtime.evaluate', { expression:'window.__u = []' });
+for (const u of urls) await send('Runtime.evaluate', { expression:`window.__u.push(${JSON.stringify(u)})` });
+const ran = await send('Runtime.evaluate', { expression:'drawScene(window.__u).then(() => "ok", e => String(e))', awaitPromise:true, returnByValue:true });
+console.log('draw:', ran.result && ran.result.result && ran.result.result.value);
 for (let i = 0; i < 100; i++) { const r = await send('Runtime.evaluate', { expression:'window.done === true', returnByValue:true }); if (r.result.result.value) break; await sleep(200); }
 const r = await send('Runtime.evaluate', { expression:"document.getElementById('c').toDataURL('image/jpeg', .8)", returnByValue:true });
-const out = join(here, '..', '..', 'bg', 'cd-shop-2.jpg'); writeFileSync(out, Buffer.from(r.result.result.value.split(',')[1], 'base64'));
+const out = join(here, '..', '..', 'bg', 'cd-shop-3.jpg'); writeFileSync(out, Buffer.from(r.result.result.value.split(',')[1], 'base64'));
 console.log('wrote', out); ws.close(); proc.kill();
