@@ -1,0 +1,56 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#000"><canvas id="c" width="1920" height="1200"></canvas>
+<script>
+/* A drawn merch booth for the shop page (not a photo): a pegboard wall hung with T-shirts, towels, photoset packs, badges and
+   light sticks, a table in front with a pink cloth; the members' own profile photos (photos/*.jpg) are what is printed on the
+   goods. Seeded. */
+window.drawScene = async (urls = []) => {
+let seed = 3501; const R = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296, rr = (a, b) => a + R() * (b - a), pick = a => a[Math.floor(R() * a.length)];
+const W = 1920, H = 1200, c = document.getElementById('c'), g = c.getContext('2d');
+const imgs = (await Promise.all(urls.map(u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; })))).filter(Boolean);
+for (let i = imgs.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [imgs[i], imgs[j]] = [imgs[j], imgs[i]]; }
+let k = 0; const next = () => imgs[k++ % imgs.length];
+const face = (im, x, y, w, h) => { const s = Math.min(im.naturalWidth / w, im.naturalHeight / h); g.drawImage(im, (im.naturalWidth - w * s) / 2, (im.naturalHeight - h * s) / 2 * .6, w * s, h * s, x, y, w, h); };
+const shadow = (b = 16, y = 8) => { g.shadowColor = 'rgba(0,0,0,.4)'; g.shadowBlur = b; g.shadowOffsetX = 3; g.shadowOffsetY = y; }, noShadow = () => { g.shadowColor = 'transparent'; };
+// pegboard
+g.fillStyle = '#E9E4DC'; g.fillRect(0, 0, W, H);
+const pg = g.createLinearGradient(0, 0, 0, H); pg.addColorStop(0, 'rgba(255,255,255,.2)'); pg.addColorStop(1, 'rgba(60,40,30,.25)'); g.fillStyle = pg; g.fillRect(0, 0, W, H);
+for (let y = 14; y < H; y += 32) for (let x = 14; x < W; x += 32) { g.fillStyle = 'rgba(60,45,35,.55)'; g.beginPath(); g.arc(x, y, 3.4, 0, 7); g.fill(); }
+const hook = (x, y) => { g.strokeStyle = '#8A8F96'; g.lineWidth = 3; g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 22); g.stroke(); };
+const tag = (x, y, t) => { shadow(4, 2); g.fillStyle = '#FFF'; g.fillRect(x, y, 58, 22); noShadow(); g.fillStyle = '#E4457E'; g.font = 'bold 13px sans-serif'; g.fillText(t, x + 7, y + 16); };
+function tee(x, y, w, col, im) {
+  const h = w * 1.05; shadow(20, 10); g.fillStyle = col; g.beginPath();
+  g.moveTo(x + w * .3, y); g.lineTo(x + w * .7, y); g.lineTo(x + w, y + h * .18); g.lineTo(x + w * .86, y + h * .34); g.lineTo(x + w * .78, y + h * .3); g.lineTo(x + w * .78, y + h); g.lineTo(x + w * .22, y + h); g.lineTo(x + w * .22, y + h * .3); g.lineTo(x + w * .14, y + h * .34); g.lineTo(x, y + h * .18); g.closePath(); g.fill(); noShadow();
+  g.fillStyle = 'rgba(0,0,0,.08)'; g.beginPath(); g.arc(x + w / 2, y, w * .12, 0, Math.PI); g.fill();
+  if (im) { face(im, x + w * .33, y + h * .26, w * .34, w * .4); }
+  g.fillStyle = col === '#1B1A1F' ? 'rgba(255,255,255,.85)' : 'rgba(30,20,40,.75)'; g.font = `bold ${Math.round(w * .07)}px sans-serif`; g.textAlign = 'center'; g.fillText(pick(['BIRTHDAY 2027', 'GE2026', 'Kimi to Doko', 'FAN FEST']), x + w / 2, y + h * .78); g.textAlign = 'left';
+}
+function towel(x, y, w, h, col) {
+  shadow(14, 8); g.fillStyle = col; g.fillRect(x, y, w, h); noShadow();
+  g.fillStyle = 'rgba(255,255,255,.88)'; g.save(); g.translate(x + w / 2, y + h / 2); g.rotate(-Math.PI / 2); g.font = `900 ${Math.round(w * .5)}px sans-serif`; g.textAlign = 'center'; g.fillText(pick(['BNK48', 'CGM48']), 0, w * .18); g.restore();
+  g.fillStyle = 'rgba(255,255,255,.35)'; for (let i = 0; i < 6; i++) g.fillRect(x, y + h - 14 - i * 5, w, 2);
+}
+function pack(x, y, s) {
+  // a photoset: three photos fanned in a clear sleeve
+  for (let i = 0; i < 3; i++) { g.save(); g.translate(x + s / 2, y + s * .65); g.rotate((i - 1) * .14); shadow(8, 4); g.fillStyle = '#fff'; g.fillRect(-s * .32, -s * .55, s * .64, s * .9); noShadow(); face(next(), -s * .28, -s * .5, s * .56, s * .7); g.restore(); }
+  g.fillStyle = 'rgba(255,255,255,.22)'; g.fillRect(x, y, s, s * 1.25); g.strokeStyle = 'rgba(255,255,255,.6)'; g.lineWidth = 2; g.strokeRect(x, y, s, s * 1.25);
+}
+function badge(x, y, r) { shadow(8, 4); g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, r + 4, 0, 7); g.fill(); noShadow(); g.save(); g.beginPath(); g.arc(x, y, r, 0, 7); g.clip(); face(next(), x - r, y - r, r * 2, r * 2); g.restore(); const gl = g.createRadialGradient(x - r * .4, y - r * .5, 2, x, y, r); gl.addColorStop(0, 'rgba(255,255,255,.55)'); gl.addColorStop(.4, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+function stick(x, y, col) { shadow(10, 6); g.fillStyle = '#26232B'; g.fillRect(x - 7, y + 60, 14, 120); g.fillStyle = col; g.beginPath(); g.arc(x, y + 34, 30, 0, 7); g.fill(); noShadow(); const gl = g.createRadialGradient(x, y + 34, 4, x, y + 34, 90); gl.addColorStop(0, col + 'AA'); gl.addColorStop(1, col + '00'); g.fillStyle = gl; g.fillRect(x - 100, y - 60, 200, 200); }
+// the wall: rows of goods
+const TEE = ['#FFFFFF', '#1B1A1F', '#F8C8D8', '#BFE6DF', '#F4E3A1', '#C9B8F0'], TOWEL = ['#E4457E', '#2E8C82', '#9B5BB5', '#F2A93B', '#4FA9DE'];
+for (let x = 20; x < W; x += 290) { const w = rr(200, 230), y = 40 + rr(-10, 10); hook(x + w / 2, y - 22); tee(x, y, w, pick(TEE), next()); tag(x + w - 40, y + w * 1.05 - 10, '฿350'); }
+for (let x = 40; x < W; x += 150) { const y = 330 + rr(-8, 8); if (R() < .45) { hook(x + 45, y - 18); towel(x, y, 90, 250, pick(TOWEL)); tag(x + 50, y + 230, '฿350'); } else { hook(x + 55, y - 18); pack(x, y, 110); tag(x + 60, y + 128, '฿350'); } }
+for (let x = 60; x < W; x += 130) { if (R() < .3) stick(x, 640, pick(['#FF5FA2', '#3FE0C8', '#B48CFF'])); else { badge(x, 680, 38); badge(x + 40, 760, 30); } }
+// the table and its pink cloth, with packs and a stand-up sign
+g.fillStyle = '#C93C6E'; g.fillRect(0, 860, W, 340); const tc = g.createLinearGradient(0, 860, 0, H); tc.addColorStop(0, 'rgba(255,255,255,.18)'); tc.addColorStop(1, 'rgba(0,0,0,.3)'); g.fillStyle = tc; g.fillRect(0, 860, W, 340);
+for (let x = 0; x < W; x += 60) { g.fillStyle = 'rgba(0,0,0,.08)'; g.fillRect(x, 900, 28, 300); }
+g.fillStyle = '#2E8C82'; g.fillRect(0, 860, W, 16); g.fillStyle = '#F3EFEA'; g.fillRect(0, 838, W, 26);
+for (let x = 40; x < W; x += rr(170, 240)) { if (R() < .25) { shadow(12, 6); g.fillStyle = '#fff'; g.fillRect(x, 700, 150, 136); noShadow(); g.fillStyle = '#E4457E'; g.font = 'bold 22px sans-serif'; g.fillText('PRE-ORDER', x + 14, 740); g.fillStyle = '#2B2340'; g.font = 'bold 30px sans-serif'; g.fillText('฿350', x + 32, 790); } else { for (let i = 0; i < 3; i++) pack(x + i * 8, 760 - i * 6, 90); } }
+// warm light from above
+for (const sx of [300, 960, 1620]) { const sp = g.createRadialGradient(sx, -60, 20, sx, 380, 700); sp.addColorStop(0, 'rgba(255,230,180,.35)'); sp.addColorStop(1, 'rgba(255,230,180,0)'); g.fillStyle = sp; g.fillRect(0, 0, W, H); }
+const v = g.createRadialGradient(W / 2, H * .45, H * .35, W / 2, H * .5, W * .75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(20,10,10,.5)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
+const snap = document.createElement('canvas'); snap.width = W; snap.height = H; snap.getContext('2d').drawImage(c, 0, 0);
+g.clearRect(0, 0, W, H); g.filter = 'blur(1.3px)'; g.drawImage(snap, 0, 0); g.filter = 'none';
+};
+if (!/[?&]wait\b/.test(location.search)) drawScene();
+</script>
