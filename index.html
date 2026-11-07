@@ -6293,14 +6293,19 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-fx.z{ font:800 12px/1 ui-monospace,Menlo,monospace; color:var(--ink-soft); animation-duration:2.4s; }
   /* her ring of things to do, around her when tapped; her meow at the edge of the screen; the paw to bring her to this page */
   .meow-ring{ position:absolute; left:0; top:0; width:0; height:0; z-index:2; pointer-events:none; }
+  /* a pale band behind the ring, so its buttons read over any picture; clear in the middle, where she is */
+  .meow-ring::before{ content:''; position:absolute; left:var(--rx, 0px); top:var(--ry, 0px); width:360px; height:360px; margin:-180px 0 0 -180px; border-radius:50%;
+    background:radial-gradient(closest-side, transparent 34%, color-mix(in srgb, var(--card) 88%, transparent) 46%, color-mix(in srgb, var(--card) 88%, transparent) 72%, transparent); opacity:0; transition:opacity .2s; }
+  .meow-ring.on::before{ opacity:1; }
   .meow-rb{ position:absolute; left:0; top:0; width:44px; height:44px; margin:-22px 0 0 -22px; padding:0; border-radius:50%; border:1.5px solid var(--line);
     background:var(--card); color:var(--ink); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.14); display:flex; align-items:center; justify-content:center; cursor:pointer;
     pointer-events:auto; transform:scale(.3); opacity:0; transition:transform .22s cubic-bezier(.34,1.56,.64,1), opacity .15s; -webkit-tap-highlight-color:transparent; }
   .meow-rb.on{ transform:scale(1); opacity:1; }
   .meow-rb:active{ transform:scale(.92) translateY(2px); box-shadow:none; }
   .meow-rb .meow-px{ width:26px; height:26px; }
-  .meow-rb small{ position:absolute; bottom:100%; margin-bottom:1px; font-size:10.5px; font-weight:700; white-space:nowrap; color:var(--ink);
-    text-shadow:0 0 3px var(--card), 0 0 3px var(--card), 0 0 2px var(--card); }
+  .meow-rb small{ position:absolute; left:50%; top:50%; transform:translate(calc(-50% + var(--lx, 0px)), calc(-50% + var(--ly, -34px))); padding:1px 7px 2px;
+    border-radius:99px; background:var(--card); border:1px solid var(--line); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.1);
+    font-size:11px; line-height:1.3; font-weight:700; white-space:nowrap; color:var(--ink); pointer-events:none; }
   .meow-rb.is-home{ width:34px; height:34px; margin:-17px 0 0 -17px; font-size:15px; }
   .meow-edge{ position:absolute; left:0; top:0; padding:5px 11px; border-radius:99px; background:var(--card); color:var(--ink); border:1.5px solid var(--pink);
     box-shadow:0 3px 0 rgba(var(--shadow-rgb),.12); font-size:13px; font-weight:700; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .25s; }
@@ -29191,21 +29196,30 @@ function meowRingOpen(w){
   (w.layerEl() || _meowLayer).appendChild(el);
   _meowRing = { el, w, t:setTimeout(meowRingClose, 6500) };
   meowRingPos(w);
-  requestAnimationFrame(() => el.querySelectorAll('.meow-rb').forEach((b, i) => setTimeout(() => b.classList.add('on'), i * 35)));
+  requestAnimationFrame(() => { el.classList.add('on'); el.querySelectorAll('.meow-rb').forEach((b, i) => setTimeout(() => b.classList.add('on'), i * 35)); });
 }
 function meowRingPos(w){
   const r = _meowRing; if(!r || r.w !== w) return;
   if(w.mode !== 'ledge' || w.gone){ meowRingClose(); return; }
   const d = w.dc; if(!d) return;
-  const band = meowBand(), [ox, oy] = w.off(), cx = d.x + ox, cy = d.y + oy - w.ch * .3, R = 100;
+  const band = meowBand(), [ox, oy] = w.off(), cx = d.x + ox, cy = d.y + oy - w.ch * .3, R = 104;
   const below = cy - R - 30 < (w.sp === 'page' ? scrollY : 0) + band.top;   // too near the top of the screen: the ring goes under her
   const lo = (w.sp === 'page' ? scrollX : 0) + 26, hi = (w.sp === 'page' ? scrollX : 0) + innerWidth - 26;
-  r.el.style.transform = `translate(${cx.toFixed(0)}px, ${cy.toFixed(0)}px)`;
+  // near a screen edge the ring slides toward the middle rather than squashing its buttons against the side
+  const rc = hi - lo > 2 * R + 40 ? Math.max(lo + R + 20, Math.min(hi - R - 20, cx)) : (lo + hi) / 2, dx = cx - rc;
+  r.el.style.transform = `translate(${rc.toFixed(0)}px, ${cy.toFixed(0)}px)`;
+  r.el.style.setProperty('--ry', (below ? w.ch * .55 : 0).toFixed(0) + 'px');
   const bs = [...r.el.children], n = bs.length - 1;
   bs.forEach((b, i) => {
-    if(b.dataset.k === 'home'){ const sx = cx > (lo + hi) / 2 ? -1 : 1; b.style.left = (sx * (w.cw * .5 + 30)) + 'px'; b.style.top = (below ? -10 : w.ch * .35) + 'px'; return; }
+    if(b.dataset.k === 'home'){ const sx = cx > (lo + hi) / 2 ? -1 : 1; b.style.left = (dx + sx * (w.cw * .5 + 30)) + 'px'; b.style.top = (below ? -10 : w.ch * .35) + 'px'; return; }
     const a = (-175 + (n > 1 ? i * 170 / (n - 1) : 85)) * Math.PI / 180, x = Math.cos(a) * R, y = Math.sin(a) * R * (below ? -1 : 1) + (below ? w.ch * .55 : 0);
-    b.style.left = Math.max(lo - cx, Math.min(hi - cx, x)).toFixed(0) + 'px'; b.style.top = y.toFixed(0) + 'px';
+    b.style.left = Math.max(lo - rc, Math.min(hi - rc, x)).toFixed(0) + 'px'; b.style.top = y.toFixed(0) + 'px';
+    // its name sits outside the ring, along the line from her to the button, clear of its neighbours
+    const ux = Math.cos(a), uy = Math.sin(a) * (below ? -1 : 1), k = 30 + 22 * Math.abs(ux), sm = b.querySelector('small');
+    let lx = ux * k;
+    if(sm){ const bx = Math.max(lo - rc, Math.min(hi - rc, x)) + rc - (w.sp === 'page' ? scrollX : 0), hw = sm.offsetWidth / 2 + 6;   // kept inside the screen
+      lx = Math.max(hw - bx, Math.min(innerWidth - hw - bx, lx)); }
+    b.style.setProperty('--lx', lx.toFixed(0) + 'px'); b.style.setProperty('--ly', (uy * (k - 4)).toFixed(0) + 'px');
   });
 }
 // can she eat now? not when full, not again right after a meal
