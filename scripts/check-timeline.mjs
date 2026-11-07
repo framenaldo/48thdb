@@ -1,0 +1,24 @@
+// Is the iAM48 timeline on the site keeping up with the app? node scripts/check-timeline.mjs [how many numbers past the newest to ask, default 400]
+// Reads api.48thdb.com/timeline, then asks app.bnk48.com for the numbers after the newest post it holds (and a stretch below it) and lists any
+// member posts the site is missing. Exit 1 when some are missing. (The Worker's own walk is described in worker/README.md.)
+const reach = +process.argv[2] || 400;
+const API = 'https://api.48thdb.com/timeline', URL_OF = n => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
+const t = await (await fetch(`${API}?c=${Date.now()}`)).json();
+const have = new Set(t.posts.map(p => p.n)), top = Math.max(...have), lo = top - 120;
+console.log(`site: ${t.posts.length} posts, newest ${top} (${t.posts[0].m}, ${t.posts[0].at}); walk at ${t.walk && t.walk.max}; checked ${t.checked}`);
+const nums = []; for (let n = lo; n <= top + reach; n++) if (!have.has(n)) nums.push(n);
+const found = [];
+async function probe(n){
+  try{
+    const r = await fetch(URL_OF(n), { headers:{ 'user-agent':'Mozilla/5.0 (48thDb timeline check)', accept:'text/html' } });
+    if(r.status === 404) return; if(!r.ok){ found.push({ n, err:r.status }); return; }
+    const h = await r.text(), m = h.match(/img\.bnk48cdn\.net\/member\/(\d+)\/profile/);
+    if(m) found.push({ n, iam:+m[1], locked:h.indexOf('class="post-card') < 0, ago:((h.match(/post-card-duration">\s*([^<]*?)\s*</) || [])[1] || '') });
+  }catch(e){ found.push({ n, err:String(e.message || e).slice(0, 40) }); }
+}
+for (let i = 0; i < nums.length; i += 24) await Promise.all(nums.slice(i, i + 24).map(probe));
+const missing = found.filter(f => f.iam).sort((a, b) => a.n - b.n), errs = found.filter(f => f.err);
+// a member's post that is on the app but not on the site; ones from graduates or accounts not on the list are not kept by the site on purpose
+console.log(`asked ${nums.length} numbers (${lo}…${top + reach}): ${missing.length} member page(s) the site does not hold${errs.length ? `, ${errs.length} could not be asked` : ''}`);
+for (const f of missing) console.log(`  ${f.n}  iAM member ${f.iam}  ${f.locked ? 'locked' : f.ago}`);
+process.exit(missing.length ? 1 : 0);

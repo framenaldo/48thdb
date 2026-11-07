@@ -1,0 +1,25 @@
+# Three times a day (09:00, 15:00, 21:00 in Thailand): is the site's iAM48 posts row keeping up with the app?
+# scripts/check-timeline.mjs reads api.48thdb.com/timeline, asks app.bnk48.com for the numbers after the newest post it holds and
+# exits 1 when a member's post is missing — then this run fails and GitHub emails the repo owner. A pass is silent. Reads only public
+# pages; nothing is written or deployed. GitHub's cron is best-effort and can be late.
+name: Check iAM48 timeline
+
+on:
+  schedule:
+    - cron: '0 2,8,14 * * *'   # 09:00, 15:00, 21:00 in Thailand
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Compare the site with the app
+        run: node scripts/check-timeline.mjs 400
