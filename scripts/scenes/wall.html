@@ -17,14 +17,14 @@ const FR = [
 ];
 function frame(x, y, w, h, f, im) {
   g.save(); g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 26; g.shadowOffsetX = 8; g.shadowOffsetY = 16;
-  const e = f.edge;
+  const sc = Math.max(.45, w / 215), e = Math.round(f.edge * sc), mat = Math.round(f.mat * sc);
   if (f.k === 'gold') { const gr = g.createLinearGradient(x, y, x + w, y + h); gr.addColorStop(0, '#F4D58A'); gr.addColorStop(.35, '#B8862E'); gr.addColorStop(.6, '#F1CF7A'); gr.addColorStop(1, '#7A5418'); g.fillStyle = gr; }
   else if (f.k === 'black') g.fillStyle = '#121014'; else if (f.k === 'white') g.fillStyle = '#F3F0EA'; else { const gr = g.createLinearGradient(x, y, x + w, y); gr.addColorStop(0, '#6B4226'); gr.addColorStop(1, '#3E2414'); g.fillStyle = gr; }
   g.fillRect(x, y, w, h); g.restore();
   g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = 2; g.strokeRect(x + 3, y + 3, w - 6, h - 6);
   g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(x + e - 3, y + e - 3, w - 2 * e + 6, h - 2 * e + 6);
-  if (f.mat) { g.fillStyle = '#F7F3EC'; g.fillRect(x + e, y + e, w - 2 * e, h - 2 * e); }
-  const ix = x + e + f.mat, iy = y + e + f.mat, iw = w - 2 * (e + f.mat), ih = h - 2 * (e + f.mat), k = Math.min(im.naturalWidth / iw, im.naturalHeight / ih);
+  if (mat) { g.fillStyle = '#F7F3EC'; g.fillRect(x + e, y + e, w - 2 * e, h - 2 * e); }
+  const ix = x + e + mat, iy = y + e + mat, iw = w - 2 * (e + mat), ih = h - 2 * (e + mat), k = Math.min(im.naturalWidth / iw, im.naturalHeight / ih);
   g.drawImage(im, (im.naturalWidth - iw * k) / 2, (im.naturalHeight - ih * k) / 2, iw * k, ih * k, ix, iy, iw, ih);
   const gl = g.createLinearGradient(ix, iy, ix + iw, iy + ih); gl.addColorStop(0, 'rgba(255,255,255,.16)'); gl.addColorStop(.4, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(ix, iy, iw, ih);
 }
@@ -35,19 +35,19 @@ function light(x, y, w) {
 // salon hang: columns of frames of mixed sizes; a light over some
 let k = 0, x = -30;
 while (x < W + 40 && imgs.length) {
-  const colW = rr(170, 260); let y = rr(10, 60);
+  const colW = rr(92, 140); let y = rr(10, 60);
   while (y < H - 170) {
     const f = pick(FR), w = colW, h = Math.round(w * pick([1, 1.25, 1.33, .8])), im = imgs[k++ % imgs.length];
     if (y + h > H - 140) break;
     frame(x, y, w, h, f, im);
     if (R() < .3) light(x + w / 2, y - 4, w * .5);
-    y += h + rr(26, 46);
+    y += h + rr(16, 28);
   }
-  x += colW + rr(30, 56);
+  x += colW + rr(18, 34);
 }
 const v = g.createRadialGradient(W / 2, H * .45, H * .3, W / 2, H * .5, W * .75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.55)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
 const snap = document.createElement('canvas'); snap.width = W; snap.height = H; snap.getContext('2d').drawImage(c, 0, 0);
-g.clearRect(0, 0, W, H); g.filter = 'blur(1.3px)'; g.drawImage(snap, 0, 0); g.filter = 'none';
+g.clearRect(0, 0, W, H); g.filter = 'blur(2.2px)'; g.drawImage(snap, 0, 0); g.filter = 'none';
 };
 if (!/[?&]wait\b/.test(location.search)) drawScene();
 </script>

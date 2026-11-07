@@ -4177,9 +4177,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     background:linear-gradient(rgba(14,9,20,.30), rgba(14,9,20,.52)), url(bg/cd-shop-7.jpg) center top / cover no-repeat; }
   html[data-cdshop="1"] .wk-head{ color:#fff; text-shadow:0 2px 14px rgba(0,0,0,.6); }
   html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list, html[data-cdshop="1"] .wk-cats, html[data-cdshop="1"] .gal-teaser{
-    position:relative; border-radius:26px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.74); --line:rgba(255,255,255,.22); --paper-dim:rgba(255,255,255,.14); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08);
-    background:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 38%, rgba(255,255,255,.03) 62%, rgba(255,255,255,.16) 100%), rgba(26,18,44,.30);
-    -webkit-backdrop-filter:blur(22px) saturate(1.7) brightness(1.06); backdrop-filter:blur(22px) saturate(1.7) brightness(1.06);
+    position:relative; border-radius:26px; color:#fff; text-shadow:0 1px 7px rgba(0,0,0,.42); --ink:#fff; --ink-soft:rgba(255,255,255,.74); --line:rgba(255,255,255,.22); --paper-dim:rgba(255,255,255,.14); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08);
+    background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), rgba(26,18,44,.14);
+    -webkit-backdrop-filter:blur(13px) saturate(1.6) brightness(1.05); backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);
     border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
     box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.14), inset 0 0 28px rgba(255,255,255,.08), 0 20px 44px rgba(0,0,0,.38); }
   html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list{ padding:16px 18px 6px; margin-bottom:18px; }
@@ -4201,16 +4201,16 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-cdshop="1"] .filter-bar .chip, html[data-cdshop="1"] .filter-bar button{ -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
   html[data-cdshop="1"] .cds-off{ display:inline-block; margin:0 0 10px; padding:4px 12px; border-radius:99px; border:1.5px solid rgba(255,255,255,.4); background:rgba(255,255,255,.14); color:#fff; font:inherit; font-size:11.5px; font-weight:800; cursor:pointer; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
   html[data-cdshop="1"] .cds-off:active{ transform:translateY(2px); }
-  @media (max-width:760px){ html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list, html[data-cdshop="1"] .wk-cats, html[data-cdshop="1"] .gal-teaser{ -webkit-backdrop-filter:blur(14px) saturate(1.5); backdrop-filter:blur(14px) saturate(1.5); } }
+  @media (max-width:760px){ html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list, html[data-cdshop="1"] .wk-cats, html[data-cdshop="1"] .gal-teaser{ -webkit-backdrop-filter:blur(9px) saturate(1.5); backdrop-filter:blur(9px) saturate(1.5); } }
   /* ---- the calendar on a cork notice board, for everyone (?board=off turns it off on one device). The groups' own event
      posters pinned up behind the page (bg/cork-board-1.jpg, from scripts/board), the month and the list as panes of the same liquid
      glass as the Works page: one blurred pane each; the days and rows inside are only tinted. ---- */
   html[data-board="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
     background:linear-gradient(rgba(24,14,6,.16), rgba(24,14,6,.38)), url(bg/cork-board-1.jpg) center top / cover no-repeat; }
   html[data-board="1"] .calp > .feed-head, html[data-board="1"] .calp-board, html[data-board="1"] .calp-agenda{
-    position:relative; border-radius:26px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.22); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.14);
-    background:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 38%, rgba(255,255,255,.03) 62%, rgba(255,255,255,.16) 100%), rgba(34,20,14,.34);
-    -webkit-backdrop-filter:blur(22px) saturate(1.6) brightness(1.04); backdrop-filter:blur(22px) saturate(1.6) brightness(1.04);
+    position:relative; border-radius:26px; color:#fff; text-shadow:0 1px 7px rgba(0,0,0,.42); --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.22); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.14);
+    background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), rgba(34,20,14,.16);
+    -webkit-backdrop-filter:blur(13px) saturate(1.6) brightness(1.05); backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);
     border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
     box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.14), inset 0 0 28px rgba(255,255,255,.08), 0 20px 44px rgba(0,0,0,.35); }
   html[data-board="1"] .calp-agenda{ padding:12px; }
@@ -4225,17 +4225,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-board="1"] .calp-subscribe, html[data-board="1"] .calp-bar button{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.4); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
   @media (max-width:760px){ html[data-board="1"] .calp > .feed-head, html[data-board="1"] .calp-board, html[data-board="1"] .calp-agenda{ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
   /* ---- the members page on a gallery wall and the shop at a merch booth, for everyone (?wall=off / ?booth=off turns one off on a
-     device). Drawn backgrounds from scripts/scenes with the members' own photos (bg/photo-wall-1.jpg,
+     device). Drawn backgrounds from scripts/scenes with the members' own photos (bg/photo-wall-2.jpg,
      bg/merch-booth-3.jpg) and the same liquid-glass panes: one blurred pane per block, what is inside only tinted. The members
      table's sticky name column keeps a nearly solid tint, or the cells scrolled under it would show through. ---- */
   html[data-wall="1"] body::before, html[data-booth="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background-position:center top; background-size:cover; background-repeat:no-repeat; }
-  html[data-wall="1"] body::before{ background-image:linear-gradient(rgba(18,8,16,.22), rgba(18,8,16,.5)), url(bg/photo-wall-1.jpg); }
+  html[data-wall="1"] body::before{ background-image:linear-gradient(rgba(18,8,16,.22), rgba(18,8,16,.5)), url(bg/photo-wall-2.jpg); }
   html[data-booth="1"] body::before{ background-image:linear-gradient(rgba(30,14,20,.18), rgba(30,14,20,.42)), url(bg/merch-booth-3.jpg); }
-  html[data-wall="1"]{ --pane-tint:rgba(40,16,36,.36); } html[data-booth="1"]{ --pane-tint:rgba(52,20,34,.36); }
+  html[data-wall="1"]{ --pane-tint:rgba(40,16,36,.18); } html[data-booth="1"]{ --pane-tint:rgba(52,20,34,.18); }
   html[data-wall="1"] .filter-bar.mb-bar, html[data-wall="1"] .table-wrap, html[data-wall="1"] .thead-sticky-outer, html[data-booth="1"] .shop > .feed-head, html[data-booth="1"] .shop-grid{
-    position:relative; border-radius:24px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.2); --card:rgba(255,255,255,.06); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.12);
-    background:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 38%, rgba(255,255,255,.03) 62%, rgba(255,255,255,.16) 100%), var(--pane-tint);
-    -webkit-backdrop-filter:blur(22px) saturate(1.6) brightness(1.04); backdrop-filter:blur(22px) saturate(1.6) brightness(1.04);
+    position:relative; border-radius:24px; color:#fff; text-shadow:0 1px 7px rgba(0,0,0,.42); --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.2); --card:rgba(255,255,255,.06); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.12);
+    background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), var(--pane-tint);
+    -webkit-backdrop-filter:blur(13px) saturate(1.6) brightness(1.05); backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);
     border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
     box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.14), inset 0 0 28px rgba(255,255,255,.08), 0 20px 44px rgba(0,0,0,.35); }
   html[data-wall="1"] .filter-bar.mb-bar{ padding:10px 12px; }
@@ -4259,11 +4259,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-stage="1"] body::before, html[data-desk="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background-position:center top; background-size:cover; background-repeat:no-repeat; }
   html[data-stage="1"] body::before{ background-image:linear-gradient(rgba(6,4,12,.18), rgba(6,4,12,.5)), url(bg/stage-wall-1.jpg); }
   html[data-desk="1"] body::before{ background-image:linear-gradient(rgba(30,16,8,.16), rgba(30,16,8,.42)), url(bg/fan-desk-1.jpg); }
-  html[data-stage="1"]{ --pane-tint:rgba(18,12,40,.42); } html[data-desk="1"]{ --pane-tint:rgba(46,26,16,.4); }
+  html[data-stage="1"]{ --pane-tint:rgba(18,12,40,.2); } html[data-desk="1"]{ --pane-tint:rgba(46,26,16,.18); }
   html[data-stage="1"] #main > :not(.ov-layer):not(script), html[data-desk="1"] #main > :not(.ov-layer):not(.app-version):not(script){
-    position:relative; border-radius:24px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.2); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.12);
-    background:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 38%, rgba(255,255,255,.03) 62%, rgba(255,255,255,.16) 100%), var(--pane-tint);
-    -webkit-backdrop-filter:blur(22px) saturate(1.6) brightness(1.04); backdrop-filter:blur(22px) saturate(1.6) brightness(1.04);
+    position:relative; border-radius:24px; color:#fff; text-shadow:0 1px 7px rgba(0,0,0,.42); --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.2); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.12);
+    background:linear-gradient(135deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.04) 38%, rgba(255,255,255,.02) 62%, rgba(255,255,255,.11) 100%), var(--pane-tint);
+    -webkit-backdrop-filter:blur(13px) saturate(1.6) brightness(1.05); backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);
     border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
     box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.14), inset 0 0 28px rgba(255,255,255,.08), 0 20px 44px rgba(0,0,0,.35); padding:14px; margin-bottom:16px; }
   html[data-desk="1"] .account-card, html[data-desk="1"] .meow-adopt, html[data-desk="1"] .lay-sheet-note{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.2); }
@@ -4273,12 +4273,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-stage="1"] .subtab.active{ background:rgba(255,255,255,.9); color:#1B1426; }
   @media (max-width:760px){ html[data-stage="1"] #main > :not(.ov-layer), html[data-desk="1"] #main > :not(.ov-layer){ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
   /* ---- the home page's backdrop (a preview: only with ?home=on, off with ?home=off): the other pages' scenes blurred into a field of
-     colour (bg/home-collage-1.jpg, from scripts/scenes/collage.html) with a wash in the reader's own light or dark over it, so text
+     colour (bg/home-collage-2.jpg, from scripts/scenes/collage.html) with a wash in the reader's own light or dark over it, so text
      outside the cards stays readable; the cards keep their own colours, and each section heading sits on a small glass capsule. ---- */
   html[data-home="1"]{ --home-wash:rgba(255,246,250,.76); }
   :root[data-theme="dark"][data-home="1"]{ --home-wash:rgba(14,10,22,.7); }
   html[data-home="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(var(--home-wash), var(--home-wash)), url(bg/home-collage-1.jpg) center top / cover no-repeat; }
+    background:linear-gradient(var(--home-wash), var(--home-wash)), url(bg/home-collage-2.jpg) center top / cover no-repeat; }
   html[data-home="1"] #main .section-label{ display:inline-block; padding:5px 15px; border-radius:99px; border:1px solid var(--line); border-top-color:rgba(255,255,255,.55);
     background:linear-gradient(135deg, rgba(255,255,255,.34), rgba(255,255,255,.08)), color-mix(in srgb, var(--card) 62%, transparent);
     -webkit-backdrop-filter:blur(14px) saturate(1.5); backdrop-filter:blur(14px) saturate(1.5); box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 6px 16px rgba(0,0,0,.12); }
