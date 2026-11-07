@@ -15950,19 +15950,20 @@ function gecVolumeCard(en, d, hNow, N){
   const p = GEC_POLLS.ge2026, g = gec24(d, hNow), hi = Math.floor(hNow - 1e-9), M = monthsShort();
   const hrs = []; for(let h = Math.max(0, hi - 47); h <= hi; h++) hrs.push([h, d.hours[h] || 0]);
   if(hrs.length < 3) return '';
-  const last24 = hrs.slice(-24), live = last24.filter(x => x[1] > 0), top = last24.reduce((a, b) => b[1] > a[1] ? b : a, last24[0]), low = live.length ? live.reduce((a, b) => b[1] < a[1] ? b : a, live[0]) : null;
+  // busiest and quietest over everything the chart shows (the 48 hours), so the gold bar is the tallest one in it
+  const live = hrs.filter(x => x[1] > 0), top = hrs.reduce((a, b) => b[1] > a[1] ? b : a, hrs[0]), low = live.length ? live.reduce((a, b) => b[1] < a[1] ? b : a, live[0]) : null;
   const when = h => new Date(gecMs(p, p.start + h * 1200)), hm = h => `${String(when(h).getHours()).padStart(2, '0')}:00`;
   const peak = Math.max(1, ...hrs.map(x => x[1]));
   // a short label on the bar: whole tokens with a comma, one decimal under ten, nothing for an hour with no votes
   const lab = v => v <= 0 ? '' : v >= 10 ? Math.round(v).toLocaleString('en-US') : (Math.round(v * 10) / 10).toString();
-  const cols = hrs.map(([h, v], k) => { const t = when(h), pct = v / peak * 84, cls = h === hi ? ' is-now' : v === top[1] && k >= hrs.length - 24 ? ' is-hi' : '';
+  const cols = hrs.map(([h, v], k) => { const t = when(h), pct = v / peak * 84, cls = h === top[0] ? ' is-hi' : h === hi ? ' is-now' : '';
     return `<div class="gec-vcol${cls}"><div class="gec-vplot"><i style="height:${pct.toFixed(1)}%"></i>${v > 0 ? `<em style="bottom:calc(${pct.toFixed(1)}% + 2px)">${lab(v)}</em>` : ''}</div>
       <span>${hm(h)}</span><small>${t.getHours() === 0 || k === 0 ? `${t.getDate()} ${M[t.getMonth()]}` : ''}</small></div>`; }).join('');
   const cell = (k, v, sub) => `<div><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
   return `<div class="gea-card gec-vc"><h3 class="gec-h">${en ? 'Tokens voted, hour by hour' : 'โทเคนที่โหวตรายชั่วโมง'}</h3>
     <div class="gec-stats4">${cell(en ? 'Last 24 h' : '24 ชม. ล่าสุด', gecTok(g), en ? 'tokens' : 'โทเคน')}${cell(en ? 'Last 24 h in baht' : '24 ชม. ล่าสุด เป็นเงิน', gecN(g * gecPrice), en ? 'baht' : 'บาท')}
-      ${cell(en ? 'Busiest hour' : 'ชั่วโมงที่โหวตมากสุด', gecTok(top[1]), hm(top[0]))}${low ? cell(en ? 'Quietest hour (not zero)' : 'ชั่วโมงที่โหวตน้อยสุด (ไม่นับศูนย์)', gecTok(low[1]), hm(low[0])) : cell(en ? 'Quietest hour' : 'ชั่วโมงที่โหวตน้อยสุด', '–', '')}</div>
-    <p class="gec-cap"><span>${en ? 'Last 48 hours · scroll sideways for earlier' : '48 ชม. ล่าสุด · เลื่อนไปทางซ้ายดูย้อนหลัง'}</span><span><i class="hi"></i>${en ? 'busiest of the last 24 h' : 'มากสุดใน 24 ชม.'} <i class="now"></i>${en ? 'this hour, still running' : 'ชั่วโมงนี้ ยังไม่จบ'}</span></p>
+      ${cell(en ? 'Busiest hour (in the chart)' : 'ชั่วโมงที่โหวตมากสุด (ในกราฟ)', gecTok(top[1]), hm(top[0]))}${low ? cell(en ? 'Quietest hour (in the chart, not zero)' : 'ชั่วโมงที่โหวตน้อยสุด (ในกราฟ ไม่นับศูนย์)', gecTok(low[1]), hm(low[0])) : cell(en ? 'Quietest hour' : 'ชั่วโมงที่โหวตน้อยสุด', '–', '')}</div>
+    <p class="gec-cap"><span>${en ? 'Last 48 hours · scroll sideways for earlier' : '48 ชม. ล่าสุด · เลื่อนไปทางซ้ายดูย้อนหลัง'}</span><span><i class="hi"></i>${en ? 'busiest in this chart' : 'มากสุดในกราฟนี้'} <i class="now"></i>${en ? 'this hour, still running' : 'ชั่วโมงนี้ ยังไม่จบ'}</span></p>
     <div class="gec-vbars" data-vbars><div class="gec-vin">${cols}</div></div>
   </div>`;
 }
