@@ -6293,10 +6293,6 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-fx.z{ font:800 12px/1 ui-monospace,Menlo,monospace; color:var(--ink-soft); animation-duration:2.4s; }
   /* her ring of things to do, around her when tapped; her meow at the edge of the screen; the paw to bring her to this page */
   .meow-ring{ position:absolute; left:0; top:0; width:0; height:0; z-index:2; pointer-events:none; }
-  /* a pale band behind the ring, so its buttons read over any picture; clear in the middle, where she is */
-  .meow-ring::before{ content:''; position:absolute; left:var(--rx, 0px); top:var(--ry, 0px); width:360px; height:360px; margin:-180px 0 0 -180px; border-radius:50%;
-    background:radial-gradient(closest-side, transparent 34%, color-mix(in srgb, var(--card) 88%, transparent) 46%, color-mix(in srgb, var(--card) 88%, transparent) 72%, transparent); opacity:0; transition:opacity .2s; }
-  .meow-ring.on::before{ opacity:1; }
   .meow-rb{ position:absolute; left:0; top:0; width:44px; height:44px; margin:-22px 0 0 -22px; padding:0; border-radius:50%; border:1.5px solid var(--line);
     background:var(--card); color:var(--ink); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.14); display:flex; align-items:center; justify-content:center; cursor:pointer;
     pointer-events:auto; transform:scale(.3); opacity:0; transition:transform .22s cubic-bezier(.34,1.56,.64,1), opacity .15s; -webkit-tap-highlight-color:transparent; }
@@ -29208,7 +29204,6 @@ function meowRingPos(w){
   // near a screen edge the ring slides toward the middle rather than squashing its buttons against the side
   const rc = hi - lo > 2 * R + 40 ? Math.max(lo + R + 20, Math.min(hi - R - 20, cx)) : (lo + hi) / 2, dx = cx - rc;
   r.el.style.transform = `translate(${rc.toFixed(0)}px, ${cy.toFixed(0)}px)`;
-  r.el.style.setProperty('--ry', (below ? w.ch * .55 : 0).toFixed(0) + 'px');
   const bs = [...r.el.children], n = bs.length - 1;
   bs.forEach((b, i) => {
     if(b.dataset.k === 'home'){ const sx = cx > (lo + hi) / 2 ? -1 : 1; b.style.left = (dx + sx * (w.cw * .5 + 30)) + 'px'; b.style.top = (below ? -10 : w.ch * .35) + 'px'; return; }
