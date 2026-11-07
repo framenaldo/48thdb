@@ -16,10 +16,14 @@ let tab; for (let i = 0; i < 100 && !tab; i++) { try { tab = (await (await fetch
 const ws = new WebSocket(tab.webSocketDebuggerUrl); await new Promise(r => ws.addEventListener('open', r));
 let seq = 0; const wait = new Map(); ws.addEventListener('message', e => { const m = JSON.parse(e.data); if (m.id && wait.has(m.id)) { wait.get(m.id)(m); wait.delete(m.id); } });
 const send = (method, params = {}) => new Promise(res => { const id = ++seq; wait.set(id, res); ws.send(JSON.stringify({ id, method, params })); });
-await send('Page.navigate', { url:'file://' + resolve(scene) + '?wait' }); await sleep(600);
+await send('Page.navigate', { url:'file://' + resolve(scene) + '?wait' });
+for (let i = 0; i < 100; i++) { const t = await send('Runtime.evaluate', { expression:"typeof drawScene === 'function'", returnByValue:true }); if (t.result && t.result.result && t.result.result.value) break; await sleep(200); }   // wait for the scene page to be ready
 await send('Runtime.evaluate', { expression:'window.__u = []' });
 for (const u of urls) await send('Runtime.evaluate', { expression:`window.__u.push(${JSON.stringify(u)})` });
 const ran = await send('Runtime.evaluate', { expression:'drawScene(window.__u).then(() => "ok", e => String(e))', awaitPromise:true, returnByValue:true });
-console.log('draw:', ran.result && ran.result.result && ran.result.result.value);
+console.log('draw:', JSON.stringify(ran).slice(0, 300));
+// a drawing that failed leaves a black canvas, and a black picture once went live: check it is not before writing
+const bright = await send('Runtime.evaluate', { expression:"(() => { const c = document.getElementById('c'), t = document.createElement('canvas'); t.width = t.height = 16; const x = t.getContext('2d'); x.drawImage(c, 0, 0, 16, 16); const d = x.getImageData(0, 0, 16, 16).data; let s = 0; for (let i = 0; i < d.length; i += 4) s += d[i] + d[i + 1] + d[i + 2]; return s / (d.length / 4) / 3; })()", returnByValue:true });
+if (!(bright.result.result.value > 12)) { console.error('the picture came out black (' + bright.result.result.value + '): not written'); ws.close(); proc.kill(); process.exit(1); }
 const r = await send('Runtime.evaluate', { expression:"document.getElementById('c').toDataURL('image/jpeg', .8)", returnByValue:true });
 writeFileSync(resolve(out), Buffer.from(r.result.result.value.split(',')[1], 'base64')); console.log('wrote', out); ws.close(); proc.kill();

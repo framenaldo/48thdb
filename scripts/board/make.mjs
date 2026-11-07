@@ -21,6 +21,7 @@ const postersDir = join(here, '..', '..', 'posters');
 const urls = readdirSync(postersDir).filter(f => /-s\.jpg$/.test(f)).sort().map(f => 'data:image/jpeg;base64,' + readFileSync(join(postersDir, f)).toString('base64')), more = [];
 console.log(urls.length, 'posters');
 await send('Page.navigate', { url:'file://' + join(here, 'scene.html') + '?wait' });
+for (let i = 0; i < 100; i++) { const t = await send('Runtime.evaluate', { expression:"typeof drawScene === 'function'", returnByValue:true }); if (t.result && t.result.result && t.result.result.value) break; await sleep(200); }   // wait for the scene page to be ready
 await sleep(500);
 // handed in one at a time: a single message with every picture in it was too big for the browser to take
 await send('Runtime.evaluate', { expression:'window.__u = []; window.__v = []' });
@@ -29,6 +30,9 @@ for (const u of more) await send('Runtime.evaluate', { expression:`window.__v.pu
 const ran = await send('Runtime.evaluate', { expression:'drawScene(window.__u, window.__v).then(() => "ok", e => String(e))', awaitPromise:true, returnByValue:true });
 console.log('draw:', ran.result && ran.result.result && ran.result.result.value);
 for (let i = 0; i < 100; i++) { const r = await send('Runtime.evaluate', { expression:'window.done === true', returnByValue:true }); if (r.result.result.value) break; await sleep(200); }
+// a drawing that failed leaves a black canvas, and a black picture once went live: check it is not before writing
+const bright = await send('Runtime.evaluate', { expression:"(() => { const c = document.getElementById('c'), t = document.createElement('canvas'); t.width = t.height = 16; const x = t.getContext('2d'); x.drawImage(c, 0, 0, 16, 16); const d = x.getImageData(0, 0, 16, 16).data; let s = 0; for (let i = 0; i < d.length; i += 4) s += d[i] + d[i + 1] + d[i + 2]; return s / (d.length / 4) / 3; })()", returnByValue:true });
+if (!(bright.result.result.value > 12)) { console.error('the picture came out black (' + bright.result.result.value + '): not written'); ws.close(); proc.kill(); process.exit(1); }
 const r = await send('Runtime.evaluate', { expression:"document.getElementById('c').toDataURL('image/jpeg', .8)", returnByValue:true });
 const out = join(here, '..', '..', 'bg', 'cork-board-1.jpg'); writeFileSync(out, Buffer.from(r.result.result.value.split(',')[1], 'base64'));
 console.log('wrote', out); ws.close(); proc.kill();

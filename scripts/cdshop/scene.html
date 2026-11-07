@@ -60,7 +60,7 @@ for (let r = 0; r < rows; r++) {
   g.fillStyle = '#0E0E12'; g.beginPath(); g.moveTo(0, y0 + ROW - 36); g.lineTo(W, y0 + ROW - 60); g.lineTo(W, y0 + ROW - 40); g.lineTo(0, y0 + ROW - 16); g.fill();
   g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(0, y0 + ROW - 36, W, 2);
   for (let k = 0; k < 7; k++) { const tx = 60 + k * (W - 200) / 7 + rr(0, 120),   // spread along the lip so no two tags overlap
-    ty = y0 + ROW - 34 - (tx / W) * 24; const t = pick(['฿350', '฿420', '฿350', 'NEW', 'USED', 'ลดราคา', '฿420', 'SALE'])   // a CD is ฿350, the newer ones ฿420; tag(tx, ty, t, pick(['#F6F3E8', '#F6F3E8', '#E4457E', '#F5C542']), '#111'); }
+    ty = y0 + ROW - 34 - (tx / W) * 24; const t = pick(['฿350', '฿420', '฿350', 'NEW', 'USED', 'ลดราคา', '฿420', 'SALE']); tag(tx, ty, t, pick(['#F6F3E8', '#F6F3E8', '#E4457E', '#F5C542']), '#111'); }
 }
 // warm ceiling spots, haze and vignette
 for (const sx of [260, 700, 1180, 1640]) { const sp = g.createRadialGradient(sx, -40, 10, sx, 300, 520); sp.addColorStop(0, 'rgba(255,214,150,.42)'); sp.addColorStop(1, 'rgba(255,214,150,0)'); g.fillStyle = sp; g.fillRect(0, 0, W, H); }

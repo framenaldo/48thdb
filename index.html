@@ -4174,7 +4174,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      shop wall behind the page (bg/cd-shop.jpg, from scripts/cdshop), and the lists as panes of liquid glass: one blurred pane per list,
      not per row, so a phone scrolls them without a cost. ---- */
   html[data-cdshop="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(rgba(14,9,20,.30), rgba(14,9,20,.52)), url(bg/cd-shop-6.jpg) center top / cover no-repeat; }
+    background:linear-gradient(rgba(14,9,20,.30), rgba(14,9,20,.52)), url(bg/cd-shop-7.jpg) center top / cover no-repeat; }
   html[data-cdshop="1"] .wk-head{ color:#fff; text-shadow:0 2px 14px rgba(0,0,0,.6); }
   html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list, html[data-cdshop="1"] .wk-cats, html[data-cdshop="1"] .gal-teaser{
     position:relative; border-radius:26px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.74); --line:rgba(255,255,255,.22);
@@ -4226,11 +4226,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @media (max-width:760px){ html[data-board="1"] .calp > .feed-head, html[data-board="1"] .calp-board, html[data-board="1"] .calp-agenda{ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
   /* ---- the members page on a gallery wall and the shop at a merch booth, for everyone (?wall=off / ?booth=off turns one off on a
      device). Drawn backgrounds from scripts/scenes with the members' own photos (bg/photo-wall-1.jpg,
-     bg/merch-booth-2.jpg) and the same liquid-glass panes: one blurred pane per block, what is inside only tinted. The members
+     bg/merch-booth-3.jpg) and the same liquid-glass panes: one blurred pane per block, what is inside only tinted. The members
      table's sticky name column keeps a nearly solid tint, or the cells scrolled under it would show through. ---- */
   html[data-wall="1"] body::before, html[data-booth="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background-position:center top; background-size:cover; background-repeat:no-repeat; }
   html[data-wall="1"] body::before{ background-image:linear-gradient(rgba(18,8,16,.22), rgba(18,8,16,.5)), url(bg/photo-wall-1.jpg); }
-  html[data-booth="1"] body::before{ background-image:linear-gradient(rgba(30,14,20,.18), rgba(30,14,20,.42)), url(bg/merch-booth-2.jpg); }
+  html[data-booth="1"] body::before{ background-image:linear-gradient(rgba(30,14,20,.18), rgba(30,14,20,.42)), url(bg/merch-booth-3.jpg); }
   html[data-wall="1"]{ --pane-tint:rgba(40,16,36,.36); } html[data-booth="1"]{ --pane-tint:rgba(52,20,34,.36); }
   html[data-wall="1"] .filter-bar.mb-bar, html[data-wall="1"] .table-wrap, html[data-wall="1"] .thead-sticky-outer, html[data-booth="1"] .shop > .feed-head, html[data-booth="1"] .shop-grid{
     position:relative; border-radius:24px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.2); --card:rgba(255,255,255,.06); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.12);
@@ -4253,6 +4253,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-booth="1"] .shop > .feed-head .feed-title{ color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.35); }
   html[data-booth="1"] .shop > .feed-head .feed-today{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.38); }
   @media (max-width:760px){ html[data-wall="1"] .filter-bar.mb-bar, html[data-wall="1"] .table-wrap, html[data-booth="1"] .shop > .feed-head, html[data-booth="1"] .shop-grid{ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
+  /* chips and links inside a dressed pane: the light-mode pastel chip (pale pink, white text from the pane's --ink) was unreadable */
+  :is(html[data-cdshop="1"], html[data-board="1"], html[data-wall="1"], html[data-booth="1"]) :is(.chip, .chip-link, .mw-more, .mw-and){
+    background:rgba(255,255,255,.18); color:#fff; border-color:rgba(255,255,255,.42); box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.2); }
+  :is(html[data-cdshop="1"], html[data-board="1"], html[data-wall="1"], html[data-booth="1"]) :is(.chip, .chip-link, .mw-more, .mw-and) *{ color:inherit; }
   .gec-vc .gec-stats4{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin:6px 0 10px; } @media (min-width:760px){ .gec-vc .gec-stats4{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
   .gec-vc .gec-stats4 div{ padding:8px 10px; border-radius:12px; background:var(--paper-dim); } .gec-vc .gec-stats4 small{ display:block; font-size:11px; font-weight:800; color:var(--ink-soft); }
   .gec-vc .gec-stats4 b{ display:block; margin-top:2px; font-size:16px; font-weight:800; font-variant-numeric:tabular-nums; } .gec-vc .gec-stats4 em{ font-style:normal; font-size:11px; font-weight:700; color:var(--ink-soft); }

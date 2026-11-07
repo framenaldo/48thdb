@@ -1,4 +1,4 @@
-// node scripts/cdshop/make.mjs [folder of covers: the owner's CD covers in ~/Documents/48TH/web/cover] [folder of MV thumbnails to fill the rest]  → bg/cd-shop-6.jpg (a new name each time it changes: the service worker serves images stale-first) (1920×1200); needs Google Chrome on this Mac.
+// node scripts/cdshop/make.mjs [folder of covers: the owner's CD covers in ~/Documents/48TH/web/cover] [folder of MV thumbnails to fill the rest]  → bg/cd-shop-7.jpg (a new name each time it changes: the service worker serves images stale-first) (1920×1200); needs Google Chrome on this Mac.
 // The thumbnails are the groups' own MVs (ids in data/youtube.json), fetched once with
 //   mkdir -p /tmp/cdthumbs && cd /tmp/cdthumbs && node -e "console.log(Object.keys(require('<repo>/data/youtube.json').videos).join('\\n'))" | xargs -P 12 -I{} curl -s -o {}.jpg https://i.ytimg.com/vi/{}/hqdefault.jpg
 // and are not kept in the repo; without a folder the covers are invented.
@@ -20,6 +20,7 @@ const read = dir => dir ? readdirSync(dir).filter(f => /\.(jpe?g|png|webp)$/i.te
 const urls = read(process.argv[2]), more = read(process.argv[3]);
 console.log(urls.length, 'covers', more.length, 'thumbnails');
 await send('Page.navigate', { url:'file://' + join(here, 'scene.html') + '?wait' });
+for (let i = 0; i < 100; i++) { const t = await send('Runtime.evaluate', { expression:"typeof drawScene === 'function'", returnByValue:true }); if (t.result && t.result.result && t.result.result.value) break; await sleep(200); }   // wait for the scene page to be ready
 await sleep(500);
 // handed in one at a time: a single message with every picture in it was too big for the browser to take
 await send('Runtime.evaluate', { expression:'window.__u = []; window.__v = []' });
@@ -28,6 +29,9 @@ for (const u of more) await send('Runtime.evaluate', { expression:`window.__v.pu
 const ran = await send('Runtime.evaluate', { expression:'drawScene(window.__u, window.__v).then(() => "ok", e => String(e))', awaitPromise:true, returnByValue:true });
 console.log('draw:', ran.result && ran.result.result && ran.result.result.value);
 for (let i = 0; i < 100; i++) { const r = await send('Runtime.evaluate', { expression:'window.done === true', returnByValue:true }); if (r.result.result.value) break; await sleep(200); }
+// a drawing that failed leaves a black canvas, and a black picture once went live: check it is not before writing
+const bright = await send('Runtime.evaluate', { expression:"(() => { const c = document.getElementById('c'), t = document.createElement('canvas'); t.width = t.height = 16; const x = t.getContext('2d'); x.drawImage(c, 0, 0, 16, 16); const d = x.getImageData(0, 0, 16, 16).data; let s = 0; for (let i = 0; i < d.length; i += 4) s += d[i] + d[i + 1] + d[i + 2]; return s / (d.length / 4) / 3; })()", returnByValue:true });
+if (!(bright.result.result.value > 12)) { console.error('the picture came out black (' + bright.result.result.value + '): not written'); ws.close(); proc.kill(); process.exit(1); }
 const r = await send('Runtime.evaluate', { expression:"document.getElementById('c').toDataURL('image/jpeg', .8)", returnByValue:true });
-const out = join(here, '..', '..', 'bg', 'cd-shop-6.jpg'); writeFileSync(out, Buffer.from(r.result.result.value.split(',')[1], 'base64'));
+const out = join(here, '..', '..', 'bg', 'cd-shop-7.jpg'); writeFileSync(out, Buffer.from(r.result.result.value.split(',')[1], 'base64'));
 console.log('wrote', out); ws.close(); proc.kill();
