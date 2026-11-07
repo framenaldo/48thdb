@@ -253,6 +253,11 @@ const TL_STEP = 16, TL_FAR = [30, 60, 100, 200], TL_KEEP = 120, TL_KEEP_MS = 7 *
 // far behind (the cron stopped firing for most of a day once, 3–4 Nov 2026): twice the step a run until caught up,
 // still well inside the free plan's 50 requests a run
 const TL_CATCHUP = 32, TL_BEHIND = 64, TL_STALE_MS = 15 * 60000;
+// blind: no number is known to exist past the walk's, and the numbers right after it are empty (a post's number can sit a hundred
+// numbers on: 7 Nov 2026 the walk waited at 849322 for twelve hours while posts 849375 and 849460 existed). Then each run asks 12 numbers
+// in a row and a sweep every TL_SWEEP numbers out to TL_REACH, its starting point moving a step each run, so every number up to
+// TL_REACH is asked within TL_SWEEP runs; the first one that exists tells the walk where the sequence has got to.
+const TL_BLIND_NEAR = 12, TL_SWEEP = 6, TL_REACH = 150, TL_BLIND_FAR = [200, 260], TL_SAVE_MS = 30 * 60000;
 const TL_URL = (n) => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
 
 export function tlText(h) {
@@ -288,7 +293,7 @@ async function tlProbe(n, now) {
   if (!res.ok) return { n, failed: true, status: res.status };
   return { n, post: tlParse(n, await res.text(), now) };
 }
-async function tlScan(env) {
+export async function tlScan(env, nowMs) {
   const st = (await env.IAM.get(TL_KEY, 'json')) || { max: 0, posts: [] };
   // the newest lives are numbers known to exist
   const slices = await Promise.all([...Array(IAM_SLICES).keys()].map((i) => env.IAM.get(`slice:${i}`, 'json')));
@@ -299,17 +304,22 @@ async function tlScan(env) {
   const topWas = st.top || 0;
   ahead = Math.max(ahead, topWas, ...st.posts.map((p) => p.n));
   if (!st.max) { if (!ahead) return { skipped: 'no-start' }; st.max = ahead - 60; }
-  const from = st.max, now = Date.now(), step = ahead - from > TL_BEHIND ? TL_CATCHUP : TL_STEP;
-  const asks = [...Array(step).keys()].map((i) => from + 1 + i).concat(TL_FAR.map((d) => from + d));
+  const from = st.max, now = nowMs || Date.now(), blind = ahead <= from;
+  const step = blind ? TL_BLIND_NEAR : ahead - from > TL_BEHIND ? TL_CATCHUP : TL_STEP;
+  const phase = Math.floor(now / 300000) % TL_SWEEP;
+  const sweep = [];
+  if (blind) for (let d = TL_BLIND_NEAR + 1 + phase; d <= TL_REACH; d += TL_SWEEP) sweep.push(d);
+  const asks = [...Array(step).keys()].map((i) => from + 1 + i).concat((blind ? sweep.concat(TL_BLIND_FAR) : TL_FAR).map((d) => from + d));
   const got = await Promise.all(asks.map((n) => tlProbe(n, now).catch((e) => ({ n, failed: true, status: String((e && e.message) || e).slice(0, 60) }))));
   // a number that keeps failing (an error page, a refusal) is given up after three runs, so it cannot hold the walk forever
   st.fails = st.fails || {};
   for (const r of got) if (r.failed && r.n <= from + step) { st.fails[r.n] = (st.fails[r.n] || 0) + 1; if (st.fails[r.n] >= 3) { r.failed = false; r.gone = true; } }
   for (const k of Object.keys(st.fails)) if (+k <= from) delete st.fails[k];
-  st.last = { at: new Date(now).toISOString(), answers: got.reduce((o, r) => { const k = r.post ? 'post' : r.gone ? '404' : String(r.status || 'failed'); o[k] = (o[k] || 0) + 1; return o; }, {}) };
+  st.last = { at: new Date(now).toISOString(), blind, answers: got.reduce((o, r) => { const k = r.post ? 'post' : r.gone ? '404' : String(r.status || 'failed'); o[k] = (o[k] || 0) + 1; return o; }, {}) };
   const ids = await iamIds(env).catch(() => ({}));
   const who = Object.fromEntries(Object.entries(ids).map(([m, i]) => [i, m]));
   const have = new Set(st.posts.map((p) => p.n));
+  const savedAt = st.at ? Date.parse(st.at) : 0;   // when the state was last written to KV: it is only written when something moved, so `at` from KV alone looks stale
   let added = 0, seen = 0;
   for (const r of got) {
     if (!r.post) continue;
@@ -329,7 +339,7 @@ async function tlScan(env) {
   st.top = Math.max(topWas, ahead);
   st.posts = st.posts.filter((p) => now - Date.parse(p.at) < TL_KEEP_MS).sort((a, b) => b.n - a.n).slice(0, TL_KEEP);
   st.at = new Date(now).toISOString();
-  if (added || st.max !== from || st.top !== topWas || got.some((r) => r.failed)) await env.IAM.put(TL_KEY, JSON.stringify(st));
+  if (added || st.max !== from || st.top !== topWas || got.some((r) => r.failed) || now - savedAt > TL_SAVE_MS) await env.IAM.put(TL_KEY, JSON.stringify(st));
   await writeCache(TL_CACHE, { checked: st.at, posts: st.posts, walk: { max: st.max, last: st.last } }, 60);
   return { from, max: st.max, ahead, added };
 }

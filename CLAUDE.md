@@ -228,7 +228,7 @@ app's public post pages (`tlScan`, its own 5-minute cron — see worker/README.m
 there is no list of posts, only numbers shared with lives and everything else.
 A card shows the first three lines and one small picture and opens the post on
 iAM48; posts locked to the app ("Exclusive on iAM48") are a strip of names only and
-their content is never asked for. Never show or keep the gift senders' pictures.
+their content is never asked for. Never show or keep the gift senders' pictures. The walk once stalled twelve hours at a gap in the numbers (7 Nov 2026), not at a Cloudflare limit — see `blind` in `tlScan` and worker/README.md; a change to the Worker reaches visitors only when it is deployed with wrangler.
 
 ## Notifications: แจ้งเตือนงาน
 
