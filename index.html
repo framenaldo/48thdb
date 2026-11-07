@@ -28853,8 +28853,8 @@ class MeowRoamer extends MeowWalker {
   /* ---- each frame ---- */
   tick(dt){
     // she is on another page: not here at all; back on hers, she is sitting about somewhere on screen
-    if(!meowHere()){ if(this.gone && meowSec() > (this.followAt || 0) && !(_meow.pet && _meow.pet.asleep)){ meowBringHere(isEN() ? 'Followed you~' : 'ตามมาแล้ว~'); return; }
-      if(!this.gone){ this.followAt = meowSec() + meowRand(2.5, 6); this.gone = true; this.btn.hidden = true; meowRingClose(); meowToysPaint(); this.toyView = null; if(_meowBubble) _meowBubble.classList.remove('on'); if(_meowEdge) _meowEdge.classList.remove('on'); } meowCallPaint(); return; }
+    if(!meowHere()){ if(this.gone && meowSec() > (this.rollAt || 0)){ this.rollAt = meowSec() + meowRand(60, 180); if(this.rollPage()) return; }
+      if(!this.gone){ const LV0 = this.pet ? meowT(this.pet, 'love') : .5; this.goneAt = meowSec(); this.rollAt = meowSec() + (LV0 > .7 ? meowRand(3, 9) : meowRand(30, 90)); this.gone = true; this.btn.hidden = true; meowRingClose(); meowToysPaint(); this.toyView = null; if(_meowBubble) _meowBubble.classList.remove('on'); if(_meowEdge) _meowEdge.classList.remove('on'); } meowCallPaint(); return; }
     if(this.gone){ this.gone = false; meowCallPaint(); this.reenter(null, true); setTimeout(meowToysPaint, 300); return; }
     if(this.toyView !== state.view){ this.toyView = state.view; setTimeout(meowToysPaint, 400); }
     meowEdgeTick(this, dt);
@@ -28945,7 +28945,18 @@ class MeowRoamer extends MeowWalker {
     this.draw();
   }
   // off the screen for a while; back from either side along the menu bar
-  goAway(){ this.mode = 'away'; this.awayT = meowRand(20, 60); this.queue = []; this.btn.hidden = true; if(_meowBubble) _meowBubble.classList.remove('on'); }
+  /* she is free to be on any page. Out of the reader's sight she thinks now and then: a clingy cat comes over to where the
+     reader is, an independent one mostly stays where she is or goes off to another page. True for the next roll as well. */
+  rollPage(){
+    const p = this.pet; if(!p || p.asleep || p.shy) return false;
+    const LV = meowT(p, 'love'), odds = .03 + LV * .55 + Math.min(.08, (p.bond || 0) / 1250);
+    if(Math.random() < odds){ meowBringHere(isEN() ? (LV > .6 ? 'Missed you~' : 'Came to see~') : (LV > .6 ? 'คิดถึงเลยตามมา~' : 'แวะมาดูหน่อย~')); return true; }
+    if(Math.random() < .4){ const o = meowOtherPage(p.page); if(o){ p.page = o; meowSave(); } }
+    return false;
+  }
+  goAway(){ this.mode = 'away';
+    // leaving the screen, she may not come back to this page: she wanders off to another one (more so the more independent she is)
+    const p = this.pet; if(p && Math.random() < .3 + (1 - meowT(p, 'love')) * .35){ const o = meowOtherPage(state.view); if(o){ p.page = o; meowSave(); } } this.awayT = meowRand(20, 60); this.queue = []; this.btn.hidden = true; if(_meowBubble) _meowBubble.classList.remove('on'); }
   tickAway(dt){ this.awayT -= dt; if(this.awayT <= 0) this.reenter(); }
   // she comes (back) onto the screen: a leap in from the side onto a card in view
   reenter(say, quiet){
@@ -29419,6 +29430,11 @@ function meowPageName(v){
   if(n) return en ? n.en : n.th;
   const m = MEOW_PAGE_NAMES[v]; return m ? (en ? m[1] : m[0]) : (en ? 'another page' : 'อีกหน้าหนึ่ง');
 }
+// another page for her to be on, other than the one given
+function meowOtherPage(not){
+  const views = [...new Set((typeof NAV_CATALOG !== 'undefined' ? NAV_CATALOG : []).filter(o => !o.fav).map(o => o.view))].filter(v => v !== not && v !== 'auth');
+  return views.length ? meowPick(views) : null;
+}
 function meowHere(){ const p = _meow && _meow.pet; return !p || !p.page || p.page === state.view; }
 let _meowCall = null;
 // the menu bar's real height (it grows with the phone's safe area), so what sits above it never lands on it: sets --nav-h
@@ -29429,8 +29445,8 @@ function meowNavGap(){
 }
 addEventListener('resize', () => meowNavGap());
 function meowCallPaint(){
-  // she follows the reader to a new page by herself after a few seconds; the pill only shows if she is slow to (asleep)
-  const p = _meow && _meow.pet, show = !!(p && !_meow.home && _meowWalk && !meowHere() && meowSec() - (_meowWalk.followAt || 0) > 6);
+  // she is free to be on another page: the pill says where she is and lets the reader bring her over
+  const p = _meow && _meow.pet, show = !!(p && !_meow.home && _meowWalk && !meowHere() && meowSec() - (_meowWalk.goneAt || 0) > 2);
   if(!show){ if(_meowCall) _meowCall.hidden = true; return; }
   if(!_meowCall){
     _meowCall = document.createElement('button'); _meowCall.type = 'button'; _meowCall.className = 'meow-call';
