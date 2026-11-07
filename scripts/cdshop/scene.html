@@ -1,0 +1,55 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#000"><canvas id="c" width="1920" height="1200"></canvas>
+<script>
+/* A made-up CD shop wall for the Works page (drawn here, not a photo): dark wood, slanted display shelves of jewel cases with
+   invented covers, price tags, warm ceiling spots. Seeded, so it comes out the same each time. */
+let seed = 48; const R = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296, rr = (a, b) => a + R() * (b - a), pick = a => a[Math.floor(R() * a.length)];
+const W = 1920, H = 1200, c = document.getElementById('c'), g = c.getContext('2d');
+const hsl = (h, s, l, a = 1) => `hsla(${h},${s}%,${l}%,${a})`;
+// wall: dark walnut panels
+let w = g.createLinearGradient(0, 0, 0, H); w.addColorStop(0, '#2B1B14'); w.addColorStop(.5, '#3A2419'); w.addColorStop(1, '#22150F'); g.fillStyle = w; g.fillRect(0, 0, W, H);
+for (let x = 0; x < W; x += 96) { g.fillStyle = `rgba(0,0,0,${rr(.05, .18)})`; g.fillRect(x, 0, 2, H); g.fillStyle = `rgba(255,190,120,${rr(.02, .06)})`; g.fillRect(x + 3, 0, 22, H); }
+for (let i = 0; i < 900; i++) { g.fillStyle = `rgba(0,0,0,${rr(.03, .09)})`; g.fillRect(rr(0, W), rr(0, H), rr(1, 3), rr(30, 160)); }
+// vertical slotted uprights
+for (let x = 210; x < W; x += 480) { g.fillStyle = '#0B0A0C'; g.fillRect(x, 0, 26, H); g.fillStyle = '#26242A'; g.fillRect(x + 2, 0, 3, H); for (let y = 12; y < H; y += 44) { g.fillStyle = '#000'; g.fillRect(x + 9, y, 8, 20); } }
+const STYLES = ['sun', 'stripes', 'portrait', 'grad', 'lines', 'dots', 'band'];
+const PAL = [[338, 80, 58], [172, 52, 38], [265, 55, 55], [42, 85, 55], [205, 70, 50], [12, 80, 55], [150, 45, 40], [310, 60, 50], [0, 0, 12], [0, 0, 92], [28, 70, 48]];
+function art(x, y, s) {
+  const [h, sa, l] = pick(PAL), [h2] = pick(PAL), st = pick(STYLES);
+  const gr = g.createLinearGradient(x, y, x + s, y + s); gr.addColorStop(0, hsl(h, sa, Math.min(85, l + 18))); gr.addColorStop(1, hsl(h2, sa, Math.max(14, l - 14))); g.fillStyle = gr; g.fillRect(x, y, s, s);
+  g.save(); g.beginPath(); g.rect(x, y, s, s); g.clip();
+  if (st === 'sun') { g.fillStyle = hsl(h2, 80, 70, .9); g.beginPath(); g.arc(x + s * rr(.35, .65), y + s * rr(.3, .6), s * rr(.18, .3), 0, 7); g.fill(); }
+  if (st === 'stripes') { g.fillStyle = hsl(h2, 70, 80, .5); for (let k = -4; k < 9; k++) { g.save(); g.translate(x + k * s / 6, y); g.rotate(.5); g.fillRect(0, -s, s / 14, s * 3); g.restore(); } }
+  if (st === 'portrait') { g.fillStyle = hsl(25, 45, rr(55, 80)); g.beginPath(); g.arc(x + s / 2, y + s * .4, s * .16, 0, 7); g.fill(); g.fillStyle = hsl(h2, 40, 25, .9); g.beginPath(); g.ellipse(x + s / 2, y + s * 1.02, s * .34, s * .36, 0, 0, 7); g.fill(); g.fillStyle = hsl(30, 40, 12); g.beginPath(); g.arc(x + s / 2, y + s * .35, s * .17, Math.PI, 0); g.fill(); }
+  if (st === 'lines') { g.fillStyle = 'rgba(255,255,255,.8)'; g.fillRect(x + s * .1, y + s * .72, s * .6, s * .06); g.fillRect(x + s * .1, y + s * .82, s * .4, s * .04); }
+  if (st === 'dots') { g.fillStyle = 'rgba(255,255,255,.35)'; for (let i = 0; i < 14; i++) { g.beginPath(); g.arc(x + rr(0, s), y + rr(0, s), s * rr(.03, .09), 0, 7); g.fill(); } }
+  if (st === 'band') { g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(x, y + s * .62, s, s * .2); g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(x + s * .08, y + s * .69, s * .5, s * .05); }
+  g.restore();
+}
+function tag(x, y, label, bg, fg) { g.fillStyle = bg; g.fillRect(x, y, label.length * 9 + 12, 17); g.fillStyle = fg; g.font = 'bold 12px sans-serif'; g.fillText(label, x + 6, y + 13); }
+const ROW = 158, rows = 7;
+for (let r = 0; r < rows; r++) {
+  const y0 = 60 + r * ROW, sz = 92 - r * 1.5;
+  // the slanted shelf: a dark back plate, then cases leaning on it
+  g.fillStyle = 'rgba(0,0,0,.55)'; g.beginPath(); g.moveTo(0, y0 + 20); g.lineTo(W, y0 - 6); g.lineTo(W, y0 + ROW - 28); g.lineTo(0, y0 + ROW - 4); g.fill();
+  for (let x = -20; x < W; x += sz + 3) {
+    if (R() < .02) { x += sz * .5; continue; }
+    const dy = (x / W) * -26 + 22 + (R() < .15 ? rr(-5, 5) : 0), y = y0 + dy;
+    g.save(); g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 10; g.shadowOffsetY = 6; g.fillStyle = '#0D0D10'; g.fillRect(x, y, sz, sz + 4); g.restore();
+    art(x + 4, y + 4, sz - 8);
+    // plastic: spine edge + glare
+    g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(x, y, 5, sz + 4);
+    const gl = g.createLinearGradient(x, y, x + sz, y + sz); gl.addColorStop(0, 'rgba(255,255,255,.28)'); gl.addColorStop(.42, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(x + 4, y + 4, sz - 8, sz - 8);
+  }
+  // shelf lip with price tags
+  g.fillStyle = '#0E0E12'; g.beginPath(); g.moveTo(0, y0 + ROW - 36); g.lineTo(W, y0 + ROW - 60); g.lineTo(W, y0 + ROW - 40); g.lineTo(0, y0 + ROW - 16); g.fill();
+  g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(0, y0 + ROW - 36, W, 2);
+  for (let k = 0; k < 7; k++) { const tx = rr(60, W - 160), ty = y0 + ROW - 34 - (tx / W) * 24; const t = pick(['฿199', '฿259', '฿129', 'NEW', 'USED', 'ลดราคา', '฿349', 'SALE']); tag(tx, ty, t, pick(['#F6F3E8', '#F6F3E8', '#E4457E', '#F5C542']), '#111'); }
+}
+// warm ceiling spots, haze and vignette
+for (const sx of [260, 700, 1180, 1640]) { const sp = g.createRadialGradient(sx, -40, 10, sx, 300, 520); sp.addColorStop(0, 'rgba(255,214,150,.42)'); sp.addColorStop(1, 'rgba(255,214,150,0)'); g.fillStyle = sp; g.fillRect(0, 0, W, H); }
+const v = g.createRadialGradient(W / 2, H * .45, H * .35, W / 2, H * .5, W * .75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.55)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
+// a little depth of field
+const snap = document.createElement('canvas'); snap.width = W; snap.height = H; snap.getContext('2d').drawImage(c, 0, 0);
+g.clearRect(0, 0, W, H); g.filter = 'blur(1.4px)'; g.drawImage(snap, 0, 0); g.filter = 'none';
+window.done = true;
+</script>
