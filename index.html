@@ -4194,6 +4194,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @media (prefers-reduced-motion:reduce){ .gec-tape{ overflow-x:auto; } .gec-tape > div{ animation:none; } }
   .gec-mq{ display:flex; align-items:baseline; flex-wrap:wrap; gap:6px 12px; margin:2px 0 4px; font-size:13px; font-weight:800; }
   .gec-mq .up{ color:#2FD0A0; } .gec-mq small{ color:#8FA3BF; font-weight:700; }
+  .gec-pairh{ display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 12px; } .gec-pairh b{ font-size:20px; letter-spacing:.01em; color:#E6EDF7; } .gec-pairh b span{ color:#8FA3BF; font-weight:700; font-size:15px; } .gec-pairh small{ font-size:11.5px; font-weight:700; color:#8FA3BF; }
+  .gec-unit{ display:block; margin:0; font-family:inherit; font-size:12px; font-weight:700; color:#8FA3BF; letter-spacing:0; }
+  .gec-px{ margin-left:auto; font:800 15px ui-monospace, 'SF Mono', Menlo, Consolas, monospace; color:#E6EDF7; } .gec-px small{ margin-left:6px; font:700 10.5px system-ui, sans-serif; color:#8FA3BF; }
+  .gec-stats4{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin:8px 0 10px; } @media (min-width:760px){ .gec-stats4{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+  .gec-stats4 div{ padding:8px 10px; border-radius:12px; background:#17233A; border:1px solid #243653; } .gec-stats4 small{ display:block; font-size:10.5px; font-weight:800; color:#8FA3BF; }
+  .gec-stats4 b{ display:block; margin-top:2px; font:800 15px ui-monospace, 'SF Mono', Menlo, Consolas, monospace; color:#E6EDF7; } .gec-stats4 em{ font-style:normal; font-size:10.5px; font-weight:700; color:#8FA3BF; }
+  .gec-cap{ display:flex; justify-content:space-between; gap:8px; margin:6px 0 2px; font-size:11px; font-weight:700; color:#8FA3BF; } .gec-cap i{ display:inline-block; width:9px; height:9px; margin:0 3px 0 8px; border-radius:2px; vertical-align:-1px; }
+  .gec-cap i.hi, .gec-vol rect.hi{ background:#F5B83D; fill:#F5B83D; } .gec-cap i.now, .gec-vol rect.now{ background:#E4457E; fill:#E4457E; }
+  .gec-vol{ display:block; width:100%; height:92px; margin-bottom:8px; border-radius:10px; background:#0E1829; } .gec-vol rect{ fill:#2FD0A0; } .gec-vol .grid line{ stroke:#1F3050; stroke-width:1; vector-effect:non-scaling-stroke; stroke-dasharray:3 4; }
+  .gec.is-market .gec-feed .gec-th{ font-size:10.5px; font-weight:800; color:#8FA3BF; text-transform:uppercase; letter-spacing:.04em; } .gec.is-market .gec-feed b small.gec-b{ display:block; font-size:10px; font-weight:700; color:#8FA3BF; text-align:right; }
+  .gec.is-market .gec-feed li:not(.gec-th) b{ color:#2FD0A0; }
   .gec-spark{ display:block; width:100%; height:64px; margin:6px 0 4px; }
   .gec-spark polyline{ fill:none; stroke:#2FD0A0; stroke-width:2; vector-effect:non-scaling-stroke; stroke-linejoin:round; } .gec-spark polygon{ fill:url(#gecSparkG); }
   .gec-mkt{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 8px; font-size:11.5px; font-weight:800; color:#8FA3BF; }
@@ -15796,13 +15807,13 @@ function gecFeedCard(en, N, pc, hms){
   const before = gecFeedSeen;
   gecFeedSeen = new Set(d.feed.map(v => v.tx + v.b));
   const bigSum = d.big.reduce((s, v) => s + v.amt, 0);
-  return `<div class="gea-card" data-gshare="feed"><h3 class="gec-h"><i class="gec-live"></i>${en ? 'Latest votes' : 'โหวตล่าสุด'}</h3>
-    <ol class="gec-feed">${list.map(v => { const hb = gecBursts.get(v.w); const huge = hb && hb.sum >= GEC_HUGE && v.b >= hb.start && v.b <= hb.last;
+  return `<div class="gea-card" data-gshare="feed"><h3 class="gec-h"><i class="gec-live"></i>${gecMarketOn ? (en ? 'Recent trades · votes' : 'รายการล่าสุด · โหวต') : (en ? 'Latest votes' : 'โหวตล่าสุด')}</h3>
+    <ol class="gec-feed">${gecMarketOn ? `<li class="gec-th"><span>${en ? 'Time' : 'เวลา'}</span><span>${en ? 'Wallet' : 'กระเป๋า'}</span><b>${en ? 'Amount (GE6) · ฿' : 'จำนวน (GE6) · ฿'}</b></li>` : ''}${list.map(v => { const hb = gecBursts.get(v.w); const huge = hb && hb.sum >= GEC_HUGE && v.b >= hb.start && v.b <= hb.last;
       return `<li class="${v.amt >= GEC_BIG ? 'is-big' : ''}${huge ? ' is-huge' : ''}${before && !before.has(v.tx + v.b) ? ' is-new' : ''}">
       <span class="gec-ft">${hms(gecMs(p, v.b))}</span>
       <button class="gec-w" data-action="gec-wallet" data-id="${v.w}">${v.w.slice(0, 6)}…${v.w.slice(-4)}</button>
       ${huge ? `<span class="gec-bigtag is-huge">🔥 ${gecN(hb.sum)}</span>` : v.amt >= GEC_BIG ? `<span class="gec-bigtag">${en ? 'big' : 'ก้อนใหญ่'}</span>` : ''}
-      <b>${gecTok(v.amt, 4)}</b></li>`; }).join('')}</ol>
+      <b>${gecTok(v.amt, 4)}${gecMarketOn ? `<small class="gec-b">฿${gecN(v.amt * gecPrice)}</small>` : ''}</b></li>`; }).join('')}</ol>
     <p class="gec-sub">${en ? `Big votes (${N(GEC_BIG)} tokens or more): <b>${N(d.big.length)}</b>, together <b>${gecTok(bigSum)}</b> — ${pc(bigSum / d.sum)} of everything voted.`
       : `โหวตก้อนใหญ่ (${N(GEC_BIG)} โทเคนขึ้นไป) <b>${N(d.big.length)}</b> ครั้ง รวม <b>${gecTok(bigSum)}</b> โทเคน คิดเป็น ${pc(bigSum / d.sum)} ของที่โหวตทั้งหมด`}</p></div>`;
 }
@@ -15968,29 +15979,36 @@ function renderGEChain(){
 function gecMarketHead(en, d, o2, hNow, wl, N){
   const g = gec24(d, hNow), before = d.sum - g, pc = before > 0 ? g / before * 100 : 0, same = o2 ? gecUpTo(o2, hNow) : 0;
   const it = [
-    `<span><i>GE6</i> ${gecTok(d.sum)} <i class="up">▲ +${gecTok(g)} (+${pc.toFixed(1)}%)</i></span>`,
+    `<span><i>GE6/THB</i> ฿${gecPrice}.00 <i class="flat">▬</i></span>`, `<span><i>${en ? 'VOL 24H' : 'ปริมาณ 24ชม.'}</i> ${gecTok(g)} <i class="up">▲ +${pc.toFixed(1)}%</i></span>`, `<span><i>${en ? 'VOTED' : 'โหวตแล้ว'}</i> ${gecTok(d.sum)}</span>`,
     `<span><i>${en ? 'VOTES' : 'ครั้งโหวต'}</i> ${N(d.n)}</span>`, `<span><i>${en ? 'WALLETS' : 'กระเป๋า'}</i> ${N(wl.length)}</span>`,
-    `<span><i>${en ? 'VALUE' : 'มูลค่า'}</i> ฿${N(d.sum * gecPrice)}</span>`, `<span><i>${en ? 'PRICE' : 'ราคา'}</i> ฿${gecPrice}.00 <i class="flat">▬ ${en ? 'fixed' : 'คงที่'}</i></span>`,
+    `<span><i>${en ? 'VALUE' : 'มูลค่า'}</i> ฿${N(d.sum * gecPrice)}</span>`, 
     `<span><i>${en ? 'AVG/VOTE' : 'เฉลี่ย/ครั้ง'}</i> ${gecTok(d.sum / d.n)}</span>`,
     same > 0 ? `<span><i>vs GE2025</i> <i class="${d.sum >= same ? 'up' : 'hot'}">${d.sum >= same ? '▲' : '▼'} ×${(d.sum / same).toFixed(2)}</i></span>` : '',
     `<span><i>${en ? 'CLOSES' : 'ปิดโหวต'}</i> 12 ${en ? 'NOV' : 'พ.ย.'}</span>`].filter(Boolean).join('');
   return `<div class="gec-tape" aria-hidden="true"><div>${it}${it}</div></div>
-    <div class="gec-mkt"><span>${en ? 'GE2026 · VOTE MARKET (preview)' : 'GE2026 · กระดานโหวต (ตัวอย่างธีม)'}</span><button data-action="gec-market">${en ? 'Back to normal' : 'กลับธีมปกติ'}</button></div>`;
+    <div class="gec-mkt"><span>${en ? 'GE6/THB · COIN MARKET (theme preview)' : 'GE6/THB · กระดานเหรียญ (ตัวอย่างธีม)'}</span><button data-action="gec-market">${en ? 'Back to normal' : 'กลับธีมปกติ'}</button></div>`;
 }
 function gecMarketQuote(en, d, hNow, hAll, elapsed, N, wl){
-  const g = gec24(d, hNow), before = d.sum - g, pc = before > 0 ? g / before * 100 : 0, from = Math.max(0, hNow - 72), n = 60, vals = [];
-  for(let i = 0; i <= n; i++) vals.push(gecUpTo(d, from + (hNow - from) * i / n));
-  const lo = vals[0], hi = vals[n], rng = Math.max(1e-9, hi - lo), pts = vals.map((v, i) => `${(i / n * 320).toFixed(1)},${(62 - (v - lo) / rng * 56).toFixed(1)}`);
-  return `<div class="gea-card gec-big" data-gshare="total">
-    <p class="gec-k">GE6 · ${en ? 'TOKENS VOTED' : 'โทเคนที่โหวตแล้ว'}</p>
-    <p class="gec-v">${odo('v-sum', gecTok(d.sum))}</p>
-    <div class="gec-mq"><span class="up">▲ +${gecTok(g)} (+${pc.toFixed(2)}%)</span><small>${en ? 'last 24 h' : 'ใน 24 ชม. ล่าสุด'}</small></div>
-    <svg class="gec-spark" viewBox="0 0 320 66" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="gecSparkG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2FD0A0" stop-opacity=".35"/><stop offset="1" stop-color="#2FD0A0" stop-opacity="0"/></linearGradient></defs>
-      <polygon points="0,66 ${pts.join(' ')} 320,66"/><polyline points="${pts.join(' ')}"/></svg>
-    <small class="gec-mq"><small>${en ? 'last 3 days' : '3 วันล่าสุด'}</small></small>
-    <div class="gec-trio"><span><b>${odo('v-n', N(d.n))}</b>${en ? 'votes' : 'ครั้งที่โหวต'}</span><span><b>${odo('v-w', N(wl.length))}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${gecTok(d.sum / d.n)}</b>${en ? 'per vote' : 'เฉลี่ย/ครั้ง'}</span></div>
+  const p = GEC_POLLS.ge2026, g = gec24(d, hNow), before = d.sum - g, pc = before > 0 ? g / before * 100 : 0, hi = Math.floor(hNow - 1e-9);
+  const hrs = []; for(let h = Math.max(0, hi - 47); h <= hi; h++) hrs.push([h, d.hours[h] || 0]);
+  const last24 = hrs.slice(-24), top = last24.reduce((a, b) => b[1] > a[1] ? b : a, last24[0]), low = last24.reduce((a, b) => b[1] < a[1] ? b : a, last24[0]);
+  const hm = h => { const t = new Date(gecMs(p, p.start + h * 1200)); return `${String(t.getHours()).padStart(2, '0')}:00`; };
+  const peak = Math.max(1, ...hrs.map(x => x[1])), bw = 320 / hrs.length;
+  const bars = hrs.map(([h, v], k) => `<rect x="${(k * bw + .6).toFixed(1)}" y="${(84 - v / peak * 78).toFixed(1)}" width="${(bw - 1.2).toFixed(1)}" height="${Math.max(.8, v / peak * 78).toFixed(1)}" class="${h === hi ? 'now' : v === top[1] && k >= hrs.length - 24 ? 'hi' : ''}"/>`).join('');
+  const grid = [0, 1, 2, 3].map(k => `<line x1="0" x2="320" y1="${(6 + k * 26).toFixed(0)}" y2="${(6 + k * 26).toFixed(0)}"/>`).join('');
+  const cell = (k, v, sub) => `<div><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
+  return `<div class="gea-card gec-big gec-pair" data-gshare="total">
+    <div class="gec-pairh"><b>GE6<span>/THB</span></b><small>${en ? 'Election vote token · TokenX chain' : 'โทเคนโหวตเลือกตั้ง · เชน TokenX'}</small></div>
+    <p class="gec-v">${odo('v-sum', gecTok(d.sum))}<small class="gec-unit">${en ? 'GE6 voted' : 'GE6 โหวตแล้ว'}</small></p>
+    <div class="gec-mq"><span class="up">▲ +${gecTok(g)} (+${pc.toFixed(2)}%)</span><small>${en ? 'last 24 h' : 'ใน 24 ชม. ล่าสุด'}</small>
+      <span class="gec-px">฿${gecPrice}.00<small>${en ? 'fixed price' : 'ราคาคงที่'}</small></span></div>
+    <div class="gec-stats4">${cell(en ? '24h Volume (GE6)' : 'ปริมาณ 24 ชม. (GE6)', gecTok(g), '')}${cell(en ? '24h Volume (THB)' : 'มูลค่า 24 ชม. (฿)', gecN(g * gecPrice), '')}
+      ${cell(en ? '24h High (hour)' : 'สูงสุดต่อชั่วโมง', gecTok(top[1]), hm(top[0]))}${cell(en ? '24h Low (hour)' : 'ต่ำสุดต่อชั่วโมง', gecTok(low[1]), hm(low[0]))}</div>
+    <p class="gec-cap"><span>${en ? 'Volume · GE6 voted each hour, last 48 h' : 'ปริมาณ · โทเคนที่โหวตรายชั่วโมง 48 ชม. ล่าสุด'}</span><span><i class="hi"></i>${en ? 'busiest' : 'มากสุด'} <i class="now"></i>${en ? 'this hour' : 'ชั่วโมงนี้'}</span></p>
+    <svg class="gec-vol" viewBox="0 0 320 88" preserveAspectRatio="none" aria-hidden="true"><g class="grid">${grid}</g>${bars}</svg>
+    <div class="gec-trio"><span><b>${odo('v-n', N(d.n))}</b>${en ? 'trades (votes)' : 'รายการ (ครั้งโหวต)'}</span><span><b>${odo('v-w', N(wl.length))}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${gecTok(d.sum / d.n)}</b>${en ? 'avg per vote' : 'เฉลี่ย/ครั้ง'}</span></div>
     <div class="gec-run"><i style="width:${Math.min(100, hNow / hAll * 100).toFixed(1)}%"></i></div>
-    <p class="gec-sub">${en ? `Open for ${elapsed} of ${Math.round(hAll / 24)} days · closes 12 Nov` : `เปิดโหวตมาแล้ว ${elapsed} จาก ${Math.round(hAll / 24)} วัน · ปิด 12 พ.ย.`}</p>
+    <p class="gec-sub">${en ? `Open for ${elapsed} of ${Math.round(hAll / 24)} days · closes 12 Nov. A vote spends tokens for good — it is not a buy or a sell.` : `เปิดโหวตมาแล้ว ${elapsed} จาก ${Math.round(hAll / 24)} วัน · ปิด 12 พ.ย. · โหวตคือการใช้โทเคนไปเลย ไม่ใช่การซื้อหรือขายต่อ`}</p>
   </div>`;
 }
 // both runs, tokens so far against hours since voting opened, over this year's span
