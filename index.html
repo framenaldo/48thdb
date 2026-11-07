@@ -28802,8 +28802,10 @@ class MeowRoamer extends MeowWalker {
   planHunt(){
     const bug = _meowBug, en = isEN();
     this.hunts = (this.hunts || 0) + 1;
-    if(this.hunts === 1) this.say(en ? 'A butterfly!' : 'ผีเสื้อ!');
+    if(this.hunts === 1) this.say(en ? bug.d.en : bug.d.th);
     const L = this.ledgeUnder(bug.x, bug.y + this.ch) || this.ledge, B = meowLedgeBox(L);
+    // a bird high overhead: she cannot reach it, only watch it go by and chatter
+    if(!(bug.d.catch > 0)){ const face = () => _meowBug && _meowBug.x; return [{ act:'watch', dur:meowRand(2, 3.5), faceX:face }, { act:'chatter', dur:meowRand(1.5, 3), faceX:face }, { act:'watch', dur:meowRand(1.5, 3), faceX:face }]; }
     return [{ act:'go', L, rx:B ? bug.x - B.l - this.cw / 2 : null, spd:2 }, ...(Math.random() < .5 ? [{ act:'chatter', dur:meowRand(.6, 1.2), faceX:() => _meowBug && _meowBug.x }] : []), { act:'stalk', dur:meowRand(.8, 1.5), faceX:() => _meowBug && _meowBug.x },
       { act:'fn', fn:w => { const g = _meowBug, b = w.box(); if(!g || !g.alive || !b) return;
         const dy = b.y - g.y, dx = g.x - (b.l + w.rx + w.cw / 2);
@@ -28920,7 +28922,11 @@ class MeowRoamer extends MeowWalker {
   catchBug(){
     const g = _meowBug, p = this.pet, en = isEN(); if(!g || !g.alive) return;
     this.pouncing = false;
-    if(Math.random() < .55){
+    if(g.d.sting && Math.random() < .5){   // a bee stings back
+      g.flee(this); if(p){ p.fun = meowClamp(p.fun - 4); meowSave(); }
+      this.say(en ? 'Ow! It stung me!' : 'โอ๊ย! ผึ้งต่อย!'); this.onLand = w => { w.queue = [{ act:'sneeze', dur:1.2 }, { act:'shake', dur:.6 }, { act:'groom', dur:3 }, { act:'sit', dur:2 }]; }; return;
+    }
+    if(Math.random() < (g.d.catch || .55)){
       g.die(); meowFx(_meowLayer, this, '✦');
       if(p){ p.fun = meowClamp(p.fun + 6); const m = p.mem || (p.mem = {}); m.caught = (m.caught || 0) + 1; meowSave(); }
       this.say(en ? 'Got it!' : 'จับได้แล้ว!');
@@ -29042,43 +29048,67 @@ class MeowRoamer extends MeowWalker {
   headY(){ const d = this.dc || { y:0 }; return this.mode === 'climb' ? d.y - this.cw / 2 : d.y - this.ch / 2; }
 }
 
-/* ---- a butterfly that comes by now and then, for her to stalk ---- */
-const MEOW_BUG = [['pp...pp', 'pwp.pwp', 'ppkkkpp', '.pp.pp.', '.p...p.'], ['..p.p..', '..pkp..', '..pkp..', '...k...', '.......']];
+/* ---- visitors that come by now and then, for her to stalk: a butterfly or dragonfly by day, a bee that stings, a moth at
+   night, a bird that crosses high up (she only chatters at it), a leaf drifting down. They live in page coordinates, around
+   where she is; the hunt logic is the same for all (planHunt, catchBug) and a kind only changes how it moves ---- */
+const MEOW_BF = ['pp...pp', 'pwp.pwp', 'ppkkkpp', '.pp.pp.', '.p...p.'], MEOW_BF2 = ['..p.p..', '..pkp..', '..pkp..', '...k...', '.......'];
+const MEOW_VISITORS = {
+  butterfly:{ w:7, h:5, fr:[MEOW_BF, MEOW_BF2], cols:['#FF8FB8', '#5CC8B8', '#F5C542', '#9B8CF2'], speed:70, flap:.12, wp:[1.2, 2.8], rise:[40, 260], bob:.9, catch:.55, when:'day', wt:5, th:'ผีเสื้อ!', en:'A butterfly!' },
+  dragonfly:{ w:9, h:5, fr:[['..l.l....', '.lllllll.', 'kppppppp.', '.........', '.........'], ['.........', 'kppppppp.', '.lllllll.', '..l.l....', '.........']], cols:['#2F8FD0', '#1F9E8C', '#8A6CE0'], speed:150, flap:.05, wp:[.5, 1.5], rise:[40, 200], bob:.3, catch:.4, when:'day', wt:2.2, th:'แมลงปอ!', en:'A dragonfly!' },
+  bee:{ w:6, h:5, fr:[['..l.l.', '..lll.', 'ykykyk', '.ykyk.', '......'], ['......', '.l..l.', 'ykykyk', '.ykyk.', '..l...']], cols:['#F5C542'], speed:95, flap:.04, wp:[.4, 1.1], rise:[30, 160], bob:1.7, catch:.5, sting:true, when:'day', wt:2, th:'ผึ้ง!', en:'A bee!' },
+  moth:{ w:7, h:5, fr:[MEOW_BF, MEOW_BF2], cols:['#BDA889', '#A89BB8'], speed:55, flap:.1, wp:[.8, 2], rise:[40, 220], bob:1.2, catch:.55, when:'night', wt:5, th:'แมลงเม่า!', en:'A moth!' },
+  bird:{ w:8, h:5, fr:[['kk....kk', '.kk..kk.', '..kkkk..', '........', '........'], ['........', '........', 'kkkkkkkk', '..kkkk..', '........']], cols:['#5A6B7B'], speed:120, flap:.17, catch:0, pass:true, when:'day', wt:2, th:'นก!', en:'A bird!' },
+  leaf:{ w:5, h:5, fr:[['...pp', '..ppp', '.ppp.', 'ppp..', 'b....'], ['pp...', 'ppp..', '.ppp.', '..ppp', '....b']], cols:['#6DB35A', '#E08A3C', '#C9553D'], speed:38, flap:.55, catch:.7, drift:true, when:'any', wt:2, th:'ใบไม้ปลิวมา!', en:'A leaf!' },
+};
 class MeowBug {
-  constructor(host, s){
+  constructor(host, s, kind){
+    const d = this.d = MEOW_VISITORS[kind] || MEOW_VISITORS.butterfly; this.kind = kind;
     this.s = Math.max(2, s - 1); this.alive = true; this.T = 0; this.life = meowRand(22, 40); this.wp = null; this.wpT = 0;
-    // it flutters in page coordinates, around where the cat is
     const band = meowBand(), w = _meowWalk; this.dir = Math.random() < .5 ? 1 : -1;
     this.hy = w && w.vy != null ? w.vy : scrollY + innerHeight / 2;
     this.x = this.dir > 0 ? band.railRight - 20 : innerWidth + 20; this.y = this.hy - meowRand(80, 220);
-    this.col = meowPick(['#FF8FB8', '#5CC8B8', '#F5C542', '#9B8CF2']);
-    this.el = document.createElement('canvas'); this.el.width = 7; this.el.height = 5; this.el.className = 'meow-px meow-bug';
-    this.el.style.width = 7 * this.s + 'px'; this.el.style.height = 5 * this.s + 'px'; this.frames = MEOW_BUG.map(f => this.paint(f)); this.fr = -1;
+    if(d.pass){ this.y = Math.max(scrollY + band.top + 30, this.hy - meowRand(240, 340)); }
+    if(d.drift){ this.x = meowRand(band.railRight + 40, innerWidth - 40); this.y = Math.max(scrollY + band.top + 10, this.hy - meowRand(300, 380)); this.sway = Math.random() * 6; }
+    this.col = meowPick(d.cols); this.col2 = '#2E8C82';
+    this.el = document.createElement('canvas'); this.el.width = d.w; this.el.height = d.h; this.el.className = 'meow-px meow-bug';
+    this.el.style.width = d.w * this.s + 'px'; this.el.style.height = d.h * this.s + 'px'; this.frames = d.fr.map(f => this.paint(f)); this.fr = -1;
     host.appendChild(this.el);
   }
-  paint(rows){ const c = document.createElement('canvas'); c.width = 7; c.height = 5; const g = c.getContext('2d');
-    rows.forEach((r, y) => { for(let x = 0; x < 7; x++){ const ch = r[x]; if(ch === '.') continue; g.fillStyle = ch === 'k' ? MEOW_INK : ch === 'w' ? '#FFFFFF' : this.col; g.fillRect(x, y, 1, 1); } }); return c; }
+  paint(rows){ const d = this.d, c = document.createElement('canvas'); c.width = d.w; c.height = d.h; const g = c.getContext('2d');
+    const pal = { k:MEOW_INK, w:'#FFFFFF', y:'#F5C542', b:'#8B5E3C', s:this.col2, l:'#8FCBEA' };
+    rows.forEach((r, y) => { for(let x = 0; x < d.w; x++){ const ch = r[x]; if(ch === '.') continue; g.fillStyle = pal[ch] || this.col; g.fillRect(x, y, 1, 1); } }); return c; }
   tick(dt){
-    this.T += dt; const band = meowBand(), w = _meowWalk;
-    if(w && w.vy != null && w.mode === 'ledge') this.hy += (w.vy - this.hy) * Math.min(1, dt * .5);
-    if(this.T > this.life) this.gone = true;
-    if(this.gone && !this.wpGone){ this.wpGone = true; this.wp = { x:this.x + meowRand(-200, 200), y:this.y - 900 }; this.endY = this.y - 800; }
-    if(!this.wp || (!this.gone && (this.wpT -= dt) < 0)){ this.wpT = meowRand(1.2, 2.8); this.wp = { x:meowRand(band.railRight + 30, innerWidth - 30), y:this.hy - meowRand(40, 260) }; }
-    const dx = this.wp.x - this.x, dy = this.wp.y - this.y, d = Math.hypot(dx, dy) || 1, sp = (this.fast > 0 ? 260 : 70) * (this.gone ? 1.6 : 1);
-    this.fast = (this.fast || 0) - dt;
-    this.x += dx / d * Math.min(d, sp * dt); this.y += dy / d * Math.min(d, sp * dt) + Math.sin(this.T * 9) * 0.9;
-    if(Math.abs(dx) > 2) this.dir = dx > 0 ? 1 : -1;
-    if(this.gone && (this.y < this.endY || this.T > this.life + 8)){ this.die(); return; }
-    const fr = Math.floor(this.T / .12) % 2; if(fr !== this.fr){ this.fr = fr; const g = this.el.getContext('2d'); g.clearRect(0, 0, 7, 5); g.drawImage(this.frames[fr], 0, 0); }
-    this.el.style.transform = `translate3d(${(this.x - 3.5 * this.s).toFixed(1)}px, ${(this.y - 2.5 * this.s).toFixed(1)}px, 0)`;
+    this.T += dt; const band = meowBand(), w = _meowWalk, d = this.d;
+    if(w && w.vy != null && w.mode === 'ledge') this.hy += (w.vy - this.hy) * Math.min(1, dt * (d.pass || d.drift ? .15 : .5));
+    if(d.pass){   // straight across, once
+      this.x += this.dir * d.speed * dt; this.y += Math.sin(this.T * 2.2) * .7 - 4 * dt;
+      if((this.dir > 0 && this.x > innerWidth + 30) || (this.dir < 0 && this.x < band.railRight - 40) || this.T > 40){ this.die(); return; }
+    } else if(d.drift){   // down, swaying, until it is below her
+      this.y += d.speed * dt; this.x += Math.sin(this.T * 1.7 + this.sway) * 34 * dt + this.dir * 6 * dt;
+      if(this.y > this.hy + 260 || this.T > 40){ this.die(); return; }
+    } else {
+      if(this.T > this.life) this.gone = true;
+      if(this.gone && !this.wpGone){ this.wpGone = true; this.wp = { x:this.x + meowRand(-200, 200), y:this.y - 900 }; this.endY = this.y - 800; }
+      if(!this.wp || (!this.gone && (this.wpT -= dt) < 0)){ this.wpT = meowRand(d.wp[0], d.wp[1]); this.wp = { x:meowRand(band.railRight + 30, innerWidth - 30), y:this.hy - meowRand(d.rise[0], d.rise[1]) }; }
+      const dx = this.wp.x - this.x, dy = this.wp.y - this.y, dd = Math.hypot(dx, dy) || 1, sp = (this.fast > 0 ? 260 : d.speed) * (this.gone ? 1.6 : 1);
+      this.fast = (this.fast || 0) - dt;
+      this.x += dx / dd * Math.min(dd, sp * dt); this.y += dy / dd * Math.min(dd, sp * dt) + Math.sin(this.T * 9) * d.bob;
+      if(Math.abs(dx) > 2) this.dir = dx > 0 ? 1 : -1;
+      if(this.gone && (this.y < this.endY || this.T > this.life + 8)){ this.die(); return; }
+    }
+    const fr = Math.floor(this.T / d.flap) % this.frames.length; if(fr !== this.fr){ this.fr = fr; const g = this.el.getContext('2d'); g.clearRect(0, 0, d.w, d.h); g.drawImage(this.frames[fr], 0, 0); }
+    this.el.style.transform = `translate3d(${(this.x - d.w / 2 * this.s).toFixed(1)}px, ${(this.y - d.h / 2 * this.s).toFixed(1)}px, 0)${d.pass && this.dir < 0 ? ' scaleX(-1)' : ''}`;
   }
-  flee(w){ this.fast = 1.2; this.wpT = 1.2; const cx = w.dc ? w.dc.x : this.x; this.wp = { x:Math.max(40, Math.min(innerWidth - 40, this.x + (this.x > cx ? 1 : -1) * 220)), y:this.y - 120 }; }
+  flee(w){ if(this.d.drift) return; this.fast = 1.2; this.wpT = 1.2; const cx = w.dc ? w.dc.x : this.x; this.wp = { x:Math.max(40, Math.min(innerWidth - 40, this.x + (this.x > cx ? 1 : -1) * 220)), y:this.y - 120 }; }
   die(){ this.alive = false; this.el.remove(); _meowRun.delete(this); if(_meowBug === this) _meowBug = null; }
 }
 function meowBugMaybe(force){
   const w = _meowWalk, p = _meow && _meow.pet;
   if(!w || !p || _meowBug || MEOW_STILL || document.hidden || !meowHere() || w.mode !== 'ledge' || !w.visible() || !w.awake() || (!force && Math.random() > .14)) return;
-  _meowBug = new MeowBug(_meowPage || _meowLayer, w.s); meowRun(_meowBug);
+  const h = meowThaiHour(Date.now()), night = h >= 19 || h < 6;
+  const kinds = Object.keys(MEOW_VISITORS).filter(k => MEOW_VISITORS[k].when === 'any' || (MEOW_VISITORS[k].when === 'night') === night);
+  const kind = meowWeighted(kinds.map(k => [k, MEOW_VISITORS[k].wt]));
+  _meowBug = new MeowBug(_meowPage || _meowLayer, w.s, kind); meowRun(_meowBug);
   if(w.idle() || w.act === 'groom' || w.act === 'sleep'){ w.queue = []; w.T = w.dur; }
 }
 
