@@ -4169,39 +4169,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gea-switch.is-on i{ background:#E0243A; } .gea-switch.is-on i::after{ left:23px; }
   .gea-hint{ font-size:12px; color:var(--ink-soft); line-height:1.55; margin:10px 4px; }
   /* โหวตบนบล็อกเชน (owner only) */
-  /* ---- the vote page dressed as a coin-exchange screen (a preview: only with ?market=on, off with ?market=off). The site's own
-     colours and framed cards, in light or dark as the reader has it: tokens in the teal, alerts in the pink, mono tabular
-     numbers, a pair header, 24-hour figures, an hourly volume chart and a tape across the top. ---- */
-  .gec.is-market{ --mk-up:var(--cgm); --mk-hot:var(--bnk); --mk-gold:#C8901F; }
-  :root[data-theme="dark"] .gec.is-market{ --mk-gold:#F5B83D; }
-  .gec.is-market .gec-v, .gec.is-market .gec-trio b, .gec.is-market .gec-mbig, .gec.is-market .gec-mrow b, .gec.is-market .gec-hr b, .gec.is-market .gec-r, .gec.is-market .gec-vs b,
-  .gec.is-market .gec-top b, .gec.is-market .gec-when, .gec.is-market .gec-feed b, .gec.is-market .gec-stats4 b, .gec.is-market .gec-px{ font-family:ui-monospace, 'SF Mono', Menlo, 'Roboto Mono', Consolas, monospace; font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
-  .gec.is-market .gec-v, .gec.is-market .gec-mbig{ color:var(--mk-up); }
-  .gec.is-market .gec-bar i, .gec.is-market .gec-run i{ background:var(--mk-up); }
-  .gec.is-market .gec-hr.is-best .gec-bar i{ background:var(--mk-gold); }
-  .gec.is-market .gec-big{ text-align:left; padding:14px 16px 12px; }
-  .gec.is-market .gec-live{ background:var(--mk-hot); }
-  .gec-tape{ overflow:hidden; margin:0 0 10px; border:1.5px solid var(--line); border-radius:12px; background:var(--card); white-space:nowrap; box-shadow:0 2px 0 rgba(var(--shadow-rgb),.08); }
-  .gec-tape > div{ display:inline-flex; gap:26px; padding:7px 14px; animation:gecTape 42s linear infinite; font:700 12px ui-monospace, 'SF Mono', Menlo, Consolas, monospace; color:var(--ink); }
-  .gec-tape i{ font-style:normal; color:var(--ink-soft); } .gec-tape .up{ color:var(--mk-up); } .gec-tape .flat{ color:var(--ink-soft); } .gec-tape .hot{ color:var(--mk-hot); }
-  @keyframes gecTape{ to{ transform:translateX(-50%); } }
-  @media (prefers-reduced-motion:reduce){ .gec-tape{ overflow-x:auto; } .gec-tape > div{ animation:none; } }
-  .gec-mq{ display:flex; align-items:baseline; flex-wrap:wrap; gap:6px 12px; margin:2px 0 4px; font-size:13px; font-weight:800; }
-  .gec-mq .up{ color:var(--mk-up); } .gec-mq small{ color:var(--ink-soft); font-weight:700; }
-  .gec-mkt{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 8px; font-size:11.5px; font-weight:800; color:var(--ink-soft); }
-  .gec-mkt button{ padding:3px 10px; border-radius:99px; border:1.5px solid var(--line); background:var(--card); color:var(--ink); font:inherit; cursor:pointer; box-shadow:0 2px 0 rgba(var(--shadow-rgb),.12); } .gec-mkt button:active{ transform:translateY(2px); box-shadow:none; }
-  .gec-pairh{ display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 12px; } .gec-pairh b{ font-size:20px; letter-spacing:.01em; } .gec-pairh b span{ color:var(--ink-soft); font-weight:700; font-size:15px; } .gec-pairh small{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
-  .gec-unit{ display:block; margin:0; font-family:inherit; font-size:12px; font-weight:700; color:var(--ink-soft); letter-spacing:0; }
-  .gec-px{ margin-left:auto; font-size:15px; font-weight:800; color:var(--ink); } .gec-px small{ margin-left:6px; font:700 10.5px system-ui, sans-serif; color:var(--ink-soft); }
-  .gec-stats4{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin:8px 0 10px; } @media (min-width:760px){ .gec-stats4{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
-  .gec-stats4 div{ padding:8px 10px; border-radius:12px; background:var(--paper-dim); border:1px solid var(--line); } .gec-stats4 small{ display:block; font-size:10.5px; font-weight:800; color:var(--ink-soft); }
-  .gec-stats4 b{ display:block; margin-top:2px; font-size:15px; font-weight:800; } .gec-stats4 em{ font-style:normal; font-size:10.5px; font-weight:700; color:var(--ink-soft); }
-  .gec-cap{ display:flex; justify-content:space-between; gap:8px; margin:6px 0 2px; font-size:11px; font-weight:700; color:var(--ink-soft); } .gec-cap i{ display:inline-block; width:9px; height:9px; margin:0 3px 0 8px; border-radius:2px; vertical-align:-1px; }
-  .gec-cap i.hi{ background:var(--mk-gold); } .gec-cap i.now{ background:var(--mk-hot); }
-  .gec-vol{ display:block; width:100%; height:92px; margin-bottom:8px; border-radius:10px; background:var(--paper-dim); } .gec-vol rect{ fill:var(--mk-up); } .gec-vol rect.hi{ fill:var(--mk-gold); } .gec-vol rect.now{ fill:var(--mk-hot); }
+  /* the hourly volume card: the last 48 hours as bars with the day's busiest and quietest hour (the part of the coin-market preview the owner kept) */
+  .gec-vc .gec-stats4{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin:6px 0 10px; } @media (min-width:760px){ .gec-vc .gec-stats4{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+  .gec-vc .gec-stats4 div{ padding:8px 10px; border-radius:12px; background:var(--paper-dim); } .gec-vc .gec-stats4 small{ display:block; font-size:11px; font-weight:800; color:var(--ink-soft); }
+  .gec-vc .gec-stats4 b{ display:block; margin-top:2px; font-size:16px; font-weight:800; font-variant-numeric:tabular-nums; } .gec-vc .gec-stats4 em{ font-style:normal; font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .gec-cap{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px 8px; margin:6px 2px 2px; font-size:11.5px; font-weight:700; color:var(--ink-soft); } .gec-cap i{ display:inline-block; width:9px; height:9px; margin:0 3px 0 8px; border-radius:2px; vertical-align:-1px; }
+  .gec-cap i.hi{ background:#C8901F; } .gec-cap i.now{ background:var(--bnk); }
+  .gec-vol{ display:block; width:100%; height:92px; margin-bottom:4px; border-radius:10px; background:var(--paper-dim); } .gec-vol rect{ fill:var(--cgm); } .gec-vol rect.hi{ fill:#C8901F; } .gec-vol rect.now{ fill:var(--bnk); }
   .gec-vol .grid line{ stroke:var(--line); stroke-width:1; vector-effect:non-scaling-stroke; stroke-dasharray:3 4; }
-  .gec.is-market .gec-feed .gec-th{ font-size:10.5px; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em; } .gec.is-market .gec-feed b small.gec-b{ display:block; font-size:10px; font-weight:700; color:var(--ink-soft); text-align:right; }
-  .gec.is-market .gec-feed li:not(.gec-th) b{ color:var(--mk-up); }
   .gec-status{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 2px 0; font-size:12px; color:var(--ink-soft); font-weight:600; }
   .gec-prog{ margin:8px 2px 0; font-size:12px; font-weight:700; color:var(--ink-soft); }
   .gec-prog b{ display:block; height:6px; margin-top:5px; border-radius:99px; background:var(--paper-dim); overflow:hidden; }
@@ -14950,9 +14925,6 @@ const GEC_TRANSFER = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4d
 const GEC_ZERO = '0x0000000000000000000000000000000000000000', GEC_DEAD = '0x000000000000000000000000000000000000dead';
 const GEC_BIG = 1000;   // a vote this size or more is called out
 let gecBusy = null, gecErr = null, gecProg = null, gecAt = 0, gecTimer = null, gecSeeded = false;
-// the stock-market look of the vote page is a preview for now: ?market=on turns it on (kept on this device), ?market=off off
-let gecMarketOn = false;
-try{ const q = new URLSearchParams(location.search).get('market'); if(q === 'on') localStorage.setItem('48thdb-market', '1'); else if(q === 'off') localStorage.removeItem('48thdb-market'); gecMarketOn = localStorage.getItem('48thdb-market') === '1'; }catch(e){}
 const gecHour = (p, b) => Math.floor((b - p.start) * GEC_BLOCK / 3600);
 const gecMs = (p, b) => (p.t0 + (b - p.start) * GEC_BLOCK) * 1000;
 function gecLoad(id){
@@ -15800,13 +15772,13 @@ function gecFeedCard(en, N, pc, hms){
   const before = gecFeedSeen;
   gecFeedSeen = new Set(d.feed.map(v => v.tx + v.b));
   const bigSum = d.big.reduce((s, v) => s + v.amt, 0);
-  return `<div class="gea-card" data-gshare="feed"><h3 class="gec-h"><i class="gec-live"></i>${gecMarketOn ? (en ? 'Recent trades · votes' : 'รายการล่าสุด · โหวต') : (en ? 'Latest votes' : 'โหวตล่าสุด')}</h3>
-    <ol class="gec-feed">${gecMarketOn ? `<li class="gec-th"><span>${en ? 'Time' : 'เวลา'}</span><span>${en ? 'Wallet' : 'กระเป๋า'}</span><b>${en ? 'Amount (GE6) · ฿' : 'จำนวน (GE6) · ฿'}</b></li>` : ''}${list.map(v => { const hb = gecBursts.get(v.w); const huge = hb && hb.sum >= GEC_HUGE && v.b >= hb.start && v.b <= hb.last;
+  return `<div class="gea-card" data-gshare="feed"><h3 class="gec-h"><i class="gec-live"></i>${en ? 'Latest votes' : 'โหวตล่าสุด'}</h3>
+    <ol class="gec-feed">${list.map(v => { const hb = gecBursts.get(v.w); const huge = hb && hb.sum >= GEC_HUGE && v.b >= hb.start && v.b <= hb.last;
       return `<li class="${v.amt >= GEC_BIG ? 'is-big' : ''}${huge ? ' is-huge' : ''}${before && !before.has(v.tx + v.b) ? ' is-new' : ''}">
       <span class="gec-ft">${hms(gecMs(p, v.b))}</span>
       <button class="gec-w" data-action="gec-wallet" data-id="${v.w}">${v.w.slice(0, 6)}…${v.w.slice(-4)}</button>
       ${huge ? `<span class="gec-bigtag is-huge">🔥 ${gecN(hb.sum)}</span>` : v.amt >= GEC_BIG ? `<span class="gec-bigtag">${en ? 'big' : 'ก้อนใหญ่'}</span>` : ''}
-      <b>${gecTok(v.amt, 4)}${gecMarketOn ? `<small class="gec-b">฿${gecN(v.amt * gecPrice)}</small>` : ''}</b></li>`; }).join('')}</ol>
+      <b>${gecTok(v.amt, 4)}</b></li>`; }).join('')}</ol>
     <p class="gec-sub">${en ? `Big votes (${N(GEC_BIG)} tokens or more): <b>${N(d.big.length)}</b>, together <b>${gecTok(bigSum)}</b> — ${pc(bigSum / d.sum)} of everything voted.`
       : `โหวตก้อนใหญ่ (${N(GEC_BIG)} โทเคนขึ้นไป) <b>${N(d.big.length)}</b> ครั้ง รวม <b>${gecTok(bigSum)}</b> โทเคน คิดเป็น ${pc(bigSum / d.sum)} ของที่โหวตทั้งหมด`}</p></div>`;
 }
@@ -15963,45 +15935,25 @@ function renderGEChain(){
       ${o && o.wallets[w] ? `<span class="gec-tag">${en ? 'voted 2025' : 'เคยโหวต 2025'}</span>` : ''}<b>${gecTok(x[0])}<small class="gec-b">${gecBaht(x[0], en)}</small></b><small>${N(x[1])} ${en ? (x[1] === 1 ? 'vote' : 'votes') : 'ครั้ง'}</small></li>`).join('')}</ol></div>`;
 
   const o3 = o && o.n && o.to >= GEC_POLLS.ge2025.end - 20 ? o : null;
-  const mk = gecMarketOn ? gecMarketHead(en, d, o3, hNow, wl, N) : '';
-  return `<section class="gea gec${gecMarketOn ? ' is-market' : ''}">${mk}${head}${gecMarketOn ? '' : gecAboutCard(en)}${gecMarketOn ? mk && gecMarketQuote(en, d, hNow, hAll, elapsed, N, wl) : big}${gecColumns([money, gecSupplyCard(en, N, pc), gecFeedCard(en, N, pc, hms), gecWinCard(en), cmp, gecDailyCard(en, N, d, o3, hNow), hourly, gecStretchCard(en, pc, o3), sizes, top, renderGECWallet(en, N, hm)])}</section>`;
+  return `<section class="gea gec">${head}${gecAboutCard(en)}${big}${gecVolumeCard(en, d, hNow, N)}${gecColumns([money, gecSupplyCard(en, N, pc), gecFeedCard(en, N, pc, hms), gecWinCard(en), cmp, gecDailyCard(en, N, d, o3, hNow), hourly, gecStretchCard(en, pc, o3), sizes, top, renderGECWallet(en, N, hm)])}</section>`;
 }
-/* ---- the stock-market dress: a ticker tape across the top and the headline as a quote with its 24-hour change and a
-   sparkline. Tokens are not shares and a vote cannot be sold back, so there is no buying or selling here, only the
-   same figures the page already holds. The token's price is fixed (68 baht), shown as a flat line. ---- */
-function gecMarketHead(en, d, o2, hNow, wl, N){
-  const g = gec24(d, hNow), before = d.sum - g, pc = before > 0 ? g / before * 100 : 0, same = o2 ? gecUpTo(o2, hNow) : 0;
-  const it = [
-    `<span><i>GE6/THB</i> ฿${gecPrice}.00 <i class="flat">▬</i></span>`, `<span><i>${en ? 'VOL 24H' : 'ปริมาณ 24ชม.'}</i> ${gecTok(g)} <i class="up">▲ +${pc.toFixed(1)}%</i></span>`, `<span><i>${en ? 'VOTED' : 'โหวตแล้ว'}</i> ${gecTok(d.sum)}</span>`,
-    `<span><i>${en ? 'VOTES' : 'ครั้งโหวต'}</i> ${N(d.n)}</span>`, `<span><i>${en ? 'WALLETS' : 'กระเป๋า'}</i> ${N(wl.length)}</span>`,
-    `<span><i>${en ? 'VALUE' : 'มูลค่า'}</i> ฿${N(d.sum * gecPrice)}</span>`, 
-    `<span><i>${en ? 'AVG/VOTE' : 'เฉลี่ย/ครั้ง'}</i> ${gecTok(d.sum / d.n)}</span>`,
-    same > 0 ? `<span><i>vs GE2025</i> <i class="${d.sum >= same ? 'up' : 'hot'}">${d.sum >= same ? '▲' : '▼'} ×${(d.sum / same).toFixed(2)}</i></span>` : '',
-    `<span><i>${en ? 'CLOSES' : 'ปิดโหวต'}</i> 12 ${en ? 'NOV' : 'พ.ย.'}</span>`].filter(Boolean).join('');
-  return `<div class="gec-tape" aria-hidden="true"><div>${it}${it}</div></div>
-    <div class="gec-mkt"><span>${en ? 'GE6/THB · COIN MARKET (theme preview)' : 'GE6/THB · กระดานเหรียญ (ตัวอย่างธีม)'}</span><button data-action="gec-market">${en ? 'Back to normal' : 'กลับธีมปกติ'}</button></div>`;
-}
-function gecMarketQuote(en, d, hNow, hAll, elapsed, N, wl){
-  const p = GEC_POLLS.ge2026, g = gec24(d, hNow), before = d.sum - g, pc = before > 0 ? g / before * 100 : 0, hi = Math.floor(hNow - 1e-9);
+/* ---- the last 48 hours as bars (tokens voted each hour) with the 24-hour figures and the busiest and quietest hour. It began as
+   part of a coin-market look for this page that the owner tried and put back; this card is the part they kept. ---- */
+function gecVolumeCard(en, d, hNow, N){
+  const p = GEC_POLLS.ge2026, g = gec24(d, hNow), hi = Math.floor(hNow - 1e-9);
   const hrs = []; for(let h = Math.max(0, hi - 47); h <= hi; h++) hrs.push([h, d.hours[h] || 0]);
+  if(hrs.length < 3) return '';
   const last24 = hrs.slice(-24), top = last24.reduce((a, b) => b[1] > a[1] ? b : a, last24[0]), low = last24.reduce((a, b) => b[1] < a[1] ? b : a, last24[0]);
   const hm = h => { const t = new Date(gecMs(p, p.start + h * 1200)); return `${String(t.getHours()).padStart(2, '0')}:00`; };
   const peak = Math.max(1, ...hrs.map(x => x[1])), bw = 320 / hrs.length;
   const bars = hrs.map(([h, v], k) => `<rect x="${(k * bw + .6).toFixed(1)}" y="${(84 - v / peak * 78).toFixed(1)}" width="${(bw - 1.2).toFixed(1)}" height="${Math.max(.8, v / peak * 78).toFixed(1)}" class="${h === hi ? 'now' : v === top[1] && k >= hrs.length - 24 ? 'hi' : ''}"/>`).join('');
   const grid = [0, 1, 2, 3].map(k => `<line x1="0" x2="320" y1="${(6 + k * 26).toFixed(0)}" y2="${(6 + k * 26).toFixed(0)}"/>`).join('');
   const cell = (k, v, sub) => `<div><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
-  return `<div class="gea-card gec-big gec-pair" data-gshare="total">
-    <div class="gec-pairh"><b>GE6<span>/THB</span></b><small>${en ? 'Election vote token · TokenX chain' : 'โทเคนโหวตเลือกตั้ง · เชน TokenX'}</small></div>
-    <p class="gec-v">${odo('v-sum', gecTok(d.sum))}<small class="gec-unit">${en ? 'GE6 voted' : 'GE6 โหวตแล้ว'}</small></p>
-    <div class="gec-mq"><span class="up">▲ +${gecTok(g)} (+${pc.toFixed(2)}%)</span><small>${en ? 'last 24 h' : 'ใน 24 ชม. ล่าสุด'}</small>
-      <span class="gec-px">฿${gecPrice}.00<small>${en ? 'fixed price' : 'ราคาคงที่'}</small></span></div>
-    <div class="gec-stats4">${cell(en ? '24h Volume (GE6)' : 'ปริมาณ 24 ชม. (GE6)', gecTok(g), '')}${cell(en ? '24h Volume (THB)' : 'มูลค่า 24 ชม. (฿)', gecN(g * gecPrice), '')}
-      ${cell(en ? '24h High (hour)' : 'สูงสุดต่อชั่วโมง', gecTok(top[1]), hm(top[0]))}${cell(en ? '24h Low (hour)' : 'ต่ำสุดต่อชั่วโมง', gecTok(low[1]), hm(low[0]))}</div>
-    <p class="gec-cap"><span>${en ? 'Volume · GE6 voted each hour, last 48 h' : 'ปริมาณ · โทเคนที่โหวตรายชั่วโมง 48 ชม. ล่าสุด'}</span><span><i class="hi"></i>${en ? 'busiest' : 'มากสุด'} <i class="now"></i>${en ? 'this hour' : 'ชั่วโมงนี้'}</span></p>
+  return `<div class="gea-card gec-vc"><h3 class="gec-h">${en ? 'Tokens voted, hour by hour' : 'โทเคนที่โหวตรายชั่วโมง'}</h3>
+    <div class="gec-stats4">${cell(en ? 'Last 24 h' : '24 ชม. ล่าสุด', gecTok(g), en ? 'tokens' : 'โทเคน')}${cell(en ? 'Last 24 h in baht' : '24 ชม. ล่าสุด เป็นเงิน', gecN(g * gecPrice), en ? 'baht' : 'บาท')}
+      ${cell(en ? 'Busiest hour' : 'ชั่วโมงที่โหวตมากสุด', gecTok(top[1]), hm(top[0]))}${cell(en ? 'Quietest hour' : 'ชั่วโมงที่โหวตน้อยสุด', gecTok(low[1]), hm(low[0]))}</div>
+    <p class="gec-cap"><span>${en ? 'Last 48 hours' : '48 ชม. ล่าสุด'}</span><span><i class="hi"></i>${en ? 'busiest of the last 24 h' : 'มากสุดใน 24 ชม.'} <i class="now"></i>${en ? 'this hour, still running' : 'ชั่วโมงนี้ ยังไม่จบ'}</span></p>
     <svg class="gec-vol" viewBox="0 0 320 88" preserveAspectRatio="none" aria-hidden="true"><g class="grid">${grid}</g>${bars}</svg>
-    <div class="gec-trio"><span><b>${odo('v-n', N(d.n))}</b>${en ? 'trades (votes)' : 'รายการ (ครั้งโหวต)'}</span><span><b>${odo('v-w', N(wl.length))}</b>${en ? 'wallets' : 'กระเป๋า'}</span><span><b>${gecTok(d.sum / d.n)}</b>${en ? 'avg per vote' : 'เฉลี่ย/ครั้ง'}</span></div>
-    <div class="gec-run"><i style="width:${Math.min(100, hNow / hAll * 100).toFixed(1)}%"></i></div>
-    <p class="gec-sub">${en ? `Open for ${elapsed} of ${Math.round(hAll / 24)} days · closes 12 Nov. A vote spends tokens for good — it is not a buy or a sell.` : `เปิดโหวตมาแล้ว ${elapsed} จาก ${Math.round(hAll / 24)} วัน · ปิด 12 พ.ย. · โหวตคือการใช้โทเคนไปเลย ไม่ใช่การซื้อหรือขายต่อ`}</p>
   </div>`;
 }
 // both runs, tokens so far against hours since voting opened, over this year's span
@@ -30551,7 +30503,6 @@ function bindDelegatedEvents(){
         .catch(() => toast('ลบไม่ได้'));
     }
     else if(action==='nav-vote'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; state.selectedId = null; render(); pushHistory(); window.scrollTo(0, 0); }
-    else if(action==='gec-market'){ gecMarketOn = false; try{ localStorage.removeItem('48thdb-market'); }catch(e){} gecDraw(); }
     else if(action==='gec-hours'){ gecHourMode = id === 'last24' ? 'last24' : 'first48'; gecDraw(); }
     else if(action==='gec-share'){
       const spec = gecShareSpec(id);   // still names the picture and its file
