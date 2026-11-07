@@ -6289,6 +6289,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-say.on{ opacity:1; }
   .meow-say.is-left{ border-radius:12px 12px 4px 12px; }
   .meow-bug{ position:absolute; left:0; top:0; pointer-events:none; will-change:transform; }
+  /* a mouse (or her head) coming up from behind the edge of a card or a popup: the box clips everything below the edge */
+  .meow-adopt{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:14px 0; padding:12px 16px; border:1.5px solid var(--line); border-radius:var(--r-lg, 18px); background:var(--card); box-shadow:0 3px 0 rgba(var(--shadow-rgb),.12); }
+  .meow-adopt img{ image-rendering:pixelated; flex:none; }
+  .meow-adopt > div{ flex:1; min-width:160px; } .meow-adopt b{ display:block; font-size:15px; } .meow-adopt small{ display:block; font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+  .meow-hole{ position:absolute; overflow:hidden; pointer-events:none; }
+  .meow-hole canvas{ position:absolute; left:0; top:0; image-rendering:pixelated; will-change:transform; }
+  .meow-pop{ position:fixed; left:0; top:0; width:0; height:0; z-index:95; pointer-events:none; }
   .meow-fx{ position:absolute; left:0; bottom:0; pointer-events:none; font-size:14px; line-height:1; animation:meowUp 1.3s ease-out forwards; }
   .meow-fx.z{ font:800 12px/1 ui-monospace,Menlo,monospace; color:var(--ink-soft); animation-duration:2.4s; }
   /* her ring of things to do, around her when tapped; her meow at the edge of the screen; the paw to bring her to this page */
@@ -21956,6 +21963,19 @@ function renderAdminHub(){
     ${cur ? `<div class="adm-panel">${cur.html()}</div>` : ''}`;
 }
 
+// the way to adopt (or visit) the pixel cat, from the profile, for guests and members alike
+function renderMeowAdopt(){
+  const en = isEN(), st = (typeof _meow !== 'undefined' && _meow) || meowLoad(), pet = st.pet;
+  let img = '';
+  try{ img = meowSprite(pet || { sp:'orange', col:'pink' }, 'sit', 'open', 0).toDataURL(); }catch(e){}
+  const title = pet ? (en ? `${escapeHtml(pet.name)}’s home` : `บ้านของ ${escapeHtml(pet.name)}`) : (en ? 'Adopt a pixel cat' : 'รับเลี้ยงเหมียว');
+  const sub = pet ? (en ? 'Feed, play, give her water — she roams every page.' : 'ให้อาหาร เล่นด้วย เติมน้ำ น้องเดินเล่นอยู่ทุกหน้า')
+    : (en ? 'A little cat that lives on every page, learns your habits and chases mice. Free.' : 'แมวพิกเซลตัวเล็กที่อยู่ด้วยทุกหน้าของเว็บ จำเวลาของคุณได้ และไล่จับหนู · ฟรี');
+  return `<div class="meow-adopt" data-noloc>
+    ${img ? `<img src="${img}" alt="" width="72" height="54">` : ''}
+    <div><b>${title}</b><small>${sub}</small></div>
+    <button class="btn-add" data-action="open-meow">${pet ? (en ? 'Visit' : 'ไปหาน้อง') : (en ? 'Adopt' : 'รับเลี้ยง')}</button></div>`;
+}
 function renderProfile(){
   const loggedIn = state.account && state.account.loggedIn;
   const kamiMember = state.kamiOshi ? getMember(state.kamiOshi) : null;
@@ -21985,6 +22005,7 @@ function renderProfile(){
 
   return `
   ${accountBlock}
+  ${renderMeowAdopt()}
   ${renderAdminHub()}
   ${renderMyStyleCard()}
   <div class="lay-zones" data-page="profile">
@@ -28675,10 +28696,18 @@ class MeowRoamer extends MeowWalker {
     const AW = meowAwakeOdds(p, meowNow()), owl = meowNightOwl(meowNow());
     const lazy = (p.lazy ? 2.6 : 1) * (1.6 - A) * (1.5 - AW), go = (p.lazy ? .35 : 1) * (.4 + A * 1.2) * (.5 + AW);
     const toys = _meowToyEls.filter(el => el.isConnected && el.L && el.toy.k !== 'water' && this.near(meowLedgeBox(el.L), .9));
+    // a mouse out on a card, or its hole just after it ducked: she goes and stares at it
+    const mo = _meowMouse && _meowMouse.alive && !_meowMouse.spot.pop && _meowMouse.up > .3 && _meowMouse.st !== 'flee' && _meowMouse.st !== 'down' ? _meowMouse : null,
+      hole = !mo && _meowHole && !_meowHole.pop && meowSec() - _meowHole.at < 40 && _meowHole.L && meowLedgeBox(_meowHole.L) && this.near(meowLedgeBox(_meowHole.L)) ? _meowHole : null,
+      mouseGo = !tired && (mo || hole) ? .9 + PL * 2.2 : 0;
+    // members or events that have just come onto the page since she last looked
+    const keyOf = el => (el.dataset.action || '') + (el.dataset.id || ''), seenK = this._poiIds, fresh = seenK ? pois.filter(el => !seenK.has(keyOf(el))) : [];
+    this._poiIds = new Set(pois.map(keyOf));
     const bowlEl = _meowToyEls.find(el => el.isConnected && el.L && el.toy.k === 'water'), bw = _meow.bowl, wet = bowlEl && bw && bw.lvl > 0, W = p.water == null ? 80 : p.water;
     const pick = meowWeighted([
       ['explore', others.length ? (.3 + this.cur * .7) * go * (.4 + CU * 1.2) : 0],
-      ['inspect', pois.length ? (.45 + this.cur * .5) * go * (.4 + CU * 1.2) : 0],
+      ['inspect', pois.length ? (.45 + this.cur * .5) * go * (.4 + CU * 1.2) + (fresh.length && !tired ? 2.2 : 0) : 0],
+      ['mouse', mouseGo],
       ['toy', toys.length && !tired ? (.7 * go + (p.fun < 40 ? .8 : 0)) * (.4 + PL * 1.4) : 0],
       ['chew', BT > .55 ? (BT - .4) * 1.4 : 0],
       ['poke', !tired ? (.5 + CU * .6 + PL * .6) * go : 0],
@@ -28705,10 +28734,19 @@ class MeowRoamer extends MeowWalker {
         return out;
       }
       case 'inspect': {
-        const el = meowPick(pois), L = meowPoiLedge(el, this.cw); if(!L) return [{ act:'watch', dur:3 }];
+        const el = fresh.length ? meowPick(fresh) : meowPick(pois), L = meowPoiLedge(el, this.cw); if(!L) return [{ act:'watch', dur:3 }];
         const B = meowLedgeBox(L), r = el.getBoundingClientRect(); if(!B) return [{ act:'watch', dur:3 }];
         this.cur = Math.max(0, this.cur - .3);
-        return [{ act:'go', L, rx:r.left + r.width / 2 - B.l - this.cw / 2, spd:1.1 }, { act:'sniff', dur:1.4 }, { act:'fn', fn:w => w.comment(el) }, { act:'sit', dur:meowRand(2, 4) }];
+        return [{ act:'go', L, rx:r.left + r.width / 2 - B.l - this.cw / 2, spd:1.1 }, { act:'sniff', dur:1.4 }, { act:'fn', fn:w => w.comment(el) },
+          ...(fresh.includes(el) ? [{ act:'watch', dur:meowRand(4, 8), faceX:() => { const q = el.getBoundingClientRect(); return q.left + q.width / 2 + scrollX; } }, ...(Math.random() < .4 ? [{ act:'say', text:t('ใครมาน่ะ~', 'Who’s that?'), soft:true }] : [])] : []), { act:'sit', dur:meowRand(2, 4) }];
+      }
+      // a mouse: she creeps up, it ducks; she sits and stares at its hole, a paw now and then
+      case 'mouse': {
+        const x = mo ? mo.edgeX() : hole.x, L = mo ? mo.spot.L : hole.L, B = meowLedgeBox(L); if(!B) return [{ act:'watch', dur:3 }];
+        const face = () => x, rx = Math.max(0, Math.min(B.r - B.l - this.cw, x - B.l - this.cw / 2 + (Math.random() < .5 ? -1 : 1) * this.cw * .7));
+        if(mo && Math.random() < .8) this.say(t('หนู!', 'A mouse!'), true);
+        return [{ act:'go', L, rx, spd:meowRand(1, 1.5) }, { act:'stalk', dur:meowRand(.8, 1.6), faceX:face }, { act:'sniff', dur:1.2, faceX:face },
+          { act:'watch', dur:meowRand(5, 12), faceX:face }, ...(Math.random() < .5 ? [{ act:'bat', dur:.8, faceX:face }, { act:'watch', dur:meowRand(3, 7), faceX:face }] : []), { act:'lookback', dur:1.2 }, { act:'sit', dur:2 }];
       }
       case 'nap': {
         const bed = toys.find(el => el.toy.k === 'bed'); if(bed && Math.random() < .7) return meowToyPlan(this, bed);
@@ -28815,7 +28853,8 @@ class MeowRoamer extends MeowWalker {
   /* ---- each frame ---- */
   tick(dt){
     // she is on another page: not here at all; back on hers, she is sitting about somewhere on screen
-    if(!meowHere()){ if(!this.gone){ this.gone = true; this.btn.hidden = true; meowRingClose(); meowToysPaint(); this.toyView = null; if(_meowBubble) _meowBubble.classList.remove('on'); if(_meowEdge) _meowEdge.classList.remove('on'); } meowCallPaint(); return; }
+    if(!meowHere()){ if(this.gone && meowSec() > (this.followAt || 0) && !(_meow.pet && _meow.pet.asleep)){ meowBringHere(isEN() ? 'Followed you~' : 'ตามมาแล้ว~'); return; }
+      if(!this.gone){ this.followAt = meowSec() + meowRand(2.5, 6); this.gone = true; this.btn.hidden = true; meowRingClose(); meowToysPaint(); this.toyView = null; if(_meowBubble) _meowBubble.classList.remove('on'); if(_meowEdge) _meowEdge.classList.remove('on'); } meowCallPaint(); return; }
     if(this.gone){ this.gone = false; meowCallPaint(); this.reenter(null, true); setTimeout(meowToysPaint, 300); return; }
     if(this.toyView !== state.view){ this.toyView = state.view; setTimeout(meowToysPaint, 400); }
     meowEdgeTick(this, dt);
@@ -29112,6 +29151,125 @@ function meowBugMaybe(force){
   if(w.idle() || w.act === 'groom' || w.act === 'sleep'){ w.queue = []; w.T = w.dur; }
 }
 
+/* ---- a mouse that comes up from behind the edge of a card (or of an open popup), looks about, may run a little way along
+   the edge and goes back down; it ducks the moment the cat is near and awake, and she goes to stare at its hole.
+   While a popup is open her head comes up over its top edge too (MeowPeek), and she does not walk the page behind it. ---- */
+const MEOW_MOUSE = [
+  ['......q..', '..ppppppp', 'tpppppkpn', '.pppppppp', '..p...p..'],
+  ['.........', '...q.....', 'tpppppppp', '.ppppkpnn', '..p...p..'],
+  ['......q..', '..ppppppp', 'tpppppkpn', '.pppppppp', '.p..p..p.'],
+  ['......q..', '..ppppppp', 'tpppppkpn', '.pppppppp', '..p.p.p..'],
+];
+let _meowMouse = null, _meowHole = null, _meowMouseCool = 0, _meowPop = null, _meowPeek = null;
+function meowPopLayer(){ if(!_meowPop){ _meowPop = document.createElement('div'); _meowPop.className = 'meow-pop'; document.body.appendChild(_meowPop); } return _meowPop; }
+function meowOpenPopup(){ const c = document.querySelector('#main .modal-glass-card, main .modal-glass-card'); if(!c) return null; const r = c.getBoundingClientRect(); return r.width > 120 && r.height > 120 ? { el:c, r } : null; }
+class MeowMouse {
+  constructor(spot, s){
+    this.spot = spot; this.s = Math.max(2, s - 1); this.alive = true; this.T = 0; this.st = 'wait'; this.wait = meowRand(.8, 2); this.up = 0; this.dir = 1; this.fr = -1;
+    const mw = 9 * this.s, h = 5 * this.s + 2, W = Math.max(0, spot.r - spot.l);
+    this.mw = mw; this.W = W; this.x0 = Math.max(0, Math.min(W - mw, spot.x0 - spot.l)); this.x = this.x0;
+    this.box = document.createElement('div'); this.box.className = 'meow-hole'; this.box.style.cssText += `left:${spot.l}px;top:${spot.y - h}px;width:${W}px;height:${h}px;`;
+    this.el = document.createElement('canvas'); this.el.width = 9; this.el.height = 5; this.el.className = 'meow-px'; this.el.style.cssText += `width:${mw}px;height:${5 * this.s}px;top:auto;bottom:0;`;
+    this.frames = MEOW_MOUSE.map(rows => { const c = document.createElement('canvas'); c.width = 9; c.height = 5; const g = c.getContext('2d');
+      const pal = { p:'#A3ABB5', q:'#F2A0B5', t:'#F2A0B5', k:MEOW_INK, n:'#E4457E' };
+      rows.forEach((r, y) => { for(let x = 0; x < 9; x++){ const ch = r[x]; if(ch === '.') continue; g.fillStyle = pal[ch] || '#A3ABB5'; g.fillRect(x, y, 1, 1); } }); return c; });
+    spot.host.appendChild(this.box); this.box.appendChild(this.el); this.draw();
+  }
+  edgeX(){ return this.spot.l + this.x + this.mw / 2; }
+  // is the cat close and awake? (on a card; behind a popup it is her head that counts)
+  scared(){
+    const w = _meowWalk, k = _meowPeek && this.spot.pop ? _meowPeek : null;
+    if(this.spot.pop) return !!(k && Math.abs(k.cx() - this.edgeX()) < 150);
+    if(!w || w.mode !== 'ledge' || w.gone || !w.dc || !meowHere() || !w.awake() || w.act === 'sleep') return false;
+    const near = Math.abs(w.dc.x - this.edgeX()) < (_meowHole && _meowHole.bold ? 90 : 240) && Math.abs(w.dc.y - this.spot.y) < 170;
+    return near;
+  }
+  tick(dt){
+    this.T += dt; const sp = this.spot;
+    if(sp.pop){ const c = meowOpenPopup(); if(!c || Math.abs(c.r.top - sp.y) > 6 || Math.abs(c.r.left + 6 - sp.l) > 6){ this.die(); return; } }
+    else if(!sp.L || !meowLedgeBox(sp.L) || !meowHere()){ this.die(); return; }
+    else { const B = meowLedgeBox(sp.L), h = 5 * this.s + 2; if(Math.abs(B.y - sp.y) > 2){ sp.y = B.y; this.box.style.top = (sp.y - h) + 'px'; } }
+    const sc = this.scared(), run = v => { const d = v - this.x; this.dir = d > 0 ? 1 : d < 0 ? -1 : this.dir; return Math.abs(d); };
+    switch(this.st){
+      case 'wait': if(this.T > this.wait && !sc) this.go('rise'); break;
+      case 'rise': this.up = Math.min(1, this.up + dt / .6); if(sc){ this.go('flee'); break; } if(this.up >= 1){ this.go('look'); this.lookT = meowRand(1.5, 4); } break;
+      case 'look': if(sc){ this.go('flee'); break; }
+        if(this.T > this.lookT){
+          if(this.returning) this.go('run');
+          else if(Math.random() < .5 && this.W > this.mw + 50){ this.tx = Math.max(2, Math.min(this.W - this.mw - 2, this.x + (Math.random() < .5 ? -1 : 1) * meowRand(50, 150))); this.go('run'); }
+          else this.go('down');
+        } break;
+      case 'run': if(sc){ this.go('flee'); break; }
+        { const d = run(this.tx); this.x += this.dir * Math.min(d, 90 * dt);
+          if(d < 2){ if(this.returning) this.go('down'); else { this.returning = true; this.tx = this.x0; this.go('look'); this.lookT = meowRand(1, 2.5); } } } break;
+      case 'flee': { const d = run(this.x0); this.x += this.dir * Math.min(d, 260 * dt); if(d < 3) this.go('down'); break; }
+      case 'down': this.up = Math.max(0, this.up - dt / (this.fled ? .2 : .4)); if(this.up <= 0){ this.finish(); return; } break;
+    }
+    this.draw();
+  }
+  go(st){ this.st = st; this.T = 0; if(st === 'flee'){ this.fled = true; _meowMouseCool = meowSec() + meowRand(25, 70); _meowHole = { x:this.spot.l + this.x0 + this.mw / 2, L:this.spot.L, pop:this.spot.pop, at:meowSec() }; if(_meowWalk && this.spot.L && !this.spot.pop) _meowWalk.hunts = 0; } }
+  draw(){
+    const run = this.st === 'run' || this.st === 'flee', fr = run ? 2 + Math.floor(this.T / .08) % 2 : this.st === 'look' && Math.floor(this.T / .35) % 3 === 1 ? 1 : 0;
+    if(fr !== this.fr){ this.fr = fr; const g = this.el.getContext('2d'); g.clearRect(0, 0, 9, 5); g.drawImage(this.frames[fr], 0, 0); }
+    const sink = (1 - this.up) * (5 * this.s + 4);
+    this.el.style.transform = `translate(${this.x.toFixed(1)}px, ${sink.toFixed(1)}px) scaleX(${this.dir})`;
+  }
+  finish(){ this.die(); }
+  die(){ this.alive = false; this.box.remove(); _meowRun.delete(this); if(_meowMouse === this) _meowMouse = null; }
+}
+// a mouse comes out now and then, in the page or over an open popup
+function meowMouseMaybe(force){
+  const w = _meowWalk, p = _meow && _meow.pet;
+  if(!w || !p || _meowMouse || MEOW_STILL || document.hidden || !meowHere() || _meow.home || (!force && (meowSec() < _meowMouseCool || Math.random() > .3))) return;
+  const pop = meowOpenPopup();
+  if(pop){
+    if(pop.r.top < 24) return;
+    const x0 = pop.r.left + 24 + Math.random() * Math.max(0, pop.r.width - 90);
+    _meowMouse = new MeowMouse({ host:meowPopLayer(), pop:true, l:pop.r.left + 6, r:pop.r.right - 6, y:pop.r.top, x0 }, w.s); meowRun(_meowMouse); return;
+  }
+  if(w.mode !== 'ledge' || !w.visible()) return;
+  const band = meowBand(), cat = w.dc, here = w.ledge;
+  const cands = _meowLedges.filter(L => { if(!L.el || meowSame(L, here)) return false; const B = meowLedgeBox(L); return B && B.y > scrollY + band.top + 60 && B.y < scrollY + band.bottom - 40 && B.r - B.l > 110; });
+  if(!cands.length) return;
+  const L = meowWeighted(cands.map(c => { const B = meowLedgeBox(c); return [c, cat ? Math.min(3, 1 + Math.hypot(B.l + (B.r - B.l) / 2 - cat.x, B.y - cat.y) / 300) : 1]; })), B = meowLedgeBox(L);
+  _meowMouse = new MeowMouse({ host:_meowPage || _meowLayer, L, l:B.l, r:B.r, y:B.y, x0:B.l + 12 + Math.random() * Math.max(0, B.r - B.l - 70) }, w.s); meowRun(_meowMouse);
+}
+/* her head over the edge of an open popup: comes up slowly, blinks, slides about, ears first */
+class MeowPeek {
+  constructor(pop){
+    const p = _meow.pet, s = _meowWalk ? _meowWalk.s : 3; this.s = s; this.alive = true; this.T = 0; this.up = 0; this.blinkAt = meowRand(2, 5); this.moveAt = meowRand(3, 7);
+    this.hh = Math.max(12, Math.min(Math.round(10 * s), Math.floor(pop.r.top) - 4)); this.card = pop.el;   // a tall popup leaves little room: only her ears and brow show this.r = pop.r;
+    this.box = document.createElement('div'); this.box.className = 'meow-hole';
+    this.cvs = { open:meowSprite(p, 'front', 'open', 0), blink:meowSprite(p, 'front', 'blink', 0), happy:meowSprite(p, 'front', 'happy', 0) };
+    this.el = document.createElement('canvas'); this.el.width = MEOW_W; this.el.height = MEOW_H; this.el.className = 'meow-px';
+    this.el.style.cssText += `width:${MEOW_W * s}px;height:${MEOW_H * s}px;top:0;`;
+    this.x = pop.r.width * (.2 + Math.random() * .6) - MEOW_W * s / 2; this.tx = this.x; this.eyes = ''; this.place(pop.r);
+    this.box.appendChild(this.el); meowPopLayer().appendChild(this.box); this.paint('open'); meowRun(this);
+  }
+  cx(){ return this.r.left + 6 + this.x + MEOW_W * this.s / 2; }
+  place(r){ this.r = r; this.box.style.cssText += `left:${r.left + 6}px;top:${r.top - this.hh}px;width:${Math.max(0, r.width - 12)}px;height:${this.hh}px;`; }
+  paint(k){ if(this.eyes === k) return; this.eyes = k; const g = this.el.getContext('2d'); g.clearRect(0, 0, MEOW_W, MEOW_H); g.drawImage(this.cvs[k], 0, 0); }
+  tick(dt){
+    const pop = meowOpenPopup(); if(!pop || pop.el !== this.card){ this.die(); return; }
+    if(Math.abs(pop.r.top - this.r.top) > 1 || Math.abs(pop.r.left - this.r.left) > 1 || Math.abs(pop.r.width - this.r.width) > 1) this.place(pop.r);
+    this.T += dt; this.up = Math.min(1, this.up + dt / 1.1);
+    const m = _meowMouse && _meowMouse.spot.pop && _meowMouse.st !== 'wait' && _meowMouse.up > .3 ? _meowMouse : null;
+    if(m){ this.tx = m.edgeX() - this.r.left - 6 - MEOW_W * this.s / 2; } else if(this.T > this.moveAt){ this.moveAt = this.T + meowRand(4, 9); this.tx = (Math.random() * .7 + .1) * this.r.width - MEOW_W * this.s / 2; }
+    this.x += (this.tx - this.x) * Math.min(1, dt * (m ? 1.2 : .5));
+    const blink = this.T > this.blinkAt; if(blink && this.T > this.blinkAt + .15){ this.blinkAt = this.T + meowRand(2, 6); } this.paint(blink && this.T < this.blinkAt - 0 ? 'blink' : this.up < 1 ? 'open' : (Math.floor(this.T / 6) % 3 === 2 ? 'happy' : 'open'));
+    const bob = this.up < 1 ? 0 : Math.sin(this.T * 1.3) * 1.2;
+    this.el.style.transform = `translate(${this.x.toFixed(1)}px, ${((1 - this.up) * (this.hh + 4) + bob).toFixed(1)}px)`;
+  }
+  die(){ this.alive = false; this.box.remove(); _meowRun.delete(this); if(_meowPeek === this) _meowPeek = null; meowPopCheck(); }
+}
+// is a popup open? then her head is over it and she is not walking the page behind
+function meowPopCheck(){
+  const w = _meowWalk, p = _meow && _meow.pet, pop = meowOpenPopup(), want = !!(pop && p && w && !_meow.home && meowHere() && !MEOW_STILL && pop.r.top > 18 && !p.asleep && w.act !== 'sleep');
+  if(want && !_meowPeek){ _meowPeek = new MeowPeek(pop); w.btn.style.visibility = 'hidden'; }
+  else if(!want && _meowPeek){ _meowPeek.die(); }
+  if(!pop || !_meowPeek){ if(w && w.btn.style.visibility === 'hidden') w.btn.style.visibility = ''; }
+}
+
 function meowPlace(){ if(_meowWalk){ _meowWalk.resize(); if(_meowSpotWant) meowSpotRestore(_meowWalk); meowToysPaint(); } }
 function meowSay(text, ms = 2600){
   if(!_meowBubble || !_meowWalk || !text || _meowWalk.mode === 'away' || !meowHere()) return;
@@ -29168,6 +29326,9 @@ function meowMount(){
     setInterval(() => { if(!document.hidden && _meow && _meow.pet){ meowAdvance(); meowDaily(); meowMem(_meow.pet).seen = meowNow(); } }, 60000);
     addEventListener('pagehide', () => { if(_meow && _meow.pet){ meowMem(_meow.pet).seen = meowNow(); try{ localStorage.setItem(MEOW_KEY, JSON.stringify(_meow)); }catch(e){} } });
     setInterval(() => meowBugMaybe(), 20000);
+    setInterval(() => meowMouseMaybe(), 25000);
+    setInterval(() => meowPopCheck(), 400);
+    setTimeout(() => meowMouseMaybe(true), 20000);
   }
   _meowLayer.hidden = false; _meowPage.hidden = false;
   if(!_meowWalk){
@@ -29268,7 +29429,8 @@ function meowNavGap(){
 }
 addEventListener('resize', () => meowNavGap());
 function meowCallPaint(){
-  const p = _meow && _meow.pet, show = !!(p && !_meow.home && _meowWalk && !meowHere());
+  // she follows the reader to a new page by herself after a few seconds; the pill only shows if she is slow to (asleep)
+  const p = _meow && _meow.pet, show = !!(p && !_meow.home && _meowWalk && !meowHere() && meowSec() - (_meowWalk.followAt || 0) > 6);
   if(!show){ if(_meowCall) _meowCall.hidden = true; return; }
   if(!_meowCall){
     _meowCall = document.createElement('button'); _meowCall.type = 'button'; _meowCall.className = 'meow-call';
