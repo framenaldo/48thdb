@@ -4202,6 +4202,28 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-cdshop="1"] .cds-off{ display:inline-block; margin:0 0 10px; padding:4px 12px; border-radius:99px; border:1.5px solid rgba(255,255,255,.4); background:rgba(255,255,255,.14); color:#fff; font:inherit; font-size:11.5px; font-weight:800; cursor:pointer; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
   html[data-cdshop="1"] .cds-off:active{ transform:translateY(2px); }
   @media (max-width:760px){ html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list, html[data-cdshop="1"] .wk-cats, html[data-cdshop="1"] .gal-teaser{ -webkit-backdrop-filter:blur(14px) saturate(1.5); backdrop-filter:blur(14px) saturate(1.5); } }
+  /* ---- the calendar on a cork notice board (a preview: only with ?board=on, off with ?board=off). The groups' own event
+     posters pinned up behind the page (bg/cork-board-1.jpg, from scripts/board), the month and the list as panes of the same liquid
+     glass as the Works page: one blurred pane each; the days and rows inside are only tinted. ---- */
+  html[data-board="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:linear-gradient(rgba(24,14,6,.16), rgba(24,14,6,.38)), url(bg/cork-board-1.jpg) center top / cover no-repeat; }
+  html[data-board="1"] .calp > .feed-head, html[data-board="1"] .calp-board, html[data-board="1"] .calp-agenda{
+    position:relative; border-radius:26px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.22); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08);
+    background:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 38%, rgba(255,255,255,.03) 62%, rgba(255,255,255,.16) 100%), rgba(34,20,14,.34);
+    -webkit-backdrop-filter:blur(22px) saturate(1.6) brightness(1.04); backdrop-filter:blur(22px) saturate(1.6) brightness(1.04);
+    border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.14), inset 0 0 28px rgba(255,255,255,.08), 0 20px 44px rgba(0,0,0,.35); }
+  html[data-board="1"] .calp-agenda{ padding:12px; }
+  html[data-board="1"] .calp > .feed-head .feed-title{ color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.35); }
+  html[data-board="1"] .calp > .feed-head .feed-today{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.38); }
+  html[data-board="1"] .calp-cell:not(.is-empty){ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.18); }
+  html[data-board="1"] .calp-cell.is-today{ border-color:#FF8FB8; box-shadow:0 0 0 1px #FF8FB8 inset; }
+  html[data-board="1"] .calp-cell[data-weekend] .calp-num{ color:#FFB3CF; }
+  html[data-board="1"] .calp-item{ color:#fff; }
+  html[data-board="1"] .calp-ag-row{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.18); }
+  html[data-board="1"] .calp-bar, html[data-board="1"] .calp > .section-label, html[data-board="1"] .calp-legend{ color:#fff; text-shadow:0 1px 10px rgba(0,0,0,.55); }
+  html[data-board="1"] .calp-subscribe, html[data-board="1"] .calp-bar button{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.4); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+  @media (max-width:760px){ html[data-board="1"] .calp > .feed-head, html[data-board="1"] .calp-board, html[data-board="1"] .calp-agenda{ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
   .gec-vc .gec-stats4{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin:6px 0 10px; } @media (min-width:760px){ .gec-vc .gec-stats4{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
   .gec-vc .gec-stats4 div{ padding:8px 10px; border-radius:12px; background:var(--paper-dim); } .gec-vc .gec-stats4 small{ display:block; font-size:11px; font-weight:800; color:var(--ink-soft); }
   .gec-vc .gec-stats4 b{ display:block; margin-top:2px; font-size:16px; font-weight:800; font-variant-numeric:tabular-nums; } .gec-vc .gec-stats4 em{ font-style:normal; font-size:11px; font-weight:700; color:var(--ink-soft); }
@@ -14967,7 +14989,14 @@ let gecBusy = null, gecErr = null, gecProg = null, gecAt = 0, gecTimer = null, g
 // the Works page is dressed as a CD shop for everyone; ?cdshop=off turns it off on one device (kept), ?cdshop=on back on
 let cdShopOn = true;
 try{ const q = new URLSearchParams(location.search).get('cdshop'); if(q === 'off') localStorage.setItem('48thdb-cdshop', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-cdshop'); cdShopOn = localStorage.getItem('48thdb-cdshop') !== 'off'; }catch(e){}
-function cdShopSync(){ const on = cdShopOn && state.view === 'discography'; if(on) document.documentElement.dataset.cdshop = '1'; else delete document.documentElement.dataset.cdshop; }
+// the calendar's cork board is a preview for now: ?board=on turns it on (kept on this device), ?board=off off
+let boardOn = false;
+try{ const q = new URLSearchParams(location.search).get('board'); if(q === 'on') localStorage.setItem('48thdb-board', '1'); else if(q === 'off') localStorage.removeItem('48thdb-board'); boardOn = localStorage.getItem('48thdb-board') === '1'; }catch(e){}
+function cdShopSync(){
+  const d = document.documentElement.dataset;
+  if(cdShopOn && state.view === 'discography') d.cdshop = '1'; else delete d.cdshop;
+  if(boardOn && state.view === 'calendar') d.board = '1'; else delete d.board;
+}
 const gecHour = (p, b) => Math.floor((b - p.start) * GEC_BLOCK / 3600);
 const gecMs = (p, b) => (p.t0 + (b - p.start) * GEC_BLOCK) * 1000;
 function gecLoad(id){

@@ -1,0 +1,58 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#000"><canvas id="c" width="1920" height="1200"></canvas>
+<script>
+/* A drawn cork notice board for the calendar page (not a photo): the groups' real event posters (posters/*-s.jpg, handed in by
+   make.mjs) pinned and taped up at an angle, sticky notes in a hand-written face, warm light. Seeded, so it comes out the same. */
+window.drawScene = async (urls = []) => {
+let seed = 1048; const R = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296, rr = (a, b) => a + R() * (b - a), pick = a => a[Math.floor(R() * a.length)];
+const W = 1920, H = 1200, c = document.getElementById('c'), g = c.getContext('2d');
+const imgs = (await Promise.all(urls.map(u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; })))).filter(Boolean);
+for (let i = imgs.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [imgs[i], imgs[j]] = [imgs[j], imgs[i]]; }
+// cork: a warm brown, broad patches, then thousands of grains
+g.fillStyle = '#B4834F'; g.fillRect(0, 0, W, H);
+for (let i = 0; i < 60; i++) { const x = rr(0, W), y = rr(0, H), r = rr(120, 420), p = g.createRadialGradient(x, y, 0, x, y, r); const d = R() < .5; p.addColorStop(0, d ? 'rgba(90,55,25,.18)' : 'rgba(225,180,120,.16)'); p.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = p; g.fillRect(0, 0, W, H); }
+for (let i = 0; i < 70000; i++) { const t = R(); g.fillStyle = t < .45 ? `rgba(70,40,15,${rr(.15, .45)})` : t < .8 ? `rgba(230,190,130,${rr(.12, .35)})` : `rgba(40,22,8,${rr(.2, .5)})`; const s = rr(1, 3.4); g.fillRect(rr(0, W), rr(0, H), s, s * rr(.6, 1.4)); }
+// old pin holes
+for (let i = 0; i < 260; i++) { g.fillStyle = 'rgba(30,15,5,.55)'; g.beginPath(); g.arc(rr(0, W), rr(0, H), rr(1, 2), 0, 7); g.fill(); }
+function pin(x, y) {
+  const col = pick(['#E4457E', '#2E8C82', '#F5C542', '#4FA9DE', '#E5533D', '#9B5BB5']);
+  g.save(); g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x + 6, y + 8, 11, 7, .4, 0, 7); g.fill();
+  const p = g.createRadialGradient(x - 4, y - 4, 1, x, y, 12); p.addColorStop(0, '#fff'); p.addColorStop(.25, col); p.addColorStop(1, 'rgba(0,0,0,.55)');
+  g.fillStyle = p; g.beginPath(); g.arc(x, y, 11, 0, 7); g.fill(); g.restore();
+}
+function tape(x, y, a, w = 90) { g.save(); g.translate(x, y); g.rotate(a); g.fillStyle = 'rgba(245,238,215,.62)'; g.fillRect(-w / 2, -14, w, 28); g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(-w / 2, -14, w, 6); g.restore(); }
+function paper(x, y, w, h, a, draw) {
+  g.save(); g.translate(x, y); g.rotate(a);
+  g.shadowColor = 'rgba(40,20,5,.5)'; g.shadowBlur = 18; g.shadowOffsetX = 6; g.shadowOffsetY = 10; g.fillStyle = '#FBF8F1'; g.fillRect(-w / 2, -h / 2, w, h); g.shadowColor = 'transparent';
+  draw(-w / 2, -h / 2, w, h); g.restore();
+}
+// the posters in a loose grid, each a little off straight, pinned or taped
+const cols = 7, rows = 3, cw = W / cols, rh = H / rows; let k = 0;
+for (let r = 0; r < rows; r++) for (let cI = 0; cI < cols; cI++) {
+  const im = imgs[k++ % Math.max(1, imgs.length)]; if (!im) break;
+  const w = rr(190, 250), h = w * im.naturalHeight / im.naturalWidth, x = cI * cw + cw / 2 + rr(-40, 40) + (r % 2 ? cw * .3 : 0), y = r * rh + rh / 2 + rr(-40, 40), a = rr(-.09, .09);
+  paper(x, y, w + 16, Math.min(h, rh * 1.15) + 16, a, (px, py, pw, ph) => { g.drawImage(im, px + 8, py + 8, pw - 16, ph - 16); g.fillStyle = 'rgba(255,240,210,.08)'; g.fillRect(px, py, pw, ph); });
+  const hh = (Math.min(h, rh * 1.15) + 16) / 2;
+  if (R() < .6) pin(x + Math.sin(-a) * -hh, y - hh * Math.cos(a) + 10); else { tape(x - w / 2 + 6, y - hh + 4, -.6); tape(x + w / 2 - 6, y - hh + 4, .6); }
+}
+// sticky notes and a ticket stub or two
+// each note's lines as written, so a Thai word is never cut in the middle
+const NOTES = [['ห้ามพลาด!'], ['จองบัตร', 'ด่วน!'], ['Hi-Touch', '✿'], ['อย่าลืม', 'แท่งไฟ!'], ['รอบ', 'บ่ายโมง'], ['♡ โอชิ'], ['ไปด้วยกัน', 'นะ'], ['ประกาศผล', '14 พ.ย.'], ['Roadshow!'], ['ซื้อ', 'โฟโต้เซ็ต']];
+for (let i = 0; i < 9; i++) {
+  const x = rr(60, W - 60), y = rr(60, H - 60), s = rr(120, 150), a = rr(-.2, .2), col = pick(['#FFE97A', '#FFB3CF', '#A8E6DA', '#FFD59A']);
+  g.save(); g.translate(x, y); g.rotate(a); g.shadowColor = 'rgba(40,20,5,.45)'; g.shadowBlur = 12; g.shadowOffsetX = 4; g.shadowOffsetY = 8; g.fillStyle = col; g.fillRect(-s / 2, -s / 2, s, s); g.shadowColor = 'transparent';
+  g.fillStyle = 'rgba(0,0,0,.06)'; g.fillRect(-s / 2, -s / 2, s, 18);
+  g.fillStyle = '#2B2340'; g.font = `${Math.round(s / 6.2)}px "Chalkboard SE", "Marker Felt", "Thonburi", sans-serif`; g.textAlign = 'center';
+  const words = NOTES[i % NOTES.length];
+  words.forEach((wd, j) => g.fillText(wd, 0, 4 + (j - (words.length - 1) / 2) * s / 5)); g.restore();
+  if (R() < .5) pin(x, y - s / 2 + 14);
+}
+for (let i = 0; i < 4; i++) paper(rr(100, W - 100), rr(100, H - 100), 150, 62, rr(-.3, .3), (px, py, pw, ph) => { g.fillStyle = pick(['#E4457E', '#2E8C82', '#9B5BB5']); g.fillRect(px, py, pw, ph); g.strokeStyle = 'rgba(255,255,255,.7)'; g.setLineDash([4, 4]); g.beginPath(); g.moveTo(px + pw * .72, py + 6); g.lineTo(px + pw * .72, py + ph - 6); g.stroke(); g.setLineDash([]); g.fillStyle = '#fff'; g.font = 'bold 15px sans-serif'; g.fillText('TICKET', px + 14, py + 26); g.font = '12px sans-serif'; g.fillText('48 · ADMIT ONE', px + 14, py + 46); });
+// light: warm from above, darker at the edges
+const top = g.createLinearGradient(0, 0, 0, H); top.addColorStop(0, 'rgba(255,225,170,.18)'); top.addColorStop(1, 'rgba(40,20,5,.25)'); g.fillStyle = top; g.fillRect(0, 0, W, H);
+const v = g.createRadialGradient(W / 2, H * .45, H * .35, W / 2, H * .5, W * .75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(20,10,0,.5)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
+const snap = document.createElement('canvas'); snap.width = W; snap.height = H; snap.getContext('2d').drawImage(c, 0, 0);
+g.clearRect(0, 0, W, H); g.filter = 'blur(1.3px)'; g.drawImage(snap, 0, 0); g.filter = 'none';
+window.done = true;
+};
+if (!/[?&]wait\b/.test(location.search)) drawScene();
+</script>
