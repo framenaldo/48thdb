@@ -28438,6 +28438,7 @@ class MeowRoamer extends MeowWalker {
       this.mode = 'ledge'; this.spd = 1; this.cur = .4; this.born = meowSec(); this.squash = 0; this.fxT = 0; this.viewAt = state.view;
       const vis = this.onScreen(); this.ledge = vis.length ? meowPick(vis) : _meowLedges[0];
       const B = meowLedgeBox(this.ledge); this.rx = B ? Math.random() * Math.max(0, B.r - B.l - this.cw) : 0;
+      meowSpotRestore(this);   // a reload finds her where she was
     }
   }
   // the cards she could stand on that are on screen now
@@ -29045,7 +29046,7 @@ function meowBugMaybe(force){
   if(w.idle() || w.act === 'groom' || w.act === 'sleep'){ w.queue = []; w.T = w.dur; }
 }
 
-function meowPlace(){ if(_meowWalk){ _meowWalk.resize(); meowToysPaint(); } }
+function meowPlace(){ if(_meowWalk){ _meowWalk.resize(); if(_meowSpotWant) meowSpotRestore(_meowWalk); meowToysPaint(); } }
 function meowSay(text, ms = 2600){
   if(!_meowBubble || !_meowWalk || !text || _meowWalk.mode === 'away' || !meowHere()) return;
   _meowBubble.textContent = text; _meowBubble.classList.add('on');
@@ -29113,9 +29114,39 @@ function meowMount(){
       },
       onDraw:w => { meowBubblePos(w); if(_meowRing) meowRingPos(w); } });
     meowRun(_meowWalk);
-    if(_meowWalk.mode === 'ledge') _meowWalk.next();   // asleep or not is up to the hours she lived through while away (think)
-  } else { _meowWalk.key = ''; _meowWalk.resize(); if(_meowWalk.mode === 'ledge'){ _meowWalk.queue = []; _meowWalk.next(); } }
+    if(_meowWalk.mode === 'ledge' && !_meowWalk.kept) _meowWalk.next();   // asleep or not is up to the hours she lived through while away (think)
+  } else { _meowWalk.key = ''; _meowWalk.resize(); if(_meowWalk.mode === 'ledge' && !(_meowWalk.kept && _meowWalk.act === _meowWalk.kept && Date.now() - _meowSpotT0 < 8000)){ _meowWalk.queue = []; if(_meowSpotWant) meowSpotRestore(_meowWalk); _meowWalk.next(); } }
 }
+/* where she is on her page, kept on the device so a reload (or coming back within the day) finds her on the same card,
+   at the same spot, doing the same quiet thing (asleep stays asleep). Page coordinates: y as it is, x as a share of the width. */
+const MEOW_SPOT = '48thdb-meow-spot';
+function meowSpotSave(){
+  const w = _meowWalk; if(!w || w.mode !== 'ledge' || w.gone || !meowHere()) return;
+  const B = meowLedgeBox(w.ledge); if(!B) return;
+  const rest = /^(sleep|loaf)$/.test(w.act) ? { act:w.act, left:Math.max(0, w.dur - w.T), pose:w.sleepPose } : null;
+  try{ localStorage.setItem(MEOW_SPOT, JSON.stringify({ page:state.view, x:(B.l + w.rx + w.cw / 2) / innerWidth, y:B.y, at:Date.now(), rest })); }catch(e){}
+}
+// the page is still drawing for a moment after a reload (cards come in from the network), so the spot is tried again
+// as the cards settle, for the first few seconds, until the card she was on is there
+let _meowSpotWant, _meowSpotT0 = Date.now();
+function meowSpotRestore(w){
+  if(_meowSpotWant === undefined){ _meowSpotWant = null; try{ const o = JSON.parse(localStorage.getItem(MEOW_SPOT) || 'null'); if(o && o.page === state.view && Date.now() - o.at < 24 * MEOW_HR) _meowSpotWant = o; }catch(e){} }
+  const o = _meowSpotWant; if(!o || !w || o.page !== state.view) return;
+  if(Date.now() - _meowSpotT0 > 8000){ _meowSpotWant = null; return; }
+  if(w.mode !== 'ledge') return;
+  const x = o.x * innerWidth; let best = null, bd = 1e9;
+  for(const L of _meowLedges){ const B = meowLedgeBox(L); if(!B || x < B.l - 10 || x > B.r + 10) continue; const d = Math.abs(B.y - o.y); if(d < bd){ bd = d; best = L; } }
+  if(!best || bd > 400) return;
+  const B = meowLedgeBox(best); w.ledge = best; w.rx = Math.max(0, Math.min(B.r - B.l - w.cw, x - B.l - w.cw / 2)); w.vx = B.l + w.rx; w.vy = B.y;
+  if(bd < 24) _meowSpotWant = null;   // found the very card
+  // still resting if it was only a little while ago
+  const gone = (Date.now() - o.at) / 1000;
+  if(o.rest && o.rest.left - gone > 3 && !(_meow.pet && _meow.pet.asleep)){ w.queue = [{ act:o.rest.act, dur:o.rest.left - gone, pose:o.rest.pose }]; w.kept = o.rest.act; if(w.act !== o.rest.act && w.dc) w.next(); }
+  if(w.dc) w.draw();
+}
+addEventListener('pagehide', meowSpotSave);
+document.addEventListener('visibilitychange', () => { if(document.hidden) meowSpotSave(); });
+setInterval(() => { if(!document.hidden) meowSpotSave(); }, 5000);
 /* she sleeps when she wants to — no one can put her to bed or get her up. A stroke while she sleeps may wake her (more
    likely the cuddlier she is, less at night); mostly she sleeps on. Woken at night she stays up a little, then dozes off again. */
 function meowNudge(p){
