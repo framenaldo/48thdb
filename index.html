@@ -4253,10 +4253,29 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-booth="1"] .shop > .feed-head .feed-title{ color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.35); }
   html[data-booth="1"] .shop > .feed-head .feed-today{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.38); }
   @media (max-width:760px){ html[data-wall="1"] .filter-bar.mb-bar, html[data-wall="1"] .table-wrap, html[data-booth="1"] .shop > .feed-head, html[data-booth="1"] .shop-grid{ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
+  /* ---- the stats page on a stage LED wall and the profile on a fan's desk (previews: ?stage=on on stats, ?desk=on on the profile;
+     =off turns each off): drawn backgrounds from scripts/scenes (bg/stage-wall-1.jpg, bg/fan-desk-1.jpg) behind one liquid-glass pane
+     per top-level block of the page, whatever it holds; cards inside are only tinted. ---- */
+  html[data-stage="1"] body::before, html[data-desk="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background-position:center top; background-size:cover; background-repeat:no-repeat; }
+  html[data-stage="1"] body::before{ background-image:linear-gradient(rgba(6,4,12,.18), rgba(6,4,12,.5)), url(bg/stage-wall-1.jpg); }
+  html[data-desk="1"] body::before{ background-image:linear-gradient(rgba(30,16,8,.16), rgba(30,16,8,.42)), url(bg/fan-desk-1.jpg); }
+  html[data-stage="1"]{ --pane-tint:rgba(18,12,40,.42); } html[data-desk="1"]{ --pane-tint:rgba(46,26,16,.4); }
+  html[data-stage="1"] #main > :not(.ov-layer):not(script), html[data-desk="1"] #main > :not(.ov-layer):not(.app-version):not(script){
+    position:relative; border-radius:24px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.2); --card:rgba(255,255,255,.07); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.12);
+    background:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 38%, rgba(255,255,255,.03) 62%, rgba(255,255,255,.16) 100%), var(--pane-tint);
+    -webkit-backdrop-filter:blur(22px) saturate(1.6) brightness(1.04); backdrop-filter:blur(22px) saturate(1.6) brightness(1.04);
+    border:1px solid rgba(255,255,255,.34); border-top-color:rgba(255,255,255,.62); border-left-color:rgba(255,255,255,.5);
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.14), inset 0 0 28px rgba(255,255,255,.08), 0 20px 44px rgba(0,0,0,.35); padding:14px; margin-bottom:16px; }
+  html[data-desk="1"] .account-card, html[data-desk="1"] .meow-adopt, html[data-desk="1"] .lay-sheet-note{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.2); }
+  html[data-stage="1"] .stat-cell, html[data-stage="1"] .group-card, html[data-desk="1"] .fb-card{ background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.2); }
+  html[data-desk="1"] .section-label, html[data-stage="1"] .section-label{ color:#fff; }
+  html[data-stage="1"] .subtab, html[data-stage="1"] .page-share-btn{ background:rgba(255,255,255,.14); color:#fff; border-color:rgba(255,255,255,.36); }
+  html[data-stage="1"] .subtab.active{ background:rgba(255,255,255,.9); color:#1B1426; }
+  @media (max-width:760px){ html[data-stage="1"] #main > :not(.ov-layer), html[data-desk="1"] #main > :not(.ov-layer){ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
   /* chips and links inside a dressed pane: the light-mode pastel chip (pale pink, white text from the pane's --ink) was unreadable */
-  :is(html[data-cdshop="1"], html[data-board="1"], html[data-wall="1"], html[data-booth="1"]) :is(.chip, .chip-link, .mw-more, .mw-and){
+  :is(html[data-cdshop="1"], html[data-board="1"], html[data-wall="1"], html[data-booth="1"], html[data-stage="1"], html[data-desk="1"]) :is(.chip, .chip-link, .mw-more, .mw-and){
     background:rgba(255,255,255,.18); color:#fff; border-color:rgba(255,255,255,.42); box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.2); }
-  :is(html[data-cdshop="1"], html[data-board="1"], html[data-wall="1"], html[data-booth="1"]) :is(.chip, .chip-link, .mw-more, .mw-and) *{ color:inherit; }
+  :is(html[data-cdshop="1"], html[data-board="1"], html[data-wall="1"], html[data-booth="1"], html[data-stage="1"], html[data-desk="1"]) :is(.chip, .chip-link, .mw-more, .mw-and) *{ color:inherit; }
   .gec-vc .gec-stats4{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin:6px 0 10px; } @media (min-width:760px){ .gec-vc .gec-stats4{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
   .gec-vc .gec-stats4 div{ padding:8px 10px; border-radius:12px; background:var(--paper-dim); } .gec-vc .gec-stats4 small{ display:block; font-size:11px; font-weight:800; color:var(--ink-soft); }
   .gec-vc .gec-stats4 b{ display:block; margin-top:2px; font-size:16px; font-weight:800; font-variant-numeric:tabular-nums; } .gec-vc .gec-stats4 em{ font-style:normal; font-size:11px; font-weight:700; color:var(--ink-soft); }
@@ -15027,10 +15046,15 @@ try{ const q = new URLSearchParams(location.search).get('cdshop'); if(q === 'off
 const bgPreview = k => { try{ const q = new URLSearchParams(location.search).get(k); if(q === 'off') localStorage.setItem('48thdb-' + k, 'off'); else if(q === 'on') localStorage.removeItem('48thdb-' + k); return localStorage.getItem('48thdb-' + k) !== 'off'; }catch(e){ return true; } };
 const boardOn = bgPreview('board');
 const wallOn = bgPreview('wall'), boothOn = bgPreview('booth');
+// still previews (off unless asked): ?stage=on / ?desk=on, kept on this device, =off off
+const bgOptIn = k => { try{ const q = new URLSearchParams(location.search).get(k); if(q === 'on') localStorage.setItem('48thdb-' + k, '1'); else if(q === 'off') localStorage.removeItem('48thdb-' + k); return localStorage.getItem('48thdb-' + k) === '1'; }catch(e){ return false; } };
+const stageOn = bgOptIn('stage'), deskOn = bgOptIn('desk');
 function cdShopSync(){
   const d = document.documentElement.dataset;
   if(wallOn && state.view === 'browse') d.wall = '1'; else delete d.wall;
   if(boothOn && state.view === 'shop') d.booth = '1'; else delete d.booth;
+  if(stageOn && state.view === 'stats') d.stage = '1'; else delete d.stage;
+  if(deskOn && state.view === 'profile') d.desk = '1'; else delete d.desk;
   if(cdShopOn && state.view === 'discography') d.cdshop = '1'; else delete d.cdshop;
   if(boardOn && state.view === 'calendar') d.board = '1'; else delete d.board;
 }

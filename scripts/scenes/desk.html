@@ -1,0 +1,36 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#000"><canvas id="c" width="1920" height="1200"></canvas>
+<script>
+/* A drawn fan's desk, seen from above, for the profile page (not a photo): warm wood, photocards of the members (their own profile
+   photos), a light stick, ticket stubs, a notebook, sticky notes, a phone and a cup. Seeded. */
+window.drawScene = async (urls = []) => {
+let seed = 2048; const R = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296, rr = (a, b) => a + R() * (b - a), pick = a => a[Math.floor(R() * a.length)];
+const W = 1920, H = 1200, c = document.getElementById('c'), g = c.getContext('2d');
+const imgs = (await Promise.all(urls.map(u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; })))).filter(Boolean);
+for (let i = imgs.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [imgs[i], imgs[j]] = [imgs[j], imgs[i]]; }
+let k = 0; const next = () => imgs[k++ % Math.max(1, imgs.length)];
+const shadow = (b = 18, y = 10) => { g.shadowColor = 'rgba(30,15,5,.45)'; g.shadowBlur = b; g.shadowOffsetX = 5; g.shadowOffsetY = y; }, noShadow = () => { g.shadowColor = 'transparent'; };
+const at = (x, y, a, f) => { g.save(); g.translate(x, y); g.rotate(a); f(); g.restore(); };
+// wood: planks with grain
+for (let y = 0; y < H; y += 150) { const b = rr(-12, 12); g.fillStyle = `rgb(${150 + b},${102 + b},${66 + b})`; g.fillRect(0, y, W, 150); for (let i = 0; i < 70; i++) { g.strokeStyle = `rgba(80,45,20,${rr(.08, .22)})`; g.lineWidth = rr(1, 3); g.beginPath(); const yy = y + rr(0, 150); g.moveTo(0, yy); for (let x = 0; x <= W; x += 120) g.lineTo(x, yy + Math.sin(x / rr(90, 200)) * rr(2, 6)); g.stroke(); } g.fillStyle = 'rgba(40,20,8,.35)'; g.fillRect(0, y, W, 3); }
+function card(x, y, a, w = 170) { const h = w * 1.45, im = next(); at(x, y, a, () => { shadow(); g.fillStyle = '#fff'; g.beginPath(); g.roundRect(-w / 2, -h / 2, w, h, 14); g.fill(); noShadow(); g.save(); g.beginPath(); g.roundRect(-w / 2 + 8, -h / 2 + 8, w - 16, h - 16, 10); g.clip(); if (im) { const s = Math.min(im.naturalWidth / (w - 16), im.naturalHeight / (h - 16)); g.drawImage(im, (im.naturalWidth - (w - 16) * s) / 2, 0, (w - 16) * s, (h - 16) * s, -w / 2 + 8, -h / 2 + 8, w - 16, h - 16); } const gl = g.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2); gl.addColorStop(0, 'rgba(255,255,255,.3)'); gl.addColorStop(.4, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(-w / 2, -h / 2, w, h); g.restore(); }); }
+function ticket(x, y, a) { at(x, y, a, () => { shadow(10, 6); g.fillStyle = pick(['#E4457E', '#2E8C82', '#9B5BB5']); g.fillRect(-150, -55, 300, 110); noShadow(); g.strokeStyle = 'rgba(255,255,255,.7)'; g.setLineDash([6, 6]); g.beginPath(); g.moveTo(80, -48); g.lineTo(80, 48); g.stroke(); g.setLineDash([]); g.fillStyle = '#fff'; g.font = 'bold 26px sans-serif'; g.fillText(pick(['CONCERT 2026', 'HANDSHAKE', 'ROADSHOW', 'FAN FEST']), -132, -8); g.font = '16px sans-serif'; g.fillText('ADMIT ONE · 48', -132, 26); }); }
+function note(x, y, a, lines) { at(x, y, a, () => { shadow(10, 6); g.fillStyle = pick(['#FFE97A', '#FFB3CF', '#A8E6DA']); g.fillRect(-80, -80, 160, 160); noShadow(); g.fillStyle = '#2B2340'; g.font = '26px "Chalkboard SE", "Thonburi", sans-serif'; g.textAlign = 'center'; lines.forEach((l, i) => g.fillText(l, 0, 6 + (i - (lines.length - 1) / 2) * 34)); g.textAlign = 'left'; }); }
+// notebook
+at(980, 600, -.05, () => { shadow(26, 14); g.fillStyle = '#FBF7EE'; g.fillRect(-300, -210, 600, 420); noShadow(); g.fillStyle = 'rgba(0,0,0,.08)'; g.fillRect(-3, -210, 6, 420); g.strokeStyle = 'rgba(90,130,200,.35)'; for (let i = 1; i < 12; i++) { g.beginPath(); g.moveTo(-280, -210 + i * 34); g.lineTo(280, -210 + i * 34); g.stroke(); } g.fillStyle = '#4A3B6B'; g.font = '30px "Chalkboard SE", "Thonburi", sans-serif'; ['ตารางเดือนนี้ ♡', 'Roadshow 7–8', 'Hi-Touch รอบ 2', 'ประกาศผล 14'].forEach((t, i) => g.fillText(t, -270, -150 + i * 68)); g.fillText('Kami Oshi ★', 30, -150); });
+// light stick
+at(1560, 300, .6, () => { shadow(20, 10); g.fillStyle = '#22202A'; g.fillRect(-18, 40, 36, 300); g.fillStyle = '#FF5FA2'; g.beginPath(); g.arc(0, 0, 70, 0, 7); g.fill(); noShadow(); const gl = g.createRadialGradient(-20, -20, 4, 0, 0, 70); gl.addColorStop(0, 'rgba(255,255,255,.8)'); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.beginPath(); g.arc(0, 0, 70, 0, 7); g.fill(); g.fillStyle = '#fff'; g.font = '900 40px sans-serif'; g.textAlign = 'center'; g.fillText('48', 0, 14); g.textAlign = 'left'; });
+// phone
+at(330, 860, .18, () => { shadow(24, 12); g.fillStyle = '#121016'; g.beginPath(); g.roundRect(-110, -220, 220, 440, 34); g.fill(); noShadow(); const im = next(); g.save(); g.beginPath(); g.roundRect(-98, -206, 196, 412, 26); g.clip(); if (im) { const s = Math.min(im.naturalWidth / 196, im.naturalHeight / 412); g.drawImage(im, (im.naturalWidth - 196 * s) / 2, 0, 196 * s, 412 * s, -98, -206, 196, 412); } g.fillStyle = 'rgba(255,255,255,.9)'; g.font = 'bold 52px sans-serif'; g.textAlign = 'center'; g.fillText('20:48', 0, -120); g.textAlign = 'left'; g.restore(); });
+// cup
+at(1700, 900, 0, () => { shadow(24, 12); g.fillStyle = '#F4F1EC'; g.beginPath(); g.arc(0, 0, 110, 0, 7); g.fill(); noShadow(); g.fillStyle = '#6B3E22'; g.beginPath(); g.arc(0, 0, 86, 0, 7); g.fill(); g.fillStyle = 'rgba(255,240,220,.35)'; g.beginPath(); g.ellipse(-20, -24, 40, 14, -.5, 0, 7); g.fill(); g.strokeStyle = '#F4F1EC'; g.lineWidth = 22; g.beginPath(); g.arc(130, 0, 40, -1.2, 1.2); g.stroke(); });
+// photocards, tickets and notes around
+[[220, 260, -.2], [420, 330, .14], [640, 190, -.08], [1300, 220, .12], [1360, 860, -.16], [1140, 980, .2], [560, 1010, -.1], [1880, 520, .2], [60, 560, .1]].forEach(([x, y, a]) => card(x, y, a));
+ticket(760, 860, -.12); ticket(1500, 640, .16); ticket(120, 1080, .05);
+note(1830, 120, .15, ['อย่าลืม', 'แท่งไฟ!']); note(130, 120, -.12, ['♡ โอชิ']); note(860, 1110, .08, ['จองบัตร', 'ด่วน!']);
+// warm lamp light from the top left
+const lp = g.createRadialGradient(300, 120, 40, 500, 300, 1500); lp.addColorStop(0, 'rgba(255,230,180,.3)'); lp.addColorStop(1, 'rgba(30,15,5,.35)'); g.fillStyle = lp; g.fillRect(0, 0, W, H);
+const snap = document.createElement('canvas'); snap.width = W; snap.height = H; snap.getContext('2d').drawImage(c, 0, 0);
+g.clearRect(0, 0, W, H); g.filter = 'blur(1.4px)'; g.drawImage(snap, 0, 0); g.filter = 'none';
+};
+if (!/[?&]wait\b/.test(location.search)) drawScene();
+</script>

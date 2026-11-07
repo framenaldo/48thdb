@@ -1,0 +1,50 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#000"><canvas id="c" width="1920" height="1200"></canvas>
+<script>
+/* A drawn stage LED wall for the stats page (not a photo): panels of glowing charts, big numbers and a ranking board with the
+   members' own profile photos, a pixel grid over it, beams from above, the audience's heads below. Seeded. */
+window.drawScene = async (urls = []) => {
+let seed = 1148; const R = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296, rr = (a, b) => a + R() * (b - a), pick = a => a[Math.floor(R() * a.length)];
+const W = 1920, H = 1200, c = document.getElementById('c'), g = c.getContext('2d');
+const imgs = (await Promise.all(urls.map(u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; })))).filter(Boolean);
+for (let i = imgs.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [imgs[i], imgs[j]] = [imgs[j], imgs[i]]; }
+const PK = '#FF4F9A', TL = '#33E0C8', GD = '#FFC94A', VI = '#A77BFF';
+g.fillStyle = '#07060C'; g.fillRect(0, 0, W, H);
+const glow = (col, b) => { g.shadowColor = col; g.shadowBlur = b; }, noGlow = () => { g.shadowColor = 'transparent'; g.shadowBlur = 0; };
+// the LED wall: panels in a frame
+const X0 = 40, Y0 = 40, WW = W - 80, HH = 760;
+g.fillStyle = '#0D0B16'; g.fillRect(X0, Y0, WW, HH);
+function panel(x, y, w, h, draw) { g.fillStyle = 'rgba(20,16,36,.92)'; g.fillRect(x, y, w, h); g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 2; g.strokeRect(x, y, w, h); g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip(); draw(x, y, w, h); g.restore(); }
+// bars
+panel(70, 70, 560, 330, (x, y, w, h) => { for (let i = 0; i < 12; i++) { const v = rr(.25, .95), bw = 30, bx = x + 30 + i * 43; glow(i % 2 ? TL : PK, 18); g.fillStyle = i % 2 ? TL : PK; g.fillRect(bx, y + h - 30 - v * (h - 70), bw, v * (h - 70)); } noGlow(); g.fillStyle = 'rgba(255,255,255,.75)'; g.font = 'bold 22px sans-serif'; g.fillText('VIEWS', x + 24, y + 38); });
+// line chart
+panel(650, 70, 620, 330, (x, y, w, h) => { g.strokeStyle = 'rgba(255,255,255,.08)'; for (let i = 1; i < 5; i++) { g.beginPath(); g.moveTo(x, y + i * h / 5); g.lineTo(x + w, y + i * h / 5); g.stroke(); }
+  for (const [col, k] of [[GD, 0], [VI, 1]]) { glow(col, 16); g.strokeStyle = col; g.lineWidth = 5; g.beginPath(); let v = rr(.3, .6); for (let i = 0; i <= 20; i++) { v = Math.max(.08, Math.min(.92, v + rr(-.12, .14))); const px = x + 20 + i * (w - 40) / 20, py = y + h - 20 - v * (h - 60); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); } noGlow();
+  g.fillStyle = 'rgba(255,255,255,.75)'; g.font = 'bold 22px sans-serif'; g.fillText('LIVE · iAM48', x + 24, y + 38); });
+// big number + donut
+panel(1290, 70, 590, 330, (x, y, w, h) => { glow(PK, 30); g.fillStyle = '#FFE1EE'; g.font = '900 170px sans-serif'; g.fillText('48', x + 40, y + 230); noGlow();
+  const cx = x + w - 130, cy = y + h / 2, r = 96; let a0 = -Math.PI / 2; for (const [col, f] of [[PK, .42], [TL, .33], [GD, .25]]) { glow(col, 16); g.strokeStyle = col; g.lineWidth = 34; g.beginPath(); g.arc(cx, cy, r, a0, a0 + f * Math.PI * 2 - .05); g.stroke(); a0 += f * Math.PI * 2; } noGlow(); });
+// ranking board with photos
+panel(70, 420, 1210, 360, (x, y, w, h) => { g.fillStyle = 'rgba(255,255,255,.75)'; g.font = 'bold 22px sans-serif'; g.fillText('RANKING', x + 24, y + 38);
+  for (let i = 0; i < 7; i++) { const im = imgs[i % Math.max(1, imgs.length)], tx = x + 24 + i * 168, ty = y + 60, tw = 150, th = 200; glow(i === 0 ? GD : 'rgba(255,79,154,.6)', i === 0 ? 30 : 14); g.fillStyle = '#000'; g.fillRect(tx, ty, tw, th); noGlow();
+    if (im) { const s = Math.min(im.naturalWidth / tw, im.naturalHeight / th); g.drawImage(im, (im.naturalWidth - tw * s) / 2, 0, tw * s, th * s, tx, ty, tw, th); }
+    g.fillStyle = i === 0 ? GD : 'rgba(255,255,255,.9)'; g.font = '900 34px sans-serif'; g.fillText(String(i + 1), tx + 8, ty + th + 44);
+    g.fillStyle = i % 2 ? TL : PK; g.fillRect(tx + 44, ty + th + 22, (tw - 50) * rr(.4, 1), 14); } });
+// counters
+panel(1300, 420, 580, 360, (x, y, w, h) => { const rows = [['SINGLES', '31'], ['MEMBERS', '58'], ['EVENTS', '62'], ['VIEWS', '1.2M']]; rows.forEach(([k, v], i) => { g.fillStyle = 'rgba(255,255,255,.6)'; g.font = 'bold 22px sans-serif'; g.fillText(k, x + 30, y + 70 + i * 78); glow(i % 2 ? TL : PK, 18); g.fillStyle = i % 2 ? '#C9FFF6' : '#FFE1EE'; g.font = '900 52px sans-serif'; g.textAlign = 'right'; g.fillText(v, x + w - 30, y + 78 + i * 78); g.textAlign = 'left'; noGlow(); }); });
+// LED pixels over the wall
+for (let y = Y0; y < Y0 + HH; y += 6) { g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(X0, y, WW, 2); }
+for (let x = X0; x < X0 + WW; x += 6) { g.fillStyle = 'rgba(0,0,0,.22)'; g.fillRect(x, Y0, 2, HH); }
+// stage floor and its reflection
+const fl = g.createLinearGradient(0, 820, 0, H); fl.addColorStop(0, '#15101F'); fl.addColorStop(1, '#05040A'); g.fillStyle = fl; g.fillRect(0, 820, W, H - 820);
+g.save(); g.globalAlpha = .18; g.translate(0, 1620); g.scale(1, -1); g.drawImage(c, 0, Y0, W, HH, 0, 0, W, HH * .5); g.restore();
+// beams
+for (const [bx, col] of [[300, PK], [760, TL], [1160, VI], [1620, GD]]) { const bm = g.createLinearGradient(bx, 0, bx, 900); bm.addColorStop(0, col + '55'); bm.addColorStop(1, col + '00'); g.fillStyle = bm; g.beginPath(); g.moveTo(bx - 20, 0); g.lineTo(bx + 20, 0); g.lineTo(bx + rr(160, 260), 900); g.lineTo(bx - rr(160, 260), 900); g.fill(); }
+// the audience's heads, with a few light sticks up
+for (let i = 0; i < 70; i++) { const x = rr(-20, W + 20), y = rr(1010, 1220), r = rr(34, 52); g.fillStyle = '#030206'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.fillRect(x - r * 1.3, y + r * .6, r * 2.6, 200); }
+for (let i = 0; i < 26; i++) { const x = rr(40, W - 40), y = rr(930, 1040), col = pick([PK, TL, VI]); g.strokeStyle = '#111'; g.lineWidth = 8; g.beginPath(); g.moveTo(x, y); g.lineTo(x + rr(-20, 20), y + 110); g.stroke(); glow(col, 26); g.fillStyle = col; g.beginPath(); g.arc(x, y, 16, 0, 7); g.fill(); noGlow(); }
+const v = g.createRadialGradient(W / 2, H * .4, H * .3, W / 2, H * .5, W * .75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.55)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
+const snap = document.createElement('canvas'); snap.width = W; snap.height = H; snap.getContext('2d').drawImage(c, 0, 0);
+g.clearRect(0, 0, W, H); g.filter = 'blur(1.6px)'; g.drawImage(snap, 0, 0); g.filter = 'none';
+};
+if (!/[?&]wait\b/.test(location.search)) drawScene();
+</script>
