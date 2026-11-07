@@ -4,8 +4,10 @@
    ceiling spots. The covers are the groups' real CD covers (the owner's folder Documents/48TH/web/cover) — or their MV thumbnails —
    when make.mjs hands them in, else invented ones; each centre-cut square, shuffled so the same cover never stands next to itself.
    Seeded, so it comes out the same each time. */
-window.drawScene = async (urls = []) => {
-const imgs = (await Promise.all(urls.map(u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; })))).filter(Boolean);
+window.drawScene = async (urls = [], more = []) => {
+const load = list => Promise.all(list.map(u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; }))).then(a => a.filter(Boolean));
+// every real cover goes up; MV thumbnails fill the rest of the ~150 places, for the songs with no cover in the folder
+const main = await load(urls), extra = await load(more), imgs = main.concat(extra.slice(0, Math.max(0, 150 - main.length)));
 let ci = 0, dealt = false;
 let seed = 48; const R = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296, rr = (a, b) => a + R() * (b - a), pick = a => a[Math.floor(R() * a.length)];
 const W = 1920, H = 1200, c = document.getElementById('c'), g = c.getContext('2d');
@@ -57,7 +59,8 @@ for (let r = 0; r < rows; r++) {
   // shelf lip with price tags
   g.fillStyle = '#0E0E12'; g.beginPath(); g.moveTo(0, y0 + ROW - 36); g.lineTo(W, y0 + ROW - 60); g.lineTo(W, y0 + ROW - 40); g.lineTo(0, y0 + ROW - 16); g.fill();
   g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(0, y0 + ROW - 36, W, 2);
-  for (let k = 0; k < 7; k++) { const tx = rr(60, W - 160), ty = y0 + ROW - 34 - (tx / W) * 24; const t = pick(['฿199', '฿259', '฿129', 'NEW', 'USED', 'ลดราคา', '฿349', 'SALE']); tag(tx, ty, t, pick(['#F6F3E8', '#F6F3E8', '#E4457E', '#F5C542']), '#111'); }
+  for (let k = 0; k < 7; k++) { const tx = 60 + k * (W - 200) / 7 + rr(0, 120),   // spread along the lip so no two tags overlap
+    ty = y0 + ROW - 34 - (tx / W) * 24; const t = pick(['฿199', '฿259', '฿129', 'NEW', 'USED', 'ลดราคา', '฿349', 'SALE']); tag(tx, ty, t, pick(['#F6F3E8', '#F6F3E8', '#E4457E', '#F5C542']), '#111'); }
 }
 // warm ceiling spots, haze and vignette
 for (const sx of [260, 700, 1180, 1640]) { const sp = g.createRadialGradient(sx, -40, 10, sx, 300, 520); sp.addColorStop(0, 'rgba(255,214,150,.42)'); sp.addColorStop(1, 'rgba(255,214,150,0)'); g.fillStyle = sp; g.fillRect(0, 0, W, H); }
