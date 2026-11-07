@@ -1,4 +1,4 @@
-// node scripts/cdshop/make.mjs [folder of covers: the owner's CD covers in ~/Documents/48TH/web/cover] [folder of MV thumbnails to fill the rest]  → bg/cd-shop-5.jpg (a new name each time it changes: the service worker serves images stale-first) (1920×1200); needs Google Chrome on this Mac.
+// node scripts/cdshop/make.mjs [folder of covers: the owner's CD covers in ~/Documents/48TH/web/cover] [folder of MV thumbnails to fill the rest]  → bg/cd-shop-6.jpg (a new name each time it changes: the service worker serves images stale-first) (1920×1200); needs Google Chrome on this Mac.
 // The thumbnails are the groups' own MVs (ids in data/youtube.json), fetched once with
 //   mkdir -p /tmp/cdthumbs && cd /tmp/cdthumbs && node -e "console.log(Object.keys(require('<repo>/data/youtube.json').videos).join('\\n'))" | xargs -P 12 -I{} curl -s -o {}.jpg https://i.ytimg.com/vi/{}/hqdefault.jpg
 // and are not kept in the repo; without a folder the covers are invented.
@@ -29,5 +29,5 @@ const ran = await send('Runtime.evaluate', { expression:'drawScene(window.__u, w
 console.log('draw:', ran.result && ran.result.result && ran.result.result.value);
 for (let i = 0; i < 100; i++) { const r = await send('Runtime.evaluate', { expression:'window.done === true', returnByValue:true }); if (r.result.result.value) break; await sleep(200); }
 const r = await send('Runtime.evaluate', { expression:"document.getElementById('c').toDataURL('image/jpeg', .8)", returnByValue:true });
-const out = join(here, '..', '..', 'bg', 'cd-shop-5.jpg'); writeFileSync(out, Buffer.from(r.result.result.value.split(',')[1], 'base64'));
+const out = join(here, '..', '..', 'bg', 'cd-shop-6.jpg'); writeFileSync(out, Buffer.from(r.result.result.value.split(',')[1], 'base64'));
 console.log('wrote', out); ws.close(); proc.kill();

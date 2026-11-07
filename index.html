@@ -4174,7 +4174,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      shop wall behind the page (bg/cd-shop.jpg, from scripts/cdshop), and the lists as panes of liquid glass: one blurred pane per list,
      not per row, so a phone scrolls them without a cost. ---- */
   html[data-cdshop="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(rgba(14,9,20,.30), rgba(14,9,20,.52)), url(bg/cd-shop-5.jpg) center top / cover no-repeat; }
+    background:linear-gradient(rgba(14,9,20,.30), rgba(14,9,20,.52)), url(bg/cd-shop-6.jpg) center top / cover no-repeat; }
   html[data-cdshop="1"] .wk-head{ color:#fff; text-shadow:0 2px 14px rgba(0,0,0,.6); }
   html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list, html[data-cdshop="1"] .wk-cats, html[data-cdshop="1"] .gal-teaser{
     position:relative; border-radius:26px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.74); --line:rgba(255,255,255,.22);
@@ -4202,7 +4202,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-cdshop="1"] .cds-off{ display:inline-block; margin:0 0 10px; padding:4px 12px; border-radius:99px; border:1.5px solid rgba(255,255,255,.4); background:rgba(255,255,255,.14); color:#fff; font:inherit; font-size:11.5px; font-weight:800; cursor:pointer; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
   html[data-cdshop="1"] .cds-off:active{ transform:translateY(2px); }
   @media (max-width:760px){ html[data-cdshop="1"] .disc-col, html[data-cdshop="1"] .mw-list, html[data-cdshop="1"] .wk-cats, html[data-cdshop="1"] .gal-teaser{ -webkit-backdrop-filter:blur(14px) saturate(1.5); backdrop-filter:blur(14px) saturate(1.5); } }
-  /* ---- the calendar on a cork notice board (a preview: only with ?board=on, off with ?board=off). The groups' own event
+  /* ---- the calendar on a cork notice board, for everyone (?board=off turns it off on one device). The groups' own event
      posters pinned up behind the page (bg/cork-board-1.jpg, from scripts/board), the month and the list as panes of the same liquid
      glass as the Works page: one blurred pane each; the days and rows inside are only tinted. ---- */
   html[data-board="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
@@ -4224,13 +4224,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-board="1"] .calp-bar, html[data-board="1"] .calp > .section-label, html[data-board="1"] .calp-legend{ color:#fff; text-shadow:0 1px 10px rgba(0,0,0,.55); }
   html[data-board="1"] .calp-subscribe, html[data-board="1"] .calp-bar button{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.4); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
   @media (max-width:760px){ html[data-board="1"] .calp > .feed-head, html[data-board="1"] .calp-board, html[data-board="1"] .calp-agenda{ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
-  /* ---- the members page on a gallery wall and the shop at a merch booth (previews: ?wall=on on the members page, ?booth=on on the
-     shop; =off turns each off). Drawn backgrounds from scripts/scenes with the members' own photos (bg/photo-wall-1.jpg,
-     bg/merch-booth-1.jpg) and the same liquid-glass panes: one blurred pane per block, what is inside only tinted. The members
+  /* ---- the members page on a gallery wall and the shop at a merch booth, for everyone (?wall=off / ?booth=off turns one off on a
+     device). Drawn backgrounds from scripts/scenes with the members' own photos (bg/photo-wall-1.jpg,
+     bg/merch-booth-2.jpg) and the same liquid-glass panes: one blurred pane per block, what is inside only tinted. The members
      table's sticky name column keeps a nearly solid tint, or the cells scrolled under it would show through. ---- */
   html[data-wall="1"] body::before, html[data-booth="1"] body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background-position:center top; background-size:cover; background-repeat:no-repeat; }
   html[data-wall="1"] body::before{ background-image:linear-gradient(rgba(18,8,16,.22), rgba(18,8,16,.5)), url(bg/photo-wall-1.jpg); }
-  html[data-booth="1"] body::before{ background-image:linear-gradient(rgba(30,14,20,.18), rgba(30,14,20,.42)), url(bg/merch-booth-1.jpg); }
+  html[data-booth="1"] body::before{ background-image:linear-gradient(rgba(30,14,20,.18), rgba(30,14,20,.42)), url(bg/merch-booth-2.jpg); }
   html[data-wall="1"]{ --pane-tint:rgba(40,16,36,.36); } html[data-booth="1"]{ --pane-tint:rgba(52,20,34,.36); }
   html[data-wall="1"] .filter-bar.mb-bar, html[data-wall="1"] .table-wrap, html[data-wall="1"] .thead-sticky-outer, html[data-booth="1"] .shop > .feed-head, html[data-booth="1"] .shop-grid{
     position:relative; border-radius:24px; color:#fff; --ink:#fff; --ink-soft:rgba(255,255,255,.76); --line:rgba(255,255,255,.2); --card:rgba(255,255,255,.06); --glass-card:rgba(255,255,255,.08); --paper-dim:rgba(255,255,255,.12);
@@ -15018,11 +15018,10 @@ let gecBusy = null, gecErr = null, gecProg = null, gecAt = 0, gecTimer = null, g
 // the Works page is dressed as a CD shop for everyone; ?cdshop=off turns it off on one device (kept), ?cdshop=on back on
 let cdShopOn = true;
 try{ const q = new URLSearchParams(location.search).get('cdshop'); if(q === 'off') localStorage.setItem('48thdb-cdshop', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-cdshop'); cdShopOn = localStorage.getItem('48thdb-cdshop') !== 'off'; }catch(e){}
-// the calendar's cork board is a preview for now: ?board=on turns it on (kept on this device), ?board=off off
-let boardOn = false;
-try{ const q = new URLSearchParams(location.search).get('board'); if(q === 'on') localStorage.setItem('48thdb-board', '1'); else if(q === 'off') localStorage.removeItem('48thdb-board'); boardOn = localStorage.getItem('48thdb-board') === '1'; }catch(e){}
-// the members page's gallery wall and the shop's merch booth are previews too: ?wall=on / ?booth=on (kept on this device), =off off
-const bgPreview = k => { try{ const q = new URLSearchParams(location.search).get(k); if(q === 'on') localStorage.setItem('48thdb-' + k, '1'); else if(q === 'off') localStorage.removeItem('48thdb-' + k); return localStorage.getItem('48thdb-' + k) === '1'; }catch(e){ return false; } };
+// the dressed pages are on for everyone: the calendar's cork board, the members' gallery wall, the shop's merch booth.
+// ?board=off / ?wall=off / ?booth=off turns one off on this device (kept), =on back on
+const bgPreview = k => { try{ const q = new URLSearchParams(location.search).get(k); if(q === 'off') localStorage.setItem('48thdb-' + k, 'off'); else if(q === 'on') localStorage.removeItem('48thdb-' + k); return localStorage.getItem('48thdb-' + k) !== 'off'; }catch(e){ return true; } };
+const boardOn = bgPreview('board');
 const wallOn = bgPreview('wall'), boothOn = bgPreview('booth');
 function cdShopSync(){
   const d = document.documentElement.dataset;
