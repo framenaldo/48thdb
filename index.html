@@ -22021,6 +22021,7 @@ function renderMeowAdopt(){
   return `<div class="meow-adopt" data-noloc>
     ${img ? `<img src="${img}" alt="" width="72" height="54">` : ''}
     <div><b>${title}</b><small>${sub}</small><small>${keep}</small></div>
+    ${!pet && meowSignedIn() ? `<button class="btn-secondary" data-action="meow-pull">${en ? 'Fetch my cat' : 'ดึงน้องจากบัญชี'}</button>` : ''}
     <button class="btn-add" data-action="open-meow">${pet ? (en ? 'Visit' : 'ไปหาน้อง') : (en ? 'Adopt' : 'รับเลี้ยง')}</button></div>`;
 }
 function renderProfile(){
@@ -28174,7 +28175,32 @@ function meowLoad(){
    app keeps its own storage, so a new device starts empty and fetches her after sign-in). Two guards keep a device from
    ever overwriting her: nothing goes up before the account's copy has been read (`_meowCloudRead`), and an empty cat is
    never uploaded. */
-let _meowPush = 0, _meowCloudRead = false;
+let _meowPush = 0, _meowCloudRead = false, _meowSync = null;   // _meowSync: how the last upload went { ok, at, err }
+// upload her now; resolves true when the account holds her
+function meowPushNow(){
+  const u = typeof fbAuth !== 'undefined' && fbAuth.currentUser;
+  if(!_meow || !_meow.pet || !u) return Promise.resolve(false);
+  let data; try{ data = JSON.parse(JSON.stringify(_meow)); }catch(e){ return Promise.resolve(false); }   // no undefined values, which Firestore refuses
+  return fbDb.collection('users').doc(u.uid).set({ meow:data }, { merge:true })
+    .then(() => { _meowSync = { ok:true, at:Date.now() }; return true; })
+    .catch(e => { _meowSync = { ok:false, at:Date.now(), err:String((e && (e.code || e.message)) || e).slice(0, 80) }; try{ console.warn('meow sync', e); }catch(x){} return false; })
+    .then(r => { meowSyncPaint(); return r; });
+}
+// fetch her from the account on request (a new device, or after a failed first read)
+async function meowPullCloud(){
+  const u = typeof fbAuth !== 'undefined' && fbAuth.currentUser; if(!u || !meowSignedIn()) return null;
+  try{
+    const d = await fbDb.collection('users').doc(u.uid).get(), m = d.exists ? d.data().meow : null;
+    meowFromAccount(m || null); return !!(m && m.pet);
+  }catch(e){ _meowSync = { ok:false, at:Date.now(), err:String((e && (e.code || e.message)) || e).slice(0, 80) }; return null; }
+}
+const meowSyncText = t => {
+  if(!meowSignedIn()) return t('เก็บไว้ในเครื่องนี้ เข้าสู่ระบบแล้วน้องจะตามไปทุกเครื่อง', 'Kept on this device. Sign in and she follows you to every device.');
+  if(_meowSync && _meowSync.ok) return t(`☁ เก็บไว้กับบัญชีแล้ว (${new Date(_meowSync.at).toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' })}) · ล็อกอินเครื่องไหนก็เจอน้องตัวเดิม`, `☁ Saved to your account (${new Date(_meowSync.at).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })}) · the same cat on every device you sign in on`);
+  if(_meowSync && !_meowSync.ok) return t(`☁ ยังเก็บขึ้นบัญชีไม่ได้ (${_meowSync.err}) · กดลองอีกครั้ง`, `☁ Could not save to your account (${_meowSync.err}) · tap to retry`);
+  return t('☁ กำลังเก็บน้องไว้กับบัญชี…', '☁ Saving her to your account…');
+};
+function meowSyncPaint(){ const el = _meowSheet && _meowSheet.el.querySelector('.meow-sync'); if(el) el.textContent = meowSyncText((th, e) => isEN() ? e : th); }
 const meowSignedIn = () => !!(typeof state !== 'undefined' && state.account && state.account.loggedIn);
 function meowSave(){
   if(!_meow) return;
@@ -28183,7 +28209,7 @@ function meowSave(){
   clearTimeout(_meowPush);
   _meowPush = setTimeout(() => {
     if(!_meow || !_meow.pet || (meowSignedIn() && !_meowCloudRead)) return;
-    try{ if(typeof fbAuth !== 'undefined' && fbAuth.currentUser) fbDb.collection('users').doc(fbAuth.currentUser.uid).set({ meow:_meow }, { merge:true }).catch(() => {}); }catch(e){}
+    meowPushNow();
   }, 4000);
 }
 // after sign-in the account's cat is the cat: it replaces whatever this device holds, unless it is the same cat (then the newer copy
@@ -29802,9 +29828,10 @@ function openMeowSheet(){
   closeShareSheet(); closeMeowSheet();
   if(!_meow) _meow = meowLoad();
   // signed in: her account's cat is still being fetched, so do not start adopting a new one
-  if(meowSignedIn() && !_meowCloudRead && !_meow.pet){ toast(isEN() ? 'Fetching your cat from your account…' : 'กำลังเรียกน้องจากบัญชีของคุณ… รอสักครู่'); return; }
+  if(meowSignedIn() && !_meowCloudRead && !_meow.pet){ toast(isEN() ? 'Fetching your cat from your account…' : 'กำลังเรียกน้องจากบัญชีของคุณ… รอสักครู่'); meowPullCloud().then(r => { if(r) openMeowSheet(); }); return; }
   const el = document.createElement('div'); el.className = 'share-sheet meow-sheet';
   _meowSheet = { el, tray:false, step:_meow.pet ? 'home' : 'pick', hs:{ sp:'orange', col:'#E4457E', taps:0, name:'' } };
+  if(_meow.pet && meowSignedIn() && _meowCloudRead) meowPushNow();
   document.body.appendChild(el);
   meowSheetPaint();
   requestAnimationFrame(() => el.classList.add('show'));
@@ -29872,7 +29899,7 @@ function meowSheetPaint(){
     <p class="lay-sheet-note">${t('ได้ขนมวันละ 3 ชิ้นเมื่อกลับมาเข้าเว็บ และอีกชิ้นทุกครั้งที่เปิดดูงานหรือเมมเบอร์ (วันละ 3) · น้องนอนเมื่ออยากนอน วันละราว 12–16 ชั่วโมงเป็นช่วง ๆ กลางวันหลับเยอะ พลบค่ำกับเช้ามืดตื่นตัวที่สุด กลางคืนชอบลุกมาวิ่งเล่น ลูบตอนหลับอาจตื่นหรือไม่ก็ได้ · ชามน้ำ: น้องไปกินเองเมื่อหิวน้ำ เติมน้ำใหม่ทุกวัน น้ำค้างคืนน้องไม่ค่อยกิน', 'Three snacks a day for coming back, one more for each event or member you open (three a day). She sleeps when she likes, 12–16 hours a day in bouts: much of the day, wide awake at dusk and dawn, and often up at night to run about; a stroke while she sleeps may or may not wake her. Water bowl: she drinks by herself when thirsty; fill it fresh each day, she hardly touches day-old water.')}</p>
     ${_meow.home || sleeping ? '' : `<button class="lay-row" data-meow="call"><span><b>${t('เรียกน้องมาตรงนี้', 'Call her here')}</b><small>${t('น้องเดินเล่นอยู่ที่ไหนสักแห่งในหน้า กดแล้วน้องจะกระโดดมาหา', 'She roams the whole page; she will leap over to you')}</small></span><i>›</i></button>`}
     <button class="lay-row" data-meow="home"><span>${_meow.home ? t('ให้น้องออกมาเดินเล่นบนเว็บ', 'Let her walk the site') : t('ให้น้องอยู่บ้าน ไม่เดินบนเว็บ', 'Keep her home, off the pages')}</span></button>
-    <p class="lay-sheet-note">${state.account && state.account.loggedIn ? t('เก็บไว้กับบัญชีของคุณ เปิดเครื่องไหนก็เจอน้อง', 'Kept with your account, on every device.') : t('เก็บไว้ในเครื่องนี้ เข้าสู่ระบบแล้วน้องจะตามไปทุกเครื่อง', 'Kept on this device. Sign in and she follows you to every device.')}</p></div>`;
+    <p class="lay-sheet-note meow-sync"${meowSignedIn() ? ' data-meow="sync" role="button"' : ''}>${meowSyncText(t)}</p></div>`;
   el.querySelectorAll('[data-meow-ic]').forEach(s => { const c = meowPix(s.dataset.meowIc); if(c) s.replaceWith(c); });
   const bowl = el.querySelector('[data-meow-prop="bowl"]'); if(bowl){ const c = meowPix('bowl'); c.style.width = '36px'; c.style.height = '36px'; bowl.appendChild(c); }
   const wb = el.querySelector('[data-meow-prop="water"]'); if(wb){ const c = meowPix(_meow.bowl && _meow.bowl.lvl > 0 ? 'water' : 'waterE'); c.style.width = '36px'; c.style.height = '36px'; wb.appendChild(c); }
@@ -29959,6 +29986,7 @@ function meowSheetClick(e){
   }
   const b = e.target.closest('[data-meow]'); if(!b) return;
   const k = b.dataset.meow;
+  if(k === 'sync'){ _meowSync = null; meowSyncPaint(); meowPushNow(); return; }
   if(k === 'box'){ S.step = 'box'; S.hs.taps = 0; meowSheetPaint(); return; }
   if(k === 'knock'){
     S.hs.taps++;
@@ -30713,6 +30741,10 @@ function bindDelegatedEvents(){
       renderMain(); replaceHistory();
     }
     else if(action==='open-push'){ state.setMenuOpen = false; render(); openPushSheet(); }
+    else if(action==='meow-pull'){
+      toast(isEN() ? 'Looking for your cat in your account…' : 'กำลังหาน้องในบัญชีของคุณ…');
+      meowPullCloud().then(r => { if(r === false) toast(isEN() ? 'No cat in this account yet. Open the cat on the device she is on, while signed in, and she goes up to your account.' : 'บัญชีนี้ยังไม่มีน้องบนคลาวด์ · ถ้าเคยเลี้ยงไว้ที่เครื่องอื่น ให้เปิดเว็บที่เครื่องนั้นตอนล็อกอินอยู่ แล้วน้องจะถูกส่งขึ้นบัญชี'); else if(r === null) toast(isEN() ? 'Could not reach your account. Try again.' : 'ติดต่อบัญชีไม่ได้ ลองใหม่อีกครั้ง'); });
+    }
     else if(action==='open-meow'){ state.setMenuOpen = false; render(); openMeowSheet(); }
     else if(action==='install-app'){ state.setMenuOpen = false; render(); installApp(); }
     else if(action==='toggle-theme'){
