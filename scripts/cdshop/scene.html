@@ -1,7 +1,11 @@
 <!doctype html><meta charset="utf-8"><body style="margin:0;background:#000"><canvas id="c" width="1920" height="1200"></canvas>
 <script>
-/* A made-up CD shop wall for the Works page (drawn here, not a photo): dark wood, slanted display shelves of jewel cases with
-   invented covers, price tags, warm ceiling spots. Seeded, so it comes out the same each time. */
+/* A drawn CD shop wall for the Works page (not a photo): dark wood, slanted display shelves of jewel cases, price tags, warm
+   ceiling spots. The covers are the groups' own MV thumbnails (from their YouTube channels, cropped square) when make.mjs hands
+   them in, else invented ones. Seeded, so it comes out the same each time. */
+window.drawScene = async (urls = []) => {
+const imgs = (await Promise.all(urls.map(u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; })))).filter(Boolean);
+let ci = 0;
 let seed = 48; const R = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296, rr = (a, b) => a + R() * (b - a), pick = a => a[Math.floor(R() * a.length)];
 const W = 1920, H = 1200, c = document.getElementById('c'), g = c.getContext('2d');
 const hsl = (h, s, l, a = 1) => `hsla(${h},${s}%,${l}%,${a})`;
@@ -14,6 +18,8 @@ for (let x = 210; x < W; x += 480) { g.fillStyle = '#0B0A0C'; g.fillRect(x, 0, 2
 const STYLES = ['sun', 'stripes', 'portrait', 'grad', 'lines', 'dots', 'band'];
 const PAL = [[338, 80, 58], [172, 52, 38], [265, 55, 55], [42, 85, 55], [205, 70, 50], [12, 80, 55], [150, 45, 40], [310, 60, 50], [0, 0, 12], [0, 0, 92], [28, 70, 48]];
 function art(x, y, s) {
+  // a real cover: the picture inside the 16:9 frame of a 480×360 thumbnail, cut square from its middle
+  if (imgs.length) { const im = imgs[ci++ % imgs.length]; g.drawImage(im, 105, 45, 270, 270, x, y, s, s); return; }
   const [h, sa, l] = pick(PAL), [h2] = pick(PAL), st = pick(STYLES);
   const gr = g.createLinearGradient(x, y, x + s, y + s); gr.addColorStop(0, hsl(h, sa, Math.min(85, l + 18))); gr.addColorStop(1, hsl(h2, sa, Math.max(14, l - 14))); g.fillStyle = gr; g.fillRect(x, y, s, s);
   g.save(); g.beginPath(); g.rect(x, y, s, s); g.clip();
@@ -52,4 +58,6 @@ const v = g.createRadialGradient(W / 2, H * .45, H * .35, W / 2, H * .5, W * .75
 const snap = document.createElement('canvas'); snap.width = W; snap.height = H; snap.getContext('2d').drawImage(c, 0, 0);
 g.clearRect(0, 0, W, H); g.filter = 'blur(1.4px)'; g.drawImage(snap, 0, 0); g.filter = 'none';
 window.done = true;
+};
+if (!/[?&]wait\b/.test(location.search)) drawScene();
 </script>

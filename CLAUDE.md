@@ -144,7 +144,7 @@ the Firebase CLI from the owner's machine.
   counted off the organiser's chart): drawn as little chairs in 3D, rings in
   2D, and counted on each zone's row. Chairs only, never what is sold. MCC
   Hall's are 2,350.
-- **CD-shop dress for the Works page (a preview, not the default).** `/works?cdshop=on` (kept on the device; `?cdshop=off` or the "กลับธีมปกติ" pill on the page turns it off): a drawn shop wall behind the page (`bg/cd-shop.jpg`, made by `node scripts/cdshop/make.mjs` from `scripts/cdshop/scene.html` — invented covers, not photos, not our own art; seeded so it comes out the same) and the lists as panes of liquid glass (`html[data-cdshop="1"]`, `cdShopSync` in `renderMain`; one blurred pane per list, never per row — a phone scrolls them without a cost). Awaiting the owner's verdict.
+- **CD-shop dress for the Works page (a preview, not the default).** `/works?cdshop=on` (kept on the device; `?cdshop=off` or the "กลับธีมปกติ" pill on the page turns it off): a drawn shop wall behind the page (`bg/cd-shop-2.jpg`, made by `node scripts/cdshop/make.mjs <folder of MV thumbnails>` from `scripts/cdshop/scene.html`: a drawn wall whose covers are the groups' own MV thumbnails, cropped square; seeded; a remade picture needs a new file name) and the lists as panes of liquid glass (`html[data-cdshop="1"]`, `cdShopSync` in `renderMain`; one blurred pane per list, never per row — a phone scrolls them without a cost). Awaiting the owner's verdict.
 - The Works page (/works/songs, once /music; view `discography`) holds everything the groups made
   or took part in: the songs, then concerts, events, films, series, shows, other
   artists' MVs and ads from `SEED_MEDIA`, picked by category (`WORKS_CATS`). A
