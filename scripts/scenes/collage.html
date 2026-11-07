@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#000"><canvas id="c" width="1920" height="1200"></canvas>
+<script>
+/* The home page's backdrop: the other pages' scenes (CD shop, cork board, photo wall, merch booth, stage, desk) laid side by side
+   and blurred until only their colour and warmth are left, so the home page shares the family's look without any scene behind its
+   text. Handed the finished backgrounds by make.mjs (node scripts/scenes/make.mjs scripts/scenes/collage.html bg/home-collage-1.jpg bg
+   "^(cd-shop|cork|photo|merch|stage|fan)"). */
+window.drawScene = async (urls = []) => {
+const W = 1920, H = 1200, c = document.getElementById('c'), g = c.getContext('2d');
+const imgs = (await Promise.all(urls.map(u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; })))).filter(Boolean);
+g.fillStyle = '#2A1E2E'; g.fillRect(0, 0, W, H);
+const n = imgs.length, cols = 3, rows = Math.ceil(n / cols), cw = W / cols, rh = H / rows;
+imgs.forEach((im, i) => { const x = (i % cols) * cw, y = Math.floor(i / cols) * rh; g.save(); g.beginPath(); g.rect(x - 40, y - 40, cw + 80, rh + 80); g.clip(); g.filter = 'blur(2px)'; g.drawImage(im, x - 40, y - 40, cw + 80, rh + 80); g.restore(); });
+// blur it all until it is colour only
+const snap = document.createElement('canvas'); snap.width = W; snap.height = H; snap.getContext('2d').drawImage(c, 0, 0);
+g.clearRect(0, 0, W, H); g.filter = 'blur(46px) saturate(1.25)'; g.drawImage(snap, -60, -60, W + 120, H + 120); g.filter = 'none';
+};
+if (!/[?&]wait\b/.test(location.search)) drawScene();
+</script>
