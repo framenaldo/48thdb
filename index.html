@@ -29097,7 +29097,7 @@ function meowMount(){
       if(!_meowWalk || _meowPlacing || (e.target.closest && e.target.closest('.meow-cat, .share-sheet, .meow-ring, .meow-call, .meow-toy, .meow-tray'))) return;
       _meowWalk.noticeTap(e.clientX, e.clientY);
     }, { passive:true });
-    setInterval(() => { if(!document.hidden && performance.now() - _meowScrolling > 600) meowPlace(); }, 4000);
+    setInterval(() => { if(!document.hidden && performance.now() - _meowScrolling > 600){ meowPlace(); meowNavGap(); } }, 4000);
     setInterval(() => { if(!document.hidden && _meow && _meow.pet){ meowAdvance(); meowDaily(); } }, 60000);
     setInterval(() => meowBugMaybe(), 20000);
   }
@@ -29183,6 +29183,13 @@ function meowPageName(v){
 }
 function meowHere(){ const p = _meow && _meow.pet; return !p || !p.page || p.page === state.view; }
 let _meowCall = null;
+// the menu bar's real height (it grows with the phone's safe area), so what sits above it never lands on it: sets --nav-h
+function meowNavGap(){
+  const nav = document.querySelector('.glass-nav'), r = nav && nav.getBoundingClientRect();
+  const h = r && r.height && getComputedStyle(nav).display !== 'none' ? Math.max(0, innerHeight - r.top) : 0;
+  document.documentElement.style.setProperty('--nav-h', Math.round(h || 24) + 'px');
+}
+addEventListener('resize', () => meowNavGap());
 function meowCallPaint(){
   const p = _meow && _meow.pet, show = !!(p && !_meow.home && _meowWalk && !meowHere());
   if(!show){ if(_meowCall) _meowCall.hidden = true; return; }
@@ -29197,7 +29204,7 @@ function meowCallPaint(){
     _meowCall.innerHTML = `<span><b>${en ? 'Bring her here' : 'พาน้องมาอยู่หน้านี้'}</b><small>${escapeHtml(p.name)} ${en ? 'is on' : 'อยู่หน้า'}${en ? ' ' : ''}${escapeHtml(meowPageName(p.page))}</small></span>`;
     const c = document.createElement('canvas'); c.width = MEOW_W; c.height = MEOW_H; c.className = 'meow-px'; c.getContext('2d').drawImage(meowSprite(p, 'loaf', 'open', 0), 0, 0); _meowCall.prepend(c);
   }
-  _meowCall.hidden = false;
+  _meowCall.hidden = false; meowNavGap();
 }
 function meowBringHere(say){
   const p = _meow && _meow.pet; if(!p) return;
@@ -29379,7 +29386,7 @@ function meowToyPlan(w, el){
   if(o.k === 'bed') return [go, { act:'knead', dur:meowRand(2.5, 4) }, { act:'loaf', dur:2 }, { act:'sleep', dur:meowRand(120, 600), pose:'curl' }, { act:'stretch', dur:1.8 }, { act:'yawn', dur:1.3 }];
   return [go, { act:'sniff', dur:1.2 }, { act:'nip', dur:meowRand(4, 6) }, { act:'say', text:t('ฟินนน~', 'Bliss~'), soft:true }, { act:'roll', dur:3 }, fun(12), { act:'loaf', dur:4 }];
 }
-function meowToyTray(){
+function meowToyTray(){ meowNavGap();
   meowToyTrayClose();
   const en = isEN(), el = document.createElement('div'); el.className = 'meow-tray'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', en ? 'Leave a toy for her' : 'วางของเล่นให้น้อง');
   el.innerHTML = `<div class="meow-tray-h"><b>${en ? 'Leave a toy on this page' : 'วางของเล่นไว้ในหน้านี้'}</b><button type="button" class="meow-tray-x" data-t="x" aria-label="${en ? 'Close' : 'ปิด'}">×</button></div><div class="meow-tray-row"></div>
