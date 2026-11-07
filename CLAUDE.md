@@ -338,6 +338,8 @@ Transfer: mint → organiser's vault → sales channels → buyers; it checks ou
 against the votes). A sales channel is a wallet the vault gave 1,000 tokens or more
 (`GEC_CHAN_MIN`): the vault also sends a few tokens straight to fans, who are buyers.
 
+
+**Stock-market dress (a preview, not the default).** `/vote?market=on` (kept on the device; `?market=off` or the "กลับธีมปกติ" button turns it off) dresses the tab as a trading screen: a ticker tape, the headline as a quote with its 24-hour change and a 3-day sparkline (`gecMarketHead`, `gecMarketQuote`), dark terminal panel `.gec.is-market` with mono tabular numbers, green for up and pink for alerts. It only restyles figures the page already has — tokens are not shares and a vote cannot be sold back, so there is no buy/sell, no per-member figures, and the token price is shown as a fixed ฿68 line. Awaiting the owner's verdict before it becomes the default.
 ## House rules
 
 **Sources.** For current BNK48 members, bnk48.com wins outright — overwrite what
