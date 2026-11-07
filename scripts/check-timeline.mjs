@@ -17,7 +17,10 @@ async function probe(n){
   }catch(e){ found.push({ n, err:String(e.message || e).slice(0, 40) }); }
 }
 for (let i = 0; i < nums.length; i += 24) await Promise.all(nums.slice(i, i + 24).map(probe));
-let missing = found.filter(f => f.iam).sort((a, b) => a.n - b.n);
+// the Worker keeps only members on its list (data/lives.json, graduates left out), so a page by anyone else is not a miss
+const lives = await (await fetch(`https://48thdb.com/data/lives.json?c=${Date.now()}`)).json();
+const listed = new Set(Object.values(lives.members || {}).filter(v => v && v.iam && !v.grad).map(v => v.iam));
+let missing = found.filter(f => f.iam && listed.has(f.iam)).sort((a, b) => a.n - b.n);
 const errs = found.filter(f => f.err);
 // a post made in the last few minutes may simply not have been reached by the Worker's walk yet (it runs every five minutes): give it
 // seven minutes and look again, and only what is still missing counts. --no-wait skips that.
