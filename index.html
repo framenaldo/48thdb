@@ -4177,6 +4177,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gec-cap i.hi{ background:#C8901F; } .gec-cap i.now{ background:var(--bnk); }
   .gec-vbars{ overflow-x:auto; border-radius:10px; background:var(--paper-dim); -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
   .gec-vin{ display:flex; gap:3px; min-width:max-content; height:190px; padding:6px 8px 5px; }
+  .gec-vin.is-day .gec-vcol{ width:58px; } .gec-vin.is-day .gec-vplot em{ font-size:11px; }
   .gec-vcol{ width:36px; flex:none; display:flex; flex-direction:column; align-items:center; }
   .gec-vplot{ position:relative; flex:1; width:100%; background:repeating-linear-gradient(0deg, transparent 0 calc(25% - 1px), color-mix(in srgb, var(--ink-soft) 16%, transparent) calc(25% - 1px) 25%); }
   .gec-vplot i{ position:absolute; left:3px; right:3px; bottom:0; display:block; min-height:2px; border-radius:4px 4px 0 0; background:var(--cgm); }
@@ -15942,29 +15943,34 @@ function renderGEChain(){
       ${o && o.wallets[w] ? `<span class="gec-tag">${en ? 'voted 2025' : 'เคยโหวต 2025'}</span>` : ''}<b>${gecTok(x[0])}<small class="gec-b">${gecBaht(x[0], en)}</small></b><small>${N(x[1])} ${en ? (x[1] === 1 ? 'vote' : 'votes') : 'ครั้ง'}</small></li>`).join('')}</ol></div>`;
 
   const o3 = o && o.n && o.to >= GEC_POLLS.ge2025.end - 20 ? o : null;
-  return `<section class="gea gec">${head}${gecAboutCard(en)}${big}${gecVolumeCard(en, d, hNow, N)}${gecColumns([money, gecSupplyCard(en, N, pc), gecFeedCard(en, N, pc, hms), gecWinCard(en), cmp, gecDailyCard(en, N, d, o3, hNow), hourly, gecStretchCard(en, pc, o3), sizes, top, renderGECWallet(en, N, hm)])}</section>`;
+  return `<section class="gea gec">${head}${gecAboutCard(en)}${big}${gecVolumeCard(en, d, hNow, N)}${gecColumns([money, gecSupplyCard(en, N, pc), gecFeedCard(en, N, pc, hms), gecWinCard(en), cmp, gecDailyCard(en, N, d, o3, hNow), gecStretchCard(en, pc, o3), sizes, top, renderGECWallet(en, N, hm)])}</section>`;
 }
-/* ---- the last 48 hours as bars (tokens voted each hour) with the 24-hour figures and the busiest and quietest hour. It began as
-   part of a coin-market look for this page that the owner tried and put back; this card is the part they kept. ---- */
+/* ---- tokens voted as bars, from the first hour of voting to now: by the hour or by the day (a day = 24 hours from the opening, as
+   in the day-by-day card), with the busiest, quietest (not zero), average and current figures of what is shown. It began as part of a
+   coin-market look for this page that the owner tried and put back; this card is the part they kept. The bars scroll sideways,
+   opening on the newest. ---- */
+let gecVolMode = 'hour';
 function gecVolumeCard(en, d, hNow, N){
-  const p = GEC_POLLS.ge2026, g = gec24(d, hNow), hi = Math.floor(hNow - 1e-9), M = monthsShort();
-  const hrs = []; for(let h = Math.max(0, hi - 47); h <= hi; h++) hrs.push([h, d.hours[h] || 0]);
-  if(hrs.length < 3) return '';
-  // busiest and quietest over everything the chart shows (the 48 hours), so the gold bar is the tallest one in it
-  const live = hrs.filter(x => x[1] > 0), top = hrs.reduce((a, b) => b[1] > a[1] ? b : a, hrs[0]), low = live.length ? live.reduce((a, b) => b[1] < a[1] ? b : a, live[0]) : null;
+  const p = GEC_POLLS.ge2026, hi = Math.floor(hNow - 1e-9), M = monthsShort(), day = gecVolMode === 'day';
   const when = h => new Date(gecMs(p, p.start + h * 1200)), hm = h => `${String(when(h).getHours()).padStart(2, '0')}:00`;
-  const peak = Math.max(1, ...hrs.map(x => x[1]));
-  // a short label on the bar: whole tokens with a comma, one decimal under ten, nothing for an hour with no votes
+  const items = [];   // [index, tokens, label, small label]
+  if(day){ for(let k = 0; k * 24 <= hi; k++){ let v = 0; for(let h = k * 24; h < k * 24 + 24 && h <= hi; h++) v += d.hours[h] || 0; items.push([k, v, `${en ? 'Day' : 'วัน'} ${k + 1}`, `${when(k * 24).getDate()} ${M[when(k * 24).getMonth()]}`]); } }
+  else for(let h = 0; h <= hi; h++){ const t = when(h); items.push([h, d.hours[h] || 0, hm(h), t.getHours() === 0 || h === 0 ? `${t.getDate()} ${M[t.getMonth()]}` : '']); }
+  if(items.length < 3) return '';
+  const cur = items.length - 1, live = items.filter(x => x[1] > 0), top = items.reduce((a, b) => b[1] > a[1] ? b : a, items[0]), low = live.length ? live.reduce((a, b) => b[1] < a[1] ? b : a, live[0]) : null;
+  const avg = d.sum / Math.max(1, day ? hNow / 24 : hNow), peak = Math.max(1, top[1]);
   const lab = v => v <= 0 ? '' : v >= 10 ? Math.round(v).toLocaleString('en-US') : (Math.round(v * 10) / 10).toString();
-  const cols = hrs.map(([h, v], k) => { const t = when(h), pct = v / peak * 84, cls = h === top[0] ? ' is-hi' : h === hi ? ' is-now' : '';
+  const cols = items.map(([k, v, l1, l2], n) => { const pct = v / peak * 84, cls = k === top[0] ? ' is-hi' : n === cur ? ' is-now' : '';
     return `<div class="gec-vcol${cls}"><div class="gec-vplot"><i style="height:${pct.toFixed(1)}%"></i>${v > 0 ? `<em style="bottom:calc(${pct.toFixed(1)}% + 2px)">${lab(v)}</em>` : ''}</div>
-      <span>${hm(h)}</span><small>${t.getHours() === 0 || k === 0 ? `${t.getDate()} ${M[t.getMonth()]}` : ''}</small></div>`; }).join('');
+      <span>${l1}</span><small>${l2}</small></div>`; }).join('');
   const cell = (k, v, sub) => `<div><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
-  return `<div class="gea-card gec-vc"><h3 class="gec-h">${en ? 'Tokens voted, hour by hour' : 'โทเคนที่โหวตรายชั่วโมง'}</h3>
-    <div class="gec-stats4">${cell(en ? 'Last 24 h' : '24 ชม. ล่าสุด', gecTok(g), en ? 'tokens' : 'โทเคน')}${cell(en ? 'Last 24 h in baht' : '24 ชม. ล่าสุด เป็นเงิน', gecN(g * gecPrice), en ? 'baht' : 'บาท')}
-      ${cell(en ? 'Busiest hour (in the chart)' : 'ชั่วโมงที่โหวตมากสุด (ในกราฟ)', gecTok(top[1]), hm(top[0]))}${low ? cell(en ? 'Quietest hour (in the chart, not zero)' : 'ชั่วโมงที่โหวตน้อยสุด (ในกราฟ ไม่นับศูนย์)', gecTok(low[1]), hm(low[0])) : cell(en ? 'Quietest hour' : 'ชั่วโมงที่โหวตน้อยสุด', '–', '')}</div>
-    <p class="gec-cap"><span>${en ? 'Last 48 hours · scroll sideways for earlier' : '48 ชม. ล่าสุด · เลื่อนไปทางซ้ายดูย้อนหลัง'}</span><span><i class="hi"></i>${en ? 'busiest in this chart' : 'มากสุดในกราฟนี้'} <i class="now"></i>${en ? 'this hour, still running' : 'ชั่วโมงนี้ ยังไม่จบ'}</span></p>
-    <div class="gec-vbars" data-vbars><div class="gec-vin">${cols}</div></div>
+  const unit = day ? (en ? 'day' : 'วัน') : (en ? 'hour' : 'ชั่วโมง'), nameOf = x => day ? `${en ? 'Day' : 'วันที่'} ${x[0] + 1} · ${when(x[0] * 24).getDate()} ${M[when(x[0] * 24).getMonth()]}` : `${when(x[0]).getDate()} ${M[when(x[0]).getMonth()]} ${hm(x[0])}`;
+  return `<div class="gea-card gec-vc"><h3 class="gec-h">${en ? 'Tokens voted' : 'โทเคนที่โหวต'} ${day ? (en ? 'by day' : 'รายวัน') : (en ? 'by hour' : 'รายชั่วโมง')}</h3>
+    <div class="gea-seg gec-seg"><button class="${day ? '' : 'is-on'}" data-action="gec-volmode" data-id="hour">${en ? 'By hour' : 'รายชั่วโมง'}</button><button class="${day ? 'is-on' : ''}" data-action="gec-volmode" data-id="day">${en ? 'By day' : 'รายวัน'}</button></div>
+    <div class="gec-stats4">${cell(en ? `Busiest ${unit}` : `${unit}ที่โหวตมากสุด`, gecTok(top[1]), nameOf(top))}${low ? cell(en ? `Quietest ${unit} (not zero)` : `${unit}ที่โหวตน้อยสุด (ไม่นับศูนย์)`, gecTok(low[1]), nameOf(low)) : cell(en ? `Quietest ${unit}` : `${unit}ที่โหวตน้อยสุด`, '–', '')}
+      ${cell(en ? `Average per ${unit}` : `เฉลี่ยต่อ${unit}`, gecTok(avg), en ? 'since voting opened' : 'ตั้งแต่เปิดโหวต')}${cell(en ? (day ? 'Today so far' : 'This hour so far') : (day ? 'วันนี้ (ยังไม่จบ)' : 'ชั่วโมงนี้ (ยังไม่จบ)'), gecTok(items[cur][1]), nameOf(items[cur]))}</div>
+    <p class="gec-cap"><span>${en ? `From the opening · ${items.length} ${day ? 'days' : 'hours'} · scroll sideways` : `ตั้งแต่เปิดโหวต · ${items.length} ${day ? 'วัน' : 'ชั่วโมง'} · เลื่อนไปทางซ้ายดูย้อนหลัง`}</span><span><i class="hi"></i>${en ? 'tallest in this chart' : 'มากสุดในกราฟนี้'} <i class="now"></i>${en ? 'still running' : 'ยังไม่จบ'}</span></p>
+    <div class="gec-vbars" data-vbars><div class="gec-vin${day ? ' is-day' : ''}">${cols}</div></div>
   </div>`;
 }
 // the bars scroll sideways; a redraw keeps where the reader had scrolled to (the newest hour at the right edge until they move it)
@@ -30567,6 +30573,7 @@ function bindDelegatedEvents(){
         .catch(() => toast('ลบไม่ได้'));
     }
     else if(action==='nav-vote'){ state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; state.selectedId = null; render(); pushHistory(); window.scrollTo(0, 0); }
+    else if(action==='gec-volmode'){ gecVolMode = id === 'day' ? 'day' : 'hour'; gecVolX = null; gecDraw(); }
     else if(action==='gec-hours'){ gecHourMode = id === 'last24' ? 'last24' : 'first48'; gecDraw(); }
     else if(action==='gec-share'){
       const spec = gecShareSpec(id);   // still names the picture and its file
