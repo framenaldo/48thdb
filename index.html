@@ -22016,9 +22016,11 @@ function renderMeowAdopt(){
   const title = pet ? (en ? `${escapeHtml(pet.name)}’s home` : `บ้านของ ${escapeHtml(pet.name)}`) : (en ? 'Adopt a pixel cat' : 'รับเลี้ยงเหมียว');
   const sub = pet ? (en ? 'Feed, play, give her water — she roams every page.' : 'ให้อาหาร เล่นด้วย เติมน้ำ น้องเดินเล่นอยู่ทุกหน้า')
     : (en ? 'A little cat that lives on every page, learns your habits and chases mice. Free.' : 'แมวพิกเซลตัวเล็กที่อยู่ด้วยทุกหน้าของเว็บ จำเวลาของคุณได้ และไล่จับหนู · ฟรี');
+  const keep = meowSignedIn() ? (en ? 'Kept with your account — the same cat on every device you sign in on.' : 'เก็บไว้กับบัญชีของคุณ · ล็อกอินเครื่องไหนก็เจอน้องตัวเดิม')
+    : (en ? 'Sign in first and she follows you to every device.' : 'เข้าสู่ระบบก่อนรับเลี้ยง แล้วน้องจะตามไปทุกเครื่อง ไม่ต้องสร้างใหม่');
   return `<div class="meow-adopt" data-noloc>
     ${img ? `<img src="${img}" alt="" width="72" height="54">` : ''}
-    <div><b>${title}</b><small>${sub}</small></div>
+    <div><b>${title}</b><small>${sub}</small><small>${keep}</small></div>
     <button class="btn-add" data-action="open-meow">${pet ? (en ? 'Visit' : 'ไปหาน้อง') : (en ? 'Adopt' : 'รับเลี้ยง')}</button></div>`;
 }
 function renderProfile(){
@@ -28168,21 +28170,35 @@ function meowLoad(){
   try{ const s = JSON.parse(localStorage.getItem(MEOW_KEY) || 'null'); if(s && typeof s === 'object') return s; }catch(e){}
   return { v:1, pet:null, snacks:3, day:'', opens:0, home:false, saved:0 };
 }
-let _meowPush = 0;
+/* Her cloud copy is `users/<uid>.meow`. Signed in, there is ONE cat, the account's, on every device (a Home Screen or Dock
+   app keeps its own storage, so a new device starts empty and fetches her after sign-in). Two guards keep a device from
+   ever overwriting her: nothing goes up before the account's copy has been read (`_meowCloudRead`), and an empty cat is
+   never uploaded. */
+let _meowPush = 0, _meowCloudRead = false;
+const meowSignedIn = () => !!(typeof state !== 'undefined' && state.account && state.account.loggedIn);
 function meowSave(){
   if(!_meow) return;
   _meow.saved = meowNow();
   try{ localStorage.setItem(MEOW_KEY, JSON.stringify(_meow)); }catch(e){}
   clearTimeout(_meowPush);
   _meowPush = setTimeout(() => {
+    if(!_meow || !_meow.pet || (meowSignedIn() && !_meowCloudRead)) return;
     try{ if(typeof fbAuth !== 'undefined' && fbAuth.currentUser) fbDb.collection('users').doc(fbAuth.currentUser.uid).set({ meow:_meow }, { merge:true }).catch(() => {}); }catch(e){}
   }, 4000);
 }
-// a copy kept with the account wins when it is newer than the device's
+// after sign-in the account's cat is the cat: it replaces whatever this device holds, unless it is the same cat (then the newer copy
+// wins). A different cat found on the device is put aside, not lost. An account with no cat yet takes the device's.
 function meowFromAccount(m){
-  if(!m || typeof m !== 'object' || !(m.saved > ((_meow && _meow.saved) || 0))) return;
+  _meowCloudRead = true;
+  const mine = _meow && _meow.pet, theirs = m && typeof m === 'object' ? m.pet : null;
+  if(!theirs){ if(mine) meowSave(); return; }
+  const same = mine && mine.born === theirs.born && mine.name === theirs.name;
+  if(same && !(m.saved > ((_meow && _meow.saved) || 0))){ meowSave(); return; }
+  if(mine && !same){ try{ localStorage.setItem(MEOW_KEY + '-aside', JSON.stringify(_meow)); }catch(e){} }
   _meow = m; try{ localStorage.setItem(MEOW_KEY, JSON.stringify(m)); }catch(e){}
+  if(!same && typeof toast === 'function') toast(isEN() ? `${theirs.name} came along from your account` : `น้อง${theirs.name}ตามมาจากบัญชีของคุณแล้ว`);
   meowMount();
+  if(typeof state !== 'undefined' && state.view === 'profile' && typeof render === 'function') render();
 }
 /* there is no bedtime. Like a real cat she sleeps 12–16 hours a day in bouts of about an hour, mostly in the middle of
    the day; she is most awake at dusk and dawn (cats are crepuscular) and often up at night to run and play. How likely
@@ -29785,6 +29801,8 @@ function closeMeowSheet(){
 function openMeowSheet(){
   closeShareSheet(); closeMeowSheet();
   if(!_meow) _meow = meowLoad();
+  // signed in: her account's cat is still being fetched, so do not start adopting a new one
+  if(meowSignedIn() && !_meowCloudRead && !_meow.pet){ toast(isEN() ? 'Fetching your cat from your account…' : 'กำลังเรียกน้องจากบัญชีของคุณ… รอสักครู่'); return; }
   const el = document.createElement('div'); el.className = 'share-sheet meow-sheet';
   _meowSheet = { el, tray:false, step:_meow.pet ? 'home' : 'pick', hs:{ sp:'orange', col:'#E4457E', taps:0, name:'' } };
   document.body.appendChild(el);
@@ -31124,7 +31142,7 @@ async function init(){
     if(user && !user.isAnonymous){
       state.account = { name: user.displayName || user.email || 'ผู้ใช้', email: user.email || '', loggedIn:true, uid:user.uid,
         photo: user.photoURL || null };
-      noteSignup(user);
+      noteSignup(user); _meowCloudRead = false;
     } else {
       state.account = null;
     }
@@ -31166,7 +31184,7 @@ async function init(){
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;
     if(state.account && oshiData.avatar) state.account.avatar = oshiData.avatar;
-    if(state.account && oshiData.meow) meowFromAccount(oshiData.meow);
+    if(state.account && state.account.loggedIn) meowFromAccount(oshiData.meow || null);
     // the reader's own arrangement; a guest or someone signed out gets the site as it comes
     const lay = state.account ? (oshiData.layout || null) : null;
     if(JSON.stringify(lay) !== JSON.stringify(_authKnown ? state.layout : _bootLayout)) changed = true;
