@@ -339,7 +339,7 @@ against the votes). A sales channel is a wallet the vault gave 1,000 tokens or m
 (`GEC_CHAN_MIN`): the vault also sends a few tokens straight to fans, who are buyers.
 
 
-**Hourly volume card.** Under the headline the vote tab has a card of the last 48 hours as bars (tokens voted each hour) with the 24-hour tokens and baht and the busiest and quietest hour of the day (`gecVolumeCard`; gold = busiest of the last 24 h, pink = the hour still running). It is what is left of a stock-market and then coin-exchange look for the page (ticker tape, GE6/THB pair header, mono numbers, dark panel) that the owner previewed and put back ("ตัวเลขมันดูยาก") — don't bring that theme back unasked; the page keeps its normal look.
+**Hourly volume card.** Under the headline the vote tab has a card of the last 48 hours as bars (tokens voted each hour) with the 24-hour tokens and baht and the busiest and quietest hour of the day — the quietest not counting hours with no votes (`gecVolumeCard`; gold = busiest of the last 24 h, pink = the hour still running). Each bar carries its token count above it and its hour (and date at midnight) under it; 48 columns of 36 px scroll sideways, opening on the newest hour, and a redraw keeps where the reader scrolled to (`gecVolX`, `gecVolSet`). It is what is left of a stock-market and then coin-exchange look for the page (ticker tape, GE6/THB pair header, mono numbers, dark panel) that the owner previewed and put back ("ตัวเลขมันดูยาก") — don't bring that theme back unasked; the page keeps its normal look.
 ## House rules
 
 **Sources.** For current BNK48 members, bnk48.com wins outright — overwrite what
