@@ -33,4 +33,6 @@ if (missing.length && !process.argv.includes('--no-wait')) {
 // a member's post that is on the app but not on the site; ones from graduates or accounts not on the list are not kept by the site on purpose
 console.log(`asked ${nums.length} numbers (${lo}…${top + reach}): ${missing.length} member page(s) the site does not hold${errs.length ? `, ${errs.length} could not be asked` : ''}`);
 for (const f of missing) console.log(`  ${f.n}  iAM member ${f.iam}  ${f.locked ? 'locked' : f.ago}`);
+// most numbers could not be asked (the app refusing this machine, a network fault): that proves nothing, so it is a failure too
+if (errs.length > nums.length * .2) { console.log('too many numbers could not be asked; the check is inconclusive'); process.exit(2); }
 process.exit(missing.length ? 1 : 0);

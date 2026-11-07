@@ -228,7 +228,7 @@ app's public post pages (`tlScan`, its own 5-minute cron — see worker/README.m
 there is no list of posts, only numbers shared with lives and everything else.
 A card shows the first three lines and one small picture and opens the post on
 iAM48; posts locked to the app ("Exclusive on iAM48") are a strip of names only and
-their content is never asked for. Never show or keep the gift senders' pictures. The walk once stalled twelve hours at a gap in the numbers (7 Nov 2026), not at a Cloudflare limit — see `blind` in `tlScan` and worker/README.md; a change to the Worker reaches visitors only when it is deployed with wrangler.
+their content is never asked for. Never show or keep the gift senders' pictures. The walk once stalled twelve hours at a gap in the numbers (7 Nov 2026), not at a Cloudflare limit — see `blind` in `tlScan` and worker/README.md; a change to the Worker reaches visitors only when it is deployed with wrangler. A GitHub Actions job (`.github/workflows/check-timeline.yml`, 09:00, 15:00 and 21:00 Thai time) runs `node scripts/check-timeline.mjs`, which compares the site's posts with the app's pages and fails — so GitHub emails the owner — when a listed member's post is still missing seven minutes after first seen; run it by hand any time.
 
 ## Notifications: แจ้งเตือนงาน
 
