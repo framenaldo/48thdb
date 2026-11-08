@@ -15064,14 +15064,14 @@ const wallOn = bgPreview('wall'), boothOn = bgPreview('booth');
 // the stats page's stage wall, the profile's desk and the home page's backdrop are on for everyone too (=off turns one off on a device)
 const stageOn = bgPreview('stage'), deskOn = bgPreview('desk'), homeOn = bgPreview('home');
 function cdShopSync(){
-  const d = document.documentElement.dataset;
-  if(wallOn && state.view === 'browse') d.wall = '1'; else delete d.wall;
-  if(boothOn && state.view === 'shop') d.booth = '1'; else delete d.booth;
-  if(stageOn && state.view === 'stats') d.stage = '1'; else delete d.stage;
-  if(deskOn && state.view === 'profile') d.desk = '1'; else delete d.desk;
-  if(homeOn && state.view === 'feed') d.home = '1'; else delete d.home;
-  if(cdShopOn && state.view === 'discography') d.cdshop = '1'; else delete d.cdshop;
-  if(boardOn && state.view === 'calendar') d.board = '1'; else delete d.board;
+  const d = document.documentElement.dataset, sc = typeof bgScenes === 'function' ? bgScenes() : true;
+  if(sc && wallOn && state.view === 'browse') d.wall = '1'; else delete d.wall;
+  if(sc && boothOn && state.view === 'shop') d.booth = '1'; else delete d.booth;
+  if(sc && stageOn && state.view === 'stats') d.stage = '1'; else delete d.stage;
+  if(sc && deskOn && state.view === 'profile') d.desk = '1'; else delete d.desk;
+  if(sc && homeOn && state.view === 'feed') d.home = '1'; else delete d.home;
+  if(sc && cdShopOn && state.view === 'discography') d.cdshop = '1'; else delete d.cdshop;
+  if(sc && boardOn && state.view === 'calendar') d.board = '1'; else delete d.board;
 }
 const gecHour = (p, b) => Math.floor((b - p.start) * GEC_BLOCK / 3600);
 const gecMs = (p, b) => (p.t0 + (b - p.start) * GEC_BLOCK) * 1000;
@@ -21410,7 +21410,7 @@ function visitsPages(D){
   const row = (label, n, t, cls, go) => `<div class="vis-row${cls ? ' ' + cls : ''}${go ? ' is-link' : ''}"${go ? ` role="link" tabindex="0" data-action="open-${go[0]}" data-id="${escapeAttr(go[1])}"` : ''}><span>${escapeHtml(label)}</span><em>${n.toLocaleString('en-US')}</em><i><b style="width:${(n / t * 100).toFixed(1)}%"></b></i></div>`;
   const used = rows.filter(r => r[1] > 0), none = rows.filter(r => !r[1]);
   return `<div><p class="vis-h">หน้าที่เปิด · 7 วัน</p>
-    ${used.map(([p, n], k) => row(PAGE_NAMES[p] || p, n, top, k === 0 ? 'is-most' : k === used.length - 1 ? 'is-least' : '')).join('')}
+    ${used.map(([p, n], k) => row(PAGE_NAMES[p] || bgLabel(p) || p, n, top, k === 0 ? 'is-most' : k === used.length - 1 ? 'is-least' : '')).join('')}
     ${none.length ? `<p class="vis-note"><b>ไม่มีใครเปิดเลย:</b> ${none.map(([p]) => escapeHtml(PAGE_NAMES[p] || p)).join(' · ')}</p>` : ''}
     ${since && Date.now() - since.getTime() < 7 * 86400000 ? `<p class="vis-note">เริ่มนับเมื่อ ${since.getDate()} ${M[since.getMonth()]} ยังไม่ครบ 7 วัน</p>` : ''}</div>
   ${D.pageItems && D.pageItems.length ? `<div><p class="vis-h">สมาชิกและงานที่เปิดดูบ่อย · ${day ? '24 ชั่วโมง' : '7 วัน'}</p>
@@ -21461,7 +21461,10 @@ const LAYOUT_ZONES = {
   ],
 };
 const LAYOUT_BG = [
-  { k:'', th:'ชมพู-มิ้นต์', en:'Pink & mint', sw:'linear-gradient(135deg,#FBD9E7,#D3F1E6)' },
+  // the page scenes (CD shop, cork board, gallery wall…) are the default; every other choice turns them off for that reader.
+  // 'plain' is the old pink & mint, kept as a choice of its own
+  { k:'scene', th:'ฉากประจำหน้า', en:'Page scenes', img:'bg/home-collage-2.jpg', scene:true },
+  { k:'plain', th:'ชมพู-มิ้นต์ (เรียบ)', en:'Pink & mint (plain)', sw:'linear-gradient(135deg,#FBD9E7,#D3F1E6)' },
   { k:'sky', th:'ฟ้า', en:'Sky', sw:'linear-gradient(135deg,#C9E4FF,#F3E8FF)' },
   { k:'peach', th:'พีช', en:'Peach', sw:'linear-gradient(135deg,#FFE7C2,#FFD1DC)' },
   { k:'lilac', th:'ม่วง', en:'Lilac', sw:'linear-gradient(135deg,#E6D9FF,#FBD9EF)' },
@@ -21574,13 +21577,24 @@ function layoutChrome(){
   const main = document.getElementById('main');
   main && main.insertAdjacentHTML('beforeend', `<button class="lay-addzone" data-action="lay-sheet">＋ ${en ? 'Add a zone' : 'เพิ่มโซน'}${off ? ` · ${off} ${en ? 'available' : 'โซนที่ยังไม่ได้ใส่'}` : ''}</button>`);
 }
+const bgChoice = () => myLayout().bg || 'scene';
+const bgScenes = () => bgChoice() === 'scene';   // a guest, or anyone who has not picked a background of their own
 function applyBackground(){
-  const bg = myLayout().bg || '', b = LAYOUT_BG.find(x => x.k === bg);
+  const bg = bgChoice(), b = LAYOUT_BG.find(x => x.k === bg), own = b && !b.scene && b.k !== 'plain';
   const root = document.documentElement;
-  if(b && b.k) root.dataset.bg = b.k; else delete root.dataset.bg;
-  if(b && b.img){ root.dataset.bgPhoto = '1'; root.style.setProperty('--bg-photo', `url(${b.img})`); }
+  if(own) root.dataset.bg = b.k; else delete root.dataset.bg;
+  if(own && b.img){ root.dataset.bgPhoto = '1'; root.style.setProperty('--bg-photo', `url(${b.img})`); }
   else { delete root.dataset.bgPhoto; root.style.removeProperty('--bg-photo'); }
+  cdShopSync();
+  // one anonymous count a day per device of which background a signed-in reader is on (the owner's visitors card lists it)
+  if(canLayout()){ try{ const day = new Date().toISOString().slice(0, 10), was = localStorage.getItem('48thdb-bgnow'); if(was !== day + bg){ localStorage.setItem('48thdb-bgnow', day + bg); bgHit('bg-now', bg); } }catch(e){} }
 }
+// the owner's visitors card counts these as screens: bg-pick:<key> each time a swatch is tapped, bg-now:<key> once a day per signed-in device
+function bgHit(kind, key){
+  if(location.hostname !== '48thdb.com' || state.isOwner) return;
+  try{ fetch(`${HIT_API}?p=${encodeURIComponent(kind + ':' + key)}&i=`, { mode:'no-cors', keepalive:true, cache:'no-store' }).catch(() => {}); }catch(e){}
+}
+const bgLabel = p => { const m = /^bg-(pick|now):(.+)$/.exec(p), b = m && LAYOUT_BG.find(x => x.k === m[2]); return b ? `${m[1] === 'pick' ? 'เลือกพื้นหลัง' : 'ใช้พื้นหลัง'} · ${b.th}` : ''; };
 /* The dashboard's tiles are arranged one by one: layout.dash = { order, hidden } over these
    keys. Each shows ‹ eye › while arranging; the order is CSS `order` in the dashboard's grid. */
 const DASH_KINDS = [{ k:'quiz', th:'หาโอชิจากดวง', en:'Find your oshi' }, { k:'cal', th:'งานใน 7 วัน', en:'Events this week' }, { k:'shop', th:'ร้านค้า', en:'Shop' },
@@ -21991,7 +22005,7 @@ function renderMyStyleCard(){
     <div class="lay-slots">${keys.map(slot).join('')}</div>
     ${pick != null ? `<div class="lay-pickrow">${NAV_CATALOG.filter(o => o.value !== 'profile').map(o => `<button class="chip${keys[pick] === o.value ? ' active' : ''}" data-action="lay-nav-pick" data-id="${o.value}">${escapeHtml(en ? o.en : o.th)}</button>`).join('')}</div>` : ''}
     <p class="vis-h">${en ? 'Background' : 'ธีมพื้นหลัง'}</p>
-    <div class="lay-sw">${LAYOUT_BG.map(b => `<button class="lay-swatch${(L.bg || '') === b.k ? ' is-on' : ''}" style="background:${b.img ? `center/cover url(${b.img})` : b.sw}" data-action="lay-bg" data-id="${b.k}" aria-label="${escapeAttr(en ? b.en : b.th)}" title="${escapeAttr(en ? b.en : b.th)}"></button>`).join('')}</div>
+    <div class="lay-sw">${LAYOUT_BG.map(b => `<button class="lay-swatch${(L.bg || 'scene') === b.k ? ' is-on' : ''}" style="background:${b.img ? `center/cover url(${b.img})` : b.sw}" data-action="lay-bg" data-id="${b.k}" aria-label="${escapeAttr(en ? b.en : b.th)}" title="${escapeAttr(en ? b.en : b.th)}"></button>`).join('')}</div>
     <p class="vis-h">${en ? 'Colour of this page' : 'สีหน้าโปรไฟล์'}</p>
     <div class="lay-sw">${LAYOUT_ACC.map(a => { const km = a.k === 'oshi' && state.kamiOshi ? getMember(state.kamiOshi) : null;
       const c = a.k === 'oshi' ? (km ? getGroup(km.groupId).color : '#B9AFC2') : (a.c || 'var(--paper-dim)');
@@ -30744,7 +30758,7 @@ function bindDelegatedEvents(){
     }
     else if(action==='ask-ai') askAI(state.query);
     else if(action==='ask-example'){ state.query = id; const box = document.getElementById('search-input'); if(box) box.value = id; renderMain(); replaceHistory(); askAI(id); }
-    else if(action==='lay-bg') setLayout({ bg:id });
+    else if(action==='lay-bg'){ bgHit('bg-pick', id); setLayout({ bg:id }); }
     else if(action==='lay-acc') setLayout({ acc:id });
     else if(action==='lay-reset-all'){ if(confirm(isEN() ? 'Put the whole site back as it comes?' : 'คืนค่าเดิมทั้งหมด ทั้งหน้าแรก หน้าโปรไฟล์ เมนูล่าง และธีม?')){ state.layout = null; state.navPick = null; saveLayout(); const y = window.scrollY || 0; render(); scrollPageTo(y); } }
     else if(action==='signups-refresh'){ el.textContent = 'กำลังโหลด…'; loadSignups(); }

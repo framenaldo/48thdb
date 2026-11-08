@@ -418,3 +418,5 @@ open `/?sw=off`. `node .claude/check-site.mjs` walks every view in three languag
 the sheets and the 3D poster headlessly and reports page errors. Walk every view in all three languages, plus a member sheet and
 an event sheet, and check the console is clean. Take a screenshot for anything
 visual — the owner reviews on a phone, so check it at phone width.
+
+**Background choice (My layout).** The first swatch, "ฉากประจำหน้า" (`bg:'scene'`, also what an empty `bg` means), is the default: the dressed pages' scenes show. Any other swatch (`plain` is the old pink & mint, or a colour/photo) turns every scene off for that reader (`bgScenes()` gates the `data-*` flags in `cdShopSync`, which `applyBackground` calls). Usage is counted anonymously through /hit: `bg-pick:<key>` per tap and `bg-now:<key>` once a day per signed-in device (`bgHit`); the owner's visitors card labels them with `bgLabel`. Counts start from the day this shipped.
