@@ -2505,6 +2505,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
 
   /* today's events stand out from every other card: one even pink-to-teal rim (a poster's own colour
      can be as quiet as olive), a soft pink glow, the poster lifted in a white frame */
+  /* preview: today's events as a swipeable row; the next card shows at the side so it is clear there is more */
+  .today-slide{ display:flex; align-items:stretch; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    margin:0 -2px; padding:2px 2px 14px; }
+  .today-slide::-webkit-scrollbar{ display:none; }
+  .today-slide > .today-hero{ flex:0 0 88%; margin:0; scroll-snap-align:start; }
+  .today-slide-dots{ display:flex; justify-content:center; gap:6px; margin:-4px 0 12px; }
+  .today-slide-dots i{ width:7px; height:7px; border-radius:50%; background:var(--line); transition:background .2s, transform .2s; }
+  .today-slide-dots i.on{ background:var(--bnk); transform:scale(1.2); }
   .today-hero{
     position:relative; overflow:hidden; margin:0 0 14px;
     border-radius:22px; border:0;
@@ -15068,6 +15076,7 @@ const boardOn = bgPreview('board');
 const wallOn = bgPreview('wall'), boothOn = bgPreview('booth');
 // the stats page's stage wall, the profile's desk and the home page's backdrop are on for everyone too (=off turns one off on a device)
 const stageOn = bgPreview('stage'), deskOn = bgPreview('desk'), homeOn = bgPreview('home');
+todaySlideOn();   // reads ?evslide= while the address still has it
 function cdShopSync(){
   const d = document.documentElement.dataset, sc = typeof bgScenes === 'function' ? bgScenes() : true;
   if(sc && wallOn && state.view === 'browse') d.wall = '1'; else delete d.wall;
@@ -19896,7 +19905,10 @@ function renderFeed(){
     ${nowOn.length ? `
     <section class="feed-block today-hero-block">
       <h2 class="section-label">งานวันนี้</h2>
-      ${nowOn.map(e => renderTodayHero(e, iso)).join('')}
+      ${todaySlideOn() && nowOn.length > 1
+        ? `<div class="today-slide" data-today-slide>${nowOn.map(e => renderTodayHero(e, iso)).join('')}</div>
+           <div class="today-slide-dots" aria-hidden="true">${nowOn.map((_, k) => `<i${k ? '' : ' class="on"'}></i>`).join('')}</div>`
+        : nowOn.map(e => renderTodayHero(e, iso)).join('')}
     </section>` : ''}
     ${renderFeedFanFest(mine)}
     ${geLive ? gecHomeCard(isEN()) : ''}
@@ -25045,7 +25057,7 @@ function renderMain(){
   attachMainEvents();
   startBirthdayFireworks();
   geHeroFx();
-  requestAnimationFrame(bindEdgeFades);   // it measures the chips, which forces a layout; after the rest of this draw there is only one
+  requestAnimationFrame(bindEdgeFades); requestAnimationFrame(bindTodaySlides);   // it measures the chips, which forces a layout; after the rest of this draw there is only one
   bindPosterZoom();
   bindOrgZoom();
   applyPageMeta();
@@ -30365,6 +30377,18 @@ function goBack(fallback){
 // styling is muted for as long as anything is scrolling.
 /* The mask has to know which side still has chips past it, which only the
    scroll position can say. */
+/* PREVIEW (not on for anyone): ?evslide=on shows today's events as a row of cards to swipe instead of a stack; ?evslide=off goes back. */
+function todaySlideOn(){ try{ const q = new URLSearchParams(location.search).get('evslide'); if(q === 'on') localStorage.setItem('48thdb-evslide', 'on'); else if(q === 'off') localStorage.removeItem('48thdb-evslide'); return localStorage.getItem('48thdb-evslide') === 'on'; }catch(e){ return false; } }
+function bindTodaySlides(){
+  document.querySelectorAll('[data-today-slide]').forEach(row => {
+    if(row._sl) return; row._sl = true;
+    const dots = row.parentNode.querySelectorAll('.today-slide-dots i');
+    row.addEventListener('scroll', () => {
+      const k = Math.round(row.scrollLeft / Math.max(1, row.scrollWidth - row.clientWidth) * (dots.length - 1));
+      dots.forEach((d, i) => d.classList.toggle('on', i === k));
+    }, { passive:true });
+  });
+}
 function bindEdgeFades(){
   document.querySelectorAll('.bday-next').forEach(row => {
     if(row._edge) return; row._edge = true;   // kept through a redraw: already watched
