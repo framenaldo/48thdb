@@ -5171,6 +5171,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .qz-why li{ position:relative; padding-left:24px; font-size:14px; line-height:1.5; }
   .qz-why li::before{ content:'✓'; position:absolute; left:0; top:0; width:18px; height:18px; border-radius:50%; display:grid; place-items:center;
     font-size:11px; font-weight:800; color:#fff; background:var(--c); }
+  .qz-why-b{ all:unset; cursor:pointer; box-sizing:border-box; }
+  .qz-why-b:focus-visible{ outline:2px solid var(--c); outline-offset:2px; border-radius:4px; }
+  .qz-why-q{ display:inline-grid; place-items:center; width:16px; height:16px; margin-left:2px; border-radius:50%; font-size:10px; font-weight:800; color:var(--ink); background:var(--line); vertical-align:1px; }
+  .qz-ex{ display:none; margin:6px 0 2px; padding:9px 11px; border-radius:12px; font-size:12.5px; line-height:1.55; color:var(--ink-soft); background:var(--card); border:1px solid var(--line); }
+  .qz-why li.is-open .qz-ex{ display:block; }
+  .qz-ex-g{ display:grid; gap:5px; margin-top:8px; }
+  .qz-ex-r{ display:flex; gap:5px; flex-wrap:wrap; }
+  .qz-ex-p{ padding:2px 9px; border-radius:99px; font-size:12px; font-weight:700; color:var(--ink); background:var(--line); }
+  .qz-ex-p.is-on{ color:#fff; background:var(--c); }
   .qz-acts{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:10px; margin:16px 0 10px; }
   .qz-more-h{ margin:20px 2px 10px; }
   .qz-run{ display:flex; align-items:center; gap:12px; width:100%; margin:0 0 9px; padding:10px 14px 10px 10px; text-align:left; font:inherit; color:var(--ink); cursor:pointer;
@@ -19385,22 +19394,42 @@ function qzRead(iso, night){
   const yr = cny && md < +cny ? y - 1 : y;
   return { day, sign, animal: ((yr - 4) % 12 + 12) % 12 };
 }
+
+/* what a reason means, shown when the reader taps it (id = the 4th item of a qzTies entry) */
+const QZ_ANIM_TH = QZ_ANIMALS.map(a => a[0]), QZ_ANIM_EN = QZ_ANIMALS.map(a => a[1]);
+function qzExplain(id, r, en){
+  const A = en ? QZ_ANIM_EN : QZ_ANIM_TH, own = r && r.her ? r.her.animal : -1;
+  const grp = [[0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]];
+  const six = [[0, 1], [2, 11], [3, 10], [4, 9], [5, 8], [6, 7]];
+  const pill = (list, on) => list.map(i => `<span class="qz-ex-p${on.includes(i) ? ' is-on' : ''}">${A[i]}</span>`).join('');
+  if(id === 'trine') return (en ? 'Chinese astrology splits the 12 year animals into four groups of three, four years apart. Two people from the same group, in different years, are said to back each other up.' : 'ตำราจีนแบ่งปีนักษัตร 12 ปีเป็น 4 กลุ่ม กลุ่มละ 3 ปี ห่างกันทีละ 4 ปี คนที่อยู่กลุ่มเดียวกันแต่เกิดคนละปี เชื่อกันว่าหนุนกัน เกื้อกูลกัน')
+    + `<span class="qz-ex-g">${grp.map(g => `<span class="qz-ex-r">${pill(g, [own])}</span>`).join('')}</span>`;
+  if(id === 'six') return (en ? 'Liu He, the “six harmonies”: six pairs of year animals that are said to be true friends.' : 'ลิ่วเหอ (หกคู่ผสาน) คือปีนักษัตรหกคู่ที่เชื่อกันว่าเป็นมิตรแท้ต่อกัน')
+    + `<span class="qz-ex-g">${six.map(g => `<span class="qz-ex-r">${pill(g, [own])}</span>`).join('')}</span>`;
+  if(id === 'sameyear') return en ? 'Born under the same year animal, so you tend to see things alike.' : 'เกิดปีนักษัตรเดียวกัน เชื่อกันว่าคิดคล้ายกัน เข้าใจกันง่าย';
+  if(id === 'friend') return en ? 'In Thai Taksa astrology each day of the week has a number. Some pairs of days are “friends” (คู่มิตร): 1–5, 2–4, 3–6 and 7–8. It is for fun, not a prediction.' : 'ตำราทักษาไทยให้วันเกิดแต่ละวันมีเลขประจำ (อาทิตย์ 1 จันทร์ 2 อังคาร 3 พุธกลางวัน 4 พฤหัส 5 ศุกร์ 6 เสาร์ 7 พุธกลางคืน 8) เลขที่เป็นคู่มิตรคือ 1–5, 2–4, 3–6 และ 7–8 เชื่อกันว่าเป็นมิตรกัน';
+  if(id === 'couple') return en ? 'Another pairing in Taksa: คู่สมพล, days that lend each other strength — 1–6, 2–8, 3–5 and 4–7. It is for fun, not a prediction.' : 'อีกการจับคู่ในตำราทักษา คู่สมพลคือวันเกิดที่ส่งพลังให้กัน ได้แก่ 1–6, 2–8, 3–5 และ 4–7 เชื่อกันว่าเสริมกัน';
+  if(id === 'sameday') return en ? 'You were born on the same day of the week, so you share the same Taksa day.' : 'เกิดวันเดียวกันในสัปดาห์ จึงมีวันทักษาเดียวกัน เชื่อกันว่าเข้าใจกันง่าย';
+  if(id === 'signel') return en ? 'Each Thai zodiac sign belongs to one of four elements — fire, earth, air, water. Signs of the same element are said to share a temperament.' : 'ราศีแต่ละราศีอยู่ในหนึ่งในสี่ธาตุ คือ ไฟ ดิน ลม น้ำ ราศีธาตุเดียวกันเชื่อกันว่านิสัยใจคอคล้ายกัน';
+  if(id === 'mates') return en ? 'Some elements complement each other: fire with air, and earth with water.' : 'บางธาตุเสริมกัน คือ ไฟกับลม และดินกับน้ำ';
+  return '';
+}
 // what ties two readings, best first; foes come back as a negative score only
 function qzTies(a, b){
   const out = [];
   let score = 0;
   const p = qzPair(a.day.n, b.day.n);
-  if(p === 'friend'){ score += 3; out.push(['day', 'คู่มิตรตามตำราทักษา', 'Friend days in Thai astrology (ทักษา)']); }
-  else if(p === 'couple'){ score += 3; out.push(['day', 'คู่สมพล วันเกิดที่ส่งพลังให้กัน', 'Days that lend each other strength in Thai astrology (คู่สมพล)']); }
-  else if(p === 'same'){ score += 1.5; out.push(['day', 'เกิดวันเดียวกัน เข้าใจกันง่าย', 'Born on the same day of the week']); }
+  if(p === 'friend'){ score += 3; out.push(['day', 'คู่มิตรตามตำราทักษา', 'Friend days in Thai astrology (ทักษา)', 'friend']); }
+  else if(p === 'couple'){ score += 3; out.push(['day', 'คู่สมพล วันเกิดที่ส่งพลังให้กัน', 'Days that lend each other strength in Thai astrology (คู่สมพล)', 'couple']); }
+  else if(p === 'same'){ score += 1.5; out.push(['day', 'เกิดวันเดียวกัน เข้าใจกันง่าย', 'Born on the same day of the week', 'sameday']); }
   else if(p === 'foe') score -= 2;
   const x = a.animal, y = b.animal, gap = ((x - y) % 12 + 12) % 12;
-  if(x !== y && gap % 4 === 0){ score += 3; out.push(['year', 'สามประสาน ปีที่หนุนกัน', 'A three-way harmony of years']); }
-  else if((x + y) % 12 === 1){ score += 3; out.push(['year', 'คู่ลิ่วเหอ ปีที่เป็นมิตรแท้', 'Years that are true friends']); }
-  else if(x === y){ score += 1.5; out.push(['year', 'ปีนักษัตรเดียวกัน', 'The same year animal']); }
+  if(x !== y && gap % 4 === 0){ score += 3; out.push(['year', 'สามประสาน ปีที่หนุนกัน', 'A three-way harmony of years', 'trine']); }
+  else if((x + y) % 12 === 1){ score += 3; out.push(['year', 'คู่ลิ่วเหอ ปีที่เป็นมิตรแท้', 'Years that are true friends', 'six']); }
+  else if(x === y){ score += 1.5; out.push(['year', 'ปีนักษัตรเดียวกัน', 'The same year animal', 'sameyear']); }
   else if(gap === 6) score -= 2;
-  if(a.sign[3] === b.sign[3]){ score += 2; out.push(['sign', `ราศีธาตุ${QZ_EL[a.sign[3]][0]}เหมือนกัน`, `Both ${QZ_EL[a.sign[3]][1].toLowerCase()} signs`]); }
-  else if(QZ_MATES[a.sign[3]] === b.sign[3]){ score += 1.5; out.push(['sign', `ธาตุ${QZ_EL[a.sign[3]][0]}กับธาตุ${QZ_EL[b.sign[3]][0]} เสริมกัน`, `${QZ_EL[a.sign[3]][1]} and ${QZ_EL[b.sign[3]][1].toLowerCase()} feed each other`]); }
+  if(a.sign[3] === b.sign[3]){ score += 2; out.push(['sign', `ราศีธาตุ${QZ_EL[a.sign[3]][0]}เหมือนกัน`, `Both ${QZ_EL[a.sign[3]][1].toLowerCase()} signs`, 'signel']); }
+  else if(QZ_MATES[a.sign[3]] === b.sign[3]){ score += 1.5; out.push(['sign', `ธาตุ${QZ_EL[a.sign[3]][0]}กับธาตุ${QZ_EL[b.sign[3]][0]} เสริมกัน`, `${QZ_EL[a.sign[3]][1]} and ${QZ_EL[b.sign[3]][1].toLowerCase()} feed each other`, 'mates']); }
   return { score, out };
 }
 /* ดวงวันประกาศผล — shirt colours by ทักษา. Round the wheel 1 2 3 4 7 5 8 6 from
@@ -19548,7 +19577,7 @@ function qzChips(r, en){
 }
 function qzMatchCard(r, rank){
   const en = isEN(), m = r.m, g = getGroup(m.groupId);
-  const why = r.ties.out.map(t => en ? t[2] : t[1]);
+  const why = r.ties.out.map(t => en ? t[2] : t[1]), whyId = r.ties.out.map(t => t[3] || '');
   if(r.els.includes(r.top)) why.push(en ? `${QZ_EL[r.top][3][0].toUpperCase() + QZ_EL[r.top][3].slice(1)}, the way you like` : `${QZ_EL[r.top][2]} ตรงกับแบบที่คุณชอบ`);
   const trait = `${en ? `Born on a ${r.her.day.en}: ` : `คนเกิดวัน${r.her.day.th}: `}${r.her.day.tr[en ? 1 : 0]}`;
   if(rank) return `<button class="qz-run" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
@@ -19559,7 +19588,7 @@ function qzMatchCard(r, rank){
     <h2 class="qz-name">${escapeHtml(nickName(m))}</h2>
     <p class="qz-sub">${escapeHtml(g.name)}${m.gen ? ` · ${en ? 'Gen ' + m.gen : 'รุ่น ' + m.gen}` : ''}</p>
     <div class="qz-chips">${qzChips(r.her, en)}</div>
-    <ul class="qz-why">${why.slice(0, 4).map(w => `<li>${escapeHtml(w)}</li>`).join('')}<li>${escapeHtml(trait)}</li></ul>
+    <ul class="qz-why">${why.slice(0, 4).map((w, i) => { const ex = whyId[i] ? qzExplain(whyId[i], r, en) : ''; return ex ? `<li class="has-ex"><button class="qz-why-b" data-action="qz-why" aria-expanded="false">${escapeHtml(w)} <span class="qz-why-q" aria-hidden="true">?</span></button><span class="qz-ex">${ex}</span></li>` : `<li>${escapeHtml(w)}</li>`; }).join('')}<li>${escapeHtml(trait)}</li></ul>
     <div class="qz-acts"><button class="qz-go" data-action="open-member" data-id="${m.id}">${en ? 'Open her profile' : 'ดูโปรไฟล์'}</button>
       <button class="qz-go is-ghost" data-action="quiz-share">${ICONS.share}${en ? 'Share' : 'แชร์ผล'}</button></div>
   </article>`;
@@ -30720,6 +30749,7 @@ function bindDelegatedEvents(){
       state.query = '';
       render(); pushHistory(); window.scrollTo(0, 0);
     }
+    else if(action === 'qz-why'){ const li = el.closest('li'); if(li){ const on = li.classList.toggle('is-open'); el.setAttribute('aria-expanded', String(on)); } }
     else if(action.startsWith('quiz-')) quizAction(action, id);
     else if(action==='nav-gallery'){
       state.view = 'gallery';
