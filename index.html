@@ -2507,9 +2507,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      can be as quiet as olive), a soft pink glow, the poster lifted in a white frame */
   /* preview: today's events as a swipeable row; the next card shows at the side so it is clear there is more */
   .today-slide{ display:flex; align-items:stretch; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;
-    margin:0 -20px; padding:2px 20px 14px; scroll-padding-left:20px; }   /* runs out to the screen's edge (main's side padding is 20px), so the next card is cut by the screen, not by an invisible wall */
+    margin:0 -20px -10px; padding:2px 20px 24px; scroll-padding-left:20px; }   /* runs out to the screen's edge (main's side padding is 20px), so the next card is cut by the screen, not by an invisible wall */
   .today-slide::-webkit-scrollbar{ display:none; }
-  .today-slide > .today-hero{ flex:0 0 88%; margin:0; scroll-snap-align:start; }
+  /* the row clips what is under it, so the card's big soft shadow ended in a hard-edged band: a tighter shadow that fits the room below */
+  .today-slide > .today-hero{ flex:0 0 88%; margin:0; scroll-snap-align:start; box-shadow:0 7px 14px -6px rgba(228,69,126,.3); }
   @media (min-width:700px){ .today-slide > .today-hero{ flex-basis:min(88%, 560px); } }
   /* preview, narrow screens (one column): the birthday row runs out to the screen's edge too, with no fade; from 1024px up it sits in the side column and wraps */
   @media (max-width:1023px){
@@ -2519,9 +2520,18 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* wide screens: no swiping, the day's events lie in a grid */
   @media (min-width:1024px){
     .today-slide{ display:grid; grid-template-columns:repeat(auto-fill, minmax(380px, 1fr)); gap:14px; overflow:visible; margin:0; padding:0 0 4px; }
-    .today-slide > .today-hero{ flex:none; }
+    .today-slide > .today-hero{ flex:none; box-shadow:0 10px 28px rgba(228,69,126,.22); }
     .today-slide-dots{ display:none; }
   }
+  /* preview (?clear=on): the boxes on the home page as clearer glass — a thinner, softer rim and a see-through fill */
+  html[data-clear="1"] .today-hero{ background:color-mix(in srgb, var(--c) 12%, color-mix(in srgb, var(--card) 52%, transparent)) !important;
+    -webkit-backdrop-filter:blur(10px) saturate(1.4); backdrop-filter:blur(10px) saturate(1.4); }
+  html[data-clear="1"] .today-hero::after{ padding:1.5px; opacity:.55; }
+  html[data-clear="1"] .today-hero::before{ opacity:.35; }
+  html[data-clear="1"] .tl-card, html[data-clear="1"] .tl-chip{ background:color-mix(in srgb, var(--card) 58%, transparent); border-color:color-mix(in srgb, var(--line) 60%, transparent);
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+  html[data-clear="1"] .bday-chip{ background:linear-gradient(to right, var(--c,var(--ink)) 0 4px, color-mix(in srgb, var(--card) 58%, transparent) 4px);
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
   .today-slide-dots{ display:flex; justify-content:center; gap:6px; margin:-4px 0 12px; }
   .today-slide-dots i{ width:7px; height:7px; border-radius:50%; background:var(--line); transition:background .2s, transform .2s; }
   .today-slide-dots i.on{ background:var(--bnk); transform:scale(1.2); }
@@ -15094,8 +15104,11 @@ const wallOn = bgPreview('wall'), boothOn = bgPreview('booth');
 // the stats page's stage wall, the profile's desk and the home page's backdrop are on for everyone too (=off turns one off on a device)
 const stageOn = bgPreview('stage'), deskOn = bgPreview('desk'), homeOn = bgPreview('home');
 todaySlideOn();   // reads ?evslide= while the address still has it
+// PREVIEW (off for everyone): ?clear=on makes today's cards clearer glass, ?clear=off goes back (kept on the device)
+const clearOn = (() => { try{ const q = new URLSearchParams(location.search).get('clear'); if(q === 'on') localStorage.setItem('48thdb-clear', 'on'); else if(q === 'off') localStorage.removeItem('48thdb-clear'); return localStorage.getItem('48thdb-clear') === 'on'; }catch(e){ return false; } })();
 function cdShopSync(){
-  const d = document.documentElement.dataset, sc = typeof bgScenes === 'function' ? bgScenes() : true;
+  const d = document.documentElement.dataset; if(clearOn) d.clear = '1';
+  const sc = typeof bgScenes === 'function' ? bgScenes() : true;
   if(sc && wallOn && state.view === 'browse') d.wall = '1'; else delete d.wall;
   if(sc && boothOn && state.view === 'shop') d.booth = '1'; else delete d.booth;
   if(sc && stageOn && state.view === 'stats') d.stage = '1'; else delete d.stage;
