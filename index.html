@@ -22145,6 +22145,10 @@ function noteSignup(user){
     .then(() => { try{ localStorage.setItem(k, day); }catch(e){} }).catch(() => {});
 }
 let signupsState = null;
+const SIGNUPS_SEEN_LS = '48thdb-signups-seen';
+function signupsSeenAt(){ try{ const v = +localStorage.getItem(SIGNUPS_SEEN_LS); if(v) return v; localStorage.setItem(SIGNUPS_SEEN_LS, String(Date.now())); return Date.now(); }catch(e){ return Date.now(); } }
+function signupsNew(){ const S = signupsState; if(!S || !S.list) return 0; const t = signupsSeenAt(); return S.list.filter(x => x.joined > t).length; }
+function signupsMarkSeen(){ try{ localStorage.setItem(SIGNUPS_SEEN_LS, String(Date.now())); }catch(e){} }
 async function loadSignups(){
   signupsState = { ...(signupsState || {}), loading:true };
   try{
@@ -22268,6 +22272,10 @@ function renderAdminHub(){
   const cur = items.find(i => i.k === state.adminTab);
   if(cur && cur.ids) adminMarkSeen(cur.k, cur.ids());
   items.forEach(i => { i.n = i.ids && i !== cur ? adminNew(i.k, i.ids()) : 0; });
+  // new accounts since the owner last opened สมาชิกเว็บ (the list is read in the background, so the number shows without opening it)
+  if(!signupsState || (!signupsState.loading && Date.now() - signupsState.at > 300000)) setTimeout(loadSignups, 0);
+  const sg = items.find(i => i.k === 'signups');
+  if(cur === sg) signupsMarkSeen(); else sg.n = signupsNew();
   return `<h3 class="section-label">เครื่องมือแอดมิน</h3>
     <div class="adm-menu">${items.map(i => `<button class="adm-btn${cur === i ? ' is-on' : ''}" data-action="admin-tab" data-id="${i.k}" aria-expanded="${cur === i}">
       <span class="adm-ic" aria-hidden="true">${i.ic}</span><span class="adm-t"><b>${i.th}</b><small>${i.sub}</small></span>${i.n ? `<span class="adm-n">${i.n}</span>` : ''}</button>`).join('')}</div>
