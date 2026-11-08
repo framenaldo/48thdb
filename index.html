@@ -2507,9 +2507,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      can be as quiet as olive), a soft pink glow, the poster lifted in a white frame */
   /* preview: today's events as a swipeable row; the next card shows at the side so it is clear there is more */
   .today-slide{ display:flex; align-items:stretch; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;
-    margin:0 -2px; padding:2px 2px 14px; }
+    margin:0 -20px; padding:2px 20px 14px; scroll-padding-left:20px; }   /* runs out to the screen's edge (main's side padding is 20px), so the next card is cut by the screen, not by an invisible wall */
   .today-slide::-webkit-scrollbar{ display:none; }
   .today-slide > .today-hero{ flex:0 0 88%; margin:0; scroll-snap-align:start; }
+  @media (min-width:700px){ .today-slide > .today-hero{ flex-basis:min(88%, 560px); } }
   .today-slide-dots{ display:flex; justify-content:center; gap:6px; margin:-4px 0 12px; }
   .today-slide-dots i{ width:7px; height:7px; border-radius:50%; background:var(--line); transition:background .2s, transform .2s; }
   .today-slide-dots i.on{ background:var(--bnk); transform:scale(1.2); }
