@@ -28664,12 +28664,21 @@ function meowFitPage(){
   if(!_meowPage) return;
   _meowPage.style.width = document.documentElement.clientWidth + 'px'; _meowPage.style.height = meowDocH() + 'px'; _meowPage.style.overflow = 'hidden';
 }
+/* While the reader scrolls, her floor is not measured again: a card's rect and scrollY are read at slightly different moments on a
+   phone (the page is moved by the compositor ahead of the script), so each frame's sum came out a few pixels apart and she
+   trembled. She lives in the page, which carries her; a floor measured just before the scroll is still the right one. */
 function meowLedgeBox(L){
   if(!L) return null;
-  if(L.floor) return { l:L.l, r:L.r, y:meowDocH() - 8 };
-  if(!L.el || !L.el.isConnected) return null;
-  const r = L.el.getBoundingClientRect(); if(!r.width) return null;
-  return { l:r.left + L.pad + scrollX, r:r.right - L.pad + scrollX, y:r.top + 1 + scrollY };
+  const still = performance.now() - (_meowScrolling || 0) > 250;
+  if(!still && L._bx && (L.floor || (L.el && L.el.isConnected))) return L._bx;
+  let B;
+  if(L.floor) B = { l:L.l, r:L.r, y:meowDocH() - 8 };
+  else {
+    if(!L.el || !L.el.isConnected) return null;
+    const r = L.el.getBoundingClientRect(); if(!r.width) return null;
+    B = { l:r.left + L.pad + scrollX, r:r.right - L.pad + scrollX, y:r.top + 1 + scrollY };
+  }
+  L._bx = B; return B;
 }
 /* ---- her mind. She is not on rails: she wants things (sleep, food, play, a look around, the reader), weighs
    them and picks one, finds her own way there over the cards — a jump, a drop off a card's end, a climb up a
