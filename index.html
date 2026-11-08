@@ -1577,15 +1577,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* A chip sliced in half at the edge reads as broken rather than as "there
      is more"; the row fades out instead, on whichever side still has chips
      past it. */
-  .bday-next.fade-end:not(.fade-start){
+  .bday-next.fade-end:not(.fade-start), .tl-row.fade-end:not(.fade-start), .tl-locked.fade-end:not(.fade-start){
     -webkit-mask-image:linear-gradient(to right, #000 78%, transparent 100%);
     mask-image:linear-gradient(to right, #000 78%, transparent 100%);
   }
-  .bday-next.fade-start:not(.fade-end){
+  .bday-next.fade-start:not(.fade-end), .tl-row.fade-start:not(.fade-end), .tl-locked.fade-start:not(.fade-end){
     -webkit-mask-image:linear-gradient(to right, transparent 0, #000 14%);
     mask-image:linear-gradient(to right, transparent 0, #000 14%);
   }
-  .bday-next.fade-start.fade-end{
+  .bday-next.fade-start.fade-end, .tl-row.fade-start.fade-end, .tl-locked.fade-start.fade-end{
     -webkit-mask-image:linear-gradient(to right, transparent 0, #000 14%, #000 78%, transparent 100%);
     mask-image:linear-gradient(to right, transparent 0, #000 14%, #000 78%, transparent 100%);
   }
@@ -28623,10 +28623,14 @@ function meowScanLedges(catW, nearY){
   const root = document.getElementById('main') || document.querySelector('main'); if(!root) return out;
   const R = root.id ? '#main' : 'main', sx = scrollX, sy = scrollY, focus = nearY != null ? nearY : sy + innerHeight / 2;
   const els = root.querySelectorAll(MEOW_LEDGE_SEL + ', ' + R + ' > * > *, ' + R + ' > * > * > *, ' + R + ' ' + MEOW_POI_SEL.split(', ').join(', ' + R + ' '));
-  const seen = new Set(), cand = [], pois = [];
+  const seen = new Set(), cand = [], pois = [], pin = new Map();
+  // a card that sticks to the screen (a side column on a wide screen) stays in the same place on screen while the page scrolls: a floor
+  // there would carry her and anything set down on it along with the scroll. Nothing that is, or sits in, a fixed or sticky box is a floor.
+  const pinned = e => { if(!e || e === document.body || e === root) return false; if(pin.has(e)) return pin.get(e); const p = getComputedStyle(e).position, v = p === 'sticky' || p === 'fixed' || pinned(e.parentElement); pin.set(e, v); return v; };
   for(const el of els){
     if(seen.has(el) || el.closest('.ov-layer, .share-sheet, .modal-backdrop, header, .glass-nav')) continue;
     seen.add(el);
+    if(pinned(el)) continue;
     const r = el.getBoundingClientRect();
     if(r.width < 20 || r.height < 20) continue;
     const top = r.top + sy, d = Math.abs(top - focus);
@@ -30357,7 +30361,7 @@ function goBack(fallback){
 /* The mask has to know which side still has chips past it, which only the
    scroll position can say. */
 function bindEdgeFades(){
-  document.querySelectorAll('.bday-next').forEach(row => {
+  document.querySelectorAll('.bday-next, .tl-row, .tl-locked').forEach(row => {
     if(row._edge) return; row._edge = true;   // kept through a redraw: already watched
     const sync = () => {
       const max = row.scrollWidth - row.clientWidth;
