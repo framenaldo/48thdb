@@ -4277,7 +4277,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-stage="1"] .subtab, html[data-stage="1"] .page-share-btn{ background:rgba(255,255,255,.14); color:var(--g-ink); border-color:rgba(255,255,255,.36); }
   html[data-stage="1"] .subtab.active{ background:rgba(255,255,255,.9); color:#1B1426; }
   @media (max-width:760px){ html[data-stage="1"] #main > :not(.ov-layer), html[data-desk="1"] #main > :not(.ov-layer){ -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); } }
-  /* ---- the home page's backdrop (a preview: only with ?home=on, off with ?home=off): the other pages' scenes blurred into a field of
+  /* ---- the home page's backdrop, for everyone (?home=off turns it off on one device): the other pages' scenes blurred into a field of
      colour (bg/home-collage-2.jpg, from scripts/scenes/collage.html) with a wash in the reader's own light or dark over it, so text
      outside the cards stays readable; the cards keep their own colours, and each section heading sits on a small glass capsule. ---- */
   html[data-home="1"]{ --home-wash:rgba(255,246,250,.76); }
@@ -15061,10 +15061,8 @@ try{ const q = new URLSearchParams(location.search).get('cdshop'); if(q === 'off
 const bgPreview = k => { try{ const q = new URLSearchParams(location.search).get(k); if(q === 'off') localStorage.setItem('48thdb-' + k, 'off'); else if(q === 'on') localStorage.removeItem('48thdb-' + k); return localStorage.getItem('48thdb-' + k) !== 'off'; }catch(e){ return true; } };
 const boardOn = bgPreview('board');
 const wallOn = bgPreview('wall'), boothOn = bgPreview('booth');
-// the stats page's stage wall and the profile's desk are on for everyone too (=off turns one off on a device); the home page's
-// backdrop is still a preview, off unless asked: ?home=on, kept on this device, ?home=off off
-const stageOn = bgPreview('stage'), deskOn = bgPreview('desk');
-const homeOn = (() => { try{ const q = new URLSearchParams(location.search).get('home'); if(q === 'on') localStorage.setItem('48thdb-home', '1'); else if(q === 'off') localStorage.removeItem('48thdb-home'); return localStorage.getItem('48thdb-home') === '1'; }catch(e){ return false; } })();
+// the stats page's stage wall, the profile's desk and the home page's backdrop are on for everyone too (=off turns one off on a device)
+const stageOn = bgPreview('stage'), deskOn = bgPreview('desk'), homeOn = bgPreview('home');
 function cdShopSync(){
   const d = document.documentElement.dataset;
   if(wallOn && state.view === 'browse') d.wall = '1'; else delete d.wall;
