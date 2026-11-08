@@ -2511,6 +2511,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .today-slide::-webkit-scrollbar{ display:none; }
   .today-slide > .today-hero{ flex:0 0 88%; margin:0; scroll-snap-align:start; }
   @media (min-width:700px){ .today-slide > .today-hero{ flex-basis:min(88%, 560px); } }
+  /* preview, narrow screens (one column): the birthday row runs out to the screen's edge too, with no fade; from 1024px up it sits in the side column and wraps */
+  @media (max-width:1023px){
+    .bday-next.is-bleed{ margin-left:-20px; margin-right:-20px; padding:2px 20px 8px; scroll-padding-left:20px; }
+    .bday-next.is-bleed:is(.fade-start, .fade-end){ -webkit-mask-image:none; mask-image:none; }
+  }
   .today-slide-dots{ display:flex; justify-content:center; gap:6px; margin:-4px 0 12px; }
   .today-slide-dots i{ width:7px; height:7px; border-radius:50%; background:var(--line); transition:background .2s, transform .2s; }
   .today-slide-dots i.on{ background:var(--bnk); transform:scale(1.2); }
@@ -19975,7 +19980,7 @@ function renderFeed(){
     </section>` : ''}
     <section class="feed-block is-birthday is-bday-next">
       <h2 class="section-label">วันเกิดที่ใกล้ถึง</h2>
-      <div class="bday-next">
+      <div class="bday-next${todaySlideOn() ? ' is-bleed' : ''}">
         ${upcoming.map(({m,d}) => {
           const g = getGroup(m.groupId);
           const a = calcAge(m.birthday);
