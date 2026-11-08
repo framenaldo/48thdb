@@ -28972,6 +28972,8 @@ class MeowRoamer extends MeowWalker {
   }
   startWall(st, b, max){
     const B = meowLedgeBox(st.L); if(!B) return false;
+    // a climb up the screen's edge crawls at 20px a second: over more than a screenful it looked like a cat stuck in the margin for a minute
+    if(b.y - B.y > innerHeight * .8) return false;
     const band = meowBand(), left = (B.l + B.r) / 2 < (band.railRight + innerWidth) / 2;
     const x = left ? 0 : max, edge = left ? b.l - band.railRight : innerWidth - b.r;
     if(edge > 140){
