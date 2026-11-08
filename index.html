@@ -1577,15 +1577,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* A chip sliced in half at the edge reads as broken rather than as "there
      is more"; the row fades out instead, on whichever side still has chips
      past it. */
-  .bday-next.fade-end:not(.fade-start), .tl-row.fade-end:not(.fade-start), .tl-locked.fade-end:not(.fade-start){
+  .bday-next.fade-end:not(.fade-start){
     -webkit-mask-image:linear-gradient(to right, #000 78%, transparent 100%);
     mask-image:linear-gradient(to right, #000 78%, transparent 100%);
   }
-  .bday-next.fade-start:not(.fade-end), .tl-row.fade-start:not(.fade-end), .tl-locked.fade-start:not(.fade-end){
+  .bday-next.fade-start:not(.fade-end){
     -webkit-mask-image:linear-gradient(to right, transparent 0, #000 14%);
     mask-image:linear-gradient(to right, transparent 0, #000 14%);
   }
-  .bday-next.fade-start.fade-end, .tl-row.fade-start.fade-end, .tl-locked.fade-start.fade-end{
+  .bday-next.fade-start.fade-end{
     -webkit-mask-image:linear-gradient(to right, transparent 0, #000 14%, #000 78%, transparent 100%);
     mask-image:linear-gradient(to right, transparent 0, #000 14%, #000 78%, transparent 100%);
   }
@@ -30361,7 +30361,7 @@ function goBack(fallback){
 /* The mask has to know which side still has chips past it, which only the
    scroll position can say. */
 function bindEdgeFades(){
-  document.querySelectorAll('.bday-next, .tl-row, .tl-locked').forEach(row => {
+  document.querySelectorAll('.bday-next').forEach(row => {
     if(row._edge) return; row._edge = true;   // kept through a redraw: already watched
     const sync = () => {
       const max = row.scrollWidth - row.clientWidth;
