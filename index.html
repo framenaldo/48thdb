@@ -6476,7 +6476,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @keyframes boot-fade{ from{ opacity:0; } to{ opacity:1; } }
   @media (prefers-reduced-motion:reduce){ html.booted #main{ animation:boot-fade .25s ease-out both; } }
   /* ---- เหมียว: a pixel cat that walks the top of the menu bar on every page (MEOW_*, meowInit) ---- */
-  .meow-walk{ position:fixed; z-index:29; left:0; top:0; width:0; height:0; pointer-events:none; }
+  /* below the header (20), the menu it opens (inside it) and sticky bars (15): she, her toys and the visitors pass under them when the page scrolls, and above the page's cards */
+  .meow-walk{ position:fixed; z-index:14; left:0; top:0; width:0; height:0; pointer-events:none; }
   .meow-walk.meow-page{ position:absolute; }   /* on a card she lives in the page itself, so the browser scrolls her with it */
   .meow-cat{ position:absolute; left:0; bottom:0; padding:0; border:0; background:none; cursor:pointer; pointer-events:auto; touch-action:manipulation;
     transform-origin:50% 100%; will-change:transform; -webkit-tap-highlight-color:transparent; }
