@@ -29728,7 +29728,8 @@ let _meowCall = null;
 // the menu bar's real height (it grows with the phone's safe area), so what sits above it never lands on it: sets --nav-h
 function meowNavGap(){
   const nav = document.querySelector('.glass-nav'), r = nav && nav.getBoundingClientRect();
-  const h = r && r.height && getComputedStyle(nav).display !== 'none' ? Math.max(0, innerHeight - r.top) : 0;
+  // on a wide screen the menu is a rail down the left side, not a bar along the foot: nothing sits above it
+  const rail = r && r.height > r.width, h = r && r.height && !rail && getComputedStyle(nav).display !== 'none' ? Math.max(0, innerHeight - r.top) : 0;
   document.documentElement.style.setProperty('--nav-h', Math.round(h || 24) + 'px');
 }
 addEventListener('resize', () => meowNavGap());
