@@ -2516,6 +2516,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .bday-next.is-bleed{ margin-left:-20px; margin-right:-20px; padding:2px 20px 8px; scroll-padding-left:20px; }
     .bday-next.is-bleed:is(.fade-start, .fade-end){ -webkit-mask-image:none; mask-image:none; }
   }
+  /* wide screens: no swiping, the day's events lie in a grid */
+  @media (min-width:1024px){
+    .today-slide{ display:grid; grid-template-columns:repeat(auto-fill, minmax(380px, 1fr)); gap:14px; overflow:visible; margin:0; padding:0 0 4px; }
+    .today-slide > .today-hero{ flex:none; }
+    .today-slide-dots{ display:none; }
+  }
   .today-slide-dots{ display:flex; justify-content:center; gap:6px; margin:-4px 0 12px; }
   .today-slide-dots i{ width:7px; height:7px; border-radius:50%; background:var(--line); transition:background .2s, transform .2s; }
   .today-slide-dots i.on{ background:var(--bnk); transform:scale(1.2); }
@@ -3969,6 +3975,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .tl-frame{ border:1px solid var(--line); border-radius:22px; background:var(--paper-dim); box-shadow:0 3px 0 rgba(var(--shadow-rgb, 0,0,0),.1);
     padding:12px 0 2px; overflow:hidden; }
   .tl-frame .tl-locked, .tl-frame .tl-row{ padding-left:12px; padding-right:12px; scroll-padding-left:12px; }
+  /* on a phone the iAM48 posts have no frame: the rows run out to the screen's edge (main's side padding is 20px) */
+  @media (max-width:1023px){
+    .tl-frame{ border:0; border-radius:0; background:none; box-shadow:none; padding:0; overflow:visible; }
+    .tl-frame .tl-locked, .tl-frame .tl-row{ margin-left:-20px; margin-right:-20px; padding-left:20px; padding-right:20px; scroll-padding-left:20px; }
+  }
   .tl-row{ display:flex; gap:10px; overflow-x:auto; padding:2px 2px 10px; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
   .tl-row::-webkit-scrollbar{ display:none; }
   .tl-card{ flex:0 0 272px; scroll-snap-align:start; display:flex; flex-direction:column; gap:9px; padding:11px 12px 12px; border-radius:18px;
@@ -30383,8 +30394,9 @@ function goBack(fallback){
 // styling is muted for as long as anything is scrolling.
 /* The mask has to know which side still has chips past it, which only the
    scroll position can say. */
-/* PREVIEW (not on for anyone): ?evslide=on shows today's events as a row of cards to swipe instead of a stack; ?evslide=off goes back. */
-function todaySlideOn(){ try{ const q = new URLSearchParams(location.search).get('evslide'); if(q === 'on') localStorage.setItem('48thdb-evslide', 'on'); else if(q === 'off') localStorage.removeItem('48thdb-evslide'); return localStorage.getItem('48thdb-evslide') === 'on'; }catch(e){ return false; } }
+/* On for everyone (owner, 8 Nov 2026): on a phone today's events are a row of cards to swipe, running out to the screen's edge, instead of a
+   stack; from 1024px up they sit in a grid. ?evslide=off turns it off on one device (kept), ?evslide=on turns it back. */
+function todaySlideOn(){ try{ const q = new URLSearchParams(location.search).get('evslide'); if(q === 'off') localStorage.setItem('48thdb-evslide', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-evslide'); return localStorage.getItem('48thdb-evslide') !== 'off'; }catch(e){ return true; } }
 function bindTodaySlides(){
   document.querySelectorAll('[data-today-slide]').forEach(row => {
     if(row._sl) return; row._sl = true;
