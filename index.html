@@ -2523,8 +2523,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .today-slide > .today-hero{ flex:none; box-shadow:0 10px 28px rgba(228,69,126,.22); }
     .today-slide-dots{ display:none; }
   }
-  /* preview (?clear=on): the boxes on the home page as clearer glass — a thinner, softer rim and a see-through fill */
-  html[data-clear="1"] .today-hero{ background:color-mix(in srgb, var(--c) 12%, color-mix(in srgb, var(--card) 52%, transparent)) !important;
+  /* the boxes on the home page as clearer glass — a thinner, softer rim and a see-through fill (off with ?clear=off) */
+  /* only by day: at night the themed cards keep their poster-coloured light fill with dark type, which a dark see-through fill would swallow */
+  html[data-clear="1"][data-theme="light"] .today-hero{ background:color-mix(in srgb, var(--c) 12%, color-mix(in srgb, var(--card) 52%, transparent)) !important;
     -webkit-backdrop-filter:blur(10px) saturate(1.4); backdrop-filter:blur(10px) saturate(1.4); }
   html[data-clear="1"] .today-hero::after{ padding:1.5px; opacity:.55; }
   html[data-clear="1"] .today-hero::before{ opacity:.35; }
@@ -4798,6 +4799,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .lay-sw{ display:flex; flex-wrap:wrap; gap:7px; }
   .lay-swatch{ width:42px; height:42px; padding:0; border-radius:14px; border:3px solid var(--card); cursor:pointer; box-shadow:0 0 0 1px var(--line), 0 3px 0 var(--line);
     font:inherit; font-weight:800; color:#fff; font-size:16px; }
+  .lay-swatch.lay-add{ background:var(--card); border:2px dashed var(--ink-soft); color:var(--ink-soft); font-size:22px; font-weight:700; line-height:1; }
   .lay-swatch.is-dot{ width:35px; height:35px; border-radius:50%; font-size:14px; }
   .lay-swatch.is-on{ box-shadow:0 0 0 3px #E4457E, 0 3px 0 var(--line); }
   .lay-swatch:active{ transform:translateY(2px); }
@@ -15104,8 +15106,8 @@ const wallOn = bgPreview('wall'), boothOn = bgPreview('booth');
 // the stats page's stage wall, the profile's desk and the home page's backdrop are on for everyone too (=off turns one off on a device)
 const stageOn = bgPreview('stage'), deskOn = bgPreview('desk'), homeOn = bgPreview('home');
 todaySlideOn();   // reads ?evslide= while the address still has it
-// PREVIEW (off for everyone): ?clear=on makes today's cards clearer glass, ?clear=off goes back (kept on the device)
-const clearOn = (() => { try{ const q = new URLSearchParams(location.search).get('clear'); if(q === 'on') localStorage.setItem('48thdb-clear', 'on'); else if(q === 'off') localStorage.removeItem('48thdb-clear'); return localStorage.getItem('48thdb-clear') === 'on'; }catch(e){ return false; } })();
+// On for everyone (owner, 8 Nov 2026): the home page's cards are clearer glass. ?clear=off turns it off on one device (kept), ?clear=on back.
+const clearOn = (() => { try{ const q = new URLSearchParams(location.search).get('clear'); if(q === 'off') localStorage.setItem('48thdb-clear', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-clear'); return localStorage.getItem('48thdb-clear') !== 'off'; }catch(e){ return true; } })();
 function cdShopSync(){
   const d = document.documentElement.dataset; if(clearOn) d.clear = '1';
   const sc = typeof bgScenes === 'function' ? bgScenes() : true;
@@ -21625,12 +21627,15 @@ function layoutChrome(){
   main && main.insertAdjacentHTML('beforeend', `<button class="lay-addzone" data-action="lay-sheet">＋ ${en ? 'Add a zone' : 'เพิ่มโซน'}${off ? ` · ${off} ${en ? 'available' : 'โซนที่ยังไม่ได้ใส่'}` : ''}</button>`);
 }
 const bgChoice = () => myLayout().bg || 'plain';
-const bgScenes = () => bgChoice() === 'scene';   // only a signed-in reader who picked "ฉากประจำหน้า"
+const bgScenes = () => bgChoice() === 'scene';
+const bgOwn = () => bgChoice() === 'mine' && !!myLayout().bgImg;   // only a signed-in reader who picked "ฉากประจำหน้า"
 function applyBackground(){
   const bg = bgChoice(), b = LAYOUT_BG.find(x => x.k === bg), own = b && !b.scene && b.k !== 'plain';
   const root = document.documentElement;
   if(own) root.dataset.bg = b.k; else delete root.dataset.bg;
-  if(own && b.img){ root.dataset.bgPhoto = '1'; root.style.setProperty('--bg-photo', `url(${b.img})`); }
+  const mine = bg === 'mine' && myLayout().bgImg;   // a photo the reader added from their own device (kept in their layout)
+  if(mine){ root.dataset.bg = 'mine'; root.dataset.bgPhoto = '1'; root.style.setProperty('--bg-photo', `url("${mine}")`); }
+  else if(own && b.img){ root.dataset.bgPhoto = '1'; root.style.setProperty('--bg-photo', `url(${b.img})`); }
   else { delete root.dataset.bgPhoto; root.style.removeProperty('--bg-photo'); }
   cdShopSync();
   // one anonymous count a day per device of which background a signed-in reader is on (the owner's visitors card lists it)
@@ -21641,7 +21646,7 @@ function bgHit(kind, key){
   if(location.hostname !== '48thdb.com' || state.isOwner) return;
   try{ fetch(`${HIT_API}?p=${encodeURIComponent(kind + ':' + key)}&i=`, { mode:'no-cors', keepalive:true, cache:'no-store' }).catch(() => {}); }catch(e){}
 }
-const bgLabel = p => { const m = /^bg-(pick|now):(.+)$/.exec(p), b = m && LAYOUT_BG.find(x => x.k === m[2]); return b ? `${m[1] === 'pick' ? 'เลือกพื้นหลัง' : 'ใช้พื้นหลัง'} · ${b.th}` : ''; };
+const bgLabel = p => { const m = /^bg-(pick|now):(.+)$/.exec(p), b = m && (m[2] === 'mine' ? { th:'รูปของตัวเอง' } : LAYOUT_BG.find(x => x.k === m[2])); return b ? `${m[1] === 'pick' ? 'เลือกพื้นหลัง' : 'ใช้พื้นหลัง'} · ${b.th}` : ''; };
 /* The dashboard's tiles are arranged one by one: layout.dash = { order, hidden } over these
    keys. Each shows ‹ eye › while arranging; the order is CSS `order` in the dashboard's grid. */
 const DASH_KINDS = [{ k:'quiz', th:'หาโอชิจากดวง', en:'Find your oshi' }, { k:'cal', th:'งานใน 7 วัน', en:'Events this week' }, { k:'shop', th:'ร้านค้า', en:'Shop' },
@@ -21694,6 +21699,7 @@ function cleanLayout(L){
   if(!d) delete out.dash;
   else if( JSON.stringify(d.order || dashDefault()) === JSON.stringify(dashDefault()) && !(d.hidden || []).length && !Object.keys(d.kinds || {}).length) delete out.dash;
   if(!out.bg) delete out.bg;
+  if(!out.bgImg) delete out.bgImg;
   if(!out.acc) delete out.acc;
   if(!out.nav || JSON.stringify(out.nav) === JSON.stringify(NAV_DEFAULT)) delete out.nav;
   return Object.keys(out).length ? out : null;
@@ -22052,11 +22058,12 @@ function renderMyStyleCard(){
     <div class="lay-slots">${keys.map(slot).join('')}</div>
     ${pick != null ? `<div class="lay-pickrow">${NAV_CATALOG.filter(o => o.value !== 'profile').map(o => `<button class="chip${keys[pick] === o.value ? ' active' : ''}" data-action="lay-nav-pick" data-id="${o.value}">${escapeHtml(en ? o.en : o.th)}</button>`).join('')}</div>` : ''}
     <p class="vis-h">${en ? 'Background' : 'ธีมพื้นหลัง'}</p>
-    <div class="lay-sw">${LAYOUT_BG.map(b => `<button class="lay-swatch${(L.bg || 'plain') === b.k ? ' is-on' : ''}" style="background:${b.img ? `center/cover url(${b.img})` : b.sw}" data-action="lay-bg" data-id="${b.k}" aria-label="${escapeAttr(en ? b.en : b.th)}" title="${escapeAttr(en ? b.en : b.th)}"></button>`).join('')}</div>
+    <div class="lay-sw">${L.bgImg ? `<button class="lay-swatch${L.bg === 'mine' ? ' is-on' : ''}" style="background:center/cover url('${L.bgImg}')" data-action="lay-bg" data-id="mine" aria-label="${en ? 'My photo' : 'รูปของฉัน'}" title="${en ? 'My photo' : 'รูปของฉัน'}"></button>` : ''}<button class="lay-swatch lay-add" data-action="lay-bg-add" aria-label="${en ? 'Add my own photo' : 'เพิ่มรูปพื้นหลังของฉัน'}" title="${en ? 'Add my own photo' : 'เพิ่มรูปพื้นหลังของฉัน'}">＋</button><input type="file" id="lay-bg-file" accept="image/*" hidden>${LAYOUT_BG.map(b => `<button class="lay-swatch${(L.bg || 'plain') === b.k ? ' is-on' : ''}" style="background:${b.img ? `center/cover url(${b.img})` : b.sw}" data-action="lay-bg" data-id="${b.k}" aria-label="${escapeAttr(en ? b.en : b.th)}" title="${escapeAttr(en ? b.en : b.th)}"></button>`).join('')}</div>
     <p class="vis-h">${en ? 'Colour of this page' : 'สีหน้าโปรไฟล์'}</p>
     <div class="lay-sw">${LAYOUT_ACC.map(a => { const km = a.k === 'oshi' && state.kamiOshi ? getMember(state.kamiOshi) : null;
       const c = a.k === 'oshi' ? (km ? getGroup(km.groupId).color : '#B9AFC2') : (a.c || 'var(--paper-dim)');
       return `<button class="lay-swatch is-dot${(L.acc || '') === a.k ? ' is-on' : ''}" style="background:${c}" data-action="lay-acc" data-id="${a.k}" aria-label="${escapeAttr(a.th)}" title="${escapeAttr(a.th)}">${a.k === 'oshi' ? '★' : a.k === '' ? '↺' : ''}</button>`; }).join('')}</div>
+    ${L.bgImg ? `<button class="link-inline lay-resetall" data-action="lay-bg-del">${en ? 'Remove my photo' : 'ลบรูปพื้นหลังของฉัน'}</button>` : ''}
     ${state.layout ? `<button class="link-inline lay-resetall" data-action="lay-reset-all">${en ? 'Put everything back as it was' : 'คืนค่าเดิมทั้งหมด'}</button>` : ''}
   </div>`;
 }
@@ -30420,6 +30427,28 @@ function bindTodaySlides(){
     }, { passive:true });
   });
 }
+/* A photo of the reader's own as the background: shrunk on their device (long side 1100px, a JPEG of a few hundred KB at most) and kept
+   in their layout, so it follows the account; nobody else sees it. */
+document.addEventListener('change', e => {
+  const inp = e.target; if(!inp || inp.id !== 'lay-bg-file' || !inp.files || !inp.files[0]) return;
+  const file = inp.files[0]; inp.value = '';
+  if(!/^image\//.test(file.type)) return;
+  const url = URL.createObjectURL(file), img = new Image();
+  img.onload = () => {
+    try{
+      const k = Math.min(1, 1100 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      let q = .72, data = c.toDataURL('image/jpeg', q);
+      while(data.length > 420000 && q > .3){ q -= .1; data = c.toDataURL('image/jpeg', q); }
+      if(data.length > 700000){ alert(isEN() ? 'That photo is too big to keep.' : 'รูปใหญ่เกินไป ลองรูปอื่น'); return; }
+      bgHit('bg-pick', 'mine'); setLayout({ bg:'mine', bgImg:data });
+    }catch(err){ alert(isEN() ? 'Could not use that photo.' : 'ใช้รูปนี้ไม่ได้'); }
+    finally{ URL.revokeObjectURL(url); }
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); alert(isEN() ? 'Could not open that photo.' : 'เปิดรูปนี้ไม่ได้'); };
+  img.src = url;
+});
 function bindEdgeFades(){
   document.querySelectorAll('.bday-next').forEach(row => {
     if(row._edge) return; row._edge = true;   // kept through a redraw: already watched
@@ -30835,6 +30864,8 @@ function bindDelegatedEvents(){
     else if(action==='ask-ai') askAI(state.query);
     else if(action==='ask-example'){ state.query = id; const box = document.getElementById('search-input'); if(box) box.value = id; renderMain(); replaceHistory(); askAI(id); }
     else if(action==='lay-bg'){ bgHit('bg-pick', id); setLayout({ bg:id }); }
+    else if(action==='lay-bg-add'){ const f = document.getElementById('lay-bg-file'); if(f) f.click(); }
+    else if(action==='lay-bg-del') setLayout({ bg:'plain', bgImg:null });
     else if(action==='lay-acc') setLayout({ acc:id });
     else if(action==='lay-reset-all'){ if(confirm(isEN() ? 'Put the whole site back as it comes?' : 'คืนค่าเดิมทั้งหมด ทั้งหน้าแรก หน้าโปรไฟล์ เมนูล่าง และธีม?')){ state.layout = null; state.navPick = null; saveLayout(); const y = window.scrollY || 0; render(); scrollPageTo(y); } }
     else if(action==='signups-refresh'){ el.textContent = 'กำลังโหลด…'; loadSignups(); }
