@@ -28589,7 +28589,9 @@ const _meowRun = new Set();
 let _meowRaf = 0, _meowLast = 0;
 function meowLoop(t){
   const dt = Math.min(.05, (t - (_meowLast || t)) / 1000); _meowLast = t;
-  if(!document.hidden) _meowRun.forEach(w => w.tick(dt));
+  // one frame that throws must not end the loop: the next frame was only asked for after the ticks, so an error in any of them left
+  // every sprite frozen where it stood (a still cat in the margin that nothing moved) until the page was reloaded
+  if(!document.hidden) _meowRun.forEach(w => { try{ w.tick(dt); }catch(e){ if(!w._tickErr){ w._tickErr = 1; try{ console.error('meow tick', e); }catch(_){} } } });
   _meowRaf = _meowRun.size ? requestAnimationFrame(meowLoop) : 0;
 }
 function meowRun(w){ _meowRun.add(w); if(!_meowRaf){ _meowLast = 0; _meowRaf = requestAnimationFrame(meowLoop); } }
