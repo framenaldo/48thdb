@@ -5184,6 +5184,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .qz-more-h{ margin:20px 2px 10px; }
   .qz-run{ display:flex; align-items:center; gap:12px; width:100%; margin:0 0 9px; padding:10px 14px 10px 10px; text-align:left; font:inherit; color:var(--ink); cursor:pointer;
     border-radius:18px; background:var(--card); border:1px solid var(--line); box-shadow:0 3px 0 color-mix(in srgb, var(--c) 25%, var(--line)); transition:transform .1s ease; }
+  .qz-run-wrap{ margin:0 0 9px; } .qz-run-wrap .qz-run{ margin:0; }
+  .qz-run-car{ flex:none; margin-left:-4px; font-size:13px; color:var(--ink-soft); transition:transform .2s; }
+  .qz-run-wrap.is-open .qz-run-car{ transform:rotate(180deg); }
+  .qz-run-full{ display:none; margin-top:9px; } .qz-run-wrap.is-open .qz-run-full{ display:block; }
   .qz-run:active{ transform:translateY(2px); }
   .qz-run-pic{ position:relative; flex:none; display:grid; place-items:center; width:52px; height:52px; border-radius:50%; overflow:hidden; color:#fff; font-size:12px; font-weight:800;
     box-shadow:0 0 0 2px var(--c); }
@@ -19575,22 +19579,23 @@ function qzChips(r, en){
     <span class="qz-chip">${en ? r.sign[2] : 'ราศี' + r.sign[1]}</span>
     <span class="qz-chip">${en ? 'Year of the ' + QZ_ANIMALS[r.animal][1] : 'ปี' + QZ_ANIMALS[r.animal][0]}</span>`;
 }
-function qzMatchCard(r, rank){
+function qzMatchCard(r, rank, noShare){
   const en = isEN(), m = r.m, g = getGroup(m.groupId);
   const why = r.ties.out.map(t => en ? t[2] : t[1]), whyId = r.ties.out.map(t => t[3] || '');
   if(r.els.includes(r.top)) why.push(en ? `${QZ_EL[r.top][3][0].toUpperCase() + QZ_EL[r.top][3].slice(1)}, the way you like` : `${QZ_EL[r.top][2]} ตรงกับแบบที่คุณชอบ`);
   const trait = `${en ? `Born on a ${r.her.day.en}: ` : `คนเกิดวัน${r.her.day.th}: `}${r.her.day.tr[en ? 1 : 0]}`;
-  if(rank) return `<button class="qz-run" style="--c:${g.color}" data-action="open-member" data-id="${m.id}">
-    ${renderAvatar(m, 'qz-run-pic', g.color)}<span class="qz-run-t"><b>${escapeHtml(nickName(m))}</b><small>${escapeHtml(why[0] || trait)}</small></span><span class="qz-run-pct">${r.pct}%</span></button>`;
+  if(rank) return `<div class="qz-run-wrap" style="--c:${g.color}"><button class="qz-run" data-action="qz-run" aria-expanded="false">
+    ${renderAvatar(m, 'qz-run-pic', g.color)}<span class="qz-run-t"><b>${escapeHtml(nickName(m))}</b><small>${escapeHtml(why[0] || trait)}</small></span><span class="qz-run-pct">${r.pct}%</span><span class="qz-run-car" aria-hidden="true">▾</span></button>
+    <div class="qz-run-full">${qzMatchCard(r, 0, true)}</div></div>`;
   return `<article class="qz-best" style="--c:${g.color}">
-    <p class="qz-best-h">${en ? 'The member your stars favour most' : 'เมมเบอร์ที่ดวงถูกโฉลกกับคุณที่สุด'}</p>
+    ${noShare ? '' : `<p class="qz-best-h">${en ? 'The member your stars favour most' : 'เมมเบอร์ที่ดวงถูกโฉลกกับคุณที่สุด'}</p>`}
     <button class="qz-best-pic" data-action="open-member" data-id="${m.id}" aria-label="${escapeAttr(nickName(m))}"><span class="qz-orbit" aria-hidden="true">${QZ_WHEEL.map((n, i) => `<i style="--a:${i * 45}deg;--o:${QZ_COLOURS[n][2]}"></i>`).join('')}</span>${renderAvatar(m, 'qz-pic', g.color)}<span class="qz-pct" data-to="${r.pct}">${r.pct}<small>%</small></span></button>
     <h2 class="qz-name">${escapeHtml(nickName(m))}</h2>
     <p class="qz-sub">${escapeHtml(g.name)}${m.gen ? ` · ${en ? 'Gen ' + m.gen : 'รุ่น ' + m.gen}` : ''}</p>
     <div class="qz-chips">${qzChips(r.her, en)}</div>
     <ul class="qz-why">${why.slice(0, 4).map((w, i) => { const ex = whyId[i] ? qzExplain(whyId[i], r, en) : ''; return ex ? `<li class="has-ex"><button class="qz-why-b" data-action="qz-why" aria-expanded="false">${escapeHtml(w)} <span class="qz-why-q" aria-hidden="true">?</span></button><span class="qz-ex">${ex}</span></li>` : `<li>${escapeHtml(w)}</li>`; }).join('')}<li>${escapeHtml(trait)}</li></ul>
     <div class="qz-acts"><button class="qz-go" data-action="open-member" data-id="${m.id}">${en ? 'Open her profile' : 'ดูโปรไฟล์'}</button>
-      <button class="qz-go is-ghost" data-action="quiz-share">${ICONS.share}${en ? 'Share' : 'แชร์ผล'}</button></div>
+      ${noShare ? '' : `<button class="qz-go is-ghost" data-action="quiz-share">${ICONS.share}${en ? 'Share' : 'แชร์ผล'}</button>`}</div>
   </article>`;
 }
 /* Three ways in, one tab each: the birthday alone (date, group, her), the quiz alone (five questions, group, her),
@@ -30749,6 +30754,7 @@ function bindDelegatedEvents(){
       state.query = '';
       render(); pushHistory(); window.scrollTo(0, 0);
     }
+    else if(action === 'qz-run'){ const w = el.closest('.qz-run-wrap'); if(w){ const on = w.classList.toggle('is-open'); el.setAttribute('aria-expanded', String(on)); if(on) setTimeout(() => { try{ w.querySelector('.qz-run-full').scrollIntoView({ block:'nearest', behavior:'smooth' }); }catch(e){} }, 30); } }
     else if(action === 'qz-why'){ const li = el.closest('li'); if(li){ const on = li.classList.toggle('is-open'); el.setAttribute('aria-expanded', String(on)); } }
     else if(action.startsWith('quiz-')) quizAction(action, id);
     else if(action==='nav-gallery'){
