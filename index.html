@@ -21461,10 +21461,10 @@ const LAYOUT_ZONES = {
   ],
 };
 const LAYOUT_BG = [
-  // the page scenes (CD shop, cork board, gallery wall…) are the default; every other choice turns them off for that reader.
+  // the page scenes (CD shop, cork board, gallery wall…) are a choice (owner, 8 Nov: most readers like it plain); the default is 'plain'.
   // 'plain' is the old pink & mint, kept as a choice of its own
-  { k:'scene', th:'ฉากประจำหน้า', en:'Page scenes', img:'bg/home-collage-2.jpg', scene:true },
   { k:'plain', th:'ชมพู-มิ้นต์ (เรียบ)', en:'Pink & mint (plain)', sw:'linear-gradient(135deg,#FBD9E7,#D3F1E6)' },
+  { k:'scene', th:'ฉากประจำหน้า', en:'Page scenes', img:'bg/home-collage-2.jpg', scene:true },
   { k:'sky', th:'ฟ้า', en:'Sky', sw:'linear-gradient(135deg,#C9E4FF,#F3E8FF)' },
   { k:'peach', th:'พีช', en:'Peach', sw:'linear-gradient(135deg,#FFE7C2,#FFD1DC)' },
   { k:'lilac', th:'ม่วง', en:'Lilac', sw:'linear-gradient(135deg,#E6D9FF,#FBD9EF)' },
@@ -21577,8 +21577,8 @@ function layoutChrome(){
   const main = document.getElementById('main');
   main && main.insertAdjacentHTML('beforeend', `<button class="lay-addzone" data-action="lay-sheet">＋ ${en ? 'Add a zone' : 'เพิ่มโซน'}${off ? ` · ${off} ${en ? 'available' : 'โซนที่ยังไม่ได้ใส่'}` : ''}</button>`);
 }
-const bgChoice = () => myLayout().bg || 'scene';
-const bgScenes = () => bgChoice() === 'scene';   // a guest, or anyone who has not picked a background of their own
+const bgChoice = () => myLayout().bg || 'plain';
+const bgScenes = () => bgChoice() === 'scene';   // only a signed-in reader who picked "ฉากประจำหน้า"
 function applyBackground(){
   const bg = bgChoice(), b = LAYOUT_BG.find(x => x.k === bg), own = b && !b.scene && b.k !== 'plain';
   const root = document.documentElement;
@@ -22005,7 +22005,7 @@ function renderMyStyleCard(){
     <div class="lay-slots">${keys.map(slot).join('')}</div>
     ${pick != null ? `<div class="lay-pickrow">${NAV_CATALOG.filter(o => o.value !== 'profile').map(o => `<button class="chip${keys[pick] === o.value ? ' active' : ''}" data-action="lay-nav-pick" data-id="${o.value}">${escapeHtml(en ? o.en : o.th)}</button>`).join('')}</div>` : ''}
     <p class="vis-h">${en ? 'Background' : 'ธีมพื้นหลัง'}</p>
-    <div class="lay-sw">${LAYOUT_BG.map(b => `<button class="lay-swatch${(L.bg || 'scene') === b.k ? ' is-on' : ''}" style="background:${b.img ? `center/cover url(${b.img})` : b.sw}" data-action="lay-bg" data-id="${b.k}" aria-label="${escapeAttr(en ? b.en : b.th)}" title="${escapeAttr(en ? b.en : b.th)}"></button>`).join('')}</div>
+    <div class="lay-sw">${LAYOUT_BG.map(b => `<button class="lay-swatch${(L.bg || 'plain') === b.k ? ' is-on' : ''}" style="background:${b.img ? `center/cover url(${b.img})` : b.sw}" data-action="lay-bg" data-id="${b.k}" aria-label="${escapeAttr(en ? b.en : b.th)}" title="${escapeAttr(en ? b.en : b.th)}"></button>`).join('')}</div>
     <p class="vis-h">${en ? 'Colour of this page' : 'สีหน้าโปรไฟล์'}</p>
     <div class="lay-sw">${LAYOUT_ACC.map(a => { const km = a.k === 'oshi' && state.kamiOshi ? getMember(state.kamiOshi) : null;
       const c = a.k === 'oshi' ? (km ? getGroup(km.groupId).color : '#B9AFC2') : (a.c || 'var(--paper-dim)');
