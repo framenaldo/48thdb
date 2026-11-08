@@ -2542,7 +2542,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
   html[data-clear="1"] .bday-chip{ background:linear-gradient(to right, var(--c,var(--ink)) 0 4px, color-mix(in srgb, var(--card) 58%, transparent) 4px);
     -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
-  /* preview (?glassall=on): every card in the page's own area takes a see-through fill — the cards all read --card, so the page's --card is
+  /* every card in the page's own area takes a see-through fill — the cards all read --card, so the page's --card is
      made see-through; sheets and popups (.ov-layer) keep the solid one so they stay readable over the page */
   html[data-gall="1"][data-theme="light"] #main{ --card:rgba(255,255,255,.55); }
   html[data-gall="1"][data-theme="dark"] #main{ --card:rgba(30,23,41,.55); }
@@ -15127,8 +15127,8 @@ const wallOn = bgPreview('wall'), boothOn = bgPreview('booth');
 // the stats page's stage wall, the profile's desk and the home page's backdrop are on for everyone too (=off turns one off on a device)
 const stageOn = bgPreview('stage'), deskOn = bgPreview('desk'), homeOn = bgPreview('home');
 todaySlideOn();   // reads ?evslide= while the address still has it
-// PREVIEW (off for everyone): ?glassall=on makes the cards on every page see-through glass; ?glassall=off goes back (kept on the device)
-const gallOn = (() => { try{ const q = new URLSearchParams(location.search).get('glassall'); if(q === 'on') localStorage.setItem('48thdb-gall', 'on'); else if(q === 'off') localStorage.removeItem('48thdb-gall'); return localStorage.getItem('48thdb-gall') === 'on'; }catch(e){ return false; } })();
+// On for everyone (owner, 8 Nov 2026): the cards on every page are see-through glass. ?glassall=off turns it off on one device (kept), ?glassall=on back.
+const gallOn = (() => { try{ const q = new URLSearchParams(location.search).get('glassall'); if(q === 'off') localStorage.setItem('48thdb-gall', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-gall'); return localStorage.getItem('48thdb-gall') !== 'off'; }catch(e){ return true; } })();
 // On for everyone (owner, 8 Nov 2026): the home page's cards are clearer glass. ?clear=off turns it off on one device (kept), ?clear=on back.
 const clearOn = (() => { try{ const q = new URLSearchParams(location.search).get('clear'); if(q === 'off') localStorage.setItem('48thdb-clear', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-clear'); return localStorage.getItem('48thdb-clear') !== 'off'; }catch(e){ return true; } })();
 function cdShopSync(){
