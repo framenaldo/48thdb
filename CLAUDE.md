@@ -207,7 +207,7 @@ the Firebase CLI from the owner's machine.
   and loaded when the Works page is drawn (`mediaEps`). Add a new episode there; such a
   work carries no single `yt`.
 - Who is on, wherever it is shown, is a photo tile with her name over it (`rotaTile`, `rt-f`); a tap lights her in every
-  round of that block, a second tap opens her page and a tap anywhere else lets go (`rota-hl`, `rotaClearHl`). A rota with `lanes:true` is a table instead, lanes down and rounds across, one table a kind (`rotaCell`, `laneTable`: the owner found rows of big tiles bulky, 9 Nov); โอชิฉัน keeps the same page and dims everyone else (`is-oshi-only`; the owner's word, 9 Nov). Its motion (9 Nov, `rotaAnim`, off with reduced motion): `rt-wave` dims column by column going in and out of โอชิฉัน and pops the oshi with a shine, `rt-in` cascades the lanes when the tab or day changes, a tap rings the face (`rt-tap`) and pings her other tables (`rt-ping`), and the round on now has a time bar under its heading and a soft light down its column. Many cells move only by opacity and transform. An event with rounds of several kinds and/or days
+  round of that block, a second tap on her or a tap anywhere else lets go (`rota-hl`, `rotaClearHl`; the owner's word, 9 Nov), and while she is lit a pill at the foot of the sheet opens her page (`rotaGo`). A rota with `lanes:true` is a table instead, lanes down and rounds across, one table a kind (`rotaCell`, `laneTable`: the owner found rows of big tiles bulky, 9 Nov); โอชิฉัน keeps the same page and dims everyone else (`is-oshi-only`; the owner's word, 9 Nov). Its motion (9 Nov, `rotaAnim`, off with reduced motion): `rt-wave` dims column by column going in and out of โอชิฉัน and pops the oshi with a shine, `rt-in` cascades the lanes when the tab or day changes, a tap rings the face (`rt-tap`) and pings her other tables (`rt-ping`), and the round on now has a time bar under its heading and a soft light down its column. Many cells move only by opacity and transform. An event with rounds of several kinds and/or days
   carries `rota: { day?, head, where, kinds:[{k,th,en,c}], rounds:[{d?,k,n,a,b,ids}] }` (`renderRota`: day pills when the
   rounds span days, tabs by kind and "โอชิฉัน", rounds past or on now marked by the clock) — the Busking day and the
   Haunted Graveyard. A roadshow's `lineup` and a booth's `slots` keep their own tables but draw the same tiles.
@@ -388,6 +388,8 @@ home page and in the calendar's day sheet, when the stream does.
 **Language.** Member names in English; song titles exactly as the official MV
 titles them (`SONG_MIX`); venue names in whatever language the poster uses, never
 translated. Everything else in Thai.
+
+**Senbatsu Round of the thank-you event** (a rota round with `ge:true`): lane = rank from the final results (`ge2026-final`), live: a lane says its rank until her name is entered, then her face pops in on every open sheet at once, without a redraw (`rotaLiveGe`; the listener compares `geFinalTopKey`).
 
 **Election results.** The rounds are called **ผลด่วน 1 / ผลด่วน 2 / ผลสุดท้าย** —
 never "เบื้องต้น". A rank whose score is known but whose name is not says

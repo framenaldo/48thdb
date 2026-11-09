@@ -2493,6 +2493,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-wave .rt-c, .rt-wave .rt-f{ transition:opacity .28s ease calc(var(--i, 0) * 70ms); }
   .is-oshi-only.rt-wave .rt-c.is-oshi, .is-oshi-only.rt-wave .rt-f.is-oshi{ animation:rt-pop .42s cubic-bezier(.3,1.5,.5,1) backwards; animation-delay:calc(var(--i, 0) * 70ms + 120ms); }
   .is-oshi-only.rt-wave .rt-c.is-oshi i::after{ content:''; position:absolute; inset:0; background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,.8) 50%, transparent 65%); transform:translateX(-120%); animation:rt-shine .6s ease-out forwards; animation-delay:calc(var(--i, 0) * 70ms + 260ms); }
+  .rt-f.rt-new{ animation:rt-pop .42s cubic-bezier(.3,1.5,.5,1), rt-ring .6s ease-out; }
   @keyframes rt-pop{ from{ transform:scale(.8); } }
   @keyframes rt-shine{ to{ transform:translateX(120%); } }
   .rt-in .rt-t tbody tr{ animation:rt-rise .34s ease-out backwards; animation-delay:calc(var(--r, 0) * 28ms); }
@@ -2507,6 +2508,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @keyframes rt-ring{ from{ box-shadow:0 0 0 0 rgba(255,200,61,.8); } to{ box-shadow:0 0 0 12px rgba(255,200,61,0); } }
   @media (min-width:700px){ .rt-t .rt-c.rt-tap, .rt-t .rt-c.rt-ping{ animation-name:rt-tap; animation-iteration-count:1; } .rt-t .rt-c.rt-ping{ animation-name:none; } .rt-t .rt-c.rt-tap i{ animation:rt-ring .55s ease-out; } .rt-t .rt-c.rt-ping i{ animation:rt-ring .55s ease-out .12s 2 backwards; } }
   @media (prefers-reduced-motion:reduce){ .rt-wave .rt-c, .rt-wave .rt-f, .rt-t thead .is-now::after{ transition:none; } .rt-t tbody td.is-now::after, .rt-t .rt-c.rt-tap, .rt-t .rt-c.rt-ping, .rt-f.rt-tap, .rt-f.rt-ping, .rt-t .rt-c.rt-tap i, .rt-t .rt-c.rt-ping i{ animation:none; } }
+  .rt-go{ position:absolute; z-index:8; left:50%; bottom:14px; transform:translateX(-50%); max-width:calc(100% - 28px); white-space:nowrap; font:inherit; font-size:13.5px; font-weight:800; padding:9px 18px; border-radius:99px; border:2px solid #FFC83D; background:var(--card); color:var(--ink); cursor:pointer; box-shadow:0 3px 0 #FFC83D, 0 8px 20px -6px rgba(0,0,0,.45); animation:rt-go-in .22s ease-out; }
+  .rt-go:active{ transform:translateX(-50%) translateY(2px); box-shadow:0 1px 0 #FFC83D; }
+  @keyframes rt-go-in{ from{ opacity:0; transform:translateX(-50%) translateY(10px); } }
+  @media (prefers-reduced-motion:reduce){ .rt-go, .rt-f.rt-new{ animation:none; } }
   .rt-none{ margin:6px 0; font-size:13px; color:var(--ink-soft); } .rt-none[hidden]{ display:none; }
   /* on a wide screen each cell is a block of one width, so the photos of a round stand in a straight line under its heading */
   .rt-tbl{ container-type:inline-size; }
@@ -14790,13 +14795,15 @@ const GE_LS = '48thdb-ge';
   if(!c || !c.rounds) return;
   if(Date.now() - c.at > 30 * 60000) for(const k in c.rounds) if(c.rounds[k]) delete c.rounds[k].live;
   state.geRounds = c.rounds; }catch(e){} })();
+// who holds ranks 1–12 of the final results, as one string: a change is a new name for the Senbatsu Round of the thank-you event
+const geFinalTopKey = () => { const sl = geSlots('ge2026-final'); return Array.from({ length:12 }, (_, k) => (sl[k + 1] && sl[k + 1].id) || '').join(); };
 function listenGE(){
   if(_geUnsub) return;
   try{
     _geUnsub = fbDb.collection('ge').onSnapshot(snap => {
       const next = {};
       snap.docs.forEach(d => { next[d.id] = d.data(); });
-      const same = JSON.stringify(next) === JSON.stringify(state.geRounds || {});
+      const same = JSON.stringify(next) === JSON.stringify(state.geRounds || {}), topWas = geFinalTopKey();
       state.geRounds = next; _geLoaded = true;
       try{ localStorage.setItem(GE_LS, JSON.stringify({ at:Date.now(), rounds:next })); }catch(e){}
       if(tickerSpeedMine != null && +((next.ticker || {}).speed) === tickerSpeedMine) tickerSpeedMine = null;
@@ -14804,6 +14811,7 @@ function listenGE(){
       { const on = !!(next.theme && next.theme.on); let was = null; try{ was = localStorage.getItem(FEST.SITE_LS); localStorage.setItem(FEST.SITE_LS, on ? '1' : '0'); }catch(e){}
         if(was !== null && (was === '1') !== on && document.getElementById('main')){ renderMain(); return; } }
       if(!document.getElementById('main')) return;
+      if(topWas !== geFinalTopKey()) rotaLiveGe();   // a name of the top twelve was entered: it goes up on an open sheet at once
       if(state.selectedId || state.selectedEvent || state.posterOf || state.editingId) return;
       // the owner mid-entry keeps their cursor; the page catches up after
       if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
@@ -18937,7 +18945,12 @@ const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.d
 // a table cell of a lanes rota: small photo, name under it
 const rotaCell = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
   return `<button class="rt-c${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}"><i>${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}</i><span data-noloc${nickName(m).length > 9 ? ' class="is-long"' : ''}>${escapeHtml(nickName(m))}</span></button>`; };
-const rotaClearHl = root => { root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.hl').forEach(x => x.classList.remove('hl', 'rt-tap', 'rt-ping')); };
+const rotaClearHl = root => { root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.hl').forEach(x => x.classList.remove('hl', 'rt-tap', 'rt-ping'));
+  const c = root.closest('.modal-glass-card'), b = c && c.querySelector('.rt-go'); if(b) b.remove(); };
+// a second tap on a face now lets her go, so the way to her page is a pill at the foot of the sheet while she is lit
+const rotaGo = (root, id) => { const c = root.closest('.modal-glass-card'), m = getMember(id); if(!c || !m) return;
+  let b = c.querySelector('.rt-go'); if(!b){ b = document.createElement('button'); b.className = 'rt-go'; b.dataset.action = 'open-member'; c.appendChild(b); }
+  b.dataset.id = id; b.innerHTML = `<span data-noloc>${escapeHtml(nickName(m))}</span> · ${isEN() ? 'Open profile' : 'ดูโปรไฟล์'} ›`; };
 // one short play on a rota: rt-wave going in and out of โอชิฉัน, rt-in when the tables change
 const rotaAnim = (root, c) => { if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;
   root.classList.remove('rt-wave', 'rt-in'); void root.offsetWidth; root.classList.add(c);
@@ -18966,16 +18979,15 @@ function renderRota(ev){
   const at = (hm, day) => { const d = parseYmd(day); const [h, m] = hm.split(':').map(Number); d.setHours(h, m, 0, 0); return d.getTime(); };
   const kind = k => R.kinds.find(x => x.k === k), mine = state.oshi || [];
   const tile = rotaTile;
-  // a `ge` round takes ranks 1–12 from the latest election results, lane = rank (until the final, the latest quick result)
-  // only the final results put faces in it; before that each lane says its rank, as the poster's table does (the owner's word, 9 Nov)
-  const geR = R.rounds.some(r => r.ge) ? geLatestRound() : null, geFinal = !!geR && geR.id === 'ge2026-final' && geAnnounced(geR.id) >= 12;
-  const geIds = () => { const sl = geFinal ? geSlots(geR.id) : {}; return Array.from({ length:12 }, (_, k) => (sl[k + 1] && sl[k + 1].id && getMember(sl[k + 1].id)) ? sl[k + 1].id : null); };
+  // a `ge` round takes ranks 1–12 from the final results, lane = rank: each face comes up the moment her name is entered (rotaLiveGe);
+  // until then her lane says its rank, as the poster's table does (the owner's word, 9 Nov)
+  const geIds = () => { const sl = geSlots('ge2026-final'); return Array.from({ length:12 }, (_, k) => (sl[k + 1] && sl[k + 1].id && getMember(sl[k + 1].id)) ? sl[k + 1].id : null); };
   const rounds = R.rounds.map(r => r.ge ? { ...r, ids: geIds() } : r), dayOf = r => r.d || R.day;
   const stateOf = r => { const D = dayOf(r), done = D < iso || (D === iso && at(r.b, D) <= now); return { done, on:D === iso && !done && at(r.a, D) <= now }; };
   const laneTile = (r, id, i) => !R.lanes ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap${r.ge ? ' is-rank' : ''}"><i class="rt-lane">${i + 1}</i>${r.ge ? `<span>${en ? `Rank ${i + 1}` : `อันดับ ${i + 1}`}</span>` : ''}</span>`;
   const hasOshi = ids => ids.some(i => mine.includes(i)) ? 1 : 0;
   const roundRow = r => { const K = kind(r.k), D = dayOf(r), { done, on } = stateOf(r);
-    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${D}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${hasOshi(r.ids)}" style="--b:${K.c}">
+    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${D}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${hasOshi(r.ids)}"${r.ge ? ' data-ge="1"' : ''} style="--b:${K.c}">
       <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${r.ge ? (en ? 'Lane = final rank' : 'เลนตามอันดับผลสุดท้าย') : `${en ? 'Round' : 'รอบที่'} ${r.n}`}</small><em></em></div>
       <div class="rt-g">${r.ids.map((id, i) => laneTile(r, id, i)).join('')}</div></div>`; };
   // a lanes rota reads as a table: a row for each lane, a column for each round of a kind (the owner, 9 Nov: the rows of big tiles were bulky)
@@ -18997,8 +19009,22 @@ function renderRota(ev){
     <div class="rt-box" data-rota data-day="${pick}">
       ${dayPills}
       <div class="rt-tabs" role="tablist">${tab('all', en ? 'All' : 'ทั้งหมด')}${R.kinds.map(K => tab(K.k, en ? K.en : K.th, K.c)).join('')}${mine.length ? tab('oshi', en ? 'My oshi' : 'โอชิฉัน', '#E4457E') : ''}</div>
-      <p class="rt-hint">${en ? 'Tap a face to see every round she is in, tap elsewhere to clear' : 'แตะหน้าเมมเบอร์เพื่อดูทุกรอบที่เธออยู่ แตะที่อื่นเพื่อยกเลิก'}</p>
+      <p class="rt-hint">${en ? 'Tap a face to see every round she is in, tap it again or elsewhere to clear' : 'แตะหน้าเมมเบอร์เพื่อดูทุกรอบที่เธออยู่ แตะซ้ำหรือแตะที่อื่นเพื่อยกเลิก'}</p>
       <div class="rt-list">${rowsHtml}<p class="rt-none" hidden>${en ? 'None of your oshi are on this day.' : 'โอชิของคุณไม่อยู่ในรอบของวันนี้'}</p></div></div>`;
+}
+/* A name of the final's top twelve was entered: the open sheet's Senbatsu row is swapped where it stands, so the reader's tab and
+   place on the page stay, and the new face pops in. */
+function rotaLiveGe(){
+  const ev = state.selectedEvent && SEED_SCHEDULE.find(e => e.id === state.selectedEvent), root = document.querySelector('.rt-box');
+  if(!ev || !ev.rota || !root || !ev.rota.rounds.some(r => r.ge)) return;
+  const box = document.createElement('div'); box.innerHTML = renderRota(ev);
+  const fresh = box.querySelectorAll('.rt-row[data-ge]');
+  root.querySelectorAll('.rt-row[data-ge]').forEach((old, i) => { const n = fresh[i]; if(!n) return;
+    const had = new Set([...old.querySelectorAll('.rt-f[data-id]')].map(x => x.dataset.id));
+    n.querySelectorAll('.rt-f[data-id]').forEach(x => { if(!had.has(x.dataset.id)) x.classList.add('rt-new'); if(root.dataset.hl && x.dataset.id === root.dataset.hl) x.classList.add('hl'); });
+    const a = old.querySelector('em'), b = n.querySelector('em'); if(a && b) b.textContent = a.textContent;
+    old.replaceWith(n); });
+  rotaShow(root);
 }
 /* a row's activity in its own colour (ev.tones = [{ m:'Group Hi-Touch', c:'#E4457E' }]): the name as a chip, the round after it */
 const esTone = (ev, what) => (ev.tones || []).find(t => what.startsWith(t.m)) || null;
@@ -31037,10 +31063,10 @@ function bindDelegatedEvents(){
       root.dataset.k = k; rotaShow(root); }
     else if(action==='rota-day'){ const root = el.closest('[data-rota]'); root.dataset.day = id; root.querySelectorAll('.rt-day').forEach(x => x.classList.toggle('on', x === el)); rotaAnim(root, 'rt-in'); rotaShow(root); }
     else if(action==='rota-hl'){ const root = el.closest('[data-rota]'), same = root.dataset.hl === id;
-      if(same){ rotaClearHl(root); el.dataset.action = 'open-member'; el.click(); el.dataset.action = 'rota-hl'; return; }
+      if(same){ rotaClearHl(root); return; }
       root.dataset.hl = id;
       root.classList.add('has-hl');
-      root.querySelectorAll('.rt-f, .rt-c').forEach(x => { const on = x.dataset.id === id; x.classList.toggle('hl', on); x.classList.remove('rt-tap', 'rt-ping'); if(on){ void x.offsetWidth; x.classList.add(x === el ? 'rt-tap' : 'rt-ping'); } }); }
+      root.querySelectorAll('.rt-f, .rt-c').forEach(x => { const on = x.dataset.id === id; x.classList.toggle('hl', on); x.classList.remove('rt-tap', 'rt-ping'); if(on){ void x.offsetWidth; x.classList.add(x === el ? 'rt-tap' : 'rt-ping'); } }); rotaGo(root, id); }
     else if(action==='slide-to'){ const tr = el.closest('.evm-slides').querySelector('[data-track]'); tr.scrollTo({ left:trackStep(tr) * (+el.dataset.i), behavior:'smooth' }); }
     else if(action==='open-poster'){
       state.geClip = false; state.posterOf = id; renderMain(); pushHistory();
