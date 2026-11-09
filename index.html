@@ -2444,6 +2444,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-f span{ position:absolute; z-index:1; left:3px; right:3px; bottom:4px; font-size:10px; font-weight:800; line-height:1.1; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-shadow:0 1px 2px rgba(0,0,0,.6); }
   .rt-f.is-oshi{ outline:2.5px solid #FFC83D; outline-offset:-2.5px; }
   [data-rota].has-hl .rt-f{ opacity:.25; transition:opacity .15s; } [data-rota].has-hl .rt-f.hl{ opacity:1; outline:3px solid #FFC83D; outline-offset:-3px; }
+  /* rota.lanes: each tile carries its lane number (a gap keeps the place of an empty lane) */
+  .rt-lane{ position:absolute; z-index:1; top:3px; left:3px; min-width:15px; height:15px; padding:0 3px; border-radius:8px; background:rgba(0,0,0,.55); color:#fff; font-size:9px; font-weight:800; line-height:15px; font-style:normal; text-align:center; }
+  .rt-gap{ cursor:default; background:var(--surface-2, rgba(127,127,127,.12)); box-shadow:none; opacity:.5; }
   .rt-g .rt-f{ min-width:0; } .slot-who .rt-g, .rota-who .rt-g, .es-who .rt-g, .es-gwho .rt-g{ width:100%; }
   .rt-days{ display:flex; gap:6px; overflow-x:auto; padding:0 1px 8px; scrollbar-width:none; } .rt-days::-webkit-scrollbar{ display:none; }
   .rt-day{ flex:none; display:flex; flex-direction:column; align-items:center; min-width:54px; padding:5px 10px; border-radius:12px; border:1px solid var(--line); background:var(--card); font:inherit; font-size:15px; font-weight:800; color:var(--ink); line-height:1.15; box-shadow:0 2px 0 var(--line); cursor:pointer; }
@@ -8404,13 +8407,39 @@ const SEED_SCHEDULE = [
         'cgm-ginna','cgm-nisha','cgm-ploen','cgm-else','cgm-punpon',
         'bnk-l','bnk-khowjow','bnk-luksorn','cgm-chifa','cgm-emma']],
     ] },
-  { id:'ev-ge6-heart', start:'2026-11-15', tba:true,
+  { id:'ev-ge6-heart', start:'2026-11-15', time:'10:30', until:'21:15',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 : Heart to Heart', short:'Heart to Heart',
-    groups:['bnk48','cgm48'], timeline:'ge2026',
+    venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'], timeline:'ge2026',
     related:['ev-election-results','ev-concert-2026'],
-    info:['งานต่อเนื่องหลังประกาศผลการเลือกตั้ง',
-      'รายละเอียดสถานที่และเวลารอประกาศ'],
-    allMembers:true },
+    poster:{ accent:'#B8913F', surface:'#F7F2E6', ink:'#3A2A10', img:'posters/ge6-heart-main.jpg', w:2000, h:1334, th:'Heart to Heart', en:'Heart to Heart',
+      more:[{ img:'posters/ge6-heart-rounds.jpg', w:2000, h:1500, th:'ตารางรอบและเลน', en:'Round table' },
+        { img:'posters/ge6-heart-letter.jpg', w:1500, h:1500, th:'Letter Set และ Heart to Heart Event', en:'Letter Set & Heart to Heart Event' },
+        { img:'posters/ge6-heart-rules.jpg', w:1500, h:1500, th:'Appreciation Event และกติกา', en:'Appreciation Event & rules' }] },
+    info:['งานขอบคุณแฟน ๆ หลังประกาศผลการเลือกตั้ง Senbatsu General Election 2026 มีสองกิจกรรม: Appreciation Event (รอบ 1–5) และ Heart to Heart Event (รอบ 6–10) ปิดท้ายด้วย Senbatsu Round',
+      'Appreciation Event: ไม่ต้องใช้บัตร ไม่มีค่าใช้จ่าย ส่งกำลังใจและรับคำขอบคุณจากเมมเบอร์ในเวลาสั้น ๆ',
+      'Heart to Heart Event: ใช้ Letter Set เลือกได้ว่าจะส่งกำลังใจ (เขียนข้อความลง Postcard ให้เสร็จก่อนเข้าเลน แล้วมอบให้เมมเบอร์) หรือรับคำขอบคุณ (นำ Postcard เปล่าเข้าไป เมมเบอร์จะปั๊มตราขอบคุณที่ออกแบบเองและเขียนชื่อเล่นให้)',
+      'Letter Set 250 บาท จำกัด 5 ชุด/Order/คน ได้รับเป็น Benefit จากการซื้อบัตร Senbatsu General Election 2026 Zone A–C และมีขายในวันงานที่จุด Official Merchandise',
+      'ปิดเลน 15 นาทีก่อนจบแต่ละรอบ ถ้ารอบเริ่มช้าจะไม่ทดเวลา',
+      'ใครมาไม่ทันรอบของเมมเบอร์ที่จะส่งจดหมายให้ มีจุดรับจดหมายท้ายฮอลล์',
+      'ห้ามบันทึกภาพ เสียง และวิดีโอ ห้ามสัมผัสตัวเมมเบอร์ นำสัมภาระเข้าเลนได้ 1 ชิ้น (กว้าง+ยาว+สูง ไม่เกิน 90 ซม.) ห้ามนำอาหารและเครื่องดื่มเข้างาน ยกเว้นน้ำดื่มขวดพลาสติกมีฝาปิด'],
+    detail:['10:30–15:15 Appreciation Event รอบ 1–5 (ไม่ต้องใช้บัตร)',
+      '15:30–20:30 Heart to Heart Event รอบ 6–10 (ใช้ Letter Set)',
+      '20:45–21:15 Senbatsu Round: อันดับ 1–12 อยู่เลน 1–12 ตามอันดับ'],
+    members:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon','bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail','bnk-wawa','bnk-fame','cgm-kwan','cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin','bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing','bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'],
+    rota:{ day:'2026-11-15', head:'ตารางรอบและเลน', where:'MCC Hall', lanes:true,
+      kinds:[{ k:'ap', th:'Appreciation', en:'Appreciation', c:'#3E8E4F' }, { k:'hh', th:'Heart to Heart', en:'Heart to Heart', c:'#B8913F' }],
+      rounds:[
+      { k:'ap', n:1, a:'10:30', b:'11:15', ids:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon'] },
+      { k:'ap', n:2, a:'11:30', b:'12:15', ids:['bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail',null,'bnk-wawa','bnk-fame','cgm-kwan'] },
+      { k:'ap', n:3, a:'12:30', b:'13:15', ids:['cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin'] },
+      { k:'ap', n:4, a:'13:30', b:'14:15', ids:[null,'bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing'] },
+      { k:'ap', n:5, a:'14:30', b:'15:15', ids:['bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'] },
+      { k:'hh', n:6, a:'15:30', b:'16:30', ids:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon'] },
+      { k:'hh', n:7, a:'16:30', b:'17:30', ids:['bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail',null,'bnk-wawa',null,'cgm-kwan'] },
+      { k:'hh', n:8, a:'17:30', b:'18:30', ids:['cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin'] },
+      { k:'hh', n:9, a:'18:30', b:'19:30', ids:['bnk-fame','bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing'] },
+      { k:'hh', n:10, a:'19:30', b:'20:30', ids:['bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'] },
+      ] } },
   { id:'ev-mbk-haunted-graveyard-1026', start:'2026-10-26', end:'2026-10-29', time:'16:00', until:'19:30',
     title:'THE HAUNTED GRAVEYARD',
     venue:'MBK Center, Bangkok', groups:['bnk48','cgm48'],
@@ -18857,7 +18886,7 @@ function renderRota(ev){
   const rows = R.rounds.map(r => { const K = kind(r.k), D = r.d || R.day, done = D < iso || (D === iso && at(r.b, D) <= now), on = D === iso && !done && at(r.a, D) <= now;
     return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${r.d || R.day}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${r.ids.some(i => mine.includes(i)) ? 1 : 0}" style="--b:${K.c}">
       <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${en ? 'Round' : 'รอบที่'} ${r.n}</small><em></em></div>
-      <div class="rt-g">${r.ids.map(tile).join('')}</div></div>`; }).join('');
+      <div class="rt-g">${r.ids.map((id, i) => !R.lanes ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap"><i class="rt-lane">${i + 1}</i></span>`).join('')}</div></div>`; }).join('');
   const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   const dayPills = days.length > 1 ? `<div class="rt-days" role="tablist">${days.map(d => { const x = parseYmd(d); return `<button class="rt-day${d === pick ? ' on' : ''}" data-action="rota-day" data-id="${d}"><small>${WD[x.getDay()]}</small>${x.getDate()} ${M[x.getMonth()]}</button>`; }).join('')}</div>` : '';
   const tab = (k, label, c) => `<button class="rt-tab${k === 'all' ? ' on' : ''}" data-action="rota-tab" data-id="${k}"${c ? ` style="--b:${c}"` : ''}>${label}</button>`;
