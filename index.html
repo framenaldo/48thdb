@@ -15717,7 +15717,9 @@ function renderGECWallet(en, N, hm){
 const gecOnScreen = () => (state.view === 'timeline' && ['chain', 'overview', undefined, null, ''].includes(state.geTab));
 function gecKick(force){
   if(gecBusy || !gecOnScreen()) return;
-  if(!force && Date.now() - gecAt < 2500 && gecLoad('ge2026')) return;
+  // through our Worker a look counts against its free daily allowance (100,000 requests, all of api.48thdb.com):
+  // every 3 s from every open vote tab ran it out on 9 Nov and took the whole Worker down, so via the proxy a look is at most every 10 s
+  if(!force && Date.now() - gecAt < (gecVia === 'proxy' ? 10000 : 2500) && gecLoad('ge2026')) return;
   const mark = () => { const d = gecLoad('ge2026'), t = gecLoad('tok'); return (d ? d.n : -1) + ':' + (t ? t.n : -1); };
   const m0 = mark(), had25 = !!gecLoad('ge2025'), err0 = gecErr;
   gecErr = null;
@@ -15787,7 +15789,8 @@ function gecSocket(){
 }
 function gecPushed(){
   if(gecBusy){ gecAgain = true; return; }
-  gecAt = 0; gecKick();
+  if(gecVia !== 'proxy') gecAt = 0;   // via our Worker the 10-second spacing holds (gecKick)
+  gecKick();
 }
 // the "up to" line alone, when a check found nothing new
 function gecStamp(){
@@ -16060,6 +16063,7 @@ function gecHourRows(d, o, hNow){
 let gecLite = null, gecLiteBusy = false, gecLiteAt = 0, gecLiteTimer = null;
 async function gecLiteSync(){
   if(gecLiteBusy) return;
+  if(gecVia === 'proxy' && gecLite && Date.now() - gecLiteAt < 20000) return;   // spare the Worker's daily allowance (see gecKick)
   gecLiteBusy = true;
   try{
     const p = GEC_POLLS.ge2026, full = gecLoad('ge2026'), past = gecLoad('ge2025');
@@ -16143,12 +16147,12 @@ function gecHugeLine(en){
 function gecHomeCard(en){
   const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), iso = toYmd(todayStart());
   if(!vote || iso < vote.start || iso > eventLastDay(vote)) return '';
-  if(Date.now() - gecLiteAt > 15000) setTimeout(gecLiteSync, 0);
+  if(Date.now() - gecLiteAt > 45000) setTimeout(gecLiteSync, 0);
   if(!gecLiteTimer) gecLiteTimer = setInterval(() => {
     if(state.view !== 'feed'){ clearInterval(gecLiteTimer); gecLiteTimer = null; return; }
     gecSocket();
     if(!document.hidden) gecLiteSync();
-  }, 15000);
+  }, 45000);   // was 15 s: the home card's looks go through the Worker too (see gecKick)
   setTimeout(gecSocket, 0);
   return `<section class="feed-block is-gevote"><h2 class="section-label">${en ? 'GE2026 · Live Voting' : 'GE2026 · โหวตสด'}</h2>${gecHomeTeaser(en)}</section>`;
 }
