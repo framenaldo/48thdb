@@ -207,7 +207,7 @@ the Firebase CLI from the owner's machine.
   and loaded when the Works page is drawn (`mediaEps`). Add a new episode there; such a
   work carries no single `yt`.
 - Who is on, wherever it is shown, is a photo tile with her name over it (`rotaTile`, `rt-f`); a tap lights her in every
-  round of that block, a second tap opens her page and a tap anywhere else lets go (`rota-hl`, `rotaClearHl`). A rota with `lanes:true` is a table instead, lanes down and rounds across, one table a kind (`rotaCell`, `laneTable`: the owner found rows of big tiles bulky, 9 Nov); its โอชิฉัน tab has rows of its own holding only the reader's oshi with their lanes (`rt-mine`). An event with rounds of several kinds and/or days
+  round of that block, a second tap opens her page and a tap anywhere else lets go (`rota-hl`, `rotaClearHl`). A rota with `lanes:true` is a table instead, lanes down and rounds across, one table a kind (`rotaCell`, `laneTable`: the owner found rows of big tiles bulky, 9 Nov); โอชิฉัน keeps the same page and dims everyone else (`is-oshi-only`; the owner's word, 9 Nov). An event with rounds of several kinds and/or days
   carries `rota: { day?, head, where, kinds:[{k,th,en,c}], rounds:[{d?,k,n,a,b,ids}] }` (`renderRota`: day pills when the
   rounds span days, tabs by kind and "โอชิฉัน", rounds past or on now marked by the clock) — the Busking day and the
   Haunted Graveyard. A roadshow's `lineup` and a booth's `slots` keep their own tables but draw the same tiles.
