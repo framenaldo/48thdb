@@ -28,6 +28,7 @@ const YT_TTL_MS = 30000;              // one look per channel per half minute, s
 const KEEP_MS = 5 * 60 * 1000;        // how long a refused check may stand on the last answer
 
 import { pushRoute, pushTick } from './push.js';
+import { checkinRoute } from './checkin.js';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -370,20 +371,26 @@ const VISITS_TTL = 120;
 const GOOGLE_JWK = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
 
 const b64url = (t) => Uint8Array.from(atob(t.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((t.length + 3) % 4)), (c) => c.charCodeAt(0));
-async function isOwner(request, env) {
+/* The Firebase ID token the page sends, checked against Google's signature: its claims, or null. */
+async function firebaseClaims(request) {
   const m = (request.headers.get('authorization') || '').match(/^Bearer\s+([\w-]+)\.([\w-]+)\.([\w-]+)$/);
-  if (!m || !env.OWNER_EMAIL) return false;
+  if (!m) return null;
   const head = JSON.parse(new TextDecoder().decode(b64url(m[1])));
   const body = JSON.parse(new TextDecoder().decode(b64url(m[2])));
   const now = Date.now() / 1000;
   if (head.alg !== 'RS256' || body.aud !== FIREBASE_PROJECT || body.iss !== `https://securetoken.google.com/${FIREBASE_PROJECT}`
-    || !(body.exp > now) || !(body.iat < now + 300) || body.email_verified !== true
-    || String(body.email || '').toLowerCase() !== env.OWNER_EMAIL.trim().toLowerCase()) return false;
+    || !(body.exp > now) || !(body.iat < now + 300) || !body.sub) return null;
   const keys = await (await fetch(GOOGLE_JWK, { cf: { cacheTtl: 3600, cacheEverything: true } })).json();
   const jwk = (keys.keys || []).find((k) => k.kid === head.kid);
-  if (!jwk) return false;
+  if (!jwk) return null;
   const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
-  return crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64url(m[3]), new TextEncoder().encode(`${m[1]}.${m[2]}`));
+  const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64url(m[3]), new TextEncoder().encode(`${m[1]}.${m[2]}`));
+  return ok ? body : null;
+}
+async function isOwner(request, env) {
+  if (!env.OWNER_EMAIL) return false;
+  const c = await firebaseClaims(request);
+  return !!c && c.email_verified === true && String(c.email || '').toLowerCase() === env.OWNER_EMAIL.trim().toLowerCase();
 }
 
 const VISITS_QUERY = `query ($a: String!, $host: String!, $s: Time!, $w: Time!, $f: Time!, $e: Time!) {
@@ -844,6 +851,8 @@ export default {
     }
     const pushed = await pushRoute(request, env, new URL(request.url));
     if (pushed) return pushed;
+    const checked = await checkinRoute(request, env, new URL(request.url), { claims: firebaseClaims, owner: isOwner, headers: JSON_HEADERS });
+    if (checked) return checked;
     if (new URL(request.url).pathname === '/translate') {
       const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
       const say = (body, status) => new Response(JSON.stringify(body), { status, headers: own });

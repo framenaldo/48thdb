@@ -1017,6 +1017,41 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     transition:transform .25s var(--ease-out), opacity .2s ease; box-shadow:0 -10px 40px rgba(0,0,0,.2); }
   .share-sheet.show .share-back{ opacity:1; }
   .share-sheet.show .share-panel{ transform:none; opacity:1; }
+  /* check-in by photo and the stamp book */
+  .ck-row{ display:flex; align-items:center; gap:10px; margin:12px 0 4px; flex-wrap:wrap; }
+  .ck-row.is-done{ color:var(--ink-soft); font-size:13px; font-weight:600; }
+  .ck-row small{ color:var(--ink-soft); font-size:12px; }
+  .ck-btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; font:inherit; font-weight:700; font-size:15px; padding:11px 20px; border-radius:99px; border:2px solid var(--pink); background:linear-gradient(135deg,var(--pink),#ff9bc0); color:#fff; cursor:pointer; box-shadow:0 4px 0 #c9457c; transition:transform .08s, box-shadow .08s; }
+  .ck-btn:active{ transform:translateY(3px); box-shadow:0 1px 0 #c9457c; }
+  .ck-btn.is-ghost{ background:var(--card); color:var(--pink); box-shadow:0 4px 0 var(--line); }
+  .ck-btn.is-ghost:active{ box-shadow:0 1px 0 var(--line); }
+  .ck-ink{ --k:#E4457E; --r:-8deg; width:8em; height:8em; margin:0 auto; border-radius:50%; position:relative; color:var(--k); display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; transform:rotate(var(--r)); border:.29em solid var(--k); filter:url(#ck-rough); flex:none; }
+  .ck-ink::before{ content:""; position:absolute; inset:.43em; border-radius:50%; border:.11em solid var(--k); }
+  .ck-ink b{ font-size:1.85em; line-height:1; color:var(--k); margin:0; }
+  .ck-ink i{ font-style:normal; font-size:.58em; letter-spacing:.06em; margin-top:.4em; text-align:center; line-height:1.25; padding:0 1.4em; white-space:nowrap; }
+  .ck-ink em{ font-style:normal; font-size:.57em; letter-spacing:.35em; border-top:.14em solid var(--k); border-bottom:.14em solid var(--k); padding:.1em .5em; margin-bottom:.5em; }
+  .ck-ink.is-off{ border-style:dashed; border-color:var(--line); filter:none; }
+  .ck-ink.is-off::before{ display:none; }
+  .ck-ink.is-big{ margin:8px auto 14px; animation:ck-stamp .55s cubic-bezier(.2,1.5,.4,1); }
+  @keyframes ck-stamp{ from{ transform:scale(1.9) rotate(-24deg); opacity:0; } 60%{ opacity:1; } to{ transform:scale(1) rotate(var(--r)); } }
+  .ck-cam{ aspect-ratio:4/3; border-radius:20px; border:2px dashed var(--line); display:flex; align-items:center; justify-content:center; font-size:44px; margin:10px 0 14px; background:var(--paper-dim); }
+  .ck-shots{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .ck-shots .ck-btn{ flex:1; min-width:130px; }
+  .ck-priv{ font-size:12px; color:var(--ink-soft); margin:12px 0 0; text-align:center; }
+  .ck-why{ font-size:13px; color:var(--pink); text-align:center; margin:12px 0 0; font-weight:600; }
+  .ck-scan{ position:relative; height:200px; border-radius:20px; overflow:hidden; background:var(--paper-dim); margin:10px 0 14px; }
+  .ck-scan img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .ck-scan::after{ content:""; position:absolute; left:0; right:0; height:54px; top:-54px; background:linear-gradient(transparent,rgba(255,255,255,.6),transparent); border-bottom:2px solid #fff; animation:ck-sweep 1.6s ease-in-out infinite; }
+  @keyframes ck-sweep{ to{ top:200px; } }
+  .ck-wait{ text-align:center; font-weight:700; margin:0 0 6px; }
+  .ck-res{ text-align:center; }
+  .ck-res h3{ margin:0 0 6px; font-size:20px; }
+  .ck-gain{ display:inline-block; font-weight:700; font-size:14px; padding:7px 16px; border-radius:99px; background:#fff3dc; border:2px solid #d9a35a; color:#7a4a17; margin:0 0 14px; }
+  .ck-book{ background:var(--card); border:2px solid var(--line); border-radius:22px; padding:16px 12px; }
+  .ck-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px 6px; }
+  .ck-cell{ text-align:center; font-size:11px; }
+  .ck-cell b{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-top:6px; font-size:12px; color:var(--ink); line-height:1.25; }
+  @media (prefers-reduced-motion:reduce){ .ck-ink.is-big{ animation:none; } .ck-scan::after{ animation:none; } }
   @media (min-width:700px){ .share-sheet{ align-items:center; } .share-panel{ border-radius:26px; } }
   .share-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; font-size:17px; }
   .share-x{ width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; font-size:15px; }
@@ -11247,7 +11282,7 @@ async function loadOshiData(){
   try{
     const doc = await fbDb.collection('users').doc(fbAuth.currentUser.uid).get();
     const d = doc.exists ? doc.data() : {};
-    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null, layout:d.layout||null, meow:d.meow||null, quiz:d.quiz||null};
+    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null, layout:d.layout||null, meow:d.meow||null, quiz:d.quiz||null, stamps:d.stamps||null};
   }catch(e){ return {oshi:[], kamiOshi:null}; }
 }
 async function saveOshiData(){
@@ -11369,6 +11404,175 @@ function openPushSheet(){
       }catch(err){ say(t('เปิดไม่สำเร็จ ลองใหม่อีกครั้ง', 'Could not turn it on. Try again.')); }
     }
   });
+}
+/* ============================= เช็กอินงานด้วยรูป · สมุดแสตมป์ =============================
+   At an official event a signed-in reader photographs a sign, backdrop or screen that carries the BNK48 or CGM48 logo;
+   the Worker (worker/checkin.js, POST /checkin) answers yes or no and the event is stamped in the reader's book. The
+   photo is not kept. Hidden until `GET api.48thdb.com/checkin` answers 405 (checkCheckin), so the page can ship before
+   the Worker. A stamp is kept per account: localStorage `48thdb-stamps:<uid>` and users/<uid>.stamps, merged by union.
+   Each new stamp gives the cat CK_COOKIES snacks (_meow.snacks, the 🍪 in her home). The reader is not told what is
+   checked. The owner's account may try it on any physical event at any time. */
+const CK_COOKIES = 3;
+let _ckOn = false, _ckPush = 0, _ckCloudRead = false;
+function checkCheckin(){
+  return fetch(`${LIVE_API}/checkin`, { cache:'no-store' }).then(r => {
+    if(r.status !== 405 || _ckOn) return;
+    _ckOn = true;
+    if(state.selectedEvent || state.view === 'profile') renderMain();
+  }).catch(() => {});
+}
+const ckUid = () => (state.account && state.account.loggedIn && fbAuth.currentUser && fbAuth.currentUser.uid) || null;
+function ckStamps(){
+  const u = ckUid(); if(!u) return {};
+  try{ const o = JSON.parse(localStorage.getItem('48thdb-stamps:' + u) || '{}'); return o && typeof o === 'object' ? o : {}; }catch(e){ return {}; }
+}
+function ckSave(o){
+  const u = ckUid(); if(!u) return;
+  try{ localStorage.setItem('48thdb-stamps:' + u, JSON.stringify(o)); }catch(e){}
+  clearTimeout(_ckPush); _ckPush = setTimeout(ckPushNow, 1500);
+}
+function ckPushNow(){
+  const u = ckUid(); if(!u || !_ckCloudRead) return;
+  const o = ckStamps(); if(!Object.keys(o).length) return;
+  fbDb.collection('users').doc(u).set({ stamps:o }, { merge:true }).catch(e => { try{ console.warn('stamps sync', e); }catch(x){} });
+}
+// the account's stamps and this device's, joined (a stamp is never taken back); true when the page should be drawn again
+function ckFromAccount(c){
+  _ckCloudRead = true;
+  const u = ckUid(); if(!u) return false;
+  const mine = ckStamps(), cloud = c && typeof c === 'object' ? c : {};
+  let grew = false, fresh = false;
+  for(const k of Object.keys(cloud)) if(!mine[k] && cloud[k] && typeof cloud[k] === 'object'){ mine[k] = cloud[k]; grew = true; }
+  for(const k of Object.keys(mine)) if(!cloud[k]) fresh = true;
+  if(grew) try{ localStorage.setItem('48thdb-stamps:' + u, JSON.stringify(mine)); }catch(e){}
+  if(fresh) ckPushNow();
+  return grew;
+}
+function ckOpenNow(ev){
+  if(!ev || ev.cancelled || ev.period || ev.tba || ev.online || !ev.venue) return false;
+  const iso = toYmd(todayStart()), at = startsAt(ev, iso); if(!at) return false;
+  const end = endsAtToday(ev, iso) || at + DEFAULT_RUN_MS, now = Date.now();
+  return now >= at - 45 * 60000 && now <= end + 30 * 60000;
+}
+// the place on a stamp: the last part of the venue, cut at a word so that it fits the ring (14 characters)
+function ckPlace(ev){
+  const v = String(ev.venue || '').split(',').pop().trim();
+  if(v.length <= 14) return v;
+  let out = '';
+  for(const w of v.split(/\s+/)){ const n = out ? out + ' ' + w : w; if(n.length > 14) break; out = n; }
+  return out || v.slice(0, 13) + '…';
+}
+const CK_MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const CK_MON_EN = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+// the colour of a stamp follows the kind of event
+function ckColor(ev){
+  const t = ev.title || '';
+  if(/หลอน|halloween/i.test(t)) return '#7a4fd0';
+  if(/election|results|GE\s?20|เลือกตั้ง/i.test(t)) return '#c58a12';
+  if(/pop\s*up/i.test(t)) return '#2E8C82';
+  if(/birthday|วันเกิด/i.test(t)) return '#3d8fd6';
+  return '#E4457E';
+}
+function ckRec(ev){
+  const iso = toYmd(todayStart());
+  return { at:Date.now(), d:iso, t:eventShortName(ev), p:ckPlace(ev), c:ckColor(ev) };
+}
+// one ink stamp: day, month and place; sz is its font size in px (the stamp is 8em wide)
+function ckStampHtml(r, sz, cls){
+  const en = isEN(), m = Number(String(r.d || '').slice(5, 7)) - 1, day = Number(String(r.d || '').slice(8, 10)) || '';
+  const rot = ((r.at || 0) % 15) - 7;
+  return `<div class="ck-ink${cls ? ' ' + cls : ''}" style="--k:${escapeAttr(r.c || '#E4457E')};--r:${rot}deg;font-size:${sz}px"><em>OFFICIAL</em><b>${day}</b><i>${m >= 0 ? (en ? CK_MON_EN[m] : CK_MON[m]) : ''}<br>${escapeHtml(String(r.p || '').toUpperCase())}</i></div>`;
+}
+function ckEnsureFilter(){
+  if(document.getElementById('ck-rough')) return;
+  const d = document.createElement('div'); d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+  d.innerHTML = '<svg width="0" height="0" aria-hidden="true"><filter id="ck-rough"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -.8 1.2" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter></svg>';
+  document.body.appendChild(d);
+}
+// the button on an event's sheet
+function renderCheckinBtn(ev){
+  if(!_ckOn || !ev || ev.online || !ev.venue || ev.period || ev.cancelled) return '';
+  const open = ckOpenNow(ev), tryIt = state.isOwner && !open, got = ckStamps()[ev.id];
+  if(!open && !tryIt && !got) return '';
+  ckEnsureFilter();
+  const en = isEN();
+  if(got) return `<div class="ck-row is-done">${ckStampHtml(got, 6)}<span>${en ? 'Checked in' : 'เช็กอินแล้ว'}</span></div>`;
+  return `<div class="ck-row"><button class="ck-btn" data-action="ck-open" data-id="${escapeAttr(ev.id)}"><span aria-hidden="true">📸</span>${en ? 'Check in' : 'เช็กอินงานนี้'}</button>${tryIt ? `<small>${en ? '(owner: try it)' : '(เจ้าของ: ทดลอง)'}</small>` : ''}</div>`;
+}
+// the profile's book
+function renderStampBook(){
+  const o = ckStamps(), list = Object.keys(o).map(k => o[k]).sort((a, b) => (b.at || 0) - (a.at || 0));
+  if(!ckUid() || (!_ckOn && !list.length)) return '';
+  ckEnsureFilter();
+  const en = isEN(), n = list.length, slots = Math.max(6, Math.ceil(n / 3) * 3 + (n % 3 === 0 ? 0 : 0));
+  const cells = list.map(r => `<div class="ck-cell">${ckStampHtml(r, 10)}<b>${escapeHtml(r.t || '')}</b></div>`).join('')
+    + Array.from({ length:Math.max(0, slots - n) }, () => '<div class="ck-cell"><div class="ck-ink is-off" style="font-size:10px"></div></div>').join('');
+  return `<section class="lay-z" data-zone="stamps"><h3 class="section-label">${en ? 'Stamp book' : 'สมุดแสตมป์'}${n ? ` (${n})` : ''}</h3>
+    <div class="ck-book">${n ? '' : `<p class="muted-note" style="margin:0 0 12px">${en ? 'Check in at an official event to get your first stamp.' : 'เช็กอินที่งาน official เพื่อรับแสตมป์ใบแรก'}</p>`}<div class="ck-grid">${cells}</div></div></section>`;
+}
+// shrinks the photo (long side 1024px, JPEG) and returns it as base64 without the data: prefix
+async function ckShrink(file){
+  let bmp = null;
+  try{ bmp = await createImageBitmap(file, { imageOrientation:'from-image' }); }catch(e){}
+  if(!bmp){
+    bmp = await new Promise((ok, no) => { const im = new Image(), u = URL.createObjectURL(file); im.onload = () => { URL.revokeObjectURL(u); ok(im); }; im.onerror = no; im.src = u; });
+  }
+  const w0 = bmp.width || bmp.naturalWidth, h0 = bmp.height || bmp.naturalHeight, k = Math.min(1, 1024 / Math.max(w0, h0));
+  const c = document.createElement('canvas'); c.width = Math.round(w0 * k); c.height = Math.round(h0 * k);
+  c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', .8).replace(/^data:image\/jpeg;base64,/, '');
+}
+function openCheckin(id){
+  const ev = SEED_SCHEDULE.find(e => e.id === id); if(!ev) return;
+  const en = isEN(), t = (a, b) => en ? b : a;
+  if(!ckUid()){ state.selectedEvent = null; state.view = 'auth'; render(); pushHistory(); return; }
+  ckEnsureFilter(); closeShareSheet();
+  const el = document.createElement('div'); el.className = 'share-sheet';
+  let step = 'shoot', preview = '', why = '', rec = null, cookies = 0;
+  const body = () => {
+    if(step === 'shoot') return `<p class="lay-sheet-note">${t('ถ่ายป้ายงาน แบ็กดรอป หรือภาพบนจอที่มีโลโก้ BNK48 / CGM48 ให้เห็นชัดๆ', 'Photograph a sign, backdrop or screen showing the BNK48 / CGM48 logo, clearly.')}</p>
+      <div class="ck-cam"><span aria-hidden="true">📸</span></div>
+      <div class="ck-shots"><button class="ck-btn" data-ck="snap">${t('ถ่ายรูป', 'Take a photo')}</button><button class="ck-btn is-ghost" data-ck="pick">${t('เลือกรูป', 'Choose a photo')}</button></div>
+      <input type="file" accept="image/*" capture="environment" hidden data-ck-file="snap"><input type="file" accept="image/*" hidden data-ck-file="pick">
+      ${why ? `<p class="ck-why" role="status">${why}</p>` : ''}
+      <p class="ck-priv">🔒 ${t('รูปใช้ตรวจแล้วลบทิ้ง ไม่ถูกเก็บและไม่แสดงในเว็บ', 'The photo is checked and thrown away. It is not kept or shown.')}</p>`;
+    if(step === 'check') return `<div class="ck-scan">${preview ? `<img src="${preview}" alt="">` : ''}</div><p class="ck-wait">${t('กำลังตรวจรูป… รอสักครู่', 'Checking… one moment')}</p>`;
+    return `<div class="ck-res">${ckStampHtml(rec, 18, 'is-big')}<h3>${t('เช็กอินสำเร็จ!', 'Checked in!')}</h3>
+      ${cookies ? `<p class="ck-gain">🍪 +${cookies} ${t('ขนมให้เหมียว', 'snacks for your cat')}</p>` : ''}
+      <div class="ck-shots"><button class="ck-btn" data-ck="book">${t('ดูสมุดแสตมป์', 'See my stamp book')}</button><button class="ck-btn is-ghost" data-share="close">${t('ปิด', 'Close')}</button></div></div>`;
+  };
+  const paint = () => { el.innerHTML = `<div class="share-back" data-share="close"></div>
+    <div class="share-panel" role="dialog" aria-label="${t('เช็กอินงาน', 'Check in')}">
+      <div class="share-head"><b>${t('เช็กอินงาน', 'Check in')}</b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>${body()}</div>`; };
+  paint();
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  const send = async file => {
+    step = 'check'; preview = URL.createObjectURL(file); why = ''; paint();
+    try{
+      const img = await ckShrink(file), tok = await fbAuth.currentUser.getIdToken();
+      const res = await fetch(`${LIVE_API}/checkin`, { method:'POST', cache:'no-store', headers:{ authorization:`Bearer ${tok}`, 'content-type':'application/json' }, body:JSON.stringify({ e:ev.id, img }) });
+      const d = await res.json().catch(() => ({}));
+      if(d && d.ok){
+        const all = ckStamps(), first = !all[ev.id];
+        rec = all[ev.id] || ckRec(ev);
+        if(first){ all[ev.id] = rec; ckSave(all); if(typeof _meow !== 'undefined' && _meow){ _meow.snacks = Math.min(99, (_meow.snacks || 0) + CK_COOKIES); meowSave(); cookies = CK_COOKIES; } }
+        step = 'done'; paint(); if(state.selectedEvent === ev.id || state.view === 'profile') renderMain();
+        return;
+      }
+      why = { closed:t('ตอนนี้ยังเช็กอินงานนี้ไม่ได้', 'Check-in is not open for this event right now.'), nologo:t('ยังไม่พบป้ายงานในรูป ลองถ่ายให้เห็นโลโก้ชัดๆ อีกครั้ง', 'No event sign found in the photo. Try again with the logo clearly in view.'),
+        dup:t('รูปนี้ถูกใช้ไปแล้ว ลองถ่ายใหม่ที่งาน', 'This photo has been used already. Take a new one at the event.'), busy:t('ลองบ่อยเกินไป รอสักครู่แล้วลองใหม่', 'Too many tries. Wait a little and try again.') }[d && d.why] || t('เช็กอินไม่สำเร็จ ลองใหม่อีกครั้ง', 'Could not check in. Try again.');
+      if(d && d.say && state.isOwner) why += ` [${d.say.model || '-'}: ${d.say.word || '?'}]`;
+    }catch(err){ why = t('เช็กอินไม่สำเร็จ ลองใหม่อีกครั้ง', 'Could not check in. Try again.'); }
+    step = 'shoot'; paint();
+  };
+  el.addEventListener('click', e => {
+    if(e.target.closest('[data-share="close"]')){ closeShareSheet(); return; }
+    const b = e.target.closest('[data-ck]'); if(!b) return;
+    if(b.dataset.ck === 'book'){ closeShareSheet(); state.selectedEvent = null; state.view = 'profile'; render(); pushHistory(); return; }
+    const f = el.querySelector(`[data-ck-file="${b.dataset.ck}"]`); if(f) f.click();
+  });
+  el.addEventListener('change', e => { const f = e.target.files && e.target.files[0]; if(e.target.matches('[data-ck-file]') && f){ e.target.value = ''; send(f); } });
 }
 function renderSetMenu(){
   const en = isEN(), shops = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open').length;
@@ -18845,6 +19049,7 @@ function renderEventModal(){
           : ev.online ? `<span class="evm-venue evm-online">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
             <span>${escapeHtml(ev.online)}</span></span>` : ''}
+        ${renderCheckinBtn(ev)}
         ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
           groupTag(g)).join('')}</div>` : ''}
 
@@ -21564,6 +21769,7 @@ const LAYOUT_ZONES = {
     { k:'oshievents', th:'งานของโอชิ', en:'My oshi’s events', extra:true, icon:'⭐' },
     { k:'feedback', th:'ความคิดเห็น', en:'Feedback' },
     { k:'iam', th:'แอปของวง', en:'The group’s app' },
+    { k:'stamps', th:'สมุดแสตมป์', en:'Stamp book' },
     { k:'backup', th:'สำรองข้อมูล', en:'Backup' },
   ],
 };
@@ -22374,6 +22580,7 @@ function renderProfile(){
   ${oshiMembers.length ? `<div class="grid-mini grid-mini-oshi">${oshiMembers.map(m => renderMiniCard(m)).join('')}</div>` : `<p class="muted-note">ยังไม่มี Oshi — กดดาว ☆ ที่รายชื่อสมาชิกเพื่อเพิ่ม</p>`}
   </section>
   ${zoneOn('profile', 'oshievents') ? `<section class="lay-z" data-zone="oshievents"><h3 class="section-label">${isEN() ? 'My oshi’s events' : 'งานของโอชิที่จะถึง'}</h3>${oshiEventsList(5)}</section>` : ''}
+  ${renderStampBook()}
   <section class="lay-z" data-zone="feedback">
   <h3 class="section-label">ส่งความคิดเห็นถึง 48thDb</h3>
   ${renderFeedbackCard('profile')}
@@ -31121,6 +31328,7 @@ function bindDelegatedEvents(){
       renderMain(); replaceHistory();
     }
     else if(action==='open-push'){ state.setMenuOpen = false; render(); openPushSheet(); }
+    else if(action==='ck-open') openCheckin(id);
     else if(action==='meow-pull'){
       toast(isEN() ? 'Looking for your cat in your account…' : 'กำลังหาน้องในบัญชีของคุณ…');
       meowPullCloud().then(r => { if(r === false) toast(isEN() ? 'No cat in this account yet. Open the cat on the device she is on, while signed in, and she goes up to your account.' : 'บัญชีนี้ยังไม่มีน้องบนคลาวด์ · ถ้าเคยเลี้ยงไว้ที่เครื่องอื่น ให้เปิดเว็บที่เครื่องนั้นตอนล็อกอินอยู่ แล้วน้องจะถูกส่งขึ้นบัญชี'); else if(r === null) toast(isEN() ? 'Could not reach your account. Try again.' : 'ติดต่อบัญชีไม่ได้ ลองใหม่อีกครั้ง'); });
@@ -31534,6 +31742,7 @@ async function init(){
   render();
   refreshTimeline();   // the members' iAM48 posts need no sign-in, so they come at once
   checkAI();
+  checkCheckin();
   checkPush();
   warmMemberSheet();
 
@@ -31596,7 +31805,7 @@ async function init(){
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;
     if(state.account && oshiData.avatar) state.account.avatar = oshiData.avatar;
-    if(state.account && state.account.loggedIn){ meowFromAccount(oshiData.meow || null); if(quizFromAccount(oshiData.quiz || null)) changed = true; }
+    if(state.account && state.account.loggedIn){ meowFromAccount(oshiData.meow || null); if(quizFromAccount(oshiData.quiz || null)) changed = true; if(ckFromAccount(oshiData.stamps || null)) changed = true; }
     // the reader's own arrangement; a guest or someone signed out gets the site as it comes
     const lay = state.account ? (oshiData.layout || null) : null;
     if(JSON.stringify(lay) !== JSON.stringify(_authKnown ? state.layout : _bootLayout)) changed = true;

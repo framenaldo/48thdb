@@ -249,6 +249,27 @@ button first sends the reader to "เพิ่มเว็บไว้หน้�
 .vapid-private`), the public half `VAPID_PUBLIC` is in wrangler.toml. At most 40 pushes a run (the free plan's
 subrequest limit). Not sent yet: live-now and election results.
 
+## Check-in by photo: เช็กอินงาน · สมุดแสตมป์
+
+At an official event with a venue (not online, not a period) a signed-in reader photographs a sign, backdrop or screen that
+carries the BNK48 or CGM48 logo (the owner's rule, 9 Nov 2026) and the event is stamped in their book. The button is
+`renderCheckinBtn` on the event sheet (under the venue line), open from 45 minutes before the start to 30 minutes after the end
+(`ckOpenNow`); the owner may try it on any physical event at any time. The sheet is `openCheckin`; the book is the profile zone
+`stamps` (`renderStampBook`, a row in `LAYOUT_ZONES.profile`); a stamp is an ink stamp in the colour of the kind of event
+(`ckStampHtml`, `ckColor`; the owner chose this look over a gradient coin and a ticket, 9 Nov). Hidden until `GET api.48thdb.com/checkin`
+answers 405 (`checkCheckin`), so the page can ship before the Worker. **Never tell the reader what is checked** (the owner's word):
+the sheet says to show the logo clearly, a refusal says no sign was found, nothing more. The photo is shrunk in the browser
+(1024px JPEG), sent to `worker/checkin.js` and **never kept**; the Worker keeps only `ck:<event>:<uid>` and `ckh:<event>:<hash>` in KV
+IAM for 120 days. It verifies the Firebase token (`firebaseClaims`, shared with `isOwner`), the event's window in
+`data/push-schedule.json` (45 min before to 7 h after a start, no online event), one stamp per account per event, one
+picture per event (SHA-256), 8 tries an hour, and asks a vision model (`MODELS` in checkin.js, tried in order) whether the picture
+shows the logo or name. The model has not been tried on real event photos: the owner can test it from their own account (the answer
+shows `[model: word]` after a refusal) and change `MODELS`/`PROMPT`. The logo alone is not proof of being there (it is on every
+official post), so the real guards are the window, one per account and the picture hash; stamps are for fun, nothing is redeemed.
+Stamps live in localStorage `48thdb-stamps:<uid>` and `users/<uid>.stamps` (no new Firestore rule: `users/<uid>` is the reader's own),
+joined by union (`ckFromAccount`). A new stamp gives the cat `CK_COOKIES` (3) snacks, the 🍪 in her home (`_meow.snacks`, cap 99).
+Deploy the Worker with wrangler (`worker/`) for the button to appear; no secret or binding is new (it uses `AI` and `IAM`).
+
 ## AI in the search: ถามเว็บได้
 
 A question typed into the search (`renderAskBlock`, `askAnswer`). The Worker's

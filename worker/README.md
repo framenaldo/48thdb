@@ -201,3 +201,12 @@ a reminder about 30 minutes before an event starts, from `data/push-schedule.jso
     cd worker && npx wrangler secret put VAPID_PRIVATE < .vapid-private
 
 then deploy as usual. Until both are there `/push/key` answers 503 and the page hides the button.
+
+## Check-in by photo (checkin.js)
+
+`GET /checkin` answers 405 (the page shows its check-in button only when it does); `POST /checkin` takes `{ e: <event id>, img: <base64 JPEG> }`
+with the reader's Firebase ID token and answers `{ ok }` or `{ ok:false, why }`. Needs only the `AI` and `IAM` bindings already here. It reads
+`data/push-schedule.json` for the event's window (45 min before a start to 7 h after, never an online event), checks the picture with a vision model
+(`MODELS`, `PROMPT` at the top of the file; not yet tried on real event photos), and keeps no photo, only `ck:<event>:<uid>` and `ckh:<event>:<hash>` in
+KV for 120 days. The owner's account skips the window and the one-a-person rule and gets the model's raw answer back (the site shows it after a refusal),
+so the model can be tried anywhere. After `wrangler deploy`: `curl -i https://api.48thdb.com/checkin` should say 405.
