@@ -900,19 +900,56 @@ DTSTART;VALUE=DATE:20261126
 DTEND;VALUE=DATE:20261130
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-ge6-heart@48thdb
+UID:ev-ge6-heart-2026-11-15@48thdb
 DTSTAMP:20261115T000000Z
 SUMMARY:BNK48 & CGM48 Senbatsu General Election 2026 : Heart to Heart
-DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
- M48 ทุกคน\nรายละเอียดและเวลา
- ยังไม่ประกาศ\n• งานต่อเนื่
- องหลังประกาศผลการเลือกตั
- ้ง\n• รายละเอียดสถานที่และ
- เวลารอประกาศ\n\nhttps://48thdb.com/event/ev-ge6-he
- art
+LOCATION:MCC Hall\, The Mall Lifestore Bangkapi
+DESCRIPTION:เมมเบอร์: Berry\, Patt\, Else\, Inkcha\, Lingli
+ ng\, Micha\, Monet\, Palmmy\, Neen\, Saonoi\, Emmy\, Cartoon\, Arlee\, Niy
+ a\, Galeya\, Nisha\, Grape\, Proud\, Luksorn\, Mail\, Wawa\, Fame\, Kwan\,
+  Emma\, Hoop\, Praifa\, Sindy\, Shenae\, Valentine\, Chifa\, Jew\, Khowjow
+ \, Nana\, L\, Mirin\, Khaimook\, Mint\, Satangpound\, Tara\, Mayji\, Lewle
+ w\, Nall\, Lookked\, Marine\, Prae\, Jingjing\, Yoghurt\, Hongyok\, Nammon
+ n\, Pancake\, Blythe\, Praew\, Janry\, Rose\, Namphet\, Ginna\, Punpon\, P
+ loen\n• 10:30–15:15 Appreciation Event รอบ 1–5 (ไม่ต
+ ้องใช้บัตร)\n• 15:30–20:30 Heart to Heart Event 
+ รอบ 6–10 (ใช้ Letter Set)\n• 20:45–21:15 Senbatsu Round:
+  อันดับ 1–12 อยู่เลน 1–12 ตามอัน
+ ดับ\n• งานขอบคุณแฟน ๆ หลังปร
+ ะกาศผลการเลือกตั้ง Senbatsu General El
+ ection 2026 มีสองกิจกรรม: Appreciation Event (ร
+ อบ 1–5) และ Heart to Heart Event (รอบ 6–10) ปิด
+ ท้ายด้วย Senbatsu Round\n• Appreciation Event: ไม่
+ ต้องใช้บัตร ไม่มีค่าใช้จ่
+ าย ส่งกำลังใจและรับคำขอบค
+ ุณจากเมมเบอร์ในเวลาสั้น ๆ\
+ n• Heart to Heart Event: ใช้ Letter Set เลือกได้
+ ว่าจะส่งกำลังใจ (เขียนข้อค
+ วามลง Postcard ให้เสร็จก่อนเข้า
+ เลน แล้วมอบให้เมมเบอร์) หร
+ ือรับคำขอบคุณ (นำ Postcard เปล่า
+ เข้าไป เมมเบอร์จะปั๊มตราข
+ อบคุณที่ออกแบบเองและเขีย
+ นชื่อเล่นให้)\n• Letter Set 250 บาท จำ
+ กัด 5 ชุด/Order/คน ได้รับเป็น Benefit 
+ จากการซื้อบัตร Senbatsu General Election 2026 
+ Zone A–C และมีขายในวันงานที่จุ
+ ด Official Merchandise\n• ปิดเลน 15 นาทีก่อ
+ นจบแต่ละรอบ ถ้ารอบเริ่มช้
+ าจะไม่ทดเวลา\n• ใครมาไม่ทั
+ นรอบของเมมเบอร์ที่จะส่งจ
+ ดหมายให้ มีจุดรับจดหมายท้
+ ายฮอลล์\n• ห้ามบันทึกภาพ เส
+ ียง และวิดีโอ ห้ามสัมผัสตั
+ วเมมเบอร์ นำสัมภาระเข้าเล
+ นได้ 1 ชิ้น (กว้าง+ยาว+สูง ไม่
+ เกิน 90 ซม.) ห้ามนำอาหารและเค
+ รื่องดื่มเข้างาน ยกเว้นน้
+ ำดื่มขวดพลาสติกมีฝาปิด\n\nhttp
+ s://48thdb.com/event/ev-ge6-heart
 URL:https://48thdb.com/event/ev-ge6-heart
-DTSTART;VALUE=DATE:20261115
-DTEND;VALUE=DATE:20261116
+DTSTART;TZID=Asia/Bangkok:20261115T103000
+DTEND;TZID=Asia/Bangkok:20261115T211500
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-mbk-haunted-graveyard-1026-2026-10-26@48thdb
