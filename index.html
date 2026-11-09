@@ -1018,9 +1018,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .share-sheet.show .share-back{ opacity:1; }
   .share-sheet.show .share-panel{ transform:none; opacity:1; }
   /* check-in by photo and the stamp book */
-  .ck-row{ display:flex; align-items:center; gap:10px; margin:12px 0 4px; flex-wrap:wrap; }
-  .ck-row.is-done{ color:var(--ink-soft); font-size:13px; font-weight:600; }
-  .ck-row small{ color:var(--ink-soft); font-size:12px; }
+  /* beside the date and time on an event's sheet; the meta row keeps room for the share and close buttons only where the body sits beside them */
+  .ck-chip{ display:inline-flex; align-items:center; gap:4px; font:inherit; font-size:11.5px; font-weight:800; line-height:inherit; padding:3px 11px; border-radius:999px; border:2px solid var(--pink); background:var(--pink); color:#fff; cursor:pointer; white-space:nowrap; box-shadow:0 2px 0 #c9457c; transition:transform .08s, box-shadow .08s; }
+  .ck-chip:active{ transform:translateY(2px); box-shadow:none; }
+  .ck-chip.is-done{ background:none; border-color:var(--k); color:var(--k); box-shadow:none; cursor:default; }
+  @media (max-width:1023px){ .evm-meta:has(.ck-chip){ padding-right:0; } }
   .ck-btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; font:inherit; font-weight:700; font-size:15px; padding:11px 20px; border-radius:99px; border:2px solid var(--pink); background:linear-gradient(135deg,var(--pink),#ff9bc0); color:#fff; cursor:pointer; box-shadow:0 4px 0 #c9457c; transition:transform .08s, box-shadow .08s; }
   .ck-btn:active{ transform:translateY(3px); box-shadow:0 1px 0 #c9457c; }
   .ck-btn.is-ghost{ background:var(--card); color:var(--pink); box-shadow:0 4px 0 var(--line); }
@@ -2448,6 +2450,49 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-lane{ position:absolute; z-index:1; top:3px; left:3px; min-width:15px; height:15px; padding:0 3px; border-radius:8px; background:rgba(0,0,0,.55); color:#fff; font-size:9px; font-weight:800; line-height:15px; font-style:normal; text-align:center; }
   .rt-gap.is-rank{ opacity:1; background:rgba(192,57,43,.12); color:var(--ink); box-shadow:none; } .rt-gap.is-rank::before, .rt-gap.is-rank::after{ display:none; } .rt-gap.is-rank span{ text-shadow:none; color:#C0392B; bottom:auto; top:50%; transform:translateY(-50%); }
   .rt-gap{ cursor:default; background:var(--surface-2, rgba(127,127,127,.12)); box-shadow:none; opacity:.5; }
+  /* rota.lanes: lanes down, rounds across */
+  .rt-tbl{ padding:9px 6px 8px; }
+  .rt-tbl .rt-h{ padding:0 4px; }
+  .rt-t{ width:100%; border-collapse:collapse; table-layout:fixed; }
+  .rt-t th, .rt-t td{ padding:3px 1px; text-align:center; vertical-align:middle; border-top:1px solid var(--line); }
+  .rt-t thead th{ border-top:0; padding:3px 1px 5px; font-weight:800; line-height:1.15; color:var(--ink); border-radius:9px 9px 0 0; }
+  .rt-t thead b{ display:block; font-size:12px; font-variant-numeric:tabular-nums; }
+  .rt-t thead small{ display:block; font-size:9.5px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .rt-t .rt-ln{ width:24px; font-size:11px; font-weight:800; color:var(--ink-soft); }
+  .rt-t thead .rt-ln{ font-size:9.5px; }
+  .rt-t .is-done{ opacity:.45; }
+  .rt-t .is-now{ background:color-mix(in srgb, var(--b) 16%, transparent); }
+  .rt-t thead .is-now, .rt-t thead .is-now small{ background:var(--b); color:#fff; }
+  .rt-c{ display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; padding:1px 0; border:0; background:none; font:inherit; color:var(--ink); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:opacity .15s; }
+  .rt-c i{ display:block; flex:none; width:34px; height:34px; border-radius:50%; overflow:hidden; background:var(--c); box-shadow:0 0 0 1.5px var(--c); }
+  .rt-c img{ display:block; width:100%; height:100%; object-fit:cover; object-position:50% 18%; }
+  .rt-c span{ display:block; max-width:100%; font-size:9.5px; font-weight:700; line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rt-c span.is-long{ font-size:8.4px; letter-spacing:-.25px; overflow:visible; max-width:none; }
+  .rt-c:active i{ transform:scale(.92); }
+  /* the โอชิฉัน tab: one small pill a member, with her lane */
+  .rt-mine{ padding-bottom:9px; } .rt-mine .rt-h{ margin-bottom:6px; }
+  .rt-mg{ display:flex; flex-wrap:wrap; gap:6px; }
+  .rt-c.rt-mc{ flex-direction:row; width:auto; gap:7px; padding:3px 11px 3px 3px; border-radius:11px; border:1px solid var(--line); background:var(--paper-dim); box-shadow:0 2px 0 rgba(var(--shadow-rgb),.1); }
+  .rt-c.rt-mc:active{ transform:translateY(2px); box-shadow:none; }
+  .rt-mc i{ width:28px; height:35px; border-radius:8px; box-shadow:none !important; }
+  .rt-c.rt-mc span, .rt-c.rt-mc span.is-long{ font-size:13px; font-weight:800; letter-spacing:0; }
+  .rt-mc b{ font-size:12px; font-weight:800; color:var(--b); white-space:nowrap; }
+  .rt-c.is-oshi i{ box-shadow:0 0 0 2.5px #FFC83D; }
+  [data-rota].has-hl .rt-c{ opacity:.25; } [data-rota].has-hl .rt-c.hl{ opacity:1; } .rt-c.hl i{ box-shadow:0 0 0 3px #FFC83D; }
+  /* in the table a face is a small tile, not a circle: on a phone her name lies over the photo as on every other tile, on a wide screen beside it */
+  @media (max-width:699px){
+    .rt-t td{ padding:2px 1px; }
+    .rt-t .rt-c{ position:relative; display:block; width:88%; margin:0 auto; aspect-ratio:4 / 5; padding:0; border-radius:9px; overflow:hidden; background:var(--c); color:#fff; }
+    .rt-t .rt-c i{ position:absolute; inset:0; width:auto; height:auto; border-radius:0; box-shadow:none !important; }
+    .rt-t .rt-c::after{ content:''; position:absolute; inset:auto 0 0; height:46%; background:linear-gradient(to top, rgba(0,0,0,.75), transparent); }
+    .rt-t .rt-c span{ position:absolute; z-index:1; left:0; right:0; bottom:3px; max-width:none; text-align:center; font-size:9px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.7); }
+    .rt-t .rt-c span.is-long{ font-size:7px; letter-spacing:-.25px; overflow:hidden; text-overflow:clip; }
+    .rt-t .rt-c.is-oshi::before, .rt-t .rt-c.hl::before{ content:''; position:absolute; inset:0; z-index:2; border:2.5px solid #FFC83D; border-radius:9px; }
+  }
+  @media (min-width:700px){ .rt-t .rt-c i{ width:36px; height:45px; border-radius:8px; } }
+  .rt-empty{ color:var(--ink-soft); opacity:.6; }
+  .rt-none{ margin:6px 0; font-size:13px; color:var(--ink-soft); } .rt-none[hidden]{ display:none; }
+  @media (min-width:700px){ .rt-c{ flex-direction:row; justify-content:center; gap:7px; } .rt-c span, .rt-c span.is-long{ font-size:12.5px; letter-spacing:0; } .rt-t .rt-ln{ width:40px; font-size:12.5px; } .rt-t thead b{ font-size:14px; } .rt-t thead small{ font-size:11px; } }
   .rt-g .rt-f{ min-width:0; } .slot-who .rt-g, .rota-who .rt-g, .es-who .rt-g, .es-gwho .rt-g{ width:100%; }
   .rt-days{ display:flex; gap:6px; overflow-x:auto; padding:0 1px 8px; scrollbar-width:none; } .rt-days::-webkit-scrollbar{ display:none; }
   .rt-day{ flex:none; display:flex; flex-direction:column; align-items:center; min-width:54px; padding:5px 10px; border-radius:12px; border:1px solid var(--line); background:var(--card); font:inherit; font-size:15px; font-weight:800; color:var(--ink); line-height:1.15; box-shadow:0 2px 0 var(--line); cursor:pointer; }
@@ -11532,10 +11577,9 @@ function renderCheckinBtn(ev){
   if(!_ckOn || !ev || ev.online || !ev.venue || ev.period || ev.cancelled) return '';
   const open = ckOpenNow(ev), tryIt = state.isOwner && !open, got = ckStamps()[ev.id];
   if(!open && !tryIt && !got) return '';
-  ckEnsureFilter();
   const en = isEN();
-  if(got) return `<div class="ck-row is-done">${ckStampHtml(got, 6)}<span>${en ? 'Checked in' : 'เช็กอินแล้ว'}</span></div>`;
-  return `<div class="ck-row"><button class="ck-btn" data-action="ck-open" data-id="${escapeAttr(ev.id)}"><span aria-hidden="true">📸</span>${en ? 'Check in' : 'เช็กอินงานนี้'}</button>${tryIt ? `<small>${en ? '(owner: try it)' : '(เจ้าของ: ทดลอง)'}</small>` : ''}</div>`;
+  if(got) return `<span class="ck-chip is-done" style="--k:${escapeAttr(got.c || '#E4457E')}">✓ ${en ? 'Checked in' : 'เช็กอินแล้ว'}</span>`;
+  return `<button class="ck-chip" data-action="ck-open" data-id="${escapeAttr(ev.id)}"><span aria-hidden="true">📸</span>${en ? 'Check in' : 'เช็กอิน'}${tryIt ? (en ? ' (try)' : ' (ทดลอง)') : ''}</button>`;
 }
 // the profile's book
 function renderStampBook(){
@@ -18867,8 +18911,15 @@ function renderSetlist(ev, head){
    a tap on a face lights her in every round. { day, where, kinds:[{k,th,en,c}], rounds:[{k,n,a,b,ids}] } */
 const rotaTile = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
   return `<button class="rt-f${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}">${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}<span data-noloc>${escapeHtml(nickName(m))}</span></button>`; };
-const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.day;
-  root.querySelectorAll('.rt-row').forEach(r => { r.hidden = !((!d || r.dataset.d === d) && (k === 'all' || r.dataset.k === k || (k === 'oshi' && r.dataset.oshi === '1'))); }); };
+// the rows for the picked day and tab; โอชิฉัน has rows of its own that hold only the reader's oshi
+const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.day; let n = 0;
+  root.querySelectorAll('.rt-row').forEach(r => { const mine = r.classList.contains('rt-mine');
+    const on = (!d || r.dataset.d === d) && (k === 'oshi' ? mine : !mine && (k === 'all' || r.dataset.k === k)); r.hidden = !on; if(on) n++; });
+  const none = root.querySelector('.rt-none'); if(none) none.hidden = !(k === 'oshi' && !n); };
+// a table cell of a lanes rota: small photo, name under it
+const rotaCell = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
+  return `<button class="rt-c${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}"><i>${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}</i><span data-noloc${nickName(m).length > 9 ? ' class="is-long"' : ''}>${escapeHtml(nickName(m))}</span></button>`; };
+const rotaClearHl = root => { root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.hl').forEach(x => x.classList.remove('hl')); };
 const rotaTiles = ids => `<div class="rt-g">${ids.map(rotaTile).join('')}</div>`;
 /* A takeover of an X account: who posts each evening, today's lit, and the way to the account itself */
 function renderTakeover(ev){
@@ -18897,10 +18948,28 @@ function renderRota(ev){
   // only the final results put faces in it; before that each lane says its rank, as the poster's table does (the owner's word, 9 Nov)
   const geR = R.rounds.some(r => r.ge) ? geLatestRound() : null, geFinal = !!geR && geR.id === 'ge2026-final' && geAnnounced(geR.id) >= 12;
   const geIds = () => { const sl = geFinal ? geSlots(geR.id) : {}; return Array.from({ length:12 }, (_, k) => (sl[k + 1] && sl[k + 1].id && getMember(sl[k + 1].id)) ? sl[k + 1].id : null); };
-  const rows = R.rounds.map(r => r.ge ? { ...r, ids: geIds() } : r).map(r => { const K = kind(r.k), D = r.d || R.day, done = D < iso || (D === iso && at(r.b, D) <= now), on = D === iso && !done && at(r.a, D) <= now;
-    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${r.d || R.day}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${r.ids.some(i => mine.includes(i)) ? 1 : 0}" style="--b:${K.c}">
+  const rounds = R.rounds.map(r => r.ge ? { ...r, ids: geIds() } : r), dayOf = r => r.d || R.day;
+  const stateOf = r => { const D = dayOf(r), done = D < iso || (D === iso && at(r.b, D) <= now); return { done, on:D === iso && !done && at(r.a, D) <= now }; };
+  const laneTile = (r, id, i) => !R.lanes ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap${r.ge ? ' is-rank' : ''}"><i class="rt-lane">${i + 1}</i>${r.ge ? `<span>${en ? `Rank ${i + 1}` : `อันดับ ${i + 1}`}</span>` : ''}</span>`;
+  // one round as a row of tiles; `only` keeps just those members (the โอชิฉัน tab), each still with her own lane number
+  const roundRow = (r, only) => { const K = kind(r.k), D = dayOf(r), { done, on } = stateOf(r);
+    const cells = r.ids.map((id, i) => [id, i]).filter(([id]) => !only || only.includes(id));
+    return `<div class="rt-row${only ? ' rt-mine' : ''}${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${D}"${only ? ' hidden' : ''} data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" style="--b:${K.c}">
       <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${r.ge ? (en ? 'Lane = final rank' : 'เลนตามอันดับผลสุดท้าย') : `${en ? 'Round' : 'รอบที่'} ${r.n}`}</small><em></em></div>
-      <div class="rt-g">${r.ids.map((id, i) => !R.lanes ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap${r.ge ? ' is-rank' : ''}"><i class="rt-lane">${i + 1}</i>${r.ge ? `<span>${en ? `Rank ${i + 1}` : `อันดับ ${i + 1}`}</span>` : ''}</span>`).join('')}</div></div>`; }).join('');
+      ${only ? `<div class="rt-mg">${cells.map(([id, i]) => rotaCell(id).replace('class="rt-c', 'class="rt-c rt-mc').replace('</span></button>', `</span>${R.lanes ? `<b>${en ? 'Lane' : 'เลน'} ${i + 1}</b>` : ''}</button>`)).join('')}</div>`
+        : `<div class="rt-g">${cells.map(([id, i]) => laneTile(r, id, i)).join('')}</div>`}</div>`; };
+  // a lanes rota reads as a table: a row for each lane, a column for each round of a kind (the owner, 9 Nov: the rows of big tiles were bulky)
+  const laneTable = list => { const K = kind(list[0].k), D = dayOf(list[0]), n = Math.max(...list.map(r => r.ids.length));
+    const cls = r => { const { done, on } = stateOf(r); return done ? ' class="is-done"' : on ? ' class="is-now"' : ''; };
+    return `<div class="rt-row rt-tbl" data-d="${D}" data-k="${list[0].k}" style="--b:${K.c}">
+      <div class="rt-h"><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><em></em></div>
+      <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Lane' : 'เลน'}</th>${list.map(r => `<th${cls(r)} data-from="${at(r.a, D)}" data-to="${at(r.b, D)}"><small>${en ? 'R' : 'รอบ'} ${r.n}</small><b>${r.a}</b><small>–${r.b}</small></th>`).join('')}</tr></thead>
+      <tbody>${Array.from({ length:n }, (_, i) => `<tr><th class="rt-ln">${i + 1}</th>${list.map(r => `<td${cls(r)}>${r.ids[i] ? rotaCell(r.ids[i]) : '<span class="rt-empty">–</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
+  const seen = new Set();
+  const rows = rounds.map(r => { if(!R.lanes || r.ge) return roundRow(r);
+    const key = dayOf(r) + '|' + r.k; if(seen.has(key)) return ''; seen.add(key);
+    return laneTable(rounds.filter(x => !x.ge && dayOf(x) + '|' + x.k === key)); }).join('')
+    + rounds.filter(r => r.ids.some(i => mine.includes(i))).map(r => roundRow(r, mine)).join('');
   const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   const dayPills = days.length > 1 ? `<div class="rt-days" role="tablist">${days.map(d => { const x = parseYmd(d); return `<button class="rt-day${d === pick ? ' on' : ''}" data-action="rota-day" data-id="${d}"><small>${WD[x.getDay()]}</small>${x.getDate()} ${M[x.getMonth()]}</button>`; }).join('')}</div>` : '';
   const tab = (k, label, c) => `<button class="rt-tab${k === 'all' ? ' on' : ''}" data-action="rota-tab" data-id="${k}"${c ? ` style="--b:${c}"` : ''}>${label}</button>`;
@@ -18909,8 +18978,8 @@ function renderRota(ev){
     <div class="rt-box" data-rota data-day="${pick}">
       ${dayPills}
       <div class="rt-tabs" role="tablist">${tab('all', en ? 'All' : 'ทั้งหมด')}${R.kinds.map(K => tab(K.k, en ? K.en : K.th, K.c)).join('')}${mine.length ? tab('oshi', en ? 'My oshi' : 'โอชิฉัน', '#E4457E') : ''}</div>
-      <p class="rt-hint">${en ? 'Tap a face to see every round she is in' : 'แตะหน้าเมมเบอร์เพื่อดูทุกรอบที่เธออยู่'}</p>
-      <div class="rt-list">${rowsHtml}</div></div>`;
+      <p class="rt-hint">${en ? 'Tap a face to see every round she is in, tap elsewhere to clear' : 'แตะหน้าเมมเบอร์เพื่อดูทุกรอบที่เธออยู่ แตะที่อื่นเพื่อยกเลิก'}</p>
+      <div class="rt-list">${rowsHtml}<p class="rt-none" hidden>${en ? 'None of your oshi are on this day.' : 'โอชิของคุณไม่อยู่ในรอบของวันนี้'}</p></div></div>`;
 }
 /* a row's activity in its own colour (ev.tones = [{ m:'Group Hi-Touch', c:'#E4457E' }]): the name as a chip, the round after it */
 const esTone = (ev, what) => (ev.tones || []).find(t => what.startsWith(t.m)) || null;
@@ -18990,6 +19059,13 @@ function rotaTick(){
     r.querySelector('em').textContent = on ? (en ? `On now · ${schedSpan(b - now)} left` : `กำลังจัด · เหลือ ${schedSpan(b - now)}`) : done ? (en ? 'Over' : 'จบแล้ว') : '';
     r.style.setProperty('--p', on ? Math.min(100, (now - a) / (b - a) * 100).toFixed(1) + '%' : '0%');
   });
+  // a lanes table: the round's column is dimmed when over and lit while on
+  document.querySelectorAll('.rt-t').forEach(t => { let say = '';
+    [...t.tHead.rows[0].cells].forEach((th, i) => { if(!th.dataset.from) return;
+      const a = +th.dataset.from, b = +th.dataset.to, on = now >= a && now < b, done = now >= b;
+      if(on) say = en ? `On now · ${schedSpan(b - now)} left` : `กำลังจัด · เหลือ ${schedSpan(b - now)}`;
+      [...t.rows].forEach(tr => { const c = tr.cells[i]; if(c.classList.contains('is-now') !== on) c.classList.toggle('is-now', on); if(c.classList.contains('is-done') !== done) c.classList.toggle('is-done', done); }); });
+    const em = t.closest('.rt-row').querySelector('em'); if(em.textContent !== say) em.textContent = say; });
 }
 function schedTick(){
   rotaTick();
@@ -19068,6 +19144,7 @@ function renderEventModal(){
         <div class="evm-meta">
           ${renderStreamLink(ev, 'evm-icon')}
           <p class="evm-date"><span>${ev.dateTag ? `<span class="evm-date-tag">${escapeHtml(ev.dateTag)}</span> · ` : ''}${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}${ev.part?' · '+escapeHtml(ev.part):''}</span></p>
+          ${renderCheckinBtn(ev)}
           ${renderLiveChip(ev, 'is-meta')}
           ${(()=>{ const iso = toYmd(todayStart()), at = startsAt(ev, iso);
             return at ? startsPill('evm-starts', ev, iso, at) : ''; })()}
@@ -19092,7 +19169,6 @@ function renderEventModal(){
           : ev.online ? `<span class="evm-venue evm-online">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
             <span>${escapeHtml(ev.online)}</span></span>` : ''}
-        ${renderCheckinBtn(ev)}
         ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
           groupTag(g)).join('')}</div>` : ''}
 
@@ -30877,6 +30953,8 @@ function bindRipple(){
 function bindDelegatedEvents(){
   bindRipple();
   document.body.addEventListener('click', async (e)=>{
+    // a tap anywhere but on a face (or the day and kind tabs) lets go of the member lit in a rota
+    if(!e.target.closest('.rt-f[data-id], .rt-c[data-id], .rt-tabs, .rt-days')) document.querySelectorAll('[data-rota].has-hl').forEach(rotaClearHl);
     const el = e.target.closest('[data-action]');
     if(!el){
       if(state.profileMenuOpen){ state.profileMenuOpen=false; renderProfileSlot(); }
@@ -30938,9 +31016,9 @@ function bindDelegatedEvents(){
       root.dataset.k = k; rotaShow(root); }
     else if(action==='rota-day'){ const root = el.closest('[data-rota]'); root.dataset.day = id; root.querySelectorAll('.rt-day').forEach(x => x.classList.toggle('on', x === el)); rotaShow(root); }
     else if(action==='rota-hl'){ const root = el.closest('[data-rota]'), same = root.dataset.hl === id;
-      if(same){ root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.rt-f.hl').forEach(x => x.classList.remove('hl')); el.dataset.action = 'open-member'; el.click(); el.dataset.action = 'rota-hl'; return; }
+      if(same){ rotaClearHl(root); el.dataset.action = 'open-member'; el.click(); el.dataset.action = 'rota-hl'; return; }
       root.dataset.hl = id;
-      root.classList.add('has-hl'); root.querySelectorAll('.rt-f').forEach(x => x.classList.toggle('hl', x.dataset.id === id)); }
+      root.classList.add('has-hl'); root.querySelectorAll('.rt-f, .rt-c').forEach(x => x.classList.toggle('hl', x.dataset.id === id)); }
     else if(action==='slide-to'){ const tr = el.closest('.evm-slides').querySelector('[data-track]'); tr.scrollTo({ left:trackStep(tr) * (+el.dataset.i), behavior:'smooth' }); }
     else if(action==='open-poster'){
       state.geClip = false; state.posterOf = id; renderMain(); pushHistory();
