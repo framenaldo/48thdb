@@ -2446,6 +2446,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   [data-rota].has-hl .rt-f{ opacity:.25; transition:opacity .15s; } [data-rota].has-hl .rt-f.hl{ opacity:1; outline:3px solid #FFC83D; outline-offset:-3px; }
   /* rota.lanes: each tile carries its lane number (a gap keeps the place of an empty lane) */
   .rt-lane{ position:absolute; z-index:1; top:3px; left:3px; min-width:15px; height:15px; padding:0 3px; border-radius:8px; background:rgba(0,0,0,.55); color:#fff; font-size:9px; font-weight:800; line-height:15px; font-style:normal; text-align:center; }
+  .rt-gap.is-rank{ opacity:1; background:rgba(192,57,43,.12); color:var(--ink); box-shadow:none; } .rt-gap.is-rank::before, .rt-gap.is-rank::after{ display:none; } .rt-gap.is-rank span{ text-shadow:none; color:#C0392B; bottom:auto; top:50%; transform:translateY(-50%); }
   .rt-gap{ cursor:default; background:var(--surface-2, rgba(127,127,127,.12)); box-shadow:none; opacity:.5; }
   .rt-g .rt-f{ min-width:0; } .slot-who .rt-g, .rota-who .rt-g, .es-who .rt-g, .es-gwho .rt-g{ width:100%; }
   .rt-days{ display:flex; gap:6px; overflow-x:auto; padding:0 1px 8px; scrollbar-width:none; } .rt-days::-webkit-scrollbar{ display:none; }
@@ -7833,6 +7834,13 @@ const SEED_SCHEDULE = [
     related:['ev-election-results','ev-concert-2026','ev-election-voting'],
     poster:{ accent:'#8E1E2E', surface:'#F6EDE6', ink:'#2A1116', img:'posters/ge2026-live-talk-1026.jpg', w:1920, h:1080 },
     stream:{ label:'YouTube BNK48 Official', channel:'bnk48', url:'https://www.youtube.com/@bnk48official/live' } },
+  { id:'ev-ge6-live-talk-1109', start:'2026-11-09', time:'18:00',
+    title:'BNK48 & CGM48 Senbatsu General Election 2026 Final Results Announcement Live Talk', short:'Live Talk',
+    online:'YouTube BNK48 Official', groups:['bnk48','cgm48'], timeline:'ge2026',
+    members:['bnk-arlee','bnk-hoop','bnk-praew','cgm-prae','cgm-lewlew','cgm-ploen'],
+    related:['ev-ge6-live-talk-1026','ev-election-results','ev-concert-2026'],
+    poster:{ accent:'#8E1E2E', surface:'#F6EDE6', ink:'#2A1116', img:'posters/ge2026-live-talk-1109.jpg', w:1920, h:1080 },
+    stream:{ label:'YouTube BNK48 Official', channel:'bnk48', url:'https://www.youtube.com/live/lNVgj8JFbFk' } },
   { id:'ev-election-results', start:'2026-11-14', time:'18:00',
     sales:{ from:'2026-10-15T12:00' },
     title:'BNK48 & CGM48 Senbatsu General Election 2026 · Final Results', short:'General Election 2026 Final Results',
@@ -13743,6 +13751,7 @@ const FEST_KINDS = {
 const FEST_EVENT = {
   'ev-concert-2026':   { kind:'concert', word:'Journey of Dreams', sub:'夢の旅 · CONCERT' },
   'ev-ge6-live-talk-1026': { word:'Live Talk', sub:'GE2026 · FINAL RESULTS' },
+  'ev-ge6-live-talk-1109': { word:'Live Talk', sub:'GE2026 · FINAL RESULTS' },
   'ev-fame-fanmeet':   { word:"Fame's Airline", sub:'FANMEET · BOARDING PASS', motif:'planes' },
   'ev-hoop-bday-said': { sub:'THEATER SHOW' },
   'ev-partner-1017':   { word:'Lanna Expo 2026', sub:'JAPAN–THAILAND 140TH ANNIVERSARY' },
@@ -16647,7 +16656,7 @@ const EVENT_ICON = {
   'ev-shock-me-girls-x-takeover':'xlogo',
   'ev-election-voting':'token', 'ev-election-results':'trophy', 'ev-election-fanfest':'sparkles',
   'ev-ge6-single':'disc', 'ev-ge6-photoset':'photos', 'ev-ge6-handshake':'handshake',
-  'ev-ge6-myo1':'myo', 'ev-ge6-myo2':'myo', 'ev-concert-2026':'mic', 'ev-ge6-live-talk-1026':'live', 'ev-ge6-heart':'heart',
+  'ev-ge6-myo1':'myo', 'ev-ge6-myo2':'myo', 'ev-concert-2026':'mic', 'ev-ge6-live-talk-1026':'live', 'ev-ge6-live-talk-1109':'live', 'ev-ge6-heart':'heart',
   'ev-roadshow-mbk':'mic', 'ev-roadshow-fashionisland':'mic', 'ev-roadshow-0905':'mic',
   'ev-nine-charity':'mic', 'ev-charity-football-2026':'ball', 'ev-fame-fanmeet':'airplane',
   'ev-hachicha-tsukimi':'cup', 'ev-lanna-tsukimi':'sparkles', 'ev-nipponhaku-2026':'sparkles',
@@ -18885,12 +18894,13 @@ function renderRota(ev){
   const kind = k => R.kinds.find(x => x.k === k), mine = state.oshi || [];
   const tile = rotaTile;
   // a `ge` round takes ranks 1–12 from the latest election results, lane = rank (until the final, the latest quick result)
-  const geR = R.rounds.some(r => r.ge) ? geLatestRound() : null, geFinal = geR && geR.id === 'ge2026-final';
-  const geIds = () => { const sl = geR ? geSlots(geR.id) : {}; return Array.from({ length:12 }, (_, k) => (sl[k + 1] && sl[k + 1].id && getMember(sl[k + 1].id)) ? sl[k + 1].id : null); };
+  // only the final results put faces in it; before that each lane says its rank, as the poster's table does (the owner's word, 9 Nov)
+  const geR = R.rounds.some(r => r.ge) ? geLatestRound() : null, geFinal = !!geR && geR.id === 'ge2026-final' && geAnnounced(geR.id) >= 12;
+  const geIds = () => { const sl = geFinal ? geSlots(geR.id) : {}; return Array.from({ length:12 }, (_, k) => (sl[k + 1] && sl[k + 1].id && getMember(sl[k + 1].id)) ? sl[k + 1].id : null); };
   const rows = R.rounds.map(r => r.ge ? { ...r, ids: geIds() } : r).map(r => { const K = kind(r.k), D = r.d || R.day, done = D < iso || (D === iso && at(r.b, D) <= now), on = D === iso && !done && at(r.a, D) <= now;
     return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${r.d || R.day}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${r.ids.some(i => mine.includes(i)) ? 1 : 0}" style="--b:${K.c}">
-      <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${r.ge ? (geR ? (geFinal ? (en ? 'Lanes by final rank' : 'เลนตามอันดับผลสุดท้าย') : (en ? `By ${geRoundLabel(geR)} for now — the final may change it` : `ตาม${geRoundLabel(geR)} ไปก่อน รอผลสุดท้าย`)) : (en ? 'Lanes by rank, after the results' : 'เลนตามอันดับ รอประกาศผล')) : `${en ? 'Round' : 'รอบที่'} ${r.n}`}</small><em></em></div>
-      <div class="rt-g">${r.ids.map((id, i) => !R.lanes ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap"><i class="rt-lane">${i + 1}</i></span>`).join('')}</div></div>`; }).join('');
+      <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${r.ge ? (en ? 'Lane = final rank' : 'เลนตามอันดับผลสุดท้าย') : `${en ? 'Round' : 'รอบที่'} ${r.n}`}</small><em></em></div>
+      <div class="rt-g">${r.ids.map((id, i) => !R.lanes ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap${r.ge ? ' is-rank' : ''}"><i class="rt-lane">${i + 1}</i>${r.ge ? `<span>${en ? `Rank ${i + 1}` : `อันดับ ${i + 1}`}</span>` : ''}</span>`).join('')}</div></div>`; }).join('');
   const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   const dayPills = days.length > 1 ? `<div class="rt-days" role="tablist">${days.map(d => { const x = parseYmd(d); return `<button class="rt-day${d === pick ? ' on' : ''}" data-action="rota-day" data-id="${d}"><small>${WD[x.getDay()]}</small>${x.getDate()} ${M[x.getMonth()]}</button>`; }).join('')}</div>` : '';
   const tab = (k, label, c) => `<button class="rt-tab${k === 'all' ? ' on' : ''}" data-action="rota-tab" data-id="${k}"${c ? ` style="--b:${c}"` : ''}>${label}</button>`;
