@@ -2470,7 +2470,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-c span.is-long{ font-size:8.4px; letter-spacing:-.25px; overflow:visible; max-width:none; }
   .rt-c:active i{ transform:scale(.92); }
   /* โอชิฉัน: the same page, with everyone else dimmed */
-  .is-oshi-only .rt-c:not(.is-oshi), .is-oshi-only .rt-f:not(.is-oshi){ opacity:.2; filter:saturate(.4); }
+  .is-oshi-only .rt-c:not(.is-oshi), .is-oshi-only .rt-f:not(.is-oshi){ opacity:.2; }
   .rt-c.is-oshi i{ box-shadow:0 0 0 2.5px #FFC83D; }
   [data-rota].has-hl .rt-c{ opacity:.25; } [data-rota].has-hl .rt-c.hl{ opacity:1; } .rt-c.hl i{ box-shadow:0 0 0 3px #FFC83D; }
   /* in the table a face is a small tile, not a circle: on a phone her name lies over the photo as on every other tile, on a wide screen beside it */
@@ -2486,6 +2486,27 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @media (min-width:700px){ .rt-t .rt-c i{ width:36px; height:45px; border-radius:8px; } }
   @media (min-width:700px){ @container (min-width:640px){ .rt-tbl .rt-c span.is-long{ font-size:12.5px; overflow:visible; } } }
   .rt-empty{ color:var(--ink-soft); opacity:.6; }
+  /* the rota's motion: only opacity and transform play on many cells at once, and only for a moment; rings on the one or two cells tapped */
+  .rt-f{ transition:opacity .15s; }
+  .rt-t td, .rt-t thead .is-now{ position:relative; }
+  .rt-c i{ position:relative; }
+  .rt-wave .rt-c, .rt-wave .rt-f{ transition:opacity .28s ease calc(var(--i, 0) * 70ms); }
+  .is-oshi-only.rt-wave .rt-c.is-oshi, .is-oshi-only.rt-wave .rt-f.is-oshi{ animation:rt-pop .42s cubic-bezier(.3,1.5,.5,1) backwards; animation-delay:calc(var(--i, 0) * 70ms + 120ms); }
+  .is-oshi-only.rt-wave .rt-c.is-oshi i::after{ content:''; position:absolute; inset:0; background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,.8) 50%, transparent 65%); transform:translateX(-120%); animation:rt-shine .6s ease-out forwards; animation-delay:calc(var(--i, 0) * 70ms + 260ms); }
+  @keyframes rt-pop{ from{ transform:scale(.8); } }
+  @keyframes rt-shine{ to{ transform:translateX(120%); } }
+  .rt-in .rt-t tbody tr{ animation:rt-rise .34s ease-out backwards; animation-delay:calc(var(--r, 0) * 28ms); }
+  .rt-in .rt-t thead, .rt-in .rt-row:not(.rt-tbl){ animation:rt-rise .3s ease-out backwards; }
+  @keyframes rt-rise{ from{ opacity:0; transform:translateY(10px); } }
+  .rt-t thead .is-now::after{ content:''; position:absolute; left:3px; right:3px; bottom:2px; height:3px; border-radius:2px; background:#fff; transform-origin:0 50%; transform:scaleX(var(--p, 0)); transition:transform 1s linear; }
+  .rt-t tbody td.is-now::after{ content:''; position:absolute; inset:0; pointer-events:none; background:linear-gradient(transparent, color-mix(in srgb, #fff 26%, transparent), transparent); opacity:0; animation:rt-sweep 7s linear infinite; animation-delay:calc(var(--r, 0) * 70ms); }
+  @keyframes rt-sweep{ 0%, 9%, 100%{ opacity:0; } 4%{ opacity:1; } }
+  .rt-t .rt-c.rt-tap, .rt-f.rt-tap{ z-index:3; animation:rt-tap .36s cubic-bezier(.3,1.5,.5,1), rt-ring .55s ease-out; }
+  .rt-t .rt-c.rt-ping, .rt-f.rt-ping{ z-index:3; animation:rt-ring .55s ease-out .12s 2 backwards; }
+  @keyframes rt-tap{ 40%{ transform:scale(1.12); } }
+  @keyframes rt-ring{ from{ box-shadow:0 0 0 0 rgba(255,200,61,.8); } to{ box-shadow:0 0 0 12px rgba(255,200,61,0); } }
+  @media (min-width:700px){ .rt-t .rt-c.rt-tap, .rt-t .rt-c.rt-ping{ animation-name:rt-tap; animation-iteration-count:1; } .rt-t .rt-c.rt-ping{ animation-name:none; } .rt-t .rt-c.rt-tap i{ animation:rt-ring .55s ease-out; } .rt-t .rt-c.rt-ping i{ animation:rt-ring .55s ease-out .12s 2 backwards; } }
+  @media (prefers-reduced-motion:reduce){ .rt-wave .rt-c, .rt-wave .rt-f, .rt-t thead .is-now::after{ transition:none; } .rt-t tbody td.is-now::after, .rt-t .rt-c.rt-tap, .rt-t .rt-c.rt-ping, .rt-f.rt-tap, .rt-f.rt-ping, .rt-t .rt-c.rt-tap i, .rt-t .rt-c.rt-ping i{ animation:none; } }
   .rt-none{ margin:6px 0; font-size:13px; color:var(--ink-soft); } .rt-none[hidden]{ display:none; }
   /* on a wide screen each cell is a block of one width, so the photos of a round stand in a straight line under its heading */
   .rt-tbl{ container-type:inline-size; }
@@ -18916,7 +18937,11 @@ const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.d
 // a table cell of a lanes rota: small photo, name under it
 const rotaCell = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
   return `<button class="rt-c${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}"><i>${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}</i><span data-noloc${nickName(m).length > 9 ? ' class="is-long"' : ''}>${escapeHtml(nickName(m))}</span></button>`; };
-const rotaClearHl = root => { root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.hl').forEach(x => x.classList.remove('hl')); };
+const rotaClearHl = root => { root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.hl').forEach(x => x.classList.remove('hl', 'rt-tap', 'rt-ping')); };
+// one short play on a rota: rt-wave going in and out of โอชิฉัน, rt-in when the tables change
+const rotaAnim = (root, c) => { if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  root.classList.remove('rt-wave', 'rt-in'); void root.offsetWidth; root.classList.add(c);
+  clearTimeout(root._rtAnim); root._rtAnim = setTimeout(() => root.classList.remove(c), 1100); };
 const rotaTiles = ids => `<div class="rt-g">${ids.map(rotaTile).join('')}</div>`;
 /* A takeover of an X account: who posts each evening, today's lit, and the way to the account itself */
 function renderTakeover(ev){
@@ -18958,8 +18983,8 @@ function renderRota(ev){
     const cls = r => { const { done, on } = stateOf(r); return done ? ' class="is-done"' : on ? ' class="is-now"' : ''; };
     return `<div class="rt-row rt-tbl" data-d="${D}" data-k="${list[0].k}" data-oshi="${hasOshi(list.flatMap(r => r.ids))}" style="--b:${K.c}">
       <div class="rt-h"><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><em></em></div>
-      <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Lane' : 'เลน'}</th>${list.map(r => `<th${cls(r)} data-from="${at(r.a, D)}" data-to="${at(r.b, D)}"><small>${en ? 'R' : 'รอบ'} ${r.n}</small><b>${r.a}</b><small>–${r.b}</small></th>`).join('')}</tr></thead>
-      <tbody>${Array.from({ length:n }, (_, i) => `<tr><th class="rt-ln">${i + 1}</th>${list.map(r => `<td${cls(r)}>${r.ids[i] ? rotaCell(r.ids[i]) : '<span class="rt-empty">–</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
+      <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Lane' : 'เลน'}</th>${list.map(r => `<th${cls(r)}${stateOf(r).on ? ` style="--p:${((now - at(r.a, D)) / (at(r.b, D) - at(r.a, D))).toFixed(3)}"` : ''} data-from="${at(r.a, D)}" data-to="${at(r.b, D)}"><small>${en ? 'R' : 'รอบ'} ${r.n}</small><b>${r.a}</b><small>–${r.b}</small></th>`).join('')}</tr></thead>
+      <tbody>${Array.from({ length:n }, (_, i) => `<tr style="--r:${i}"><th class="rt-ln">${i + 1}</th>${list.map((r, c) => `<td${cls(r)} style="--i:${c}">${r.ids[i] ? rotaCell(r.ids[i]) : '<span class="rt-empty">–</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
   const seen = new Set();
   const rows = rounds.map(r => { if(!R.lanes || r.ge) return roundRow(r);
     const key = dayOf(r) + '|' + r.k; if(seen.has(key)) return ''; seen.add(key);
@@ -19058,6 +19083,7 @@ function rotaTick(){
     [...t.tHead.rows[0].cells].forEach((th, i) => { if(!th.dataset.from) return;
       const a = +th.dataset.from, b = +th.dataset.to, on = now >= a && now < b, done = now >= b;
       if(on) say = en ? `On now · ${schedSpan(b - now)} left` : `กำลังจัด · เหลือ ${schedSpan(b - now)}`;
+      if(on) th.style.setProperty('--p', ((now - a) / (b - a)).toFixed(3));
       [...t.rows].forEach(tr => { const c = tr.cells[i]; if(c.classList.contains('is-now') !== on) c.classList.toggle('is-now', on); if(c.classList.contains('is-done') !== done) c.classList.toggle('is-done', done); }); });
     const em = t.closest('.rt-row').querySelector('em'); if(em.textContent !== say) em.textContent = say; });
 }
@@ -31007,12 +31033,14 @@ function bindDelegatedEvents(){
     }
     else if(action==='rota-tab'){ const root = el.closest('[data-rota]'), k = el.dataset.id;
       root.querySelectorAll('.rt-tab').forEach(x => x.classList.toggle('on', x === el));
+      if((root.dataset.k || 'all') !== k) rotaAnim(root, k === 'oshi' || root.dataset.k === 'oshi' ? 'rt-wave' : 'rt-in');
       root.dataset.k = k; rotaShow(root); }
-    else if(action==='rota-day'){ const root = el.closest('[data-rota]'); root.dataset.day = id; root.querySelectorAll('.rt-day').forEach(x => x.classList.toggle('on', x === el)); rotaShow(root); }
+    else if(action==='rota-day'){ const root = el.closest('[data-rota]'); root.dataset.day = id; root.querySelectorAll('.rt-day').forEach(x => x.classList.toggle('on', x === el)); rotaAnim(root, 'rt-in'); rotaShow(root); }
     else if(action==='rota-hl'){ const root = el.closest('[data-rota]'), same = root.dataset.hl === id;
       if(same){ rotaClearHl(root); el.dataset.action = 'open-member'; el.click(); el.dataset.action = 'rota-hl'; return; }
       root.dataset.hl = id;
-      root.classList.add('has-hl'); root.querySelectorAll('.rt-f, .rt-c').forEach(x => x.classList.toggle('hl', x.dataset.id === id)); }
+      root.classList.add('has-hl');
+      root.querySelectorAll('.rt-f, .rt-c').forEach(x => { const on = x.dataset.id === id; x.classList.toggle('hl', on); x.classList.remove('rt-tap', 'rt-ping'); if(on){ void x.offsetWidth; x.classList.add(x === el ? 'rt-tap' : 'rt-ping'); } }); }
     else if(action==='slide-to'){ const tr = el.closest('.evm-slides').querySelector('[data-track]'); tr.scrollTo({ left:trackStep(tr) * (+el.dataset.i), behavior:'smooth' }); }
     else if(action==='open-poster'){
       state.geClip = false; state.posterOf = id; renderMain(); pushHistory();
