@@ -21794,7 +21794,13 @@ async function loadVisits(){
     const res = await fetch(VISITS_API, { headers:{ authorization:`Bearer ${tok}` }, cache:'no-store' });
     const d = await res.json().catch(() => ({}));
     visitsState = res.ok ? { at:Date.now(), data:d } : { at:Date.now(), data:visitsState.data || null, err:d.error || `HTTP ${res.status}` };
-  }catch(e){ visitsState = { at:Date.now(), data:(visitsState && visitsState.data) || null, err:'net' }; }
+  }catch(e){
+    // the fetch itself failed: ask the Worker once more without the token (a plain GET, no preflight) to tell
+    // "api.48thdb.com can't be reached" from "it answers, but the signed-in request broke before it could reply"
+    let why = 'net';
+    try{ const r = await fetch(VISITS_API, { cache:'no-store' }); why = r.status === 403 ? 'crash' : `net-${r.status}`; }catch(e2){}
+    visitsState = { at:Date.now(), data:(visitsState && visitsState.data) || null, err:why, msg:String((e && e.message) || e).slice(0, 80) };
+  }
   if(state.view !== 'profile') return;
   if(document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
   renderMain();
@@ -22619,7 +22625,7 @@ function renderVisitsCard(){
     <ol class="vis-setup"><li>สร้างโทเค็นที่ dash.cloudflare.com/profile/api-tokens → Create Token → Custom token → สิทธิ์ <b>Account · Account Analytics · Read</b></li>
     <li>ในเทอร์มินัล: <code>cd ~/Downloads/48thdb-deploy-package/worker && npm_config_cache="$HOME/.npm-wrangler" npx wrangler secret put CF_ANALYTICS_TOKEN</code> แล้ววางโทเค็น</li></ol></div>`;
   const D = V.data;
-  if(!D) return head + `<div class="vis-card"><p class="vis-note">${V.err ? `โหลดตัวเลขไม่ได้ (${escapeHtml(V.err === 'net' ? 'ต่อเน็ตไม่ได้' : V.err)}) ลองกดรีเฟรช` : 'กำลังโหลด…'}</p></div>`;
+  if(!D) return head + `<div class="vis-card"><p class="vis-note">${V.err ? `โหลดตัวเลขไม่ได้ (${escapeHtml(V.err === 'net' ? 'ต่อ api.48thdb.com ไม่ได้' : V.err === 'crash' ? 'เซิร์ฟเวอร์ตอบ แต่คำขอตัวเลขล้มก่อนตอบกลับ' : V.err)}${V.msg ? ` · ${escapeHtml(V.msg)}` : ''}) ลองกดรีเฟรช` : 'กำลังโหลด…'}</p></div>`;
   const fmt = n => Number(n || 0).toLocaleString('en-US');
   const short = n => n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + 'k' : String(n);
   const days = visitsByDay(D.hours || []);
