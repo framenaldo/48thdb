@@ -8427,7 +8427,7 @@ const SEED_SCHEDULE = [
       '20:45–21:15 Senbatsu Round: อันดับ 1–12 อยู่เลน 1–12 ตามอันดับ'],
     members:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon','bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail','bnk-wawa','bnk-fame','cgm-kwan','cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin','bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing','bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'],
     rota:{ day:'2026-11-15', head:'ตารางรอบและเลน', where:'MCC Hall', lanes:true,
-      kinds:[{ k:'ap', th:'Appreciation', en:'Appreciation', c:'#3E8E4F' }, { k:'hh', th:'Heart to Heart', en:'Heart to Heart', c:'#B8913F' }],
+      kinds:[{ k:'ap', th:'Appreciation', en:'Appreciation', c:'#3E8E4F' }, { k:'hh', th:'Heart to Heart', en:'Heart to Heart', c:'#B8913F' }, { k:'sb', th:'Senbatsu Round', en:'Senbatsu Round', c:'#C0392B' }],
       rounds:[
       { k:'ap', n:1, a:'10:30', b:'11:15', ids:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon'] },
       { k:'ap', n:2, a:'11:30', b:'12:15', ids:['bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail',null,'bnk-wawa','bnk-fame','cgm-kwan'] },
@@ -8439,6 +8439,7 @@ const SEED_SCHEDULE = [
       { k:'hh', n:8, a:'17:30', b:'18:30', ids:['cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin'] },
       { k:'hh', n:9, a:'18:30', b:'19:30', ids:['bnk-fame','bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing'] },
       { k:'hh', n:10, a:'19:30', b:'20:30', ids:['bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'] },
+      { k:'sb', n:'Senbatsu', a:'20:45', b:'21:15', ge:true, ids:[] },
       ] } },
   { id:'ev-mbk-haunted-graveyard-1026', start:'2026-10-26', end:'2026-10-29', time:'16:00', until:'19:30',
     title:'THE HAUNTED GRAVEYARD',
@@ -18883,9 +18884,12 @@ function renderRota(ev){
   const at = (hm, day) => { const d = parseYmd(day); const [h, m] = hm.split(':').map(Number); d.setHours(h, m, 0, 0); return d.getTime(); };
   const kind = k => R.kinds.find(x => x.k === k), mine = state.oshi || [];
   const tile = rotaTile;
-  const rows = R.rounds.map(r => { const K = kind(r.k), D = r.d || R.day, done = D < iso || (D === iso && at(r.b, D) <= now), on = D === iso && !done && at(r.a, D) <= now;
+  // a `ge` round takes ranks 1–12 from the latest election results, lane = rank (until the final, the latest quick result)
+  const geR = R.rounds.some(r => r.ge) ? geLatestRound() : null, geFinal = geR && geR.id === 'ge2026-final';
+  const geIds = () => { const sl = geR ? geSlots(geR.id) : {}; return Array.from({ length:12 }, (_, k) => (sl[k + 1] && sl[k + 1].id && getMember(sl[k + 1].id)) ? sl[k + 1].id : null); };
+  const rows = R.rounds.map(r => r.ge ? { ...r, ids: geIds() } : r).map(r => { const K = kind(r.k), D = r.d || R.day, done = D < iso || (D === iso && at(r.b, D) <= now), on = D === iso && !done && at(r.a, D) <= now;
     return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${r.d || R.day}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${r.ids.some(i => mine.includes(i)) ? 1 : 0}" style="--b:${K.c}">
-      <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${en ? 'Round' : 'รอบที่'} ${r.n}</small><em></em></div>
+      <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${r.ge ? (geR ? (geFinal ? (en ? 'Lanes by final rank' : 'เลนตามอันดับผลสุดท้าย') : (en ? `By ${geRoundLabel(geR)} for now — the final may change it` : `ตาม${geRoundLabel(geR)} ไปก่อน รอผลสุดท้าย`)) : (en ? 'Lanes by rank, after the results' : 'เลนตามอันดับ รอประกาศผล')) : `${en ? 'Round' : 'รอบที่'} ${r.n}`}</small><em></em></div>
       <div class="rt-g">${r.ids.map((id, i) => !R.lanes ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap"><i class="rt-lane">${i + 1}</i></span>`).join('')}</div></div>`; }).join('');
   const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   const dayPills = days.length > 1 ? `<div class="rt-days" role="tablist">${days.map(d => { const x = parseYmd(d); return `<button class="rt-day${d === pick ? ' on' : ''}" data-action="rota-day" data-id="${d}"><small>${WD[x.getDay()]}</small>${x.getDate()} ${M[x.getMonth()]}</button>`; }).join('')}</div>` : '';
