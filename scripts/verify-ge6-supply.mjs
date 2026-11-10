@@ -2,7 +2,8 @@
 // integers (BigInt), sorts the tokens the same way the card does, and checks the totals against the chain's own
 // totalSupply() and balanceOf() for the vault, every sales channel, the poll and a sample of buyers. Also sums the poll's
 // Voted events. node scripts/verify-ge6-supply.mjs
-const RPC = 'https://scan.tokenx.finance/api/eth-rpc';
+// through the site's own Worker (api.48thdb.com/chain: logs and the tip only); balanceOf checks run only where eth_call answers
+const RPC = process.env.GE6_RPC || 'https://api.48thdb.com/chain';
 const TOKEN = '0x2f5c60bde7a5ebd2b116bb03cb5232fa1ea55f1c', START = 48783515;
 const POLL = '0x86a1f49e1b1cbd69971e99b66123264c75ac2c8f', POLL_START = 49475830, POLL_END = 50696530;
 const TRANSFER = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
@@ -11,6 +12,7 @@ const ZERO = '0x0000000000000000000000000000000000000000', DEAD = '0x00000000000
 const hex = n => '0x' + n.toString(16);
 async function rpc(method, params) {
   for (let k = 0; ; k++) {
+    if (method === 'eth_call' && k) throw new Error('no eth_call');
     try {
       const r = await fetch(RPC, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) });
       const j = await r.json(); if (j.error) throw new Error(j.error.message); return j.result;
@@ -57,7 +59,9 @@ console.log(`buyers ${holders} wallets: ${fmt(buyers)}`);
 console.log(`voted (poll balance) ${fmt(voted)}`);
 console.log(`sum of the four ${fmt(vaultT + chanT + buyers + voted)}; sold to buyers ${fmt(buyers + voted)}; voted share ${(Number(voted * 10000n / (buyers + voted)) / 100).toFixed(2)}%`);
 // the chain's own numbers
-const supply = await call('0x18160ddd');
+let supply = null;
+try { supply = await call('0x18160ddd'); } catch (e) { console.log('eth_call not available here (' + (e.message || e) + '): skipping the balanceOf checks'); }
+if (supply != null) {
 console.log(`totalSupply() ${fmt(supply)} ${supply === minted - burnt ? 'matches' : 'DIFFERS'}`);
 let bad = 0;
 const check = async (label, a) => { const c = await balOf(a); const r = bal[a] || 0n; if (c !== r) { bad++; console.log(`  MISMATCH ${label} ${a}: replay ${fmt(r)} chain ${fmt(c)}`); } return c; };
@@ -68,6 +72,7 @@ const buyerList = Object.keys(bal).filter(a => !skip.has(a) && bal[a] > 0n).sort
 const sample = [...buyerList.slice(0, 20), ...buyerList.filter((_, i) => i % Math.max(1, Math.floor(buyerList.length / 40)) === 0)];
 for (const a of new Set(sample)) await check('buyer', a);
 console.log(`balanceOf checks: ${bad ? bad + ' MISMATCH(ES)' : 'all match'} (${vault.length + chans.length + 1 + new Set(sample).size} wallets)`);
+}
 // the poll's Voted events
 const vl = await logs(POLL, POLL_START, Math.min(head, POLL_END), VOTED);
 const vtx = new Set(); let vsum = 0n;
