@@ -12967,7 +12967,7 @@ const TL_LS = '48thdb-tl';
 let IAMTL = (() => { try{ const c = JSON.parse(localStorage.getItem(TL_LS) || 'null'); return c && Array.isArray(c.posts) ? c : null; }catch(e){ return null; } })(), _tlTimer = null, _tlTried = false;
 const TL_POST = n => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
 function refreshTimeline(){
-  if(!_tlTimer) _tlTimer = setInterval(() => { if(!document.hidden) refreshTimeline(); }, 5 * 60000);
+  if(!_tlTimer) _tlTimer = setInterval(() => { if(!document.hidden) refreshTimeline(); }, 2 * 60000);   // the Worker walks every minute (Workers Paid, 10 Nov 2026)
   return fetch(`${LIVE_API}/timeline?t=${Math.floor(Date.now() / 60000)}`, { cache:'no-store' })
     .then(r => r.ok ? r.json() : null)
     .then(d => {

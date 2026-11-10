@@ -229,7 +229,7 @@ the Firebase CLI from the owner's machine.
 
 The home page's "iAM48 ล่าสุด" row (zone `iamtl`, `renderTimelineZone`) shows what
 members post in the iAM48 app, from `api.48thdb.com/timeline`. The Worker walks the
-app's public post pages (`tlScan`, its own 5-minute cron — see worker/README.md):
+app's public post pages (`tlScan`, its own cron, every minute since the Workers Paid plan on 10 Nov 2026 — see worker/README.md):
 there is no list of posts, only numbers shared with lives and everything else.
 A card shows the first three lines and one small picture and opens the post on
 iAM48; posts locked to the app ("Exclusive on iAM48") are a strip of names only and

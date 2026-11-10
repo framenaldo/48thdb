@@ -156,7 +156,7 @@ async function streamStates(ids, env) {
  * days is kept in KV, and the page adds the lives newer than its own copy of
  * lives.json. The list of members and their iAM ids comes from lives.json
  * itself, so the two never disagree about who is counted. */
-const IAM_SLICES = 3;
+const IAM_SLICES = 1;   // was 3 on the free plan (50 requests a run); on Workers Paid everyone is looked at every run
 const IAM_KEEP_MS = 3 * 86400000;
 const IAM_KEY = 'https://live.state/iam-v1';
 const IDS_FROM = ['https://48thdb.com/data/lives.json',
@@ -250,10 +250,11 @@ async function iamRecent(env) {
  * whether it is locked to the app ("Exclusive on iAM48"), whose content is not
  * asked for. The gift senders' pictures on the page are fans' — never kept. */
 const TL_KEY = 'tl-v1', TL_CACHE = 'https://live.state/tl-v1', MAIN_CRON = '*/5 * * * *', PUSH_CRON = '4-59/5 * * * *';
+// Workers Paid (10 Nov 2026): the walk runs every minute instead of every five, so a post shows about a minute after it goes up
 const TL_STEP = 16, TL_FAR = [30, 60, 100, 200], TL_KEEP = 120, TL_KEEP_MS = 7 * 86400000;
 // far behind (the cron stopped firing for most of a day once, 3–4 Nov 2026): twice the step a run until caught up,
 // still well inside the free plan's 50 requests a run
-const TL_CATCHUP = 32, TL_BEHIND = 64, TL_STALE_MS = 15 * 60000;
+const TL_CATCHUP = 48, TL_BEHIND = 64, TL_STALE_MS = 5 * 60000;
 // blind: no number is known to exist past the walk's, and the numbers right after it are empty (a post's number can sit a hundred
 // numbers on: 7 Nov 2026 the walk waited at 849322 for twelve hours while posts 849375 and 849460 existed). Then each run asks 12 numbers
 // in a row and a sweep every TL_SWEEP numbers out to TL_REACH, its starting point moving a step each run, so every number up to
@@ -307,7 +308,7 @@ export async function tlScan(env, nowMs) {
   if (!st.max) { if (!ahead) return { skipped: 'no-start' }; st.max = ahead - 60; }
   const from = st.max, now = nowMs || Date.now(), blind = ahead <= from;
   const step = blind ? TL_BLIND_NEAR : ahead - from > TL_BEHIND ? TL_CATCHUP : TL_STEP;
-  const phase = Math.floor(now / 300000) % TL_SWEEP;
+  const phase = Math.floor(now / 60000) % TL_SWEEP;   // a step each run (one a minute)
   const sweep = [];
   if (blind) for (let d = TL_BLIND_NEAR + 1 + phase; d <= TL_REACH; d += TL_SWEEP) sweep.push(d);
   const asks = [...Array(step).keys()].map((i) => from + 1 + i).concat((blind ? sweep.concat(TL_BLIND_FAR) : TL_FAR).map((d) => from + d));

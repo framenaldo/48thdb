@@ -14,7 +14,7 @@ const SITE = 'https://48thdb.com';
 const SCHEDULE_URL = `${SITE}/data/push-schedule.json`;
 const HEAD_MIN = 30, WINDOW = [25, 35];       // a start is announced when it is 25–35 minutes away, once per subscription
 const SUB_TTL = 120 * 86400, MSG_TTL = 3600;
-const MAX_SENDS = 40;                         // the free plan allows 50 subrequests a run
+const MAX_SENDS = 400;                        // Workers Paid allows 1,000 subrequests a run (the free plan 50)
 const HOSTS = [/(^|\.)fcm\.googleapis\.com$/, /(^|\.)push\.services\.mozilla\.com$/, /(^|\.)push\.apple\.com$/, /(^|\.)notify\.windows\.com$/];
 const HEADERS = {
   'content-type': 'application/json; charset=utf-8', 'access-control-allow-origin': '*', 'cache-control': 'no-store',
