@@ -836,6 +836,19 @@ DTSTART;TZID=Asia/Bangkok:20261026T190000
 DTEND;TZID=Asia/Bangkok:20261026T210000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm-time-to-play-ep1-2026-11-10@48thdb
+DTSTAMP:20261110T000000Z
+SUMMARY:CGM48 TIME TO PLAY! "พาเด็กๆ กลับบ้าน
+ " EP.1
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Nana\, Emma\, Praifa\, Tara\n• YouT
+ ube Premiere ตอนแรกของรายการ CGM48 TIME TO P
+ LAY!\n\nhttps://48thdb.com/event/ev-cgm-time-to-play-ep1
+URL:https://48thdb.com/event/ev-cgm-time-to-play-ep1
+DTSTART;TZID=Asia/Bangkok:20261110T180000
+DTEND;TZID=Asia/Bangkok:20261110T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-ge6-live-talk-1109-2026-11-09@48thdb
 DTSTAMP:20261109T000000Z
 SUMMARY:BNK48 & CGM48 Senbatsu General Election 2026 Final Results Announce
