@@ -1,0 +1,28 @@
+# Every morning (08:00 in Thailand): how many Cloudflare Worker requests has the account used this month?
+# scripts/check-cf-usage.mjs exits 1 when the month so far passes 8M, or the pace would pass the paid plan's 10M included
+# requests — then this run fails and GitHub emails the repo owner. A pass is silent. Reads analytics only.
+# Token: CF_USAGE_TOKEN (Account Analytics: Read) if set, else the deploy token CLOUDFLARE_API_TOKEN.
+name: Check Worker usage
+
+on:
+  schedule:
+    - cron: '0 1 * * *'   # 08:00 in Thailand
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Count this month's requests
+        env:
+          CF_USAGE_TOKEN: ${{ secrets.CF_USAGE_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node scripts/check-cf-usage.mjs
