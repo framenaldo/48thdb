@@ -394,20 +394,21 @@ async function isOwner(request, env) {
   return !!c && c.email_verified === true && String(c.email || '').toLowerCase() === env.OWNER_EMAIL.trim().toLowerCase();
 }
 
-const VISITS_QUERY = `query ($a: String!, $host: String!, $s: Time!, $w: Time!, $f: Time!, $e: Time!) {
-  viewer { accounts(filter: { accountTag: $a }) {
-    hours: rumPageloadEventsAdaptiveGroups(limit: 1000, filter: { requestHost: $host, datetime_geq: $s, datetime_lt: $e }) {
-      count sum { visits } dimensions { datetimeHour } }
-    countries: rumPageloadEventsAdaptiveGroups(limit: 8, orderBy: [sum_visits_DESC], filter: { requestHost: $host, datetime_geq: $w, datetime_lt: $e }) {
-      count sum { visits } dimensions { countryName } }
-    referers: rumPageloadEventsAdaptiveGroups(limit: 8, orderBy: [sum_visits_DESC], filter: { requestHost: $host, datetime_geq: $w, datetime_lt: $e }) {
-      count sum { visits } dimensions { refererHost } }
-    devices: rumPageloadEventsAdaptiveGroups(limit: 5, orderBy: [sum_visits_DESC], filter: { requestHost: $host, datetime_geq: $w, datetime_lt: $e }) {
-      count sum { visits } dimensions { deviceType } }
-    refDays: rumPageloadEventsAdaptiveGroups(limit: 5000, filter: { requestHost: $host, datetime_geq: $f, datetime_lt: $e }) {
-      sum { visits } dimensions { datetimeHour refererHost } }
-  } }
-}`;
+/* Web Analytics samples a long query: 31 days by the hour in one go came back with one page view standing for up to
+ * 35 (10 Nov 2026, once the site had a few thousand visits a day), so the card showed 0 visits and page views in round
+ * 10,000s. Three days or less come back unsampled, so the month is asked in windows of at most three days, in parallel,
+ * and added up. Each window carries the hours, and — where it overlaps the last 7 / 15 days — the lists and refDays. */
+const VISITS_WIN_MS = 3 * 86400000;
+const RUM = (name, limit, filter, fields, order) =>
+  `${name}: rumPageloadEventsAdaptiveGroups(limit: ${limit}${order ? ', orderBy: [sum_visits_DESC]' : ''}, filter: { requestHost: $host, ${filter} }) { ${fields} }`;
+function visitsWinQuery(lists, refs) {
+  const parts = [RUM('hours', 1000, 'datetime_geq: $s, datetime_lt: $e', 'count sum { visits } dimensions { datetimeHour }')];
+  if (lists) for (const [k, dim] of [['countries', 'countryName'], ['referers', 'refererHost'], ['devices', 'deviceType']])
+    parts.push(RUM(k, 40, 'datetime_geq: $w, datetime_lt: $e', `count sum { visits } dimensions { ${dim} }`, true));
+  if (refs) parts.push(RUM('refDays', 5000, 'datetime_geq: $f, datetime_lt: $e', 'sum { visits } dimensions { datetimeHour refererHost }'));
+  return `query ($a: String!, $host: String!, $s: Time!, $e: Time!${lists ? ', $w: Time!' : ''}${refs ? ', $f: Time!' : ''}) {
+  viewer { accounts(filter: { accountTag: $a }) { ${parts.join('\n    ')} } } }`;
+}
 
 /* Which screen people open. The site is one page and Web Analytics keeps the
  * path without its query, so every screen is "/" there; the page says which
@@ -508,7 +509,7 @@ async function gscSummary(env) {
   return body;
 }
 
-async function visits(env) {
+export async function visits(env) {
   const hit = await readCache(VISITS_KEY);
   if (hit) return hit;
   const now = Date.now(), hour = 3600000;
@@ -519,16 +520,40 @@ async function visits(env) {
   const fortnight = new Date(end.getTime() - 15 * 24 * hour);
   const hitsP = env.HITS ? hitsSummary(env).catch((e) => ({ pagesErr: String((e && e.message) || e) })) : Promise.resolve({ pagesErr: 'no-binding' });
   const searchP = gscSummary(env).catch((e) => ({ searchErr: String((e && e.message) || e) }));
-  const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` },
-    body: JSON.stringify({ query: VISITS_QUERY, variables: {
-      a: CF_ACCOUNT, host: SITE_HOST, s: start.toISOString(), w: week.toISOString(), f: fortnight.toISOString(), e: end.toISOString() } }),
-  });
-  const d = await res.json();
-  if (d.errors && d.errors.length) throw new Error(d.errors.map((e) => e.message).join('; '));
-  const acc = d.data && d.data.viewer && d.data.viewer.accounts && d.data.viewer.accounts[0];
-  if (!acc) throw new Error('no analytics for this account');
+  const wins = [];
+  for (let t = start.getTime(); t < end.getTime(); t += VISITS_WIN_MS) wins.push([t, Math.min(t + VISITS_WIN_MS, end.getTime())]);
+  const accs = await Promise.all(wins.map(async ([s, e]) => {
+    const lists = e > week.getTime(), refs = e > fortnight.getTime();
+    const vars = { a: CF_ACCOUNT, host: SITE_HOST, s: new Date(s).toISOString(), e: new Date(e).toISOString() };
+    if (lists) vars.w = new Date(Math.max(s, week.getTime())).toISOString();
+    if (refs) vars.f = new Date(Math.max(s, fortnight.getTime())).toISOString();
+    const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` },
+      body: JSON.stringify({ query: visitsWinQuery(lists, refs), variables: vars }),
+    });
+    const d = await res.json();
+    if (d.errors && d.errors.length) throw new Error(d.errors.map((x) => x.message).join('; '));
+    const one = d.data && d.data.viewer && d.data.viewer.accounts && d.data.viewer.accounts[0];
+    if (!one) throw new Error('no analytics for this account');
+    return one;
+  }));
+  // the windows' lists added together, biggest first
+  const merged = (k, key, limit) => {
+    const m = new Map();
+    for (const one of accs) for (const r of one[k] || []) {
+      const id = r.dimensions[key] || '', o = m.get(id) || { dimensions: { [key]: id }, sum: { visits: 0 }, count: 0 };
+      o.sum.visits += r.sum.visits; o.count += r.count; m.set(id, o);
+    }
+    return [...m.values()].sort((x, y) => y.sum.visits - x.sum.visits).slice(0, limit);
+  };
+  const acc = {
+    hours: accs.flatMap((one) => one.hours || []),
+    countries: merged('countries', 'countryName', 8),
+    referers: merged('referers', 'refererHost', 8),
+    devices: merged('devices', 'deviceType', 5),
+    refDays: accs.flatMap((one) => one.refDays || []),
+  };
   const rows = (list, key) => (list || []).map((r) => [r.dimensions[key] || '', r.sum.visits, r.count]);
   const body = {
     at: new Date(now).toISOString(),

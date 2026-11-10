@@ -78,3 +78,13 @@ try {
     console.log(`${days}d by hour: ${g.length} rows, visits ${f(v)}, page views ${f(c)}, largest sample interval ${si}`);
   }
 } catch (e) { console.log('31d probe: ' + (e.message || e)); }
+// the visitors card's own query, run here: daily visits / page views by Bangkok day for the last 8 days
+try {
+  globalThis.caches = { default: { match: async () => null, put: async () => {} } };
+  const { visits } = await import('../worker/live-worker.js');
+  const d = await visits({ CF_ANALYTICS_TOKEN: TOKEN });
+  const days = {};
+  for (const [h, v, n] of d.hours) { const k = new Date(Date.parse(h) + 7 * 3600e3).toISOString().slice(0, 10); (days[k] ||= [0, 0]); days[k][0] += v; days[k][1] += n; }
+  console.log('Visitors card by day:', Object.entries(days).sort().slice(-8).map(([k, [v, n]]) => `${k.slice(5)} ${f(v)}/${f(n)}`).join(', '));
+  console.log('Referers 7d:', d.referers.map(r => `${r[0] || 'direct'} ${f(r[1])}`).join(', '), '· refDays rows', d.refDays.length);
+} catch (e) { console.log('Visitors card query: ' + (e.message || e)); }
