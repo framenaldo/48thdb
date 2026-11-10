@@ -12,7 +12,7 @@ takes about a minute. Check it landed with
 `curl -s https://48thdb.com/ | grep <something you changed>`.
 
 Other pieces: `worker/` holds the YouTube live checker at api.48thdb.com, which
-is deployed by hand with wrangler. An event whose stream link is one YouTube video
+is deployed with wrangler — by hand, or from GitHub Actions "Deploy Worker" (`deploy-worker.yml`, workflow_dispatch, the site's `CLOUDFLARE_API_TOKEN`). An event whose stream link is one YouTube video
 follows that video (`/stream`, `STREAMS` in the page): it closes when the stream
 ends and stays on while it runs late. Firebase holds the shared member list,
 sign-in, the review queue, flash announcements, election results and event-link
