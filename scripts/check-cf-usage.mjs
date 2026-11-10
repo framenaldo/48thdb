@@ -52,3 +52,15 @@ if (total >= WARN_AT || pace >= INCLUDED) {
   console.log(`::error::Worker requests ${f(total)} this month (pace ${f(pace)}), over the warning line — extra requests cost $0.30 per million.`);
   process.exit(1);
 }
+
+// Also: what Web Analytics (the owner's visitors card) holds for the last three days, to tell a quiet site from a broken count.
+try {
+  const RQ = `query($a:String!,$s:Time!,$e:Time!){viewer{accounts(filter:{accountTag:$a}){
+    rumPageloadEventsAdaptiveGroups(limit:200,filter:{requestHost:"48thdb.com",datetime_geq:$s,datetime_lt:$e}){count sum{visits} avg{sampleInterval} dimensions{date}}}}}`;
+  const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H,
+    body: JSON.stringify({ query: RQ, variables: { a: acc, s: new Date(now - 3 * 864e5).toISOString(), e: now.toISOString() } }) });
+  const j = await r.json();
+  if (j.errors?.length) console.log('Web Analytics:', j.errors.map(x => x.message).join('; ').slice(0, 300));
+  else for (const g of (j.data.viewer.accounts[0]?.rumPageloadEventsAdaptiveGroups || []).sort((a, b) => a.dimensions.date < b.dimensions.date ? -1 : 1))
+    console.log(`Web Analytics ${g.dimensions.date}: visits ${f(g.sum.visits)}, page views ${f(g.count)}, sample interval ${g.avg.sampleInterval}`);
+} catch (e) { console.log('Web Analytics: ' + (e.message || e)); }
