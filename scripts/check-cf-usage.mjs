@@ -64,3 +64,17 @@ try {
   else for (const g of (j.data.viewer.accounts[0]?.rumPageloadEventsAdaptiveGroups || []).sort((a, b) => a.dimensions.date < b.dimensions.date ? -1 : 1))
     console.log(`Web Analytics ${g.dimensions.date}: visits ${f(g.sum.visits)}, page views ${f(g.count)}, sample interval ${g.avg.sampleInterval}`);
 } catch (e) { console.log('Web Analytics: ' + (e.message || e)); }
+// the visitors card asks for 31 days by the hour in one go: how heavily is that sampled?
+try {
+  const Q31 = `query($a:String!,$s:Time!,$e:Time!){viewer{accounts(filter:{accountTag:$a}){
+    rumPageloadEventsAdaptiveGroups(limit:1000,filter:{requestHost:"48thdb.com",datetime_geq:$s,datetime_lt:$e}){count sum{visits} avg{sampleInterval} dimensions{datetimeHour}}}}}`;
+  for (const days of [31, 7, 3]) {
+    const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H,
+      body: JSON.stringify({ query: Q31, variables: { a: acc, s: new Date(now - days * 864e5).toISOString(), e: now.toISOString() } }) });
+    const j = await r.json();
+    if (j.errors?.length) { console.log(`${days}d by hour:`, j.errors.map(x => x.message).join('; ').slice(0, 300)); continue; }
+    const g = j.data.viewer.accounts[0]?.rumPageloadEventsAdaptiveGroups || [];
+    const v = g.reduce((s, x) => s + x.sum.visits, 0), c = g.reduce((s, x) => s + x.count, 0), si = g.length ? Math.max(...g.map(x => x.avg.sampleInterval)) : 0;
+    console.log(`${days}d by hour: ${g.length} rows, visits ${f(v)}, page views ${f(c)}, largest sample interval ${si}`);
+  }
+} catch (e) { console.log('31d probe: ' + (e.message || e)); }
