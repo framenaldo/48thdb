@@ -39,6 +39,10 @@
   "light": "linear-gradient(180deg, hsl(171 32% 92%) 0%, hsl(169 15% 93%) 17%, hsl(23 13% 90%) 33%, hsl(160 28% 89%) 50%, hsl(170 39% 86%) 67%, hsl(169 43% 87%) 83%, hsl(170 43% 85%) 100%)",
   "dark": "linear-gradient(180deg, hsl(171 22% 19%) 0%, hsl(169 10% 20%) 17%, hsl(23 9% 18%) 33%, hsl(160 19% 17%) 50%, hsl(170 27% 16%) 67%, hsl(169 30% 16%) 83%, hsl(170 30% 15%) 100%)"
  },
+ "posters/bnk48-7th-gen-audition.png": {
+  "light": "linear-gradient(180deg, hsl(255 61% 87%) 0%, hsl(255 61% 87%) 17%, hsl(255 61% 87%) 33%, hsl(255 61% 87%) 50%, hsl(255 61% 87%) 67%, hsl(255 62% 87%) 83%, hsl(257 64% 88%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(255 35% 17%) 0%, hsl(255 35% 17%) 17%, hsl(255 35% 17%) 33%, hsl(255 35% 17%) 50%, hsl(255 35% 17%) 67%, hsl(255 35% 17%) 83%, hsl(257 35% 17%) 100%)"
+ },
  "posters/bnk48-anotherdot-1104.jpg": {
   "light": "linear-gradient(180deg, hsl(217 54% 85%) 0%, hsl(217 65% 83%) 17%, hsl(216 58% 85%) 33%, hsl(225 32% 84%) 50%, hsl(221 39% 81%) 67%, hsl(223 48% 78%) 83%, hsl(224 20% 78%) 100%)",
   "dark": "linear-gradient(180deg, hsl(217 35% 16%) 0%, hsl(217 35% 14%) 17%, hsl(216 35% 15%) 33%, hsl(225 23% 15%) 50%, hsl(221 27% 13%) 67%, hsl(223 34% 11%) 83%, hsl(224 14% 11%) 100%)"
@@ -103,21 +107,9 @@
   "light": "linear-gradient(180deg, hsl(350 56% 79%) 0%, hsl(355 53% 79%) 17%, hsl(357 54% 79%) 33%, hsl(355 62% 79%) 50%, hsl(352 62% 78%) 67%, hsl(354 50% 78%) 83%, hsl(354 69% 78%) 100%)",
   "dark": "linear-gradient(180deg, hsl(350 35% 12%) 0%, hsl(355 35% 13%) 17%, hsl(357 35% 12%) 33%, hsl(355 35% 12%) 50%, hsl(352 35% 12%) 67%, hsl(354 35% 12%) 83%, hsl(354 35% 11%) 100%)"
  },
- "posters/ge6-heart-letter.jpg": {
-  "light": "linear-gradient(180deg, hsl(16 58% 78%) 0%, hsl(25 43% 78%) 17%, hsl(15 17% 79%) 33%, hsl(30 35% 78%) 50%, hsl(23 38% 78%) 67%, hsl(37 16% 80%) 83%, hsl(42 12% 83%) 100%)",
-  "dark": "linear-gradient(180deg, hsl(16 35% 11%) 0%, hsl(25 30% 12%) 17%, hsl(15 12% 12%) 33%, hsl(30 25% 11%) 50%, hsl(23 26% 11%) 67%, hsl(37 11% 13%) 83%, hsl(42 9% 14%) 100%)"
- },
  "posters/ge6-heart-main.jpg": {
   "light": "linear-gradient(180deg, hsl(11 13% 78%) 0%, hsl(22 39% 78%) 17%, hsl(16 43% 78%) 33%, hsl(13 48% 78%) 50%, hsl(17 38% 78%) 67%, hsl(43 37% 78%) 83%, hsl(12 55% 78%) 100%)",
   "dark": "linear-gradient(180deg, hsl(11 9% 10%) 0%, hsl(22 27% 10%) 17%, hsl(16 30% 10%) 33%, hsl(13 34% 10%) 50%, hsl(17 27% 11%) 67%, hsl(43 26% 11%) 83%, hsl(12 35% 10%) 100%)"
- },
- "posters/ge6-heart-rounds.jpg": {
-  "light": "linear-gradient(180deg, hsl(17 54% 78%) 0%, hsl(39 43% 78%) 17%, hsl(51 34% 79%) 33%, hsl(55 37% 78%) 50%, hsl(56 38% 78%) 67%, hsl(55 37% 78%) 83%, hsl(52 34% 78%) 100%)",
-  "dark": "linear-gradient(180deg, hsl(17 35% 11%) 0%, hsl(39 30% 11%) 17%, hsl(51 24% 13%) 33%, hsl(55 26% 12%) 50%, hsl(56 26% 12%) 67%, hsl(55 26% 12%) 83%, hsl(52 24% 11%) 100%)"
- },
- "posters/ge6-heart-rules.jpg": {
-  "light": "linear-gradient(180deg, hsl(31 39% 78%) 0%, hsl(34 36% 78%) 17%, hsl(30 29% 78%) 33%, hsl(34 29% 78%) 50%, hsl(36 31% 78%) 67%, hsl(32 32% 78%) 83%, hsl(34 30% 78%) 100%)",
-  "dark": "linear-gradient(180deg, hsl(31 27% 11%) 0%, hsl(34 25% 11%) 17%, hsl(30 20% 11%) 33%, hsl(34 20% 11%) 50%, hsl(36 22% 10%) 67%, hsl(32 22% 10%) 83%, hsl(34 21% 10%) 100%)"
  },
  "posters/ge6-photoset.jpg": {
   "light": "linear-gradient(180deg, hsl(359 70% 78%) 0%, hsl(26 46% 78%) 17%, hsl(9 64% 78%) 33%, hsl(12 53% 78%) 50%, hsl(11 67% 78%) 67%, hsl(15 62% 78%) 83%, hsl(25 40% 79%) 100%)",
@@ -198,9 +190,5 @@
  "posters/ruamnamjai-16.jpg": {
   "light": "linear-gradient(180deg, hsl(57 19% 91%) 0%, hsl(64 21% 87%) 17%, hsl(85 8% 89%) 33%, hsl(186 51% 86%) 50%, hsl(18 17% 88%) 67%, hsl(57 15% 88%) 83%, hsl(86 33% 92%) 100%)",
   "dark": "linear-gradient(180deg, hsl(57 13% 18%) 0%, hsl(64 14% 17%) 17%, hsl(85 5% 18%) 33%, hsl(186 35% 16%) 50%, hsl(18 12% 17%) 67%, hsl(57 11% 17%) 83%, hsl(86 23% 19%) 100%)"
- },
- "posters/shock-me-girls-x-takeover.jpg": {
-  "light": "linear-gradient(180deg, hsl(317 40% 93%) 0%, hsl(318 47% 92%) 17%, hsl(319 46% 92%) 33%, hsl(320 41% 92%) 50%, hsl(317 30% 92%) 67%, hsl(319 49% 91%) 83%, hsl(319 52% 92%) 100%)",
-  "dark": "linear-gradient(180deg, hsl(317 28% 20%) 0%, hsl(318 33% 19%) 17%, hsl(319 32% 19%) 33%, hsl(320 29% 19%) 50%, hsl(317 21% 19%) 67%, hsl(319 35% 18%) 83%, hsl(319 35% 19%) 100%)"
  }
 }
