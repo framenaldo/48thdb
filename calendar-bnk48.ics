@@ -1230,6 +1230,19 @@ DTSTART;TZID=Asia/Bangkok:20261110T190000
 DTEND;TZID=Asia/Bangkok:20261110T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-bnk-7th-gen-audition@48thdb
+DTSTAMP:20261116T000000Z
+SUMMARY:BNK48 7th Generation Audition
+DESCRIPTION:• เปิดรับใบสมัคร 16 พ.ย. 00:0
+ 0 – 21 ธ.ค. 2026 23:59 น.\n• สมัครทางเว็
+ บไซต์ audition.bnk48.com\n\nhttps://48thdb.com/event/ev-bnk-7th-
+ gen-audition
+URL:https://48thdb.com/event/ev-bnk-7th-gen-audition
+DTSTART;VALUE=DATE:20261116
+DTEND;VALUE=DATE:20261222
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-shock-me-girls-orientation-2026-11-20@48thdb
 DTSTAMP:20261120T000000Z
 SUMMARY:SHOCK ME GIRLS: SEMESTER 2 ORIENTATION DAY
