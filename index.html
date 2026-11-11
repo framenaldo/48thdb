@@ -6718,6 +6718,66 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-sheet .lay-row span{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left; }
   .meow-sheet .lay-row small{ font-size:11.5px; font-weight:500; color:var(--ink-soft); }
   .meow-sheet .lay-row i{ margin-left:auto; flex:none; }
+  /* ---- Preview: the glass look (?ui=glass on one device, ?ui=off back; html[data-ui="glass"], set in cdShopSync). ----
+     Skin only — nothing moves: the next event's poster, blurred, is the room; a few panes of glass with hairline
+     edges sit in it; numbers are large and light. Sheets are see-through glass too (the owner asked, 11 Nov 2026). */
+  html[data-ui="glass"]{ --u-page:#ECE6EA; --u-wash:rgba(250,246,248,.76); --u-glass:rgba(255,255,255,.5); --u-edge:rgba(255,255,255,.78);
+    --u-hair:rgba(28,22,34,.10); --u-shadow:rgba(60,30,50,.14); --u-sheet:rgba(250,246,249,.74); --u-bar:rgba(250,246,248,.55);
+    --u-img-glass:rgba(20,10,16,.38); --u-img-edge:rgba(255,255,255,.22); background:var(--u-page); }
+  :root[data-theme="dark"][data-ui="glass"]{ --u-page:#0F0B12; --u-wash:rgba(13,9,16,.7); --u-glass:rgba(36,29,42,.46); --u-edge:rgba(255,255,255,.13);
+    --u-hair:rgba(255,255,255,.09); --u-shadow:rgba(0,0,0,.42); --u-sheet:rgba(24,19,29,.7); --u-bar:rgba(15,11,18,.5); }
+  html[data-ui="glass"] body{ background:none; }
+  html[data-ui="glass"] body::before{ content:''; position:fixed; inset:-70px; z-index:-1; pointer-events:none; background:var(--u-amb, none) center / cover no-repeat;
+    filter:blur(46px) saturate(1.3); transform:translateZ(0); }
+  html[data-ui="glass"] body::after{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background:var(--u-wash); }
+  html[data-ui="glass"] header.top{ background:var(--u-bar); border-bottom:1px solid var(--u-hair); box-shadow:none;
+    -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5); }
+  /* home: the date card is no card, the labels are plain words */
+  html[data-ui="glass"] .feed-head{ background:none; border:0; box-shadow:none; padding:2px 2px 0; -webkit-backdrop-filter:none; backdrop-filter:none; }
+  html[data-ui="glass"] .feed-today{ background:none; border:0; box-shadow:none; padding:0; font-size:12px; font-weight:600; letter-spacing:.12em; color:var(--ink-soft); }
+  html[data-ui="glass"] .cd-next, html[data-ui="glass"] .dash-t, html[data-ui="glass"] .tl-card, html[data-ui="glass"] .tl-chip,
+  html[data-ui="glass"] .bday-chip, html[data-ui="glass"] .ev-card:not(.is-themed){ background:var(--u-glass); border:1px solid var(--u-edge);
+    box-shadow:0 10px 28px var(--u-shadow); -webkit-backdrop-filter:blur(22px) saturate(1.6); backdrop-filter:blur(22px) saturate(1.6); }
+  html[data-ui="glass"] .cd-next{ border-radius:20px; }
+  html[data-ui="glass"] .dash-t, html[data-ui="glass"] .dash-ge{ border-radius:24px; }
+  html[data-ui="glass"] .tl-card{ border-radius:22px; }
+  html[data-ui="glass"] .ev-card{ border-radius:26px; box-shadow:0 12px 32px var(--u-shadow); }
+  html[data-ui="glass"] .ev-card.is-themed{ border-color:var(--u-img-edge); }
+  html[data-ui="glass"] .dash-ge:not(.dash-bk){ background:var(--u-glass); border:1px solid var(--u-edge); color:var(--ink); box-shadow:0 12px 32px var(--u-shadow);
+    -webkit-backdrop-filter:blur(22px) saturate(1.6); backdrop-filter:blur(22px) saturate(1.6); }
+  html[data-ui="glass"] .dash-ge:not(.dash-bk) .dash-r i{ color:var(--ink-soft); font-weight:300; font-size:17px; }
+  html[data-ui="glass"] .dash-ge:not(.dash-bk) .dash-ge-top b{ font-weight:500; }
+  html[data-ui="glass"] .dash-ge:active, html[data-ui="glass"] .dash-t:active, html[data-ui="glass"] .cd-next:active{ transform:scale(.965); }
+  html[data-ui="glass"] #main .feed-block .section-label{ display:block; padding:0; border:0; border-radius:0; background:none; box-shadow:none;
+    -webkit-backdrop-filter:none; backdrop-filter:none; font-size:18px; font-weight:500; letter-spacing:0; }
+  html[data-ui="glass"] .feed-block .section-label::before{ display:none; }
+  /* the live vote: the poster fills the card, the figures sit on a pane of dark glass at its foot */
+  html[data-ui="glass"] .gec-teaser.is-home{ display:flex; padding:210px 30px 28px; min-height:0; border-radius:30px; overflow:hidden; background:#150A0F;
+    box-shadow:0 18px 44px var(--u-shadow); isolation:isolate; }
+  html[data-ui="glass"] .gec-teaser.is-home:active{ transform:scale(.975); box-shadow:0 10px 26px var(--u-shadow); }
+  html[data-ui="glass"] .gec-teaser.is-home .gec-t-poster{ position:absolute; inset:0; top:0; right:0; width:100%; height:100%; object-fit:cover; object-position:50% 22%;
+    transform:none; border-radius:0; box-shadow:none; z-index:-2; }
+  html[data-ui="glass"] .gec-teaser.is-home::after{ content:''; position:absolute; left:12px; right:12px; bottom:12px; top:194px; z-index:-1; border-radius:22px;
+    background:var(--u-img-glass); border:1px solid var(--u-img-edge); -webkit-backdrop-filter:blur(22px) saturate(1.5); backdrop-filter:blur(22px) saturate(1.5); }
+  html[data-ui="glass"] .gec-teaser.is-home .gec-t-k{ font-size:12px; font-weight:500; letter-spacing:.03em; color:rgba(255,255,255,.74); }
+  html[data-ui="glass"] .gec-teaser.is-home .gec-t-v{ font-size:44px; font-weight:300; letter-spacing:-.03em; line-height:1.08; color:#fff; }
+  html[data-ui="glass"] .gec-teaser.is-home .gec-t-row{ font-size:13px; font-weight:400; color:rgba(255,255,255,.74); }
+  html[data-ui="glass"] .gec-teaser.is-home .gec-t-row b, html[data-ui="glass"] .gec-teaser.is-home .gec-t-row .gec-t-x{ color:#fff; font-weight:600; }
+  html[data-ui="glass"] .gec-teaser.is-home .gec-t-go{ font-weight:500; color:rgba(255,255,255,.74); padding-top:10px; margin-top:8px; border-top:1px solid var(--u-img-edge); }
+  /* the menu bar: a quiet capsule, the tab you are on is the dark one */
+  html[data-ui="glass"] .glass-nav{ background:var(--u-glass); border:1px solid var(--u-edge); box-shadow:0 12px 34px var(--u-shadow);
+    -webkit-backdrop-filter:blur(24px) saturate(1.6); backdrop-filter:blur(24px) saturate(1.6); }
+  html[data-ui="glass"] .gnav-blob{ background:var(--ink); box-shadow:none; }
+  html[data-ui="glass"] .glass-nav button{ color:var(--ink-soft); }
+  html[data-ui="glass"] .glass-nav button.active{ color:var(--u-page); }
+  /* sheets: glass you can see the page through, on phones too */
+  html[data-ui="glass"] .modal-backdrop{ background:color-mix(in srgb, var(--u-page) 38%, transparent); }
+  html[data-ui="glass"] .modal-glass-card{ border-radius:30px; border:1px solid var(--u-edge); box-shadow:0 30px 70px var(--u-shadow);
+    -webkit-backdrop-filter:blur(26px) saturate(1.6); backdrop-filter:blur(26px) saturate(1.6); }
+  html[data-ui="glass"] .modal-glass-card:not(.is-postered){ background:var(--u-sheet); }
+  html[data-ui="glass"] .modal-glass-card.is-postered.has-grad{ background:none; isolation:isolate; }
+  html[data-ui="glass"] .modal-glass-card.is-postered.has-grad::before{ content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; background:var(--sheet-grad); opacity:.8; }
+  :root[data-theme="dark"][data-ui="glass"] .modal-glass-card.is-postered.has-grad::before{ background:var(--sheet-grad-d); opacity:.76; }
 </style>
 <script>
   /* Runs before first paint: follow the OS. A tap on the switch holds only for this visit (sessionStorage). */
@@ -15476,14 +15536,27 @@ todaySlideOn();   // reads ?evslide= while the address still has it
 const gallOn = (() => { try{ const q = new URLSearchParams(location.search).get('glassall'); if(q === 'off') localStorage.setItem('48thdb-gall', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-gall'); return localStorage.getItem('48thdb-gall') !== 'off'; }catch(e){ return true; } })();
 // On for everyone (owner, 8 Nov 2026): the home page's cards are clearer glass. ?clear=off turns it off on one device (kept), ?clear=on back.
 const clearOn = (() => { try{ const q = new URLSearchParams(location.search).get('clear'); if(q === 'off') localStorage.setItem('48thdb-clear', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-clear'); return localStorage.getItem('48thdb-clear') !== 'off'; }catch(e){ return true; } })();
+// Preview of the glass look: ?ui=glass turns it on for this device (kept), ?ui=off back. Off for everyone else.
+const uiGlass = (() => { try{ const q = new URLSearchParams(location.search).get('ui'); if(q === 'glass') localStorage.setItem('48thdb-ui', 'glass'); else if(q === 'off') localStorage.removeItem('48thdb-ui'); return localStorage.getItem('48thdb-ui') === 'glass'; }catch(e){ return false; } })();
+let _uiAmb = false;
+// the room's colours: the next event's poster (its small copy), blurred by the CSS
+function uiAmbient(){
+  if(_uiAmb) return; _uiAmb = true;
+  const iso = toYmd(todayStart());
+  const ev = SEED_SCHEDULE.filter(e => !e.period && e.poster && e.poster.img && (e.end || e.start) >= iso)
+    .sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'))[0];
+  const src = ev ? ev.poster.img.replace(/\.(jpe?g|png)$/i, '-s.jpg') : 'posters/election-2026-s.jpg';
+  document.documentElement.style.setProperty('--u-amb', `url("${src}")`);
+}
 function cdShopSync(){
   const d = document.documentElement.dataset; if(clearOn) d.clear = '1'; if(gallOn) d.gall = '1';
+  if(uiGlass){ d.ui = 'glass'; uiAmbient(); }
   const sc = typeof bgScenes === 'function' ? bgScenes() : true;
   if(sc && wallOn && state.view === 'browse') d.wall = '1'; else delete d.wall;
   if(sc && boothOn && state.view === 'shop') d.booth = '1'; else delete d.booth;
   if(sc && stageOn && state.view === 'stats') d.stage = '1'; else delete d.stage;
   if(sc && deskOn && state.view === 'profile') d.desk = '1'; else delete d.desk;
-  if(sc && homeOn && state.view === 'feed') d.home = '1'; else delete d.home;
+  if(sc && homeOn && state.view === 'feed' && !uiGlass) d.home = '1'; else delete d.home;
   if(sc && cdShopOn && state.view === 'discography') d.cdshop = '1'; else delete d.cdshop;
   if(sc && boardOn && state.view === 'calendar') d.board = '1'; else delete d.board;
 }
