@@ -29176,7 +29176,17 @@ function meowDocH(){
 }
 function meowFitPage(){
   if(!_meowPage) return;
-  _meowPage.style.width = document.documentElement.clientWidth + 'px'; _meowPage.style.height = meowDocH() + 'px'; _meowPage.style.overflow = 'hidden';
+  const w = document.documentElement.clientWidth + 'px', h = meowDocH() + 'px', st = _meowPage.style;
+  if(st.width !== w) st.width = w; if(st.height !== h) st.height = h; if(st.overflow !== 'hidden') st.overflow = 'hidden';
+}
+/* Her layer is as tall as the page, so it has to follow the page the moment it changes. Fitted only every four seconds (and not
+   while the reader scrolled), it kept the height of the page before: from the home page to a short one there were thousands of
+   pixels of nothing to scroll through (10 Nov 2026). The page's own boxes are watched, and the layer is fitted in the same frame. */
+let _meowFitRO = null;
+function meowWatchPage(){
+  if(typeof ResizeObserver === 'undefined') return;
+  if(!_meowFitRO) _meowFitRO = new ResizeObserver(() => meowFitPage());
+  for(const id of ['app', 'main']){ const el = document.getElementById(id); if(el && el._meowFit !== _meowFitRO){ el._meowFit = _meowFitRO; _meowFitRO.observe(el); } }
 }
 /* While the reader scrolls, her floor is not measured again: a card's rect and scrollY are read at slightly different moments on a
    phone (the page is moved by the compositor ahead of the script), so each frame's sum came out a few pixels apart and she
@@ -29299,6 +29309,9 @@ class MeowRoamer extends MeowWalker {
       this.mode = 'ledge'; this.spd = 1; this.cur = .4; this.born = meowSec(); this.squash = 0; this.fxT = 0; this.viewAt = state.view;
       const vis = this.onScreen(); this.ledge = vis.length ? meowPick(vis) : _meowLedges[0];
       const B = meowLedgeBox(this.ledge); this.rx = B ? Math.random() * Math.max(0, B.r - B.l - this.cw) : 0;
+      // she knows where she stands from the start: drawn before her first frame she sat in the screen's bottom-left corner, and a
+      // card redrawn in that moment dropped her from nowhere (a position that is not a number, which never moved again: 10 Nov 2026)
+      if(B){ this.vx = B.l + this.rx; this.vy = B.y; }
       meowSpotRestore(this);   // a reload finds her where she was
     }
   }
@@ -29669,7 +29682,7 @@ class MeowRoamer extends MeowWalker {
   tick(dt){
     // she is on another page: not here at all; back on hers, she is sitting about somewhere on screen
     if(!meowHere()){ if(this.gone && meowSec() > (this.rollAt || 0)){ this.rollAt = meowSec() + meowRand(60, 180); if(this.rollPage()) return; }
-      if(!this.gone){ const LV0 = this.pet ? meowT(this.pet, 'love') : .5; this.goneAt = meowSec(); this.rollAt = meowSec() + (LV0 > .7 ? meowRand(3, 9) : meowRand(30, 90)); this.gone = true; this.btn.hidden = true; meowRingClose(); meowToysPaint(); this.toyView = null; if(_meowBubble) _meowBubble.classList.remove('on'); if(_meowEdge) _meowEdge.classList.remove('on'); } meowCallPaint(); return; }
+      if(!this.gone){ const LV0 = this.pet ? meowT(this.pet, 'love') : .5; this.goneAt = meowSec(); this.rollAt = meowSec() + (LV0 > .7 ? meowRand(3, 9) : meowRand(30, 90)); this.gone = true; this.btn.hidden = true; meowRingClose(); meowToysPaint(); this.toyView = null; if(_meowBubble) _meowBubble.classList.remove('on'); if(_meowEdge) _meowEdge.classList.remove('on'); } if(!this.btn.hidden) this.btn.hidden = true; meowCallPaint(); return; }
     if(this.gone){ this.gone = false; meowCallPaint(); this.reenter(null, true); setTimeout(meowToysPaint, 300); return; }
     if(this.toyView !== state.view){ this.toyView = state.view; setTimeout(meowToysPaint, 400); }
     meowEdgeTick(this, dt);
@@ -29843,7 +29856,9 @@ class MeowRoamer extends MeowWalker {
   layerEl(){ return this.sp === 'page' && _meowPage ? _meowPage : _meowLayer; }
   off(){ return [0, 0]; }   // her coordinates are the page's already
   draw(){
-    if(!this.pet || this.mode === 'away'){ this.btn.hidden = true; return; }
+    // on another page she is not drawn at all: a draw asked for while she was away (her account's copy arriving, a nudge) used to
+    // show her, still, in the corner of a page she was not on, beside the pill that says where she is
+    if(!this.pet || this.mode === 'away' || this.gone || !meowHere()){ this.btn.hidden = true; return; }
     this.btn.hidden = false;
     const sp = this.space();
     if(sp !== this.sp){ this.sp = sp; const L = this.layerEl(); if(L && this.btn.parentNode !== L){ L.appendChild(this.btn); if(_meowBubble) L.appendChild(_meowBubble); } }
@@ -29870,6 +29885,8 @@ class MeowRoamer extends MeowWalker {
       if(this.squash > 0){ sy = 1 - this.squash * .8; sx = 1 + this.squash * .45; cy += this.ch * (1 - sy) / 2; }
     }
     if(this.tw){ const k = this.tw.t / this.tw.d, e = k * (2 - k); cx = this.tw.x + (cx - this.tw.x) * e; cy = this.tw.y + (cy - this.tw.y) * e; rot = this.tw.r + (rot - this.tw.r) * e; }
+    // a place that is not a number cannot be drawn, and the browser keeps her last one: she would stand still for good. She leaps in again.
+    if(!Number.isFinite(cx) || !Number.isFinite(cy)){ if(!this._lost){ this._lost = true; try{ this.tw = null; this.cl = null; this.reenter(null, true); } finally { this._lost = false; } } return; }
     this.dc = { x:cx, y:cy, r:rot };
     const [ox, oy] = this.off();
     const tf = `translate3d(${(cx - this.cw / 2 + ox).toFixed(1)}px, ${(cy - this.ch / 2 + oy).toFixed(1)}px, 0) rotate(${rot.toFixed(1)}deg) scale(${(dir * sx).toFixed(3)}, ${sy.toFixed(3)})`;
@@ -30157,6 +30174,7 @@ function meowMount(){
     setTimeout(() => meowMouseMaybe(true), 20000);
   }
   _meowLayer.hidden = false; _meowPage.hidden = false;
+  meowWatchPage(); meowFitPage();
   if(!_meowWalk){
     _meowWalk = new MeowRoamer(_meowLayer, {
       onTap:w => {
