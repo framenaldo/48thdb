@@ -2352,6 +2352,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .org-members .ev-person{ background:color-mix(in srgb, var(--c) 13%, var(--card)); }
   .ev-tba{ margin:7px 0 0; font-size:12px; color:var(--ink-soft); font-style:italic; }
   .ev-people{ display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
+  /* the label before an event's guests: a line of its own, so they do not read as part of the line-up */
+  .ev-guest-tag{ flex:1 0 100%; margin:4px 0 -1px; font-size:10.5px; font-weight:800; letter-spacing:.04em; color:var(--ink-soft); }
   .ev-person{
     display:inline-flex; align-items:center; gap:5px; cursor:pointer;
     padding:3px 9px 3px 3px; border-radius:999px;
@@ -8115,7 +8117,7 @@ const SEED_SCHEDULE = [
       'Top 12 เซ็มบัตสึได้ไปถ่าย MV ที่ญี่ปุ่น',
       'Kami7 Special Project — เพลงร่วมกับ AKB48',
       '#BNK48CGM48_GE2026'],
-    allMembers:true },
+    allMembers:true, guests:['bnk-orn','bnk-tarwaan','cgm-nenie','cgm-angel'], guestLabel:'Commentator · iAM48' },
   { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04', boothPlan:'fanfest',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival', short:'General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
@@ -8857,6 +8859,8 @@ SEED_SCHEDULE.forEach(e => {
   if(e.slots && !e.members) e.members = [...new Set(e.slots.flatMap(s => s.members))];
   // every current member takes part: the list follows the roster rather than being copied out
   if(e.allMembers) e.members = SEED_MEMBERS.map(m => m.id);
+  // former members who come back for an event (the results night's commentators): shown with the line-up, after it
+  if(e.guests) e.members = [...new Set([...(e.members || []), ...e.guests])];
 });
 
 /* The election is not one day but two months of deadlines, so the events that
@@ -13852,12 +13856,12 @@ function renderEventCard(ev, todayIso){
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
         groupTag(g)).join('')}</div>` : ''}
       ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
-      ${img ? '' : renderEventPeople(people, 6)}
+      ${img ? '' : renderEventPeople(people, 6, '', ev)}
       ${!img && mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
       ${(!img || !people.length) && hasMore ? `<p class="ev-open">ดูรายละเอียด</p>` : ''}
     </div>
     ${img && people.length ? `<div class="ev-foot">
-      ${renderEventPeople(people, 8)}
+      ${renderEventPeople(people, 8, '', ev)}
       ${mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
       ${hasMore ? `<p class="ev-open">ดูรายละเอียด</p>` : ''}
     </div>` : ''}
@@ -13900,17 +13904,21 @@ function renderLineupPills(L){
   return L.whole.map(g => `<span class="ev-all" style="--c:${g.color}">All ${escapeHtml(g.name)} Members</span>`).join('');
 }
 /* The member row of a card: the whole-group pills, then chips, oshi first, up to max. */
-function renderEventPeople(people, max, cls){
+function renderEventPeople(people, max, cls, ev){
   if(!people.length) return '';
-  const L = lineupGroups(people.map(m => m.id));
-  const rest = people.filter(m => L.rest.includes(m.id));
-  const shown = rest.slice(0, max), more = rest.length - shown.length;
-  return `<div class="ev-people${cls ? ' ' + cls : ''}">${renderLineupPills(L)}${shown.map(m => {
-    const g = getGroup(m.groupId);
+  // an event's guests (former members back as commentators) come after the line-up, behind a label of their own
+  const gs = new Set((ev && ev.guests) || []), guests = people.filter(m => gs.has(m.id));
+  people = people.filter(m => !gs.has(m.id));
+  const chip = m => { const g = getGroup(m.groupId);
     return `<button class="ev-person${state.oshi.includes(m.id)?' is-oshi':''}" style="--c:${g.color}"
       data-action="open-member" data-id="${m.id}" title="${escapeAttr(m.name)}">
       ${renderAvatar(m,'avatar-sm',g.color)}<span>${escapeHtml(nickName(m))}</span>
-    </button>`; }).join('')}${more > 0 ? `<span class="ev-more-people">+${more}</span>` : ''}</div>`;
+    </button>`; };
+  const L = lineupGroups(people.map(m => m.id));
+  const rest = people.filter(m => L.rest.includes(m.id));
+  const shown = rest.slice(0, max), more = rest.length - shown.length;
+  const tail = guests.length ? `<span class="ev-guest-tag">${escapeHtml((ev && ev.guestLabel) || 'Commentator')}</span>${guests.map(chip).join('')}` : '';
+  return `<div class="ev-people${cls ? ' ' + cls : ''}">${renderLineupPills(L)}${shown.map(chip).join('')}${more > 0 ? `<span class="ev-more-people">+${more}</span>` : ''}${tail}</div>`;
 }
 
 /* Today's events, as the first thing under the date: the whole poster where
@@ -13954,7 +13962,7 @@ function renderTodayHero(ev, todayIso){
     </div>
     <div class="today-hero-body today-hero-foot">
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g => groupTag(g)).join('')}</div>` : ''}
-      ${renderEventPeople(people, 8)}
+      ${renderEventPeople(people, 8, "", ev)}
       ${open ? `<p class="today-hero-open">ดูรายละเอียด</p>` : ''}
     </div>
   </article>`;
