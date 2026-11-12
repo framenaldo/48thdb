@@ -2353,6 +2353,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .ev-tba{ margin:7px 0 0; font-size:12px; color:var(--ink-soft); font-style:italic; }
   .ev-people{ display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
   /* the label before an event's guests: a line of its own, so they do not read as part of the line-up */
+  /* a card's own short lines (cardNote): what else the event has, said where it is seen */
+  .ev-note{ margin:7px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:3px; font-size:12px; font-weight:600; line-height:1.4; color:var(--ink); }
+  .ev-note li{ position:relative; padding-left:16px; }
+  .ev-note li::before{ content:''; position:absolute; left:3px; top:.42em; width:7px; height:7px; border-radius:50%; background:#E0243A; box-shadow:0 0 0 2px color-mix(in srgb, #E0243A 25%, transparent); }
   .ev-guest-tag{ flex:1 0 100%; margin:4px 0 -1px; font-size:10.5px; font-weight:800; letter-spacing:.04em; color:var(--ink-soft); }
   .ev-person{
     display:inline-flex; align-items:center; gap:5px; cursor:pointer;
@@ -8117,7 +8121,8 @@ const SEED_SCHEDULE = [
       'Top 12 เซ็มบัตสึได้ไปถ่าย MV ที่ญี่ปุ่น',
       'Kami7 Special Project — เพลงร่วมกับ AKB48',
       '#BNK48CGM48_GE2026'],
-    allMembers:true, guests:['bnk-orn','bnk-tarwaan','cgm-nenie','cgm-angel'], guestLabel:'Commentator · iAM48' },
+    allMembers:true, guests:['bnk-orn','bnk-tarwaan','cgm-nenie','cgm-angel'], guestLabel:'Commentator · ไลฟ์วิเคราะห์ผล',
+    cardNote:['ไลฟ์ประกาศผล · YouTube BNK48 Official', 'ไลฟ์วิเคราะห์ผล · แอป iAM48 (เฉพาะผู้สมัครแพ็กเกจ)'] },
   { id:'ev-election-fanfest', start:'2026-10-03', end:'2026-10-04', boothPlan:'fanfest',
     title:'BNK48 & CGM48 Senbatsu General Election 2026 Fan Festival', short:'General Election 2026 Fan Festival',
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'],
@@ -10447,6 +10452,9 @@ const EN = {
   'จัดรอบค่ำ วันเดียวกับ BNK48 & CGM48 Journey of Dreams 夢の旅 ที่จัดรอบกลางวัน':
     'Held in the evening, the same day as BNK48 & CGM48 Journey of Dreams 夢の旅 in the afternoon',
   'ประตูเปิด 12:00 น. · เริ่มงาน 13:00 น.': 'Doors open 12:00 · starts 13:00',
+  'ไลฟ์ประกาศผล · YouTube BNK48 Official': 'Results live · YouTube BNK48 Official',
+  'ไลฟ์วิเคราะห์ผล · แอป iAM48 (เฉพาะผู้สมัครแพ็กเกจ)': 'Live commentary · iAM48 app (subscribers only)',
+  'Commentator · ไลฟ์วิเคราะห์ผล': 'Commentators · live commentary',
   'ถ่ายทอดสดทาง YouTube BNK48 Official 14 พ.ย. 18:00 น.': 'Live on YouTube BNK48 Official, 14 Nov 18:00',
   'ไลฟ์วิเคราะห์ผลกับ Orn, Tarwaan, Nenie และ Angel ในแอป iAM48 14 พ.ย. 18:00 น. (เฉพาะสมาชิกที่สมัครแพ็กเกจ)': 'Live commentary with Orn, Tarwaan, Nenie and Angel in the iAM48 app, 14 Nov 18:00 (subscribers only)',
   'ประตูเปิด 17:00 น. · เริ่มงาน 18:00 น.': 'Doors open 17:00 · starts 18:00',
@@ -13852,6 +13860,7 @@ function renderEventCard(ev, todayIso){
         return at ? startsPill('ev-starts', ev, todayIso, at) : ''; })()}
       <h3 class="ev-title">${cancelTag(ev)}${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':ev.tag==='partner'?'<span class="ev-tag">Partner</span>':''}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
+      ${(ev.cardNote || []).length ? `<ul class="ev-note">${ev.cardNote.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>` : ''}
       ${renderSaleLine(ev)}
       ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
         groupTag(g)).join('')}</div>` : ''}
