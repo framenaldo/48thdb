@@ -16107,8 +16107,8 @@ function gecShareSpec(id){
       [en ? 'Buyers, not voted' : 'ผู้ซื้อถือ ยังไม่โหวต', buyers, '#3CC4A5'], [en ? 'Voted' : 'โหวตแล้ว', voted, '#FF6FA5']];
     return spec(en ? 'Where all the GE6 is' : 'โทเคน GE6 ทั้งหมดอยู่ที่ไหน', [
       { type:'bars', rows:parts.map(([label, v, colour]) => ({ label, value:`${T(v)} · ${pc(v / t.minted)}`, frac:v / t.minted, colour })) },
-      { type:'note', text:en ? `Minted: ${T(t.minted)}. Sold through to buyers: ${T(buyers + voted)}, of which ${pc((buyers + voted) ? voted / (buyers + voted) : 0)} has been voted. Counted from every transfer on the chain.`
-        : `ผลิตทั้งหมด ${T(t.minted)} · ขายถึงมือผู้ซื้อแล้ว ${T(buyers + voted)} โหวตไปแล้ว ${pc((buyers + voted) ? voted / (buyers + voted) : 0)} ของที่ขายได้ · นับจากการโอนจริงทุกครั้งบนบล็อกเชน` }]);
+      { type:'note', text:en ? `Minted: ${T(t.minted)}. Delivered to buyers’ wallets: ${T(buyers + voted)}, of which ${pc((buyers + voted) ? voted / (buyers + voted) : 0)} has been voted. Counted from every transfer on the chain.`
+        : `ผลิตทั้งหมด ${T(t.minted)} · ส่งถึงกระเป๋าผู้ซื้อแล้ว ${T(buyers + voted)} โหวตไปแล้ว ${pc((buyers + voted) ? voted / (buyers + voted) : 0)} ของที่ส่งถึงผู้ซื้อ · นับจากการโอนจริงทุกครั้งบนบล็อกเชน` }]);
   }
   if(id === 'feed'){
     const bigSum = d.big.reduce((s, v) => s + v.amt, 0);
@@ -16438,8 +16438,8 @@ function gecSupplyCard(en, N, pc){
     <div class="gec-stack">${parts.map(([c, , v]) => `<i class="${c}" style="width:${(v / t.minted * 100).toFixed(2)}%"></i>`).join('')}</div>
     <div class="gec-mrows gec-srows">${parts.map(([c, k, v]) => `<div class="gec-mrow"><span><i class="gec-dot ${c}"></i>${k}</span><b>${gecTok(v)}<small>${pc(v / t.minted)}</small></b></div>`).join('')}
       <div class="gec-mrow is-total"><span>${en ? 'Minted, all of it' : 'ผลิตทั้งหมด'}</span><b>${gecTok(t.minted)}</b></div></div>
-    <p class="gec-sub">${en ? `Sold through to buyers so far: <b>${gecTok(sold)}</b>, and <b>${pc(sold ? voted / sold : 0)}</b> of that has been voted.`
-      : `ขายถึงมือผู้ซื้อแล้วทั้งหมด <b>${gecTok(sold)}</b> โทเคน · โหวตไปแล้ว <b>${pc(sold ? voted / sold : 0)}</b> ของที่ขายได้`}</p>
+    <p class="gec-sub">${en ? `Delivered to buyers’ wallets: <b>${gecTok(sold)}</b>, and <b>${pc(sold ? voted / sold : 0)}</b> of that has been voted. Sales closed on 10 Nov at 23:00; what still moves afterwards is stock being delivered.`
+      : `ส่งถึงกระเป๋าผู้ซื้อแล้วทั้งหมด <b>${gecTok(sold)}</b> โทเคน · โหวตไปแล้ว <b>${pc(sold ? voted / sold : 0)}</b> ของที่ส่งถึงผู้ซื้อ · ปิดขาย 10 พ.ย. เวลา 23:00 น. ตัวเลขที่ยังขยับหลังจากนั้นคือการส่งมอบโทเคนที่ซื้อไว้`}</p>
     <p class="gec-sub">${en ? `How this is counted: GE6 was minted once, ${gecTok(t.minted)} tokens, into the organiser’s vault — the same wallet that created this vote. The vault hands stock to its sales channels (the ${chans.length} wallets it sent 1,000 tokens or more), and they pass them on to buyers; the few tokens it sends straight to a fan count as that fan’s. Every figure comes from those transfers on the chain; none is a guess.`
       : `นับยังไง: GE6 ผลิตครั้งเดียว ${gecTok(t.minted)} โทเคน เข้ากระเป๋าคลังของผู้จัด (กระเป๋าเดียวกับที่สร้างสัญญาโหวตนี้) คลังแบ่งโทเคนให้ช่องทางขาย คือ ${chans.length} กระเป๋าที่รับจากคลังรวม 1,000 โทเคนขึ้นไป แล้วช่องทางขายส่งต่อให้ผู้ซื้อ ส่วนกระเป๋าที่คลังส่งให้ตรง ๆ ไม่กี่โทเคน นับเป็นของผู้ซื้อ ทุกตัวเลขนับจากการโอนจริงบนบล็อกเชน ไม่ได้ประมาณ`}</p>
     <button class="chip gec-more" data-action="gec-chan" aria-expanded="${gecChanOpen}">${gecChanOpen ? (en ? 'Hide the sales channels' : 'ซ่อนช่องทางขาย') : (en ? `See the ${chans.length} sales channels` : `ดูช่องทางขาย ${chans.length} กระเป๋า`)}</button>
