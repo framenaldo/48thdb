@@ -20118,7 +20118,9 @@ function qzVoteHours(her, me, limit){
   const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), iso = toYmd(todayStart());
   if(!her || !her.birthday || !vote || vote.start > iso || eventLastDay(vote) < iso) return [];
   const en = isEN(), TH = 7 * 36e5, now = Date.now();
-  const close = Date.UTC(...eventLastDay(vote).split('-').map((v, i) => i === 1 ? v - 1 : +v)) + 864e5 - TH;
+  // the vote closes at 21:00 on its last day (GE_PAGE.voteClose): from then on there is no hour left to vote in
+  const close = thaiMs(eventLastDay(vote), GE_PAGE.voteClose);
+  if(now >= close) return [];
   const hers = qzRuler(qzRead(her.birthday, false).day.n, ['เดช', 'มนตรี', 'ศรี']), mine = me ? qzRuler(me.day.n, ['ศรี', 'เดช']) : null;
   const thDay = ms => new Date(ms + TH).toISOString().slice(0, 10), hm = ms => new Date(ms + TH).toISOString().slice(11, 16);
   const today = thDay(now), tomorrow = thDay(now + 864e5);
@@ -20248,6 +20250,9 @@ function qzMatchCard(r, rank, noShare){
    and the vote itself — good hours and a shirt for results night, which wants only a member (and her birthday if the
    reader gives one). state.quizMode is the tab and lives in the address (/quiz/quiz, /quiz/day). */
 const QZ_MODES = [['birth', '🎂', 'ใส่วันเกิด', 'Birthday'], ['quiz', '🎯', 'เล่นควิซ', 'Quiz'], ['day', '🗳️', 'ฤกษ์โหวต', 'Vote']];
+// once the vote has closed the third tab is about the results night's shirt alone
+const qzVoteShut = () => { const v = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote); return !v || Date.now() >= thaiMs(eventLastDay(v), GE_PAGE.voteClose); };
+const qzModes = () => qzVoteShut() ? QZ_MODES.map(m => m[0] === 'day' ? ['day', '👕', 'สีเสื้อมงคล', 'Lucky shirt'] : m) : QZ_MODES;
 const quizLast = () => (_quiz.mode === 'quiz' ? QZ_QUESTIONS.length + 1 : 1);      // the step that asks for a group
 function quizStart(mode){
   const base = { mode, step: mode === 'quiz' ? 1 : 0, ans: [], birth: qzBirth() };
@@ -20281,11 +20286,12 @@ function renderQuiz(){
   const lead = { birth: en ? 'Your birthday against every member’s — by the day of the week (ทักษา), the Thai zodiac and the year animal. Just for fun.'
       : 'เทียบวันเกิดของคุณกับเมมเบอร์ทุกคน ตามตำราทักษา ราศีแบบไทย และปีนักษัตร ดูดวงเพื่อความสนุกนะ',
     quiz: en ? 'Five questions on what kind of fan you are — no birthday needed. Just for fun.' : 'ตอบห้าข้อว่าคุณเป็นแฟนสายไหน ไม่ต้องบอกวันเกิด เล่นเพื่อความสนุกนะ',
-    day: en ? 'Good hours to vote for your oshi, and a shirt colour for results night.' : 'หาฤกษ์ดีกดโหวตให้โอชิ และสีเสื้อสำหรับวันประกาศผล' }[mode];
+    day: qzVoteShut() ? (en ? 'A lucky shirt colour to cheer your oshi on results night.' : 'สีเสื้อมงคลใส่เชียร์โอชิในวันประกาศผล')
+      : (en ? 'Good hours to vote for your oshi, and a shirt colour for results night.' : 'หาฤกษ์ดีกดโหวตให้โอชิ และสีเสื้อสำหรับวันประกาศผล') }[mode];
   const head = `<header class="feed-head qz-head">
     <p class="feed-today">${en ? 'Horoscope quiz' : 'ดูดวงหาโอชิ'}</p>
     <h1 class="qz-title">${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}</h1>
-    <div class="qz-tabs" role="tablist">${QZ_MODES.map(([k, e, th, n]) => `<button class="qz-tab${mode === k ? ' is-on' : ''}" role="tab" aria-selected="${mode === k}" data-action="quiz-mode" data-id="${k}"><span aria-hidden="true">${e}</span>${en ? n : th}</button>`).join('')}</div>
+    <div class="qz-tabs" role="tablist">${qzModes().map(([k, e, th, n]) => `<button class="qz-tab${mode === k ? ' is-on' : ''}" role="tab" aria-selected="${mode === k}" data-action="quiz-mode" data-id="${k}"><span aria-hidden="true">${e}</span>${en ? n : th}</button>`).join('')}</div>
     <p class="qz-lead">${lead}</p>
   </header>`;
   const dots = n => `<p class="qz-step">${en ? `Step ${n} of ${total}` : `ข้อ ${n}/${total}`}</p><div class="qz-dots">${Array.from({ length: total }, (_, i) => `<i class="${i < n ? 'is-on' : ''}"></i>`).join('')}</div>`;
@@ -20328,7 +20334,7 @@ function renderQuiz(){
       ${me ? `<div class="qz-me is-result"><span>${en ? 'You:' : 'ดวงคุณ:'}</span>${qzChips(me, en)}</div>` : ''}
       ${list[0] ? qzMatchCard(list[0], 0) : ''}
       ${list.length > 1 ? `<h3 class="section-label qz-more-h">${en ? (mode === 'quiz' ? 'Two more to your taste' : 'Two more your stars favour') : (mode === 'quiz' ? 'อีกสองคนที่น่าจะถูกใจคุณ' : 'อีกสองคนที่ดวงถูกโฉลกกับคุณ')}</h3>${list.slice(1, 3).map(r => qzMatchCard(r, 1)).join('')}` : ''}
-      <div class="qz-next is-center">${list[0] && dayOpen ? `<button class="qz-go" data-action="quiz-day" data-id="${list[0].m.id}">🗳️ ${en ? `Vote hours & shirt for ${escapeHtml(nickName(list[0].m))}` : `ฤกษ์โหวต · สีเสื้อของ ${escapeHtml(nickName(list[0].m))}`}</button>` : ''}
+      <div class="qz-next is-center">${list[0] && dayOpen ? `<button class="qz-go" data-action="quiz-day" data-id="${list[0].m.id}">${qzVoteShut() ? `👕 ${en ? `Lucky shirt for ${escapeHtml(nickName(list[0].m))}` : `สีเสื้อมงคลเชียร์ ${escapeHtml(nickName(list[0].m))}`}` : `🗳️ ${en ? `Vote hours & shirt for ${escapeHtml(nickName(list[0].m))}` : `ฤกษ์โหวต · สีเสื้อของ ${escapeHtml(nickName(list[0].m))}`}`}</button>` : ''}
         <button class="qz-go is-ghost" data-action="quiz-again">↺ ${en ? 'Start again' : 'ทำใหม่'}</button></div>
       <p class="qz-note">${mode === 'quiz' ? (en ? 'For fun only. Each answer leans to one of four elements; members are matched by the elements of their birth day and sign.' : 'เล่นเพื่อความสนุก แต่ละคำตอบเอนไปทางธาตุหนึ่งในสี่ แล้วจับคู่กับธาตุของวันเกิดและราศีของเมมเบอร์')
         : (en ? 'For fun only: no horoscope has been shown to work. Days by the Thai ทักษา pairs (คู่มิตร, คู่สมพล), the Thai sidereal zodiac, year animals from Chinese New Year; members born on a Wednesday are counted by day.'
