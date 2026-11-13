@@ -8744,7 +8744,8 @@ const SEED_SCHEDULE = [
     members:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon','bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail','bnk-wawa','bnk-fame','cgm-kwan','cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin','bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing','bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'],
     rota:{ day:'2026-11-15', head:'ตารางรอบและเลน', where:'MCC Hall', lanes:true,
       kinds:[{ k:'ap', th:'Appreciation', en:'Appreciation', c:'#3E8E4F' }, { k:'hh', th:'Heart to Heart', en:'Heart to Heart', c:'#B8913F' }, { k:'sb', th:'Senbatsu Round', en:'Senbatsu Round', c:'#C0392B' },
-        { k:'hc', th:'Hachi Cha', en:'Hachi Cha', c:'#2E8C82' }, { k:'mc', th:'Merchandise', en:'Merchandise', c:'#7A5BB8' }],
+        { k:'hc', th:'Hachi Cha', en:'Hachi Cha', c:'#2E8C82', nolane:true, note:['สลับฝั่งทุก 30 นาที', 'sides swap every 30 min'] },
+        { k:'mc', th:'Merchandise', en:'Merchandise', c:'#7A5BB8', nolane:true, note:['สลับฝั่งทุก 30 นาที', 'sides swap every 30 min'] }],
       rounds:[
       { k:'ap', n:1, a:'10:30', b:'11:15', ids:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon'] },
       { k:'ap', n:2, a:'11:30', b:'12:15', ids:['bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail',null,'bnk-wawa','bnk-fame','cgm-kwan'] },
@@ -19435,11 +19436,11 @@ function renderRota(ev){
   const geIds = () => { const sl = geSlots('ge2026-final'); return Array.from({ length:12 }, (_, k) => (sl[k + 1] && sl[k + 1].id && getMember(sl[k + 1].id)) ? sl[k + 1].id : null); };
   const rounds = R.rounds.map(r => r.ge ? { ...r, ids: geIds() } : r), dayOf = r => r.d || R.day;
   const stateOf = r => { const D = dayOf(r), done = D < iso || (D === iso && at(r.b, D) <= now); return { done, on:D === iso && !done && at(r.a, D) <= now }; };
-  const laneTile = (r, id, i) => !R.lanes ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap${r.ge ? ' is-rank' : ''}"><i class="rt-lane">${i + 1}</i>${r.ge ? `<span>${en ? `Rank ${i + 1}` : `อันดับ ${i + 1}`}</span>` : ''}</span>`;
+  const laneTile = (r, id, i) => !R.lanes || kind(r.k).nolane ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap${r.ge ? ' is-rank' : ''}"><i class="rt-lane">${i + 1}</i>${r.ge ? `<span>${en ? `Rank ${i + 1}` : `อันดับ ${i + 1}`}</span>` : ''}</span>`;
   const hasOshi = ids => ids.some(i => mine.includes(i)) ? 1 : 0;
   const roundRow = r => { const K = kind(r.k), D = dayOf(r), { done, on } = stateOf(r);
     return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${D}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${hasOshi(r.ids)}"${r.ge ? ' data-ge="1"' : ''} style="--b:${K.c}">
-      <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${r.ge ? (en ? 'Lane = final rank' : 'เลนตามอันดับผลสุดท้าย') : `${en ? 'Round' : 'รอบที่'} ${r.n}`}</small><em></em></div>
+      <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${r.ge ? (en ? 'Lane = final rank' : 'เลนตามอันดับผลสุดท้าย') : `${en ? 'Round' : 'รอบที่'} ${r.n}${K.note ? ` · ${escapeHtml(en ? K.note[1] : K.note[0])}` : ''}`}</small><em></em></div>
       <div class="rt-g">${r.ids.map((id, i) => laneTile(r, id, i)).join('')}</div></div>`; };
   // a lanes rota reads as a table: a row for each lane, a column for each round of a kind (the owner, 9 Nov: the rows of big tiles were bulky)
   const laneTable = list => { const K = kind(list[0].k), D = dayOf(list[0]), n = Math.max(...list.map(r => r.ids.length));
@@ -19449,7 +19450,7 @@ function renderRota(ev){
       <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Lane' : 'เลน'}</th>${list.map(r => `<th${cls(r)}${stateOf(r).on ? ` style="--p:${((now - at(r.a, D)) / (at(r.b, D) - at(r.a, D))).toFixed(3)}"` : ''} data-from="${at(r.a, D)}" data-to="${at(r.b, D)}"><small>${en ? 'R' : 'รอบ'} ${r.n}</small><b>${r.a}</b><small>–${r.b}</small></th>`).join('')}</tr></thead>
       <tbody>${Array.from({ length:n }, (_, i) => `<tr style="--r:${i}"><th class="rt-ln">${i + 1}</th>${list.map((r, c) => `<td${cls(r)} style="--i:${c}">${r.ids[i] ? rotaCell(r.ids[i]) : '<span class="rt-empty">–</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
   const seen = new Set();
-  const rows = rounds.map(r => { if(!R.lanes || r.ge) return roundRow(r);
+  const rows = rounds.map(r => { if(!R.lanes || r.ge || kind(r.k).nolane) return roundRow(r);   // a booth has no lanes: its rounds are rows of faces
     const key = dayOf(r) + '|' + r.k; if(seen.has(key)) return ''; seen.add(key);
     return laneTable(rounds.filter(x => !x.ge && dayOf(x) + '|' + x.k === key)); }).join('');
   const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
