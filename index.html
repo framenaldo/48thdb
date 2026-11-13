@@ -2539,6 +2539,16 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-day{ flex:none; display:flex; flex-direction:column; align-items:center; min-width:54px; padding:5px 10px; border-radius:12px; border:1px solid var(--line); background:var(--card); font:inherit; font-size:15px; font-weight:800; color:var(--ink); line-height:1.15; box-shadow:0 2px 6px color-mix(in srgb, var(--line) 60%, transparent); cursor:pointer; }
   .rt-day small{ font-size:11px; font-weight:700; color:var(--ink-soft); } .rt-day.on{ background:var(--ink); border-color:var(--ink); color:var(--paper); } .rt-day.on small{ color:inherit; opacity:.8; }
   .es-row.has-tone{ box-shadow:inset 4px 0 0 var(--rt); }
+  /* a timetable with faces: each part's heading on a solid band in the event's own colour (owner, 13 Nov) */
+  :root .es-box.has-who .es-row, :root .es-box.has-who .es-row.is-alt{ background:var(--c); padding-top:9px; padding-bottom:9px; }
+  :root .es-box.has-who .es-row :is(.es-time, .es-what, .es-name){ color:#fff; }
+  :root .es-box.has-who .es-row .es-st{ color:rgba(255,255,255,.88); }
+  :root .es-box.has-who .es-row.is-now{ background:var(--es-live); box-shadow:none; }
+  :root .es-box.has-who .es-row.is-done{ background:color-mix(in srgb, var(--c) 55%, var(--card)); }
+  :root .es-box.has-who .es-row.is-done :is(.es-time, .es-what){ opacity:.8; }
+  :root .es-box.has-who .es-row .es-bar{ background:rgba(255,255,255,.8); }
+  :root .es-box.has-who .es-row .es-sl-pill{ background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.55); color:#fff; box-shadow:none; }
+  :root .es-box.has-who .es-who{ padding-top:11px; }
   .es-row.is-alt, .es-who.is-alt{ background:color-mix(in srgb, var(--ink) 6%, var(--card)); }
   :root[data-theme="dark"] .es-row.is-alt, :root[data-theme="dark"] .es-who.is-alt{ background:color-mix(in srgb, var(--ink) 9%, var(--card)); }
   .es-kind{ display:inline-block; padding:1px 10px; margin-right:4px; border-radius:99px; font-size:13px; font-weight:800; white-space:nowrap; color:#fff; background:var(--rt); }
@@ -19457,7 +19467,7 @@ function renderSchedule(ev){
   const luPills = luDays.length > 1 ? `<div class="sl-days es-days" role="tablist">${luDays.map(d => { const x = parseYmd(d);
     return `<button class="sl-day${d === luOn ? ' is-on' : ''}" data-action="es-day" data-value="${d}" role="tab" aria-selected="${d === luOn}">${luLabel(d)}<small>${
       d === iso ? (en ? 'Today' : 'วันนี้') : (en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'])[x.getDay()]}</small></button>`; }).join('')}</div>` : '';
-  const flushBox = () => { if(box){ out += `${luPills}<div class="es-box" data-rota>${box}</div>`; box = ''; } };
+  const flushBox = () => { if(box){ out += `${luPills}<div class="es-box${LU ? ' has-who' : ''}" data-rota>${box}</div>`; box = ''; } };
   const flushNotes = () => { if(notes){ out += `<ul class="ev-detail">${notes}</ul>`; notes = ''; } };
   let nRow = 0;
   for(const r of items){
