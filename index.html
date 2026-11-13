@@ -12101,7 +12101,7 @@ function syncNav(navContainer){
   if(navNow && navNow.dataset.lang !== (isEN() ? 'en' : 'th')) navContainer.innerHTML = '';
   if(!navContainer.querySelector('.glass-nav')){
     navContainer.innerHTML = renderNav();
-    requestAnimationFrame(() => placeNavBlob(navContainer.querySelector('.glass-nav'), false));
+    requestAnimationFrame(() => { placeNavBlob(navContainer.querySelector('.glass-nav'), false); if(typeof navPinSoon === 'function') navPinSoon(); });
     return;
   }
   const current = currentNavValue();
@@ -12113,6 +12113,27 @@ function syncNav(navContainer){
   placeNavBlob(navContainer.querySelector('.glass-nav'), true);
 }
 window.addEventListener('resize', () => placeNavBlob(document.querySelector('.glass-nav'), false));
+/* Safari on the iPhone sometimes left the menu bar stuck halfway up the screen (owner, 13 Nov): a fixed bar hangs
+   from the layout viewport, which Safari can leave out of step with what is on screen. On a touch screen the bar is
+   pinned by its top to the visible viewport instead; where the two agree this puts it exactly where it was. */
+let _navPinGap = null, _navPinRaf = 0;
+function navPin(){
+  _navPinRaf = 0;
+  const nav = document.querySelector('.glass-nav'), vv = window.visualViewport;
+  if(!nav || !vv) return;
+  if(nav.style.top){ nav.style.top = ''; nav.style.bottom = ''; }
+  const cs = getComputedStyle(nav), r = nav.getBoundingClientRect();
+  if(cs.position !== 'fixed' || !r.height || r.height > r.width) return;   // hidden, or the rail down the side
+  if(_navPinGap === null || !_navPinGap) _navPinGap = Math.min(48, Math.max(0, innerHeight - r.bottom));   // its own gap above the home bar; a stuck bar must not set it
+  const top = vv.offsetTop + vv.height - r.height - _navPinGap;
+  if(Math.abs(top - r.top) > 1){ nav.style.bottom = 'auto'; nav.style.top = Math.round(top) + 'px'; }
+}
+const navPinSoon = () => { if(!_navPinRaf) _navPinRaf = requestAnimationFrame(navPin); };
+if(window.visualViewport && matchMedia('(hover:none) and (pointer:coarse)').matches){
+  visualViewport.addEventListener('resize', navPinSoon); visualViewport.addEventListener('scroll', navPinSoon);
+  addEventListener('scroll', navPinSoon, { passive:true }); addEventListener('orientationchange', () => { _navPinGap = null; navPinSoon(); });
+  addEventListener('pageshow', navPinSoon); document.addEventListener('visibilitychange', navPinSoon);
+}
 
 function renderGroupPills(){
   const ids = ['all', ...GROUPS.map(g=>g.id)];
