@@ -3957,11 +3957,16 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-soon-t b{ font-size:15px; } .gel-soon-t small{ opacity:.8; font-size:12.5px; }
   .gel-soon-go{ flex:none; font-size:12.5px; font-weight:700; opacity:.9; }
   /* the final round: a gold rim; in the last three hours a little larger, with a slow glow */
-  .gel-soon.is-final{ border:1.5px solid rgba(243,201,105,.6); box-shadow:0 4px 0 rgba(42,5,8,.35); }
-  .gel-soon.is-final .gel-soon-t b{ color:#F3C969; }
-  .gel-soon.is-ready{ padding:14px 16px; background:radial-gradient(circle at 85% 0%, rgba(243,201,105,.35), transparent 55%), radial-gradient(circle at 10% 100%, rgba(179,18,30,.9), transparent 60%), #2A0508; animation:gel-ready 2.4s ease-in-out infinite; }
+  .gel-soon.is-final{ color:#3A1A04; border:1.5px solid #B9862A; box-shadow:0 4px 0 #8A5E16, inset 0 1px 0 rgba(255,255,255,.55);
+    background:linear-gradient(115deg, #F7DE8E 0%, #E8BC55 38%, #FBE7A6 52%, #D9A23A 72%, #F1CF73 100%); }
+  .gel-soon.is-final .gel-soon-t b{ color:#3A1A04; } .gel-soon.is-final .gel-soon-t small{ opacity:.82; }
+  .gel-soon.is-final .gel-soon-dot{ background:#B3121E; }
+  .gel-soon.is-final .gel-soon-go{ opacity:1; font-weight:800; }
+  .feed-block.is-gevote{ margin-top:0; }
+  .gel-soon.is-final{ margin:0 0 14px; }
+  .gel-soon.is-ready{ padding:14px 16px; background-size:200% 100%; animation:gel-ready 3s ease-in-out infinite; }
   .gel-soon.is-ready .gel-soon-t b{ font-size:17px; }
-  @keyframes gel-ready{ 50%{ box-shadow:0 4px 0 rgba(42,5,8,.35), 0 0 22px rgba(243,201,105,.35); } }
+  @keyframes gel-ready{ 50%{ background-position:100% 0; box-shadow:0 4px 0 #8A5E16, 0 0 24px rgba(232,188,85,.55); } }
   @media (prefers-reduced-motion:reduce){ .gel-soon.is-ready{ animation:none; } }
   .gel-strip-top{ display:flex; align-items:center; gap:8px; min-height:4px; }
   .gel-strip-top small{ opacity:.8; font-size:12.5px; }
@@ -14887,7 +14892,7 @@ function renderGEPage(){
   // the results tab appears once there is something in it (always for the owner)
   const hasResults = state.isOwner || GE_ROUNDS.some(r => geHasData(r.id) || ((state.geRounds || {})[r.id] || {}).live);
   const liveRound = geLiveRound();
-  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []), ['chain', en ? 'Live Voting' : 'โหวตสด'],
+  const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []), ['chain', (typeof gecClosed === 'function' && gecClosed()) ? (en ? 'Voting' : 'โหวต') : (en ? 'Live Voting' : 'โหวตสด')],
     ['timeline', en ? 'Schedule' : 'กำหนดการ']]
     .map(([v, l]) => `<button class="sub-tab${tab === v || (v === 'candidates' && tab === 'songs') ? ' active' : ''}" data-action="ge-tab" data-value="${v}">${l}${v === 'results' && liveRound ? '<i class="gel-dot"></i>' : ''}${v === 'chain' && vote && iso >= vote.start && iso <= eventLastDay(vote) ? '<i class="gel-dot"></i>' : ''}</button>`).join('')}</div>`;
   const liveBanner = liveRound && tab !== 'results' ? `<button class="ge-live-banner" data-action="ge-tab" data-value="results">
@@ -15316,23 +15321,7 @@ function renderHomeDash(ge){
   const waitGE = !ge && !_geLoaded && !Object.keys(state.geRounds || {}).length && vote && night && iso >= vote.start && iso <= eventLastDay(night);
   // between ผลด่วน 1 and ผลด่วน 2: a word that the next round is close; it goes by itself once round 2 has names or goes live
   const q1 = GE_ROUNDS[0], q2 = GE_ROUNDS[1];
-  const fin = GE_ROUNDS[GE_ROUNDS.length - 1], finDoc = (state.geRounds || {})[fin.id] || {};
-  const finAt = night ? thaiMs(night.start, night.time || '18:00') : 0, nowT = Date.now();
-  // the vote is closed and the final round is not under way yet: say the results are read out here, live
-  const finWait = night && typeof gecClosed === 'function' && gecClosed() && !geHasData(fin.id) && !finDoc.live && !geIsLive(fin.id) && nowT < finAt + 6 * 36e5;
-  const finSoon = finWait && nowT >= finAt - 3 * 36e5;   // the last three hours: getting ready
-  const left = Math.max(0, finAt - nowT), lh = Math.floor(left / 36e5), lm = Math.floor(left % 36e5 / 6e4);
-  const finBanner = !finWait ? '' : finSoon
-    ? `<button class="gel-soon is-final is-ready" data-action="open-ge-final"><span class="gel-soon-dot"></span><span class="gel-soon-t">
-        <small>${en ? 'GE2026 · tonight' : 'GE2026 · คืนนี้'}</small>
-        <b>${en ? 'Getting ready for the Final Results' : 'เตรียมประกาศผลเลือกตั้งรอบสุดท้าย'}</b>
-        <small>${left ? (en ? `Starts ${night.time || '18:00'} · in ${lh ? lh + ' h ' : ''}${lm} min` : `เริ่ม ${night.time || '18:00'} น. · อีก ${lh ? lh + ' ชม. ' : ''}${lm} นาที`) : (en ? 'About to start · stay on this page' : 'ใกล้เริ่มแล้ว · เปิดหน้านี้ค้างไว้ได้เลย')} · ${en ? 'every name appears here the moment it is read out' : 'ทุกรายชื่อขึ้นที่นี่ทันทีที่ประกาศ'}</small></span>
-        <span class="gel-soon-go">${en ? 'Results →' : 'ดูผล →'}</span></button>`
-    : `<button class="gel-soon is-final" data-action="open-ge-final"><span class="gel-soon-dot"></span><span class="gel-soon-t">
-        <b>${en ? 'GE2026 Final Results, live right here' : 'ประกาศผลเลือกตั้งรอบสุดท้าย (Final Results) แบบเรียลไทม์ที่นี่'}</b>
-        <small>${en ? `${night.start.slice(8)} Nov, ${night.time || '18:00'} · stay tuned` : `${+night.start.slice(8)} พ.ย. เวลา ${night.time || '18:00'} น. · โปรดติดตาม`}</small></span>
-        <span class="gel-soon-go">${en ? 'See →' : 'ดู →'}</span></button>`;
-  const soon = finBanner || (q1 && q2 && geHasData(q1.id) && !geHasData(q2.id) && !geIsLive(q2.id) && !((state.geRounds || {})[q2.id] || {}).live
+  const soon = (q1 && q2 && geHasData(q1.id) && !geHasData(q2.id) && !geIsLive(q2.id) && !((state.geRounds || {})[q2.id] || {}).live
     ? `<button class="gel-soon" data-action="open-ge-results"><span class="gel-soon-dot"></span><span class="gel-soon-t"><b>${en ? 'Preliminary 2 is coming soon' : 'ผลด่วน 2 ใกล้ประกาศแล้ว'}</b></span><span class="gel-soon-go">${en ? 'Round 1 →' : 'ดูผลด่วน 1 →'}</span></button>` : '');
   return `<section class="feed-block feed-dash${ge || waitGE || (bigKind && bigKinds[bigKind]) ? '' : ' no-ge'}">${soon}<div class="dash">
     ${(() => { const k = ((myLayout().dash || {}).kinds || {}).ge; return k && bigKinds[k] ? bigKinds[k]() : waitGE ? '<span class="dash-ge is-wait" data-tile="ge" aria-hidden="true"></span>' : square; })()}
@@ -15342,6 +15331,27 @@ function renderHomeDash(ge){
 // the final-results banner counts down and changes to 'getting ready' three hours before: the home page is drawn again once a minute
 // while it is there (only what changed is swapped)
 setInterval(() => { if(!document.hidden && state.view === 'feed' && !state.selectedEvent && !state.selectedId && document.querySelector('.gel-soon.is-final')) renderMain(); }, 60000);
+/* the final results are coming: at the very top of the home page, in gold. From three hours before it is the getting-ready card
+   with a countdown; the moment the owner starts entering the final round it goes, and the live card takes over. */
+function geFinalBanner(){
+  const en = isEN(), night = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
+  const fin = GE_ROUNDS[GE_ROUNDS.length - 1], finDoc = (state.geRounds || {})[fin.id] || {};
+  const finAt = night ? thaiMs(night.start, night.time || '18:00') : 0, nowT = Date.now();
+  // the vote is closed and the final round is not under way yet: say the results are read out here, live
+  const finWait = night && typeof gecClosed === 'function' && gecClosed() && !geHasData(fin.id) && !finDoc.live && !geIsLive(fin.id) && nowT < finAt + 6 * 36e5;
+  const finSoon = finWait && nowT >= finAt - 3 * 36e5;   // the last three hours: getting ready
+  const left = Math.max(0, finAt - nowT), lh = Math.floor(left / 36e5), lm = Math.floor(left % 36e5 / 6e4);
+  return !finWait ? '' : finSoon
+    ? `<button class="gel-soon is-final is-ready" data-action="open-ge-final"><span class="gel-soon-dot"></span><span class="gel-soon-t">
+        <small>${en ? 'GE2026 · tonight' : 'GE2026 · คืนนี้'}</small>
+        <b>${en ? 'Getting ready for the Final Results' : 'เตรียมประกาศผลเลือกตั้งรอบสุดท้าย'}</b>
+        <small>${left ? (en ? `Starts ${night.time || '18:00'} · in ${lh ? lh + ' h ' : ''}${lm} min` : `เริ่ม ${night.time || '18:00'} น. · อีก ${lh ? lh + ' ชม. ' : ''}${lm} นาที`) : (en ? 'About to start · stay on this page' : 'ใกล้เริ่มแล้ว · เปิดหน้านี้ค้างไว้ได้เลย')} · ${en ? 'every name appears here the moment it is read out' : 'ทุกรายชื่อขึ้นที่นี่ทันทีที่ประกาศ'}</small></span>
+        <span class="gel-soon-go">${en ? 'Results →' : 'ดูผล →'}</span></button>`
+    : `<button class="gel-soon is-final" data-action="open-ge-final"><span class="gel-soon-dot"></span><span class="gel-soon-t">
+        <b>${en ? 'GE2026 Final Results, live right here' : 'ประกาศผลเลือกตั้งรอบสุดท้าย (Final Results) แบบเรียลไทม์ที่นี่'}</b>
+        <small>${en ? `${night.start.slice(8)} Nov, ${night.time || '18:00'} · stay tuned` : `${+night.start.slice(8)} พ.ย. เวลา ${night.time || '18:00'} น. · โปรดติดตาม`}</small></span>
+        <span class="gel-soon-go">${en ? 'See →' : 'ดู →'}</span></button>`;
+}
 function renderHomeGE(opt = {}){
   const live = geLiveRound(), done = GE_ROUNDS.filter(r => geHasData(r.id));
   const round = live || done[done.length - 1];
@@ -16415,7 +16425,7 @@ function gecHomeCard(en){
     if(!document.hidden) gecLiteSync();
   }, 45000);   // was 15 s: the home card's looks go through the Worker too (see gecKick)
   setTimeout(gecSocket, 0);
-  return `<section class="feed-block is-gevote"><h2 class="section-label">${gecClosed() ? (en ? 'GE2026 · Voting Closed' : 'GE2026 · ปิดโหวตแล้ว') : (en ? 'GE2026 · Live Voting' : 'GE2026 · โหวตสด')}</h2>${gecHomeTeaser(en)}</section>`;
+  return `${geFinalBanner()}<section class="feed-block is-gevote"><h2 class="section-label">${gecClosed() ? (en ? 'GE2026 · Voting Closed' : 'GE2026 · ปิดโหวตแล้ว') : (en ? 'GE2026 · Live Voting' : 'GE2026 · โหวตสด')}</h2>${gecHomeTeaser(en)}</section>`;
 }
 /* Numbers that roll like a meter when they change. odo(key, text) marks one;
    after each draw odoRun turns the digits that moved on their wheels, from
