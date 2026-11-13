@@ -16165,7 +16165,7 @@ const gecShort = w => `${w.slice(0, 6)}…${w.slice(-4)}`;
 function gecCtx(){
   const p = GEC_POLLS.ge2026, d = gecLoad('ge2026'), oo = gecLoad('ge2025');
   const o = oo && oo.n && oo.to >= GEC_POLLS.ge2025.end - 20 ? oo : null;
-  const hNow = d ? (d.to - p.start + 1) * GEC_BLOCK / 3600 : 0, hAll = (p.end - p.start) * GEC_BLOCK / 3600;
+  const hNow = d ? (Math.min(d.to, p.end) - p.start + 1) * GEC_BLOCK / 3600 : 0, hAll = (p.end - p.start) * GEC_BLOCK / 3600;
   const wl = d ? Object.entries(d.wallets).sort((a, b) => b[1][0] - a[1][0]) : [];
   return { p, d, o, hNow, hAll, wl };
 }
@@ -16277,20 +16277,21 @@ function gecShareSpec(id){
   const T = v => gecTok(v), Bh = v => gecBaht(v, en), N = gecN, pc = gecPc;
   const at = en ? gecHM(gecMs(p, d.to)) : `เวลา ${gecHM(gecMs(p, d.to))} น.`;
   const row = (head, count, names = '') => ({ head, count, names });
-  const elapsed = en ? `Voting open ${hNow < 48 ? `${Math.floor(hNow)} h ${Math.round(hNow % 1 * 60)} min` : `${Math.floor(hNow / 24)} days`} of ${Math.round(hAll / 24)} days · closes 12 Nov`
+  const shutS = gecClosed();
+  const elapsed = shutS ? (en ? `Voting ran ${Math.round(hAll / 24)} days · closed 12 Nov` : `เปิดโหวต ${Math.round(hAll / 24)} วัน · ปิดโหวตแล้ว 12 พ.ย.`) : en ? `Voting open ${hNow < 48 ? `${Math.floor(hNow)} h ${Math.round(hNow % 1 * 60)} min` : `${Math.floor(hNow / 24)} days`} of ${Math.round(hAll / 24)} days · closes 12 Nov`
     : `เปิดโหวตมาแล้ว ${hNow < 48 ? `${Math.floor(hNow)} ชม. ${Math.round(hNow % 1 * 60)} นาที` : `${Math.floor(hNow / 24)} วัน`} จาก ${Math.round(hAll / 24)} วัน · ปิด 12 พ.ย.`;
   const spec = (title, blocks, subtitle = '') => ({ kicker:'48thDb · GE2026', title, subtitle, at, blocks });
-  if(id === 'total') return spec(en ? 'Tokens voted so far' : 'โทเคนที่โหวตแล้ว', [
+  if(id === 'total') return spec(shutS ? (en ? 'Final count, voting closed' : 'ยอดสุดท้าย ปิดโหวตแล้ว') : en ? 'Tokens voted so far' : 'โทเคนที่โหวตแล้ว', [
     { type:'tiles', tiles:[{ label:en ? 'Tokens voted' : 'โทเคนที่โหวตแล้ว', value:T(d.sum) }, { label:en ? 'Votes' : 'ครั้งที่โหวต', value:N(d.n) }] },
-    { type:'tiles', tiles:[{ label:en ? 'Wallets' : 'กระเป๋า', value:N(wl.length) }, { label:en ? 'Last 24 h' : 'โหวตใน 24 ชม. ล่าสุด', value:T(gec24(d, hNow)) }] },
+    { type:'tiles', tiles:[{ label:en ? 'Wallets' : 'กระเป๋า', value:N(wl.length) }, { label:shutS ? (en ? 'The last 24 h' : 'โหวตใน 24 ชม. สุดท้าย') : en ? 'Last 24 h' : 'โหวตใน 24 ชม. ล่าสุด', value:T(gec24(d, hNow)) }] },
     { type:'note', text:elapsed }]);
   if(id === 'money'){
     const same = o ? gecUpTo(o, hNow) : 0;
     return spec(en ? 'The vote in baht' : 'มูลค่าการโหวตเป็นเงิน', [
-      { type:'tiles', tiles:[{ label:en ? 'Voted so far' : 'มูลค่าที่โหวตแล้ว', value:Bh(d.sum) }] },
-      { type:'days', rows:[row(en ? 'Last 24 hours' : '24 ชม. ล่าสุด', Bh(gec24(d, hNow))), row(en ? 'Average a vote' : 'เฉลี่ยต่อครั้ง', Bh(d.sum / d.n)),
+      { type:'tiles', tiles:[{ label:shutS ? (en ? 'Voted in all' : 'มูลค่าที่โหวตทั้งหมด') : en ? 'Voted so far' : 'มูลค่าที่โหวตแล้ว', value:Bh(d.sum) }] },
+      { type:'days', rows:[row(shutS ? (en ? 'The last 24 hours' : '24 ชม. สุดท้าย') : en ? 'Last 24 hours' : '24 ชม. ล่าสุด', Bh(gec24(d, hNow))), row(en ? 'Average a vote' : 'เฉลี่ยต่อครั้ง', Bh(d.sum / d.n)),
         row(en ? 'Biggest wallet' : 'กระเป๋าที่โหวตมากสุด', Bh(wl[0][1][0])),
-        ...(o ? [row(en ? 'GE2025 at this point' : 'GE2025 ณ เวลาเดียวกัน', Bh(same)), row(en ? 'GE2025 final total, when voting closed' : 'GE2025 ยอดรวมตอนปิดโหวต', Bh(o.sum))] : [])] },
+        ...(o ? [...(shutS ? [] : [row(en ? 'GE2025 at this point' : 'GE2025 ณ เวลาเดียวกัน', Bh(same))]), row(en ? 'GE2025 final total, when voting closed' : 'GE2025 ยอดรวมตอนปิดโหวต', Bh(o.sum))] : [])] },
       { type:'note', text:en ? `At ${gecPrice} baht a token.` : `คิดที่ราคา ${gecPrice} บาทต่อโทเคน` }]);
   }
   if(id === 'supply'){
@@ -16327,7 +16328,7 @@ function gecShareSpec(id){
     for(let i = cur; i >= Math.max(0, cur - 13); i--){
       const a = i * 24, v26 = (i === cur ? d.sum : gecUpTo(d, a + 24)) - gecUpTo(d, a), v25 = gecUpTo(o, Math.min(a + 24, hNow)) - gecUpTo(o, a);
       const t = new Date(gecMs(p, p.start + a * 1200));
-      rows.push(row(`${en ? 'Day' : 'วันที่'} ${i + 1} · ${t.getDate()} ${M[t.getMonth()]}${i === cur ? (en ? ' (so far)' : ' (ถึงตอนนี้)') : ''}`, T(v26),
+      rows.push(row(`${en ? 'Day' : 'วันที่'} ${i + 1} · ${t.getDate()} ${M[t.getMonth()]}${i === cur && !gecClosed() ? (en ? ' (so far)' : ' (ถึงตอนนี้)') : ''}`, T(v26),
         `2025: ${T(v25)}${v25 > 0 ? ` · ×${(v26 / v25).toFixed(2)}` : ''} · ${en ? 'new wallets' : 'กระเป๋าใหม่'} +${N(fresh(d, a, a + 24))}`));
     }
     return spec(en ? 'Day by day against GE2025' : 'รายวัน เทียบ GE2025 วันต่อวัน', [{ type:'days', rows }]);
@@ -16682,7 +16683,7 @@ function gecFeedCard(en, N, pc, hms){
 function gecDailyCard(en, N, d, o, hNow){
   if(!o) return '';
   const p = GEC_POLLS.ge2026, M = monthsShort();
-  const days = Math.ceil(hNow / 24), cur = days - 1;
+  const days = Math.ceil(hNow / 24), cur = days - 1, shut = gecClosed();
   const fresh = (x, a, b) => Object.values(x.wallets).filter(w => w[2] >= a && w[2] < b).length;
   const rows = [];
   for(let i = cur; i >= 0; i--){
@@ -16690,7 +16691,7 @@ function gecDailyCard(en, N, d, o, hNow){
     const v26 = (i === cur ? d.sum : gecUpTo(d, a + 24)) - gecUpTo(d, a);
     const v25 = gecUpTo(o, b) - gecUpTo(o, a);
     const t = new Date(gecMs(p, p.start + a * 1200));
-    rows.push(`<div class="gec-day${i === cur ? ' is-now' : ''}">
+    rows.push(`<div class="gec-day${i === cur && !shut ? ' is-now' : ''}">
       <span class="gec-dl"><b>${en ? 'Day' : 'วันที่'} ${i + 1}</b><small>${t.getDate()} ${M[t.getMonth()]}</small></span>
       <span class="gec-dv"><b>${gecTok(v26)}</b><small>2025: ${gecTok(v25)}${v25 > 0 ? ` · ×${(v26 / v25).toFixed(2)}` : ''}</small></span>
       <span class="gec-dn"><b>+${N(fresh(d, a, a + 24))}</b><small>2025: +${N(fresh(o, a, Math.min(a + 24, Math.ceil(hNow))))}</small></span></div>`);
@@ -16698,8 +16699,8 @@ function gecDailyCard(en, N, d, o, hNow){
   return `<div class="gea-card" data-gshare="daily"><h3 class="gec-h">${en ? 'Day by day against GE2025' : 'รายวัน เทียบ GE2025 วันต่อวัน'}</h3>
     <div class="gec-dhead"><span>${en ? 'Day' : 'วัน'}</span><span>${en ? 'Tokens' : 'โทเคน'}</span><span>${en ? 'New wallets' : 'กระเป๋าใหม่'}</span></div>
     <div class="gec-days">${rows.join('')}</div>
-    <p class="gec-sub">${en ? 'A day runs noon to noon, from the hour voting opened; both years opened at noon. The top row (pink) is today so far, set against the same hours last year. “New wallets” are wallets voting for the first time that year.'
-      : 'นับวันละ 24 ชม. จากเที่ยงวันถึงเที่ยงวัน ตามเวลาเปิดโหวต (ทั้ง 2 ปีเปิดเที่ยงวัน) · แถวบนสุดสีชมพูคือวันนี้ถึงตอนนี้ เทียบกับปีที่แล้วช่วงเวลาเดียวกัน · “กระเป๋าใหม่” คือกระเป๋าที่โหวตครั้งแรกของปีนั้น'}</p></div>`;
+    <p class="gec-sub">${en ? `A day runs noon to noon, from the hour voting opened; both years opened at noon. ${shut ? 'The top row is the last day, from noon to the close, set against the same hours last year.' : 'The top row (pink) is today so far, set against the same hours last year.'} “New wallets” are wallets voting for the first time that year.`
+      : `นับวันละ 24 ชม. จากเที่ยงวันถึงเที่ยงวัน ตามเวลาเปิดโหวต (ทั้ง 2 ปีเปิดเที่ยงวัน) · ${shut ? 'แถวบนสุดคือวันสุดท้าย ตั้งแต่เที่ยงวันจนปิดโหวต' : 'แถวบนสุดสีชมพูคือวันนี้ถึงตอนนี้'} เทียบกับปีที่แล้วช่วงเวลาเดียวกัน · “กระเป๋าใหม่” คือกระเป๋าที่โหวตครั้งแรกของปีนั้น`}</p></div>`;
 }
 
 // How GE2025 ran out its last stretch, so the projection can be read for what it is
@@ -16748,7 +16749,7 @@ function renderGEChain(){
     ${gecErr ? `<p class="gec-err">${en ? 'Could not reach the explorer: ' : 'ดึงข้อมูลไม่สำเร็จ: '}${escapeHtml(gecErr)}</p>` : ''}`;
   if(!d || !d.n) return `<section class="gea gec">${head}${gecAboutCard(en)}<div class="gea-card"><p class="gea-hint">${gecBusy ? (en ? 'Reading the votes…' : 'กำลังอ่านโหวต…') : (en ? 'No votes yet.' : 'ยังไม่มีโหวต')}</p></div></section>`;
 
-  const hNow = (d.to - p.start + 1) * GEC_BLOCK / 3600, hAll = (p.end - p.start) * GEC_BLOCK / 3600;
+  const hNow = (Math.min(d.to, p.end) - p.start + 1) * GEC_BLOCK / 3600, hAll = (p.end - p.start) * GEC_BLOCK / 3600;
   const wl = Object.entries(d.wallets).sort((a, b) => b[1][0] - a[1][0]);
   const elapsed = hNow < 48 ? (en ? `${Math.floor(hNow)} h ${Math.round(hNow % 1 * 60)} min` : `${Math.floor(hNow)} ชม. ${Math.round(hNow % 1 * 60)} นาที`)
     : (en ? `${Math.floor(hNow / 24)} days` : `${Math.floor(hNow / 24)} วัน`);
@@ -16803,7 +16804,8 @@ function renderGEChain(){
       ${o2 ? row(en ? 'GE2025 final total, when voting closed' : 'GE2025 ยอดรวมตอนปิดโหวต', gecBaht(o2.sum, en)) : ''}
       ${o2 && same25 > 0 && !shut ? row(en ? 'On last year’s curve' : 'ถ้าเดินตามเส้นปีที่แล้ว', gecBaht(d.sum * o2.sum / same25, en)) : ''}
     </div>
-    <p class="gec-sub">${en ? 'Last 24 hours: the votes cast in the day before now. GE2025 is priced at today’s token price, not what it was then.'
+    <p class="gec-sub">${shut ? (en ? 'The last 24 hours: the votes cast in the day before voting closed. GE2025 is priced at today’s token price, not what it was then.'
+      : '24 ชม. สุดท้าย: ยอดที่โหวตในช่วง 24 ชั่วโมงก่อนปิดโหวต · GE2025 คิดที่ราคาวันนี้ ไม่ใช่ราคาตอนนั้น') : en ? 'Last 24 hours: the votes cast in the day before now. GE2025 is priced at today’s token price, not what it was then.'
       : '24 ชม. ล่าสุด: ยอดที่โหวตในช่วง 24 ชั่วโมงก่อนถึงตอนนี้ · GE2025 คิดที่ราคาวันนี้ ไม่ใช่ราคาตอนนั้น'}</p></div>`;
 
   // last year at the same hour of its run, and where it ended
@@ -16872,11 +16874,14 @@ function gecVolumeCard(en, d, hNow, N){
   const items = [];   // [index, tokens, label, small label]
   if(day){ for(let k = 0; k * 24 <= hi; k++){ let v = 0; for(let h = k * 24; h < k * 24 + 24 && h <= hi; h++) v += d.hours[h] || 0; items.push([k, v, `${en ? 'Day' : 'วัน'} ${k + 1}`, `${when(k * 24).getDate()} ${M[when(k * 24).getMonth()]}`]); } }
   else for(let h = 0; h <= hi; h++){ const t = when(h); items.push([h, d.hours[h] || 0, hm(h), t.getHours() === 0 || h === 0 ? `${t.getDate()} ${M[t.getMonth()]}` : '']); }
+  // closed: no hour or day is still running; the minutes after the last vote before the close are not a bar of their own
+  const shut = gecClosed();
+  if(shut) while(items.length > 1 && !(items[items.length - 1][1] > 0)) items.pop();
   if(items.length < 3) return '';
   const cur = items.length - 1, live = items.filter(x => x[1] > 0), top = items.reduce((a, b) => b[1] > a[1] ? b : a, items[0]), low = live.length ? live.reduce((a, b) => b[1] < a[1] ? b : a, live[0]) : null;
   const avg = d.sum / Math.max(1, day ? hNow / 24 : hNow), peak = Math.max(1, top[1]);
   const lab = v => v <= 0 ? '' : v >= 10 ? Math.round(v).toLocaleString('en-US') : (Math.round(v * 10) / 10).toString();
-  const cols = items.map(([k, v, l1, l2], n) => { const pct = v / peak * 84, cls = k === top[0] ? ' is-hi' : n === cur ? ' is-now' : '';
+  const cols = items.map(([k, v, l1, l2], n) => { const pct = v / peak * 84, cls = k === top[0] ? ' is-hi' : n === cur && !shut ? ' is-now' : '';
     return `<div class="gec-vcol${cls}"><div class="gec-vplot"><i style="height:${pct.toFixed(1)}%"></i>${v > 0 ? `<em style="bottom:calc(${pct.toFixed(1)}% + 2px)">${lab(v)}</em>` : ''}</div>
       <span>${l1}</span><small>${l2}</small></div>`; }).join('');
   const cell = (k, v, sub) => `<div><small>${k}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
@@ -16884,8 +16889,8 @@ function gecVolumeCard(en, d, hNow, N){
   return `<div class="gea-card gec-vc"><h3 class="gec-h">${en ? 'Tokens voted' : 'โทเคนที่โหวต'} ${day ? (en ? 'by day' : 'รายวัน') : (en ? 'by hour' : 'รายชั่วโมง')}</h3>
     <div class="gea-seg gec-seg"><button class="${day ? '' : 'is-on'}" data-action="gec-volmode" data-id="hour">${en ? 'By hour' : 'รายชั่วโมง'}</button><button class="${day ? 'is-on' : ''}" data-action="gec-volmode" data-id="day">${en ? 'By day' : 'รายวัน'}</button></div>
     <div class="gec-stats4">${cell(en ? `Busiest ${unit}` : `${unit}ที่โหวตมากสุด`, gecTok(top[1]), nameOf(top))}${low ? cell(en ? `Quietest ${unit} (not zero)` : `${unit}ที่โหวตน้อยสุด (ไม่นับศูนย์)`, gecTok(low[1]), nameOf(low)) : cell(en ? `Quietest ${unit}` : `${unit}ที่โหวตน้อยสุด`, '–', '')}
-      ${cell(en ? `Average per ${unit}` : `เฉลี่ยต่อ${unit}`, gecTok(avg), en ? 'since voting opened' : 'ตั้งแต่เปิดโหวต')}${cell(en ? (day ? 'Today so far' : 'This hour so far') : (day ? 'วันนี้ (ยังไม่จบ)' : 'ชั่วโมงนี้ (ยังไม่จบ)'), gecTok(items[cur][1]), nameOf(items[cur]))}</div>
-    <p class="gec-cap"><span>${en ? `From the opening · ${items.length} ${day ? 'days' : 'hours'} · scroll sideways` : `ตั้งแต่เปิดโหวต · ${items.length} ${day ? 'วัน' : 'ชั่วโมง'} · เลื่อนไปทางซ้ายดูย้อนหลัง`}</span><span><i class="hi"></i>${en ? 'tallest in this chart' : 'มากสุดในกราฟนี้'} <i class="now"></i>${en ? 'still running' : 'ยังไม่จบ'}</span></p>
+      ${cell(en ? `Average per ${unit}` : `เฉลี่ยต่อ${unit}`, gecTok(avg), en ? 'since voting opened' : 'ตั้งแต่เปิดโหวต')}${cell(shut ? (en ? (day ? 'Last day' : 'Last hour') : (day ? 'วันสุดท้าย' : 'ชั่วโมงสุดท้าย')) : en ? (day ? 'Today so far' : 'This hour so far') : (day ? 'วันนี้ (ยังไม่จบ)' : 'ชั่วโมงนี้ (ยังไม่จบ)'), gecTok(items[cur][1]), nameOf(items[cur]))}</div>
+    <p class="gec-cap"><span>${en ? `${shut ? 'Opening to close' : 'From the opening'} · ${items.length} ${day ? 'days' : 'hours'} · scroll sideways` : `${shut ? 'ตั้งแต่เปิดจนปิดโหวต' : 'ตั้งแต่เปิดโหวต'} · ${items.length} ${day ? 'วัน' : 'ชั่วโมง'} · เลื่อนไปทางซ้ายดูย้อนหลัง`}</span><span><i class="hi"></i>${en ? 'tallest in this chart' : 'มากสุดในกราฟนี้'}${shut ? '' : ` <i class="now"></i>${en ? 'still running' : 'ยังไม่จบ'}`}</span></p>
     <div class="gec-vbars" data-vbars><div class="gec-vin${day ? ' is-day' : ''}">${cols}</div></div>
   </div>`;
 }
