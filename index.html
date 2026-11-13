@@ -2539,15 +2539,22 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-day{ flex:none; display:flex; flex-direction:column; align-items:center; min-width:54px; padding:5px 10px; border-radius:12px; border:1px solid var(--line); background:var(--card); font:inherit; font-size:15px; font-weight:800; color:var(--ink); line-height:1.15; box-shadow:0 2px 6px color-mix(in srgb, var(--line) 60%, transparent); cursor:pointer; }
   .rt-day small{ font-size:11px; font-weight:700; color:var(--ink-soft); } .rt-day.on{ background:var(--ink); border-color:var(--ink); color:var(--paper); } .rt-day.on small{ color:inherit; opacity:.8; }
   .es-row.has-tone{ box-shadow:inset 4px 0 0 var(--rt); }
-  /* a timetable with faces: each part's heading on a solid band in the event's own colour (owner, 13 Nov) */
-  :root .es-box.has-who .es-row, :root .es-box.has-who .es-row.is-alt{ background:var(--c); padding-top:9px; padding-bottom:9px; }
+  /* a timetable with faces: each part's heading on a solid band in the event's own colour (owner, 13 Nov), deepened
+     a touch, a soft light from above and a hairline of light along its top; the status sits on it as a small pill */
+  :root .es-box.has-who .es-row, :root .es-box.has-who .es-row.is-alt{ padding-top:10px; padding-bottom:10px;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--c) 86%, #000) 0%, color-mix(in srgb, var(--c) 64%, #000) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22); }
   :root .es-box.has-who .es-row :is(.es-time, .es-what, .es-name){ color:#fff; }
-  :root .es-box.has-who .es-row .es-st{ color:rgba(255,255,255,.88); }
-  :root .es-box.has-who .es-row.is-now{ background:var(--es-live); box-shadow:none; }
-  :root .es-box.has-who .es-row.is-done{ background:color-mix(in srgb, var(--c) 55%, var(--card)); }
-  :root .es-box.has-who .es-row.is-done :is(.es-time, .es-what){ opacity:.8; }
-  :root .es-box.has-who .es-row .es-bar{ background:rgba(255,255,255,.8); }
-  :root .es-box.has-who .es-row .es-sl-pill{ background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.55); color:#fff; box-shadow:none; }
+  :root .es-box.has-who .es-row .es-time{ font-weight:600; letter-spacing:.04em; opacity:.8; }
+  :root .es-box.has-who .es-row .es-what{ font-weight:600; letter-spacing:.015em; }
+  :root .es-box.has-who .es-row .es-st:not(:empty){ display:inline-flex; width:max-content; margin-top:6px; padding:3px 10px 3px 8px; border-radius:99px;
+    font-size:11.5px; color:#fff; background:rgba(255,255,255,.16); box-shadow:inset 0 0 0 1px rgba(255,255,255,.28); }
+  :root .es-box.has-who .es-row.is-now .es-st{ background:#fff; color:var(--es-live); box-shadow:0 2px 8px rgba(0,0,0,.18); }
+  :root .es-box.has-who .es-row.is-now{ box-shadow:inset 0 1px 0 rgba(255,255,255,.22), inset 4px 0 0 var(--es-live); }
+  :root .es-box.has-who .es-row.is-done{ background:color-mix(in srgb, var(--c) 50%, var(--card)); box-shadow:none; }
+  :root .es-box.has-who .es-row.is-done :is(.es-time, .es-what){ opacity:.85; }
+  :root .es-box.has-who .es-row .es-bar{ height:3px; background:var(--es-live); }
+  :root .es-box.has-who .es-row .es-sl-pill{ background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.5); color:#fff; box-shadow:none; }
   :root .es-box.has-who .es-who{ padding-top:11px; }
   .es-row.is-alt, .es-who.is-alt{ background:color-mix(in srgb, var(--ink) 6%, var(--card)); }
   :root[data-theme="dark"] .es-row.is-alt, :root[data-theme="dark"] .es-who.is-alt{ background:color-mix(in srgb, var(--ink) 9%, var(--card)); }
