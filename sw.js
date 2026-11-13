@@ -7,7 +7,7 @@
  * and only falls back to the cache when the network cannot answer.
  */
 
-const VERSION = 'v15';
+const VERSION = 'v16';
 const PAGES = `48thdb-pages-${VERSION}`;
 const ASSETS = `48thdb-assets-${VERSION}`;
 
@@ -39,14 +39,43 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-/** The page: network first, cache as a safety net. */
+/* The page: still the network's word first — but the word asked for is a few bytes, not the page.
+ *
+ * The page is some 700 KB over the wire and the host sends no validator with it, so every visit used to download all of
+ * it again, changed or not. Each deploy now stamps the page with its build (<meta name="build">, a hash of the file) and
+ * publishes the same stamp as /version.txt. A visit asks for version.txt (never cached); when it names the build of the
+ * copy kept here, that copy is the page and nothing else is downloaded. Any doubt — no answer in three seconds, an answer
+ * that is not a stamp, a different stamp, no copy — and the page is fetched from the network exactly as before, so a
+ * deploy still reaches everyone on their next visit. The stamp kept is read out of the page that was kept, never from
+ * version.txt, so the two cannot disagree. */
+const STAMP = /^[0-9a-f]{16,64}$/;
+const appRoute = (path) => !/\.[a-z0-9]+$/i.test(path) && !/^\/(m|p)\//.test(path) && path !== '/privacy';
+async function liveBuild() {
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 3000);
+  try {
+    const res = await fetch('/version.txt?t=' + Date.now(), { cache: 'no-store', signal: ctl.signal });
+    const v = res.ok ? (await res.text()).trim() : '';
+    return STAMP.test(v) ? v : '';
+  } catch (err) { return ''; } finally { clearTimeout(t); }
+}
+async function keepPage(cache, fresh) {
+  const copy = fresh.clone(), text = await fresh.clone().text();
+  const m = /<meta name="build" content="([0-9a-f]{16,64})">/.exec(text.slice(0, 2000));
+  await cache.put('./index.html', copy);
+  if (m) await cache.put('./build', new Response(m[1])); else await cache.delete('./build');
+}
 async function pageFirst(request) {
   const cache = await caches.open(PAGES);
+  const path = new URL(request.url).pathname;
+  const app = path === '/' || path === '/index.html' || appRoute(path);
   try {
+    if (app) {
+      const [kept, stamp, live] = await Promise.all([cache.match('./index.html'), cache.match('./build').then(r => r ? r.text() : ''), liveBuild()]);
+      if (kept && live && stamp === live) return kept;
+    }
     const fresh = await fetch(request);
     // only the app itself is the offline copy — not /m/<id> or /p/<id>, which are pages of their own
-    const path = new URL(request.url).pathname;
-    if (fresh && fresh.ok && (path === '/' || path === '/index.html')) cache.put('./index.html', fresh.clone());
+    if (fresh && fresh.ok && !fresh.redirected && app && /text\/html/.test(fresh.headers.get('content-type') || '')) await keepPage(cache, fresh).catch(() => {});
     return fresh;
   } catch (err) {
     return (await cache.match('./index.html')) || (await cache.match('./')) || Response.error();

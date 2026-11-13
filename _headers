@@ -15,6 +15,9 @@
 /*.ics
   Cache-Control: public, max-age=1800
 
+# Which build of the page is live: asked for on every visit, a few bytes (see sw.js).
+/version.txt
+  Cache-Control: no-store
 # Pictures and fonts never change under a name (a replaced one gets a new file name, see CLAUDE.md), so a browser may keep
 # them a week without asking again: about 80 fewer requests each time the home page opens. A week, not for ever, so a file
 # replaced in place by mistake still heals itself.

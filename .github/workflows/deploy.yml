@@ -39,7 +39,12 @@ jobs:
           git ls-files -z \
             | grep -zvE '^(scripts/|worker/|\.github/|\.claude/|\.gitignore|CLAUDE\.md|\.firebaserc|firebase\.json|site\.wrangler\.toml|senbatsu-idol-database)' \
             | tar -cf - --null -T - | tar -xf - -C public
-          echo "Publishing $(find public -type f | wc -l) files"
+          # the page's build stamp: a hash of the page, written into it and published beside it (sw.js reads both)
+          H=$(sha256sum public/index.html | cut -c1-32)
+          sed -i "s/<meta name=\"build\" content=\"dev\">/<meta name=\"build\" content=\"$H\">/" public/index.html
+          grep -q "<meta name=\"build\" content=\"$H\">" public/index.html || { echo "::error::the build stamp did not go into index.html"; exit 1; }
+          printf %s "$H" > public/version.txt
+          echo "Publishing $(find public -type f | wc -l) files, build $H"
 
       - name: Check the token is there
         run: |
