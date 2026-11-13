@@ -5837,6 +5837,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* Clear dots in a slim row under the picture; the swipe takes the height of the picture on show (fitTrack), so a short
      poster beside a tall one leaves no empty room under it. */
   .evm-track{ align-items:flex-start; }
+  /* A frame of the first poster's shape, held from the start: nothing under it moves while swiping. Another shape of
+     picture sits whole in the middle of its slide, on a faint plate. */
+  .evm-track.is-fixed{ align-items:stretch; transition:none; }
+  .evm-track.is-fixed .evm-slide{ display:flex; align-items:center; justify-content:center; height:100%; min-height:0; overflow:hidden;
+    border-radius:14px; background:color-mix(in srgb, var(--ink) 7%, transparent); }
+  .evm-track.is-fixed .evm-poster{ width:auto; height:auto; max-width:100%; max-height:100%; min-width:0; }
+  .evm-track.is-fixed .evm-slide:first-child .evm-poster{ width:100%; height:100%; object-fit:contain; }
   .evm-dots{ display:flex; width:max-content; margin:8px auto 0; align-items:center; gap:2px; padding:3px 5px; border-radius:99px; background:rgba(20,20,28,.2); }
   .evm-dot{ display:grid; place-items:center; width:20px; height:20px; padding:0; border:0; background:none; cursor:pointer; -webkit-tap-highlight-color:transparent; }
   .evm-dot::before{ content:''; width:7px; height:7px; border-radius:99px; background:rgba(255,255,255,.55); box-shadow:0 0 0 .5px rgba(0,0,0,.18); transition:width .25s ease, background .25s ease; }
@@ -6522,6 +6529,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
       -webkit-mask-composite:source-in;
       mask:linear-gradient(180deg, #000 calc(100% - 96px), transparent), linear-gradient(90deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
       mask-composite:intersect; }
+    .evm-layout.has-media .evm-track.is-fixed{ max-height:calc(min(92vh, 1100px) - 72px); }
     .evm-layout.has-media .evm-body{ display:block; min-width:0; padding-top:4px; }
     .evm-layout.has-media .evm-poster{ margin:0; max-height:calc(min(92vh, 1100px) - 72px); width:auto; max-width:100%; margin-inline:auto; }
   }
@@ -19544,6 +19552,7 @@ document.addEventListener('scroll', e => {
 }, true);
 // The swipe is as tall as the picture on show, eased from one height to the next.
 function fitTrack(t){
+  if(t.classList.contains('is-fixed')) return;
   const kids = t.children, i = Math.min(kids.length - 1, Math.max(0, Math.round(t.scrollLeft / Math.max(1, trackStep(t)))));
   const h = kids[i] ? kids[i].offsetHeight : 0;
   if(h && t.style.height !== h + 'px') t.style.height = h + 'px';
@@ -19557,7 +19566,10 @@ function posterSlides(ev){
       <img class="evm-poster" src="${escapeAttr(x.img)}"${x.w ? ` width="${x.w}" height="${x.h}"` : ''}
         alt="${en ? 'Poster' : 'โปสเตอร์งาน'} ${escapeAttr(ev.title)}" ${i ? 'loading="lazy"' : 'loading="lazy"'} decoding="async"></button>`;
   if(list.length < 2) return one(list[0], 0);
-  return `<div class="evm-slides"><div class="evm-track" data-track>${list.map(one).join('')}</div>
+  // the frame keeps the first poster's shape from the moment the sheet opens, so a swipe never moves what is under it;
+  // a picture of another shape sits inside it, whole and centred (fitTrack leaves such a track alone)
+  const fix = p.w && p.h ? ` is-fixed" style="aspect-ratio:${p.w} / ${p.h}` : '';
+  return `<div class="evm-slides"><div class="evm-track${fix}" data-track>${list.map(one).join('')}</div>
     <div class="evm-dots" role="tablist">${list.map((x, i) => `<button class="evm-dot${i ? '' : ' on'}" data-action="slide-to" data-i="${i}" role="tab" aria-label="${i + 1} / ${list.length}${x.th ? ' · ' + escapeAttr(en ? (x.en || x.th) : x.th) : ''}" title="${x.th ? escapeAttr(en ? (x.en || x.th) : x.th) : ''}"></button>`).join('')}</div></div>`;
 }
 function renderEventModal(){
