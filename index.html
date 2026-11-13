@@ -16055,7 +16055,9 @@ const gecClosed = () => Date.now() > gecMs(GEC_POLLS.ge2026, GEC_POLLS.ge2026.en
 /* The final count, from the chain's own balance of the poll (balanceOf, as the explorer shows it on the poll's page), read after the
    close on 12 Nov 2026. The list of transfers the explorer hands out is short of it by 76.20 GE6 (a few votes it never listed, the 0.05
    among them), so once the vote is closed this figure is the total; the charts by hour and day still come from the listed votes. */
-const GEC_FINAL = { sum:1672642.55, listed:1672566.35 };
+/* After the close the poll sent everything it held to the burn address in one transfer (block 50,696,843, tx 0x7eb8e559…):
+   1,672,643.55 GE6. That burn is the vote's own final figure and is used as the total. */
+const GEC_FINAL = { sum:1672643.55, listed:1672566.35, burnBlock:50696843 };
 const gecFinal = x => gecClosed() ? GEC_FINAL.sum : x;
 const gecPc = v => (v * 100).toFixed(v < .1 ? 1 : 0) + '%';
 const gecHM = ms => { const t = new Date(Math.round(ms / 60000) * 60000); return `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`; };
@@ -16533,14 +16535,16 @@ function gecSupplyCard(en, N, pc){
   // buyers' row, the four rows add up to what was minted.
   buyers = Math.max(0, buyers - short);
   // closed: the chain's own balances say what the buyers still hold — what was minted, less the vault, the channels and the vote
-  if(gecClosed()) buyers = Math.max(0, t.minted - t.burnt - vault - chan - voted);
+  if(gecClosed()) buyers = Math.max(0, t.minted - Math.max(0, t.burnt - GEC_FINAL.sum) - vault - chan - voted);
   const parts = [
     ['is-vault', en ? 'Organiser’s vault — not released yet' : 'คลังของผู้จัด — ยังไม่ปล่อยขาย', vault],
     ['is-chan', en ? `With the ${chans.length} sales channels — not sold on yet` : `อยู่ที่ช่องทางขาย ${chans.length} กระเป๋า — ยังไม่ถึงมือผู้ซื้อ`, chan],
     ['is-buy', en ? `With buyers, not voted yet (${N(holders)} wallets)` : `อยู่กับผู้ซื้อ ยังไม่โหวต (${N(holders)} กระเป๋า)`, buyers],
     ['is-voted', en ? 'Voted' : 'โหวตแล้ว', voted],
   ];
-  if(t.burnt > 1e-9) parts.push(['is-burnt', en ? 'Burnt' : 'เผาแล้ว', t.burnt]);
+  // the poll's own burn after the close is the vote itself (counted in 'Voted'); only a burn beyond it is shown apart
+  const burntElse = gecClosed() ? Math.max(0, t.burnt - GEC_FINAL.sum) : t.burnt;
+  if(burntElse > 1e-6) parts.push(['is-burnt', en ? 'Burnt' : 'เผาแล้ว', burntElse]);
   const sold = buyers + voted;
   const chanList = chans.map(a => [a, t.chan[a], Math.max(0, t.bal[a] || 0)]).sort((x, y) => y[1][0] - x[1][0]);
   return `<div class="gea-card" data-gshare="supply"><h3 class="gec-h">${en ? 'Where all the GE6 is' : 'โทเคน GE6 ทั้งหมดอยู่ที่ไหน'}</h3>
@@ -16681,8 +16685,8 @@ function renderGEChain(){
       </div>
       <p class="gec-fin-next">${en ? 'Results are read out on <b>14 Nov 2026, 18:00</b> at MCC Hall, The Mall Lifestore Bangkapi.' : 'ประกาศผล <b>14 พ.ย. 2026 เวลา 18:00 น.</b> ที่ MCC Hall, The Mall Lifestore Bangkapi'}
         <button class="chip chip-link" data-action="open-event" data-id="ev-election-results">${en ? 'Results night' : 'ดูงานประกาศผล'}</button></p>
-      <p class="gec-sub">${en ? `The total is the poll’s own balance on the blockchain after the close. The explorer’s list of votes adds up to ${gecTok(GEC_FINAL.listed)}, ${gecTok(GEC_FINAL.sum - GEC_FINAL.listed)} short (a few votes it never listed), so the vote count and the charts below come from that list. The chain shows how much was voted, not for whom: that is for the results night.`
-        : `ยอดรวมคือยอดคงเหลือในสัญญาโหวตบนบล็อกเชนหลังปิดโหวต · รายการโหวตที่ตัวสำรวจเชนให้มารวมได้ ${gecTok(GEC_FINAL.listed)} ขาดไป ${gecTok(GEC_FINAL.sum - GEC_FINAL.listed)} (มีบางรายการที่ตัวสำรวจไม่ได้ส่งมา) จำนวนครั้งและกราฟด้านล่างจึงนับจากรายการที่มี · บล็อกเชนบอกได้ว่าโหวตไปเท่าไร ไม่ได้บอกว่าโหวตให้ใคร ผลรายคนรอฟังวันประกาศผล`}</p>
+      <p class="gec-sub">${en ? `The total is what the poll held when voting closed: right after, it sent all of it to the burn address in one transfer (block ${GEC_FINAL.burnBlock.toLocaleString('en-US')}), so those tokens can never be used again. The explorer’s list of votes adds up to ${gecTok(GEC_FINAL.listed)}, ${gecTok(GEC_FINAL.sum - GEC_FINAL.listed)} short (a few votes it never listed), so the vote count and the charts below come from that list. The chain shows how much was voted, not for whom: that is for the results night.`
+        : `ยอดรวมคือโทเคนทั้งหมดในสัญญาโหวตตอนปิดโหวต ซึ่งหลังปิดโหวตถูกส่งไปเผาทิ้งทั้งก้อนในรายการเดียว (บล็อก ${GEC_FINAL.burnBlock.toLocaleString('en-US')}) ใช้ซ้ำไม่ได้อีก · รายการโหวตที่ตัวสำรวจเชนให้มารวมได้ ${gecTok(GEC_FINAL.listed)} ขาดไป ${gecTok(GEC_FINAL.sum - GEC_FINAL.listed)} (มีบางรายการที่ตัวสำรวจไม่ได้ส่งมา) จำนวนครั้งและกราฟด้านล่างจึงนับจากรายการที่มี · บล็อกเชนบอกได้ว่าโหวตไปเท่าไร ไม่ได้บอกว่าโหวตให้ใคร ผลรายคนรอฟังวันประกาศผล`}</p>
     </div>`;
   }
   // the same in baht, at the price per token the owner keeps up to date
