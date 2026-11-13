@@ -1371,17 +1371,64 @@ DTSTART;VALUE=DATE:20261121
 DTEND;VALUE=DATE:20261123
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-phitsanulok@48thdb
+UID:ev-kimi-roadshow-phitsanulok-2026-11-21@48thdb
 DTSTAMP:20261121T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:Central Phitsanulok\, Phitsanulok
-DESCRIPTION:รายละเอียดและเวลายังไ
- ม่ประกาศ\n• รายชื่อสมาชิกแ
- ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
- kimi-roadshow-phitsanulok
+LOCATION:ลานโปรโมชั่น ชั้น 1\, Central Phit
+ sanulok\, Phitsanulok
+DESCRIPTION:เมมเบอร์: Hongyok\, Lewlew\, Tara\, Lingling\, 
+ Prae\, Jingjing\n• รอบเวลาเดียวกันทั
+ ้งสองวัน 21 และ 22 พ.ย.\n• 12:00–13:00 Free 
+ Mini Concert\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 Merchand
+ ise\n• 17:00–18:00 Group Hi-Touch\n• บัตรเข้าร่
+ วม Group Hi-Touch ได้จากการซื้อเข็ม
+ กลัดภายในงาน\n• Zone 1 โซนนั่งช
+ มด้านใน ถ่ายด้วยโทรศัพท์ม
+ ือถือเท่านั้น ยกไม่เกินระ
+ ดับศีรษะ\n• Zone 2 โซนช่างภาพ ใช
+ ้กล้องได้ทุกชนิดและใช้อุ
+ ปกรณ์เสริมได้\n• Zone 3 โซนรอบน
+ อก ใช้กล้องได้ทุกชนิด แต่ห
+ ้ามใช้ขาตั้ง บันได เก้าอี้
+ \n• Group Hi-Touch ห้ามสวมนาฬิกาข้อม
+ ือ แหวน กำไล หรือถือสิ่งขอ
+ งที่อาจเป็นอันตรายต่อสมา
+ ชิก\n• กำหนดการอาจเปลี่ยนแ
+ ปลงตามความเหมาะสม\n\nhttps://48thdb.com/
+ event/ev-kimi-roadshow-phitsanulok
 URL:https://48thdb.com/event/ev-kimi-roadshow-phitsanulok
-DTSTART;VALUE=DATE:20261121
-DTEND;VALUE=DATE:20261123
+DTSTART;TZID=Asia/Bangkok:20261121T120000
+DTEND;TZID=Asia/Bangkok:20261121T180000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-phitsanulok-2026-11-22@48thdb
+DTSTAMP:20261121T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:ลานโปรโมชั่น ชั้น 1\, Central Phit
+ sanulok\, Phitsanulok
+DESCRIPTION:เมมเบอร์: Hongyok\, Lewlew\, Tara\, Lingling\, 
+ Prae\, Jingjing\n• รอบเวลาเดียวกันทั
+ ้งสองวัน 21 และ 22 พ.ย.\n• 12:00–13:00 Free 
+ Mini Concert\n• 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 Merchand
+ ise\n• 17:00–18:00 Group Hi-Touch\n• บัตรเข้าร่
+ วม Group Hi-Touch ได้จากการซื้อเข็ม
+ กลัดภายในงาน\n• Zone 1 โซนนั่งช
+ มด้านใน ถ่ายด้วยโทรศัพท์ม
+ ือถือเท่านั้น ยกไม่เกินระ
+ ดับศีรษะ\n• Zone 2 โซนช่างภาพ ใช
+ ้กล้องได้ทุกชนิดและใช้อุ
+ ปกรณ์เสริมได้\n• Zone 3 โซนรอบน
+ อก ใช้กล้องได้ทุกชนิด แต่ห
+ ้ามใช้ขาตั้ง บันได เก้าอี้
+ \n• Group Hi-Touch ห้ามสวมนาฬิกาข้อม
+ ือ แหวน กำไล หรือถือสิ่งขอ
+ งที่อาจเป็นอันตรายต่อสมา
+ ชิก\n• กำหนดการอาจเปลี่ยนแ
+ ปลงตามความเหมาะสม\n\nhttps://48thdb.com/
+ event/ev-kimi-roadshow-phitsanulok
+URL:https://48thdb.com/event/ev-kimi-roadshow-phitsanulok
+DTSTART;TZID=Asia/Bangkok:20261122T120000
+DTEND;TZID=Asia/Bangkok:20261122T180000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-kimi-roadshow-bigc-rajdamri@48thdb

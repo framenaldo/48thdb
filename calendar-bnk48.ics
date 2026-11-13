@@ -1297,19 +1297,6 @@ DTSTART;VALUE=DATE:20261121
 DTEND;VALUE=DATE:20261123
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-phitsanulok@48thdb
-DTSTAMP:20261121T000000Z
-SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:Central Phitsanulok\, Phitsanulok
-DESCRIPTION:รายละเอียดและเวลายังไ
- ม่ประกาศ\n• รายชื่อสมาชิกแ
- ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
- kimi-roadshow-phitsanulok
-URL:https://48thdb.com/event/ev-kimi-roadshow-phitsanulok
-DTSTART;VALUE=DATE:20261121
-DTEND;VALUE=DATE:20261123
-END:VEVENT
-BEGIN:VEVENT
 UID:ev-kimi-roadshow-bigc-rajdamri@48thdb
 DTSTAMP:20261128T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
