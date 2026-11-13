@@ -151,6 +151,10 @@
   "light": "linear-gradient(180deg, hsl(206 46% 88%) 0%, hsl(207 48% 89%) 17%, hsl(211 24% 92%) 33%, hsl(112 1% 91%) 50%, hsl(60 11% 90%) 67%, hsl(81 12% 86%) 83%, hsl(171 5% 80%) 100%)",
   "dark": "linear-gradient(180deg, hsl(206 33% 17%) 0%, hsl(207 34% 17%) 17%, hsl(211 17% 19%) 33%, hsl(112 1% 19%) 50%, hsl(60 7% 18%) 67%, hsl(81 8% 16%) 83%, hsl(171 4% 13%) 100%)"
  },
+ "posters/kimi-roadshow-phitsanulok.jpg": {
+  "light": "linear-gradient(180deg, hsl(206 48% 88%) 0%, hsl(207 48% 89%) 17%, hsl(211 24% 92%) 33%, hsl(137 1% 91%) 50%, hsl(59 13% 91%) 67%, hsl(86 15% 87%) 83%, hsl(204 12% 80%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(206 33% 17%) 0%, hsl(207 34% 17%) 17%, hsl(211 17% 19%) 33%, hsl(137 0% 19%) 50%, hsl(59 9% 18%) 67%, hsl(86 10% 17%) 83%, hsl(204 8% 13%) 100%)"
+ },
  "posters/kimi-roadshow-rama9b.jpg": {
   "light": "linear-gradient(180deg, hsl(206 48% 88%) 0%, hsl(207 48% 89%) 17%, hsl(212 19% 91%) 33%, hsl(341 15% 85%) 50%, hsl(304 9% 84%) 67%, hsl(299 15% 85%) 83%, hsl(67 13% 83%) 100%)",
   "dark": "linear-gradient(180deg, hsl(206 34% 17%) 0%, hsl(207 34% 17%) 17%, hsl(212 13% 19%) 33%, hsl(341 10% 16%) 50%, hsl(304 6% 15%) 67%, hsl(299 11% 15%) 83%, hsl(67 9% 14%) 100%)"
