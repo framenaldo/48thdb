@@ -2539,6 +2539,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-day{ flex:none; display:flex; flex-direction:column; align-items:center; min-width:54px; padding:5px 10px; border-radius:12px; border:1px solid var(--line); background:var(--card); font:inherit; font-size:15px; font-weight:800; color:var(--ink); line-height:1.15; box-shadow:0 2px 6px color-mix(in srgb, var(--line) 60%, transparent); cursor:pointer; }
   .rt-day small{ font-size:11px; font-weight:700; color:var(--ink-soft); } .rt-day.on{ background:var(--ink); border-color:var(--ink); color:var(--paper); } .rt-day.on small{ color:inherit; opacity:.8; }
   .es-row.has-tone{ box-shadow:inset 4px 0 0 var(--rt); }
+  .es-row.has-tone, .es-who.has-tone{ background:color-mix(in srgb, var(--rt) 8%, var(--card)); }
+  .es-who.has-tone{ box-shadow:inset 4px 0 0 var(--rt); }
+  .es-act{ color:color-mix(in srgb, var(--rt) 82%, var(--ink)); font-weight:800; }   /* leans to the ink, so it reads on a light or a dark card */
+  :root[data-theme="dark"] .es-row.has-tone, :root[data-theme="dark"] .es-who.has-tone{ background:color-mix(in srgb, var(--rt) 14%, var(--card)); }
   .es-kind{ display:inline-block; padding:1px 10px; margin-right:4px; border-radius:99px; font-size:13px; font-weight:800; white-space:nowrap; color:#fff; background:var(--rt); }
   .es-row.has-tone.is-done .es-kind{ filter:saturate(.5); }
   .es-row.is-done .es-time, .es-row.is-done .es-what{ opacity:.45; }
@@ -19383,8 +19387,14 @@ function rotaLiveGe(){
   rotaShow(root);
 }
 /* a row's activity in its own colour (ev.tones = [{ m:'Group Hi-Touch', c:'#E4457E' }]): the name as a chip, the round after it */
-const esTone = (ev, what) => (ev.tones || []).find(t => what.startsWith(t.m)) || null;
-const esWhat = (ev, what) => { const t = esTone(ev, what); return t ? `<span class="es-kind">${escapeHtml(t.m)}</span> ${escapeHtml(what.slice(t.m.length).trim())}` : escapeHtml(what); };
+/* each kind of activity in a timetable has its own colour, so a roadshow's day reads at a glance (owner, 13 Nov):
+   a bar down the row's edge, a light wash over the row and its faces, the activity's name in that colour */
+const ES_ACTS = [[/mini ?concert|มินิคอน/i, '#E4457E'], [/hi-?touch|ไฮทัช/i, '#2E8C82'], [/merch/i, '#D9822B'],
+  [/hachi ?cha/i, '#4E9A3E'], [/2-?shot|ทูช็อต|1-?shot|cheki|เชกิ/i, '#7A5BC7'], [/handshake|จับมือ/i, '#3D7DB0']];
+const esTone = (ev, what) => (ev.tones || []).find(t => what.startsWith(t.m))
+  || (a => a ? { c:a[1], act:true } : null)(ES_ACTS.find(([re]) => re.test(what)));
+const esWhat = (ev, what) => { const t = esTone(ev, what); return t && !t.act ? `<span class="es-kind">${escapeHtml(t.m)}</span> ${escapeHtml(what.slice(t.m.length).trim())}`
+  : t ? `<span class="es-act">${escapeHtml(what)}</span>` : escapeHtml(what); };
 function renderSchedule(ev){
   const en = isEN(), iso = toYmd(todayStart()), year = +ev.start.slice(0, 4);
   const live = !ev.cancelled && !ev.postponed && ev.start <= iso && eventLastDay(ev) >= iso;
@@ -19443,7 +19453,7 @@ function renderSchedule(ev){
       <span class="es-what">${r.sl ? `<span class="es-name">${escapeHtml(r.what)}</span><span class="es-sl-pill">${en ? 'Setlist' : 'เซ็ตลิสต์'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>`
         : esWhat(ev, r.what)}<span class="es-st">${st}</span></span>
       <span class="es-bar"></span></${tag}>`;
-    if(LU && !r.day) box += luWho(r.what);
+    if(LU && !r.day){ const w = luWho(r.what); box += tn ? w.replace(/class="es-who/g, `style="--rt:${tn.c}" class="es-who has-tone`) : w; }
     if(r.sl) box += `<div class="es-sl" id="sl-${ev.id}"${open ? '' : ' hidden'}>${renderSetlist(ev)}</div>`;
   }
   flushBox(); flushNotes();
