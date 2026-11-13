@@ -260,6 +260,17 @@ const TL_CATCHUP = 48, TL_BEHIND = 64, TL_STALE_MS = 5 * 60000;
 // in a row and a sweep every TL_SWEEP numbers out to TL_REACH, its starting point moving a step each run, so every number up to
 // TL_REACH is asked within TL_SWEEP runs; the first one that exists tells the walk where the sequence has got to.
 const TL_BLIND_NEAR = 12, TL_SWEEP = 6, TL_REACH = 150, TL_BLIND_FAR = [200, 260], TL_SAVE_MS = 30 * 60000;
+// quiet for a while (the app's numbers go on counting through the night, but nobody posts): the next post may sit further than
+// TL_REACH. 13 Nov 2026 the walk waited at 851310 for eighteen hours while posts 851505, 851506 and 851519 existed, 195 numbers
+// on — out of the sweep's reach, and between the far looks at +200 and +260. So the longer nothing has been seen, the further the
+// sweep goes (and slower round, a residue every TL_WIDE_SWEEP runs, to spare the app): [minutes idle, reach, sweep period].
+const TL_BATCH = 16;
+const TL_WIDE = [[30, 400, 12], [180, 900, 20], [720, 1800, 30]];
+export function tlReach(idleMs) {
+  let r = [TL_REACH, TL_SWEEP];
+  for (const [min, reach, sweep] of TL_WIDE) if (idleMs >= min * 60000) r = [reach, sweep];
+  return r;
+}
 const TL_URL = (n) => `https://app.bnk48.com/timeline/content-member-timeline/${n}`;
 
 export function tlText(h) {
@@ -308,16 +319,23 @@ export async function tlScan(env, nowMs) {
   if (!st.max) { if (!ahead) return { skipped: 'no-start' }; st.max = ahead - 60; }
   const from = st.max, now = nowMs || Date.now(), blind = ahead <= from;
   const step = blind ? TL_BLIND_NEAR : ahead - from > TL_BEHIND ? TL_CATCHUP : TL_STEP;
-  const phase = Math.floor(now / 60000) % TL_SWEEP;   // a step each run (one a minute)
+  // when the walk last saw something new: the newest post it holds, until it has a time of its own
+  const newest = st.posts.reduce((t, p) => Math.max(t, Date.parse(p.at) || 0), 0);
+  const movedAt = st.movedAt || newest || now, [reach, period] = tlReach(now - movedAt);
+  const phase = Math.floor(now / 60000) % period;   // a step each run (one a minute)
   const sweep = [];
-  if (blind) for (let d = TL_BLIND_NEAR + 1 + phase; d <= TL_REACH; d += TL_SWEEP) sweep.push(d);
+  if (blind) for (let d = TL_BLIND_NEAR + 1 + phase; d <= reach; d += period) sweep.push(d);
   const asks = [...Array(step).keys()].map((i) => from + 1 + i).concat((blind ? sweep.concat(TL_BLIND_FAR) : TL_FAR).map((d) => from + d));
-  const got = await Promise.all(asks.map((n) => tlProbe(n, now).catch((e) => ({ n, failed: true, status: String((e && e.message) || e).slice(0, 60) }))));
+  // in batches: a sweep out to a thousand numbers is dozens of asks, and the app answered a burst of a hundred with 500s and 502s
+  // (14 Nov 2026), which would have read as failures
+  const got = [];
+  for (let i = 0; i < asks.length; i += TL_BATCH)
+    got.push(...await Promise.all(asks.slice(i, i + TL_BATCH).map((n) => tlProbe(n, now).catch((e) => ({ n, failed: true, status: String((e && e.message) || e).slice(0, 60) })))));
   // a number that keeps failing (an error page, a refusal) is given up after three runs, so it cannot hold the walk forever
   st.fails = st.fails || {};
   for (const r of got) if (r.failed && r.n <= from + step) { st.fails[r.n] = (st.fails[r.n] || 0) + 1; if (st.fails[r.n] >= 3) { r.failed = false; r.gone = true; } }
   for (const k of Object.keys(st.fails)) if (+k <= from) delete st.fails[k];
-  st.last = { at: new Date(now).toISOString(), blind, answers: got.reduce((o, r) => { const k = r.post ? 'post' : r.gone ? '404' : String(r.status || 'failed'); o[k] = (o[k] || 0) + 1; return o; }, {}) };
+  st.last = { at: new Date(now).toISOString(), blind, reach: blind ? reach : undefined, answers: got.reduce((o, r) => { const k = r.post ? 'post' : r.gone ? '404' : String(r.status || 'failed'); o[k] = (o[k] || 0) + 1; return o; }, {}) };
   const ids = await iamIds(env).catch(() => ({}));
   const who = Object.fromEntries(Object.entries(ids).map(([m, i]) => [i, m]));
   const have = new Set(st.posts.map((p) => p.n));
@@ -339,6 +357,8 @@ export async function tlScan(env, nowMs) {
   if (failed) max = Math.min(max, failed.n - 1);
   st.max = Math.max(from, max);
   st.top = Math.max(topWas, ahead);
+  // something new: a post kept, the walk moved on, or a higher number met (a first run, with no `top` kept yet, is not news)
+  if (added || st.max !== from || (topWas && st.top !== topWas)) st.movedAt = now;
   st.posts = st.posts.filter((p) => now - Date.parse(p.at) < TL_KEEP_MS).sort((a, b) => b.n - a.n).slice(0, TL_KEEP);
   st.at = new Date(now).toISOString();
   if (added || st.max !== from || st.top !== topWas || got.some((r) => r.failed) || now - savedAt > TL_SAVE_MS) await env.IAM.put(TL_KEY, JSON.stringify(st));
