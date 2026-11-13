@@ -14,3 +14,25 @@
 # Subscribed calendars should notice an edit within the hour.
 /*.ics
   Cache-Control: public, max-age=1800
+
+# Pictures and fonts never change under a name (a replaced one gets a new file name, see CLAUDE.md), so a browser may keep
+# them a week without asking again: about 80 fewer requests each time the home page opens. A week, not for ever, so a file
+# replaced in place by mistake still heals itself.
+/photos/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/posters/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/gallery/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/bg/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/covers/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/logos/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/setlists/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/streaming/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/fonts/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
