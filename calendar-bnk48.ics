@@ -1289,17 +1289,62 @@ DTSTART;TZID=Asia/Bangkok:20261120T100000
 DTEND;TZID=Asia/Bangkok:20261120T201500
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-t21-nov@48thdb
+UID:ev-kimi-roadshow-t21-nov-2026-11-21@48thdb
 DTSTAMP:20261121T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:Terminal21 Rama 3\, Bangkok
-DESCRIPTION:รายละเอียดและเวลายังไ
- ม่ประกาศ\n• รายชื่อสมาชิกแ
- ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
- kimi-roadshow-t21-nov
+LOCATION:LG FLOOR - CARIBBEAN VILLAGE\, TERMINAL21 RAMA3\, Bangkok
+DESCRIPTION:เมมเบอร์: Micha\, Janry\, Patt\, Emmy\, L\, Mon
+ et\n• รอบเวลาเดียวกันทั้งสอง
+ วัน 21 และ 22 พ.ย.\n• 12:00–13:00 Free Mini Concert\n
+ • 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 Merchandise & Hachi Ch
+ a\n• 17:00–18:00 Group Hi-Touch\n• บัตรเข้าร่ว
+ ม Group Hi-Touch ได้จากการซื้อเข็มก
+ ลัดภายในงาน\n• Zone 1 โซนนั่งชม
+ ด้านใน ถ่ายด้วยโทรศัพท์มื
+ อถือเท่านั้น ยกไม่เกินระด
+ ับศีรษะ\n• Zone 2 โซนช่างภาพ ใช้
+ กล้องได้ทุกชนิดและใช้อุป
+ กรณ์เสริมได้\n• Zone 3 โซนรอบนอ
+ ก ใช้กล้องได้ทุกชนิด แต่ห้
+ ามใช้ขาตั้ง บันได เก้าอี้\n
+ • Group Hi-Touch ห้ามสวมนาฬิกาข้อมื
+ อ แหวน กำไล หรือถือสิ่งของ
+ ที่อาจเป็นอันตรายต่อสมาช
+ ิก\n• กำหนดการอาจเปลี่ยนแป
+ ลงตามความเหมาะสม\n\nhttps://48thdb.com/eve
+ nt/ev-kimi-roadshow-t21-nov
 URL:https://48thdb.com/event/ev-kimi-roadshow-t21-nov
-DTSTART;VALUE=DATE:20261121
-DTEND;VALUE=DATE:20261123
+DTSTART;TZID=Asia/Bangkok:20261121T120000
+DTEND;TZID=Asia/Bangkok:20261121T180000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-t21-nov-2026-11-22@48thdb
+DTSTAMP:20261121T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:LG FLOOR - CARIBBEAN VILLAGE\, TERMINAL21 RAMA3\, Bangkok
+DESCRIPTION:เมมเบอร์: Micha\, Janry\, Patt\, Emmy\, L\, Mon
+ et\n• รอบเวลาเดียวกันทั้งสอง
+ วัน 21 และ 22 พ.ย.\n• 12:00–13:00 Free Mini Concert\n
+ • 14:00–15:00 Group Hi-Touch\n• 15:30–16:30 Merchandise & Hachi Ch
+ a\n• 17:00–18:00 Group Hi-Touch\n• บัตรเข้าร่ว
+ ม Group Hi-Touch ได้จากการซื้อเข็มก
+ ลัดภายในงาน\n• Zone 1 โซนนั่งชม
+ ด้านใน ถ่ายด้วยโทรศัพท์มื
+ อถือเท่านั้น ยกไม่เกินระด
+ ับศีรษะ\n• Zone 2 โซนช่างภาพ ใช้
+ กล้องได้ทุกชนิดและใช้อุป
+ กรณ์เสริมได้\n• Zone 3 โซนรอบนอ
+ ก ใช้กล้องได้ทุกชนิด แต่ห้
+ ามใช้ขาตั้ง บันได เก้าอี้\n
+ • Group Hi-Touch ห้ามสวมนาฬิกาข้อมื
+ อ แหวน กำไล หรือถือสิ่งของ
+ ที่อาจเป็นอันตรายต่อสมาช
+ ิก\n• กำหนดการอาจเปลี่ยนแป
+ ลงตามความเหมาะสม\n\nhttps://48thdb.com/eve
+ nt/ev-kimi-roadshow-t21-nov
+URL:https://48thdb.com/event/ev-kimi-roadshow-t21-nov
+DTSTART;TZID=Asia/Bangkok:20261122T120000
+DTEND;TZID=Asia/Bangkok:20261122T180000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-kimi-roadshow-bigc-rajdamri@48thdb
