@@ -4038,6 +4038,53 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-band.is-silver, .gel-now.is-silver{ --t:#76828E; --t2:#A9B4BE; }
   .gel-band.is-bronze, .gel-now.is-bronze{ --t:#9A5733; --t2:#C98A5E; }
   .gel-band.is-rest{ --t:#6E6577; --t2:#9A92A3; }
+  /* GE2026 · a candidate's sheet of figures and facts (preview, ?gefact=on) */
+  .gef{ --t:#6E6577; --t2:#9A92A3; }
+  .gef.is-gold{ --t:#B8862E; --t2:#E0B55A; } .gef.is-silver{ --t:#76828E; --t2:#A9B4BE; } .gef.is-bronze{ --t:#9A5733; --t2:#C98A5E; }
+  .gef h4{ margin:16px 0 8px; font-size:13px; font-weight:700; color:var(--ink-soft); letter-spacing:.02em; }
+  .gef-top{ display:grid; grid-template-columns:64px minmax(0,1fr) auto; align-items:center; gap:12px; padding:12px; border-radius:20px; color:#fff;
+    background:linear-gradient(135deg, var(--t), var(--t2)); box-shadow:0 6px 18px color-mix(in srgb, var(--t) 35%, transparent); }
+  .gef-top .gef-face{ width:64px; height:64px; border-radius:50%; border:2px solid rgba(255,255,255,.85); }
+  .gef-who{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .gef-who > b{ font-size:21px; line-height:1.15; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gef-who > small{ font-size:12px; opacity:.95; display:flex; align-items:center; gap:5px; }
+  .gef-band{ align-self:flex-start; margin-top:3px; padding:2px 9px; border-radius:999px; background:rgba(255,255,255,.24); font-size:11.5px; font-weight:700; }
+  .gef-rank{ text-align:center; padding:0 6px; }
+  .gef-rank small{ display:block; font-size:11px; opacity:.9; }
+  .gef-rank b{ display:block; font-size:44px; line-height:1; font-weight:800; font-variant-numeric:tabular-nums; }
+  .gef-cells{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .gef-cells > div{ padding:9px 11px; border-radius:14px; border:1px solid var(--line); background:var(--card); min-width:0; }
+  .gef-cells small{ display:block; font-size:11.5px; color:var(--ink-soft); }
+  .gef-cells b{ display:block; font-size:18px; font-variant-numeric:tabular-nums; }
+  .gef-cells em{ display:block; font-style:normal; font-size:11px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gef-facts{ list-style:none; margin:0; padding:0; display:grid; gap:7px; }
+  .gef-facts li{ display:grid; grid-template-columns:26px minmax(0,1fr); gap:8px; align-items:start; padding:10px 12px; border-radius:14px;
+    border:1px solid color-mix(in srgb, var(--t) 30%, var(--line)); background:color-mix(in srgb, var(--t2) 12%, var(--card)); font-size:14px; line-height:1.5; }
+  .gef-facts li > i{ font-style:normal; font-size:17px; line-height:1.3; text-align:center; }
+  .gef-path{ display:flex; align-items:stretch; gap:6px; }
+  .gef-path > i{ align-self:center; font-style:normal; color:var(--ink-soft); }
+  .gef-step{ flex:1; min-width:0; padding:8px 6px; border-radius:14px; border:1px solid var(--line); background:var(--card); text-align:center; }
+  .gef-step.is-now{ border-color:var(--t); background:color-mix(in srgb, var(--t2) 16%, var(--card)); }
+  .gef-step small{ display:block; font-size:11px; color:var(--ink-soft); }
+  .gef-step b{ display:block; font-size:22px; line-height:1.15; font-variant-numeric:tabular-nums; }
+  .gef-step em{ display:block; font-style:normal; font-size:11px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .gef-hist{ border:1px solid var(--line); border-radius:14px; background:var(--card); overflow:hidden; }
+  .gef-hrow{ display:grid; grid-template-columns:minmax(0,1.25fr) auto minmax(0,1fr) auto; gap:8px; align-items:baseline; padding:8px 12px; font-size:13px; }
+  .gef-hrow + .gef-hrow{ border-top:1px solid var(--line); }
+  .gef-hrow.is-now{ background:color-mix(in srgb, var(--t2) 16%, transparent); font-weight:700; }
+  .gef-hrow span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gef-hrow small{ color:var(--ink-soft); font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gef-hrow em{ font-style:normal; font-variant-numeric:tabular-nums; text-align:right; }
+  .gef-hrow em i{ font-style:normal; font-size:10.5px; color:var(--ink-soft); font-weight:400; }
+  .gef-note{ margin:6px 2px 0; font-size:11.5px; color:var(--ink-soft); }
+  .gef-form{ border:1px solid var(--line); border-radius:14px; background:var(--card); padding:4px 12px; }
+  .gef-form p{ margin:8px 0; font-size:13.5px; }
+  .gef-form small{ display:block; font-size:11.5px; color:var(--ink-soft); margin-bottom:2px; }
+  .gef-form span{ display:flex; align-items:baseline; gap:7px; padding:2px 0; }
+  .gef-form span i{ font-style:normal; flex:none; width:18px; height:18px; border-radius:50%; background:var(--line); font-size:11px; text-align:center; line-height:18px; }
+  .gef-form span em{ font-style:normal; color:var(--ink-soft); font-size:12px; }
+  .gef-form span.is-got{ font-weight:700; } .gef-form span.is-got i{ background:var(--t); color:#fff; }
+  .gef .gef-go{ margin:16px 0 0; }
   .gel-rest-note{ margin:2px 4px 8px; font-size:11.5px; color:var(--ink-soft); }
   .gel-band-h{ display:flex; align-items:baseline; justify-content:space-between; padding:8px 12px; border-radius:12px;
     color:#fff; font-weight:800; font-size:14px; background:linear-gradient(90deg, var(--t), var(--t2)); }
@@ -14815,7 +14862,8 @@ function renderGESongs(){
   const picks = ids.length * 3, once = list.filter(s => s.by.length === 1);
   const round = geLatestRound(), slots = round ? geSlots(round.id) : {};
   const rankOf = {}; Object.keys(slots).forEach(n => { if(slots[n] && slots[n].id) rankOf[slots[n].id] = +n; });
-  const roundNote = round ? (en ? `By ${geRoundLabel(round)}` : `อิงจาก${geRoundLabel(round)}`) : '';
+  const geOver = !!round && /final/.test(round.id);   // the election is over: no more "if"
+  const roundNote = round ? (geOver ? (en ? 'From the Final Results' : 'ตามผลสุดท้าย') : (en ? `By ${geRoundLabel(round)}` : `อิงจาก${geRoundLabel(round)}`)) : '';
   const card = (title, body, c) => `<div class="group-card ge-song-card" style="--c:${c || '#E4457E'}"><div class="group-head"><h2 style="font-size:21px;">${title}</h2></div>${body}</div>`;
   const label = s => `${s.t} (${s.g})`;
 
@@ -14879,7 +14927,7 @@ function renderGESongs(){
   let c5 = '';
   if(round){
     const bs = geBandSongs(round.id);
-    c5 = card(en ? 'If it ended today' : 'ถ้าเลือกตั้งจบวันนี้', `<ul class="ge-ifnow">${GE_CENTERS.map((n, i) => {
+    c5 = card(geOver ? (en ? 'The song each group gets' : 'เพลงที่แต่ละกลุ่มได้') : (en ? 'If it ended today' : 'ถ้าเลือกตั้งจบวันนี้'), `<ul class="ge-ifnow">${GE_CENTERS.map((n, i) => {
       const m = slots[n] && slots[n].id ? getMember(slots[n].id) : null, x = bs[n], band = GE_BANDS[i].name;
       return `<li><b>${band}</b> <span>${m ? `${en ? 'Center' : 'เซ็นเตอร์'} ${escapeHtml(m.name)} (${n})` : (en ? 'Center not known' : 'ยังไม่รู้เซ็นเตอร์')}</span>
         <em>${x ? `♪ ${escapeHtml(label({ t:x.song[0], g:x.song[1] }))}${x.choice > 1 ? (en ? ` · her choice ${x.choice}` : ` · ตัวเลือกที่ ${x.choice}`) : ''}` : '—'}</em></li>`; }).join('')}</ul>
@@ -15620,6 +15668,229 @@ function renderGESummary(id){
   </section>`;
 }
 
+/* ===== GE2026 · a candidate's own sheet of figures and facts (a preview: `?gefact=on` on one device, kept; `=off` back) =====
+   Opened from a row of the Final Results once all 36 are read out. Everything on it is counted from the page's own data —
+   the final slots and GE_REST, the two quick rounds, GE_HISTORY, GE_WISH — except the one line marked `owner`, which is
+   the owner's own knowledge (no earlier election had two centres wanting one song). Only good news is written as a fact:
+   a missed aim or a fall is left to the plain tables. */
+function geFactOn(){
+  try{
+    const q = new URLSearchParams(location.search).get('gefact');
+    if(q === 'on') localStorage.setItem('48thdb-gefact', '1'); else if(q === 'off') localStorage.removeItem('48thdb-gefact');
+    return localStorage.getItem('48thdb-gefact') === '1';
+  }catch(e){ return false; }
+}
+geFactOn();   // read the switch before the address is tidied
+const GE_FINAL_ID = 'ge2026-final';
+const geFactReady = () => geFactOn() && geAnnounced(GE_FINAL_ID) >= GE_SEATS;
+function geFinalField(){
+  const sl = geSlots(GE_FINAL_ID), out = [];
+  for(let n = 1; n <= GE_SEATS; n++) if(sl[n] && sl[n].id) out.push({ id:sl[n].id, n, v:typeof sl[n].v === 'number' ? sl[n].v : null });
+  (GE_REST[GE_FINAL_ID] || []).forEach(([n, id, v]) => out.push({ id, n, v }));
+  return out;
+}
+const geElName = (e, en) => e.n === 5 ? 'GE2025' : `GE${e.n} (${e.date.slice(0, 4)})`;
+function geFactData(id){
+  const field = geFinalField(), me = field.find(x => x.id === id);
+  if(!me) return null;
+  const byN = {}; field.forEach(x => { byN[x.n] = x; });
+  const band = GE_BANDS.find(b => me.n >= b.from && me.n <= b.to) || null;
+  // the elections before this one
+  const past = GE_HISTORY.map(e => {
+    const i = e.rows.findIndex(r => r[0] === id); if(i < 0) return null;
+    const hb = geHistBands(e), b = hb.find(x => i + 1 >= x.from && i + 1 <= x.to) || null;
+    return { e, n:i + 1, v:e.rows[i][1], band:b, centre:!!b && b.from === i + 1 };
+  }).filter(Boolean);
+  // every centre there has been, in order
+  const centres = [];
+  GE_HISTORY.forEach(e => geHistBands(e).forEach(b => { const r = e.rows[b.from - 1]; if(r) centres.push({ id:r[0], e, band:b.name }); }));
+  const firsts = GE_HISTORY.map(e => e.rows[0] && e.rows[0][0]);
+  const quick = ['ge2026-q1', 'ge2026-q2'].map(rid => {
+    const s = geSlots(rid), k = Object.keys(s).find(n => s[n] && s[n].id === id);
+    return { rid, full:geAnnounced(rid) >= GE_SEATS, n:k ? +k : null, v:k && typeof s[k].v === 'number' ? s[k].v : null };
+  });
+  return { me, field, byN, band, past, centres, firsts, quick, wish:GE_WISH[id] || null };
+}
+function geFactList(id, en){
+  const d = geFactData(id); if(!d) return [];
+  const { me, field, byN, band, past, centres, firsts, quick, wish } = d;
+  const m = getMember(id), nm = x => { const mm = getMember(x); return mm ? mm.name : x; };
+  const t = (th, e) => en ? e : th, out = [];
+  const add = (ico, th, e, owner) => out.push({ ico, text:en ? e : th, owner:!!owner });
+  const ord = k => en ? (k === 1 ? 'first' : k === 2 ? 'second' : k === 3 ? 'third' : k + 'th') : 'คนที่ ' + k;
+  const times = k => en ? (k === 2 ? 'twice' : k + ' times') : k + ' ครั้ง';
+  const song = x => `“${x[0]}” (${x[1]})`;
+
+  // 1 — No. 1
+  if(me.n === 1){
+    const wins = firsts.filter(x => x === id).length + 1;
+    if(wins >= 2){
+      const others = [...new Set(firsts.filter(x => x && x !== id))].some(x => firsts.filter(y => y === x).length >= 2);
+      const back = firsts[firsts.length - 1] === id;
+      add('👑', `คว้าอันดับ 1 เป็นครั้งที่ ${wins}${back ? ' ต่อเนื่องจาก GE2025' : ''}${others ? '' : ` — คนแรกในประวัติศาสตร์ GE ที่ได้อันดับ 1 ถึง ${times(wins)}`}`,
+        `No. 1 for the ${wins === 2 ? 'second' : wins + 'th'} time${back ? ', straight after GE2025' : ''}${others ? '' : ` — the first in GE history to finish No. 1 ${times(wins)}`}`);
+    } else add('👑', 'คว้าอันดับ 1 เป็นครั้งแรก', 'No. 1 for the first time');
+  }
+  // 2 — centre
+  const ci = GE_CENTERS.indexOf(me.n);
+  if(ci >= 0){
+    const mine = centres.filter(c => c.id === id), total = mine.length + 1;
+    if(total >= 2){
+      const hadTwo = [...new Set(centres.map(c => c.id))].filter(x => centres.filter(c => c.id === x).length >= total);
+      // those who reach this count tonight, in the order they were read out (36 upward)
+      const tonight = GE_CENTERS.map(n => byN[n]).filter(x => x && centres.filter(c => c.id === x.id).length + 1 >= total).sort((a, b) => b.n - a.n);
+      const k = tonight.findIndex(x => x.id === id) + 1;
+      const trail = mine.map(c => `${geElName(c.e, en)} · ${c.band}`).concat(`GE2026 · ${band.name}`).join(' → ');
+      if(!hadTwo.length){
+        if(k === 1) add('⭐', `เซ็นเตอร์จากเวที GE ครั้งที่ ${total} (${trail}) — คนแรกในประวัติศาสตร์ GE ที่ได้เป็นเซ็นเตอร์ถึง ${times(total)}`,
+          `A GE centre for the ${total === 2 ? 'second' : total + 'th'} time (${trail}) — the first in GE history to be a centre ${times(total)}`);
+        else add('⭐', `เซ็นเตอร์จากเวที GE ครั้งที่ ${total} (${trail}) — ${ord(k)} ที่ทำได้ ต่อจาก ${nm(tonight[k - 2].id)} ซึ่งถูกประกาศชื่อก่อนในคืนเดียวกัน`,
+          `A GE centre for the ${total === 2 ? 'second' : total + 'th'} time (${trail}) — the ${ord(k)} to do it, after ${nm(tonight[k - 2].id)}, read out earlier the same night`);
+      } else add('⭐', `เซ็นเตอร์จากเวที GE ครั้งที่ ${total} (${trail})`, `A GE centre for the ${total === 2 ? 'second' : total + 'th'} time (${trail})`);
+    } else add('⭐', `เซ็นเตอร์ ${band.name} — เซ็นเตอร์จากเวที GE ครั้งแรกของเธอ`, `Centre of the ${band.name} — her first time as a GE centre`);
+  }
+  // 3 — the song
+  const bs = geBandSongs(GE_FINAL_ID);
+  if(band && bs[band.from]){
+    const got = bs[band.from], key = geSongKey(got.song[0]);
+    if(ci >= 0 && wish){
+      if(got.choice === 1){
+        add('🎵', `ได้เพลง ${song(got.song)} ซึ่งเป็นเพลงที่เลือกไว้เป็นอันดับ 1`, `Gets ${song(got.song)}, her first choice`);
+        // a centre below who wanted the same song
+        GE_CENTERS.filter(n => n > me.n).forEach(n => {
+          const o = byN[n], w = o && GE_WISH[o.id], k = w ? w.songs.findIndex(x => geSongKey(x[0]) === key) : -1, ob = GE_BANDS.find(b => b.from === n);
+          if(k >= 0 && bs[n] && bs[n].choice > k + 1) add('🤝', `${nm(o.id)} เซ็นเตอร์ ${ob.name} ก็เลือกเพลงนี้ไว้เป็นอันดับ ${k + 1} เช่นกัน แต่ ${m.name} อันดับสูงกว่าจึงได้สิทธิ์เลือกก่อน`,
+            `${nm(o.id)}, centre of the ${ob.name}, had it as choice ${k + 1} too — ${m.name} ranks higher and chooses first`),
+            add('📌', 'เป็นครั้งแรกของ GE ที่เพลงที่เซ็นเตอร์เลือกไว้ชนกัน', 'The first time in a GE that two centres wanted the same song', true);
+        });
+      } else {
+        const lost = wish.songs.slice(0, got.choice - 1).map(x => {
+          const n = GE_CENTERS.find(c => c < me.n && bs[c] && geSongKey(bs[c].song[0]) === geSongKey(x[0]));
+          return { x, n, who:n ? byN[n].id : null, b:n ? GE_BANDS.find(b => b.from === n) : null };
+        }).filter(l => l.who);
+        if(lost.length){
+          const l = lost[0];
+          add('🎵', `ได้เพลง ${song(got.song)} ซึ่งเป็นเพลงที่เลือกไว้เป็นอันดับ ${got.choice} — เพลงอันดับ 1 ของเธอคือ ${song(l.x)} ตรงกับเพลงอันดับ 1 ของ ${nm(l.who)} เซ็นเตอร์ ${l.b.name} ซึ่งอันดับสูงกว่าและได้สิทธิ์เลือกก่อน`,
+            `Gets ${song(got.song)}, her choice ${got.choice} — her first choice, ${song(l.x)}, was also the first choice of ${nm(l.who)}, centre of the ${l.b.name}, who ranks higher and chooses first`);
+          add('📌', 'เป็นครั้งแรกของ GE ที่เพลงที่เซ็นเตอร์เลือกไว้ชนกัน', 'The first time in a GE that two centres wanted the same song', true);
+        } else add('🎵', `ได้เพลง ${song(got.song)} ซึ่งเป็นเพลงที่เลือกไว้เป็นอันดับ ${got.choice}`, `Gets ${song(got.song)}, her choice ${got.choice}`);
+      }
+    } else {
+      const c = byN[band.from], k = wish ? wish.songs.findIndex(x => geSongKey(x[0]) === key) : -1;
+      add('🎵', `เพลงของ ${band.name} คือ ${song(got.song)} ที่ ${nm(c.id)} เซ็นเตอร์เป็นคนเลือก${k >= 0 ? ` — ตรงกับเพลงที่ ${m.name} เลือกไว้เป็นอันดับ ${k + 1} พอดี` : ''}`,
+        `The ${band.name} song is ${song(got.song)}, chosen by centre ${nm(c.id)}${k >= 0 ? ` — it was ${m.name}’s own choice ${k + 1} too` : ''}`);
+    }
+  }
+  // 4 — the aim she wrote down
+  const aim = wish ? geAim(wish) : null;
+  if(aim){
+    const hope = typeof wish.hope === 'number' ? t(`อันดับ ${wish.hope}`, `No. ${wish.hope}`) : t(' ', '') + String(wish.hope);
+    if(me.n >= aim[0] && me.n <= aim[1]) add('🎯', `ตั้งเป้าไว้ที่${hope} และทำได้ตามเป้า`, `Aimed for ${hope} — and got there`);
+    else if(me.n < aim[0]) add('🎯', `ตั้งเป้าไว้ที่${hope} แต่ทำได้ดีกว่าเป้าถึง ${aim[0] - me.n} อันดับ`, `Aimed for ${hope} and finished ${aim[0] - me.n} ${aim[0] - me.n === 1 ? 'place' : 'places'} better`);
+  }
+  // 5 — firsts and streaks
+  const inSen = p => p.band && p.band.name === 'Senbatsu';
+  if(band){
+    if(!past.length) add('🌱', 'มีชื่อติดอันดับ GE เป็นครั้งแรก', 'Ranked in a GE for the first time');
+    else {
+      if(band.name === 'Senbatsu' && !past.some(inSen)) add('🌟', 'ติด Senbatsu จากเวที GE เป็นครั้งแรก', 'In the GE Senbatsu for the first time');
+      if(me.n <= GE_KAMI7 && me.n > 1 && !past.some(p => p.n <= GE_KAMI7)) add('✨', 'ติด Kami 7 เป็นครั้งแรก', 'In the Kami 7 for the first time');
+      let run = 1; for(let i = GE_HISTORY.length - 1; i >= 0 && past.some(p => p.e === GE_HISTORY[i]); i--) run++;
+      let sen = band.name === 'Senbatsu' ? 1 : 0; if(sen) for(let i = GE_HISTORY.length - 1; i >= 0 && past.some(p => p.e === GE_HISTORY[i] && inSen(p)); i--) sen++;
+      if(sen >= 2) add('🔥', `ติด Senbatsu ${sen} ครั้งติดต่อกัน`, `${sen} GE Senbatsu in a row`);
+      else if(run >= 3) add('🔥', `ติดอันดับ GE ${run} ครั้งติดต่อกัน`, `Ranked in ${run} GEs in a row`);
+    }
+  }
+  // 6 — against her own past
+  if(past.length){
+    const best = Math.min(...past.map(p => p.n));
+    if(me.n < best && me.n !== 1) add('📈', `อันดับดีที่สุดของเธอตั้งแต่ลง GE มา (เดิมดีที่สุดคืออันดับ ${best})`, `Her best GE rank yet (it was No. ${best})`);
+    const last = past.find(p => p.e.n === 5);
+    if(last && me.n < last.n) add('⬆️', `ขึ้นมา ${last.n - me.n} อันดับจาก GE2025 (อันดับ ${last.n} → ${me.n})`, `Up ${last.n - me.n} ${last.n - me.n === 1 ? 'place' : 'places'} from GE2025 (No. ${last.n} → ${me.n})`);
+    const tk = past.filter(p => p.e.unit === 'tokens' && typeof p.v === 'number');
+    if(tk.length && me.v != null && me.v > Math.max(...tk.map(p => p.v))){
+      const x = last && last.v ? me.v / last.v : 0;
+      add('💎', `คะแนนสูงที่สุดเท่าที่เธอเคยได้ใน GE${x >= 1.5 ? ` — มากกว่า GE2025 ราว ${x.toFixed(1)} เท่า` : ''}`, `Her highest score yet${x >= 1.5 ? ` — about ${x.toFixed(1)}× her GE2025 score` : ''}`);
+    }
+  }
+  // 7 — her group and generation
+  const mates = field.map(x => ({ x, mm:getMember(x.id) })).filter(o => o.mm);
+  const g = getGroup(m.groupId) || {}, topG = mates.filter(o => o.mm.groupId === m.groupId).sort((a, b) => a.x.n - b.x.n)[0];
+  if(topG && topG.x.id === id && me.n !== 1) add('🏅', `อันดับสูงสุดของ ${g.name || ''} ในครั้งนี้`, `The highest-ranked ${g.name || ''} member this time`);
+  if(m.gen){
+    const gen = mates.filter(o => o.mm.groupId === m.groupId && o.mm.gen === m.gen).sort((a, b) => a.x.n - b.x.n);
+    if(gen.length >= 3 && gen[0].x.id === id && !(topG && topG.x.id === id))
+      add('🏅', `อันดับสูงสุดของ ${g.name || ''} รุ่น ${m.gen} (จาก ${gen.length} คนที่ลงสมัคร)`, `The highest-ranked of ${g.name || ''} generation ${m.gen} (${gen.length} candidates)`);
+  }
+  // 8 — the last stretch: ผลด่วน 2 → ผลสุดท้าย
+  const q2 = quick[1];
+  if(q2.full && band){
+    if(q2.n == null) add('🚀', 'ไม่อยู่ใน 36 อันดับของผลด่วน 2 แต่พลิกเข้ามาได้ในผลสุดท้าย', 'Outside the 36 at Preliminary 2 — and in at the Final Results');
+    else if(q2.n > me.n){
+      const s2 = geSlots('ge2026-q2'), climbs = field.filter(x => x.n <= GE_SEATS).map(x => { const k = Object.keys(s2).find(n => s2[n] && s2[n].id === x.id); return k ? +k - x.n : 0; });
+      const mx = Math.max(...climbs), d = q2.n - me.n;
+      add('🚀', `ขยับขึ้น ${d} อันดับจากผลด่วน 2 (อันดับ ${q2.n} → ${me.n})${d === mx && d >= 2 ? ' — มากที่สุดในช่วงโค้งสุดท้าย' : ''}`,
+        `Up ${d} ${d === 1 ? 'place' : 'places'} since Preliminary 2 (No. ${q2.n} → ${me.n})${d === mx && d >= 2 ? ' — the biggest climb of the last stretch' : ''}`);
+    }
+  }
+  // 9 — close calls
+  const up = byN[me.n - 1], dn = byN[me.n + 1];
+  if(me.v != null && up && up.v != null && up.v - me.v < me.v * 0.01)
+    add('⚡', `ห่างจากอันดับ ${up.n} (${nm(up.id)}) เพียง ${geVotes(Math.round((up.v - me.v) * 100) / 100)} คะแนน`, `Only ${geVotes(Math.round((up.v - me.v) * 100) / 100)} behind No. ${up.n} (${nm(up.id)})`);
+  if(me.v != null && dn && dn.v != null && me.v - dn.v < me.v * 0.01)
+    add('⚡', `นำอันดับ ${dn.n} (${nm(dn.id)}) เพียง ${geVotes(Math.round((me.v - dn.v) * 100) / 100)} คะแนน`, `Only ${geVotes(Math.round((me.v - dn.v) * 100) / 100)} ahead of No. ${dn.n} (${nm(dn.id)})`);
+  return out;
+}
+function openGeFact(id){
+  const m = getMember(id), d = m && geFactData(id); if(!d) return;
+  const en = isEN(), t = (th, e) => en ? e : th, { me, byN, band, past, quick, wish } = d;
+  const facts = geFactList(id, en);
+  const tone = band ? band.tone : 'rest';
+  const sum = (typeof GEC_FINAL === 'object' && GEC_FINAL.sum) || 0;
+  const share = sum && me.v != null ? (me.v / sum * 100) : null;
+  const up = byN[me.n - 1], dn = byN[me.n + 1], gf = x => geVotes(Math.round(x * 100) / 100);
+  const cell = (k, v, s) => `<div><small>${k}</small><b>${v}</b>${s ? `<em>${s}</em>` : ''}</div>`;
+  const cells = [
+    cell(t('คะแนน', 'Score'), me.v != null ? geVotes(me.v) : '—', 'Token'),
+    share != null ? cell(t('ส่วนแบ่งคะแนน', 'Share of all votes'), (share >= 10 ? share.toFixed(1) : share.toFixed(2)) + '%', t(`จาก ${geVotes(sum)}`, `of ${geVotes(sum)}`)) : '',
+    up && up.v != null && me.v != null ? cell(t(`ตามอันดับ ${up.n}`, `Behind No. ${up.n}`), '−' + gf(up.v - me.v), escapeHtml(getMember(up.id) ? getMember(up.id).name : '')) : (me.n === 1 && dn && dn.v != null ? cell(t('นำอันดับ 2', 'Ahead of No. 2'), '+' + gf(me.v - dn.v), escapeHtml(getMember(dn.id) ? getMember(dn.id).name : '')) : ''),
+    me.n !== 1 && dn && dn.v != null && me.v != null ? cell(t(`นำอันดับ ${dn.n}`, `Ahead of No. ${dn.n}`), '+' + gf(me.v - dn.v), escapeHtml(getMember(dn.id) ? getMember(dn.id).name : '')) : '',
+  ].filter(Boolean).join('');
+  // the three rounds of this election
+  const step = (label, n, v, now) => `<div class="gef-step${now ? ' is-now' : ''}"><small>${label}</small><b>${n != null ? n : '—'}</b><em>${n != null ? (v != null ? geVotes(v) : '') : t('นอก 36', 'outside 36')}</em></div>`;
+  const path = quick.some(q => q.full) ? `<h4>${t('เส้นทางใน GE2026', 'Through GE2026')}</h4><div class="gef-path">${
+    quick.filter(q => q.full).map(q => step(geRoundLabel(GE_ROUNDS.find(r => r.id === q.rid)), q.n, q.v)).join('<i>→</i>')}<i>→</i>${step(geRoundLabel(GE_ROUNDS[GE_ROUNDS.length - 1]), me.n, me.v, true)}</div>` : '';
+  // every election she was ranked in
+  const hrow = (name, n, bandName, v, unit, now) => `<div class="gef-hrow${now ? ' is-now' : ''}"><span>${name}</span><b>${t('อันดับ', 'No.')} ${n}</b><small>${bandName || ''}</small><em>${v != null ? geVotes(v) : '—'} <i>${unit}</i></em></div>`;
+  const hist = past.length ? `<h4>${t('เลือกตั้งที่ผ่านมา', 'Her elections')}</h4><div class="gef-hist">${
+    past.map(p => hrow(geElName(p.e, en), p.n, p.band ? p.band.name : '', p.v, p.e.unit === 'votes' ? t('โหวต', 'votes') : 'Token')).join('')}${
+    hrow('GE2026', me.n, band ? band.name : '', me.v, 'Token', true)}</div>
+    ${past.some(p => p.e.unit === 'votes') ? `<p class="gef-note">${t('GE ครั้งที่ 1–2 นับเป็นจำนวนโหวต ตั้งแต่ครั้งที่ 3 นับเป็น Token จึงเทียบคะแนนข้ามกันไม่ได้', 'GE1–2 counted votes and GE3 onward Token, so those scores cannot be compared.')}</p>` : ''}` : '';
+  // what she wrote on her form
+  const hope = wish ? (typeof wish.hope === 'number' ? t(`อันดับ ${wish.hope}`, `No. ${wish.hope}`) : String(wish.hope)) : '';
+  const got = band ? geBandSongs(GE_FINAL_ID)[band.from] : null;
+  const form = wish ? `<h4>${t('ที่เขียนไว้ตอนสมัคร', 'On her form')}</h4><div class="gef-form">
+      <p><small>${t('อันดับที่หวัง', 'Hoped for')}</small><b>${escapeHtml(hope)}</b></p>
+      <p><small>${t('เพลงที่อยากได้', 'Songs she wanted')}</small>${wish.songs.map((x, i) => `<span class="${got && geSongKey(got.song[0]) === geSongKey(x[0]) ? 'is-got' : ''}"><i>${i + 1}</i>${escapeHtml(x[0])} <em>(${escapeHtml(x[1])})</em></span>`).join('')}</p></div>` : '';
+  closeShareSheet();
+  const el = document.createElement('div');
+  el.className = 'share-sheet gef-sheet';
+  el.innerHTML = `<div class="share-back" data-share="close"></div>
+    <div class="share-panel gef is-${tone}" role="dialog" aria-label="${escapeHtml(m.name)} · GE2026">
+      <div class="share-head"><b>GE2026 · ${t('ผลสุดท้าย', 'Final Results')}</b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>
+      <div class="gef-top">${geFace(m, 'gef-face')}
+        <div class="gef-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small><span class="gef-band">${band ? band.name + (GE_CENTERS.includes(me.n) ? ' · Center' : me.n <= GE_KAMI7 ? ' · Kami 7' : '') : t('อันดับ 37–58', 'Ranks 37–58')}</span></div>
+        <div class="gef-rank"><small>${t('อันดับ', 'No.')}</small><b>${me.n}</b></div></div>
+      <div class="gef-cells">${cells}</div>
+      ${facts.length ? `<h4>${t('เกร็ดน่ารู้', 'Did you know')}</h4><ul class="gef-facts">${facts.map(f => `<li><i>${f.ico}</i><span>${escapeHtml(f.text)}</span></li>`).join('')}</ul>` : ''}
+      ${path}${hist}${form}
+      <button class="lay-row gef-go" data-action="open-member" data-id="${m.id}" data-gef="profile"><span><b>${t(`ดูโปรไฟล์ ${m.name}`, `${m.name}’s profile`)}</b></span><i>›</i></button>
+    </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  el.addEventListener('click', e => { if(e.target.closest('[data-share="close"]') || e.target.closest('[data-gef="profile"]')) closeShareSheet(); });
+}
+
 function renderGEResults(){
   const en = isEN();
   const rounds = state.geRounds || {};
@@ -15630,6 +15901,7 @@ function renderGEResults(){
   const prev = gePrevRanks(round.id);
   const told = geAnnounced(round.id);
   const top = Math.max(1, ...Object.values(slots).map(s => (s && s.v) || 0));
+  const factOn = round.id === GE_FINAL_ID && geFactReady();   // preview: a row opens her sheet of facts
   if(!_geSeen || _geSeen.__round !== round.id) _geSeen = null;
 
   const picks = `<div class="sub-tabs gel-rounds">${GE_ROUNDS.map(r => {
@@ -15725,7 +15997,7 @@ function renderGEResults(){
         <span class="gel-who"><b>${en ? 'Announcing…' : 'กำลังประกาศ…'}</b></span>
         <span class="gel-v${gapOf(n) ? ' is-gap' : ''}">${gapCell(mk, s, n)}</span>${bar}</div>`;
       const song = bandSongs[n];
-      return `<button class="gel-row${fresh}" data-action="open-member" data-id="${m.id}" data-hold="r${n}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
+      return `<button class="gel-row${fresh}" data-action="${factOn ? 'open-ge-fact' : 'open-member'}" data-id="${m.id}" data-hold="r${n}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
         <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small>${song ? `<small class="gel-song">${geSongLine(song, en)}</small>` : ''}</span>
         <span class="gel-v${gapOf(n) ? ' is-gap' : ''}">${gapCell(mk, s, n)}${geMove(prev, m.id, n)}</span>${bar}</button>`;
     };
@@ -15748,7 +16020,7 @@ function renderGEResults(){
   const rest = GE_REST[round.id] && told >= GE_SEATS ? `<section class="gel-band is-rest">
       <div class="gel-band-h">${en ? 'The rest of the field' : 'ผู้สมัครอันดับอื่น ๆ'}<small>${en ? 'Ranks 37–58' : 'อันดับ 37–58'}</small></div>
       <p class="gel-rest-note">${en ? 'Scores from iAM48’s own results page.' : 'คะแนนจากหน้าผลโหวตของแอป iAM48'}</p>
-      <div class="gel-rows">${GE_REST[round.id].map(([n, id, v]) => { const m = getMember(id); return m ? `<button class="gel-row" data-action="open-member" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
+      <div class="gel-rows">${GE_REST[round.id].map(([n, id, v]) => { const m = getMember(id); return m ? `<button class="gel-row" data-action="${factOn ? 'open-ge-fact' : 'open-member'}" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
         <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small></span><span class="gel-v">${geVotes(v)}</span><span class="gel-bar" style="width:${Math.min(100, v / top * 100)}%"></span></button>` : ''; }).join('')}</div></section>` : '';
   const out = `<div class="gel">${strip}${now}${picks}${shareBtn}${owner}${geChanges(round.id)}${gapSum}${gapSeg}<div class="gel-bands">${bands}${rest}</div>
     ${prev ? `<p class="gel-foot">${en ? 'Arrows compare with' : 'ลูกศรเทียบกับ'} ${geRoundLabel(GE_ROUNDS[GE_ROUNDS.findIndex(r => r.id === round.id) - 1])}</p>` : ''}
@@ -31797,6 +32069,7 @@ function bindDelegatedEvents(){
       state.geRound = el.dataset.value; _geSeen = null;
       renderMain();
     }
+    else if(action==='open-ge-fact'){ openGeFact(el.dataset.id); return; }
     else if(action==='ge-gap'){
       state.geGap = el.dataset.value;
       try{ localStorage.setItem('48thdb-ge-gap', state.geGap); }catch(e){}
