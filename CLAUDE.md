@@ -389,7 +389,9 @@ home page and in the calendar's day sheet, when the stream does.
 titles them (`SONG_MIX`); venue names in whatever language the poster uses, never
 translated. Everything else in Thai.
 
-**Senbatsu Round of the thank-you event** (a rota round with `ge:true`): lane = rank from the final results (`ge2026-final`), live: a lane says its rank until her name is entered, then her face pops in on every open sheet at once, without a redraw (`rotaLiveGe`; the listener compares `geFinalTopKey`).
+**Senbatsu Round of the thank-you event** (a rota round with `ge:true`): lane = rank from the final results (`ge2026-final`), live: it is also the last column of the Heart to Heart lane table, as on the poster (`laneTable` takes the `ge` round of the kind before it; its own row `.rt-only` shows only in the Senbatsu Round tab, `data-only`), and a lane says its rank until her name is entered, then her face pops in on every open sheet at once, without a redraw (`rotaLiveGe`; the listener compares `geFinalTopKey`).
+
+**GE2026 final count (14 Nov 2026).** The total voted is the official one, 1,672,642.55 GE6 (`GEC_FINAL.sum`): the 58 candidates' scores add up to 1,672,642.57 (the 36 in `ge2026-final`, the other 22 in `GE_REST`, from iAM48's own page, shown under the 36 once all are read out). The poll burned 1,672,643.55 after the close, one more — a vote 1 second past the close that the scoreboard does not count — shown on the supply card as its own row. The explorer's list of transfers is 76.20 short of the poll's balance, so the vote count and the charts come from the list and the totals from the balance. Taking the burn as the total was a mistake (13 Nov).
 
 **Election results.** The rounds are called **ผลด่วน 1 / ผลด่วน 2 / ผลสุดท้าย** —
 never "เบื้องต้น". A rank whose score is known but whose name is not says

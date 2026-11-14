@@ -4037,6 +4037,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-band.is-gold, .gel-now.is-gold{ --t:#B8862E; --t2:#E0B55A; }
   .gel-band.is-silver, .gel-now.is-silver{ --t:#76828E; --t2:#A9B4BE; }
   .gel-band.is-bronze, .gel-now.is-bronze{ --t:#9A5733; --t2:#C98A5E; }
+  .gel-band.is-rest{ --t:#6E6577; --t2:#9A92A3; }
+  .gel-rest-note{ margin:2px 4px 8px; font-size:11.5px; color:var(--ink-soft); }
   .gel-band-h{ display:flex; align-items:baseline; justify-content:space-between; padding:8px 12px; border-radius:12px;
     color:#fff; font-weight:800; font-size:14px; background:linear-gradient(90deg, var(--t), var(--t2)); }
   .gel-band-h small{ font-weight:600; font-size:12px; opacity:.92; }
@@ -8725,11 +8727,13 @@ const SEED_SCHEDULE = [
     venue:'MCC Hall, The Mall Lifestore Bangkapi', groups:['bnk48','cgm48'], timeline:'ge2026',
     related:['ev-election-results','ev-concert-2026'],
     poster:{ accent:'#B8913F', surface:'#F7F2E6', ink:'#3A2A10', img:'posters/ge6-heart-main.jpg', w:2000, h:1334, th:'Heart to Heart', en:'Heart to Heart',
-      more:[{ img:'posters/ge6-heart-rounds.jpg', w:2000, h:1500, th:'ตารางรอบและเลน', en:'Round table' },
+      more:[{ img:'posters/ge6-heart-wawa.jpg', w:1500, h:1500, th:'ประกาศ: Wawa ไม่สามารถเข้าร่วมงาน', en:'Announcement: Wawa cannot attend' },
+        { img:'posters/ge6-heart-rounds-2.jpg', w:2000, h:1500, th:'ตารางรอบและเลน (ฉบับปรับปรุง)', en:'Round table (updated)' },
         { img:'posters/ge6-heart-letter.jpg', w:1500, h:1500, th:'Letter Set และ Heart to Heart Event', en:'Letter Set & Heart to Heart Event' },
         { img:'posters/ge6-heart-rules.jpg', w:1500, h:1500, th:'Appreciation Event และกติกา', en:'Appreciation Event & rules' },
-        { img:'posters/ge6-heart-hachicha.jpg', w:1500, h:1500, th:'ตาราง Hachi Cha และ Merchandise', en:'Hachi Cha & Merchandise schedule' }] },
-    info:['งานขอบคุณแฟน ๆ หลังประกาศผลการเลือกตั้ง Senbatsu General Election 2026 มีสองกิจกรรม: Appreciation Event (รอบ 1–5) และ Heart to Heart Event (รอบ 6–10) ปิดท้ายด้วย Senbatsu Round',
+        { img:'posters/ge6-heart-hachicha-2.jpg', w:1500, h:1500, th:'ตาราง Hachi Cha และ Merchandise (ฉบับปรับปรุง)', en:'Hachi Cha & Merchandise schedule (updated)' }] },
+    info:['ประกาศ: Wawa BNK48 ไม่สามารถเข้าร่วมงานได้เนื่องจากปัญหาสุขภาพ ภายในงานยังมีกล่องรับ Letter Set ของ Wawa ส่งจดหมายให้กำลังใจได้ (ผู้จัดขออภัยในการเปลี่ยนแปลงอย่างกะทันหัน)',
+      'งานขอบคุณแฟน ๆ หลังประกาศผลการเลือกตั้ง Senbatsu General Election 2026 มีสองกิจกรรม: Appreciation Event (รอบ 1–5) และ Heart to Heart Event (รอบ 6–10) ปิดท้ายด้วย Senbatsu Round',
       'Appreciation Event: ไม่ต้องใช้บัตร ไม่มีค่าใช้จ่าย ส่งกำลังใจและรับคำขอบคุณจากเมมเบอร์ในเวลาสั้น ๆ',
       'Heart to Heart Event: ใช้ Letter Set เลือกได้ว่าจะส่งกำลังใจ (เขียนข้อความลง Postcard ให้เสร็จก่อนเข้าเลน แล้วมอบให้เมมเบอร์) หรือรับคำขอบคุณ (นำ Postcard เปล่าเข้าไป เมมเบอร์จะปั๊มตราขอบคุณที่ออกแบบเองและเขียนชื่อเล่นให้)',
       'Letter Set 250 บาท จำกัด 5 ชุด/Order/คน ได้รับเป็น Benefit จากการซื้อบัตร Senbatsu General Election 2026 Zone A–C และมีขายในวันงานที่จุด Official Merchandise',
@@ -8741,19 +8745,19 @@ const SEED_SCHEDULE = [
       '11:00–19:30 บูธ Official Merchandise และ Hachi Cha (ตารางเมมเบอร์ด้านล่าง)',
       '15:30–20:30 Heart to Heart Event รอบ 6–10 (ใช้ Letter Set)',
       '20:45–21:15 Senbatsu Round: อันดับ 1–12 อยู่เลน 1–12 ตามอันดับ'],
-    members:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon','bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail','bnk-wawa','bnk-fame','cgm-kwan','cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin','bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing','bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'],
+    members:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon','bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail','bnk-fame','cgm-kwan','cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin','bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing','bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'],
     rota:{ day:'2026-11-15', head:'ตารางรอบและเลน', where:'MCC Hall', lanes:true,
       kinds:[{ k:'ap', th:'Appreciation', en:'Appreciation', c:'#3E8E4F' }, { k:'hh', th:'Heart to Heart', en:'Heart to Heart', c:'#B8913F' }, { k:'sb', th:'Senbatsu Round', en:'Senbatsu Round', c:'#C0392B' },
         { k:'hc', th:'Hachi Cha', en:'Hachi Cha', c:'#2E8C82', nolane:true, note:['สลับฝั่งทุก 30 นาที', 'sides swap every 30 min'] },
         { k:'mc', th:'Merchandise', en:'Merchandise', c:'#7A5BB8', nolane:true, note:['สลับฝั่งทุก 30 นาที', 'sides swap every 30 min'] }],
       rounds:[
       { k:'ap', n:1, a:'10:30', b:'11:15', ids:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon'] },
-      { k:'ap', n:2, a:'11:30', b:'12:15', ids:['bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail',null,'bnk-wawa','bnk-fame','cgm-kwan'] },
+      { k:'ap', n:2, a:'11:30', b:'12:15', ids:['bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail',null,null,'bnk-fame','cgm-kwan'] },
       { k:'ap', n:3, a:'12:30', b:'13:15', ids:['cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin'] },
       { k:'ap', n:4, a:'13:30', b:'14:15', ids:[null,'bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing'] },
       { k:'ap', n:5, a:'14:30', b:'15:15', ids:['bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'] },
       { k:'hh', n:6, a:'15:30', b:'16:30', ids:['bnk-berry','bnk-patt','cgm-else','bnk-inkcha','cgm-lingling','bnk-micha','bnk-monet','bnk-palmmy','bnk-neen','bnk-saonoi','bnk-emmy','bnk-cartoon'] },
-      { k:'hh', n:7, a:'16:30', b:'17:30', ids:['bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail',null,'bnk-wawa',null,'cgm-kwan'] },
+      { k:'hh', n:7, a:'16:30', b:'17:30', ids:['bnk-arlee','bnk-niya','bnk-galeya','cgm-nisha','bnk-grape','bnk-proud','bnk-luksorn','bnk-mail',null,null,null,'cgm-kwan'] },
       { k:'hh', n:8, a:'17:30', b:'18:30', ids:['cgm-emma','bnk-hoop','cgm-praifa','bnk-sindy','cgm-shenae','cgm-valentine','cgm-chifa','bnk-jew','bnk-khowjow','cgm-nana','bnk-l','bnk-mirin'] },
       { k:'hh', n:9, a:'18:30', b:'19:30', ids:['bnk-fame','bnk-khaimook','bnk-mint','cgm-satangpound','cgm-tara','bnk-mayji','cgm-lewlew','bnk-nall','cgm-lookked','bnk-marine','cgm-prae','cgm-jingjing'] },
       { k:'hh', n:10, a:'19:30', b:'20:30', ids:['bnk-yoghurt','cgm-hongyok','bnk-nammonn','bnk-pancake','bnk-blythe','bnk-praew','bnk-janry','bnk-rose','cgm-namphet','cgm-ginna','cgm-punpon','cgm-ploen'] },
@@ -8763,13 +8767,13 @@ const SEED_SCHEDULE = [
       { k:'hc', n:2, a:'12:30', b:'13:30', ids:['cgm-nisha','cgm-kwan','cgm-else','bnk-niya','bnk-galeya'] },
       { k:'mc', n:2, a:'12:30', b:'13:30', ids:['bnk-patt','bnk-inkcha','bnk-micha','bnk-monet','bnk-emmy'] },
       { k:'hc', n:3, a:'14:00', b:'15:00', ids:['cgm-lingling','bnk-neen','cgm-nana','cgm-shenae'] },
-      { k:'mc', n:3, a:'14:00', b:'15:00', ids:['bnk-palmmy','bnk-wawa','bnk-cartoon','bnk-arlee','bnk-luksorn'] },
+      { k:'mc', n:3, a:'14:00', b:'15:00', ids:['bnk-palmmy','bnk-cartoon','bnk-arlee','bnk-luksorn'] },
       { k:'hc', n:4, a:'15:30', b:'16:30', ids:['bnk-yoghurt','bnk-marine','bnk-blythe','bnk-praew','bnk-nall'] },
       { k:'mc', n:4, a:'15:30', b:'16:30', ids:['bnk-pancake','bnk-rose','bnk-hoop','bnk-janry','bnk-mayji'] },
-      { k:'hc', n:5, a:'17:00', b:'18:00', ids:['cgm-jingjing','cgm-lookked','cgm-lewlew','cgm-tara','bnk-fame'] },
-      { k:'mc', n:5, a:'17:00', b:'18:00', ids:['cgm-hongyok','cgm-namphet','cgm-ginna','cgm-ploen','cgm-punpon','cgm-prae'] },
-      { k:'hc', n:6, a:'18:30', b:'19:30', ids:['bnk-mail','cgm-satangpound','bnk-grape','bnk-berry'] },
-      { k:'mc', n:6, a:'18:30', b:'19:30', ids:['bnk-nammonn','bnk-khaimook','bnk-saonoi','bnk-proud'] },
+      { k:'hc', n:5, a:'17:00', b:'18:00', ids:['cgm-jingjing','cgm-lookked','cgm-lewlew','cgm-tara','bnk-fame','cgm-satangpound'] },
+      { k:'mc', n:5, a:'17:00', b:'18:00', ids:['cgm-hongyok','cgm-namphet','cgm-ginna','cgm-ploen','cgm-punpon','cgm-prae','bnk-khaimook'] },
+      { k:'hc', n:6, a:'18:30', b:'19:30', ids:['bnk-mail','bnk-grape','bnk-berry'] },
+      { k:'mc', n:6, a:'18:30', b:'19:30', ids:['bnk-nammonn','bnk-saonoi','bnk-proud'] },
       ] } },
   { id:'ev-mbk-haunted-graveyard-1026', start:'2026-10-26', end:'2026-10-29', time:'16:00', until:'19:30',
     title:'THE HAUNTED GRAVEYARD',
@@ -10577,6 +10581,7 @@ const EN = {
   'Commentator · ไลฟ์วิเคราะห์ผล': 'Commentators · live commentary',
   'ถ่ายทอดสดทาง YouTube BNK48 Official 14 พ.ย. 18:00 น.': 'Live on YouTube BNK48 Official, 14 Nov 18:00',
   'ไลฟ์วิเคราะห์ผลกับ Orn, Tarwaan, Nenie และ Angel ในแอป iAM48 14 พ.ย. 18:00 น. (เฉพาะสมาชิกที่สมัครแพ็กเกจ)': 'Live commentary with Orn, Tarwaan, Nenie and Angel in the iAM48 app, 14 Nov 18:00 (subscribers only)',
+  'ประกาศ: Wawa BNK48 ไม่สามารถเข้าร่วมงานได้เนื่องจากปัญหาสุขภาพ ภายในงานยังมีกล่องรับ Letter Set ของ Wawa ส่งจดหมายให้กำลังใจได้ (ผู้จัดขออภัยในการเปลี่ยนแปลงอย่างกะทันหัน)': 'Announcement: Wawa (BNK48) cannot take part because of her health. A box for Wawa’s Letter Set stays at the event, so you can still send her a letter of support. (The organiser apologises for the sudden change.)',
   'ประตูเปิด 17:00 น. · เริ่มงาน 18:00 น.': 'Doors open 17:00 · starts 18:00',
   'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpop.me': 'Tickets on sale 15 Oct 2026 12:00 at eventpop.me',
   'ผังที่นั่งและราคาบัตร': 'Seat plan and prices',
@@ -15097,6 +15102,14 @@ const GE_BANDS = [
   { name:'Next Girls',  from:25, to:36, tone:'bronze' },
 ];
 const GE_SEATS = 36;
+/* Below the line: the other 22 of the 58 candidates, from iAM48's own results page ("Major vote", 14 Nov 2026), shown under the 36 once the final
+   round is read out in full. [rank, member id, score] */
+const GE_REST = { 'ge2026-final':[
+  [37,'cgm-shenae',11722.304],[38,'cgm-lewlew',10685.2324],[39,'bnk-mint',10041.867],[40,'cgm-kwan',9555.727],[41,'bnk-cartoon',8830.777],
+  [42,'bnk-mail',4861.857],[43,'cgm-else',4712.2769],[44,'bnk-berry',3136.857],[45,'cgm-praifa',3129.3172],[46,'bnk-khaimook',3071.6171],
+  [47,'cgm-valentine',2926.277],[48,'bnk-mirin',2924.157],[49,'bnk-proud',2906.994],[50,'bnk-mayji',2877.944],[51,'cgm-namphet',1745.707],
+  [52,'bnk-inkcha',1668.757],[53,'cgm-punpon',1604.767],[54,'cgm-satangpound',1487.702],[55,'cgm-hongyok',1416.572],[56,'cgm-ginna',1241.587],
+  [57,'cgm-tara',1015.577],[58,'cgm-chifa',960.907]] };
 /* The five elections before GE2026, final results. Ranks and votes from the
    AKB48 fan wiki and Wiki48 (the two agree), each name checked against the
    line-up of the single it decided: Senbatsu = the A-side, then one band per
@@ -15731,7 +15744,13 @@ function renderGEResults(){
   const owner = geCanEnter() ? `<div class="gel-owner-row"><button class="chip chip-link gel-owner" data-action="nav" data-view="gelive">${en ? 'Enter results →' : 'กรอกผล →'}</button>
 </div>` : '';
   const shareBtn = told ? `<button class="chip chip-link gel-share" data-action="share-geres" data-value="${round.id}">${ICONS.share}<span>${en ? 'Share the results as a picture' : 'แชร์ภาพสรุปผล'}</span></button>` : '';
-  const out = `<div class="gel">${strip}${now}${picks}${shareBtn}${owner}${geChanges(round.id)}${gapSum}${gapSeg}<div class="gel-bands">${bands}</div>
+  // the rest of the field, once all 36 are read out: rank, face, name and score, the bar scaled to the same top score
+  const rest = GE_REST[round.id] && told >= GE_SEATS ? `<section class="gel-band is-rest">
+      <div class="gel-band-h">${en ? 'The rest of the field' : 'ผู้สมัครอันดับอื่น ๆ'}<small>${en ? 'Ranks 37–58' : 'อันดับ 37–58'}</small></div>
+      <p class="gel-rest-note">${en ? 'Scores from iAM48’s own results page.' : 'คะแนนจากหน้าผลโหวตของแอป iAM48'}</p>
+      <div class="gel-rows">${GE_REST[round.id].map(([n, id, v]) => { const m = getMember(id); return m ? `<button class="gel-row" data-action="open-member" data-id="${m.id}"><span class="gel-n">${n}</span>${geFace(m, 'gel-face')}
+        <span class="gel-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small></span><span class="gel-v">${geVotes(v)}</span><span class="gel-bar" style="width:${Math.min(100, v / top * 100)}%"></span></button>` : ''; }).join('')}</div></section>` : '';
+  const out = `<div class="gel">${strip}${now}${picks}${shareBtn}${owner}${geChanges(round.id)}${gapSum}${gapSeg}<div class="gel-bands">${bands}${rest}</div>
     ${prev ? `<p class="gel-foot">${en ? 'Arrows compare with' : 'ลูกศรเทียบกับ'} ${geRoundLabel(GE_ROUNDS[GE_ROUNDS.findIndex(r => r.id === round.id) - 1])}</p>` : ''}
     ${renderGEHistory(en)}</div>`;
   geRemember(round.id);
@@ -16235,9 +16254,12 @@ const gecClosed = () => Date.now() > gecMs(GEC_POLLS.ge2026, GEC_POLLS.ge2026.en
 /* The final count, from the chain's own balance of the poll (balanceOf, as the explorer shows it on the poll's page), read after the
    close on 12 Nov 2026. The list of transfers the explorer hands out is short of it by 76.20 GE6 (a few votes it never listed, the 0.05
    among them), so once the vote is closed this figure is the total; the charts by hour and day still come from the listed votes. */
-/* After the close the poll sent everything it held to the burn address in one transfer (block 50,696,843, tx 0x7eb8e559…):
-   1,672,643.55 GE6. That burn is the vote's own final figure and is used as the total. */
-const GEC_FINAL = { sum:1672643.55, listed:1672566.35, burnBlock:50696843 };
+/* The final count is the official one: the scores of all 58 candidates add up to 1,672,642.57 (the posters' 36 and iAM48's other 22, 14 Nov
+   2026), the poll's balance the explorer showed after the close was exactly 1,672,642.55, and that is the total. After the close the poll
+   sent everything it held to the burn address in one transfer (block 50,696,843, tx 0x7eb8e559…): 1,672,643.55, one token more — a vote
+   of 1 GE6 at 21:00:01 (the last transfer into the poll, 14:00:01 UTC), a second past the close, which the scoreboard does not count.
+   (A first version of this took the burn as the total, 13 Nov: off by that one token.) */
+const GEC_FINAL = { sum:1672642.55, listed:1672566.35, burnBlock:50696843, burned:1672643.55 };
 const gecFinal = x => gecClosed() ? GEC_FINAL.sum : x;
 const gecPc = v => (v * 100).toFixed(v < .1 ? 1 : 0) + '%';
 const gecHM = ms => { const t = new Date(Math.round(ms / 60000) * 60000); return `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`; };
@@ -16725,7 +16747,7 @@ function gecSupplyCard(en, N, pc){
   ];
   // the poll's own burn after the close is the vote itself (counted in 'Voted'); only a burn beyond it is shown apart
   const burntElse = gecClosed() ? Math.max(0, t.burnt - GEC_FINAL.sum) : t.burnt;
-  if(burntElse > 1e-6) parts.push(['is-burnt', en ? 'Burnt' : 'เผาแล้ว', burntElse]);
+  if(burntElse > 1e-6) parts.push(['is-burnt', gecClosed() ? (en ? 'Burnt · voted after the close' : 'เผาแล้ว · โหวตหลังเวลาปิด') : (en ? 'Burnt' : 'เผาแล้ว'), burntElse]);
   const sold = buyers + voted;
   const chanList = chans.map(a => [a, t.chan[a], Math.max(0, t.bal[a] || 0)]).sort((x, y) => y[1][0] - x[1][0]);
   return `<div class="gea-card" data-gshare="supply"><h3 class="gec-h">${en ? 'Where all the GE6 is' : 'โทเคน GE6 ทั้งหมดอยู่ที่ไหน'}</h3>
@@ -16866,8 +16888,8 @@ function renderGEChain(){
       </div>
       <p class="gec-fin-next">${en ? 'Results are read out on <b>14 Nov 2026, 18:00</b> at MCC Hall, The Mall Lifestore Bangkapi.' : 'ประกาศผล <b>14 พ.ย. 2026 เวลา 18:00 น.</b> ที่ MCC Hall, The Mall Lifestore Bangkapi'}
         <button class="chip chip-link" data-action="open-event" data-id="ev-election-results">${en ? 'Results night' : 'ดูงานประกาศผล'}</button></p>
-      <p class="gec-sub">${en ? `The total is what the poll held when voting closed: right after, it sent all of it to the burn address in one transfer (block ${GEC_FINAL.burnBlock.toLocaleString('en-US')}), so those tokens can never be used again. The explorer’s list of votes adds up to ${gecTok(GEC_FINAL.listed)}, ${gecTok(GEC_FINAL.sum - GEC_FINAL.listed)} short (a few votes it never listed), so the vote count and the charts below come from that list. The chain shows how much was voted, not for whom: that is for the results night.`
-        : `ยอดรวมคือโทเคนทั้งหมดในสัญญาโหวตตอนปิดโหวต ซึ่งหลังปิดโหวตถูกส่งไปเผาทิ้งทั้งก้อนในรายการเดียว (บล็อก ${GEC_FINAL.burnBlock.toLocaleString('en-US')}) ใช้ซ้ำไม่ได้อีก · รายการโหวตที่ตัวสำรวจเชนให้มารวมได้ ${gecTok(GEC_FINAL.listed)} ขาดไป ${gecTok(GEC_FINAL.sum - GEC_FINAL.listed)} (มีบางรายการที่ตัวสำรวจไม่ได้ส่งมา) จำนวนครั้งและกราฟด้านล่างจึงนับจากรายการที่มี · บล็อกเชนบอกได้ว่าโหวตไปเท่าไร ไม่ได้บอกว่าโหวตให้ใคร ผลรายคนรอฟังวันประกาศผล`}</p>
+      <p class="gec-sub">${en ? `The total is the official count: the scores of all 58 candidates add up to it, and it is what the poll held when voting closed. Right after, the poll sent everything it held to the burn address in one transfer (block ${GEC_FINAL.burnBlock.toLocaleString('en-US')}), so those tokens can never be used again; that transfer is ${gecTok(GEC_FINAL.burned - GEC_FINAL.sum)} more, a vote that came in a second after the close and is not in the scoreboard. The explorer’s list of votes adds up to ${gecTok(GEC_FINAL.listed)}, ${gecTok(GEC_FINAL.sum - GEC_FINAL.listed)} short (a few votes it never listed), so the vote count and the charts below come from that list.`
+        : `ยอดรวมคือคะแนนทางการ รวมคะแนนทั้ง 58 อันดับได้เท่านี้ และเป็นโทเคนที่อยู่ในสัญญาโหวตตอนปิดโหวต หลังปิดโหวตสัญญาส่งโทเคนทั้งหมดที่ถืออยู่ไปเผาทิ้งในรายการเดียว (บล็อก ${GEC_FINAL.burnBlock.toLocaleString('en-US')}) ใช้ซ้ำไม่ได้อีก รายการเผามากกว่ายอดนี้ ${gecTok(GEC_FINAL.burned - GEC_FINAL.sum)} โทเคน เป็นโหวตที่เข้ามาหลังเวลาปิดหนึ่งวินาที ซึ่งไม่อยู่ในคะแนนทางการ · รายการโหวตที่ตัวสำรวจเชนให้มารวมได้ ${gecTok(GEC_FINAL.listed)} ขาดไป ${gecTok(GEC_FINAL.sum - GEC_FINAL.listed)} (มีบางรายการที่ตัวสำรวจไม่ได้ส่งมา) จำนวนครั้งและกราฟด้านล่างจึงนับจากรายการที่มี`}</p>
     </div>`;
   }
   // the same in baht, at the price per token the owner keeps up to date
@@ -19405,7 +19427,7 @@ const rotaTile = id => { const m = getMember(id); if(!m) return ''; const g = ge
 // the rows for the picked day and tab; โอชิฉัน keeps the same page and dims everyone but the reader's oshi
 const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.day; let n = 0;
   root.classList.toggle('is-oshi-only', k === 'oshi');
-  root.querySelectorAll('.rt-row').forEach(r => { const on = (!d || r.dataset.d === d) && (k === 'all' || r.dataset.k === k || (k === 'oshi' && r.dataset.oshi === '1')); r.hidden = !on; if(on) n++; });
+  root.querySelectorAll('.rt-row').forEach(r => { const on = (!d || r.dataset.d === d) && (!r.dataset.only || r.dataset.only === k) && (k === 'all' || r.dataset.k === k || (k === 'oshi' && r.dataset.oshi === '1')); r.hidden = !on; if(on) n++; });
   const none = root.querySelector('.rt-none'); if(none) none.hidden = !(k === 'oshi' && !n); };
 // a table cell of a lanes rota: small photo, name under it
 const rotaCell = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
@@ -19452,24 +19474,28 @@ function renderRota(ev){
   const laneTile = (r, id, i) => !R.lanes || kind(r.k).nolane ? tile(id) : id ? tile(id).replace('<span data-noloc>', `<i class="rt-lane">${i + 1}</i><span data-noloc>`) : `<span class="rt-f rt-gap${r.ge ? ' is-rank' : ''}"><i class="rt-lane">${i + 1}</i>${r.ge ? `<span>${en ? `Rank ${i + 1}` : `อันดับ ${i + 1}`}</span>` : ''}</span>`;
   const hasOshi = ids => ids.some(i => mine.includes(i)) ? 1 : 0;
   const roundRow = r => { const K = kind(r.k), D = dayOf(r), { done, on } = stateOf(r);
-    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}" data-d="${D}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${hasOshi(r.ids)}"${r.ge ? ' data-ge="1"' : ''} style="--b:${K.c}">
+    return `<div class="rt-row${done ? ' is-done' : ''}${on ? ' is-now' : ''}${r.ge ? ' rt-only' : ''}" data-d="${D}" data-from="${at(r.a, D)}" data-to="${at(r.b, D)}" data-k="${r.k}" data-oshi="${hasOshi(r.ids)}"${r.ge ? ' data-ge="1" data-only="sb"' : ''} style="--b:${K.c}">
       <div class="rt-h"><b>${r.a}–${r.b}</b><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><small>${r.ge ? (en ? 'Lane = final rank' : 'เลนตามอันดับผลสุดท้าย') : `${en ? 'Round' : 'รอบที่'} ${r.n}${K.note ? ` · ${escapeHtml(en ? K.note[1] : K.note[0])}` : ''}`}</small><em></em></div>
       <div class="rt-g">${r.ids.map((id, i) => laneTile(r, id, i)).join('')}</div></div>`; };
   // a lanes rota reads as a table: a row for each lane, a column for each round of a kind (the owner, 9 Nov: the rows of big tiles were bulky)
   const laneTable = list => { const K = kind(list[0].k), D = dayOf(list[0]), n = Math.max(...list.map(r => r.ids.length));
     const cls = r => { const { done, on } = stateOf(r); return done ? ' class="is-done"' : on ? ' class="is-now"' : ''; };
-    return `<div class="rt-row rt-tbl" data-d="${D}" data-k="${list[0].k}" data-oshi="${hasOshi(list.flatMap(r => r.ids))}" style="--b:${K.c}">
+    // the Senbatsu round is the last column of the table before it, as on the poster (its lane is the rank), and the table follows the live results
+    const ge = list.some(r => r.ge);
+    return `<div class="rt-row rt-tbl" data-d="${D}" data-k="${list[0].k}" data-oshi="${hasOshi(list.flatMap(r => r.ids))}"${ge ? ' data-ge="1"' : ''} style="--b:${K.c}">
       <div class="rt-h"><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><em></em></div>
-      <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Lane' : 'เลน'}</th>${list.map(r => `<th${cls(r)}${stateOf(r).on ? ` style="--p:${((now - at(r.a, D)) / (at(r.b, D) - at(r.a, D))).toFixed(3)}"` : ''} data-from="${at(r.a, D)}" data-to="${at(r.b, D)}"><small>${en ? 'R' : 'รอบ'} ${r.n}</small><b>${r.a}</b><small>–${r.b}</small></th>`).join('')}</tr></thead>
+      <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Lane' : 'เลน'}</th>${list.map(r => `<th${cls(r)}${stateOf(r).on ? ` style="--p:${((now - at(r.a, D)) / (at(r.b, D) - at(r.a, D))).toFixed(3)}"` : ''} data-from="${at(r.a, D)}" data-to="${at(r.b, D)}"><small>${r.ge ? 'Senbatsu' : `${en ? 'R' : 'รอบ'} ${r.n}`}</small><b>${r.a}</b><small>–${r.b}</small></th>`).join('')}</tr></thead>
       <tbody>${Array.from({ length:n }, (_, i) => `<tr style="--r:${i}"><th class="rt-ln">${i + 1}</th>${list.map((r, c) => `<td${cls(r)} style="--i:${c}">${r.ids[i] ? rotaCell(r.ids[i]) : '<span class="rt-empty">–</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
   const seen = new Set();
-  const rows = rounds.map(r => { if(!R.lanes || r.ge || kind(r.k).nolane) return roundRow(r);   // a booth has no lanes: its rounds are rows of faces
+  // a `ge` round joins the table of the kind that comes just before it
+  const geOf = r => { const i = rounds.indexOf(r); for(let j = i - 1; j >= 0; j--) if(!rounds[j].ge) return rounds[j]; return null; };
+  const rows = rounds.map(r => { if(!R.lanes || kind(r.k).nolane || r.ge) return roundRow(r);   // a booth has no lanes: its rounds are rows of faces; the Senbatsu round also stands alone, for its own tab
     const key = dayOf(r) + '|' + r.k; if(seen.has(key)) return ''; seen.add(key);
-    return laneTable(rounds.filter(x => !x.ge && dayOf(x) + '|' + x.k === key)); }).join('');
+    return laneTable(rounds.filter(x => !x.ge && dayOf(x) + '|' + x.k === key).concat(R.lanes ? rounds.filter(x => x.ge && geOf(x) && dayOf(geOf(x)) + '|' + geOf(x).k === key) : [])); }).join('');
   const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   const dayPills = days.length > 1 ? `<div class="rt-days" role="tablist">${days.map(d => { const x = parseYmd(d); return `<button class="rt-day${d === pick ? ' on' : ''}" data-action="rota-day" data-id="${d}"><small>${WD[x.getDay()]}</small>${x.getDate()} ${M[x.getMonth()]}</button>`; }).join('')}</div>` : '';
   const tab = (k, label, c) => `<button class="rt-tab${k === 'all' ? ' on' : ''}" data-action="rota-tab" data-id="${k}"${c ? ` style="--b:${c}"` : ''}>${label}</button>`;
-  const rowsHtml = rows.replace(/<div class="rt-row([^"]*)" data-d="([^"]+)"/g, (m, c, d) => d === pick ? m : `<div class="rt-row${c}" hidden data-d="${d}"`);
+  const rowsHtml = rows.replace(/<div class="rt-row([^"]*)" data-d="([^"]+)"/g, (m, c, d) => d === pick && !/\brt-only\b/.test(c) ? m : `<div class="rt-row${c}" hidden data-d="${d}"`);   // the Senbatsu round's own row is for its own tab
   return `<h3 class="evm-head">${en ? 'Member schedule' : R.head}${R.where ? ` <small class="rt-where">${escapeHtml(R.where)}</small>` : ''}</h3>
     <div class="rt-box" data-rota data-day="${pick}">
       ${dayPills}
@@ -19485,8 +19511,10 @@ function rotaLiveGe(){
   const box = document.createElement('div'); box.innerHTML = renderRota(ev);
   const fresh = box.querySelectorAll('.rt-row[data-ge]');
   root.querySelectorAll('.rt-row[data-ge]').forEach((old, i) => { const n = fresh[i]; if(!n) return;
-    const had = new Set([...old.querySelectorAll('.rt-f[data-id]')].map(x => x.dataset.id));
-    n.querySelectorAll('.rt-f[data-id]').forEach(x => { if(!had.has(x.dataset.id)) x.classList.add('rt-new'); if(root.dataset.hl && x.dataset.id === root.dataset.hl) x.classList.add('hl'); });
+    // in a table only its last column (the Senbatsu round) is news; the same faces stand in its other columns already
+    const cells = el => el.classList.contains('rt-tbl') ? '.rt-t td:last-child .rt-c[data-id]' : '.rt-f[data-id]';
+    const had = new Set([...old.querySelectorAll(cells(old))].map(x => x.dataset.id));
+    n.querySelectorAll(cells(n)).forEach(x => { if(!had.has(x.dataset.id)) x.classList.add('rt-new'); if(root.dataset.hl && x.dataset.id === root.dataset.hl) x.classList.add('hl'); });
     const a = old.querySelector('em'), b = n.querySelector('em'); if(a && b) b.textContent = a.textContent;
     old.replaceWith(n); });
   rotaShow(root);
