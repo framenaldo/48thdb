@@ -11620,6 +11620,19 @@ async function loadMembers(){
 /* Only the owner may change the shared member list; the Firestore rules say
    who that is and let only them read the admin collection. So a read that
    succeeds is the proof — the answer never lives in this public page. */
+/* A helper who types the results in on the night, for a while only (the owner's word, 14 Nov 2026: until 01:00 on 15 Nov,
+   Thai time). Her address is kept as a SHA-256 hash so it is not printed in the page. This only shows her the results desk;
+   what lets her save is the Firestore rule on ge/ge2026-*, which checks the address and the hour on Google's side. */
+const GE_HELPERS = [{ h:'4d74eb36dcaab9a285622733be33fd713951462b387ca214d0ffc245497c1dea', until:Date.UTC(2026, 10, 14, 18) }];
+async function checkGEHelper(){
+  const u = fbAuth.currentUser;
+  if(!u || u.isAnonymous || !u.email || !u.emailVerified || !crypto.subtle) return false;
+  const live = GE_HELPERS.filter(x => Date.now() < x.until); if(!live.length) return false;
+  try{ const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(u.email.trim().toLowerCase()));
+    const hex = [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
+    return live.some(x => x.h === hex); }catch(e){ return false; }
+}
+const geCanEnter = () => state.isOwner || (state.geHelper && GE_HELPERS.some(x => Date.now() < x.until));
 async function checkOwner(){
   const u = fbAuth.currentUser;
   if(!u || u.isAnonymous) return false;
@@ -15019,7 +15032,7 @@ function renderGEPage(){
   </div>`;
 
   // the results tab appears once there is something in it (always for the owner)
-  const hasResults = state.isOwner || GE_ROUNDS.some(r => geHasData(r.id) || ((state.geRounds || {})[r.id] || {}).live);
+  const hasResults = geCanEnter() || GE_ROUNDS.some(r => geHasData(r.id) || ((state.geRounds || {})[r.id] || {}).live);
   const liveRound = geLiveRound();
   const tabs = `<div class="sub-tabs ge-tabs">${[['overview', en ? 'Overview' : 'ภาพรวม'], ['candidates', en ? 'Candidates' : 'ผู้สมัคร'], ...(hasResults ? [['results', en ? 'Results' : 'ผลเลือกตั้ง']] : []), ['chain', (typeof gecClosed === 'function' && gecClosed()) ? (en ? 'Voting' : 'โหวต') : (en ? 'Live Voting' : 'โหวตสด')],
     ['timeline', en ? 'Schedule' : 'กำหนดการ']]
@@ -15715,7 +15728,7 @@ function renderGEResults(){
     </section>`;
   }).join('');
 
-  const owner = state.isOwner ? `<div class="gel-owner-row"><button class="chip chip-link gel-owner" data-action="nav" data-view="gelive">${en ? 'Enter results →' : 'กรอกผล →'}</button>
+  const owner = geCanEnter() ? `<div class="gel-owner-row"><button class="chip chip-link gel-owner" data-action="nav" data-view="gelive">${en ? 'Enter results →' : 'กรอกผล →'}</button>
 </div>` : '';
   const shareBtn = told ? `<button class="chip chip-link gel-share" data-action="share-geres" data-value="${round.id}">${ICONS.share}<span>${en ? 'Share the results as a picture' : 'แชร์ภาพสรุปผล'}</span></button>` : '';
   const out = `<div class="gel">${strip}${now}${picks}${shareBtn}${owner}${geChanges(round.id)}${gapSum}${gapSeg}<div class="gel-bands">${bands}</div>
@@ -16987,7 +17000,7 @@ function gecCurve(d, o, hNow, en){
    the venue reads them out in, then the name. Enter sends each. */
 function renderGEAdmin(){
   const en = isEN();
-  if(!state.isOwner) return `<section class="gea"><div class="empty-state">${en ? 'This page is for the site owner.' : 'หน้านี้สำหรับเจ้าของเว็บเท่านั้น'}</div></section>`;
+  if(!geCanEnter()) return `<section class="gea"><div class="empty-state">${en ? 'This page is for the site owner.' : 'หน้านี้สำหรับเจ้าของเว็บเท่านั้น'}</div></section>`;
   const rounds = state.geRounds || {};
   const round = GE_ROUNDS.find(r => r.id === state.geAdminRound) || GE_ROUNDS.find(r => r.id === geDefaultRound());
   state.geAdminRound = round.id;
@@ -17010,7 +17023,7 @@ function renderGEAdmin(){
     return `<div class="gea-band is-${b.tone}"><div class="gea-band-h">${b.name} · ${b.from}–${b.to}</div>${rows.join('')}</div>`;
   }).join('');
   return `<section class="gea">
-    <div class="gea-head"><button class="chip" data-action="ge-back">←</button><h2>${en ? 'Live results' : 'รายงานผลสด'}</h2><span class="gea-lock">${en ? 'Owner only' : 'เฉพาะเจ้าของเว็บ'}</span></div>
+    <div class="gea-head"><button class="chip" data-action="ge-back">←</button><h2>${en ? 'Live results' : 'รายงานผลสด'}</h2><span class="gea-lock">${state.isOwner ? (en ? 'Owner only' : 'เฉพาะเจ้าของเว็บ') : (en ? 'Helper · until 01:00' : 'ผู้ช่วยกรอกผล · ถึง 01:00 น.')}</span></div>
     <div class="gea-card">${seg}${toggle}</div>
     <p class="gea-hint">${noV ? (en ? 'This round has no scores. Type the name when it is read out; pick from the list and Enter. Photo, team and arrows fill themselves. Anything can be typed over.'
       : 'ผลด่วน 2 ไม่มีคะแนน พิมพ์ชื่อตอนเขาประกาศ เลือกจากรายการแล้วกด Enter · รูป ทีม และลูกศรขึ้น/ลงดึงให้เอง · กรอกผิดพิมพ์ทับได้ตลอด') : en ? 'Type the votes and press Enter — they go up at once. Then the name when it is read out; pick from the list and Enter. Photo, team and arrows fill themselves. Anything can be typed over.'
@@ -32432,6 +32445,7 @@ async function init(){
     }
     listenGE();   // the results need nothing below; started first, the dashboard has them sooner
     state.isOwner = await checkOwner();
+    state.geHelper = !state.isOwner && await checkGEHelper();
     // the owner sees the dressed-up events wherever they are signed in, the Home Screen app included
     // (it keeps its own storage, so a ?fx=new opened in Safari never reaches it); ?fx=off still turns it off
     if(state.isOwner && !/[?&]fx=off\b/.test(location.search)){
@@ -32452,7 +32466,7 @@ async function init(){
     // arrive. A redraw for nothing is a flicker nobody asked for.
     // Signing in changes whole pages, not just the header: the profile page
     // carries the account card, and the owner's review queue with it.
-    let changed = (state.account && state.account.uid) !== wasAccount || state.isOwner !== wasOwner;
+    let changed = (state.account && state.account.uid) !== wasAccount || state.isOwner !== wasOwner || !!state.geHelper;
     try{
       const shared = await sharedP;
       if(shared && shared.length && JSON.stringify(shared) !== JSON.stringify(state.members)){
