@@ -4017,7 +4017,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-now-rank{ display:flex; flex-direction:column; align-items:center; min-width:40px; }
   .gel-now-rank b{ font-size:30px; font-weight:800; color:var(--t); line-height:1; }
   .gel-now-rank small{ font-size:11px; color:var(--ink-soft); }
-  .gel-now-face{ width:64px !important; height:64px !important; border-radius:14px !important; flex:none; font-size:15px; }
+  .gel-now-face{ width:64px !important; height:64px !important; border-radius:50% !important; flex:none; font-size:15px; }
   .gel-now-who{ flex:1; min-width:0; display:flex; flex-direction:column; }
   .gel-now-who b{ font-size:18px; font-weight:800; }
   .gel-now-who span{ font-weight:700; font-size:15px; }
@@ -4026,7 +4026,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-dots i:nth-child(2){ animation-delay:.2s; } .gel-dots i:nth-child(3){ animation-delay:.4s; }
   .gel-before{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-size:12.5px; color:var(--ink-soft); margin:6px 4px 18px; }
   .gel-before b{ color:var(--ink); }
-  .gel-before-face{ width:22px !important; height:22px !important; border-radius:6px !important; font-size:9px; }
+  .gel-before-face{ width:22px !important; height:22px !important; border-radius:50% !important; font-size:9px; }
   .sub-tabs.gel-rounds{ margin:14px 0 4px; }   /* .sub-tabs comes later and would take the gap away */
   .gel-rounds .sub-tab.active{ background:var(--ge); border-color:var(--ge); color:#fff; }
   .gel-rounds .sub-tab.active .gel-dot, .ge-tabs .sub-tab.active .gel-dot{ background:#fff; }
@@ -4079,8 +4079,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-row.is-pending{ border-color:var(--t); border-style:dashed; }
   @keyframes gel-pop{ 0%{ transform:scale(.96); opacity:.3; } 100%{ transform:none; opacity:1; } }
   .gel-n{ font-weight:800; font-size:17px; text-align:center; color:var(--t); }
-  .gel-face{ width:44px !important; height:44px !important; border-radius:10px !important; font-size:11px; }
-  .gel-q{ width:44px; height:44px; border-radius:10px; display:grid; place-items:center; font-weight:800; font-size:18px; color:var(--ink-soft);
+  .gel-face{ width:44px !important; height:44px !important; border-radius:50% !important; font-size:11px; }
+  .gel-q{ width:44px; height:44px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:18px; color:var(--ink-soft);
     background:repeating-linear-gradient(45deg, var(--line), var(--line) 6px, transparent 6px, transparent 12px); }
   .gel-now .gel-q{ font-size:26px; }
   .gel-who{ min-width:0; }
@@ -4119,7 +4119,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-sum .is-gold b{ color:#B8862E; } .gel-sum .is-silver b{ color:#76828E; } .gel-sum .is-bronze b{ color:#9A5733; }
   .gel-sum-who{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-size:12.5px; font-weight:700; }
   .gel-sum-who i{ font-style:normal; font-weight:600; color:var(--ink-soft); }
-  .gel-sum-face{ width:22px !important; height:22px !important; border-radius:6px !important; font-size:8px; }
+  .gel-sum-face{ width:22px !important; height:22px !important; border-radius:50% !important; font-size:8px; }
   .gel-gapseg{ display:flex; gap:3px; padding:3px; margin:12px 0 2px; border-radius:12px; background:#1C1329; }
   :root[data-theme="dark"] .gel-gapseg{ background:#0B0810; box-shadow:inset 0 0 0 1px var(--line); }
   .gel-gapseg button{ flex:1; border:0; border-radius:9px; padding:8px 4px; background:none; cursor:pointer;
@@ -4407,7 +4407,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   button.gel-mini-c:active{ transform:translateY(2px); box-shadow:none; }
   .gel-mini-c.is-pending{ border-style:dashed; border-color:var(--t); cursor:default; }
   .gel-mini-c b{ font-size:13px; font-weight:800; color:var(--t); line-height:1; }
-  .gel-mini-face{ width:40px !important; height:40px !important; border-radius:10px !important; font-size:11px; }
+  .gel-mini-face{ width:44px !important; height:44px !important; border-radius:50% !important; font-size:11px; }   /* round, like the centre and the rows beside them (the owner, 15 Nov) */
   .gel-mini-c small{ font-size:11px; font-weight:600; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
   .gel-mini-c > span:not(.gel-q){ font-size:12.5px; font-weight:700; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .ge-live-banner{ display:flex; align-items:center; gap:10px; width:100%; margin:0 0 12px; padding:10px 14px; border-radius:14px; cursor:pointer;
