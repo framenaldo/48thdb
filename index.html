@@ -6797,7 +6797,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-commons .meow-fx{ color:var(--pink); }
   .meow-tag{ position:absolute; left:0; top:7px; transform:translateX(-50%); padding:1px 6px; border-radius:99px; font-size:10.5px; font-weight:700; line-height:1.5; white-space:nowrap;
     background:color-mix(in srgb, var(--card) 88%, transparent); color:var(--ink); border:1px solid var(--line); pointer-events:none; }
-  .meow-tag.is-me{ border-color:var(--pink); color:var(--pink); }
+  .meow-tag.is-me{ border-color:var(--pink); color:var(--pink); z-index:2; background:var(--card); }
   .meow-commons-n{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 8px; font-size:13px; font-weight:700; }
   .meow-commons-n small{ font-weight:500; color:var(--ink-soft); }
   .meow-fx{ position:absolute; left:0; bottom:0; pointer-events:none; font-size:14px; line-height:1; animation:meowUp 1.3s ease-out forwards; }
@@ -31574,10 +31574,43 @@ class MeowGuest extends MeowWalker {
     this.draw();
   }
 }
+/* A cat that has been in the room keeps coming by on her own, whether or not her owner is on the site (the owner's word, 15 Nov:
+   "น้องจะมาตอนไหนก็ได้"). The room keeps a roster; which of them are in just now, and what each one is doing, every page works out
+   from the clock and her id alone (`roomIn`, `roomGhost`) — so all screens agree with nobody driving her. A cat whose owner is in
+   the room is driven live by their page instead. */
+function roomHash(str){ let h = 2166136261; for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); return ((h ^ (h >>> 15)) >>> 0) / 4294967296; }
+const ROOM_VISIT = 12 * 60e3, ROOM_SLOT = 8000;
+// she drops in for a quarter of an hour or so, about two visits in five
+function roomIn(id, now){ return roomHash(id + '#' + Math.floor(now / ROOM_VISIT)) < .4; }
+// what she does in a slot of eight seconds: rests where she is, or walks a little way; where she is follows from her earlier walks
+function roomGhost(id, k){
+  const tgt = j => Math.max(0, Math.min(1, roomHash(id + '@' + j))), walks = j => roomHash(id + '|' + j) < .32;
+  let x = roomHash(id + '~'); for(let j = k - 1; j > k - 40; j--) if(walks(j)){ x = tgt(j); break; }
+  const r = roomHash(id + '|' + k);
+  if(r < .32){ const tx = tgt(k); return { a:'walk', x, tx, dir:tx > x ? 1 : -1, d:ROOM_SLOT / 1000 }; }
+  const dir = roomHash(id + 'd' + Math.floor(k / 6)) < .5 ? -1 : 1;
+  return { a:r < .55 ? 'sit' : r < .78 ? 'loaf' : r < .86 ? 'stand' : 'sleep', x, tx:x, dir, d:60 };
+}
+function meowRoomTick(R){
+  if(R !== _meowRoom || !R.me) return;
+  const now = Date.now() + (R.skew || 0), k = Math.floor(now / ROOM_SLOT);
+  if(k === R.slot) return; const first = R.slot == null; R.slot = k;
+  // who is in on her own just now: never more than the room holds, the same ones on every screen
+  const room = Math.max(0, 30 - R.live.size - 1);
+  const inNow = [...R.roster.keys()].filter(id => id !== R.me && !R.live.has(id) && roomIn(id, now)).sort((a, b) => roomHash(a + '!') - roomHash(b + '!')).slice(0, room);
+  const want = new Set(inNow);
+  for(const [id, c] of [...R.cats]){ if(c.ghost && !want.has(id)) meowRoomDrop(R, id); }
+  for(const id of inNow){
+    const st = roomGhost(id, k); let c = R.cats.get(id);
+    if(!c){ meowRoomAdd(R, id, R.roster.get(id), null, true); c = R.cats.get(id); c.w.apply(st, true); continue; }
+    if(st.a === 'walk' || c.w.act === 'walk' || first){ c.w.apply(st.a === 'walk' ? { ...st, x:c.w.x / c.w.max() } : st, false); }
+    else if(c.w.act !== st.a){ c.w.apply({ ...st, x:c.w.x / c.w.max() }, false); }
+  }
+}
 let _meowRoom = null;
 function closeMeowRoom(){
   const R = _meowRoom; if(!R) return; _meowRoom = null;
-  clearTimeout(R.rt); try{ if(R.ws) R.ws.close(1000, 'bye'); }catch(e){}
+  clearTimeout(R.rt); clearInterval(R.tk); try{ if(R.ws) R.ws.close(1000, 'bye'); }catch(e){}
   R.cats.forEach(c => { _meowRun.delete(c.w); }); R.el.remove();
 }
 function openMeowRoom(){
@@ -31588,15 +31621,18 @@ function openMeowRoom(){
     <div class="share-head"><b>${t('ห้องรวมแมว', 'The cats’ room')}</b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>
     <div class="meow-commons-n"><span data-room-n>${ok ? t('กำลังพาน้องเข้าห้อง…', 'Taking her in…') : !p ? t('ต้องรับเหมียวมาเลี้ยงก่อน', 'Adopt a cat first') : t('เข้าสู่ระบบก่อน จึงพาน้องเข้าห้องได้', 'Sign in to take her in')}</span><small>${t('พรีวิว', 'preview')}</small></div>
     <div class="meow-commons"><div class="meow-floor" style="top:318px"></div><div class="meow-floor" style="top:212px"></div><div class="meow-floor" style="top:106px"></div></div>
-    <p class="lay-sheet-note">${t('น้องของทุกคนที่เปิดห้องอยู่ตอนนี้ เห็นตรงกันทุกเครื่อง · แตะน้องตัวไหนก็ลูบได้ เจ้าของจะเห็นหัวใจ · โชว์แค่ชื่อน้อง ไม่บอกว่าเป็นของใคร · ปิดห้องแล้วน้องก็กลับออกไปด้วย', 'The cats of everyone with the room open, the same on every screen · tap any cat to stroke her; her owner sees the hearts · only her name is shown, never whose she is · she leaves when you close the room')}</p></div>`;
+    <p class="lay-sheet-note">${t('น้องที่เคยมาห้องนี้จะแวะมาเองเป็นพัก ๆ ตอนไหนก็ได้ แม้เจ้าของไม่ได้เปิดเว็บ ทุกเครื่องเห็นตรงกัน · แตะน้องตัวไหนก็ลูบได้ เจ้าของจะรู้ว่ามีคนลูบ · โชว์แค่ชื่อน้อง ไม่บอกว่าเป็นของใคร', 'A cat that has been here drops by on her own, any time, even when her owner is away; every screen sees the same · tap any cat to stroke her; her owner is told · only her name is shown, never whose she is')}</p>
+    ${ok ? `<button class="lay-row" data-room="leave"><span>${t('ไม่ให้น้องแวะมาห้องนี้อีก', 'Stop her coming to this room')}</span></button>` : ''}</div>`;
   document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('show'));
-  const R = _meowRoom = { el, cats:new Map(), me:'', tries:0, floors:[...el.querySelectorAll('.meow-floor')] };
-  el.addEventListener('click', e => { if(e.target.closest('[data-share="close"]')) closeMeowRoom(); });
+  const R = _meowRoom = { el, cats:new Map(), roster:new Map(), live:new Set(), me:'', tries:0, floors:[...el.querySelectorAll('.meow-floor')] };
+  R.tk = setInterval(() => meowRoomTick(R), 500);
+  el.addEventListener('click', e => { if(e.target.closest('[data-share="close"]')){ closeMeowRoom(); return; }
+    if(e.target.closest('[data-room="leave"]')){ try{ if(R.ws && R.ws.readyState === 1) R.ws.send(JSON.stringify({ t:'leave' })); }catch(x){} R.full = true; setTimeout(closeMeowRoom, 200); toast(t('น้องจะไม่แวะไปห้องรวมแล้ว', 'She will not go to the room any more')); } });
   if(ok) meowRoomJoin(R);
 }
 function meowRoomSay(R, th, e){ const n = R.el.querySelector('[data-room-n]'); if(n) n.textContent = isEN() ? e : th; }
 function meowRoomCount(R){ const n = R.cats.size; meowRoomSay(R, `ตอนนี้มีน้องในห้อง ${n} ตัว`, `${n} cat${n === 1 ? '' : 's'} in the room now`); }
-function meowRoomAdd(R, id, cat, st){
+function meowRoomAdd(R, id, cat, st, ghost){
   meowRoomDrop(R, id);
   const mine = id === R.me, floor = R.floors[parseInt(id.slice(0, 4), 16) % R.floors.length || 0];
   const pet = mine ? _meow.pet : { name:cat.n, sp:cat.sp, col:cat.col, born:cat.born || meowNow() - 400 * MEOW_D };
@@ -31609,7 +31645,7 @@ function meowRoomAdd(R, id, cat, st){
       if(mine){ g.plan([{ act:'purr', dur:2.2 }]); return; }
       if(R.ws && R.ws.readyState === 1) R.ws.send(JSON.stringify({ t:'pet', id }));
     } });
-  w.floor = floor; R.cats.set(id, { w, tag });
+  w.floor = floor; R.cats.set(id, { w, tag, ghost:!!ghost });
   if(st && !mine) w.apply(st, true);
   meowRun(w); w.draw(); meowRoomCount(R);
   return w;
@@ -31625,20 +31661,24 @@ async function meowRoomJoin(R){
   ws.onopen = () => ws.send(JSON.stringify({ t:'hi', cat:{ n:String(p.name || 'เหมียว').slice(0, 12), sp:p.sp, col:p.col, born:p.born || 0 } }));
   ws.onmessage = ev => {
     if(R !== _meowRoom) return; let m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
-    if(m.t === 'room'){ R.tries = 0; [...R.cats.keys()].forEach(id => meowRoomDrop(R, id)); R.me = m.me;
-      (m.cats || []).forEach(c => meowRoomAdd(R, c.id, c.cat, c.st));
-      const me = meowRoomAdd(R, R.me, null, null); ws.send(JSON.stringify(me.state())); return; }
-    if(m.t === 'join'){ meowRoomAdd(R, m.id, m.cat, null); const me = R.cats.get(R.me); if(me) ws.send(JSON.stringify(me.w.state())); return; }   // so the newcomer sees where she is
-    if(m.t === 'bye'){ meowRoomDrop(R, m.id); return; }
+    if(m.t === 'room'){ R.tries = 0; [...R.cats.keys()].forEach(id => meowRoomDrop(R, id)); R.me = m.me; R.skew = (m.now || Date.now()) - Date.now(); R.slot = null;
+      R.roster = new Map((m.roster || []).map(c => [c.id, c.cat])); R.live = new Set((m.live || []).map(c => c.id));
+      (m.live || []).forEach(c => { if(R.roster.has(c.id)) meowRoomAdd(R, c.id, R.roster.get(c.id), c.st); });
+      const me = meowRoomAdd(R, R.me, null, null); ws.send(JSON.stringify(me.state())); meowRoomTick(R);
+      if(m.pets > 0) setTimeout(() => { if(R === _meowRoom){ toast(isEN() ? `While you were away she was stroked ${m.pets} time${m.pets > 1 ? 's' : ''} ♥` : `ตอนคุณไม่อยู่ มีคนลูบน้อง ${m.pets} ครั้ง ♥`); const q = _meow.pet; if(q){ q.bond = Math.min(100, (q.bond || 0) + Math.min(5, m.pets)); meowSave(); } } }, 600);
+      return; }
+    if(m.t === 'join'){ R.roster.set(m.id, m.cat); R.live.add(m.id); meowRoomAdd(R, m.id, m.cat, null); const me = R.cats.get(R.me); if(me) ws.send(JSON.stringify(me.w.state())); return; }   // so the newcomer sees where she is
+    if(m.t === 'bye'){ R.live.delete(m.id); const c = R.cats.get(m.id); if(c) c.ghost = true; R.slot = null; return; }   // her owner left: she stays or goes as she pleases
+    if(m.t === 'left'){ R.live.delete(m.id); R.roster.delete(m.id); meowRoomDrop(R, m.id); return; }
     if(m.t === 'full'){ R.full = true; meowRoomSay(R, 'ห้องเต็มแล้ว (30 ตัว) ลองใหม่อีกสักครู่', 'The room is full (30 cats) · try again soon'); return; }
     const c = R.cats.get(m.id); if(!c) return;
-    if(m.t === 'st' && m.id !== R.me){ c.w.apply(m); return; }
+    if(m.t === 'st' && m.id !== R.me){ if(c.ghost) return; c.w.apply(m); return; }
     if(m.t === 'pet'){ for(let i = 0; i < 3; i++) setTimeout(() => meowFx(c.w.floor, c.w, '♥'), i * 150);
       if(m.id === R.me){ c.w.plan([{ act:'purr', dur:2.2 }]); const q = _meow.pet; if(q){ q.bond = Math.min(100, (q.bond || 0) + 1); meowSave(); } } }
   };
   ws.onclose = ev => {
     if(R !== _meowRoom || R.ws !== ws) return;
-    [...R.cats.keys()].forEach(id => meowRoomDrop(R, id));
+    R.me = ''; [...R.cats.keys()].forEach(id => meowRoomDrop(R, id));
     if(R.full || ev.code === 4002) return;
     if(ev.code === 4001){ meowRoomSay(R, 'น้องเข้าห้องจากอีกหน้าจอหนึ่งแล้ว', 'She went in from another screen'); return; }
     if(++R.tries > 4){ meowRoomSay(R, 'เชื่อมต่อห้องไม่ได้ ปิดแล้วเปิดใหม่อีกครั้ง', 'Could not reach the room · close and open it again'); return; }

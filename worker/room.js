@@ -1,16 +1,20 @@
 /* The cats' shared room (ห้องรวมแมว): a Durable Object holding the WebSockets of everyone whose cat is in the room.
  * Each reader's own device moves their cat and says what she is doing ("st": the act, where from, where to); the room
- * passes it to the others, who draw her doing the same. Nothing is kept: a cat is in the room while her owner's page is
- * open on it, and leaves with them. Only the cat is shown — her name, look and collar — never who owns her; the id is
- * a hash of the account. Sockets hibernate, so an idle room costs nothing.
+ * passes it to the others, who draw her doing the same. A cat that has been in keeps coming by on her own (the owner's
+ * word, 15 Nov 2026: "น้องจะมาตอนไหนก็ได้"): the room keeps a roster — id, name, look, collar, when her owner last came,
+ * strokes she got meanwhile — and every page works out from the clock alone which of them are in just now and what each
+ * is doing, so they agree without the room simulating anything. Gone from the roster 14 days after her owner last came,
+ * or at once when they ask (leave). Only the cat is shown, never who owns her; the id is a hash of the account.
+ * Sockets hibernate, so an idle room costs nothing.
  *
  *   in   {t:'hi', cat:{n, sp, col, born}}      first, once
  *        {t:'st', a, x, tx, dir, d}            what she does now: x and tx are shares (0–1) of the floor
  *        {t:'pet', id}                         a stroke for somebody's cat
- *   out  {t:'room', me, cats:[{id, cat, st}]}  to the one who came in
+ *        {t:'leave'}                           take her off the roster
+ *   out  {t:'room', me, now, pets, live:[{id, st}], roster:[{id, cat}]}  to the one who came in
  *        {t:'join', id, cat} · {t:'st', id, …} · {t:'pet', id, by} · {t:'bye', id} · {t:'full'}
  */
-const ROOM_MAX = 30;
+const ROOM_MAX = 30, ROSTER_MAX = 300, ROSTER_DAYS = 14;
 const ACTS = new Set(['sit', 'walk', 'jump', 'loaf', 'stand', 'sleep', 'purr', 'eat', 'bat']);
 const num = (v, lo, hi, d) => (typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d);
 
@@ -29,6 +33,14 @@ function cleanSt(m) {
 
 export class CatRoom {
   constructor(state) { this.state = state; }
+  async roster() { return (await this.state.storage.get('roster')) || {}; }
+  async keep(r) {
+    const now = Date.now(); let ids = Object.keys(r);
+    for (const id of ids) if (now - (r[id].at || 0) > ROSTER_DAYS * 864e5) delete r[id];
+    ids = Object.keys(r);
+    if (ids.length > ROSTER_MAX) ids.sort((a, b) => r[a].at - r[b].at).slice(0, ids.length - ROSTER_MAX).forEach((id) => delete r[id]);
+    await this.state.storage.put('roster', r);
+  }
   others(ws) { return this.state.getWebSockets().filter((o) => o !== ws); }
   cast(msg, but) {
     const s = JSON.stringify(msg);
@@ -36,7 +48,7 @@ export class CatRoom {
   }
   async fetch(request) {
     if (request.headers.get('upgrade') !== 'websocket') {
-      return new Response(JSON.stringify({ n: this.state.getWebSockets().filter((o) => (o.deserializeAttachment() || {}).cat).length, max: ROOM_MAX }),
+      return new Response(JSON.stringify({ n: this.state.getWebSockets().filter((o) => (o.deserializeAttachment() || {}).cat).length, max: ROOM_MAX, known: Object.keys(await this.roster()).length }),
         { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*', 'cache-control': 'no-store' } });
     }
     const id = request.headers.get('x-cat-id') || '';
@@ -51,7 +63,7 @@ export class CatRoom {
     } else pair[1].serializeAttachment({ id, lt: 0 });
     return new Response(null, { status: 101, webSocket: pair[0] });
   }
-  webSocketMessage(ws, raw) {
+  async webSocketMessage(ws, raw) {
     if (typeof raw !== 'string' || raw.length > 600) return;
     let m; try { m = JSON.parse(raw); } catch (e) { return; }
     const a = ws.deserializeAttachment(); if (!a || a.gone || !m) return;
@@ -59,8 +71,11 @@ export class CatRoom {
     if (m.t === 'hi') {
       const cat = cleanCat(m.cat); if (!cat) { ws.close(4003, 'cat'); return; }
       a.cat = cat; ws.serializeAttachment(a);
-      const cats = this.others(ws).map((o) => o.deserializeAttachment()).filter((b) => b && b.cat && !b.gone).map((b) => ({ id: b.id, cat: b.cat, st: b.st || null }));
-      ws.send(JSON.stringify({ t: 'room', me: a.id, cats }));
+      const r = await this.roster(), pets = (r[a.id] && r[a.id].pets) || 0;
+      r[a.id] = { cat, at: now, pets: 0 }; await this.keep(r);
+      const live = this.others(ws).map((o) => o.deserializeAttachment()).filter((b) => b && b.cat && !b.gone).map((b) => ({ id: b.id, st: b.st || null }));
+      const roster = Object.keys(r).filter((id) => id !== a.id).map((id) => ({ id, cat: r[id].cat }));
+      ws.send(JSON.stringify({ t: 'room', me: a.id, now, pets, live, roster }));
       this.cast({ t: 'join', id: a.id, cat }, ws);
       return;
     }
@@ -76,6 +91,15 @@ export class CatRoom {
       if (now - (a.pt || 0) < 700 || typeof m.id !== 'string' || m.id.length > 40) return;
       a.pt = now; ws.serializeAttachment(a);
       this.cast({ t: 'pet', id: m.id, by: a.id }, ws);
+      // her owner is not here to see it: kept for when they next come
+      if (!this.state.getWebSockets().some((o) => { const b = o.deserializeAttachment(); return b && b.id === m.id && b.cat && !b.gone; })) {
+        const r = await this.roster(); if (r[m.id]) { r[m.id].pets = Math.min(999, (r[m.id].pets || 0) + 1); await this.state.storage.put('roster', r); }
+      }
+      return;
+    }
+    if (m.t === 'leave') {
+      const r = await this.roster(); delete r[a.id]; await this.state.storage.put('roster', r);
+      this.cast({ t: 'left', id: a.id }, ws); a.gone = true; ws.serializeAttachment(a); try { ws.close(1000, 'left'); } catch (e) {}
     }
   }
   left(ws) {
