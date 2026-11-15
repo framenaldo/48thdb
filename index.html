@@ -15668,7 +15668,7 @@ function renderGESummary(id){
   </section>`;
 }
 
-/* ===== GE2026 · a candidate's own sheet of figures and facts (a preview: `?gefact=on` on one device, kept; `=off` back) =====
+/* ===== GE2026 · a candidate's own sheet of figures and facts (on for everyone since 15 Nov 2026; `?gefact=off` turns it off on one device, kept; `=on` back) =====
    Opened from a row of the Final Results once all 36 are read out. Everything on it is counted from the page's own data —
    the final slots and GE_REST, the two quick rounds, GE_HISTORY, GE_WISH — except the one line marked `owner`, which is
    the owner's own knowledge (no earlier election had two centres wanting one song). Only good news is written as a fact:
@@ -15676,9 +15676,9 @@ function renderGESummary(id){
 function geFactOn(){
   try{
     const q = new URLSearchParams(location.search).get('gefact');
-    if(q === 'on') localStorage.setItem('48thdb-gefact', '1'); else if(q === 'off') localStorage.removeItem('48thdb-gefact');
-    return localStorage.getItem('48thdb-gefact') === '1';
-  }catch(e){ return false; }
+    if(q === 'off') localStorage.setItem('48thdb-gefact', '0'); else if(q === 'on') localStorage.removeItem('48thdb-gefact');
+    return localStorage.getItem('48thdb-gefact') !== '0';
+  }catch(e){ return true; }
 }
 geFactOn();   // read the switch before the address is tidied
 const GE_FINAL_ID = 'ge2026-final';
