@@ -6787,6 +6787,19 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .meow-hole{ position:absolute; overflow:hidden; pointer-events:none; }
   .meow-hole canvas{ position:absolute; left:0; top:0; image-rendering:pixelated; will-change:transform; }
   .meow-pop{ position:fixed; left:0; top:0; width:0; height:0; z-index:95; pointer-events:none; }
+  /* ห้องรวมแมว (preview, ?room=on): everyone's cats in one room, three shelves */
+  .meow-commons{ position:relative; height:344px; margin:0 0 10px; border-radius:16px; overflow:hidden; border:1.5px solid var(--line); isolation:isolate;
+    background:linear-gradient(#FFF1F5, #EAF6F3); }
+  :root[data-theme="dark"] .meow-commons{ background:linear-gradient(#2B2140, #1F2B33); }
+  .meow-commons .meow-floor{ position:absolute; left:10px; right:10px; height:0; }
+  .meow-commons .meow-floor::after{ content:''; position:absolute; left:-10px; right:-10px; top:0; height:5px; border-radius:3px; background:color-mix(in srgb, var(--ink) 16%, transparent); }
+  .meow-commons .meow-cat{ pointer-events:auto; }
+  .meow-commons .meow-fx{ color:var(--pink); }
+  .meow-tag{ position:absolute; left:0; top:7px; transform:translateX(-50%); padding:1px 6px; border-radius:99px; font-size:10.5px; font-weight:700; line-height:1.5; white-space:nowrap;
+    background:color-mix(in srgb, var(--card) 88%, transparent); color:var(--ink); border:1px solid var(--line); pointer-events:none; }
+  .meow-tag.is-me{ border-color:var(--pink); color:var(--pink); }
+  .meow-commons-n{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 8px; font-size:13px; font-weight:700; }
+  .meow-commons-n small{ font-weight:500; color:var(--ink-soft); }
   .meow-fx{ position:absolute; left:0; bottom:0; pointer-events:none; font-size:14px; line-height:1; animation:meowUp 1.3s ease-out forwards; }
   .meow-fx.z{ font:800 12px/1 ui-monospace,Menlo,monospace; color:var(--ink-soft); animation-duration:2.4s; }
   /* her ring of things to do, around her when tapped; her meow at the edge of the screen; the paw to bring her to this page */
@@ -31421,6 +31434,7 @@ function meowSheetPaint(){
     ${S.tray && !sleeping ? `<div class="meow-foods">${MEOW_FOODS.map(f => `<button class="meow-act" data-meow-food="${f.k}"><span data-meow-ic="${f.k}"></span>${en ? f.en : f.th}<small>${f.cost ? t(`ขนม ${f.cost}`, `${f.cost} snack${f.cost > 1 ? 's' : ''}`) : t('ฟรี', 'free')}</small></button>`).join('')}</div>` : ''}
     <p class="lay-sheet-note">${t('ได้ขนมวันละ 3 ชิ้นเมื่อกลับมาเข้าเว็บ และอีกชิ้นทุกครั้งที่เปิดดูงานหรือเมมเบอร์ (วันละ 3) · น้องนอนเมื่ออยากนอน วันละราว 12–16 ชั่วโมงเป็นช่วง ๆ กลางวันหลับเยอะ พลบค่ำกับเช้ามืดตื่นตัวที่สุด กลางคืนชอบลุกมาวิ่งเล่น ลูบตอนหลับอาจตื่นหรือไม่ก็ได้ · ชามน้ำ: น้องไปกินเองเมื่อหิวน้ำ เติมน้ำใหม่ทุกวัน น้ำค้างคืนน้องไม่ค่อยกิน', 'Three snacks a day for coming back, one more for each event or member you open (three a day). She sleeps when she likes, 12–16 hours a day in bouts: much of the day, wide awake at dusk and dawn, and often up at night to run about; a stroke while she sleeps may or may not wake her. Water bowl: she drinks by herself when thirsty; fill it fresh each day, she hardly touches day-old water.')}</p>
     ${_meow.home || sleeping ? '' : `<button class="lay-row" data-meow="call"><span><b>${t('เรียกน้องมาตรงนี้', 'Call her here')}</b><small>${t('น้องเดินเล่นอยู่ที่ไหนสักแห่งในหน้า กดแล้วน้องจะกระโดดมาหา', 'She roams the whole page; she will leap over to you')}</small></span><i>›</i></button>`}
+    ${roomOn ? `<button class="lay-row" data-meow="room"><span><b>${t('ห้องรวมแมว', 'The cats’ room')}</b><small>${t('พาน้องไปเจอน้องของคนอื่น เห็นกันสด ๆ (พรีวิว)', 'Take her to meet other readers’ cats, live (preview)')}</small></span><i>›</i></button>` : ''}
     <button class="lay-row" data-meow="home"><span>${_meow.home ? t('ให้น้องออกมาเดินเล่นบนเว็บ', 'Let her walk the site') : t('ให้น้องอยู่บ้าน ไม่เดินบนเว็บ', 'Keep her home, off the pages')}</span></button>
     <p class="lay-sheet-note meow-sync"${meowSignedIn() ? ' data-meow="sync" role="button"' : ''}>${meowSyncText(t)}</p></div>`;
   el.querySelectorAll('[data-meow-ic]').forEach(s => { const c = meowPix(s.dataset.meowIc); if(c) s.replaceWith(c); });
@@ -31511,6 +31525,7 @@ function meowSheetClick(e){
   }
   const b = e.target.closest('[data-meow]'); if(!b) return;
   const k = b.dataset.meow;
+  if(k === 'room'){ closeMeowSheet(); setTimeout(openMeowRoom, 150); return; }
   if(k === 'sync'){ _meowSync = null; meowSyncPaint(); meowPushNow(); return; }
   if(k === 'box'){ S.step = 'box'; S.hs.taps = 0; meowSheetPaint(); return; }
   if(k === 'knock'){
@@ -31534,6 +31549,105 @@ function meowSheetClick(e){
   if(k === 'call'){ closeMeowSheet(); setTimeout(() => meowBringHere(t('มาแล้ว~ เรียกหนูเหรอ', 'Here I am~')), 250); return; }
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && _meowSheet) closeMeowSheet(); });
+/* ===== ห้องรวมแมว — the cats' shared room, live (a preview: 48thdb.com/?room=on turns it on for one device, kept; ?room=off back) =====
+   Everyone whose page is open on the room has their cat in it. Each device moves its own cat (the same small walker as in her
+   home) and tells the room what she does — the act, from where, to where, as shares of the floor — over a WebSocket to the Worker's
+   Durable Object (worker/room.js); the others draw her doing the same. Only the cat is shown: her name, look and collar, never whose
+   she is. Nothing is kept anywhere: closing the room takes her out of it. */
+const roomOn = (() => { try{ const q = new URLSearchParams(location.search).get('room'); if(q === 'on') localStorage.setItem('48thdb-room', '1'); else if(q === 'off') localStorage.removeItem('48thdb-room'); return localStorage.getItem('48thdb-room') === '1'; }catch(e){ return false; } })();
+class MeowGuest extends MeowWalker {
+  get pet(){ return this.o.pet; }
+  max(){ return Math.max(1, this.w - MEOW_W * this.s); }
+  next(){
+    if(this.o.mine){ super.next(); if(this.o.onAct) this.o.onAct(this); return; }
+    // somebody else's cat does what her owner's page says, and stays as she is until it says more
+    this.T = 0; this.y = 0; this.act = this.act === 'sleep' || this.act === 'loaf' ? this.act : 'sit'; this.dur = 1e9; this.draw();
+  }
+  state(){ const m = this.max(), a = this.act; return { t:'st', a, x:+(this.x / m).toFixed(4), tx:+((a === 'walk' ? this.tx : a === 'jump' ? this.jx : this.x) / m).toFixed(4), dir:this.dir, d:+Math.min(120, this.dur).toFixed(1) }; }
+  apply(st, late){
+    const m = this.max(); this.T = 0; this.y = 0; this.dir = st.dir < 0 ? -1 : 1; this.act = st.a; this.dur = st.d || 2; this.x = st.x * m;
+    if(st.a === 'walk' || st.a === 'jump'){
+      if(late){ this.x = st.tx * m; this.act = 'sit'; this.dur = 1e9; }   // she got there before we came in
+      else if(st.a === 'walk'){ this.tx = st.tx * m; if(Math.abs(this.tx - this.x) < 2){ this.act = 'sit'; this.dur = 1e9; } }
+      else { this.sx = this.x; this.jx = st.tx * m; this.dur = .7; }
+    }
+    this.draw();
+  }
+}
+let _meowRoom = null;
+function closeMeowRoom(){
+  const R = _meowRoom; if(!R) return; _meowRoom = null;
+  clearTimeout(R.rt); try{ if(R.ws) R.ws.close(1000, 'bye'); }catch(e){}
+  R.cats.forEach(c => { _meowRun.delete(c.w); }); R.el.remove();
+}
+function openMeowRoom(){
+  closeShareSheet(); closeMeowSheet(); closeMeowRoom();
+  const en = isEN(), t = (th, e) => en ? e : th, el = document.createElement('div'); el.className = 'share-sheet meow-sheet';
+  const p = _meow && _meow.pet, ok = p && meowSignedIn() && typeof fbAuth !== 'undefined' && fbAuth.currentUser;
+  el.innerHTML = `<div class="share-back" data-share="close"></div><div class="share-panel" role="dialog" aria-label="${t('ห้องรวมแมว', 'The cats’ room')}">
+    <div class="share-head"><b>${t('ห้องรวมแมว', 'The cats’ room')}</b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>
+    <div class="meow-commons-n"><span data-room-n>${ok ? t('กำลังพาน้องเข้าห้อง…', 'Taking her in…') : !p ? t('ต้องรับเหมียวมาเลี้ยงก่อน', 'Adopt a cat first') : t('เข้าสู่ระบบก่อน จึงพาน้องเข้าห้องได้', 'Sign in to take her in')}</span><small>${t('พรีวิว', 'preview')}</small></div>
+    <div class="meow-commons"><div class="meow-floor" style="top:318px"></div><div class="meow-floor" style="top:212px"></div><div class="meow-floor" style="top:106px"></div></div>
+    <p class="lay-sheet-note">${t('น้องของทุกคนที่เปิดห้องอยู่ตอนนี้ เห็นตรงกันทุกเครื่อง · แตะน้องตัวไหนก็ลูบได้ เจ้าของจะเห็นหัวใจ · โชว์แค่ชื่อน้อง ไม่บอกว่าเป็นของใคร · ปิดห้องแล้วน้องก็กลับออกไปด้วย', 'The cats of everyone with the room open, the same on every screen · tap any cat to stroke her; her owner sees the hearts · only her name is shown, never whose she is · she leaves when you close the room')}</p></div>`;
+  document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('show'));
+  const R = _meowRoom = { el, cats:new Map(), me:'', tries:0, floors:[...el.querySelectorAll('.meow-floor')] };
+  el.addEventListener('click', e => { if(e.target.closest('[data-share="close"]')) closeMeowRoom(); });
+  if(ok) meowRoomJoin(R);
+}
+function meowRoomSay(R, th, e){ const n = R.el.querySelector('[data-room-n]'); if(n) n.textContent = isEN() ? e : th; }
+function meowRoomCount(R){ const n = R.cats.size; meowRoomSay(R, `ตอนนี้มีน้องในห้อง ${n} ตัว`, `${n} cat${n === 1 ? '' : 's'} in the room now`); }
+function meowRoomAdd(R, id, cat, st){
+  meowRoomDrop(R, id);
+  const mine = id === R.me, floor = R.floors[parseInt(id.slice(0, 4), 16) % R.floors.length || 0];
+  const pet = mine ? _meow.pet : { name:cat.n, sp:cat.sp, col:cat.col, born:cat.born || meowNow() - 400 * MEOW_D };
+  const tag = document.createElement('span'); tag.className = 'meow-tag' + (mine ? ' is-me' : ''); tag.setAttribute('data-noloc', ''); tag.textContent = pet.name || ''; floor.appendChild(tag);
+  const w = new MeowGuest(floor, { pet, mine, width:() => floor.clientWidth || 300, scale:0, x:Math.random() * Math.max(1, (floor.clientWidth || 300) - 80),
+    onDraw:g => { tag.style.left = (g.x + MEOW_W * g.s / 2).toFixed(0) + 'px'; },
+    onAct:g => { if(R.ws && R.ws.readyState === 1 && R.me) R.ws.send(JSON.stringify(g.state())); },
+    onTap:g => {
+      for(let i = 0; i < 3; i++) setTimeout(() => meowFx(floor, g, '♥'), i * 150);
+      if(mine){ g.plan([{ act:'purr', dur:2.2 }]); return; }
+      if(R.ws && R.ws.readyState === 1) R.ws.send(JSON.stringify({ t:'pet', id }));
+    } });
+  w.floor = floor; R.cats.set(id, { w, tag });
+  if(st && !mine) w.apply(st, true);
+  meowRun(w); w.draw(); meowRoomCount(R);
+  return w;
+}
+function meowRoomDrop(R, id){ const c = R.cats.get(id); if(!c) return; _meowRun.delete(c.w); c.w.remove(); c.tag.remove(); R.cats.delete(id); meowRoomCount(R); }
+async function meowRoomJoin(R){
+  let tok = ''; try{ tok = await fbAuth.currentUser.getIdToken(); }catch(e){}
+  if(R !== _meowRoom) return;
+  if(!tok){ meowRoomSay(R, 'เข้าสู่ระบบก่อน จึงพาน้องเข้าห้องได้', 'Sign in to take her in'); return; }
+  const p = _meow.pet; let ws;
+  try{ ws = new WebSocket(LIVE_API.replace(/^http/, 'ws') + '/room?t=' + encodeURIComponent(tok)); }catch(e){ meowRoomSay(R, 'เข้าห้องไม่ได้ ลองใหม่อีกครั้ง', 'Could not get in · try again'); return; }
+  R.ws = ws;
+  ws.onopen = () => ws.send(JSON.stringify({ t:'hi', cat:{ n:String(p.name || 'เหมียว').slice(0, 12), sp:p.sp, col:p.col, born:p.born || 0 } }));
+  ws.onmessage = ev => {
+    if(R !== _meowRoom) return; let m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
+    if(m.t === 'room'){ R.tries = 0; [...R.cats.keys()].forEach(id => meowRoomDrop(R, id)); R.me = m.me;
+      (m.cats || []).forEach(c => meowRoomAdd(R, c.id, c.cat, c.st));
+      const me = meowRoomAdd(R, R.me, null, null); ws.send(JSON.stringify(me.state())); return; }
+    if(m.t === 'join'){ meowRoomAdd(R, m.id, m.cat, null); const me = R.cats.get(R.me); if(me) ws.send(JSON.stringify(me.w.state())); return; }   // so the newcomer sees where she is
+    if(m.t === 'bye'){ meowRoomDrop(R, m.id); return; }
+    if(m.t === 'full'){ R.full = true; meowRoomSay(R, 'ห้องเต็มแล้ว (30 ตัว) ลองใหม่อีกสักครู่', 'The room is full (30 cats) · try again soon'); return; }
+    const c = R.cats.get(m.id); if(!c) return;
+    if(m.t === 'st' && m.id !== R.me){ c.w.apply(m); return; }
+    if(m.t === 'pet'){ for(let i = 0; i < 3; i++) setTimeout(() => meowFx(c.w.floor, c.w, '♥'), i * 150);
+      if(m.id === R.me){ c.w.plan([{ act:'purr', dur:2.2 }]); const q = _meow.pet; if(q){ q.bond = Math.min(100, (q.bond || 0) + 1); meowSave(); } } }
+  };
+  ws.onclose = ev => {
+    if(R !== _meowRoom || R.ws !== ws) return;
+    [...R.cats.keys()].forEach(id => meowRoomDrop(R, id));
+    if(R.full || ev.code === 4002) return;
+    if(ev.code === 4001){ meowRoomSay(R, 'น้องเข้าห้องจากอีกหน้าจอหนึ่งแล้ว', 'She went in from another screen'); return; }
+    if(++R.tries > 4){ meowRoomSay(R, 'เชื่อมต่อห้องไม่ได้ ปิดแล้วเปิดใหม่อีกครั้ง', 'Could not reach the room · close and open it again'); return; }
+    meowRoomSay(R, 'หลุดจากห้อง กำลังเข้าใหม่…', 'Lost the room · going back in…'); R.rt = setTimeout(() => { if(R === _meowRoom) meowRoomJoin(R); }, 1500 * R.tries);
+  };
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && _meowRoom) closeMeowRoom(); });
+addEventListener('resize', () => { if(_meowRoom) _meowRoom.cats.forEach(c => c.w.resize()); });
+
 setTimeout(() => { try{ meowInit(); }catch(e){ console.warn('meow', e); } }, 900);
 function navSnapshot(){
   const snap = {};

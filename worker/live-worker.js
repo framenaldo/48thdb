@@ -29,6 +29,8 @@ const KEEP_MS = 5 * 60 * 1000;        // how long a refused check may stand on t
 
 import { pushRoute, pushTick } from './push.js';
 import { checkinRoute } from './checkin.js';
+import { roomRoute } from './room.js';
+export { CatRoom } from './room.js';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -891,6 +893,8 @@ export default {
           { status: err && err.status || 502, headers: CHAIN_HEADERS });
       }
     }
+    const roomed = await roomRoute(request, env, new URL(request.url), firebaseClaims);   // the cats' shared room (room.js)
+    if (roomed) return roomed;
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: { ...JSON_HEADERS, 'access-control-allow-headers': 'authorization, content-type',
         'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-max-age': '86400' } });

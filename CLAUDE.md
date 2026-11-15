@@ -305,6 +305,8 @@ reach, look back, tail chase, sneeze, curl or belly-up sleep, hanging off an edg
 where she is. Reduced motion: she only sits and loafs. Pixel art only. Island, friends and the rainbow bridge are not
 built (they would need Firestore rules from the owner's machine).
 
+**ห้องรวมแมว, a preview** (`?room=on` turns it on for one device, kept; `?room=off` back; the owner asked for it live, 15 Nov 2026): a row in her home opens a sheet (`openMeowRoom`) where the cats of everyone with the room open are seen together on three shelves, the same on every screen. Each device moves its own cat (`MeowGuest`, the small walker of her home) and tells the room each act — what, from where, to where, as shares of the floor — over a WebSocket to a Durable Object in the Worker (`worker/room.js`, `CatRoom`, binding `ROOM`, `GET /room` answers how many are in; the socket is `/room?t=<Firebase ID token>`); the others draw her doing the same. A tap strokes anyone's cat and her owner sees the hearts. Only the cat's name, look and collar are shown, never whose she is (the id is a hash of the account); nothing is kept — closing the room takes her out. 30 cats a room, one room so far; one message per cat every 200 ms at most. Not built yet: the owner taking a cat with a bad name out, more rooms, more than one cat a reader.
+
 ## หาโอชิจากดวง (/quiz)
 
 A horoscope quiz, reached from the ☰ menu (`renderQuiz`, view `quiz`). reader's birthday (kept in localStorage; for a signed-in reader also in their own `users/<uid>.quiz` — the birthday, last match and finished answers of both tabs, stamped, newer copy wins after sign-in, `quizFromAccount` / `quizStamp`; a guest's stays on the device; the rules let only that account read it) against each current
