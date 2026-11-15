@@ -30948,8 +30948,9 @@ function meowMount(){
         const now = meowSec(); if(now - (w.dragAt || 0) < .5) return;
         if(_meow.pet){ const m = meowMem(_meow.pet); m.taps = Math.min(9999, (m.taps || 0) + 1); }
         // a tap pets her and opens the ring of things to do with her here; with the ring open, a tap pets her again
-        if(_meowRing){ meowPurr(_meowLayer, w); return; }
-        meowPurr(_meowLayer, w); meowRingOpen(w);
+        // (a tap never breaks off what she is doing — the owner's word, 15 Nov: hearts only; ลูบหัว in the ring is the real stroke)
+        if(_meowRing){ meowPurr(_meowLayer, w, true); return; }
+        meowPurr(_meowLayer, w, true); meowRingOpen(w);
         let tip = null; try{ tip = localStorage.getItem('48thdb-meow-tip2'); localStorage.setItem('48thdb-meow-tip2', '1'); }catch(e){}
         if(!tip) setTimeout(() => meowSay(isEN() ? 'Pick something to do with me · drag to carry me' : 'เลือกเล่นกับหนูได้เลย · ลากเพื่ออุ้มได้นะ', 3600), 500);
       },
@@ -30996,8 +30997,16 @@ function meowNudge(p){
   p.asleep = false; if(_meowWalk && _meowWalk.act === 'sleep' && _meowWalk.mode === 'ledge') _meowWalk.plan([{ act:'yawn', dur:1.4 }, { act:'stretch', dur:1.8 }, { act:'sit', dur:2 }]);
   meowSave(); return true;
 }
-function meowPurr(host, w){
+function meowPurr(host, w, soft){
   const p = _meow.pet;
+  if(soft){   // a light tap on the page: she goes on with what she was doing
+    if(meowAsleep(p, meowNow()) || (w.mode === 'ledge' && w.act === 'sleep')){ meowFx(host, w, 'z', 'z'); return; }
+    p.bond = Math.min(100, (p.bond || 0) + 1);
+    if(p.shy){ p.shy = false; p.bond = Math.max(p.bond, Math.floor((p.bondPeak || 0) * .9)); if(w.say) w.say(isEN() ? 'I missed you…' : 'คิดถึงนะ… หายไปนานเลย', false); }
+    meowSave();
+    for(let i = 0; i < 2; i++) setTimeout(() => meowFx(host, w, '♥'), i * 150);
+    return;
+  }
   if(meowAsleep(p, meowNow())){
     if(meowNudge(p)){ if(w.plan) w.plan([{ act:'yawn', dur:1.4 }, { act:'stretch', dur:1.8 }, { act:'sit', dur:2 }]); if(w.say) w.say(isEN() ? 'Mm… awake' : 'งัวเงีย… ตื่นแล้ว'); return; }
     meowFx(host, w, 'z', 'z'); if(w.say && Math.random() < .3) w.say(isEN() ? 'Zzz… (still asleep)' : 'ครอก… ฟี้… (ยังหลับอยู่)', true); return;
@@ -31418,7 +31427,7 @@ function meowSheetPaint(){
   const bowl = el.querySelector('[data-meow-prop="bowl"]'); if(bowl){ const c = meowPix('bowl'); c.style.width = '36px'; c.style.height = '36px'; bowl.appendChild(c); }
   const wb = el.querySelector('[data-meow-prop="water"]'); if(wb){ const c = meowPix(_meow.bowl && _meow.bowl.lvl > 0 ? 'water' : 'waterE'); c.style.width = '36px'; c.style.height = '36px'; wb.appendChild(c); }
   meowSheetStage(sleeping ? [{ act:'sleep', dur:1e9 }] : null);
-  const need = meowNeed(p); if(need) setTimeout(() => meowSheetSay(need), 300);
+  const need = !S.quiet && meowNeed(p); clearTimeout(S.needT); if(need) S.needT = setTimeout(() => meowSheetSay(need, true), 300);   // not over what she has just said about her food
 }
 function meowSheetStage(plan){
   const S = _meowSheet, stage = S && S.el.querySelector('.meow-stage'); if(!stage) return;
@@ -31428,8 +31437,9 @@ function meowSheetStage(plan){
   if(plan) w.plan(plan);
   meowRun(w);
 }
-function meowSheetSay(text){
+function meowSheetSay(text, auto){
   const S = _meowSheet, room = S && S.el.querySelector('.meow-room'), w = S && S.walker; if(!room || !w) return;
+  if(!auto) clearTimeout(S.needT);   // her own grumble never lands on top of an answer
   let b = room.querySelector('.meow-say'); if(!b){ b = document.createElement('div'); b.className = 'meow-say'; room.appendChild(b); }
   b.textContent = text; b.classList.add('on'); b.style.bottom = 'auto'; b.style.top = '8px'; b.style.left = 'auto'; b.style.right = '10px';
   clearTimeout(b._t); b._t = setTimeout(() => b.classList.remove('on'), 2600);
@@ -31489,11 +31499,12 @@ function meowSheetClick(e){
   if(food){
     const f = MEOW_FOODS.find(x => x.k === food.dataset.meowFood), p = _meow.pet, w = S.walker;
     const no = meowWontEat(p, f);
-    if(no){ meowSheetSay(meowRefuseText(no, en)); S.tray = false; meowSheetPaint(); const w3 = S.walker; if(w3) w3.plan([{ act:'walk', x:w3.x > 120 ? 8 : 220 }, { act:'loaf', dur:8 }]); return; }
+    // full, or fed a moment ago: she looks back, walks away from the bowl and says why (said after the redraw — the redraw used to wipe the words, so nothing seemed to happen)
+    if(no){ S.tray = false; S.quiet = true; meowSheetPaint(); S.quiet = false; const w3 = S.walker; if(w3) w3.plan([{ act:'lookback', dur:1 }, { act:'walk', x:220 }, { act:'loaf', dur:8 }]); meowSheetSay(meowRefuseText(no, en)); return; }
     if(f.cost > (_meow.snacks || 0)){ meowSheetSay(t('ขนมไม่พอ อาหารเม็ดก็อร่อยนะ', 'Not enough snacks. Kibble is nice too.')); return; }
     _meow.snacks -= f.cost; S.tray = false;
     meowEats(p, f); p.bond = Math.min(100, (p.bond || 0) + 1);
-    meowSave(); meowSheetPaint();
+    meowSave(); S.quiet = true; meowSheetPaint(); S.quiet = false;
     const w2 = S.walker; if(w2){ w2.x = 40; w2.plan([{ act:'eat', face:-1, dur:3.6 }]); }
     meowSheetSay(f.k === 'kibble' ? t('ง่ำ ง่ำ', 'Nom nom') : t('ว้าว ' + f.th + '!', 'Wow, ' + f.en.toLowerCase() + '!'));
     return;
