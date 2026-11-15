@@ -15744,8 +15744,8 @@ function geFactList(id, en){
       if(!hadTwo.length){
         if(k === 1) add('⭐', `เซ็นเตอร์จากเวที GE ครั้งที่ ${total} (${trail}) — คนแรกในประวัติศาสตร์ GE ที่ได้เป็นเซ็นเตอร์ถึง ${times(total)}`,
           `A GE centre for the ${total === 2 ? 'second' : total + 'th'} time (${trail}) — the first in GE history to be a centre ${times(total)}`);
-        else add('⭐', `เซ็นเตอร์จากเวที GE ครั้งที่ ${total} (${trail}) — ${ord(k)} ที่ทำได้ ต่อจาก ${nm(tonight[k - 2].id)} ซึ่งถูกประกาศชื่อก่อนในคืนเดียวกัน`,
-          `A GE centre for the ${total === 2 ? 'second' : total + 'th'} time (${trail}) — the ${ord(k)} to do it, after ${nm(tonight[k - 2].id)}, read out earlier the same night`);
+        // the second (or later) to do it the same night says no more than the count: naming who did it first set them side by side (the owner's word, 15 Nov)
+        else add('⭐', `เซ็นเตอร์จากเวที GE ครั้งที่ ${total} (${trail})`, `A GE centre for the ${total === 2 ? 'second' : total + 'th'} time (${trail})`);
       } else add('⭐', `เซ็นเตอร์จากเวที GE ครั้งที่ ${total} (${trail})`, `A GE centre for the ${total === 2 ? 'second' : total + 'th'} time (${trail})`);
     } else add('⭐', `เซ็นเตอร์ ${band.name} — เซ็นเตอร์จากเวที GE ครั้งแรกของเธอ`, `Centre of the ${band.name} — her first time as a GE centre`);
   }
