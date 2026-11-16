@@ -4195,7 +4195,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     box-shadow:0 2px 6px color-mix(in srgb, color-mix(in srgb, var(--t) 35%, transparent) 60%, transparent); transition:transform .1s, box-shadow .1s;
   }
   .ge-hist-chip:active{ transform:translateY(2px); box-shadow:none; }
-  .ge-hist-chip.is-gold{ --t:#B8862E; } .ge-hist-chip.is-silver{ --t:#76828E; } .ge-hist-chip.is-bronze{ --t:#9A5733; }
+  .ge-hist-chip.is-gold{ --t:#B8862E; } .ge-hist-chip.is-silver{ --t:#76828E; } .ge-hist-chip.is-bronze{ --t:#9A5733; } .ge-hist-chip.is-rest{ --t:var(--ink-soft); }
+  .ge-hist-chip .ge-hist-c{ font-style:normal; font-size:10px; font-weight:800; color:#fff; background:var(--t); padding:1px 7px; border-radius:999px; margin-top:2px; }
   .ge-hist-chip small{ font-size:11px; font-weight:700; color:var(--ink-soft); }
   .ge-hist-chip b{ font-size:17px; font-weight:800; color:var(--t); }
   .ge-hist-chip span{ font-size:10.5px; font-weight:700; color:var(--ink-soft); }
@@ -16184,13 +16185,20 @@ function renderGEHistory(en){
 /* Her own line of past ranks, on her sheet: each election she ranked in. */
 function renderGEHistoryOf(m){
   const hits = GE_HISTORY.map(e => ({ e, n:e.rows.findIndex(r => r[0] === m.id) + 1 })).filter(x => x.n > 0);
-  if(!hits.length) return '';
+  // this year's: GE2026's final, ahead of the older ones (the owner's word, 16 Nov 2026)
+  const me = geAnnounced(GE_FINAL_ID) >= GE_SEATS ? geFinalField().find(x => x.id === m.id) : null;
+  if(!hits.length && !me) return '';
   const en = isEN();
-  return `<h3 class="section-label">${en ? 'General elections' : 'ผลเลือกตั้งที่ผ่านมา'}</h3>
+  // the first of a band is its centre: the A-side's, then each B-side's (the owner's word, 16 Nov 2026)
+  const centreTag = `<em class="ge-hist-c">★ ${en ? 'Center' : 'เซ็นเตอร์'}</em>`;
+  const now = me ? (() => { const b = GE_BANDS.find(x => me.n >= x.from && me.n <= x.to), tone = b ? b.tone : 'rest';
+    const inner = `<small>2026</small><b>#${me.n}</b><span>${b ? b.name : (en ? 'Candidate' : 'ผู้สมัคร')}</span>${b && b.from === me.n ? centreTag : ''}`;
+    return geFactReady() ? `<button class="ge-hist-chip is-${tone}" data-action="open-ge-fact" data-id="${m.id}">${inner}</button>` : `<span class="ge-hist-chip is-${tone}">${inner}</span>`; })() : '';
+  return `<h3 class="section-label">${en ? 'General elections' : 'ผลเลือกตั้ง'}</h3>
     <div class="ge-hist-chips">${hits.map(({ e, n }) => {
       const b = geHistBands(e).find(x => n >= x.from && n <= x.to);
-      return `<button class="ge-hist-chip is-${b.tone}" data-action="open-ge-hist" data-value="${e.id}"><small>${e.date.slice(0, 4)}</small><b>#${n}</b><span>${b.name}</span></button>`;
-    }).join('')}</div>`;
+      return `<button class="ge-hist-chip is-${b.tone}" data-action="open-ge-hist" data-value="${e.id}"><small>${e.date.slice(0, 4)}</small><b>#${n}</b><span>${b.name}</span>${b.from === n ? centreTag : ''}</button>`;
+    }).join('')}${now}</div>`;
 }
 
 /* The owner's look at the GE vote on the chain. An iAM48 vote is GE tokens sent
