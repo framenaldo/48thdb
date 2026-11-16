@@ -8978,7 +8978,8 @@ const SEED_SCHEDULE = [
     related:['ev-shock-me-girls-orientation'] },
   { id:'ev-bnk-7th-gen-audition', start:'2026-11-16', end:'2026-12-21', period:true,
     title:'BNK48 7th Generation Audition', short:'7th Gen Audition', groups:['bnk48'],
-    poster:{ accent:'#8B72DE', surface:'#F3EEFF', ink:'#2A1F52', img:'posters/bnk48-7th-gen-audition.png', w:1792, h:1024 },
+    poster:{ accent:'#82477F', surface:'#F3EEFA', ink:'#2A2140', img:'posters/bnk48-7th-gen-audition.png', w:1792, h:1024,
+      grad:{ light:'linear-gradient(165deg, #F5F0FC 0%, #EFE8FA 48%, #F6E7F2 100%)', dark:'linear-gradient(165deg, #261D38 0%, #221A33 50%, #2E1C31 100%)' } },
     links:[{ label:'สมัครเข้าร่วมออดิชัน', url:'https://audition.bnk48.com/', cta:true, c:'#82477F', flat:true, sub:'ปิดรับสมัคร 21 ธ.ค. 23:59 น.', subEn:'Applications close 21 Dec, 23:59' }],
     info:['เปิดรับใบสมัคร 16 พ.ย. 00:00 – 21 ธ.ค. 2026 23:59 น.',
       'สมัครทางเว็บไซต์ audition.bnk48.com'] },
@@ -10608,7 +10609,7 @@ const EN = {
   'จบไปแล้ววันนี้': 'Over for today',
   'จบแล้ว': 'Over',
   'ดูย้อนหลัง': 'Replay',
-  'สมัครออดิชัน': 'Apply for the audition', 'สมัครเข้าร่วมออดิชัน': 'Apply for the audition',
+  'สมัครออดิชัน': 'Apply for the audition', 'สมัครเข้าร่วมออดิชัน': 'Apply now',
   'เปิดรับใบสมัคร 16 พ.ย. 00:00 – 21 ธ.ค. 2026 23:59 น.': 'Applications open 16 Nov 00:00 – 21 Dec 2026 23:59',
   'สมัครทางเว็บไซต์ audition.bnk48.com': 'Apply on the website audition.bnk48.com',
   'LIVE · ดูไลฟ์': 'LIVE · Watch',
@@ -20024,7 +20025,7 @@ function renderEventModal(){
     : (people.length ? getGroup(people[0].groupId).color : 'var(--ink-soft)');
   const mine = people.filter(m => state.oshi.includes(m.id));
   const wantsGrad = ev.poster && ev.poster.img && !ev.poster.scene;
-  const grad = wantsGrad ? SHEET_GRAD.get(ev.poster.img) || (POSTER_GRADS && POSTER_GRADS[ev.poster.img]) || null : null;
+  const grad = wantsGrad ? ev.poster.grad || SHEET_GRAD.get(ev.poster.img) || (POSTER_GRADS && POSTER_GRADS[ev.poster.img]) || null : null;
   if(wantsGrad && !POSTER_GRADS) posterGrads();
   return `
   <div class="modal-backdrop" data-action="close-modal">
