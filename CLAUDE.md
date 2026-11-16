@@ -398,6 +398,8 @@ translated. Everything else in Thai.
 
 **A candidate's facts sheet, on for everyone** (the owner's word, 15 Nov 2026; `?gefact=off` turns it off on one device, kept, `=on` back): a row of the Final Results opens a sheet of her figures and facts instead of her profile (`openGeFact`, `geFactList`, `geFactData`) — score, share, gaps, the three rounds, her earlier elections, her form, and facts counted from the page's data (first to be No. 1 or a centre twice, the song and whose choice it was, firsts, streaks, bests). Only good news is written as a fact; a missed aim or a fall shows only in the plain tables. One line is the owner's own knowledge, not counted: the first time two centres wanted one song.
 
+**After the GE2026 (16 Nov 2026)** the owner took the candidate card (poster and clip) off the member sheet; past results stay ("ผลเลือกตั้งที่ผ่านมา" on the sheet, the GE page's results tab). Other GE2026 spots (header menu, home tile, the page itself) are not yet taken off: ask which.
+
 **Election results.** The rounds are called **ผลด่วน 1 / ผลด่วน 2 / ผลสุดท้าย** —
 never "เบื้องต้น". A rank whose score is known but whose name is not says
 "กำลังประกาศ". Bands: Senbatsu 1–12, Under Girls 13–24, Next Girls 25–36, with

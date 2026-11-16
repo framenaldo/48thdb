@@ -21515,15 +21515,7 @@ function renderDetailModal(){
                no button: the owner does not want visitors to see members compared. -->
         </div>
         ${renderSocial(m)}
-        ${isGECandidate(m.id) ? `<div class="ge-cand">
-          <button class="ge-cand-main" data-action="open-poster" data-id="ge:${m.id}">
-            <img src="${gePoster(m.id, true)}" width="360" height="509" alt="" loading="lazy" decoding="async">
-            <span class="ge-cand-t"><small>${isEN() ? 'CANDIDATE' : 'ผู้สมัคร'}</small><b>Senbatsu General Election 2026</b></span>
-          </button>
-          <span class="ge-cand-acts">
-            <button class="ge-cand-go" data-action="open-poster" data-id="ge:${m.id}">${isEN() ? 'Poster' : 'โปสเตอร์'}</button>
-            ${GE_VIDEOS[m.id] ? `<button class="ge-cand-go is-clip" data-action="open-ge-clip" data-id="${m.id}">▶ ${isEN() ? 'Clip' : 'คลิป'}</button>` : ''}
-          </span></div>` : ''}
+        <!-- The GE2026 candidate card (poster, clip) came off the member sheet when the election ended (the owner's word, 16 Nov 2026); her past results stay in the history below. -->
         </div>
         <div class="sheet-body">
         <div class="sheet-col sheet-col-a">
