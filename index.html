@@ -4187,19 +4187,21 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gel-hist-picks .sub-tab small{ font-size:10.5px; font-weight:700; opacity:.75; }
   .gel-hist-head h2{ font-size:17px; }
   .gel-hist-head small + small{ display:block; margin-top:2px; }
-  .ge-hist-chips{ display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 6px; }
+  /* a tidy grid: every chip the same size, four to a row on a phone, a centre's star tag in the room the others leave empty */
+  .ge-hist-chips{ display:grid; grid-template-columns:repeat(auto-fill, minmax(68px, 1fr)); gap:7px; margin:2px 0 6px; }
   .ge-hist-chip{
-    display:flex; flex-direction:column; align-items:center; gap:1px; min-width:72px; padding:7px 10px 8px;
-    font:inherit; color:var(--ink); cursor:pointer; border-radius:14px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; min-width:0; padding:6px 4px 7px;
+    font:inherit; color:var(--ink); cursor:pointer; border-radius:12px; text-align:center;
     border:1px solid color-mix(in srgb, var(--t) 45%, var(--line)); background:color-mix(in srgb, var(--t) 10%, var(--card));
-    box-shadow:0 2px 6px color-mix(in srgb, color-mix(in srgb, var(--t) 35%, transparent) 60%, transparent); transition:transform .1s, box-shadow .1s;
+    box-shadow:0 2px 5px color-mix(in srgb, color-mix(in srgb, var(--t) 35%, transparent) 60%, transparent); transition:transform .1s, box-shadow .1s;
   }
   .ge-hist-chip:active{ transform:translateY(2px); box-shadow:none; }
   .ge-hist-chip.is-gold{ --t:#B8862E; } .ge-hist-chip.is-silver{ --t:#76828E; } .ge-hist-chip.is-bronze{ --t:#9A5733; } .ge-hist-chip.is-rest{ --t:var(--ink-soft); }
-  .ge-hist-chip .ge-hist-c{ font-style:normal; font-size:10px; font-weight:800; color:#fff; background:var(--t); padding:1px 7px; border-radius:999px; margin-top:2px; }
-  .ge-hist-chip small{ font-size:11px; font-weight:700; color:var(--ink-soft); }
-  .ge-hist-chip b{ font-size:17px; font-weight:800; color:var(--t); }
-  .ge-hist-chip span{ font-size:10.5px; font-weight:700; color:var(--ink-soft); }
+  .ge-hist-chip small{ font-size:10.5px; font-weight:700; line-height:1.3; color:var(--ink-soft); }
+  .ge-hist-chip b{ font-size:16px; font-weight:800; line-height:1.2; color:var(--t); }
+  .ge-hist-chip span{ font-size:10px; font-weight:700; line-height:1.3; color:var(--ink-soft); white-space:nowrap; }
+  .ge-hist-chip .ge-hist-c{ font-style:normal; font-size:9.5px; font-weight:800; line-height:1.3; color:#fff; background:var(--t); padding:1px 6px; border-radius:999px; margin-top:3px; white-space:nowrap; }
+  .ge-hist-chip.is-rest .ge-hist-c{ background:var(--ink-soft); }
   /* What changed since the round before */
   .gel-share{ display:inline-flex; align-items:center; gap:6px; margin:10px 0 2px; }
   .gel-share svg{ width:16px; height:16px; }
