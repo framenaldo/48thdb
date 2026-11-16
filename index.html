@@ -31057,7 +31057,29 @@ function meowOtherPage(not){
   const views = [...new Set((typeof NAV_CATALOG !== 'undefined' ? NAV_CATALOG : []).filter(o => !o.fav).map(o => o.view))].filter(v => v !== not && v !== 'auth');
   return views.length ? meowPick(views) : null;
 }
-function meowHere(){ const p = _meow && _meow.pet; return !p || !p.page || p.page === state.view; }
+function meowHere(){ const p = _meow && _meow.pet; return !p || !p.page || (p.page === state.view && !_meowAtRoom); }
+/* The cat in the room is the same cat (the owner's word, 16 Nov 2026): while she is at the cats' room — on one of her own visits by the
+   clock (`roomIn`, as every other screen works it out), or because her owner has the room open — she is not on the page; the paw pill says
+   so and opens the room. "พาน้องมาอยู่หน้านี้" / "เรียกน้องมาตรงนี้" calls her back for the rest of that visit (`48thdb-room-skip`; other
+   screens still see her there until the visit ends — nothing tells them). Only for a cat that has been in the room (`48thdb-room-me`). */
+let _meowAtRoom = false, _meowRoomGoing = 0;
+function meowRoomWant(){
+  if(typeof roomOn === 'undefined' || !roomOn || !_meow || !_meow.pet || _meow.home) return false;
+  if(typeof _meowRoom !== 'undefined' && _meowRoom && _meowRoom.me) return true;
+  let me = '', skip = ''; try{ me = localStorage.getItem('48thdb-room-me') || ''; skip = localStorage.getItem('48thdb-room-skip') || ''; }catch(e){}
+  if(!me) return false;
+  const now = Date.now(); return roomIn(me, now) && skip !== String(Math.floor(now / ROOM_VISIT));
+}
+function meowRoomSync(){
+  const want = meowRoomWant(); if(want === _meowAtRoom || _meowRoomGoing) return;
+  const p = _meow && _meow.pet, w = _meowWalk, onPage = !!(p && w && p.page === state.view && !w.gone);
+  const set = v => { _meowRoomGoing = 0; _meowAtRoom = v; meowRingClose(); if(_meowWalk) _meowWalk.draw(); meowToysPaint(); meowCallPaint(); };
+  if(want){
+    if(onPage && w.mode === 'ledge' && w.awake() && !(typeof _meowRoom !== 'undefined' && _meowRoom)){ meowSay(isEN() ? 'Off to the cats’ room~' : 'ไปห้องรวมแมวแป๊บนะ~', 1600); _meowRoomGoing = setTimeout(() => set(true), 1700); }
+    else set(true);
+  } else { set(false); if(p && w && p.page === state.view){ w.gone = false; if(w.reenter) w.reenter(isEN() ? 'I’m back~' : 'กลับมาแล้ว~'); } }
+}
+setInterval(() => { if(!document.hidden) meowRoomSync(); }, 5000);
 let _meowCall = null;
 // the menu bar's real height (it grows with the phone's safe area), so what sits above it never lands on it: sets --nav-h
 function meowNavGap(){
@@ -31073,19 +31095,21 @@ function meowCallPaint(){
   if(!show){ if(_meowCall) _meowCall.hidden = true; return; }
   if(!_meowCall){
     _meowCall = document.createElement('button'); _meowCall.type = 'button'; _meowCall.className = 'meow-call';
-    _meowCall.addEventListener('click', () => meowBringHere());
+    _meowCall.addEventListener('click', () => { if(_meowAtRoom) openMeowRoom(); else meowBringHere(); });
     document.body.appendChild(_meowCall);
   }
-  const key = p.page + '|' + state.view + '|' + p.sp + p.col + '|' + (isEN() ? 'en' : 'th');
+  const key = p.page + '|' + state.view + '|' + p.sp + p.col + '|' + (isEN() ? 'en' : 'th') + (_meowAtRoom ? '|room' : '');
   if(_meowCall.dataset.k !== key){
     _meowCall.dataset.k = key; const en = isEN();
-    _meowCall.innerHTML = `<span><b>${en ? 'Bring her here' : 'พาน้องมาอยู่หน้านี้'}</b><small>${escapeHtml(p.name)} ${en ? 'is on' : 'อยู่หน้า'}${en ? ' ' : ''}${escapeHtml(meowPageName(p.page))}</small></span>`;
+    if(_meowAtRoom) _meowCall.innerHTML = `<span><b>${en ? 'Go and see her' : 'ไปหาน้องที่ห้องรวม'}</b><small>${escapeHtml(p.name)} ${en ? 'is at the cats’ room' : 'ไปห้องรวมแมวอยู่'}</small></span>`;
+    else _meowCall.innerHTML = `<span><b>${en ? 'Bring her here' : 'พาน้องมาอยู่หน้านี้'}</b><small>${escapeHtml(p.name)} ${en ? 'is on' : 'อยู่หน้า'}${en ? ' ' : ''}${escapeHtml(meowPageName(p.page))}</small></span>`;
     const c = document.createElement('canvas'); c.width = MEOW_W; c.height = MEOW_H; c.className = 'meow-px'; c.getContext('2d').drawImage(meowSprite(p, 'loaf', 'open', 0), 0, 0); _meowCall.prepend(c);
   }
   _meowCall.hidden = false; meowNavGap();
 }
 function meowBringHere(say){
   const p = _meow && _meow.pet; if(!p) return;
+  if(_meowAtRoom){ try{ localStorage.setItem('48thdb-room-skip', String(Math.floor(Date.now() / ROOM_VISIT))); }catch(e){} clearTimeout(_meowRoomGoing); _meowRoomGoing = 0; _meowAtRoom = false; meowToysPaint(); }   // called back from the cats' room
   p.page = state.view; meowSave(); meowCallPaint();
   if(_meowWalk){ _meowWalk.gone = false; _meowWalk.reenter(say || (isEN() ? 'Here I am~' : 'มาแล้ว~ เรียกหนูเหรอ')); }
 }
@@ -31611,7 +31635,7 @@ let _meowRoom = null;
 function closeMeowRoom(){
   const R = _meowRoom; if(!R) return; _meowRoom = null;
   clearTimeout(R.rt); clearInterval(R.tk); try{ if(R.ws) R.ws.close(1000, 'bye'); }catch(e){}
-  R.cats.forEach(c => { _meowRun.delete(c.w); }); R.el.remove();
+  R.cats.forEach(c => { _meowRun.delete(c.w); }); R.el.remove(); meowRoomSync();
 }
 function openMeowRoom(){
   closeShareSheet(); closeMeowSheet(); closeMeowRoom();
@@ -31621,13 +31645,13 @@ function openMeowRoom(){
     <div class="share-head"><b>${t('ห้องรวมแมว', 'The cats’ room')}</b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>
     <div class="meow-commons-n"><span data-room-n>${ok ? t('กำลังพาน้องเข้าห้อง…', 'Taking her in…') : !p ? t('ต้องรับเหมียวมาเลี้ยงก่อน', 'Adopt a cat first') : t('เข้าสู่ระบบก่อน จึงพาน้องเข้าห้องได้', 'Sign in to take her in')}</span><small>${t('พรีวิว', 'preview')}</small></div>
     <div class="meow-commons"><div class="meow-floor" style="top:318px"></div><div class="meow-floor" style="top:212px"></div><div class="meow-floor" style="top:106px"></div></div>
-    <p class="lay-sheet-note">${t('น้องที่เคยมาห้องนี้จะแวะมาเองเป็นพัก ๆ ตอนไหนก็ได้ แม้เจ้าของไม่ได้เปิดเว็บ ทุกเครื่องเห็นตรงกัน · แตะน้องตัวไหนก็ลูบได้ เจ้าของจะรู้ว่ามีคนลูบ · โชว์แค่ชื่อน้อง ไม่บอกว่าเป็นของใคร', 'A cat that has been here drops by on her own, any time, even when her owner is away; every screen sees the same · tap any cat to stroke her; her owner is told · only her name is shown, never whose she is')}</p>
+    <p class="lay-sheet-note">${t('น้องที่เคยมาห้องนี้จะแวะมาเองเป็นพัก ๆ ตอนไหนก็ได้ แม้เจ้าของไม่ได้เปิดเว็บ ทุกเครื่องเห็นตรงกัน · ตอนน้องมาห้องนี้ น้องจะไม่อยู่บนหน้าเว็บ (เป็นตัวเดียวกัน) · แตะน้องตัวไหนก็ลูบได้ เจ้าของจะรู้ว่ามีคนลูบ · โชว์แค่ชื่อน้อง ไม่บอกว่าเป็นของใคร', 'A cat that has been here drops by on her own, any time, even when her owner is away; every screen sees the same · while she is here she is not on the pages (she is one cat) · tap any cat to stroke her; her owner is told · only her name is shown, never whose she is')}</p>
     ${ok ? `<button class="lay-row" data-room="leave"><span>${t('ไม่ให้น้องแวะมาห้องนี้อีก', 'Stop her coming to this room')}</span></button>` : ''}</div>`;
   document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('show'));
   const R = _meowRoom = { el, cats:new Map(), roster:new Map(), live:new Set(), me:'', tries:0, floors:[...el.querySelectorAll('.meow-floor')] };
   R.tk = setInterval(() => meowRoomTick(R), 500);
   el.addEventListener('click', e => { if(e.target.closest('[data-share="close"]')){ closeMeowRoom(); return; }
-    if(e.target.closest('[data-room="leave"]')){ try{ if(R.ws && R.ws.readyState === 1) R.ws.send(JSON.stringify({ t:'leave' })); }catch(x){} R.full = true; setTimeout(closeMeowRoom, 200); toast(t('น้องจะไม่แวะไปห้องรวมแล้ว', 'She will not go to the room any more')); } });
+    if(e.target.closest('[data-room="leave"]')){ try{ if(R.ws && R.ws.readyState === 1) R.ws.send(JSON.stringify({ t:'leave' })); }catch(x){} R.full = true; R.me = ''; try{ localStorage.removeItem('48thdb-room-me'); }catch(x){} setTimeout(closeMeowRoom, 200); toast(t('น้องจะไม่แวะไปห้องรวมแล้ว', 'She will not go to the room any more')); } });
   if(ok) meowRoomJoin(R);
 }
 function meowRoomSay(R, th, e){ const n = R.el.querySelector('[data-room-n]'); if(n) n.textContent = isEN() ? e : th; }
@@ -31661,7 +31685,7 @@ async function meowRoomJoin(R){
   ws.onopen = () => ws.send(JSON.stringify({ t:'hi', cat:{ n:String(p.name || 'เหมียว').slice(0, 12), sp:p.sp, col:p.col, born:p.born || 0 } }));
   ws.onmessage = ev => {
     if(R !== _meowRoom) return; let m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
-    if(m.t === 'room'){ R.tries = 0; [...R.cats.keys()].forEach(id => meowRoomDrop(R, id)); R.me = m.me; R.skew = (m.now || Date.now()) - Date.now(); R.slot = null;
+    if(m.t === 'room'){ R.tries = 0; [...R.cats.keys()].forEach(id => meowRoomDrop(R, id)); R.me = m.me; try{ localStorage.setItem('48thdb-room-me', m.me); localStorage.removeItem('48thdb-room-skip'); }catch(e){} meowRoomSync(); R.skew = (m.now || Date.now()) - Date.now(); R.slot = null;
       R.roster = new Map((m.roster || []).map(c => [c.id, c.cat])); R.live = new Set((m.live || []).map(c => c.id));
       (m.live || []).forEach(c => { if(R.roster.has(c.id)) meowRoomAdd(R, c.id, R.roster.get(c.id), c.st); });
       const me = meowRoomAdd(R, R.me, null, null); ws.send(JSON.stringify(me.state())); meowRoomTick(R);
