@@ -4085,6 +4085,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gef-form span em{ font-style:normal; color:var(--ink-soft); font-size:12px; }
   .gef-form span.is-got{ font-weight:700; } .gef-form span.is-got i{ background:var(--t); color:#fff; }
   .gef .gef-go{ margin:16px 0 0; }
+  .gev-box{ font-size:13px; color:var(--ink-soft); } .gev-box .lay-row{ margin:0; }
+  .gev-list{ max-height:340px; overflow:auto; border:1px solid var(--line); border-radius:14px; background:var(--card); color:var(--ink); }
+  .gev-row{ display:grid; grid-template-columns:30px auto minmax(0,1fr) auto; gap:2px 8px; align-items:baseline; padding:7px 10px; font-size:12.5px; font-variant-numeric:tabular-nums; }
+  .gev-row + .gev-row{ border-top:1px solid var(--line); }
+  .gev-row span{ color:var(--ink-soft); } .gev-row small{ color:var(--ink-soft); font-size:11px; overflow:hidden; text-overflow:ellipsis; }
+  .gev-row em{ font-style:normal; font-weight:700; text-align:right; } .gev-row i{ grid-column:2 / -1; font-style:normal; font-size:11px; color:var(--ink-soft); }
   .gel-rest-note{ margin:2px 4px 8px; font-size:11.5px; color:var(--ink-soft); }
   .gel-band-h{ display:flex; align-items:baseline; justify-content:space-between; padding:8px 12px; border-radius:12px;
     color:#fff; font-weight:800; font-size:14px; background:linear-gradient(90deg, var(--t), var(--t2)); }
@@ -15779,6 +15785,26 @@ function geFactOn(){
 }
 geFactOn();   // read the switch before the address is tidied
 const GE_FINAL_ID = 'ge2026-final';
+/* How many voted for each candidate: [votes cast, wallets that voted], counted from the organiser's own list of every vote
+   (14 Nov 2026; its 43,581 votes add up to the official 1,672,642.55). Only these counts are on the page. Who voted — the
+   wallets and their codes — is never in the page or the repo: the owner alone reads it from the Worker (GET /gevoters, KV gev:<id>). */
+const GE_VOTERS = {'cgm-prae':[2030,1204],'bnk-hoop':[1800,1099],'bnk-praew':[1403,844],'bnk-monet':[1217,768],'bnk-pancake':[11154,741],'cgm-nana':[1104,552],'cgm-lewlew':[749,551],'bnk-yoghurt':[906,532],'bnk-luksorn':[760,526],'bnk-blythe':[847,515],'bnk-janry':[774,513],'bnk-saonoi':[876,478],'cgm-lookked':[768,473],'cgm-nisha':[721,438],'bnk-l':[767,432],'bnk-khowjow':[728,431],'cgm-lingling':[622,391],'cgm-kwan':[584,388],'bnk-sindy':[517,382],'bnk-arlee':[675,368],'bnk-fame':[531,362],'bnk-grape':[465,360],'cgm-jingjing':[550,344],'bnk-nall':[532,335],'bnk-emmy':[734,334],'cgm-praifa':[453,327],'bnk-rose':[671,323],'bnk-marine':[505,316],'bnk-micha':[551,298],'cgm-chifa':[347,279],'cgm-emma':[632,272],'cgm-ploen':[413,267],'bnk-jew':[424,267],'bnk-inkcha':[321,263],'cgm-else':[373,256],'cgm-punpon':[326,254],'cgm-tara':[299,247],'cgm-namphet':[318,245],'bnk-mint':[363,242],'bnk-niya':[364,240],'bnk-nammonn':[445,235],'cgm-shenae':[369,230],'bnk-patt':[365,214],'cgm-satangpound':[276,214],'bnk-wawa':[341,209],'bnk-cartoon':[284,204],'cgm-valentine':[260,194],'bnk-palmmy':[369,190],'bnk-mail':[273,184],'bnk-mirin':[225,169],'bnk-khaimook':[218,169],'cgm-hongyok':[202,158],'bnk-berry':[205,144],'bnk-proud':[211,142],'cgm-ginna':[178,133],'bnk-galeya':[717,132],'bnk-neen':[356,128],'bnk-mayji':[113,85]};
+const geVoterRank = id => Object.keys(GE_VOTERS).sort((a, b) => GE_VOTERS[b][1] - GE_VOTERS[a][1]).indexOf(id) + 1;
+const GEV_API = 'https://api.48thdb.com/gevoters';
+async function geVotersLoad(id, box){
+  const en = isEN(), t = (th, e) => en ? e : th;
+  if(!state.isOwner || !fbAuth.currentUser){ box.textContent = t('ต้องเข้าสู่ระบบด้วยบัญชีเจ้าของ', 'Owner sign-in needed'); return; }
+  box.textContent = t('กำลังโหลด…', 'Loading…');
+  try{
+    const tok = await fbAuth.currentUser.getIdToken();
+    const res = await fetch(`${GEV_API}?id=${encodeURIComponent(id)}`, { headers:{ authorization:`Bearer ${tok}` }, cache:'no-store' });
+    const d = await res.json().catch(() => ({}));
+    if(!res.ok || !Array.isArray(d.rows)){ box.textContent = t('โหลดไม่ได้', 'Could not load') + ` (${d.error || res.status})`; return; }
+    const sum = d.rows.reduce((a, r) => a + r[2], 0) || 1;
+    box.innerHTML = `<div class="gev-list">${d.rows.map((r, i) => `<div class="gev-row"><span>${i + 1}</span><b>${escapeHtml(String(r[0]))}</b>
+      <small>${escapeHtml(String(r[1]).slice(0, 6))}…${escapeHtml(String(r[1]).slice(-4))}</small><em>${geVotes(Math.round(r[2] * 100) / 100)}</em><i>${(r[2] / sum * 100).toFixed(1)}% · ${r[3]}×</i></div>`).join('')}</div>`;
+  }catch(e){ box.textContent = t('โหลดไม่ได้', 'Could not load'); }
+}
 const geFactReady = () => geFactOn() && geAnnounced(GE_FINAL_ID) >= GE_SEATS;
 function geFinalField(){
   const sl = geSlots(GE_FINAL_ID), out = [];
@@ -15930,6 +15956,11 @@ function geFactList(id, en){
         `Up ${d} ${d === 1 ? 'place' : 'places'} since Preliminary 2 (No. ${q2.n} → ${me.n})${d === mx && d >= 2 ? ' — the biggest climb of the last stretch' : ''}`);
     }
   }
+  // 8½ — how many voted for her (wallets), when that stands out
+  const vr = GE_VOTERS[id] ? geVoterRank(id) : 0;
+  if(vr && (vr <= 3 || vr <= me.n - 5)) add('🙌', vr === 1 ? `มีผู้โหวตให้มากที่สุดในบรรดาผู้สมัครทั้ง 58 คน (${GE_VOTERS[id][1].toLocaleString('en-US')} กระเป๋า)`
+      : `มีผู้โหวตให้ ${GE_VOTERS[id][1].toLocaleString('en-US')} กระเป๋า มากเป็นอันดับ ${vr} จากผู้สมัครทั้ง 58 คน`,
+    vr === 1 ? `More wallets voted for her than for any of the 58 candidates (${GE_VOTERS[id][1].toLocaleString('en-US')})` : `${GE_VOTERS[id][1].toLocaleString('en-US')} wallets voted for her — No. ${vr} of the 58 candidates`);
   // 9 — close calls
   const up = byN[me.n - 1], dn = byN[me.n + 1];
   if(me.v != null && up && up.v != null && up.v - me.v < me.v * 0.01)
@@ -15945,13 +15976,15 @@ function openGeFact(id){
   const tone = band ? band.tone : 'rest';
   const sum = (typeof GEC_FINAL === 'object' && GEC_FINAL.sum) || 0;
   const share = sum && me.v != null ? (me.v / sum * 100) : null;
-  const up = byN[me.n - 1], dn = byN[me.n + 1], gf = x => geVotes(Math.round(x * 100) / 100);
+  const up = byN[me.n - 1], dn = byN[me.n + 1], gf = x => geVotes(Math.round(x * 100) / 100), gv = GE_VOTERS[id];
   const cell = (k, v, s) => `<div><small>${k}</small><b>${v}</b>${s ? `<em>${s}</em>` : ''}</div>`;
   const cells = [
     cell(t('คะแนน', 'Score'), me.v != null ? geVotes(me.v) : '—', 'Token'),
     share != null ? cell(t('ส่วนแบ่งคะแนน', 'Share of all votes'), (share >= 10 ? share.toFixed(1) : share.toFixed(2)) + '%', t(`จาก ${geVotes(sum)}`, `of ${geVotes(sum)}`)) : '',
     up && up.v != null && me.v != null ? cell(t(`ตามอันดับ ${up.n}`, `Behind No. ${up.n}`), '−' + gf(up.v - me.v), escapeHtml(getMember(up.id) ? getMember(up.id).name : '')) : (me.n === 1 && dn && dn.v != null ? cell(t('นำอันดับ 2', 'Ahead of No. 2'), '+' + gf(me.v - dn.v), escapeHtml(getMember(dn.id) ? getMember(dn.id).name : '')) : ''),
     me.n !== 1 && dn && dn.v != null && me.v != null ? cell(t(`นำอันดับ ${dn.n}`, `Ahead of No. ${dn.n}`), '+' + gf(me.v - dn.v), escapeHtml(getMember(dn.id) ? getMember(dn.id).name : '')) : '',
+    gv ? cell(t('ผู้โหวต', 'Voters'), gv[1].toLocaleString('en-US'), t(`กระเป๋า · มากเป็นอันดับ ${geVoterRank(id)} จาก 58`, `wallets · No. ${geVoterRank(id)} of 58`)) : '',
+    gv ? cell(t('จำนวนครั้งที่โหวต', 'Votes cast'), gv[0].toLocaleString('en-US'), me.v != null ? t(`เฉลี่ย ${gf(me.v / gv[1])} Token ต่อกระเป๋า`, `${gf(me.v / gv[1])} Token a wallet`) : '') : '',
   ].filter(Boolean).join('');
   // the three rounds of this election
   const step = (label, n, v, now) => `<div class="gef-step${now ? ' is-now' : ''}"><small>${label}</small><b>${n != null ? n : '—'}</b><em>${n != null ? (v != null ? geVotes(v) : '') : t('นอก 36', 'outside 36')}</em></div>`;
@@ -15981,11 +16014,13 @@ function openGeFact(id){
       <div class="gef-cells">${cells}</div>
       ${facts.length ? `<h4>${t('เกร็ดน่ารู้', 'Did you know')}</h4><ul class="gef-facts">${facts.map(f => `<li><i>${f.ico}</i><span>${escapeHtml(f.text)}</span></li>`).join('')}</ul>` : ''}
       ${path}${hist}${form}
+      ${state.isOwner ? `<h4>${t('กระเป๋าที่โหวต · เห็นเฉพาะเจ้าของ', 'Wallets that voted · owner only')}</h4><div class="gev-box"><button class="lay-row" data-gef="voters"><span>${t('ดูรายกระเป๋าและ Wallet code', 'Show wallets and wallet codes')}</span><i>🔒</i></button></div>` : ''}
       <button class="lay-row gef-go" data-action="open-member" data-id="${m.id}" data-gef="profile"><span><b>${t(`ดูโปรไฟล์ ${m.name}`, `${m.name}’s profile`)}</b></span><i>›</i></button>
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
-  el.addEventListener('click', e => { if(e.target.closest('[data-share="close"]') || e.target.closest('[data-gef="profile"]')) closeShareSheet(); });
+  el.addEventListener('click', e => { if(e.target.closest('[data-gef="voters"]')){ geVotersLoad(id, el.querySelector('.gev-box')); return; }
+    if(e.target.closest('[data-share="close"]') || e.target.closest('[data-gef="profile"]')) closeShareSheet(); });
 }
 
 function renderGEResults(){

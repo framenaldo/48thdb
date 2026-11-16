@@ -940,6 +940,19 @@ export default {
       if (env.HITS && p && hitOk(p, 40) && hitOk(i, 80)) env.HITS.writeDataPoint({ blobs: [p, i], indexes: [p] });
       return new Response(null, { status: 204, headers: { 'access-control-allow-origin': '*', 'cache-control': 'no-store' } });
     }
+    /* Who voted for a GE2026 candidate — the owner only. The lists (wallet code, address, Token, votes) were put in KV by hand
+       with wrangler (`gev:<member id>`); they are in no file of the repo and no one else is answered. */
+    if (url.pathname === '/gevoters') {
+      const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
+      try {
+        if (!(await isOwner(request, env))) return new Response(JSON.stringify({ error: 'owner only' }), { status: 403, headers: own });
+        const id = url.searchParams.get('id') || '';
+        const v = /^(bnk|cgm)-[a-z0-9]{1,30}$/.test(id) ? await env.IAM.get('gev:' + id) : null;
+        return new Response(v || JSON.stringify({ error: 'none' }), { status: v ? 200 : 404, headers: own });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: String((err && err.message) || err) }), { status: 502, headers: own });
+      }
+    }
     if (url.pathname === '/visits') {
       const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
       try {
