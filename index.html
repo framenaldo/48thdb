@@ -4099,6 +4099,23 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gev-who-l{ display:grid; gap:4px; margin:4px 0; }
   .gev-who-r{ display:grid; grid-template-columns:26px minmax(0,1fr) auto auto; gap:8px; align-items:center; font-size:13px; font-variant-numeric:tabular-nums; }
   .gev-who-r .gev-who-f{ width:26px; height:26px; border-radius:50%; } .gev-who-r em{ font-style:normal; font-weight:700; } .gev-who-r i{ font-style:normal; font-size:11px; color:var(--ink-soft); min-width:74px; text-align:right; }
+  .gev-row u{ text-decoration:none; } .gev-full{ display:none; }
+  /* on a computer the sheet is a wide window in the middle of the screen: figures and facts left, the tables right, the owner's wallets across */
+  @media (min-width:900px){
+    .share-sheet.gef-sheet{ align-items:center; }
+    .share-panel.gef{ width:min(1120px, 94vw); max-height:92vh; border-radius:26px; padding:18px 24px 24px; }
+    .gef-cols{ display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:0 24px; align-items:start; }
+    .gef-b > h4:first-child{ margin-top:0; }
+    .gef-top{ grid-template-columns:84px minmax(0,1fr) auto; padding:16px; } .gef-top .gef-face{ width:84px; height:84px; }
+    .gef-who > b{ font-size:26px; } .gef-rank b{ font-size:56px; }
+    .gef-cells{ grid-template-columns:repeat(3, 1fr); }
+    .gev-list{ max-height:56vh; }
+    .gev-row{ grid-template-columns:44px 120px minmax(0,1fr) 130px 120px; font-size:13.5px; padding:8px 14px; } button.gev-row{ font-size:13.5px; }
+    .gev-list .gev-row i{ grid-column:auto; text-align:right; font-size:12px; } .gev-list .gev-row small{ font-size:12.5px; font-family:ui-monospace, Menlo, monospace; }
+    .gev-short{ display:none; } .gev-full{ display:inline; }
+    .gev-more{ padding-left:58px; } .gev-who-l{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:6px 24px; max-width:760px; }
+    .gev-q{ max-width:420px; } .gef .gef-go{ max-width:360px; }
+  }
   .gev-acts{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
   .gev-row span{ color:var(--ink-soft); } .gev-row small{ color:var(--ink-soft); font-size:11px; overflow:hidden; text-overflow:ellipsis; }
   .gev-row em{ font-style:normal; font-weight:700; text-align:right; } .gev-row i{ grid-column:2 / -1; font-style:normal; font-size:11px; color:var(--ink-soft); }
@@ -15845,7 +15862,7 @@ async function geVotersLoad(id, box){
       box.querySelectorAll('[data-gev-sort]').forEach(c => c.classList.toggle('is-on', c.dataset.gevSort === by));
       box.querySelector('.gev-count').textContent = q ? t(`พบ ${list.length} จาก ${rows.length} กระเป๋า`, `${list.length} of ${rows.length} wallets`) : t(`${rows.length} กระเป๋า`, `${rows.length} wallets`);
       box.querySelector('.gev-list').innerHTML = `${list.length ? '' : `<p class="gev-none">${t('ไม่พบกระเป๋าที่ค้นหา', 'No wallet matches')}</p>`}${list.map((r, i) => { const on = open === r[1]; return `<div class="gev-item${on ? ' is-open' : ''}"><button class="gev-row" data-gev-open="${escapeAttr(String(r[1]))}"><span>${i + 1}</span><b>${escapeHtml(String(r[0]))}</b>
-          <small>${escapeHtml(String(r[1]).slice(0, 6))}…${escapeHtml(String(r[1]).slice(-4))}</small><em>${geVotes(Math.round(r[2] * 100) / 100)}</em><i>${(r[2] / sum * 100).toFixed(1)}% · ${r[3]}×</i></button>
+          <small><u class="gev-short">${escapeHtml(String(r[1]).slice(0, 6))}…${escapeHtml(String(r[1]).slice(-4))}</u><u class="gev-full">${escapeHtml(String(r[1]))}</u></small><em>${geVotes(Math.round(r[2] * 100) / 100)}</em><i>${(r[2] / sum * 100).toFixed(1)}% · ${r[3]}×</i></button>
           ${on ? `<div class="gev-more"><p><small>Wallet code</small><b>${escapeHtml(String(r[0]))}</b></p><p><small>${t('ที่อยู่กระเป๋า', 'Wallet address')}</small><code>${escapeHtml(String(r[1]))}</code></p>
             <p><small>${t('กระเป๋านี้โหวตให้ใครบ้าง', 'Whom this wallet voted for')}</small></p><div class="gev-who" data-w="${escapeAttr(String(r[1]).toLowerCase())}">${geWhoHtml(_gewCache[String(r[1]).toLowerCase()], en)}</div>
             <div class="gev-acts"><button class="chip" data-gev-copy="${escapeAttr(String(r[1]))}">${t('คัดลอกที่อยู่', 'Copy address')}</button><button class="chip" data-gev-copy="${escapeAttr(String(r[0]))}">${t('คัดลอก code', 'Copy code')}</button>
@@ -16073,12 +16090,12 @@ function openGeFact(id){
   el.innerHTML = `<div class="share-back" data-share="close"></div>
     <div class="share-panel gef is-${tone}" role="dialog" aria-label="${escapeHtml(m.name)} · GE2026">
       <div class="share-head"><b>GE2026 · ${t('ผลสุดท้าย', 'Final Results')}</b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>
-      <div class="gef-top">${geFace(m, 'gef-face')}
+      <div class="gef-cols"><div class="gef-a"><div class="gef-top">${geFace(m, 'gef-face')}
         <div class="gef-who"><b>${escapeHtml(m.name)}</b><small>${geTeamTag(m)}</small><span class="gef-band">${band ? band.name + (GE_CENTERS.includes(me.n) ? ' · Center' : me.n <= GE_KAMI7 ? ' · Kami 7' : '') : t('อันดับ 37–58', 'Ranks 37–58')}</span></div>
         <div class="gef-rank"><small>${t('อันดับ', 'No.')}</small><b>${me.n}</b></div></div>
       <div class="gef-cells">${cells}</div>
       ${facts.length ? `<h4>${t('เกร็ดน่ารู้', 'Did you know')}</h4><ul class="gef-facts">${facts.map(f => `<li><i>${f.ico}</i><span>${escapeHtml(f.text)}</span></li>`).join('')}</ul>` : ''}
-      ${path}${hist}${form}
+      </div><div class="gef-b">${path}${hist}${form}</div></div>
       ${state.isOwner ? `<h4>${t('กระเป๋าที่โหวต · เห็นเฉพาะเจ้าของ', 'Wallets that voted · owner only')}</h4><div class="gev-box"><button class="lay-row" data-gef="voters"><span>${t('ดูรายกระเป๋าและ Wallet code', 'Show wallets and wallet codes')}</span><i>🔒</i></button></div>` : ''}
       <button class="lay-row gef-go" data-action="open-member" data-id="${m.id}" data-gef="profile"><span><b>${t(`ดูโปรไฟล์ ${m.name}`, `${m.name}’s profile`)}</b></span><i>›</i></button>
     </div>`;
