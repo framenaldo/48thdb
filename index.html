@@ -5297,6 +5297,46 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   }
   .tlp-btn svg{ width:16px; height:16px; flex:none; }
   .tlp-btn:hover{ background:rgba(255,255,255,calc(.75*var(--glass-k))); }
+  /* the one big button of an event (the audition's form): the poster's colour, a slow shine, a firm press */
+  .ev-cta{
+    --bc:var(--c, var(--pink));
+    position:relative; overflow:hidden; isolation:isolate;
+    display:flex; align-items:center; gap:12px; margin:14px 0 6px; padding:13px 14px 13px 13px;
+    border-radius:22px; text-decoration:none; color:#fff;
+    background:linear-gradient(120deg, color-mix(in srgb, var(--bc) 82%, #1B1140) 0%, var(--bc) 46%, color-mix(in srgb, var(--bc) 62%, #FF7DB0) 100%);
+    border:1.5px solid rgba(255,255,255,.42);
+    box-shadow:0 10px 26px color-mix(in srgb, var(--bc) 42%, transparent), 0 2px 0 color-mix(in srgb, var(--bc) 70%, #000) , inset 0 1px 0 rgba(255,255,255,.38);
+    transition:transform .16s var(--ease-out), box-shadow .16s ease, filter .16s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .ev-cta::before{ content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+    background:radial-gradient(120px 60px at 12% 0%, rgba(255,255,255,.34), transparent 70%),
+               radial-gradient(160px 70px at 100% 100%, rgba(255,255,255,.16), transparent 70%); }
+  .ev-cta::after{ content:""; position:absolute; top:-20%; bottom:-20%; left:-40%; width:34%; pointer-events:none;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.5), transparent);
+    transform:skewX(-18deg); animation:evCtaShine 4.2s ease-in-out infinite; }
+  @keyframes evCtaShine{ 0%, 62%{ left:-40%; } 100%{ left:130%; } }
+  .ev-cta-ic{ flex:none; width:44px; height:44px; border-radius:50%; display:grid; place-items:center;
+    background:#fff; color:var(--bc); box-shadow:0 3px 8px rgba(0,0,0,.16); }
+  .ev-cta-ic svg{ width:24px; height:24px; animation:evCtaStar 2.6s ease-in-out infinite; transform-origin:50% 55%; }
+  @keyframes evCtaStar{ 0%, 100%{ transform:scale(1) rotate(0); } 50%{ transform:scale(1.14) rotate(10deg); } }
+  .ev-cta-t{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; text-align:left; text-shadow:0 1px 2px rgba(0,0,0,.18); }
+  .ev-cta-t b{ font-size:18.5px; font-weight:800; line-height:1.25; letter-spacing:.005em; }
+  .ev-cta-t b{ text-wrap:balance; }
+  .ev-cta-s{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; }
+  .ev-cta-t small{ font-size:12px; font-weight:600; line-height:1.35; opacity:.94; }
+  .ev-cta-left{ flex:none; padding:2px 9px; border-radius:999px; background:rgba(255,255,255,.22);
+    border:1px solid rgba(255,255,255,.5); font-size:11px; font-weight:800; white-space:nowrap; text-shadow:none; }
+  .ev-cta.is-soon .ev-cta-left{ background:#fff; color:var(--bc); }
+  .ev-cta-go{ flex:none; width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
+    background:rgba(255,255,255,.22); transition:transform .16s var(--ease-out); }
+  .ev-cta-go svg{ width:15px; height:15px; }
+  .ev-cta:hover{ filter:brightness(1.06); transform:translateY(-2px); }
+  .ev-cta:hover .ev-cta-go{ transform:translate(2px,-2px); }
+  .ev-cta:active{ transform:translateY(2px) scale(.985); filter:brightness(.97);
+    box-shadow:0 3px 9px color-mix(in srgb, var(--bc) 34%, transparent), inset 0 1px 0 rgba(255,255,255,.3); }
+  @media (max-width:380px){ .ev-cta{ gap:9px; } .ev-cta-ic{ width:38px; height:38px; } .ev-cta-t b{ font-size:17px; } .ev-cta-go{ display:none; } }
+  @media (prefers-reduced-motion:reduce){ .ev-cta::after, .ev-cta-ic svg{ animation:none; } .ev-cta::after{ display:none; } }
   .evm-related{ display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 6px; }
   .evm-related .chip{ white-space:normal; max-width:100%; text-align:left; line-height:1.4; }
   .ev-card.is-openable{ cursor:pointer; transition:transform .2s var(--ease-out), box-shadow .2s var(--ease-out), border-color .2s ease; }
@@ -8928,7 +8968,7 @@ const SEED_SCHEDULE = [
   { id:'ev-bnk-7th-gen-audition', start:'2026-11-16', end:'2026-12-21', period:true,
     title:'BNK48 7th Generation Audition', short:'7th Gen Audition', groups:['bnk48'],
     poster:{ accent:'#8B72DE', surface:'#F3EEFF', ink:'#2A1F52', img:'posters/bnk48-7th-gen-audition.png', w:1792, h:1024 },
-    links:[{ label:'สมัครออดิชัน', url:'https://audition.bnk48.com/' }],
+    links:[{ label:'สมัครออดิชัน', url:'https://audition.bnk48.com/', cta:true, sub:'ปิดรับสมัคร 21 ธ.ค. 23:59 น.', subEn:'Applications close 21 Dec, 23:59' }],
     info:['เปิดรับใบสมัคร 16 พ.ย. 00:00 – 21 ธ.ค. 2026 23:59 น.',
       'สมัครทางเว็บไซต์ audition.bnk48.com'] },
   { id:'ev-shock-me-girls-orientation', start:'2026-11-20', time:'10:00', until:'20:15',
@@ -11996,6 +12036,26 @@ function ckEnsureFilter(){
   document.body.appendChild(d);
 }
 // the button on an event's sheet
+/* A link the whole event is about (the audition's application form) is one big button under the title, not a
+   small chip among the others: `cta:true` on the link, `sub`/`subEn` a line under its label. It counts the days
+   left to the event's end and goes back to a plain chip once the event is over. */
+function evCtaOn(ev, l){
+  return !!(l && l.cta) && !ev.cancelled && toYmd(todayStart()) <= (ev.end || ev.start);
+}
+function renderEventCta(ev){
+  const ls = (ev.links || []).filter(l => evCtaOn(ev, l));
+  if (!ls.length) return '';
+  const en = isEN();
+  const left = Math.round((new Date((ev.end || ev.start) + 'T00:00:00') - new Date(toYmd(todayStart()) + 'T00:00:00')) / 864e5);
+  const started = toYmd(todayStart()) >= ev.start;
+  const pill = !ev.period || !started ? '' : left <= 0 ? (en ? 'Last day' : 'วันสุดท้าย')
+    : en ? `${left} day${left === 1 ? '' : 's'} left` : `เหลือ ${left} วัน`;
+  return ls.map(l => `<a class="ev-cta${left <= 3 && started ? ' is-soon' : ''}" data-noloc style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">
+    <span class="ev-cta-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2l2.5 6.3 6.8.5-5.2 4.4 1.6 6.6L12 16.5 6.3 20l1.6-6.6L2.7 9l6.8-.5L12 2.2Z"/></svg></span>
+    <span class="ev-cta-t"><b>${escapeHtml(en ? (EN[l.label] || l.label) : l.label)}</b><span class="ev-cta-s">${l.sub ? `<small>${escapeHtml(en ? (l.subEn || l.sub) : l.sub)}</small>` : ''}${pill ? `<span class="ev-cta-left">${pill}</span>` : ''}</span></span>
+    <span class="ev-cta-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+  </a>`).join('');
+}
 function renderCheckinBtn(ev){
   if(!_ckOn || !ev || ev.online || !ev.venue || ev.period || ev.cancelled) return '';
   const open = ckOpenNow(ev), tryIt = state.isOwner && !open, got = ckStamps()[ev.id];
@@ -20001,6 +20061,8 @@ function renderEventModal(){
         ${groupTags.length ? `<div class="ev-groups">${groupTags.map(g=>
           groupTag(g)).join('')}</div>` : ''}
 
+        ${renderEventCta(ev)}
+
         ${ev.slots ? renderSlotTable(ev) : ''}
 
         ${ev.detail ? `
@@ -20031,7 +20093,7 @@ function renderEventModal(){
 
         ${ev.shop && shopUrl(ev.shop) && shopStatus(ev, Date.now()).state !== 'over' ? `<div class="evm-related">
           <a class="shop-buy" style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}" href="${escapeAttr(shopUrl(ev.shop))}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>ซื้อที่ ${escapeHtml(ev.shop.shopName)} <span class="shop-buy-arrow">↗</span></a></div>` : ''}
-        ${(ev.links || []).length ? `<div class="evm-related">${ev.links.map(l =>
+        ${(ev.links || []).filter(l => !evCtaOn(ev, l)).length ? `<div class="evm-related">${ev.links.filter(l => !evCtaOn(ev, l)).map(l =>
           `<a class="chip chip-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)} ↗</a>`).join('')}</div>` : ''}
         ${ev.boothPlan === 'fanfest' ? renderBoothPlan(ev) : ''}
         ${ev.lanePlan ? `<h3 class="evm-head">${isEN() ? 'Handshake lanes' : 'ผังเลนจับมือ'}</h3>${renderLanePlan(ev)}` : ''}
@@ -31458,7 +31520,7 @@ function meowSheetPaint(){
     ${S.tray && !sleeping ? `<div class="meow-foods">${MEOW_FOODS.map(f => `<button class="meow-act" data-meow-food="${f.k}"><span data-meow-ic="${f.k}"></span>${en ? f.en : f.th}<small>${f.cost ? t(`ขนม ${f.cost}`, `${f.cost} snack${f.cost > 1 ? 's' : ''}`) : t('ฟรี', 'free')}</small></button>`).join('')}</div>` : ''}
     <p class="lay-sheet-note">${t('ได้ขนมวันละ 3 ชิ้นเมื่อกลับมาเข้าเว็บ และอีกชิ้นทุกครั้งที่เปิดดูงานหรือเมมเบอร์ (วันละ 3) · น้องนอนเมื่ออยากนอน วันละราว 12–16 ชั่วโมงเป็นช่วง ๆ กลางวันหลับเยอะ พลบค่ำกับเช้ามืดตื่นตัวที่สุด กลางคืนชอบลุกมาวิ่งเล่น ลูบตอนหลับอาจตื่นหรือไม่ก็ได้ · ชามน้ำ: น้องไปกินเองเมื่อหิวน้ำ เติมน้ำใหม่ทุกวัน น้ำค้างคืนน้องไม่ค่อยกิน', 'Three snacks a day for coming back, one more for each event or member you open (three a day). She sleeps when she likes, 12–16 hours a day in bouts: much of the day, wide awake at dusk and dawn, and often up at night to run about; a stroke while she sleeps may or may not wake her. Water bowl: she drinks by herself when thirsty; fill it fresh each day, she hardly touches day-old water.')}</p>
     ${_meow.home || sleeping ? '' : `<button class="lay-row" data-meow="call"><span><b>${t('เรียกน้องมาตรงนี้', 'Call her here')}</b><small>${t('น้องเดินเล่นอยู่ที่ไหนสักแห่งในหน้า กดแล้วน้องจะกระโดดมาหา', 'She roams the whole page; she will leap over to you')}</small></span><i>›</i></button>`}
-    ${roomOn ? `<button class="lay-row" data-meow="room"><span><b>${t('ห้องรวมแมว', 'The cats’ room')}</b><small>${t('พาน้องไปเจอน้องของคนอื่น เห็นกันสด ๆ (พรีวิว)', 'Take her to meet other readers’ cats, live (preview)')}</small></span><i>›</i></button>` : ''}
+    ${roomOn ? `<button class="lay-row" data-meow="room"><span><b>${t('ห้องรวมแมว', 'The cats’ room')}</b><small>${t('พาน้องไปเจอน้องของคนอื่น เห็นกันสด ๆ', 'Take her to meet other readers’ cats, live')}</small></span><i>›</i></button>` : ''}
     <button class="lay-row" data-meow="home"><span>${_meow.home ? t('ให้น้องออกมาเดินเล่นบนเว็บ', 'Let her walk the site') : t('ให้น้องอยู่บ้าน ไม่เดินบนเว็บ', 'Keep her home, off the pages')}</span></button>
     <p class="lay-sheet-note meow-sync"${meowSignedIn() ? ' data-meow="sync" role="button"' : ''}>${meowSyncText(t)}</p></div>`;
   el.querySelectorAll('[data-meow-ic]').forEach(s => { const c = meowPix(s.dataset.meowIc); if(c) s.replaceWith(c); });
@@ -31578,7 +31640,7 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape' && _meowSheet)
    home) and tells the room what she does — the act, from where, to where, as shares of the floor — over a WebSocket to the Worker's
    Durable Object (worker/room.js); the others draw her doing the same. Only the cat is shown: her name, look and collar, never whose
    she is. Nothing is kept anywhere: closing the room takes her out of it. */
-const roomOn = (() => { try{ const q = new URLSearchParams(location.search).get('room'); if(q === 'on') localStorage.setItem('48thdb-room', '1'); else if(q === 'off') localStorage.removeItem('48thdb-room'); return localStorage.getItem('48thdb-room') === '1'; }catch(e){ return false; } })();
+const roomOn = (() => { try{ const q = new URLSearchParams(location.search).get('room'); if(q === 'off') localStorage.setItem('48thdb-room', '0'); else if(q === 'on') localStorage.removeItem('48thdb-room'); return localStorage.getItem('48thdb-room') !== '0'; }catch(e){ return true; } })();
 class MeowGuest extends MeowWalker {
   get pet(){ return this.o.pet; }
   max(){ return Math.max(1, this.w - MEOW_W * this.s); }
