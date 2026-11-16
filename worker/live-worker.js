@@ -944,17 +944,60 @@ export default {
        with wrangler (`gev:<member id>`); they are in no file of the repo and no one else is answered. */
     if (url.pathname === '/gevoters') {
       const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
+      const say = (body, status = 200) => new Response(typeof body === 'string' ? body : JSON.stringify(body), { status, headers: own });
       try {
-        if (!(await isOwner(request, env))) return new Response(JSON.stringify({ error: 'owner only' }), { status: 403, headers: own });
+        const owner = await isOwner(request, env);
+        const me = owner ? null : await firebaseClaims(request);
+        /* Sharing by code (the owner's wish, 16 Nov 2026): the owner makes a code (`gek:<code>`, good for 7 days, one use);
+           a signed-in reader redeems it on their own account and that account may read (`gea:<uid>`), until the owner takes it back. */
+        if (request.method === 'POST') {
+          const body = await request.json().catch(() => ({}));
+          if (body.act === 'redeem') {
+            if (!me) return say({ error: 'sign-in' }, 403);
+            const tries = +(await env.IAM.get('ger:' + me.sub)) || 0;
+            if (tries >= 10) return say({ error: 'slow' }, 429);
+            const code = String(body.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const k = /^[A-Z0-9]{8}$/.test(code) ? await env.IAM.get('gek:' + code) : null;
+            if (!k) { await env.IAM.put('ger:' + me.sub, String(tries + 1), { expirationTtl: 3600 }); return say({ error: 'bad-code' }, 404); }
+            await env.IAM.put('gea:' + me.sub, JSON.stringify({ email: me.email || '', name: me.name || '', at: Date.now(), code }));
+            await env.IAM.delete('gek:' + code);
+            return say({ ok: true });
+          }
+          if (!owner) return say({ error: 'owner only' }, 403);
+          if (body.act === 'new') {
+            const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = crypto.getRandomValues(new Uint8Array(8));
+            const code = Array.from(r, (x) => A[x % A.length]).join('');
+            await env.IAM.put('gek:' + code, JSON.stringify({ at: Date.now(), note: String(body.note || '').slice(0, 60) }), { expirationTtl: 7 * 86400 });
+            return say({ code });
+          }
+          if (body.act === 'revoke') {
+            const k = String(body.key || '');
+            if (!/^(gea|gek):[\w-]{1,128}$/.test(k)) return say({ error: 'bad request' }, 400);
+            await env.IAM.delete(k);
+            return say({ ok: true });
+          }
+          if (body.act === 'list') {
+            const out = { codes: [], people: [] };
+            for (const [p, to] of [['gek:', out.codes], ['gea:', out.people]]) {
+              const l = await env.IAM.list({ prefix: p, limit: 100 });
+              for (const k of l.keys) { let v = {}; try { v = JSON.parse((await env.IAM.get(k.name)) || '{}'); } catch (e) {} to.push({ key: k.name, ...v }); }
+            }
+            return say(out);
+          }
+          return say({ error: 'bad request' }, 400);
+        }
+        const may = owner || (!!me && !!(await env.IAM.get('gea:' + me.sub)));
+        if (!may) return say({ error: owner ? 'owner only' : (me ? 'no-access' : 'owner only') }, 403);
+        if (url.searchParams.get('can') === '1') return say({ ok: true });
         const id = url.searchParams.get('id') || '';
         // ?w=<wallet address or wallet code>: whom that wallet voted for (gew:<address>, gewc:<code> → address)
         let wq = (url.searchParams.get('w') || '').trim().toLowerCase();
         if (/^\d{4,20}$/.test(wq)) wq = (await env.IAM.get('gewc:' + wq)) || '';
         const v = /^0x[0-9a-f]{40}$/.test(wq) ? await env.IAM.get('gew:' + wq)
           : /^(bnk|cgm)-[a-z0-9]{1,30}$/.test(id) ? await env.IAM.get('gev:' + id) : null;
-        return new Response(v || JSON.stringify({ error: 'none' }), { status: v ? 200 : 404, headers: own });
+        return say(v || { error: 'none' }, v ? 200 : 404);
       } catch (err) {
-        return new Response(JSON.stringify({ error: String((err && err.message) || err) }), { status: 502, headers: own });
+        return say({ error: String((err && err.message) || err) }, 502);
       }
     }
     if (url.pathname === '/visits') {

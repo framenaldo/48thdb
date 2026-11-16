@@ -4116,6 +4116,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .gev-more{ padding-left:58px; } .gev-who-l{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:6px 24px; max-width:760px; }
     .gev-q{ max-width:420px; } .gef .gef-go{ max-width:360px; }
   }
+  .gev-code-row{ margin:10px 0; } .gev-code-in{ text-align:center; letter-spacing:.3em; font-weight:700; text-transform:uppercase; max-width:none; }
+  .gev-h{ margin:14px 0 8px; font-size:13px; color:var(--ink-soft); } .gev-grant span{ flex:1; min-width:0; display:flex; flex-direction:column; } .gev-grant small{ color:var(--ink-soft); font-size:11.5px; overflow:hidden; text-overflow:ellipsis; }
+  .gev-codetxt{ letter-spacing:.18em; font-variant-numeric:tabular-nums; user-select:all; }
   .gev-acts{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
   .gev-row span{ color:var(--ink-soft); } .gev-row small{ color:var(--ink-soft); font-size:11px; overflow:hidden; text-overflow:ellipsis; }
   .gev-row em{ font-style:normal; font-weight:700; text-align:right; } .gev-row i{ grid-column:2 / -1; font-style:normal; font-size:11px; color:var(--ink-soft); }
@@ -15819,16 +15822,87 @@ const GE_FINAL_ID = 'ge2026-final';
 const GE_VOTERS = {'cgm-prae':[2030,1204],'bnk-hoop':[1800,1099],'bnk-praew':[1403,844],'bnk-monet':[1217,768],'bnk-pancake':[11154,741],'cgm-nana':[1104,552],'cgm-lewlew':[749,551],'bnk-yoghurt':[906,532],'bnk-luksorn':[760,526],'bnk-blythe':[847,515],'bnk-janry':[774,513],'bnk-saonoi':[876,478],'cgm-lookked':[768,473],'cgm-nisha':[721,438],'bnk-l':[767,432],'bnk-khowjow':[728,431],'cgm-lingling':[622,391],'cgm-kwan':[584,388],'bnk-sindy':[517,382],'bnk-arlee':[675,368],'bnk-fame':[531,362],'bnk-grape':[465,360],'cgm-jingjing':[550,344],'bnk-nall':[532,335],'bnk-emmy':[734,334],'cgm-praifa':[453,327],'bnk-rose':[671,323],'bnk-marine':[505,316],'bnk-micha':[551,298],'cgm-chifa':[347,279],'cgm-emma':[632,272],'cgm-ploen':[413,267],'bnk-jew':[424,267],'bnk-inkcha':[321,263],'cgm-else':[373,256],'cgm-punpon':[326,254],'cgm-tara':[299,247],'cgm-namphet':[318,245],'bnk-mint':[363,242],'bnk-niya':[364,240],'bnk-nammonn':[445,235],'cgm-shenae':[369,230],'bnk-patt':[365,214],'cgm-satangpound':[276,214],'bnk-wawa':[341,209],'bnk-cartoon':[284,204],'cgm-valentine':[260,194],'bnk-palmmy':[369,190],'bnk-mail':[273,184],'bnk-mirin':[225,169],'bnk-khaimook':[218,169],'cgm-hongyok':[202,158],'bnk-berry':[205,144],'bnk-proud':[211,142],'cgm-ginna':[178,133],'bnk-galeya':[717,132],'bnk-neen':[356,128],'bnk-mayji':[113,85]};
 const geVoterRank = id => Object.keys(GE_VOTERS).sort((a, b) => GE_VOTERS[b][1] - GE_VOTERS[a][1]).indexOf(id) + 1;
 const GEV_API = 'https://api.48thdb.com/gevoters';
+/* Who may read the wallets: the owner, and an account that redeemed a code from the owner (the Worker decides; this flag only
+   decides what is drawn, and is dropped the moment the Worker says no). */
+const gevMay = () => { try{ const u = fbAuth.currentUser; return !!u && (state.isOwner || localStorage.getItem('48thdb-gev') === u.uid); }catch(e){ return false; } };
+const gevLabel = en => state.isOwner ? (en ? 'owner only' : 'เห็นเฉพาะเจ้าของ') : (en ? 'by the owner’s code' : 'เห็นด้วยโค้ดจากเจ้าของ');
+function gevDenied(){ try{ if(!state.isOwner) localStorage.removeItem('48thdb-gev'); }catch(e){} }
+async function gevPost(body){
+  const tok = await fbAuth.currentUser.getIdToken();
+  const res = await fetch(GEV_API, { method:'POST', headers:{ authorization:`Bearer ${tok}`, 'content-type':'application/json' }, body:JSON.stringify(body) });
+  return { ok:res.ok, status:res.status, d:await res.json().catch(() => ({})) };
+}
+/* The profile's row: a reader types the owner's code; the owner makes codes and sees who holds one. */
+function renderGevCodeCard(){
+  if(!fbAuth.currentUser) return '';
+  const en = isEN();
+  return `<button class="lay-row gev-code-row" data-action="gev-code"><span>${state.isOwner ? (en ? 'Wallet list · codes for others' : 'รายกระเป๋าโหวต · โค้ดให้คนอื่นดู')
+    : gevMay() ? (en ? 'GE2026 wallet list: you have access ✓' : 'รายกระเป๋าโหวต GE2026: ได้รับสิทธิ์แล้ว ✓') : (en ? 'Have a code from the owner?' : 'มีโค้ดจากเจ้าของเว็บ? กรอกโค้ด')}</span><i>${state.isOwner ? '🔑' : '›'}</i></button>`;
+}
+function openGevCode(){
+  if(!fbAuth.currentUser) return;
+  const en = isEN(), t = (th, e) => en ? e : th;
+  closeShareSheet();
+  const el = document.createElement('div'); el.className = 'share-sheet';
+  let data = null, msg = '';
+  const day = ms => { const d = new Date(ms); return `${d.getDate()} ${monthsShort()[d.getMonth()]}`; };
+  const body = () => {
+    if(!state.isOwner) return gevMay()
+      ? `<p class="lay-sheet-note">${t('บัญชีนี้ดูรายกระเป๋าที่โหวตได้แล้ว เปิดหน้าผลเลือกตั้ง กดชื่อผู้สมัคร แล้วเลื่อนลงท้ายแผ่น', 'This account can read the wallet list: open the results, tap a candidate and scroll to the foot of her sheet.')}</p>
+         <button class="lay-row" data-gevc="go"><span><b>${t('ไปหน้าผลเลือกตั้ง', 'Open the results')}</b></span><i>›</i></button>`
+      : `<p class="lay-sheet-note">${t('กรอกโค้ด 8 ตัวที่ได้จากเจ้าของเว็บ โค้ดใช้ได้ครั้งเดียวและผูกกับบัญชีนี้', 'Type the 8-character code from the site’s owner. It works once and is tied to this account.')}</p>
+         <input class="gev-q gev-code-in" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXXXXXX">
+         <button class="lay-row" data-gevc="redeem"><span><b>${t('ใช้โค้ด', 'Use the code')}</b></span><i>›</i></button>
+         <p class="lay-sheet-note" role="status">${msg}</p>`;
+    return `<p class="lay-sheet-note">${t('สร้างโค้ดแล้วส่งให้คนที่อยากให้ดู เขาล็อกอินบัญชีของตัวเองแล้วกรอกที่หน้าโปรไฟล์ โค้ดใช้ได้ครั้งเดียว หมดอายุใน 7 วัน และเรียกสิทธิ์คืนได้ทุกเมื่อ', 'Make a code and send it to the person. They sign in to their own account and type it on their profile. A code works once, lasts 7 days, and access can be taken back at any time.')}</p>
+      <button class="lay-row" data-gevc="new"><span><b>${t('สร้างโค้ดใหม่', 'Make a new code')}</b></span><i>＋</i></button>
+      <p class="lay-sheet-note" role="status">${msg}</p>
+      ${!data ? `<p class="lay-sheet-note">${t('กำลังโหลด…', 'Loading…')}</p>` : `
+        <h4 class="gev-h">${t('โค้ดที่ยังไม่ถูกใช้', 'Codes not used yet')} · ${data.codes.length}</h4>
+        ${data.codes.map(c => `<div class="lay-row gev-grant"><span><b class="gev-codetxt">${escapeHtml(c.key.slice(4))}</b><small>${c.at ? t(`สร้าง ${day(c.at)}`, `made ${day(c.at)}`) : ''}</small></span>
+          <button class="chip" data-gevc="copy" data-v="${escapeAttr(c.key.slice(4))}">${t('คัดลอก', 'Copy')}</button><button class="chip" data-gevc="revoke" data-v="${escapeAttr(c.key)}">${t('ลบ', 'Delete')}</button></div>`).join('') || `<p class="lay-sheet-note">—</p>`}
+        <h4 class="gev-h">${t('คนที่ได้รับสิทธิ์', 'People with access')} · ${data.people.length}</h4>
+        ${data.people.map(c => `<div class="lay-row gev-grant"><span><b>${escapeHtml(c.name || c.email || c.key.slice(4, 14))}</b><small>${escapeHtml(c.email || '')}${c.at ? ` · ${day(c.at)}` : ''}</small></span>
+          <button class="chip" data-gevc="revoke" data-v="${escapeAttr(c.key)}">${t('เรียกสิทธิ์คืน', 'Take back')}</button></div>`).join('') || `<p class="lay-sheet-note">—</p>`}`}`;
+  };
+  const paint = () => { el.innerHTML = `<div class="share-back" data-share="close"></div><div class="share-panel" role="dialog" aria-label="${t('โค้ดดูรายกระเป๋า', 'Wallet list code')}">
+    <div class="share-head"><b>${state.isOwner ? t('โค้ดให้คนอื่นดูรายกระเป๋า', 'Codes for the wallet list') : t('กรอกโค้ด', 'Enter a code')}</b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>${body()}</div>`; };
+  const load = async () => { try{ const r = await gevPost({ act:'list' }); data = r.ok ? r.d : { codes:[], people:[] }; if(!r.ok) msg = t('โหลดไม่ได้', 'Could not load') + ` (${r.d.error || r.status})`; }catch(e){ data = { codes:[], people:[] }; msg = t('โหลดไม่ได้', 'Could not load'); } paint(); };
+  paint(); document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('show'));
+  if(state.isOwner) load();
+  // an account that redeemed its code on another device: ask the Worker once and remember
+  else if(!gevMay()) fbAuth.currentUser.getIdToken().then(tok => fetch(`${GEV_API}?can=1`, { headers:{ authorization:`Bearer ${tok}` }, cache:'no-store' })).then(r => {
+    if(r.ok){ try{ localStorage.setItem('48thdb-gev', fbAuth.currentUser.uid); }catch(e){} if(el.isConnected) paint(); if(state.view === 'profile') renderMain(); } }).catch(() => {});
+  el.addEventListener('click', async e => {
+    if(e.target.closest('[data-share="close"]')){ closeShareSheet(); return; }
+    const a = e.target.closest('[data-gevc]'); if(!a) return;
+    const act = a.dataset.gevc;
+    try{
+      if(act === 'go'){ closeShareSheet(); state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'results'; state.selectedId = null; render(); pushHistory(); window.scrollTo(0, 0); }
+      else if(act === 'copy'){ navigator.clipboard.writeText(a.dataset.v); a.textContent = t('คัดลอกแล้ว ✓', 'Copied ✓'); }
+      else if(act === 'new'){ const r = await gevPost({ act:'new' }); msg = r.ok ? t(`โค้ดใหม่: ${r.d.code}`, `New code: ${r.d.code}`) : t('สร้างไม่ได้', 'Could not make one') + ` (${r.d.error || r.status})`; await load(); }
+      else if(act === 'revoke'){ await gevPost({ act:'revoke', key:a.dataset.v }); msg = ''; await load(); }
+      else if(act === 'redeem'){
+        const code = (el.querySelector('.gev-code-in').value || '').trim();
+        msg = t('กำลังตรวจโค้ด…', 'Checking…'); paint();
+        const r = await gevPost({ act:'redeem', code });
+        if(r.ok){ try{ localStorage.setItem('48thdb-gev', fbAuth.currentUser.uid); }catch(err){} msg = ''; paint(); if(state.view === 'profile') renderMain(); }
+        else { msg = r.status === 429 ? t('ลองหลายครั้งเกินไป รอสักชั่วโมงแล้วลองใหม่', 'Too many tries. Wait an hour.') : t('โค้ดไม่ถูกต้อง หรือถูกใช้ไปแล้ว', 'That code is wrong or already used.'); paint(); }
+      }
+    }catch(err){ msg = t('เชื่อมต่อไม่ได้ ลองใหม่อีกครั้ง', 'Could not connect. Try again.'); paint(); }
+  });
+}
 /* Whom one wallet voted for — the owner only, from the Worker (`?w=` an address or a wallet code). Kept for the visit. */
 const _gewCache = {};
 async function geWalletWho(w){
   w = String(w || '').trim().toLowerCase();
   if(_gewCache[w]) return _gewCache[w];
-  if(!state.isOwner || !fbAuth.currentUser) return { error:'owner' };
+  if(!gevMay()) return { error:'owner' };
   try{
     const tok = await fbAuth.currentUser.getIdToken();
     const res = await fetch(`${GEV_API}?w=${encodeURIComponent(w)}`, { headers:{ authorization:`Bearer ${tok}` }, cache:'no-store' });
     const d = await res.json().catch(() => ({}));
+    if(res.status === 403) gevDenied();
     if(res.status === 404) return (_gewCache[w] = { none:true });
     if(!res.ok || !Array.isArray(d.rows)) return { error:d.error || res.status };
     _gewCache[w] = d; if(d.addr) _gewCache[d.addr] = d;
@@ -15846,13 +15920,14 @@ function geWhoHtml(d, en){
 }
 async function geVotersLoad(id, box){
   const en = isEN(), t = (th, e) => en ? e : th;
-  if(!state.isOwner || !fbAuth.currentUser){ box.textContent = t('ต้องเข้าสู่ระบบด้วยบัญชีเจ้าของ', 'Owner sign-in needed'); return; }
+  if(!gevMay()){ box.textContent = t('บัญชีนี้ไม่มีสิทธิ์ดู', 'This account has no access'); return; }
   box.textContent = t('กำลังโหลด…', 'Loading…');
   try{
     const tok = await fbAuth.currentUser.getIdToken();
     const res = await fetch(`${GEV_API}?id=${encodeURIComponent(id)}`, { headers:{ authorization:`Bearer ${tok}` }, cache:'no-store' });
     const d = await res.json().catch(() => ({}));
-    if(!res.ok || !Array.isArray(d.rows)){ box.textContent = t('โหลดไม่ได้', 'Could not load') + ` (${d.error || res.status})`; return; }
+    if(res.status === 403) gevDenied();
+    if(!res.ok || !Array.isArray(d.rows)){ box.textContent = res.status === 403 && !state.isOwner ? t('สิทธิ์ของบัญชีนี้ถูกเรียกคืนแล้ว', 'This account’s access was taken back') : t('โหลดไม่ได้', 'Could not load') + ` (${d.error || res.status})`; return; }
     const rows = d.rows, sum = rows.reduce((a, r) => a + r[2], 0) || 1;
     let by = 'tok', open = null, q = '';
     const SORT = { tok:[t('Token มากสุด', 'Most Token'), (a, b) => b[2] - a[2]], n:[t('โหวตบ่อยสุด', 'Most votes'), (a, b) => b[3] - a[3] || b[2] - a[2]],
@@ -16096,7 +16171,7 @@ function openGeFact(id){
       <div class="gef-cells">${cells}</div>
       ${facts.length ? `<h4>${t('เกร็ดน่ารู้', 'Did you know')}</h4><ul class="gef-facts">${facts.map(f => `<li><i>${f.ico}</i><span>${escapeHtml(f.text)}</span></li>`).join('')}</ul>` : ''}
       </div><div class="gef-b">${path}${hist}${form}</div></div>
-      ${state.isOwner ? `<h4>${t('กระเป๋าที่โหวต · เห็นเฉพาะเจ้าของ', 'Wallets that voted · owner only')}</h4><div class="gev-box"><button class="lay-row" data-gef="voters"><span>${t('ดูรายกระเป๋าและ Wallet code', 'Show wallets and wallet codes')}</span><i>🔒</i></button></div>` : ''}
+      ${gevMay() ? `<h4>${t('กระเป๋าที่โหวต', 'Wallets that voted')} · ${gevLabel(en)}</h4><div class="gev-box"><button class="lay-row" data-gef="voters"><span>${t('ดูรายกระเป๋าและ Wallet code', 'Show wallets and wallet codes')}</span><i>🔒</i></button></div>` : ''}
       <button class="lay-row gef-go" data-action="open-member" data-id="${m.id}" data-gef="profile"><span><b>${t(`ดูโปรไฟล์ ${m.name}`, `${m.name}’s profile`)}</b></span><i>›</i></button>
     </div>`;
   document.body.appendChild(el);
@@ -16585,9 +16660,9 @@ let gecWallet = null;
 async function gecOpenWallet(w){
   w = String(w || '').trim().toLowerCase();
   // the owner may type a wallet code: the Worker says which wallet it is
-  if(state.isOwner && /^\d{4,20}$/.test(w)){ const d = await geWalletWho(w); if(d && d.addr) w = d.addr; }
+  if(gevMay() && /^\d{4,20}$/.test(w)){ const d = await geWalletWho(w); if(d && d.addr) w = d.addr; }
   if(!/^0x[0-9a-f]{40}$/.test(w)){ gecWallet = { w, bad:true }; gecDraw(); return; }
-  if(state.isOwner && !_gewCache[w]) geWalletWho(w).then(() => { if(gecWallet && gecWallet.w === w) gecDraw(); });
+  if(gevMay() && !_gewCache[w]) geWalletWho(w).then(() => { if(gecWallet && gecWallet.w === w) gecDraw(); });
   gecWallet = { w, loading:true };
   gecDraw();
   const card = document.querySelector('.gec-wallet'); if(card) card.scrollIntoView({ block:'start', behavior:'smooth' });
@@ -16625,7 +16700,7 @@ function renderGECWallet(en, N, hm){
     const tk = gecLoad('tok'), held = tk ? Math.max(0, tk.bal[W.w] || 0) : null;
     body = `<p class="gec-wid"><a href="${GEC_API}/address/${W.w}" target="_blank" rel="noopener">${W.w.slice(0, 10)}…${W.w.slice(-8)}</a></p>
       ${held != null ? `<p class="gec-held">${en ? 'Holds now, not voted:' : 'ตอนนี้ยังถือ GE6 ที่ยังไม่โหวต'} <b>${gecTok(held)}</b> ${en ? 'GE6' : 'โทเคน'} · ${gecBaht(held, en)}</p>` : ''}
-      ${state.isOwner ? `<div class="gec-wy gev-own"><h4>${en ? 'Voted for · owner only' : 'โหวตให้ใคร · เห็นเฉพาะเจ้าของ'}</h4>${geWhoHtml(_gewCache[W.w], en)}</div>` : ''}
+      ${gevMay() ? `<div class="gec-wy gev-own"><h4>${en ? 'Voted for' : 'โหวตให้ใคร'} · ${gevLabel(en)}</h4>${geWhoHtml(_gewCache[W.w], en)}</div>` : ''}
       ${year('ge2026')}${year('ge2025')}
       <p class="gec-sub">${en ? 'Every vote goes into the election’s poll contract, the same one for everybody — never to a member’s wallet — so who it was for cannot be told.'
         : 'ทุกโหวตส่งเข้าสัญญาโหวตของการเลือกตั้งตัวเดียวกันหมด ไม่ได้ส่งเข้ากระเป๋าของเมมเบอร์ เลยบอกไม่ได้ว่าโหวตให้ใคร'}</p>`;
@@ -23739,6 +23814,7 @@ function renderProfile(){
   ${renderMeowAdopt()}
   ${renderAdminHub()}
   ${renderMyStyleCard()}
+  ${renderGevCodeCard()}
   <div class="lay-zones" data-page="profile">
   <section class="lay-z" data-zone="kami">
   <h3 class="section-label">Kami Oshi ของคุณ</h3>
@@ -32464,6 +32540,7 @@ function bindDelegatedEvents(){
       state.geRound = el.dataset.value; _geSeen = null;
       renderMain();
     }
+    else if(action==='gev-code'){ openGevCode(); return; }
     else if(action==='open-ge-fact'){ openGeFact(el.dataset.id); return; }
     else if(action==='ge-gap'){
       state.geGap = el.dataset.value;
