@@ -931,7 +931,7 @@ export default {
         return say({ error: String((err && err.message) || err) }, err && err.status || 502);
       }
     }
-    if (request.method !== 'GET') {
+    if (request.method !== 'GET' && !(request.method === 'POST' && new URL(request.url).pathname === '/gevoters')) {
       return new Response('Method not allowed', { status: 405, headers: JSON_HEADERS });
     }
     const url = new URL(request.url);
