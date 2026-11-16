@@ -4088,7 +4088,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gev-box{ font-size:13px; color:var(--ink-soft); } .gev-box .lay-row{ margin:0; }
   .gev-list{ max-height:340px; overflow:auto; border:1px solid var(--line); border-radius:14px; background:var(--card); color:var(--ink); }
   .gev-row{ display:grid; grid-template-columns:30px auto minmax(0,1fr) auto; gap:2px 8px; align-items:baseline; padding:7px 10px; font-size:12.5px; font-variant-numeric:tabular-nums; }
-  .gev-row + .gev-row{ border-top:1px solid var(--line); }
+  .gev-item + .gev-item{ border-top:1px solid var(--line); } .gev-item.is-open{ background:color-mix(in srgb, var(--t2) 12%, transparent); }
+  button.gev-row{ width:100%; border:0; background:none; color:inherit; font:inherit; font-size:12.5px; text-align:left; cursor:pointer; } button.gev-row:active{ transform:scale(.99); }
+  .gev-sort{ display:flex; gap:6px; flex-wrap:wrap; margin:0 0 8px; } .gev-sort .chip.is-on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .gev-more{ padding:2px 10px 10px 40px; } .gev-more p{ margin:4px 0; } .gev-more small{ display:block; font-size:11px; color:var(--ink-soft); }
+  .gev-more code{ font-size:11.5px; word-break:break-all; user-select:all; } .gev-more b{ user-select:all; }
+  .gev-q{ width:100%; margin:0 0 8px; padding:9px 12px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--ink); font:inherit; font-size:16px; }
+  .gev-count{ margin-left:auto; align-self:center; font-size:11.5px; color:var(--ink-soft); } .gev-none{ margin:0; padding:14px; text-align:center; color:var(--ink-soft); }
+  .gev-acts{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
   .gev-row span{ color:var(--ink-soft); } .gev-row small{ color:var(--ink-soft); font-size:11px; overflow:hidden; text-overflow:ellipsis; }
   .gev-row em{ font-style:normal; font-weight:700; text-align:right; } .gev-row i{ grid-column:2 / -1; font-style:normal; font-size:11px; color:var(--ink-soft); }
   .gel-rest-note{ margin:2px 4px 8px; font-size:11.5px; color:var(--ink-soft); }
@@ -15800,9 +15807,35 @@ async function geVotersLoad(id, box){
     const res = await fetch(`${GEV_API}?id=${encodeURIComponent(id)}`, { headers:{ authorization:`Bearer ${tok}` }, cache:'no-store' });
     const d = await res.json().catch(() => ({}));
     if(!res.ok || !Array.isArray(d.rows)){ box.textContent = t('โหลดไม่ได้', 'Could not load') + ` (${d.error || res.status})`; return; }
-    const sum = d.rows.reduce((a, r) => a + r[2], 0) || 1;
-    box.innerHTML = `<div class="gev-list">${d.rows.map((r, i) => `<div class="gev-row"><span>${i + 1}</span><b>${escapeHtml(String(r[0]))}</b>
-      <small>${escapeHtml(String(r[1]).slice(0, 6))}…${escapeHtml(String(r[1]).slice(-4))}</small><em>${geVotes(Math.round(r[2] * 100) / 100)}</em><i>${(r[2] / sum * 100).toFixed(1)}% · ${r[3]}×</i></div>`).join('')}</div>`;
+    const rows = d.rows, sum = rows.reduce((a, r) => a + r[2], 0) || 1;
+    let by = 'tok', open = null, q = '';
+    const SORT = { tok:[t('Token มากสุด', 'Most Token'), (a, b) => b[2] - a[2]], n:[t('โหวตบ่อยสุด', 'Most votes'), (a, b) => b[3] - a[3] || b[2] - a[2]],
+      code:['Wallet code', (a, b) => String(a[0]).localeCompare(String(b[0]))] };
+    const paint = () => {
+      const list = [...rows].sort(SORT[by][1]).filter(r => !q || String(r[0]).includes(q) || String(r[1]).toLowerCase().includes(q));
+      box.querySelectorAll('[data-gev-sort]').forEach(c => c.classList.toggle('is-on', c.dataset.gevSort === by));
+      box.querySelector('.gev-count').textContent = q ? t(`พบ ${list.length} จาก ${rows.length} กระเป๋า`, `${list.length} of ${rows.length} wallets`) : t(`${rows.length} กระเป๋า`, `${rows.length} wallets`);
+      box.querySelector('.gev-list').innerHTML = `${list.length ? '' : `<p class="gev-none">${t('ไม่พบกระเป๋าที่ค้นหา', 'No wallet matches')}</p>`}${list.map((r, i) => { const on = open === r[1]; return `<div class="gev-item${on ? ' is-open' : ''}"><button class="gev-row" data-gev-open="${escapeAttr(String(r[1]))}"><span>${i + 1}</span><b>${escapeHtml(String(r[0]))}</b>
+          <small>${escapeHtml(String(r[1]).slice(0, 6))}…${escapeHtml(String(r[1]).slice(-4))}</small><em>${geVotes(Math.round(r[2] * 100) / 100)}</em><i>${(r[2] / sum * 100).toFixed(1)}% · ${r[3]}×</i></button>
+          ${on ? `<div class="gev-more"><p><small>Wallet code</small><b>${escapeHtml(String(r[0]))}</b></p><p><small>${t('ที่อยู่กระเป๋า', 'Wallet address')}</small><code>${escapeHtml(String(r[1]))}</code></p>
+            <div class="gev-acts"><button class="chip" data-gev-copy="${escapeAttr(String(r[1]))}">${t('คัดลอกที่อยู่', 'Copy address')}</button><button class="chip" data-gev-copy="${escapeAttr(String(r[0]))}">${t('คัดลอก code', 'Copy code')}</button>
+            <button class="chip chip-link" data-gev-go="${escapeAttr(String(r[1]))}">${t('ดูโหวตของกระเป๋านี้ในหน้าโหวต →', 'This wallet on the vote page →')}</button></div></div>` : ''}</div>`; }).join('')}`;
+    };
+    box.innerHTML = `<input class="gev-q" type="search" inputmode="search" autocomplete="off" spellcheck="false" placeholder="${t('ค้นหา Wallet code หรือที่อยู่กระเป๋า 0x…', 'Search a wallet code or address 0x…')}">
+      <div class="gev-sort">${Object.keys(SORT).map(k => `<button class="chip" data-gev-sort="${k}">${SORT[k][0]}</button>`).join('')}<small class="gev-count"></small></div><div class="gev-list"></div>`;
+    box.querySelector('.gev-q').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); paint(); });
+    paint();
+    box.onclick = e => {
+      const so = e.target.closest('[data-gev-sort]'), op = e.target.closest('[data-gev-open]'), cp = e.target.closest('[data-gev-copy]'), go = e.target.closest('[data-gev-go]');
+      if(so){ by = so.dataset.gevSort; paint(); }
+      else if(cp){ try{ navigator.clipboard.writeText(cp.dataset.gevCopy); cp.textContent = t('คัดลอกแล้ว ✓', 'Copied ✓'); }catch(err){} }
+      else if(go){
+        const w = go.dataset.gevGo; closeShareSheet();
+        state.view = 'timeline'; state.timelineId = 'ge2026'; state.geTab = 'chain'; state.selectedId = null; render(); pushHistory();
+        setTimeout(() => gecOpenWallet(w), 350);
+      }
+      else if(op){ const y = box.querySelector('.gev-list').scrollTop; open = open === op.dataset.gevOpen ? null : op.dataset.gevOpen; paint(); box.querySelector('.gev-list').scrollTop = y; }
+    };
   }catch(e){ box.textContent = t('โหลดไม่ได้', 'Could not load'); }
 }
 const geFactReady = () => geFactOn() && geAnnounced(GE_FINAL_ID) >= GE_SEATS;
