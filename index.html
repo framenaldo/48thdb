@@ -16660,7 +16660,11 @@ let gecWallet = null;
 async function gecOpenWallet(w){
   w = String(w || '').trim().toLowerCase();
   // the owner may type a wallet code: the Worker says which wallet it is
-  if(gevMay() && /^\d{4,20}$/.test(w)){ const d = await geWalletWho(w); if(d && d.addr) w = d.addr; }
+  if(gevMay() && /^\d{4,20}$/.test(w)){
+    const d = await geWalletWho(w);
+    if(d && d.addr) w = d.addr;
+    else { gecWallet = { w, bad:true, why:d && d.none ? 'nocode' : 'err', code:d && d.error }; gecDraw(); return; }
+  }
   if(!/^0x[0-9a-f]{40}$/.test(w)){ gecWallet = { w, bad:true }; gecDraw(); return; }
   if(gevMay() && !_gewCache[w]) geWalletWho(w).then(() => { if(gecWallet && gecWallet.w === w) gecDraw(); });
   gecWallet = { w, loading:true };
@@ -16684,7 +16688,9 @@ function renderGECWallet(en, N, hm){
   const form = `<form class="gec-find" onsubmit="gecFind(event)"><input name="w" autocomplete="off" spellcheck="false" placeholder="${gevMay() ? (en ? 'Wallet address 0x… or wallet code' : 'ที่อยู่กระเป๋า 0x… หรือ Wallet code') : (en ? 'Paste a wallet address 0x…' : 'วางที่อยู่กระเป๋า 0x…')}" value="${W ? escapeAttr(W.w) : ''}">
     <button class="chip" type="submit">${en ? 'Look up' : 'ดู'}</button></form>`;
   let body = '';
-  if(W && W.bad) body = `<p class="gec-err">${en ? 'That is not a wallet address (0x and 40 letters/numbers).' : 'ที่อยู่กระเป๋าไม่ถูกต้อง (0x ตามด้วยตัวอักษร/ตัวเลข 40 ตัว)'}</p>`;
+  if(W && W.bad && W.why === 'nocode') body = `<p class="gec-err">${en ? `Wallet code ${escapeHtml(W.w)} is not in the list of GE2026 votes — that wallet did not vote, or the number is mistyped.` : `ไม่พบ Wallet code ${escapeHtml(W.w)} ในรายการโหวต GE2026 — กระเป๋านี้ไม่ได้โหวต หรือพิมพ์เลขผิด`}</p>`;
+  else if(W && W.bad && W.why === 'err') body = `<p class="gec-err">${en ? 'Could not look that code up' : 'ค้นหา Wallet code ไม่สำเร็จ'} (${escapeHtml(String(W.code || ''))})</p>`;
+  else if(W && W.bad) body = `<p class="gec-err">${en ? 'That is not a wallet address (0x and 40 letters/numbers).' : 'ที่อยู่กระเป๋าไม่ถูกต้อง (0x ตามด้วยตัวอักษร/ตัวเลข 40 ตัว)'}</p>`;
   else if(W && W.loading) body = `<p class="gea-hint">${en ? 'Reading this wallet’s votes…' : 'กำลังอ่านโหวตของกระเป๋านี้…'}</p>`;
   else if(W && W.err) body = `<p class="gec-err">${en ? 'Could not read it: ' : 'อ่านไม่สำเร็จ: '}${escapeHtml(W.err)}</p>`;
   else if(W && W.v){
