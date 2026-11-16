@@ -947,7 +947,11 @@ export default {
       try {
         if (!(await isOwner(request, env))) return new Response(JSON.stringify({ error: 'owner only' }), { status: 403, headers: own });
         const id = url.searchParams.get('id') || '';
-        const v = /^(bnk|cgm)-[a-z0-9]{1,30}$/.test(id) ? await env.IAM.get('gev:' + id) : null;
+        // ?w=<wallet address or wallet code>: whom that wallet voted for (gew:<address>, gewc:<code> → address)
+        let wq = (url.searchParams.get('w') || '').trim().toLowerCase();
+        if (/^\d{4,20}$/.test(wq)) wq = (await env.IAM.get('gewc:' + wq)) || '';
+        const v = /^0x[0-9a-f]{40}$/.test(wq) ? await env.IAM.get('gew:' + wq)
+          : /^(bnk|cgm)-[a-z0-9]{1,30}$/.test(id) ? await env.IAM.get('gev:' + id) : null;
         return new Response(v || JSON.stringify({ error: 'none' }), { status: v ? 200 : 404, headers: own });
       } catch (err) {
         return new Response(JSON.stringify({ error: String((err && err.message) || err) }), { status: 502, headers: own });

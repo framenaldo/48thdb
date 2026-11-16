@@ -4095,6 +4095,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .gev-more code{ font-size:11.5px; word-break:break-all; user-select:all; } .gev-more b{ user-select:all; }
   .gev-q{ width:100%; margin:0 0 8px; padding:9px 12px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--ink); font:inherit; font-size:16px; }
   .gev-count{ margin-left:auto; align-self:center; font-size:11.5px; color:var(--ink-soft); } .gev-none{ margin:0; padding:14px; text-align:center; color:var(--ink-soft); }
+  .gev-wait{ margin:4px 0; font-size:12px; color:var(--ink-soft); }
+  .gev-who-l{ display:grid; gap:4px; margin:4px 0; }
+  .gev-who-r{ display:grid; grid-template-columns:26px minmax(0,1fr) auto auto; gap:8px; align-items:center; font-size:13px; font-variant-numeric:tabular-nums; }
+  .gev-who-r .gev-who-f{ width:26px; height:26px; border-radius:50%; } .gev-who-r em{ font-style:normal; font-weight:700; } .gev-who-r i{ font-style:normal; font-size:11px; color:var(--ink-soft); min-width:74px; text-align:right; }
   .gev-acts{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
   .gev-row span{ color:var(--ink-soft); } .gev-row small{ color:var(--ink-soft); font-size:11px; overflow:hidden; text-overflow:ellipsis; }
   .gev-row em{ font-style:normal; font-weight:700; text-align:right; } .gev-row i{ grid-column:2 / -1; font-style:normal; font-size:11px; color:var(--ink-soft); }
@@ -15798,6 +15802,31 @@ const GE_FINAL_ID = 'ge2026-final';
 const GE_VOTERS = {'cgm-prae':[2030,1204],'bnk-hoop':[1800,1099],'bnk-praew':[1403,844],'bnk-monet':[1217,768],'bnk-pancake':[11154,741],'cgm-nana':[1104,552],'cgm-lewlew':[749,551],'bnk-yoghurt':[906,532],'bnk-luksorn':[760,526],'bnk-blythe':[847,515],'bnk-janry':[774,513],'bnk-saonoi':[876,478],'cgm-lookked':[768,473],'cgm-nisha':[721,438],'bnk-l':[767,432],'bnk-khowjow':[728,431],'cgm-lingling':[622,391],'cgm-kwan':[584,388],'bnk-sindy':[517,382],'bnk-arlee':[675,368],'bnk-fame':[531,362],'bnk-grape':[465,360],'cgm-jingjing':[550,344],'bnk-nall':[532,335],'bnk-emmy':[734,334],'cgm-praifa':[453,327],'bnk-rose':[671,323],'bnk-marine':[505,316],'bnk-micha':[551,298],'cgm-chifa':[347,279],'cgm-emma':[632,272],'cgm-ploen':[413,267],'bnk-jew':[424,267],'bnk-inkcha':[321,263],'cgm-else':[373,256],'cgm-punpon':[326,254],'cgm-tara':[299,247],'cgm-namphet':[318,245],'bnk-mint':[363,242],'bnk-niya':[364,240],'bnk-nammonn':[445,235],'cgm-shenae':[369,230],'bnk-patt':[365,214],'cgm-satangpound':[276,214],'bnk-wawa':[341,209],'bnk-cartoon':[284,204],'cgm-valentine':[260,194],'bnk-palmmy':[369,190],'bnk-mail':[273,184],'bnk-mirin':[225,169],'bnk-khaimook':[218,169],'cgm-hongyok':[202,158],'bnk-berry':[205,144],'bnk-proud':[211,142],'cgm-ginna':[178,133],'bnk-galeya':[717,132],'bnk-neen':[356,128],'bnk-mayji':[113,85]};
 const geVoterRank = id => Object.keys(GE_VOTERS).sort((a, b) => GE_VOTERS[b][1] - GE_VOTERS[a][1]).indexOf(id) + 1;
 const GEV_API = 'https://api.48thdb.com/gevoters';
+/* Whom one wallet voted for — the owner only, from the Worker (`?w=` an address or a wallet code). Kept for the visit. */
+const _gewCache = {};
+async function geWalletWho(w){
+  w = String(w || '').trim().toLowerCase();
+  if(_gewCache[w]) return _gewCache[w];
+  if(!state.isOwner || !fbAuth.currentUser) return { error:'owner' };
+  try{
+    const tok = await fbAuth.currentUser.getIdToken();
+    const res = await fetch(`${GEV_API}?w=${encodeURIComponent(w)}`, { headers:{ authorization:`Bearer ${tok}` }, cache:'no-store' });
+    const d = await res.json().catch(() => ({}));
+    if(res.status === 404) return (_gewCache[w] = { none:true });
+    if(!res.ok || !Array.isArray(d.rows)) return { error:d.error || res.status };
+    _gewCache[w] = d; if(d.addr) _gewCache[d.addr] = d;
+    return d;
+  }catch(e){ return { error:'net' }; }
+}
+function geWhoHtml(d, en){
+  if(!d) return `<p class="gev-wait">${en ? 'Loading…' : 'กำลังโหลด…'}</p>`;
+  if(d.none) return `<p class="gev-wait">${en ? 'This wallet is not in the list of GE2026 votes.' : 'กระเป๋านี้ไม่อยู่ในรายการโหวต GE2026'}</p>`;
+  if(d.error) return `<p class="gev-wait">${en ? 'Could not load' : 'โหลดไม่ได้'} (${escapeHtml(String(d.error))})</p>`;
+  const sum = d.rows.reduce((a, r) => a + r[1], 0) || 1;
+  return `<div class="gev-who-l">${d.rows.map(r => { const m = getMember(r[0]); return m ? `<div class="gev-who-r">${geFace(m, 'gev-who-f')}<b>${escapeHtml(m.name)}</b>
+    <em>${geVotes(Math.round(r[1] * 100) / 100)}</em><i>${(r[1] / sum * 100).toFixed(1)}% · ${r[2]}×</i></div>` : ''; }).join('')}</div>
+    <p class="gev-wait">Wallet code ${escapeHtml(String(d.code || ''))} · ${en ? `${d.rows.length} candidates · ${geVotes(Math.round(sum * 100) / 100)} Token in all` : `โหวตให้ ${d.rows.length} คน · รวม ${geVotes(Math.round(sum * 100) / 100)} Token`}</p>`;
+}
 async function geVotersLoad(id, box){
   const en = isEN(), t = (th, e) => en ? e : th;
   if(!state.isOwner || !fbAuth.currentUser){ box.textContent = t('ต้องเข้าสู่ระบบด้วยบัญชีเจ้าของ', 'Owner sign-in needed'); return; }
@@ -15818,8 +15847,11 @@ async function geVotersLoad(id, box){
       box.querySelector('.gev-list').innerHTML = `${list.length ? '' : `<p class="gev-none">${t('ไม่พบกระเป๋าที่ค้นหา', 'No wallet matches')}</p>`}${list.map((r, i) => { const on = open === r[1]; return `<div class="gev-item${on ? ' is-open' : ''}"><button class="gev-row" data-gev-open="${escapeAttr(String(r[1]))}"><span>${i + 1}</span><b>${escapeHtml(String(r[0]))}</b>
           <small>${escapeHtml(String(r[1]).slice(0, 6))}…${escapeHtml(String(r[1]).slice(-4))}</small><em>${geVotes(Math.round(r[2] * 100) / 100)}</em><i>${(r[2] / sum * 100).toFixed(1)}% · ${r[3]}×</i></button>
           ${on ? `<div class="gev-more"><p><small>Wallet code</small><b>${escapeHtml(String(r[0]))}</b></p><p><small>${t('ที่อยู่กระเป๋า', 'Wallet address')}</small><code>${escapeHtml(String(r[1]))}</code></p>
+            <p><small>${t('กระเป๋านี้โหวตให้ใครบ้าง', 'Whom this wallet voted for')}</small></p><div class="gev-who" data-w="${escapeAttr(String(r[1]).toLowerCase())}">${geWhoHtml(_gewCache[String(r[1]).toLowerCase()], en)}</div>
             <div class="gev-acts"><button class="chip" data-gev-copy="${escapeAttr(String(r[1]))}">${t('คัดลอกที่อยู่', 'Copy address')}</button><button class="chip" data-gev-copy="${escapeAttr(String(r[0]))}">${t('คัดลอก code', 'Copy code')}</button>
             <button class="chip chip-link" data-gev-go="${escapeAttr(String(r[1]))}">${t('ดูโหวตของกระเป๋านี้ในหน้าโหวต →', 'This wallet on the vote page →')}</button></div></div>` : ''}</div>`; }).join('')}`;
+      const who = box.querySelector('.gev-who');
+      if(who && !_gewCache[who.dataset.w]) geWalletWho(who.dataset.w).then(d => { if(who.isConnected) who.innerHTML = geWhoHtml(d, en); });
     };
     box.innerHTML = `<input class="gev-q" type="search" inputmode="search" autocomplete="off" spellcheck="false" placeholder="${t('ค้นหา Wallet code หรือที่อยู่กระเป๋า 0x…', 'Search a wallet code or address 0x…')}">
       <div class="gev-sort">${Object.keys(SORT).map(k => `<button class="chip" data-gev-sort="${k}">${SORT[k][0]}</button>`).join('')}<small class="gev-count"></small></div><div class="gev-list"></div>`;
@@ -16535,7 +16567,10 @@ function gecBaht(t, en){
 let gecWallet = null;
 async function gecOpenWallet(w){
   w = String(w || '').trim().toLowerCase();
+  // the owner may type a wallet code: the Worker says which wallet it is
+  if(state.isOwner && /^\d{4,20}$/.test(w)){ const d = await geWalletWho(w); if(d && d.addr) w = d.addr; }
   if(!/^0x[0-9a-f]{40}$/.test(w)){ gecWallet = { w, bad:true }; gecDraw(); return; }
+  if(state.isOwner && !_gewCache[w]) geWalletWho(w).then(() => { if(gecWallet && gecWallet.w === w) gecDraw(); });
   gecWallet = { w, loading:true };
   gecDraw();
   const card = document.querySelector('.gec-wallet'); if(card) card.scrollIntoView({ block:'start', behavior:'smooth' });
@@ -16573,6 +16608,7 @@ function renderGECWallet(en, N, hm){
     const tk = gecLoad('tok'), held = tk ? Math.max(0, tk.bal[W.w] || 0) : null;
     body = `<p class="gec-wid"><a href="${GEC_API}/address/${W.w}" target="_blank" rel="noopener">${W.w.slice(0, 10)}…${W.w.slice(-8)}</a></p>
       ${held != null ? `<p class="gec-held">${en ? 'Holds now, not voted:' : 'ตอนนี้ยังถือ GE6 ที่ยังไม่โหวต'} <b>${gecTok(held)}</b> ${en ? 'GE6' : 'โทเคน'} · ${gecBaht(held, en)}</p>` : ''}
+      ${state.isOwner ? `<div class="gec-wy gev-own"><h4>${en ? 'Voted for · owner only' : 'โหวตให้ใคร · เห็นเฉพาะเจ้าของ'}</h4>${geWhoHtml(_gewCache[W.w], en)}</div>` : ''}
       ${year('ge2026')}${year('ge2025')}
       <p class="gec-sub">${en ? 'Every vote goes into the election’s poll contract, the same one for everybody — never to a member’s wallet — so who it was for cannot be told.'
         : 'ทุกโหวตส่งเข้าสัญญาโหวตของการเลือกตั้งตัวเดียวกันหมด ไม่ได้ส่งเข้ากระเป๋าของเมมเบอร์ เลยบอกไม่ได้ว่าโหวตให้ใคร'}</p>`;
