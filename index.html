@@ -16681,7 +16681,7 @@ async function gecOpenWallet(w){
 function gecFind(ev){ ev.preventDefault(); gecOpenWallet(ev.target.elements.w.value); }
 function renderGECWallet(en, N, hm){
   const W = gecWallet;
-  const form = `<form class="gec-find" onsubmit="gecFind(event)"><input name="w" autocomplete="off" spellcheck="false" placeholder="${en ? 'Paste a wallet address 0x…' : 'วางที่อยู่กระเป๋า 0x…'}" value="${W ? escapeAttr(W.w) : ''}">
+  const form = `<form class="gec-find" onsubmit="gecFind(event)"><input name="w" autocomplete="off" spellcheck="false" placeholder="${gevMay() ? (en ? 'Wallet address 0x… or wallet code' : 'ที่อยู่กระเป๋า 0x… หรือ Wallet code') : (en ? 'Paste a wallet address 0x…' : 'วางที่อยู่กระเป๋า 0x…')}" value="${W ? escapeAttr(W.w) : ''}">
     <button class="chip" type="submit">${en ? 'Look up' : 'ดู'}</button></form>`;
   let body = '';
   if(W && W.bad) body = `<p class="gec-err">${en ? 'That is not a wallet address (0x and 40 letters/numbers).' : 'ที่อยู่กระเป๋าไม่ถูกต้อง (0x ตามด้วยตัวอักษร/ตัวเลข 40 ตัว)'}</p>`;
@@ -17536,7 +17536,7 @@ function renderGEChain(){
       ${o && o.wallets[w] ? `<span class="gec-tag">${en ? 'voted 2025' : 'เคยโหวต 2025'}</span>` : ''}<b>${gecTok(x[0])}<small class="gec-b">${gecBaht(x[0], en)}</small></b><small>${N(x[1])} ${en ? (x[1] === 1 ? 'vote' : 'votes') : 'ครั้ง'}</small></li>`).join('')}</ol></div>`;
 
   const o3 = o && o.n && o.to >= GEC_POLLS.ge2025.end - 20 ? o : null;
-  return `<section class="gea gec">${head}${gecAboutCard(en)}${shut ? fin : big}${gecVolumeCard(en, d, hNow, N)}${gecColumns([money, gecSupplyCard(en, N, pc), gecFeedCard(en, N, pc, hms), gecWinCard(en), cmp, gecDailyCard(en, N, d, o3, hNow), gecStretchCard(en, pc, o3), sizes, top, renderGECWallet(en, N, hm)])}</section>`;
+  return `<section class="gea gec">${head}${gecAboutCard(en)}${shut ? fin : big}${shut ? renderGECWallet(en, N, hm) : ''}${gecVolumeCard(en, d, hNow, N)}${gecColumns([money, gecSupplyCard(en, N, pc), gecFeedCard(en, N, pc, hms), gecWinCard(en), cmp, gecDailyCard(en, N, d, o3, hNow), gecStretchCard(en, pc, o3), sizes, top, shut ? '' : renderGECWallet(en, N, hm)])}</section>`;
 }
 /* ---- tokens voted as bars, from the first hour of voting to now: by the hour or by the day (a day = 24 hours from the opening, as
    in the day-by-day card), with the busiest, quietest (not zero), average and current figures of what is shown. It began as part of a
