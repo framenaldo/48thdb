@@ -17343,7 +17343,7 @@ function gecFeedCard(en, N, pc, hms){
   const before = gecFeedSeen;
   gecFeedSeen = new Set(d.feed.map(v => v.tx + v.b));
   const bigSum = d.big.reduce((s, v) => s + v.amt, 0);
-  return `<div class="gea-card" data-gshare="feed"><h3 class="gec-h"><i class="gec-live"></i>${en ? 'Latest votes' : 'โหวตล่าสุด'}</h3>
+  return `<div class="gea-card" data-gshare="feed"><h3 class="gec-h">${gecClosed() ? '' : '<i class="gec-live"></i>'}${gecClosed() ? (en ? 'The last votes' : 'โหวตสุดท้ายก่อนปิด') : (en ? 'Latest votes' : 'โหวตล่าสุด')}</h3>
     <ol class="gec-feed">${list.map(v => { const hb = gecBursts.get(v.w); const huge = hb && hb.sum >= GEC_HUGE && v.b >= hb.start && v.b <= hb.last;
       return `<li class="${v.amt >= GEC_BIG ? 'is-big' : ''}${huge ? ' is-huge' : ''}${before && !before.has(v.tx + v.b) ? ' is-new' : ''}">
       <span class="gec-ft">${hms(gecMs(p, v.b))}</span>
