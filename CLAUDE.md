@@ -214,7 +214,7 @@ the Firebase CLI from the owner's machine.
 - An event can carry more pictures to swipe through under its first: `poster.more = [{ img, w, h, th, en }]`
   (`posterSlides`, `fitTrack`: clear dots under it and the swipe takes the shown picture's height; `th`/`en` name each dot for screen readers, the first by `poster.th`/`poster.en`; each opens the viewer as
   `pm:<event>:<n>`). The card and the shop show the first only.
-- A link the whole event is about (the audition's application form) carries `cta:true` (with `sub`/`subEn`, a line under its label): one big button in the poster's colour under the title on the event sheet, counting the days left to the event's end (`renderEventCta`, `evCtaOn`, `.ev-cta`; the owner asked for it loud, 16 Nov 2026). After the event it goes back to a plain chip among the links.
+- A link the whole event is about (the audition's application form) carries `cta:true` (with `sub`/`subEn`, a line under its label): one big button in the poster's colour under the title on the event sheet, counting the days left to the event's end (`renderEventCta`, `evCtaOn`, `.ev-cta`; the owner asked for it loud, 16 Nov 2026). After the event it goes back to a plain chip among the links. `c` on the link is its own colour and `flat:true` the calm look (one flat colour, squarer): the audition's is the plum of audition.bnk48.com's own button, at the owner's word.
 - An event poster (`poster.img`) shows on its card from a small copy,
   `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
   then `node scripts/make-poster-grads.mjs` for its sheet colours.
