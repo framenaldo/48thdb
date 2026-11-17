@@ -346,7 +346,7 @@ the last result; ทำใหม่ starts over, and leaving half way keeps the 
 Public since 1 Oct 2026: the GE2026 page's "ยอดโหวตสด" tab (`/vote`) and a
 teaser on its overview. (`?v=gechain`, the owner's old copy, now opens that tab;
 the baht figure is fixed at 68 a token — `gecPrice`.)
-A cold start reads `data/chain-ge2025.json` (final) and `data/chain-ge2026.json`
+The block between `GEC-CORE START` and `GEC-CORE END` in index.html is run on its own by the nightly job: a call there to a function defined elsewhere in the page breaks it silently (a preview's `todaySlideOn()` did, 8–17 Nov 2026), so guard such calls with `typeof`. Once the vote is closed and every copy is read past the close and the burn (`gecDone`), the page stops following the chain. A cold start reads `data/chain-ge2025.json` (final) and `data/chain-ge2026.json`
 (left nightly by `scripts/collect-chain.mjs`, which runs the page's own
 GEC-CORE block), then follows the chain. The home page shows a light card
 (`data/chain-summary.json`, then votes since, every 15 s). Share cards draw on
