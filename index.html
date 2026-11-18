@@ -6007,7 +6007,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* The lettering is drawn by a mask, so it is always the colour of the text
      it stands in for — no second file for dark mode, none for each accent. */
   .song-logo{
-    display:block; width:min(330px, 88%); aspect-ratio:var(--ratio);
+    display:block; width:min(var(--lw, 330px), 88%); aspect-ratio:var(--ratio);
     background:currentColor;
     -webkit-mask:var(--logo) center/contain no-repeat; mask:var(--logo) center/contain no-repeat;
   }
@@ -9026,29 +9026,29 @@ const SEED_SCHEDULE = [
     links:[{ label:'TikTok @shockmegirls.official', url:'https://www.tiktok.com/@shockmegirls.official' }],
     related:['ev-shock-me-girls-orientation'] },
   /* CGM48 "Chiang Mai Station" (สถานีเชียงใหม่): one overview poster from the owner (18 Nov 2026) for five events; the poster gives dates and places only, no times or links */
-  { id:'ev-cnx-station-mv', start:'2026-12-05',
+  { id:'ev-cnx-station-mv', logo:'cnx', start:'2026-12-05',
     title:'CGM48 "สถานีเชียงใหม่" (Chiang Mai Station) MV Release', short:'Station MV', groups:['cgm48'],
     related:['ev-cnx-lanna-smile','ev-cnx-exhibition','ev-cnx-book-fansign','ev-cnx-original-stage'],
     poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 } },
-  { id:'ev-cnx-lanna-smile', start:'2026-12-05', end:'2026-12-06',
+  { id:'ev-cnx-lanna-smile', logo:'cnx', start:'2026-12-05', end:'2026-12-06',
     title:'CGM48 "สถานีเชียงใหม่" · Lanna Smile Station', short:'Lanna Smile Station',
     venue:'Central Chiang Mai Airport', groups:['cgm48'],
     related:['ev-cnx-station-mv','ev-cnx-exhibition','ev-cnx-book-fansign','ev-cnx-original-stage'],
     poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 } },
-  { id:'ev-cnx-exhibition', start:'2026-12-05', end:'2026-12-13',
+  { id:'ev-cnx-exhibition', logo:'cnx', start:'2026-12-05', end:'2026-12-13',
     title:'CGM48 "สถานีเชียงใหม่" Exhibition', short:'Station Exhibition',
     venue:'Chiang Mai Cultural Centre', groups:['cgm48'],
     related:['ev-cnx-station-mv','ev-cnx-lanna-smile','ev-cnx-book-fansign','ev-cnx-original-stage'],
     poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 },
     info:['จัดในงาน Chiang Mai Design Week 2026'] },
-  { id:'ev-cnx-book-fansign', start:'2026-12-12', end:'2026-12-13',
+  { id:'ev-cnx-book-fansign', logo:'cnx', start:'2026-12-12', end:'2026-12-13',
     title:'CGM48 "สถานีเชียงใหม่" Exhibition Book + Fansign', short:'Exhibition Book + Fansign',
     venue:'Muan More Space', groups:['cgm48'],
     allMembers:'cgm48',
     related:['ev-cnx-station-mv','ev-cnx-lanna-smile','ev-cnx-exhibition','ev-cnx-original-stage'],
     poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 },
     info:['Exhibition Book + Fansign กับสมาชิกทุกคน','พรีออเดอร์ 21 พ.ย. – 7 ธ.ค. 2026'] },
-  { id:'ev-cnx-original-stage', start:'2027-01-29', end:'2027-01-31',
+  { id:'ev-cnx-original-stage', logo:'cnx', start:'2027-01-29', end:'2027-01-31',
     title:'CGM48 The Original Stage "สถานีเชียงใหม่" 1st Stage + Cheki', short:'The Original Stage',
     venue:'Muan More Space', groups:['cgm48'],
     related:['ev-cnx-station-mv','ev-cnx-lanna-smile','ev-cnx-exhibition','ev-cnx-book-fansign'],
@@ -14838,6 +14838,8 @@ const SONG_LOGOS = {
   kimi: { src:'logos/kimi-to-doko-ka-e-ikitai-v2.svg', png:'logos/kimi-to-doko-ka-e-ikitai-v2.png',
     ratio: 841.89 / 347.07, alt:'Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ', tm:'logos/kimi-to-doko-ka-e-ikitai-v2-t.png' },
   // the hand-drawn, wavy lettering the later posters use, lifted off the 30 Oct Busking poster by its dark ink
+  // "สถานีเชียงใหม่" (Chiang Mai Station), cut off the owner's overview poster by its black ink (18 Nov 2026)
+  cnx: { src:'logos/cgm48-chiang-mai-station.png', png:'logos/cgm48-chiang-mai-station.png', ratio: 1750 / 864, w:210, alt:'สถานีเชียงใหม่ — Chiang Mai Station' },
   kimiwavy: { src:'logos/kimi-to-doko-ka-e-ikitai-wavy.png', png:'logos/kimi-to-doko-ka-e-ikitai-wavy.png',
     ratio: 1104 / 458, alt:'Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ', tm:'logos/kimi-to-doko-ka-e-ikitai-wavy-t.png' },
 };
@@ -14845,7 +14847,7 @@ function renderSongLogo(key, cls, write){
   const l = SONG_LOGOS[key];
   if(!l) return '';
   // `write`: a banner that has it written out by the pen (penWrite) when the sheet opens
-  return `<span class="song-logo${cls ? ' ' + cls : ''}" style="--logo:url('${l.src}'); --ratio:${l.ratio}"${write && l.tm && fxNew() ? ` data-wr-t="${l.tm}" data-wr-img="${l.png}"` : ''}
+  return `<span class="song-logo${cls ? ' ' + cls : ''}" style="--logo:url('${l.src}'); --ratio:${l.ratio}${l.w ? `; --lw:${l.w}px` : ''}"${write && l.tm && fxNew() ? ` data-wr-t="${l.tm}" data-wr-img="${l.png}"` : ''}
     role="img" aria-label="${escapeAttr(l.alt)}"></span>`;
 }
 
