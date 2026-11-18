@@ -15491,6 +15491,10 @@ function geRemember(round){
    complete, the Senbatsu. The full list is one tap away. */
 const GE_TONE = { gold:'#B8862E', silver:'#76828E', bronze:'#9A5733' };
 const GE_HOME_SUMMARY = true;
+/* The owner's word (18 Nov 2026): the summary stays on the home page, short (the Kami 7 only), until 30 Nov, and goes by itself
+   on 1 Dec (Thai date); the dashboard's big square then shows the member of the day unless the reader picked another. */
+const GE_HOME_UNTIL = '2026-12-01', GE_HOME_SHORT = true;
+const geHomeOver = () => toYmd(todayStart()) >= GE_HOME_UNTIL;
 /* Ranks 1–7 are "Kami 7": wherever they are listed, they sit in a frame of their own. */
 const GE_KAMI7 = 7;
 const geKami7 = (inner, en, lit) => `<div class="ge-k7${lit ? ' is-lit' : ''}"><span class="ge-k7-tag">Kami 7</span>${inner}</div>`;
@@ -15652,16 +15656,22 @@ function renderHomeDash(ge){
     ask: sl => tile(`data-tile="${sl}" data-kind="ask" data-action="focus-search"`, 'is-ask', ICONS.star, '?', en ? 'Ask' : 'ถามเว็บ', en ? 'type a question' : 'พิมพ์คำถาม'),
   };
   const L = (myLayout().dash || {}).kinds || {};
-  const slot = k => `${(kinds[L[k] || DASH_DEFAULT[k] || k] || kinds[k])(k)}`;
   const bigKind = ((myLayout().dash || {}).kinds || {}).ge;
   const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), night = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
   const waitGE = !ge && !_geLoaded && !Object.keys(state.geRounds || {}).length && vote && night && iso >= vote.start && iso <= eventLastDay(night);
+  // the big square once the GE summary is gone (1 Dec 2026): the member of the day, unless the reader picked another
+  const bigNow = bigKind || (!ge && !waitGE && geHomeOver() ? 'rand' : '');
+  // a slot never repeats what the big square or an earlier slot shows: a default that would, falls back to the slot's own kind
+  const used = new Set(bigNow && bigKinds[bigNow] ? [bigNow] : []);
+  const slot = k => { let pick = L[k] || DASH_DEFAULT[k] || k;
+    if(!L[k] && used.has(pick)) pick = [k, 'gal', 'shop', 'cal', 'quiz'].find(x => kinds[x] && !used.has(x)) || k;
+    used.add(pick); return `${(kinds[pick] || kinds[k])(k)}`; };
   // between ผลด่วน 1 and ผลด่วน 2: a word that the next round is close; it goes by itself once round 2 has names or goes live
   const q1 = GE_ROUNDS[0], q2 = GE_ROUNDS[1];
   const soon = (q1 && q2 && geHasData(q1.id) && !geHasData(q2.id) && !geIsLive(q2.id) && !((state.geRounds || {})[q2.id] || {}).live
     ? `<button class="gel-soon" data-action="open-ge-results"><span class="gel-soon-dot"></span><span class="gel-soon-t"><b>${en ? 'Preliminary 2 is coming soon' : 'ผลด่วน 2 ใกล้ประกาศแล้ว'}</b></span><span class="gel-soon-go">${en ? 'Round 1 →' : 'ดูผลด่วน 1 →'}</span></button>` : '');
-  return `<section class="feed-block feed-dash${ge || waitGE || (bigKind && bigKinds[bigKind]) ? '' : ' no-ge'}">${soon}<div class="dash">
-    ${(() => { const k = ((myLayout().dash || {}).kinds || {}).ge; return k && bigKinds[k] ? bigKinds[k]() : waitGE ? '<span class="dash-ge is-wait" data-tile="ge" aria-hidden="true"></span>' : square; })()}
+  return `<section class="feed-block feed-dash${ge || waitGE || (bigKind && bigKinds[bigKind]) || geHomeOver() ? '' : ' no-ge'}">${soon}<div class="dash">
+    ${(() => { const k = bigNow; return k && bigKinds[k] ? bigKinds[k]() : waitGE ? '<span class="dash-ge is-wait" data-tile="ge" aria-hidden="true"></span>' : square; })()}
     ${slot('quiz')}${slot('cal')}${slot('shop')}${slot('gal')}
   </div></section>`;
 }
@@ -15702,7 +15712,7 @@ function renderHomeGE(opt = {}){
   // the final round, once read out in full, stays on the home page as a summary until the owner
   // says to take it down (set GE_HOME_SUMMARY to false)
   if(!opt.compact && round.id === GE_ROUNDS[GE_ROUNDS.length - 1].id && !live && told >= GE_SEATS)
-    return GE_HOME_SUMMARY ? renderGESummary(round.id) : '';
+    return GE_HOME_SUMMARY && !geHomeOver() ? renderGESummary(round.id) : '';
   const strip = `<button class="gel-strip feed-ge-strip" data-action="open-ge-results">
     <div class="gel-strip-top">${live ? '<span class="gel-live"><i></i>LIVE</span>' : ''}${hhmm ? `<small>${en ? 'Updated' : 'อัปเดต'} ${hhmm}${en ? '' : ' น.'}</small>` : ''}</div>
     <h2>${en ? 'GE2026 results' : 'ผลเลือกตั้ง GE2026'} · ${geRoundLabel(round)}</h2>
@@ -15789,7 +15799,7 @@ function renderGESummary(id){
       <span class="ge-sum-all">${en ? 'All 36 ranks →' : 'ดูผลทั้ง 36 อันดับ →'}</span>
     </button>
     ${geKami7(`${center}<div class="gel-mini">${range(2, 7).map(tile).join('')}</div>`, en)}
-    <p class="ge-sum-h">Senbatsu · ${en ? 'ranks 8–12' : 'อันดับ 8–12'}</p>
+    ${GE_HOME_SHORT ? '' : `<p class="ge-sum-h">Senbatsu · ${en ? 'ranks 8–12' : 'อันดับ 8–12'}</p>
     <div class="gel-mini ge-sum-five">${range(8, 12).map(tile).join('')}</div>
     <div class="ge-sum-stats">
       ${stat(en ? 'In the Senbatsu' : 'ใน Senbatsu', `BNK48 ${bnk} · CGM48 ${cgm}`)}
@@ -15797,7 +15807,7 @@ function renderGESummary(id){
       ${climb ? stat(en ? `Climbed most since ${geRoundLabel(GE_ROUNDS[0])}` : `ขึ้นมากสุดจาก${geRoundLabel(GE_ROUNDS[0])}`, `${escapeHtml(climb.m.name)} ▲${climb.d} (${climb.from}→${climb.to})`) : ''}
     </div>
     <p class="ge-sum-h">Under Girls · 13–24</p><div class="ge-sum-list">${range(13, 24).map(line).join('')}</div>
-    <p class="ge-sum-h">Next Girls · 25–36</p><div class="ge-sum-list">${range(25, 36).map(line).join('')}</div>
+    <p class="ge-sum-h">Next Girls · 25–36</p><div class="ge-sum-list">${range(25, 36).map(line).join('')}</div>`}
     <button class="chip chip-link gel-share" data-action="share-geres" data-value="${id}">${ICONS.share}<span>${en ? 'Share the results as a picture' : 'แชร์ภาพสรุปผล'}</span></button>
   </section>`;
 }
