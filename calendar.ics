@@ -661,6 +661,19 @@ DTSTART;TZID=Asia/Bangkok:20261105T180000
 DTEND;TZID=Asia/Bangkok:20261105T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-live-1119-2026-11-19@48thdb
+DTSTAMP:20261119T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Pop Up Live
+LOCATION:YouTube CGM48 OFFICIAL
+DESCRIPTION:เมมเบอร์: Satangpound\, Lookked\, Lewlew\, Vale
+ ntine\n• ครั้งนี้เป็นเทปที่บัน
+ ทึกไว้ล่วงหน้า\n\nhttps://48thdb.com/event/ev-
+ cgm48-popup-live-1119
+URL:https://48thdb.com/event/ev-cgm48-popup-live-1119
+DTSTART;TZID=Asia/Bangkok:20261119T180000
+DTEND;TZID=Asia/Bangkok:20261119T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-cgm48-popup-live-1117-2026-11-17@48thdb
 DTSTAMP:20261117T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Pop Up Live
