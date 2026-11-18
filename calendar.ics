@@ -1980,16 +1980,6 @@ DTSTART;TZID=Asia/Bangkok:20261110T190000
 DTEND;TZID=Asia/Bangkok:20261110T200000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-cnx-station-mv@48thdb
-DTSTAMP:20261205T000000Z
-SUMMARY:CGM48 "สถานีเชียงใหม่" (Chiang Mai Stat
- ion) MV Release
-DESCRIPTION:\nhttps://48thdb.com/event/ev-cnx-station-mv
-URL:https://48thdb.com/event/ev-cnx-station-mv
-DTSTART;VALUE=DATE:20261205
-DTEND;VALUE=DATE:20261206
-END:VEVENT
-BEGIN:VEVENT
 UID:ev-cnx-lanna-smile@48thdb
 DTSTAMP:20261205T000000Z
 SUMMARY:CGM48 "สถานีเชียงใหม่" · Lanna Smile S
