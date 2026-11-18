@@ -1983,9 +1983,11 @@ BEGIN:VEVENT
 UID:ev-cnx-lanna-smile@48thdb
 DTSTAMP:20261205T000000Z
 SUMMARY:CGM48 "สถานีเชียงใหม่" · Lanna Smile S
- tation
+ tation + MV Release
 LOCATION:Central Chiang Mai Airport
-DESCRIPTION:\nhttps://48thdb.com/event/ev-cnx-lanna-smile
+DESCRIPTION:• ปล่อย MV "สถานีเชียงใหม
+ ่" (MV Release) ในงานวันที่ 5 ธ.ค.\n\nhttps://
+ 48thdb.com/event/ev-cnx-lanna-smile
 URL:https://48thdb.com/event/ev-cnx-lanna-smile
 DTSTART;VALUE=DATE:20261205
 DTEND;VALUE=DATE:20261207
