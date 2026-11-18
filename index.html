@@ -9025,6 +9025,34 @@ const SEED_SCHEDULE = [
       'ซีรีส์ออนแอร์ทุกวันศุกร์ เสาร์ และอาทิตย์ เริ่ม 28 พ.ย. 2026 เวลา 20:00 น. ทาง TikTok @shockmegirls.official'],
     links:[{ label:'TikTok @shockmegirls.official', url:'https://www.tiktok.com/@shockmegirls.official' }],
     related:['ev-shock-me-girls-orientation'] },
+  /* CGM48 "Chiang Mai Station" (สถานีเชียงใหม่): one overview poster from the owner (18 Nov 2026) for five events; the poster gives dates and places only, no times or links */
+  { id:'ev-cnx-station-mv', start:'2026-12-05',
+    title:'CGM48 "สถานีเชียงใหม่" (Chiang Mai Station) MV Release', short:'Station MV', groups:['cgm48'],
+    related:['ev-cnx-lanna-smile','ev-cnx-exhibition','ev-cnx-book-fansign','ev-cnx-original-stage'],
+    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 } },
+  { id:'ev-cnx-lanna-smile', start:'2026-12-05', end:'2026-12-06',
+    title:'CGM48 "สถานีเชียงใหม่" · Lanna Smile Station', short:'Lanna Smile Station',
+    venue:'Central Chiang Mai Airport', groups:['cgm48'],
+    related:['ev-cnx-station-mv','ev-cnx-exhibition','ev-cnx-book-fansign','ev-cnx-original-stage'],
+    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 } },
+  { id:'ev-cnx-exhibition', start:'2026-12-05', end:'2026-12-13',
+    title:'CGM48 "สถานีเชียงใหม่" Exhibition', short:'Station Exhibition',
+    venue:'Chiang Mai Cultural Centre', groups:['cgm48'],
+    related:['ev-cnx-station-mv','ev-cnx-lanna-smile','ev-cnx-book-fansign','ev-cnx-original-stage'],
+    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 },
+    info:['จัดในงาน Chiang Mai Design Week 2026'] },
+  { id:'ev-cnx-book-fansign', start:'2026-12-12', end:'2026-12-13',
+    title:'CGM48 "สถานีเชียงใหม่" Exhibition Book + Fansign', short:'Exhibition Book + Fansign',
+    venue:'Muan More Space', groups:['cgm48'],
+    allMembers:'cgm48',
+    related:['ev-cnx-station-mv','ev-cnx-lanna-smile','ev-cnx-exhibition','ev-cnx-original-stage'],
+    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 },
+    info:['Exhibition Book + Fansign กับสมาชิกทุกคน','พรีออเดอร์ 21 พ.ย. – 7 ธ.ค. 2026'] },
+  { id:'ev-cnx-original-stage', start:'2027-01-29', end:'2027-01-31',
+    title:'CGM48 The Original Stage "สถานีเชียงใหม่" 1st Stage + Cheki', short:'The Original Stage',
+    venue:'Muan More Space', groups:['cgm48'],
+    related:['ev-cnx-station-mv','ev-cnx-lanna-smile','ev-cnx-exhibition','ev-cnx-book-fansign'],
+    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 } },
   { id:'ev-bnk-7th-gen-audition', start:'2026-11-16', end:'2026-12-21', period:true,
     title:'BNK48 7th Generation Audition', short:'7th Gen Audition', groups:['bnk48'],
     poster:{ accent:'#82477F', surface:'#F3EEFA', ink:'#2A2140', img:'posters/bnk48-7th-gen-audition.png', w:1792, h:1024,
@@ -9148,7 +9176,7 @@ SEED_SCHEDULE.forEach(e => {
   if(e.turns) e.slots = myoSlots(e.turns);
   if(e.slots && !e.members) e.members = [...new Set(e.slots.flatMap(s => s.members))];
   // every current member takes part: the list follows the roster rather than being copied out
-  if(e.allMembers) e.members = SEED_MEMBERS.map(m => m.id);
+  if(e.allMembers) e.members = SEED_MEMBERS.filter(m => e.allMembers === true || m.groupId === e.allMembers).map(m => m.id);   // allMembers:'cgm48' = every current member of that group
   // former members who come back for an event (the results night's commentators): shown with the line-up, after it
   if(e.guests) e.members = [...new Set([...(e.members || []), ...e.guests])];
 });
@@ -20618,7 +20646,7 @@ function askRange(when, month){
   }
   return [iso, '9999-12-31', en ? 'coming up' : 'ที่จะถึง', true];
 }
-const askOn = (e, id) => e.allMembers ? !!getMember(id) && !getMember(id).graduated
+const askOn = (e, id) => e.allMembers ? !!getMember(id) && !getMember(id).graduated && (e.allMembers === true || getMember(id).groupId === e.allMembers)
   : (e.members || []).includes(id) || Object.values(e.lineup || {}).some(d => Object.values(d).some(l => l.includes(id))) || (e.slots || []).some(s => (s.members || []).includes(id));
 const askNames = (list, en) => { const n = list.map(askMention); return n.length < 2 ? n.join('') : n.slice(0, -1).join(', ') + (en ? ' and ' : ' และ ') + n[n.length - 1]; };
 const askTrackRow = t => { const g = getGroup(t.work.groupId);

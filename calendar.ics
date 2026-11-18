@@ -1980,6 +1980,63 @@ DTSTART;TZID=Asia/Bangkok:20261110T190000
 DTEND;TZID=Asia/Bangkok:20261110T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cnx-station-mv@48thdb
+DTSTAMP:20261205T000000Z
+SUMMARY:CGM48 "สถานีเชียงใหม่" (Chiang Mai Stat
+ ion) MV Release
+DESCRIPTION:\nhttps://48thdb.com/event/ev-cnx-station-mv
+URL:https://48thdb.com/event/ev-cnx-station-mv
+DTSTART;VALUE=DATE:20261205
+DTEND;VALUE=DATE:20261206
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-cnx-lanna-smile@48thdb
+DTSTAMP:20261205T000000Z
+SUMMARY:CGM48 "สถานีเชียงใหม่" · Lanna Smile S
+ tation
+LOCATION:Central Chiang Mai Airport
+DESCRIPTION:\nhttps://48thdb.com/event/ev-cnx-lanna-smile
+URL:https://48thdb.com/event/ev-cnx-lanna-smile
+DTSTART;VALUE=DATE:20261205
+DTEND;VALUE=DATE:20261207
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-cnx-exhibition@48thdb
+DTSTAMP:20261205T000000Z
+SUMMARY:CGM48 "สถานีเชียงใหม่" Exhibition
+LOCATION:Chiang Mai Cultural Centre
+DESCRIPTION:• จัดในงาน Chiang Mai Design Week 2026\n\nhtt
+ ps://48thdb.com/event/ev-cnx-exhibition
+URL:https://48thdb.com/event/ev-cnx-exhibition
+DTSTART;VALUE=DATE:20261205
+DTEND;VALUE=DATE:20261214
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-cnx-book-fansign@48thdb
+DTSTAMP:20261212T000000Z
+SUMMARY:CGM48 "สถานีเชียงใหม่" Exhibition Book 
+ + Fansign
+LOCATION:Muan More Space
+DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
+ M48 ทุกคน\n• Exhibition Book + Fansign กับสมาช
+ ิกทุกคน\n• พรีออเดอร์ 21 พ.ย. – 
+ 7 ธ.ค. 2026\n\nhttps://48thdb.com/event/ev-cnx-book-fansign
+URL:https://48thdb.com/event/ev-cnx-book-fansign
+DTSTART;VALUE=DATE:20261212
+DTEND;VALUE=DATE:20261214
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-cnx-original-stage@48thdb
+DTSTAMP:20270129T000000Z
+SUMMARY:CGM48 The Original Stage "สถานีเชียงใหม
+ ่" 1st Stage + Cheki
+LOCATION:Muan More Space
+DESCRIPTION:\nhttps://48thdb.com/event/ev-cnx-original-stage
+URL:https://48thdb.com/event/ev-cnx-original-stage
+DTSTART;VALUE=DATE:20270129
+DTEND;VALUE=DATE:20270201
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-bnk-7th-gen-audition@48thdb
 DTSTAMP:20261116T000000Z
 SUMMARY:BNK48 7th Generation Audition
