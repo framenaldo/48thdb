@@ -5680,6 +5680,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     color:var(--fest-ink); opacity:.72;
   }
   .evm-fest-sub.is-long{ font-size:11.5px; letter-spacing:.16em; text-indent:.16em; padding:0 8px; line-height:1.5; }
+  .evm-fest-sub.is-th{ letter-spacing:0; text-indent:0; font-size:14px; }
   .evm-fest.is-play :is(.evm-fest-word, .evm-fest-img, .evm-fest-song){ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
   .evm-fest.is-play .evm-fest-imgw .evm-fest-img{ animation:none; }
   .evm-fest.is-play .evm-fest-imgw{ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
@@ -9026,7 +9027,7 @@ const SEED_SCHEDULE = [
     links:[{ label:'TikTok @shockmegirls.official', url:'https://www.tiktok.com/@shockmegirls.official' }],
     related:['ev-shock-me-girls-orientation'] },
   /* CGM48 "Chiang Mai Station" (สถานีเชียงใหม่): one overview poster from the owner (18 Nov 2026) for five events; the poster gives dates and places only, no times or links */
-  { id:'ev-cnx-station-mv', logo:'cnx', start:'2026-12-05',
+  { id:'ev-cnx-station-mv', noHome:true, logo:'cnx', start:'2026-12-05',
     title:'CGM48 "สถานีเชียงใหม่" (Chiang Mai Station) MV Release', short:'Station MV', groups:['cgm48'],
     related:['ev-cnx-lanna-smile','ev-cnx-exhibition','ev-cnx-book-fansign','ev-cnx-original-stage'],
     poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 } },
@@ -14519,7 +14520,7 @@ function renderEventBanner(ev){
   if(people.length && people.length <= 3) faces = `<span class="evm-fest-faces">${people.map(m => face(m, '')).join('')}</span>`;
   else if(people.length && people.length <= 8) faces = `<span class="evm-fest-faces is-mid">${people.map(m => face(m, ' is-mid')).join('')}</span>`;
   // more than fit: none at all — the line-up is listed further down the sheet
-  const long = sub.length > 18;
+  const long = sub.length > 18, thSub = /[\u0E00-\u0E7F]/.test(sub);
   return `
   <div class="evm-fest is-${k}${own.own ? ` pal-${K.pal}` : ev.poster ? ' is-postered' : ` pal-${K.pal}`}${faces ? '' : ' is-bare'}${K.word.length > 8 ? ' is-wide' : ''}${K.word.length > 13 ? ' is-longword' : ''}" aria-hidden="false">
     ${K.fx === 'beams' ? '<span class="evm-fest-beams" aria-hidden="true"><i></i><i></i></span>' : ''}
@@ -14531,7 +14532,7 @@ function renderEventBanner(ev){
       : K.img ? `<img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">`
       : K.song ? renderSongLogo(K.song, 'evm-fest-song', true)
       : festWordHtml(K.word)}
-    ${sub ? `<span class="evm-fest-sub${long ? ' is-long' : ''}" data-noloc>${escapeHtml(sub)}</span>` : ''}
+    ${sub ? `<span class="evm-fest-sub${long ? ' is-long' : ''}${thSub ? ' is-th' : ''}" data-noloc>${escapeHtml(sub)}</span>` : ''}
     ${faces}
   </div>`;
 }
@@ -21475,7 +21476,7 @@ function renderFeed(){
     .filter(x => x.d > 0).sort((a,b) => a.d - b.d).slice(0, 10);
 
   // Things on sale have a shop of their own; the feed is for what happens.
-  const events = SEED_SCHEDULE.filter(e => !e.shop && (!mine || hasMyOshi(e)))
+  const events = SEED_SCHEDULE.filter(e => !e.shop && !e.noHome && (!mine || hasMyOshi(e)))
     .slice().sort((a,b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'));
   const running = events.filter(e => !e.cancelled && e.start <= iso && eventLastDay(e) >= iso);
   const nowOn = running.filter(e => !e.period && !doneForToday(e, iso));
@@ -22095,7 +22096,7 @@ function renderFlashComposer(){
   const live = [...flashLive(state.flash), ...flashWaiting(state.flash)];
   const now = new Date(), day = toYmd(now), hm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   const iso = toYmd(todayStart());
-  const soon = SEED_SCHEDULE.filter(e => !e.shop && eventLastDay(e) >= iso)
+  const soon = SEED_SCHEDULE.filter(e => !e.shop && !e.noHome && eventLastDay(e) >= iso)
     .sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99')).slice(0, 14);
   return `<div class="pd-head"><h3 class="section-label">ประกาศบนป้ายไฟ</h3>
       <span class="muted-note">ขึ้นบนป้ายไฟ LED ทุกเครื่องทันที</span></div>
