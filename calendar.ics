@@ -1993,17 +1993,58 @@ DTSTART;TZID=Asia/Bangkok:20261110T190000
 DTEND;TZID=Asia/Bangkok:20261110T200000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-cnx-lanna-smile@48thdb
+UID:ev-cnx-lanna-smile-2026-12-05@48thdb
 DTSTAMP:20261205T000000Z
 SUMMARY:CGM48 "สถานีเชียงใหม่" · Lanna Smile S
  tation + MV Release
-LOCATION:Central Chiang Mai Airport
-DESCRIPTION:• ปล่อย MV "สถานีเชียงใหม
- ่" (MV Release) ในงานวันที่ 5 ธ.ค.\n\nhttps://
- 48thdb.com/event/ev-cnx-lanna-smile
+LOCATION:ลานกิจกรรม ชั้น 1 แกรนด์
+ ฮอลล์\, Central Chiangmai Airport\, Chiang Mai
+DESCRIPTION:• 5 ธ.ค. 12:00–13:00 Show\n• 5 ธ.ค. 14:00–19:00
+  Lanna Smile Station\n• 5 ธ.ค. 14:00–18:00 Hachi Cha & Merchandise
+ \n• 5 ธ.ค. 19:30–20:30 Group Hi-Touch\n• 6 ธ.ค. 12:00–18:0
+ 0 Lanna Smile Station\n• 6 ธ.ค. 13:00–18:00 Hachi Cha & Merchandis
+ e\n• 6 ธ.ค. 18:30–19:30 Group Hi-Touch\n• ปล่อย MV "
+ สถานีเชียงใหม่" (MV Release) ในงาน
+ วันที่ 5 ธ.ค.\n• บัตรกิจกรรมเป
+ ิดขายทาง iAM48 Application 21 พ.ย. 12:00 – 6 ธ.ค
+ . 2026 17:00 น. ใบละ 250 บาท (Digital Event Ticket)\n• 
+ บัตรเข้าร่วม Group Hi-Touch ได้จากก
+ ารซื้อเข็มกลัดภายในงาน\n• 
+ เวลากิจกรรมมีจำกัด กรุณาว
+ างแผนใช้บัตรกิจกรรมเอง\n• 
+ กำหนดการอาจเปลี่ยนแปลงตา
+ มความเหมาะสม\n\nhttps://48thdb.com/event/ev-cnx-la
+ nna-smile
 URL:https://48thdb.com/event/ev-cnx-lanna-smile
-DTSTART;VALUE=DATE:20261205
-DTEND;VALUE=DATE:20261207
+DTSTART;TZID=Asia/Bangkok:20261205T120000
+DTEND;TZID=Asia/Bangkok:20261205T203000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-cnx-lanna-smile-2026-12-06@48thdb
+DTSTAMP:20261205T000000Z
+SUMMARY:CGM48 "สถานีเชียงใหม่" · Lanna Smile S
+ tation + MV Release
+LOCATION:ลานกิจกรรม ชั้น 1 แกรนด์
+ ฮอลล์\, Central Chiangmai Airport\, Chiang Mai
+DESCRIPTION:• 5 ธ.ค. 12:00–13:00 Show\n• 5 ธ.ค. 14:00–19:00
+  Lanna Smile Station\n• 5 ธ.ค. 14:00–18:00 Hachi Cha & Merchandise
+ \n• 5 ธ.ค. 19:30–20:30 Group Hi-Touch\n• 6 ธ.ค. 12:00–18:0
+ 0 Lanna Smile Station\n• 6 ธ.ค. 13:00–18:00 Hachi Cha & Merchandis
+ e\n• 6 ธ.ค. 18:30–19:30 Group Hi-Touch\n• ปล่อย MV "
+ สถานีเชียงใหม่" (MV Release) ในงาน
+ วันที่ 5 ธ.ค.\n• บัตรกิจกรรมเป
+ ิดขายทาง iAM48 Application 21 พ.ย. 12:00 – 6 ธ.ค
+ . 2026 17:00 น. ใบละ 250 บาท (Digital Event Ticket)\n• 
+ บัตรเข้าร่วม Group Hi-Touch ได้จากก
+ ารซื้อเข็มกลัดภายในงาน\n• 
+ เวลากิจกรรมมีจำกัด กรุณาว
+ างแผนใช้บัตรกิจกรรมเอง\n• 
+ กำหนดการอาจเปลี่ยนแปลงตา
+ มความเหมาะสม\n\nhttps://48thdb.com/event/ev-cnx-la
+ nna-smile
+URL:https://48thdb.com/event/ev-cnx-lanna-smile
+DTSTART;TZID=Asia/Bangkok:20261206T120000
+DTEND;TZID=Asia/Bangkok:20261206T203000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-cnx-exhibition@48thdb
