@@ -2595,6 +2595,88 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .es-sl.is-in{ animation:esSlIn .24s var(--ease-out); }
   @keyframes esSlIn{ from{ opacity:0; transform:translateY(-6px); } }
   @media (prefers-reduced-motion:reduce){ .es-sl.is-in{ animation:none; } .es-sl-pill svg{ transition:none; } }
+  /* a Group Shot row opens its motion picture (openGroupShot): the whole row is the button, its camera pill says so */
+  .es-row.has-gs .es-what{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:5px 10px; }
+  .es-row.has-gs .es-st{ flex-basis:100%; margin-top:-2px; }
+  .es-row.has-gs.is-done .es-what{ opacity:1; }
+  .es-row.has-gs.is-done :is(.es-name, .es-st){ opacity:.45; }
+  .es-row.has-gs:active{ background:color-mix(in srgb, var(--c) 9%, var(--card)); }
+  .es-row.has-gs.is-now:active{ background:color-mix(in srgb, var(--es-live) 15%, var(--card)); }
+  .es-row.has-gs:active .es-sl-pill{ transform:translateY(2px); box-shadow:none; }
+  .es-gs-pill{ gap:4px; padding:4px 11px 4px 9px; }
+  /* the shot itself: a pop-up in the middle of the screen; the fan's shadow comes up, the members pop up at its sides,
+     the frame of a phone's camera, the flash, and the date printed in the corner. Only transform and opacity move. */
+  .gs-sheet{ align-items:center; padding:12px; }
+  .gs-sheet .share-panel{ max-width:420px; border-radius:26px; padding:14px 16px calc(16px + env(safe-area-inset-bottom) / 2); transform:scale(.82) translateY(18px);
+    transition:transform .46s cubic-bezier(.26,1.45,.45,1), opacity .18s ease; box-shadow:0 24px 60px rgba(20,8,30,.32); }
+  .gs-sheet.show .share-panel{ transform:none; }
+  .gs-title{ display:flex; flex-direction:column; line-height:1.15; font-size:18px; }
+  .gs-title small{ margin-top:3px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+  .gs-wrap{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .gs-stage{ position:relative; overflow:hidden; isolation:isolate; border-radius:18px; aspect-ratio:4 / 3;
+    background:radial-gradient(120% 95% at 50% 8%, color-mix(in srgb, var(--gs-a) 6%, #fff) 0%, color-mix(in srgb, var(--gs-a) 19%, #fff) 62%, color-mix(in srgb, var(--gs-a) 32%, #fff) 100%);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gs-a) 24%, transparent); }
+  .gs-stage.is-rows{ aspect-ratio:10 / 9; }
+  /* the event's own logo over and over, like the backdrop at a photo wall */
+  .gs-stage.has-logo::before{ content:''; position:absolute; z-index:0; inset:-30%; opacity:.11; transform:rotate(-9deg);
+    background:var(--gs-logo) 0 0 / 72px 72px repeat, var(--gs-logo) 36px 36px / 72px 72px repeat; }
+  .gs-stage::after{ content:''; position:absolute; z-index:0; left:0; right:0; bottom:0; height:20%; background:linear-gradient(to top, color-mix(in srgb, var(--gs-a) 20%, transparent), transparent); }
+  .gs-fig{ position:absolute; z-index:var(--z); left:calc(var(--x) - var(--w) / 2); bottom:var(--y); width:var(--w); aspect-ratio:3 / 4; opacity:0;
+    border:3px solid #fff; border-radius:13px; overflow:hidden; background:var(--c, #ddd); box-shadow:0 10px 20px rgba(40,12,50,.24); transform-origin:50% 100%; }
+  .gs-fig img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 20%; }
+  .gs-fig::after{ content:''; position:absolute; inset:auto 0 0; height:36%; background:linear-gradient(to top, rgba(0,0,0,.6), transparent); }
+  .gs-fig span{ position:absolute; z-index:1; left:3px; right:3px; bottom:5px; font-size:12.5px; font-weight:800; line-height:1.1; color:#fff; text-align:center;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 1px 2px rgba(0,0,0,.55); }
+  /* the row behind shows only above the front row's heads, so its names sit at the top */
+  .gs-fig.is-back::after{ inset:0 0 auto; height:30%; background:linear-gradient(to bottom, rgba(0,0,0,.55), transparent); }
+  .gs-fig.is-back span{ top:4px; bottom:auto; font-size:10.5px; }
+  .gs-fig.is-you{ background:color-mix(in srgb, var(--gs-a) 13%, #fff); border-style:dashed; border-color:color-mix(in srgb, var(--gs-a) 62%, #fff); }
+  .gs-fig.is-you::after{ display:none; }
+  .gs-fig.is-you svg{ position:absolute; left:0; bottom:0; width:100%; height:100%; fill:rgba(43,27,46,.52); }
+  .gs-fig.is-you span{ left:50%; right:auto; bottom:9%; transform:translateX(-50%); padding:2px 11px; border-radius:99px; background:var(--gs-a); font-size:12px; text-shadow:none; box-shadow:0 2px 6px rgba(0,0,0,.25); }
+  .gs-vf, .gs-flash, .gs-stamp{ position:absolute; pointer-events:none; opacity:0; }
+  .gs-vf{ z-index:20; inset:6%; --l:22px; --b:3px; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.4)); background:
+    linear-gradient(#fff 0 0) 0 0 / var(--l) var(--b) no-repeat, linear-gradient(#fff 0 0) 0 0 / var(--b) var(--l) no-repeat,
+    linear-gradient(#fff 0 0) 100% 0 / var(--l) var(--b) no-repeat, linear-gradient(#fff 0 0) 100% 0 / var(--b) var(--l) no-repeat,
+    linear-gradient(#fff 0 0) 0 100% / var(--l) var(--b) no-repeat, linear-gradient(#fff 0 0) 0 100% / var(--b) var(--l) no-repeat,
+    linear-gradient(#fff 0 0) 100% 100% / var(--l) var(--b) no-repeat, linear-gradient(#fff 0 0) 100% 100% / var(--b) var(--l) no-repeat; }
+  .gs-flash{ z-index:30; inset:0; background:#fff; }
+  .gs-stamp{ z-index:25; right:5.5%; top:5%; font:700 13px/1 ui-monospace, 'SF Mono', Menlo, Consolas, monospace; letter-spacing:.06em; color:#FF9636;
+    text-shadow:0 0 3px rgba(255,110,20,.75), 0 0 1px rgba(120,40,0,.6); }
+  @keyframes gsPop{
+    0%{ opacity:0; transform:translate(calc(var(--s) * 45%), 55%) scale(.4) rotate(calc(var(--s) * -14deg)); }
+    50%{ opacity:1; transform:translate(calc(var(--s) * -3%), -9%) scale(1.07) rotate(calc(var(--s) * 3deg)); }
+    72%{ transform:translate(calc(var(--s) * 1%), 2.5%) scale(.97) rotate(calc(var(--s) * -1deg)); }
+    88%{ transform:translateY(-1%) scale(1.01); }
+    100%{ opacity:1; transform:rotate(calc(var(--s) * -2.5deg)); } }
+  @keyframes gsYou{ from{ opacity:0; transform:translateY(10%) scale(.92); } to{ opacity:1; transform:none; } }
+  @keyframes gsVfIn{ from{ opacity:0; transform:scale(1.12); } to{ opacity:1; transform:none; } }
+  @keyframes gsGone{ to{ opacity:0; } }
+  @keyframes gsFlash{ 0%{ opacity:0; } 12%{ opacity:.95; } 100%{ opacity:0; } }
+  @keyframes gsIn{ from{ opacity:0; } to{ opacity:1; } }
+  .gs-stage.go .gs-fig{ animation:gsPop .7s cubic-bezier(.22,.9,.32,1) var(--d) both; }
+  .gs-stage.go .gs-fig.is-you{ animation:gsYou .5s ease-out var(--d) both; }
+  .gs-stage.go .gs-vf{ animation:gsVfIn .32s ease-out var(--tv) both, gsGone .18s linear calc(var(--tf) + .04s) forwards; }
+  .gs-stage.go .gs-flash{ animation:gsFlash .6s ease-out var(--tf) both; }
+  .gs-stage.go .gs-stamp{ animation:gsIn .35s ease-out calc(var(--tf) + .12s) both; }
+  .gs-picks{ display:flex; flex-wrap:wrap; justify-content:center; gap:7px; margin:12px 0 0; }
+  .gs-picks .rt-tab{ flex:none; }
+  .gs-foot{ display:flex; justify-content:center; margin:12px 0 0; }
+  .gs-again{ display:inline-flex; align-items:center; gap:6px; padding:8px 16px 8px 13px; border-radius:99px; border:1px solid var(--line); background:var(--card); color:var(--ink);
+    font:inherit; font-size:13.5px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px color-mix(in srgb, var(--line) 60%, transparent); transition:transform .12s, box-shadow .12s; }
+  .gs-again:active{ transform:translateY(2px); box-shadow:none; }
+  .gs-again svg{ width:16px; height:16px; }
+  .gs-notes{ margin:12px 2px 0; padding:10px 0 0 18px; border-top:1px dashed var(--line); font-size:12.5px; line-height:1.5; color:var(--ink-soft); }
+  .gs-notes li + li{ margin-top:3px; }
+  :root[data-theme="dark"] .gs-stage{ background:radial-gradient(120% 95% at 50% 8%, color-mix(in srgb, var(--gs-a) 28%, #2A2035) 0%, color-mix(in srgb, var(--gs-a) 15%, #1B1424) 70%, #140F1B 100%); }
+  :root[data-theme="dark"] .gs-stage.has-logo::before{ opacity:.17; }
+  :root[data-theme="dark"] .gs-fig.is-you{ background:color-mix(in srgb, var(--gs-a) 26%, #2A2135); border-color:color-mix(in srgb, var(--gs-a) 70%, #fff); }
+  :root[data-theme="dark"] .gs-fig.is-you svg{ fill:rgba(10,6,14,.6); }
+  @media (prefers-reduced-motion:reduce){
+    .gs-sheet .share-panel{ transform:none; transition:opacity .18s ease; }
+    .gs-stage .gs-fig, .gs-stage .gs-stamp{ opacity:1; animation:none !important; }
+    .gs-stage .gs-fig:not(.is-you){ transform:rotate(calc(var(--s) * -2.5deg)); }
+    .gs-stage.go :is(.gs-vf, .gs-flash){ animation:none; } }
   /* a mini concert's setlist: a pill a day, then the songs in the timetable's frame,
      session by session with the talk between, in the poster's colour */
   .sl-days{ display:flex; gap:8px; margin:9px 0 0; }
@@ -11199,6 +11281,14 @@ const EN = {
     'Zone 3, the outer area: any camera, but no tripods, ladders or chairs',
   'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม':
     'The schedule may change as circumstances require',
+  'Group Shot ถ่ายด้วยโทรศัพท์มือถือของแฟนคลับ โดยเจ้าหน้าที่เป็นผู้ถ่ายให้ ทั้ง 2:1 และ 5:1':
+    'Group Shots, 2:1 and 5:1 alike, are taken on the fan\'s own phone by the staff',
+  '1,800 บาทต่อสิทธิ์ จำหน่ายแยกจากบัตรเข้างาน':
+    '1,800 baht a shot, sold apart from the entry ticket',
+  'Monet × Praew · Janry × Praew · Marine × Sindy — คู่ละ 60 สิทธิ์ต่อรอบ':
+    'Monet × Praew · Janry × Praew · Marine × Sindy — 60 shots a pair each round',
+  'Group Shot 5:1 กับสมาชิกทั้ง 5 คน (60 สิทธิ์ต่อรอบ)':
+    'Group Shot 5:1 with all five members (60 a round)',
   'ของที่ระลึก: Welcome Card, Travel Tag, ชุดสังฆทาน, Group Shot Photo':
     'Keepsakes: Welcome Card, Travel Tag, a monk\'s offering set, Group Shot Photo',
   'ของที่ระลึก: รูปถ่ายหลังการแสดงรอบนั้น 1 ภาพ':
@@ -20172,16 +20262,107 @@ function rotaLiveGe(){
 /* a row's activity in its own colour (ev.tones = [{ m:'Group Hi-Touch', c:'#E4457E' }]): the name as a chip, the round after it */
 const esTone = (ev, what) => (ev.tones || []).find(t => what.startsWith(t.m)) || null;
 const esWhat = (ev, what) => { const t = esTone(ev, what); return t ? `<span class="es-kind">${escapeHtml(t.m)}</span> ${escapeHtml(what.slice(t.m.length).trim())}` : escapeHtml(what); };
+/* Group Shot (the owner's idea, 19 Nov 2026): a timetable row that reads "Group Shot 2:1 (Janry+Praew & Marine+Sindy)" opens a
+   short motion picture of the shot — the members pop up at the fan's sides, the fan a shadow in the middle, then the flash.
+   Who is in it comes from the brackets (sets split by &, names by +), else the event's whole line-up when it is the N of N:1.
+   A preview for now: on for the owner's account, ?gshot=on on any device (kept), ?gshot=off off. */
+const GS_RE = /Group Shot\s*(\d+)\s*:\s*1\b(?:\s*\(([^)]*)\))?/i;
+const _gsFlag = (() => { try{ const q = new URLSearchParams(location.search).get('gshot');
+  if(q === 'on') localStorage.setItem('48thdb-gshot', '1'); else if(q === 'off') localStorage.setItem('48thdb-gshot', '0');
+  return localStorage.getItem('48thdb-gshot') || ''; }catch(e){ return ''; } })();
+const gsOn = () => _gsFlag === '1' || (_gsFlag !== '0' && !!state.isOwner);
+function gsParse(ev, raw){
+  const m = String(raw || '').match(GS_RE), n = m ? Math.min(+m[1], 8) : 0; if(!n) return null;
+  const pool = (ev.members || []).map(getMember).filter(Boolean);
+  const find = s => { const k = s.trim().toLowerCase(); if(!k) return null;
+    const hit = x => [x.name, x.nameTh].some(v => v && String(v).toLowerCase() === k);
+    return pool.find(hit) || state.members.find(x => hit(x) && (!ev.groups || ev.groups.includes(x.groupId))) || null; };
+  let sets = (m[2] || '').split(/\s*[&,/]\s*/).map(g => g.split(/\s*[+×]\s*/).map(find))
+    .filter(g => g.length === n && g.every(Boolean)).map(g => g.map(x => x.id));
+  if(!sets.length && pool.length === n) sets = [pool.map(x => x.id)];
+  return sets.length ? { n, sets } : null;
+}
+/* Where each one stands, as shares of the stage (x the centre, y the foot, w the width): the fan in the middle of the front row
+   with a member at each side, the rest in a row behind, smaller and higher. They pop up front first, then from the outside in, left before right. */
+function gsSpots(n){
+  if(n === 1) return [{ m:0, x:31, y:6, w:37, z:3, s:-1, d:.42 }, { you:1, x:69, y:6, w:37, z:4, s:0, d:.12 }];
+  const S = [{ m:0, x:18, y:4, w:33.5, z:3, s:-1 }, { you:1, x:50, y:4, w:33.5, z:4, s:0, d:.12 }, { m:1, x:82, y:4, w:33.5, z:3, s:1 }];
+  const k = n - 2, step = Math.min(27, 80 / Math.max(k, 1)), w = Math.min(26, 86 / Math.max(k, 1) - 2);
+  for(let j = 0; j < k; j++){ const x = 50 + (j - (k - 1) / 2) * step; S.push({ m:2 + j, x, y:37, w, z:1, s:x < 49 ? -1 : x > 51 ? 1 : 0 }); }
+  const out = s => Math.round(Math.abs(s.x - 50));
+  S.filter(s => !s.you).sort((a, b) => b.z - a.z || out(b) - out(a) || a.x - b.x).forEach((s, i) => { s.d = +(.42 + i * .2).toFixed(2); });
+  return S;
+}
+// the fan: a shadow of a head and shoulders, framed as the members' photos are
+const GS_YOU = '<svg viewBox="0 0 60 80" aria-hidden="true"><ellipse cx="30" cy="29" rx="13" ry="15.5"/><path d="M24 42Q30 47 36 42L36.5 50C47 51.5 55 56.5 57.5 65L59.5 80H.5L2.5 65C5 56.5 13 51.5 23.5 50Z"/></svg>';
+function gsStageHtml(ev, set, stamp){
+  const en = isEN(), spots = gsSpots(set.length), last = Math.max(...spots.map(s => s.d)), tv = last + .7, tf = tv + .55;
+  const logo = (FEST_EVENT[ev.id] || {}).img || '';
+  const who = spots.map(s => s.you ? (en ? 'You' : 'คุณ') : nickName(getMember(set[s.m])));
+  const fig = s => { const pos = `--x:${s.x}%;--y:${s.y}%;--w:${s.w}%;--z:${s.z};--s:${s.s};--d:${s.d}s`;
+    if(s.you) return `<div class="gs-fig is-you" style="${pos}">${GS_YOU}<span>${en ? 'You' : 'คุณ'}</span></div>`;
+    const m = getMember(set[s.m]), g = getGroup(m.groupId);
+    return `<div class="gs-fig${s.z < 3 ? ' is-back' : ''}" style="${pos};--c:${g.color}">${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" decoding="async">` : ''}<span data-noloc>${escapeHtml(nickName(m))}</span></div>`; };
+  return `<div class="gs-stage ${set.length > 2 ? 'is-rows' : 'is-row'}${logo ? ' has-logo' : ''}" role="img" aria-label="${escapeAttr(`Group Shot ${set.length}:1 · ${who.join(', ')}`)}"
+      style="--tv:${tv.toFixed(2)}s;--tf:${tf.toFixed(2)}s${logo ? `;--gs-logo:url('${escapeAttr(logo)}')` : ''}">
+    ${spots.map(fig).join('')}<i class="gs-vf" aria-hidden="true"></i><i class="gs-flash" aria-hidden="true"></i><span class="gs-stamp" aria-hidden="true">${stamp}</span></div>`;
+}
+function openGroupShot(evId, idx){
+  const ev = SEED_SCHEDULE.find(e => e.id === evId), raw = ev && (ev.detail || [])[idx], G = raw && gsParse(ev, raw); if(!G) return;
+  closeShareSheet();
+  const en = isEN(), t = (a, b) => en ? b : a, tr = s => en ? (toEn(s) ?? enFragments(s) ?? s) : s;
+  const line = tr(raw), sm = line.match(SCHED_RE), what = sm ? sm[7] : line;
+  const time = sm ? `${sm[3].padStart(2, '0')}:${sm[4]}${sm[5] ? `–${sm[5].padStart(2, '0')}:${sm[6]}` : ''}` : '';
+  const pre = what.split(/\s*·\s*(?=Group Shot)/i)[0], round = /Group Shot/i.test(pre) ? '' : pre;
+  const day = sm && sm[1] ? new Date(+ev.start.slice(0, 4), SCHED_MON.indexOf(sm[2]) % 12, +sm[1]) : parseYmd(ev.start);
+  const stamp = `${day.getDate()} ${day.getMonth() + 1} '${String(day.getFullYear()).slice(2)}`;
+  const names = set => set.map(id => nickName(getMember(id))).join(' + ');
+  // what the event says elsewhere about this shot: how it is taken, what it costs, which ticket has it
+  const tag = `Group Shot ${G.n}:1`;
+  const notes = [...(ev.info || []).filter(x => /group shot/i.test(x)).map(tr),
+    ...(ev.sections || []).filter(s => s.head && s.head.includes(tag)).flatMap(s => s.lines.map(tr)),
+    ...((ev.seatPlan && ev.seatPlan.zones) || []).flatMap(z => (z.perks || []).filter(p => p.includes(tag)).map(p => `${t('บัตร ', '')}${z.label}${z.price ? ` ${z.price} ${t('บาท', 'baht')}` : ''} · ${tr(p)}`))];
+  let pick = 0;
+  const el = document.createElement('div'); el.className = 'share-sheet gs-sheet';
+  el.innerHTML = `<div class="share-back" data-share="close"></div>
+    <div class="share-panel gs-panel" role="dialog" aria-label="${escapeAttr(tag)}" style="--gs-a:${(ev.poster && ev.poster.accent) || '#E4457E'}">
+      <div class="share-head"><b class="gs-title">${tag}<small>${escapeHtml([round, time].filter(Boolean).join(' · '))}</small></b><button class="share-x" data-share="close" aria-label="${t('ปิด', 'Close')}">✕</button></div>
+      <div class="gs-wrap" data-gs="again">${gsStageHtml(ev, G.sets[0], stamp)}</div>
+      ${G.sets.length > 1 ? `<div class="gs-picks" role="tablist">${G.sets.map((s, i) => `<button class="rt-tab${i ? '' : ' on'}" role="tab" aria-selected="${!i}" data-gs="set" data-value="${i}" style="--b:var(--gs-a)"><span data-noloc>${escapeHtml(names(s))}</span></button>`).join('')}</div>` : ''}
+      <div class="gs-foot"><button class="gs-again" data-gs="again"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>${t('เล่นอีกครั้ง', 'Play again')}</button></div>
+      ${notes.length ? `<ul class="gs-notes">${notes.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>` : ''}
+    </div>`;
+  localize(el);
+  document.body.appendChild(el);
+  // the shot starts once the photos are ready, so no frame pops up empty
+  const play = () => { const st = el.querySelector('.gs-stage'); if(!st) return;
+    const go = () => { st.classList.remove('go'); void st.offsetWidth; st.classList.add('go'); };
+    const imgs = [...st.querySelectorAll('img')].map(i => i.decode ? i.decode().catch(() => {}) : null);
+    Promise.race([Promise.all(imgs), new Promise(r => setTimeout(r, 700))]).then(() => requestAnimationFrame(go)); };
+  requestAnimationFrame(() => { el.classList.add('show'); play(); });
+  const esc = e => { if(!el.isConnected){ document.removeEventListener('keydown', esc); return; } if(e.key === 'Escape') closeShareSheet(); };
+  document.addEventListener('keydown', esc);
+  el.addEventListener('click', e => {
+    if(e.target.closest('[data-share="close"]')){ closeShareSheet(); return; }
+    const a = e.target.closest('[data-gs]'); if(!a) return;
+    if(a.dataset.gs === 'set'){ const i = +a.dataset.value; if(i === pick) return play(); pick = i;
+      el.querySelectorAll('.gs-picks .rt-tab').forEach((b, k) => { b.classList.toggle('on', k === i); b.setAttribute('aria-selected', k === i); });
+      el.querySelector('.gs-wrap').innerHTML = gsStageHtml(ev, G.sets[i], stamp); }
+    play();
+  });
+}
 function renderSchedule(ev){
   const en = isEN(), iso = toYmd(todayStart()), year = +ev.start.slice(0, 4);
   const live = !ev.cancelled && !ev.postponed && ev.start <= iso && eventLastDay(ev) >= iso;
   const at = hm => { const t = parseYmd(iso), [h, mi] = hm.split(':').map(Number); t.setHours(h, mi, 0, 0); return t.getTime(); };
-  const items = ev.detail.map(raw => {
+  const gsMay = gsOn();
+  const items = ev.detail.map((raw, i) => {
     const line = en ? (toEn(raw) ?? enFragments(raw) ?? raw) : raw, m = line.match(SCHED_RE);
     if(!m) return { note: line };
     const [, d, mon, h1, m1, h2, m2, what] = m;
     const day = d ? toYmd(new Date(year, SCHED_MON.indexOf(mon) % 12, +d)) : null;
-    return { day, dayLabel: d ? `${d} ${mon}` : '', a: `${h1.padStart(2, '0')}:${m1}`, b: h2 ? `${h2.padStart(2, '0')}:${m2}` : '', what, mc: SL_AT_RE.test(raw) };
+    return { day, dayLabel: d ? `${d} ${mon}` : '', a: `${h1.padStart(2, '0')}:${m1}`, b: h2 ? `${h2.padStart(2, '0')}:${m2}` : '', what, mc: SL_AT_RE.test(raw),
+      gs: gsMay && GS_RE.test(raw) && gsParse(ev, raw) ? i : -1 };
   });
   // the setlist folds under today's Mini Concert row, else the undated one, else the next
   if(ev.setlist){ const mc = items.filter(r => r.mc);
@@ -20223,12 +20404,14 @@ function renderSchedule(ev){
     if(r.note){ flushBox(); notes += `<li>${escapeHtml(r.note)}</li>`; continue; }
     flushNotes();
     const gone = !r.from && r.day && r.day < iso;   // a dated row whose day has passed
-    const open = r.sl && !!_slOpen[ev.id], tag = r.sl ? 'button' : 'div', st = gone ? (en ? 'Over' : 'จบแล้ว') : '';
+    const gs = !r.sl && r.gs >= 0;   // a Group Shot row opens its motion picture
+    const open = r.sl && !!_slOpen[ev.id], tag = r.sl || gs ? 'button' : 'div', st = gone ? (en ? 'Over' : 'จบแล้ว') : '';
     const tn = esTone(ev, r.what), alt = !box ? (nRow = 0, false) : ++nRow % 2 === 1;   // every other part of the day on the card's deeper shade (owner, 13 Nov)
-    box += `<${tag} class="es-row${alt ? ' is-alt' : ''}${gone ? ' is-done' : ''}${r.sl ? ' has-sl' : ''}${tn ? ' has-tone' : ''}"${tn ? ` style="--rt:${tn.c}"` : ''}${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}${r.sl
-        ? ` data-action="sl-open" data-id="${ev.id}" aria-expanded="${open}" aria-controls="sl-${ev.id}"` : ''}>
+    box += `<${tag} class="es-row${alt ? ' is-alt' : ''}${gone ? ' is-done' : ''}${r.sl ? ' has-sl' : ''}${gs ? ' has-gs' : ''}${tn ? ' has-tone' : ''}"${tn ? ` style="--rt:${tn.c}"` : ''}${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}${r.sl
+        ? ` data-action="sl-open" data-id="${ev.id}" aria-expanded="${open}" aria-controls="sl-${ev.id}"` : gs ? ` data-action="gs-open" data-id="${ev.id}" data-value="${r.gs}" aria-haspopup="dialog"` : ''}>
       <span class="es-time">${r.a}${r.b ? `–${r.b}` : ''}${r.dayLabel ? `<small>${escapeHtml(r.dayLabel)}</small>` : ''}</span>
       <span class="es-what">${r.sl ? `<span class="es-name">${escapeHtml(r.what)}</span><span class="es-sl-pill">${en ? 'Setlist' : 'เซ็ตลิสต์'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>`
+        : gs ? `<span class="es-name">${esWhat(ev, r.what)}</span><span class="es-sl-pill es-gs-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3v10H4z"/><circle cx="12" cy="13.2" r="3.3"/></svg>${en ? 'Preview' : 'จำลอง'}</span>`
         : esWhat(ev, r.what)}<span class="es-st">${st}</span></span>
       <span class="es-bar"></span></${tag}>`;
     if(LU && !r.day){ const w = luWho(r.what); box += alt ? w.replace(/class="es-who/g, 'class="es-who is-alt') : w; }
@@ -32434,6 +32617,7 @@ function bindDelegatedEvents(){
       state.posterOf = null; state.selectedId = id; state.editingId = null; state.selectedEvent = null; state.dayOf = null;
       renderMain(); replaceHistory();
     }
+    else if(action==='gs-open'){ openGroupShot(id, +el.dataset.value); }
     else if(action==='sl-open'){
       // the setlist follows its row, after the faces of who is on in it when the event has a line-up
       let panel = el.nextElementSibling; while(panel && panel.classList.contains('es-who')) panel = panel.nextElementSibling;
