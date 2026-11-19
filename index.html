@@ -9116,13 +9116,44 @@ const SEED_SCHEDULE = [
       'ซีรีส์ออนแอร์ทุกวันศุกร์ เสาร์ และอาทิตย์ เริ่ม 28 พ.ย. 2026 เวลา 20:00 น. ทาง TikTok @shockmegirls.official'],
     links:[{ label:'TikTok @shockmegirls.official', url:'https://www.tiktok.com/@shockmegirls.official' }],
     related:['ev-shock-me-girls-orientation'] },
-  /* CGM48 "Chiang Mai Station" (สถานีเชียงใหม่): one overview poster from the owner (18 Nov 2026) for five events; the poster gives dates and places only, no times or links */
-  { id:'ev-cnx-lanna-smile', logo:'cnx', start:'2026-12-05', end:'2026-12-06',
+  /* CGM48 "Chiang Mai Station" (สถานีเชียงใหม่): one overview poster from the owner (18 Nov 2026) for five events; the poster gives dates and places only, no times or links.
+     Lanna Smile Station has five posters of its own from the owner (19 Nov 2026): key visual, schedule, activities, the set, the ticket.
+     They name no members and print no link (the tickets are sold in the iAM48 Application). */
+  { id:'ev-cnx-lanna-smile', logo:'cnx', start:'2026-12-05', end:'2026-12-06', time:'12:00',
+    sales:{ from:'2026-11-21T12:00', to:'2026-12-06T17:00' },
     title:'CGM48 "สถานีเชียงใหม่" · Lanna Smile Station + MV Release', short:'Lanna Smile Station',
-    venue:'Central Chiang Mai Airport', groups:['cgm48'],
+    venue:'ลานกิจกรรม ชั้น 1 แกรนด์ฮอลล์, Central Chiangmai Airport, Chiang Mai', groups:['cgm48'],
     related:['ev-cnx-exhibition','ev-cnx-book-fansign','ev-cnx-original-stage'],
-    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 },
-    info:['ปล่อย MV "สถานีเชียงใหม่" (MV Release) ในงานวันที่ 5 ธ.ค.'] },
+    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-lanna-smile-station.jpg', w:1500, h:1500, th:'โปสเตอร์', en:'Poster',
+      more:[{ img:'posters/cgm48-lanna-smile-station-schedule.jpg', w:1501, h:1500, th:'กำหนดการ', en:'Schedule' },
+        { img:'posters/cgm48-lanna-smile-station-activities.jpg', w:1501, h:1500, th:'กิจกรรม', en:'Activities' },
+        { img:'posters/cgm48-lanna-smile-station-set.jpg', w:1501, h:1500, th:'CGM48 Lanna Smile Station Set', en:'CGM48 Lanna Smile Station Set' },
+        { img:'posters/cgm48-lanna-smile-station-ticket.jpg', w:1501, h:1501, th:'บัตรกิจกรรม', en:'Activity ticket' },
+        { img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048, th:'ภาพรวมสถานีเชียงใหม่', en:'Chiang Mai Station overview' }] },
+    price:'250',
+    detail:[
+      '5 ธ.ค. 12:00–13:00 Show',
+      '5 ธ.ค. 14:00–19:00 Lanna Smile Station',
+      '5 ธ.ค. 14:00–18:00 Hachi Cha & Merchandise',
+      '5 ธ.ค. 19:30–20:30 Group Hi-Touch',
+      '6 ธ.ค. 12:00–18:00 Lanna Smile Station',
+      '6 ธ.ค. 13:00–18:00 Hachi Cha & Merchandise',
+      '6 ธ.ค. 18:30–19:30 Group Hi-Touch'],
+    info:['ปล่อย MV "สถานีเชียงใหม่" (MV Release) ในงานวันที่ 5 ธ.ค.',
+      'บัตรกิจกรรมเปิดขายทาง iAM48 Application 21 พ.ย. 12:00 – 6 ธ.ค. 2026 17:00 น. ใบละ 250 บาท (Digital Event Ticket)',
+      'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
+      'เวลากิจกรรมมีจำกัด กรุณาวางแผนใช้บัตรกิจกรรมเอง',
+      'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'],
+    sections:[
+      { head:'กิจกรรม Lanna Smile Station', lines:[
+        'Khom Loi Station สถานีปล่อยโคม · 4 บัตร — ถ่ายภาพ 2-Shot กับเมมเบอร์ในท่าปล่อยโคมลอย ด้วยโทรศัพท์มือถือของท่านเอง (รับรูปจากเมมเบอร์)',
+        'Tung Num Chok Station สถานีนำโชค · 2 บัตร — รับคำอวยพรที่เมมเบอร์เขียนลงบนตุงสามเหลี่ยมนำโชค (รับรูปจากเมมเบอร์)',
+        'Janken Jao Station สถานีเป่ายิ้งฉุบเจ้า · 1 บัตร — เป่ายิ้งฉุบกับเมมเบอร์ด้วยการ์ด ชนะรับรูปจากเมมเบอร์ แพ้หรือเสมอรับรูปจากสตาฟ',
+        'ร่วมกิจกรรมแต่ละรอบ ได้ Photo 1 ใบ (คละ 21 แบบ) และแสตมป์ประจำบูธ (ต้องมี Stamp Card)'] },
+      { head:'CGM48 Lanna Smile Station Set · 280 บาท', lines:[
+        'Acrylic Keychain พี่ม่อน 1 ชิ้น (คละจาก 3 แบบ) และบัตรสะสมแสตมป์ 1 ใบ',
+        'ซื้อได้ที่จุด Merchandise ภายในงาน',
+        'สะสมครบ 3 แสตมป์ แลกสิทธิ์ถ่าย Photo Booth ฟรี 1 ครั้ง · แลกได้ในงาน 5–6 ธ.ค. เท่านั้น ใช้สิทธิ์ได้ภายในปี 2026'] }] },
   { id:'ev-cnx-exhibition', logo:'cnx', start:'2026-12-05', end:'2026-12-13',
     title:'CGM48 "สถานีเชียงใหม่" Exhibition', short:'Station Exhibition',
     venue:'Chiang Mai Cultural Centre', groups:['cgm48'],
@@ -11309,6 +11340,27 @@ const EN = {
     'You must verify your identity in the iAM48 app and show an ID card matching the name on the ticket; the name cannot be changed later',
   'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน':
     'A Group Hi-Touch pass comes with a badge bought at the event',
+  'ปล่อย MV "สถานีเชียงใหม่" (MV Release) ในงานวันที่ 5 ธ.ค.':
+    'MV release: "สถานีเชียงใหม่" (Chiang Mai Station), at the event on 5 Dec',
+  'บัตรกิจกรรมเปิดขายทาง iAM48 Application 21 พ.ย. 12:00 – 6 ธ.ค. 2026 17:00 น. ใบละ 250 บาท (Digital Event Ticket)':
+    'Activity tickets (Digital Event Ticket) on sale in the iAM48 Application from 21 Nov 12:00 to 6 Dec 2026 17:00, 250 baht each',
+  'เวลากิจกรรมมีจำกัด กรุณาวางแผนใช้บัตรกิจกรรมเอง':
+    'Time for the activities is limited, so plan how you use your tickets',
+  'กิจกรรม Lanna Smile Station': 'Lanna Smile Station activities',
+  'Khom Loi Station สถานีปล่อยโคม · 4 บัตร — ถ่ายภาพ 2-Shot กับเมมเบอร์ในท่าปล่อยโคมลอย ด้วยโทรศัพท์มือถือของท่านเอง (รับรูปจากเมมเบอร์)':
+    'Khom Loi Station · 4 tickets — a 2-Shot photo with a member, posing as if letting a sky lantern go, taken on your own phone (the member hands you your photo)',
+  'Tung Num Chok Station สถานีนำโชค · 2 บัตร — รับคำอวยพรที่เมมเบอร์เขียนลงบนตุงสามเหลี่ยมนำโชค (รับรูปจากเมมเบอร์)':
+    'Tung Num Chok Station · 2 tickets — a member writes you a blessing on a triangular lucky tung flag (the member hands you your photo)',
+  'Janken Jao Station สถานีเป่ายิ้งฉุบเจ้า · 1 บัตร — เป่ายิ้งฉุบกับเมมเบอร์ด้วยการ์ด ชนะรับรูปจากเมมเบอร์ แพ้หรือเสมอรับรูปจากสตาฟ':
+    'Janken Jao Station · 1 ticket — rock-paper-scissors with a member, played with cards: win and the member hands you your photo, lose or draw and the staff do',
+  'ร่วมกิจกรรมแต่ละรอบ ได้ Photo 1 ใบ (คละ 21 แบบ) และแสตมป์ประจำบูธ (ต้องมี Stamp Card)':
+    'Each round of an activity gives you one photo (21 designs, at random) and that booth\'s stamp (you need a Stamp Card)',
+  'CGM48 Lanna Smile Station Set · 280 บาท': 'CGM48 Lanna Smile Station Set · 280 baht',
+  'Acrylic Keychain พี่ม่อน 1 ชิ้น (คละจาก 3 แบบ) และบัตรสะสมแสตมป์ 1 ใบ':
+    'One Phi Mon acrylic keychain (3 designs, at random) and one stamp card',
+  'ซื้อได้ที่จุด Merchandise ภายในงาน': 'Sold at the Merchandise point at the event',
+  'สะสมครบ 3 แสตมป์ แลกสิทธิ์ถ่าย Photo Booth ฟรี 1 ครั้ง · แลกได้ในงาน 5–6 ธ.ค. เท่านั้น ใช้สิทธิ์ได้ภายในปี 2026':
+    'Collect all 3 stamps for one free Photo Booth picture · exchange them at the event on 5–6 Dec only, and use it by the end of 2026',
   'บัตรเปิดขาย 1 ส.ค. 2026 18:00 ทาง iAM48 Application':
     'On sale 1 Aug 2026 at 18:00 in the iAM48 Application',
   'ที่นั่งแบบสุ่ม (Random Seat)': 'Random seating',
