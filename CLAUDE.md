@@ -171,8 +171,8 @@ the Firebase CLI from the owner's machine.
   Who is on in each part goes in `lineup` on the event, `{ day: { 'Mini Concert':[ids],
   'Group Hi-Touch':[ids] } }`: day pills over the timetable and faces under the
   rows whose name contains the key — not as text lines in `detail`.
-- **Group Shot rows, a preview** (the owner's idea, 19 Nov 2026; on for the owner's account, `?gshot=on` on a device, kept,
-  `=off` off; `gsOn`): a timetable row reading `Group Shot N:1 (A+B & C+D)` is a button with a camera pill (จำลอง) that
+- **Group Shot rows, on for everyone** (the owner's idea and word, 19 Nov 2026; `?gshot=off` turns it off on one device,
+  kept, `=on` back; `gsOn`): a timetable row reading `Group Shot N:1 (A+B & C+D)` is a button with a camera pill (จำลอง) that
   opens a pop-up (`openGroupShot`, `gsStageHtml`, `gsSpots`): the fan's shadow comes up in the middle, the members pop up at
   its sides (a member each side in front, the rest in a row behind with their names at the top), a phone camera's frame,
   the flash, the date printed in the corner; pills switch between the sets; the event's own logo (`FEST_EVENT[id].img`)
