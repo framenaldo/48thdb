@@ -167,7 +167,11 @@ the Firebase CLI from the owner's machine.
 - An event's `detail` (กำหนดการ) lines that start with a time — "12:00–13:00
   Mini Concert", "15:00 …", "28 ส.ค. 10:00 …" — draw as a timetable that follows
   the clock on the day (`renderSchedule`, `schedTick` in `tickClock`): over,
-  on now with time left, next. Keep writing them in that shape.
+  on now with time left, next. Keep writing them in that shape. A line that starts
+  with its day counts only on that day when the site works out when a day ends
+  (`eventUntil(ev, iso)`, `schedDay`; `untilOf` in scripts/build-calendar.mjs keeps
+  the same rule), so the days of an event can end at different times (Lanna Smile
+  Station: 20:30, then 19:30).
   Who is on in each part goes in `lineup` on the event, `{ day: { 'Mini Concert':[ids],
   'Group Hi-Touch':[ids] } }`: day pills over the timetable and faces under the
   rows whose name contains the key — not as text lines in `detail`.

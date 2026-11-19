@@ -14175,16 +14175,23 @@ function slotNow(ev, iso){
 const DEFAULT_RUN_MS = 2 * 3600000;
 /* When the day's programme ends: an explicit until, or else the latest
    "HH:MM–HH:MM" in the event's own schedule lines (a roadshow's list of
-   rounds), so an outing with a start time only is not closed too early. */
-function eventUntil(ev){
+   rounds), so an outing with a start time only is not closed too early.
+   Given the day, a line that starts with a day ("6 ธ.ค. 18:30–19:30 …") counts
+   only on that day, so two days can end at different times (Lanna Smile
+   Station: 20:30, then 19:30); a day with no lines of its own takes them all.
+   scripts/build-calendar.mjs (untilOf) keeps the same rule for the .ics. */
+function eventUntil(ev, iso){
   if(ev.until) return ev.until;
-  let last = null;
+  let last = null, mine = null;
   for(const line of [...(ev.detail || []), ...(ev.info || [])]){
+    const dm = iso ? String(line).match(SCHED_RE) : null, day = dm && dm[1] ? schedDay(ev, dm[1], dm[2]) : null;
     for(const m of String(line).matchAll(/(\d{1,2})[:.](\d{2})\s*[–-]\s*(\d{1,2})[:.](\d{2})/g)){
       const t = `${m[3].padStart(2, '0')}:${m[4]}`;
       if(!last || t > last) last = t;
+      if(iso && (!day || day === iso) && (!mine || t > mine)) mine = t;
     }
   }
+  if(mine) last = mine;
   if(last && ev.time && last > ev.time) return last;
   // a Pop Up Live (and the Halloween POP UP หลอน on tour) is an hour on stage unless it says otherwise
   if(/^\d{2}:\d{2}$/.test(ev.time || '') && /pop\s*up/i.test(ev.title || '')){
@@ -14198,7 +14205,7 @@ function endsAtToday(ev, iso){
     const today = slotsOn(ev, iso);
     return today.length ? slotTime(iso, today[today.length - 1].until) : slotTime(iso, '00:00');
   }
-  const until = eventUntil(ev);
+  const until = eventUntil(ev, iso);
   const planned = until ? slotTime(iso, until) : ev.time ? slotTime(iso, ev.time) + DEFAULT_RUN_MS : null;
   return streamEndOn(ev, iso, planned);
 }
@@ -18145,7 +18152,7 @@ function streamWindow(ev){
   };
   const from = at(ev.time);
   if(!from) return null;
-  const to = at(eventUntil(ev) || '');
+  const to = at(eventUntil(ev, day) || '');
   const planned = to && to > from ? to : from + 2 * 3600000;
   return { from, to: streamEndOn(ev, day, planned) };
 }
@@ -18288,7 +18295,7 @@ function renderDayModal(){
     const head = `${cancelTag(e)}${renderEventIcon(e, 'ev-icon')}${escapeHtml(eventShortName(e))}${renderLiveChip(e)}`;
     const where = e.venue || e.online || '';
     if(!isHm(from)){ allDay.push(box({ id:e.id, k:accent(e), inner:chipInner(head, escapeHtml(where.split(',')[0])) }, 'dv-chip')); continue; }
-    let until = sl.length ? sl[sl.length - 1].until : eventUntil(e);
+    let until = sl.length ? sl[sl.length - 1].until : eventUntil(e, iso);
     // an event that follows its YouTube stream ends when the stream did, or
     // runs on while it is still on air past its time
     const st = !sl.length && streamOf(e), hm = t => { const d = new Date(t); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
@@ -18315,7 +18322,7 @@ function renderDayModal(){
       continue;
     }
     if(!isHm(it.time)){ allDay.push(box({ id:it.ev, k:tr.color, inner:chipInner(head, '') }, 'dv-chip')); continue; }
-    const linked = it.ev && SEED_SCHEDULE.find(e => e.id === it.ev), until = linked && eventUntil(linked);
+    const linked = it.ev && SEED_SCHEDULE.find(e => e.id === it.ev), until = linked && eventUntil(linked, iso);
     const a = mins(it.time);
     const b = isHm(until) && mins(until) > a ? mins(until) : a + (['event', 'concert', 'result'].includes(it.kind) ? 120 : 30);
     timed.push({ a, b, id:it.ev, k:tr.color, head, s:sub([it.time + (en ? '' : ' น.'), it.part, it.venue]) });
@@ -20161,6 +20168,11 @@ function paintSheetGrads(root){
    hour. tickClock repaints them every 20 seconds without a redraw. */
 const SCHED_MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const SCHED_RE = new RegExp(`^(?:(\\d{1,2}) (${SCHED_MON.map(x => x.replace(/\./g, '\\.')).join('|')}) )?(\\d{1,2}):(\\d{2})(?:\\s*[–-]\\s*(\\d{1,2}):(\\d{2}))?\\s+(.+)$`);
+/* The day a dated line names ("6 ธ.ค. …"): in the year the event starts, or the next for a line past New Year */
+function schedDay(ev, d, mon){
+  const y = +ev.start.slice(0, 4), mo = SCHED_MON.indexOf(mon) % 12, day = toYmd(new Date(y, mo, +d));
+  return parseYmd(ev.start) - parseYmd(day) > 180 * 864e5 ? toYmd(new Date(y + 1, mo, +d)) : day;
+}
 /* A mini concert's setlist: a pill per day (today's open on the day), then the
    songs in one frame, session by session with the talk between; a song the
    database knows opens its release, a unit song names who sang it. The owner's
@@ -20404,7 +20416,7 @@ function openGroupShot(evId, idx){
   });
 }
 function renderSchedule(ev){
-  const en = isEN(), iso = toYmd(todayStart()), year = +ev.start.slice(0, 4);
+  const en = isEN(), iso = toYmd(todayStart());
   const live = !ev.cancelled && !ev.postponed && ev.start <= iso && eventLastDay(ev) >= iso;
   const at = hm => { const t = parseYmd(iso), [h, mi] = hm.split(':').map(Number); t.setHours(h, mi, 0, 0); return t.getTime(); };
   const gsMay = gsOn();
@@ -20412,7 +20424,7 @@ function renderSchedule(ev){
     const line = en ? (toEn(raw) ?? enFragments(raw) ?? raw) : raw, m = line.match(SCHED_RE);
     if(!m) return { note: line };
     const [, d, mon, h1, m1, h2, m2, what] = m;
-    const day = d ? toYmd(new Date(year, SCHED_MON.indexOf(mon) % 12, +d)) : null;
+    const day = d ? schedDay(ev, d, mon) : null;
     return { day, dayLabel: d ? `${d} ${mon}` : '', a: `${h1.padStart(2, '0')}:${m1}`, b: h2 ? `${h2.padStart(2, '0')}:${m2}` : '', what, mc: SL_AT_RE.test(raw),
       gs: gsMay && GS_RE.test(raw) && gsParse(ev, raw) ? i : -1 };
   });

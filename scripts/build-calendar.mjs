@@ -51,13 +51,26 @@ const days = (a, b) => { const out = []; for(let d = a; d <= b; d = addDays(d, 1
 const hm = t => t.replace(':', '') + '00';
 const plusHours = (t, h) => { const [H, M] = t.split(':').map(Number); const m = H * 60 + M + h * 60; return `${String(Math.min(23, Math.floor(m / 60))).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
 
-// the same rule the site uses: an explicit until, or the latest HH:MM–HH:MM in the event's own lines
-function untilOf(ev){
+// the same rule the site uses (eventUntil): an explicit until, or the latest HH:MM–HH:MM in the event's own lines;
+// on a given day a line that starts with a day ("6 ธ.ค. 18:30–19:30 …") counts only on that day, and a day with
+// no lines of its own takes them all (SCHED_MON, SCHED_RE and schedDay in the page)
+const SCHED_MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const SCHED_RE = new RegExp(`^(?:(\\d{1,2}) (${SCHED_MON.map(x => x.replace(/\./g, '\\.')).join('|')}) )?(\\d{1,2}):(\\d{2})(?:\\s*[–-]\\s*(\\d{1,2}):(\\d{2}))?\\s+(.+)$`);
+function schedDay(ev, d, mon){
+  const y = +ev.start.slice(0, 4), mo = SCHED_MON.indexOf(mon) % 12;
+  const at = yy => `${yy}-${String(mo + 1).padStart(2, '0')}-${String(+d).padStart(2, '0')}`;
+  return Date.parse(ev.start) - Date.parse(at(y)) > 180 * 864e5 ? at(y + 1) : at(y);
+}
+function untilOf(ev, iso){
   if(ev.until) return ev.until;
-  let last = null;
-  for(const line of [...(ev.detail || []), ...(ev.info || [])])
+  let last = null, mine = null;
+  for(const line of [...(ev.detail || []), ...(ev.info || [])]){
+    const dm = iso ? String(line).match(SCHED_RE) : null, day = dm && dm[1] ? schedDay(ev, dm[1], dm[2]) : null;
     for(const m of String(line).matchAll(/(\d{1,2})[:.](\d{2})\s*[–-]\s*(\d{1,2})[:.](\d{2})/g)){
-      const t = `${m[3].padStart(2, '0')}:${m[4]}`; if(!last || t > last) last = t; }
+      const t = `${m[3].padStart(2, '0')}:${m[4]}`; if(!last || t > last) last = t;
+      if(iso && (!day || day === iso) && (!mine || t > mine)) mine = t; }
+  }
+  if(mine) last = mine;
   return last && ev.time && last > ev.time ? last : null;
 }
 
@@ -91,9 +104,10 @@ function vevents(ev){
     ev.slots.forEach((s, i) => out.push([...base(`${ev.id}-${s.date}-${i}`, 'รอบนี้: ' + s.members.map(nick).join(', ')),
       `DTSTART;TZID=Asia/Bangkok:${ymd(s.date)}T${hm(s.time)}`, `DTEND;TZID=Asia/Bangkok:${ymd(s.date)}T${hm(s.until)}`]));
   } else if(ev.time && !ev.period){
-    const until = untilOf(ev) || plusHours(ev.time, 2);
-    for(const d of days(ev.start, last))
+    for(const d of days(ev.start, last)){
+      const until = untilOf(ev, d) || plusHours(ev.time, 2);
       out.push([...base(`${ev.id}-${d}`), `DTSTART;TZID=Asia/Bangkok:${ymd(d)}T${hm(ev.time)}`, `DTEND;TZID=Asia/Bangkok:${ymd(d)}T${hm(until)}`]);
+    }
   } else {
     // a whole-day outing, or a stretch you can buy or vote in all day
     out.push([...base(ev.id), `DTSTART;VALUE=DATE:${ymd(ev.start)}`, `DTEND;VALUE=DATE:${ymd(addDays(last, 1))}`,
