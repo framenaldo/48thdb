@@ -10158,6 +10158,17 @@ const SEED_SPECIALS = [
       { track:'Yobisute Fantasy – เรียกชื่อที ใจไม่ดีแล้ว!', unit:'Team Cuteness', centers:['bnk-palmmy', 'cgm-else'],
         members:['bnk-palmmy', 'cgm-else', 'bnk-berry', 'bnk-blythe', 'bnk-cartoon', 'bnk-khaimook', 'bnk-nammonn', 'bnk-niya', 'bnk-proud', 'cgm-hongyok', 'cgm-punpon', 'cgm-tara'] },
     ] },
+  /* The main song of CGM48's first stage of its own, The Original Stage "สถานีเชียงใหม่": first sung at the
+     Journey of Dreams concert (14 Nov 2026) and out on the streaming services the next day. Line-up and its two
+     centres from the AKB48 wiki (20 Nov 2026); its video is that first performance, on CGM48's channel, until
+     the MV comes out at Lanna Smile Station on 5 Dec. */
+  { id:'cgm-sp-chiangmaistation', groupId:'cgm48', groups:['cgm48'], kind:'digital',
+    title:'Chiang Mai Station', alt:'สถานีเชียงใหม่', date:'2026-11-15', year:2026,
+    note:'เพลงหลักของ The Original Stage "สถานีเชียงใหม่"',
+    tracks:[
+      { track:'Chiang Mai Station – สถานีเชียงใหม่', centers:['cgm-lookked', 'cgm-prae'],
+        members:['cgm-lookked', 'cgm-prae', 'cgm-jingjing', 'cgm-kwan', 'cgm-lingling', 'cgm-nana', 'cgm-ploen', 'cgm-praifa', 'cgm-shenae'] },
+    ] },
 ];
 SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 /* Work outside the group's own records: films, series, TV and online shows,
@@ -10365,6 +10376,9 @@ const SEED_MEDIA = [
   { kind:'mv', title:'Present', year:2019, by:'The Parkinson', members:['bnk-mobile'] },
   { kind:'mv', title:'124 BPM', year:2025, by:'FLIRT', members:['bnk-hoop'] },
   { kind:'mv', title:'BESIDE YOU', year:2025, by:'DEXX', members:['bnk-hoop'] },
+  /* AKB48's 66th single, for its 20th anniversary: the title song's 22 take in Hoop (No. 13) and Lookked
+     (No. 8), the first CGM48 member on an AKB48 single (the AKB48 wiki's line-up, 20 Nov 2026). */
+  { kind:'mv', title:'Oh my pumpkin!', year:2025, by:'AKB48', note:'akb66', date:'2025-08-13', members:['bnk-hoop', 'cgm-lookked'] },
   { kind:'mv', title:'เหงา...เข้าใจ', year:2026, by:'4EVE', members:['bnk-hoop'] },
 ];
 const ICONS = {
@@ -11067,6 +11081,7 @@ const EN = {
   'เพลงหลักของสเตจ BNK48 1st Stage': 'The main song of BNK48 1st Stage',
   'ร่วมกับ Nok Air': 'With Nok Air',
   'เพลงฉลองครบรอบ 20 ปี AKB48': "Celebrating AKB48's 20th anniversary",
+  'เพลงหลักของ The Original Stage "สถานีเชียงใหม่"': 'The main song of The Original Stage "Chiang Mai Station"',
   'ซิงเกิลร่วม BNK48 & CGM48': 'A joint BNK48 & CGM48 single',
   'ครั้งนี้เป็นเทปที่บันทึกไว้ล่วงหน้า': 'This one is a tape recorded in advance',
   'ซิงเกิลร่วม BNK48 & CGM48 ของ Senbatsu General Election 2026': 'A joint BNK48 & CGM48 single for the Senbatsu General Election 2026',
@@ -11612,6 +11627,7 @@ const SONG_MIX = {
   "#SukiNanda": "#Sukinanda",
   "Eien Pressure – ผูกพันนิรันดร์": "Eien Pressure (ผูกพันนิรันดร์)",
   "Lip Gloss ที่คิดถึง": "Hisashiburi no Lip Gloss (Lip Gloss ที่คิดถึง)",
+  "Chiang Mai Station – สถานีเชียงใหม่": "สถานีเชียงใหม่ (Chiang Mai Station)",
   "365-Nichi no Kamihikouki – 365 วันกับเครื่องบินกระดาษ (2024 ver.)": "365-Nichi no Kamihikouki 2024 ver. (365 วันกับเครื่องบินกระดาษ)",
   "Hokori no Oka – เนินเขาแห่งความฝัน": "Hokori no Oka (เนินเขาแห่งความฝัน)"
   };
@@ -12863,6 +12879,7 @@ const MEDIA_NOTE = { doc:['สารคดี', 'documentary'], short:['หน�
   tour:['มินิคอนเสิร์ตสัญจร 5 จังหวัด', 'mini concert tour, five cities'], mini:['มินิคอนเสิร์ต', 'mini concert'], free:['คอนเสิร์ตฟรี', 'free concert'],
   charity:['คอนเสิร์ตการกุศล', 'charity concert'], produced:['ปูเป้เป็นโปรดิวเซอร์', 'produced by Pupe'], election:['คู่กับงานเลือกตั้ง', 'with the election'],
   request:['Request Hour', 'Request Hour'], musical:['ละครเพลง', 'musical'], akb:['ร่วมกับวงตระกูล 48', 'with the 48 groups'],
+  akb66:['ซิงเกิลที่ 66 ฉลองครบรอบ 20 ปี', '66th single, for its 20th anniversary'],
   'akb-guest':['แขกรับเชิญในคอนเสิร์ต AKB48', "guest at AKB48's concert"], 'akb-online':['ร่วมกับวงตระกูล 48 · ออนไลน์', 'with the 48 groups, online'], online:['ออนไลน์', 'online'],
   abroad:['แสดงที่เซี่ยงไฮ้', 'in Shanghai'], ge:['ประกาศผลเลือกตั้งเซ็มบัตสึ', 'Senbatsu election results'], janken:['เป่ายิ้งฉุบชิงเซ็มบัตสึ', 'janken tournament'],
   sports:['งานกีฬาสี', 'sports day'], fanmeet:['แฟนมีต', 'fan meeting'], fanfest:['แฟนเฟสติวัล', 'fan festival'], anniv:['ฉลองครบรอบวง', 'anniversary'],
@@ -25068,6 +25085,7 @@ const SEED_YOUTUBE = {
   'bnk-sp-cry#0':['12VmOt8T5jk','mv'],
   'bnk-sp-kimigairu#0':['GZDde4_izAw','mv'],
   'bnk-sp-kimitodoko#0':['qdBtGpZl_jE','mv'],
+  'cgm-sp-chiangmaistation#0':['MEUmazWU2y0','live'],
   'cgm-sp-maliremix#0':['QMqby5BvIJ0','video'],
   'cgm-sp-daimairemix#0':['uqdjTzZw4Mc','video'],
   'bnk-sp-ramwong#0':['-dR3WbLrVPQ','video'],
