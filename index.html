@@ -7372,19 +7372,20 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .shop-card, .stat-cell, .account-card, .cd-next, .past-toggle){ -webkit-backdrop-filter:var(--lg-blur); backdrop-filter:var(--lg-blur); }
   html[data-lg="1"] .ev-card.is-themed:not([class*="is-scene-"]){ background:color-mix(in srgb, var(--sheet-bg) 46%, transparent); border-color:var(--lg-rim); }
   :root[data-theme="dark"][data-lg="1"] .ev-card.is-themed:not([class*="is-scene-"]){ background:color-mix(in srgb, var(--sheet-dark) 62%, transparent); }
-  /* Kimi's sky on a feed card goes see-through as in the owner's Figma (25%); its sheet keeps the full sky */
+  /* Kimi's sky on a feed card goes see-through as in the owner's Figma (25%), one smooth fall from sky to clear in shares of the card's
+     height (the meadow band at the foot showed as a break on a phone, the owner's word); its sheet keeps the full sky */
   html:root[data-fx="new"][data-lg="1"]:not([data-theme="dark"]) .ev-card.is-themed.is-scene-kimi{ border-color:var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop);
-    background:linear-gradient(180deg, rgba(147,198,234,.5) 0, rgba(191,221,242,.42) 120px, rgba(232,243,250,.36) 260px, rgba(255,255,255,.36) 78%, rgba(211,223,168,.42) 100%); }
+    background:linear-gradient(180deg, rgba(147,198,234,.5) 0%, rgba(176,212,238,.44) 30%, rgba(214,233,246,.38) 62%, rgba(255,255,255,.34) 100%); }
   /* …and at night the other way round (the owner's word, 21 Nov 2026): a dusk sky, see-through, with light ink */
   html:root[data-fx="new"][data-lg="1"][data-theme="dark"] .ev-card.is-themed.is-scene-kimi{ border-color:var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop);
-    background:linear-gradient(180deg, rgba(70,112,156,.5) 0, rgba(44,66,98,.42) 130px, rgba(30,26,46,.42) 78%, rgba(62,74,40,.42) 100%);
+    background:linear-gradient(180deg, rgba(70,112,156,.5) 0%, rgba(52,80,116,.45) 32%, rgba(38,44,72,.42) 66%, rgba(30,26,46,.42) 100%);
     --ink:#EEF4FA !important; --ink-soft:rgba(238,244,250,.74) !important; --c-text:#BFDDF2 !important; --line:rgba(255,255,255,.14) !important;
     --paper-dim:rgba(255,255,255,.08) !important; --card:rgba(255,255,255,.1) !important; --glass-card:rgba(255,255,255,.1) !important;
     --glass-edge:rgba(255,255,255,.16) !important; color:var(--ink); }
   /* …and the same dusk on Kimi's sheet at night (the owner's word, 21 Nov 2026): dark sky, light ink (the wavy lettering is a mask in
      the ink's colour, so it turns light with it), the notes light, the accent a dusk blue, the clouds dimmed. On a phone the sky is solid (a sheet never blurs the page there); wider, it is glass. */
   :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-postered.is-scene-kimi{
-    background:linear-gradient(180deg, #3E6488 0, #2C4262 150px, #221E34 330px, #1C1828 80%, #2A3020 100%) !important;
+    background:linear-gradient(180deg, #3E6488 0, #33527A 120px, #2C4262 220px, #262E4A 340px, #221E34 480px, #1C1828 100%) !important;
     border-color:var(--lg-rim); box-shadow:var(--lg-hi), 0 20px 60px rgba(0,0,0,.45);
     --sheet-bg:#221E34; --sheet-ink:#EEF4FA; --pc:#9FC3E6;
     --ink:#EEF4FA !important; --ink-soft:rgba(238,244,250,.72) !important; --c-text:#BFDDF2 !important; --line:rgba(255,255,255,.14) !important;
@@ -7392,7 +7393,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --glass-edge:rgba(255,255,255,.16) !important; --chrome-bg:rgba(255,255,255,.14); --chrome-edge:rgba(255,255,255,.22); --chrome-fg:#EEF4FA; --c:#5E86B4 !important; color:var(--ink); }
   @media (min-width:641px){
     :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-postered.is-scene-kimi{
-      background:linear-gradient(180deg, rgba(62,100,136,.84) 0, rgba(44,66,98,.8) 150px, rgba(34,30,52,.8) 330px, rgba(28,24,40,.8) 80%, rgba(42,48,32,.8) 100%) !important;
+      background:linear-gradient(180deg, rgba(62,100,136,.84) 0, rgba(51,82,122,.82) 120px, rgba(44,66,98,.8) 220px, rgba(38,46,74,.8) 340px, rgba(34,30,52,.8) 480px, rgba(28,24,40,.8) 100%) !important;
       -webkit-backdrop-filter:blur(28px) saturate(160%); backdrop-filter:blur(28px) saturate(160%); } }
   :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-scene-kimi::after{ opacity:.22; }
   :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-scene-kimi .evm-fest{ --fest-a:#3E6488; --fest-b:#2C4262; --fest-ink:#EEF4FA; }
