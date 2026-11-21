@@ -519,6 +519,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     display:flex; flex-direction:column;
   }
   /* A sheet only ever scrolls up and down; anything too wide wraps instead. */
+  /* The Chiang Mai Station / Original Stage sheets (logo 'cnx'; the owner's word, 21 Nov 2026) wear the posters' Lanna motifs,
+     scattered down both edges as on the posters: whole flowers cut from the Lanna Smile Station poster (the ones the poster's
+     edge cut in half mirrored whole), laid out once in two tall tiles (bg/lanna-motifs-l/r-*.png, already faint) that repeat
+     down the sheet, behind everything, so the cards and the text stay on top */
+  .has-lanna .evm-layout{ position:relative; isolation:isolate; }
+  .has-lanna .evm-layout::before{ content:''; position:absolute; inset:-22px -18px -28px; z-index:-1; pointer-events:none;
+    background:url(bg/lanna-motifs-l-1.png) left top / 180px auto repeat-y, url(bg/lanna-motifs-r-1.png) right 0 top 240px / 180px auto repeat-y; }
+  @media (min-width:1024px){ .has-lanna .evm-layout::before{ inset:-26px -26px -32px; } }
   .modal-scroll{ overflow-y:auto; overflow-x:hidden; overscroll-behavior-x:none; touch-action:pan-y; padding:22px 18px 28px; -webkit-overflow-scrolling:touch; }
   /* The close and share buttons sit over whatever is at the top of the sheet.
      On a themed sheet that is the poster band, and the usual near-transparent
@@ -20850,7 +20858,7 @@ function renderEventModal(){
   if(wantsGrad && !POSTER_GRADS) posterGrads();
   return `
   <div class="modal-backdrop" data-action="close-modal">
-    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&evScene(ev)?` is-scene-${evScene(ev)}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}${grad?' has-grad':''}${ev.lanePlan?' has-lanes':''}"${wantsGrad && !grad ? ` data-grad-src="${escapeAttr(ev.poster.img)}"` : ''} data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}${grad?`; --sheet-grad:${grad.light}; --sheet-grad-d:${grad.dark}`:''}">
+    <div class="modal-glass-card is-wide is-event-sheet${ev.poster?' is-postered':''}${ev.poster&&evScene(ev)?` is-scene-${evScene(ev)}`:''}${ev.poster&&ev.poster.img?' has-poster-img':''}${grad?' has-grad':''}${ev.lanePlan?' has-lanes':''}${ev.logo === 'cnx' ? ' has-lanna' : ''}"${wantsGrad && !grad ? ` data-grad-src="${escapeAttr(ev.poster.img)}"` : ''} data-stop-close="1" style="--c:${accent}${ev.poster?`; --pc:${ev.poster.accent}; --sheet-bg:${ev.poster.surface}; --sheet-ink:${ev.poster.ink}`:''}${grad?`; --sheet-grad:${grad.light}; --sheet-grad-d:${grad.dark}`:''}">
       <button class="modal-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}</button>
       <button class="modal-close-btn" data-action="close-modal" title="ปิด" aria-label="ปิด">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
