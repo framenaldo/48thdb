@@ -8252,6 +8252,11 @@ const SEED_SCHEDULE = [
     poster:{ accent:'#1F6B58', surface:'#EFF7F1', ink:'#17423A', img:'posters/cgm48-popup-ontour-1124.jpg', w:1501, h:1501,
       more:[{ img:'posters/cgm48-popup-ontour-1124-2.jpg', w:1501, h:1501, th:'เครื่องดื่มและสินค้า', en:'Drink & merch' },
             { img:'posters/cgm48-popup-ontour-1124-3.jpg', w:1500, h:1500, th:'มาตรการและผังโซน', en:'Rules & zones' }] },
+    seatPlan:{ layout:'muanmore-popup', head:'ผังโซน (จำลอง)',
+      source:'ผังจำลองจากผังโซนที่ผู้จัดประกาศ วาดตามตำแหน่งของแต่ละโซน ไม่ได้ตามสัดส่วนจริงและไม่ใช่ผังทางการ',
+      zones:[
+        { id:'Z1', label:'Zone 1', sections:['Z1'], color:'#84BF41', note:'โซนรับชมด้านในบริเวณกิจกรรม ถ่ายภาพได้โดยยกความสูงไม่เกินศีรษะ และไม่รบกวนผู้อื่น' },
+        { id:'Z2', label:'Zone 2', sections:['Z2'], color:'#7F7F7F', note:'โซนสำหรับช่างภาพที่ต้องการบันทึกภาพและวีดีโอ ใช้กล้องได้ทุกชนิด และใช้อุปกรณ์เสริมได้' }] },
     stream:{ label:'YouTube CGM48 OFFICIAL', channel:'cgm48', url:'https://www.youtube.com/@CGM48OFFICIAL/live' },
     detail:[
       '16:00 สินค้า MERCHANDISE เริ่มจำหน่าย',
@@ -18881,6 +18886,22 @@ SEAT_LAYOUTS['rama9-roadshow'] = (() => {
       Z3R:{ level:'floor', pts:SP_RM(W + 0.1, 1.35, 1.5, 5.7), at:[(W + 0.85) * SP_M, 4.2 * SP_M], text:'3', under:true },
       Z3B:{ level:'floor', pts:SP_RM(0, 5.35, W, 1.7), at:[W / 2 * SP_M, 6.2 * SP_M], text:'ZONE 3', under:true },
       Z2:{ level:'floor', pts:SP_RM(-1.6, 7.15, W + 3.2, 1.65), at:[W / 2 * SP_M, 7.97 * SP_M], text:'ZONE 2', under:true } },
+  };
+})();
+/* Muan More Space, Chiang Mai, for a Pop Up Live on tour: the organiser's zone chart redrawn as a sketch (stage, then Zone 1,
+   then Zone 2 behind it, all one width) — the zones' order and shape, not their size */
+SEAT_LAYOUTS['muanmore-popup'] = (() => {
+  const W = 10;
+  return {
+    cx:W / 2 * SP_M, cy:3.9 * SP_M, w:(W + 3) * SP_M, tightZ:true,
+    levels:{ floor:{ th:'พื้น', en:'Floor', m:0, cap:{ th:['พื้น'], en:['Floor'] } } },
+    captions:[], rules:[],
+    floor:SP_RM(-1.5, -1, W + 3, 9.8),
+    blocks:[
+      { pts:SP_RM(0, 0, W, 1.2), h:0.7 * SP_M, text:'STAGE', at:[W / 2 * SP_M, 0.6 * SP_M], big:true } ],
+    sections:{
+      Z1:{ level:'floor', pts:SP_RM(0, 1.35, W, 4), at:[W / 2 * SP_M, 3.35 * SP_M], text:'ZONE 1', under:true },
+      Z2:{ level:'floor', pts:SP_RM(0, 5.5, W, 1.75), at:[W / 2 * SP_M, 6.37 * SP_M], text:'ZONE 2', under:true } },
   };
 })();
 /* how many chairs a section has, and a zone (0 when the hall has no chairs drawn) */
