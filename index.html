@@ -9374,6 +9374,8 @@ const SEED_SCHEDULE = [
       'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'],
     /* the three booths, drawn as cards (renderBooths) with their drawings from the activities poster, and the stamp card
        that ties them together (the owner's word, 21 Nov 2026: a list of lines was hard to read) */
+    // the activity tickets are sold in the iAM Shop, the same link as its buy buttons (the owner's word, 21 Nov 2026)
+    links:[{ label:'ซื้อบัตรกิจกรรมใน iAM Shop', url:'https://app.bnk48.com/shop' }],
     booths:{ head:'กิจกรรม Lanna Smile Station', en:'Lanna Smile Station booths', ticket:250,   // a Digital Event Ticket is 250 baht (info above)
       items:[
         { key:'khomloi', name:'Khom Loi Station', th:'สถานีปล่อยโคม', tickets:4,
@@ -10753,6 +10755,8 @@ function getMember(id){ return state.members.find(m=>m.id===id); }
    than a hunt through the markup. Whole text nodes are matched, never fragments,
    so a phrase can never be half-replaced inside a longer sentence. */
 const EN = {
+  'ซื้อบัตรกิจกรรมใน iAM Shop': 'Buy activity tickets at the iAM Shop',
+  'ซื้อบัตรกิจกรรมใน iAM Shop ↗': 'Buy activity tickets at the iAM Shop ↗',
   'ฐานข้อมูลสมาชิก ตารางงาน และผลงานเพลงของ BNK48 และ CGM48': 'Members, schedule and discography of BNK48 and CGM48',
   'กำลังโหลด...': 'Loading…',
   'วันนี้ในอดีต': 'On this day',
