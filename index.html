@@ -535,6 +535,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .has-lanna .evm-head:nth-of-type(3n+2)::after{ background-image:url(bg/lanna-flower-rosette-1.png); }
     .has-lanna .evm-head:nth-of-type(3n)::after{ background-image:url(bg/lanna-flower-square-1.png); }
   }
+  /* at night the navy thread is a pale blue, or it sinks into the dark sheet; the teal stays */
+  :root[data-theme="dark"] .has-lanna .evm-layout::before{ background-image:url(bg/lanna-motifs-l-night-1.png), url(bg/lanna-motifs-r-night-1.png); }
+  @media (max-width:1023px){
+    :root[data-theme="dark"] .has-lanna .evm-head::after{ background-image:url(bg/lanna-flower-cross-night-1.png); }
+    :root[data-theme="dark"] .has-lanna .evm-head:nth-of-type(3n+2)::after{ background-image:url(bg/lanna-flower-rosette-1.png); }
+    :root[data-theme="dark"] .has-lanna .evm-head:nth-of-type(3n)::after{ background-image:url(bg/lanna-flower-square-night-1.png); }
+  }
   .modal-scroll{ overflow-y:auto; overflow-x:hidden; overscroll-behavior-x:none; touch-action:pan-y; padding:22px 18px 28px; -webkit-overflow-scrolling:touch; }
   /* The close and share buttons sit over whatever is at the top of the sheet.
      On a themed sheet that is the poster band, and the usual near-transparent
