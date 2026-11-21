@@ -7386,14 +7386,34 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-lg="1"] .ov-layer :is(.card, .cal-wrap, .pd-card, .share-preview, .ev-card, .rota, .shop-card, .tl-card, .bio-card, .ask-card,
     .qz-card, .qz-result, .mini-card, .stat-cell, .otd-row, .gel-mini-c, .sr-row){ background:var(--lg-veil); -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:var(--lg-hi); }
   html[data-lg="1"] .ev-open{ text-align:center; }
-  /* ช่วงที่เปิดอยู่ with only one run on: the poster as a banner across the row, its own colours blurred out to the edges, the
-     apply pill (a cta link's `short`) in the corner and the days left in pink under the dates (the owner's Figma, 21 Nov 2026) */
-  .per-blur{ display:none; }
+  /* Anything that can be pressed lifts a little under the mouse (the owner's word, 21 Nov 2026); only with a mouse, never on a touch
+     screen, and with `translate` so it adds to whatever transform the thing already has (its press, its own motion). Left still: a
+     link in running text, the dim behind a sheet, the ticker, the menu bar, a table's rows and cells, the cat. Cards also cast a
+     deeper shadow as they rise, pills a small one. */
+  @media (hover:hover) and (pointer:fine){
+    html[data-lg="1"] :where(button, a[href][class], [data-action], [role="button"]):not(:disabled, .modal-backdrop, .link-inline, .ticker,
+      .ticker-link, .glass-nav *, .gnav, .row, .cell, .dtable *, [class*="meow"], .per-tile){
+      transition:translate .22s var(--ease-out), box-shadow .22s var(--ease-out), transform .2s var(--ease-out), border-color .2s ease, background-color .2s ease; }
+    html[data-lg="1"] :where(button, a[href][class], [data-action], [role="button"]):not(:disabled, .modal-backdrop, .link-inline, .ticker,
+      .ticker-link, .glass-nav *, .gnav, .row, .cell, .dtable *, [class*="meow"], .per-tile):hover{ translate:0 -2px; }
+    html[data-lg="1"] :is(button, a[href], [data-action], [role="button"]):is(.card, .cal-wrap, .ev-card, .rota, .shop-card, .tl-card, .lay-card,
+      .bio-card, .qz-card, .mini-card, .stat-cell, .bday-chip, .otd-row, .dash-t, .dash-ge, .cd-next, .gel-mini-c, .gel-strip, .ge-sum-center,
+      .past-toggle, .sr-row, .gal-teaser, .account-card, .vis-card, .ev-cta, .work-row, .gec-teaser, .xt-card):hover{
+      translate:0 -3px; box-shadow:var(--lg-hi), 0 12px 28px rgba(var(--shadow-rgb),.16); }
+    html[data-lg="1"] :is(button, a[href], [data-action], [role="button"]):is(.chip, .pill, .ev-person, .tl-chip, .set-btn, .set-go, .page-share-btn,
+      .box-share-btn, .share-act, .cal-nav, .sub-tab, .scope-btn, .rt-tab, .rt-day, .sl-day, .bio-pen, .back-btn, .modal-close-btn, .modal-share-btn,
+      .btn-add, .btn-secondary, .fb-face, .wk-cat, .social-chip, .yt-btn, .iam-link, .gen-filter-chip, .ge-hist-chip, .fest-pill, .signin-btn):hover{
+      box-shadow:var(--lg-hi), 0 6px 14px rgba(var(--shadow-rgb),.14); }
+    html[data-lg="1"] button.per-tile .per-pic{ transition:translate .22s var(--ease-out), box-shadow .22s var(--ease-out), transform .12s; }
+    html[data-lg="1"] button.per-tile:hover .per-pic{ translate:0 -3px; box-shadow:var(--lg-hi), 0 12px 28px rgba(var(--shadow-rgb),.18); }
+    html[data-lg="1"] :is(button, a[href], [data-action], [role="button"]):active{ translate:0 0; }
+  }
+  /* ช่วงที่เปิดอยู่ with only one run on: the poster across the row at its own shape, the frame exactly the poster's edge (the owner's
+     word, 21 Nov 2026: a banner wider than the poster, its colours blurred out to the sides, did not look good); the apply pill (a cta
+     link's `short`) in its corner and the days left in pink under the dates */
   .per-list.is-one{ display:block; overflow:visible; }
   .per-list.is-one .per-tile{ width:100%; }
-  .per-list.is-one .per-pic{ display:flex; justify-content:center; isolation:isolate; }
-  .per-list.is-one .per-blur{ display:block; position:absolute; inset:-30px; z-index:-1; background:center / cover no-repeat; filter:blur(22px) saturate(1.15); }
-  .per-list.is-one .per-pic img{ max-width:100%; }
+  .per-list.is-one .per-pic img{ width:100%; height:auto; max-width:none; }
   .per-left.is-cta{ left:auto; right:10px; bottom:10px; padding:4px 14px; font-size:11px; background:linear-gradient(90deg, #F4B0ED, #D093CC); color:#4A1F3A; box-shadow:0 2px 8px rgba(61,31,61,.18); }
   .per-days{ font-size:11.5px; font-weight:700; color:var(--pink); }
 </style>
@@ -14807,7 +14827,6 @@ function renderPeriodTile(ev, todayIso){
     <span class="per-pic">${img
       ? `<img src="${escapeAttr(evThumb(img))}" width="${ev.poster.w || 1200}" height="${ev.poster.h || 1200}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeAttr(img)}'">`
       : `<span class="per-noimg">${escapeHtml(eventShortName(ev))}</span>`}
-      ${img ? `<span class="per-blur" style="background-image:url('${escapeAttr(evThumb(img))}')" aria-hidden="true"></span>` : ''}
       <span class="per-left${cta ? ' is-cta' : ''}">${cta ? escapeHtml(isEN() && cta.shortEn ? cta.shortEn : cta.short) : left}</span></span>
     <span class="per-name">${escapeHtml(ev.short || ev.title.split(' · ').pop())}</span>
     <span class="per-sub">${isEN() ? 'Until' : 'ถึง'} ${d} ${M[m - 1]}</span>
