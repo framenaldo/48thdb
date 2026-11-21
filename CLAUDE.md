@@ -452,6 +452,8 @@ devices that already hold it keep showing the old picture. `?sw=off` unregisters
 the worker and clears its caches — offer that link before suggesting anyone
 clear browser data.
 
+The page is stamped with its build so an unchanged page costs nothing on a revisit (21 Nov 2026, held for after results night): each deploy writes a prefix of the page's sha256 into `<meta name="build">` (the repo keeps the `dev` placeholder; the workflow refuses to deploy if the stamp did not go in) and publishes the same stamp as `version.txt` (a few bytes, `no-store`). A visit asks only for version.txt — never cached, a 3-second ceiling; when it names the build of the copy kept on the phone, that copy is served and the ~700 KB page is not downloaded again. Any doubt — no answer, an answer that is not a stamp, a different stamp, no copy kept — and the page is fetched from the network exactly as before, so a deploy still reaches everyone on their next visit. The kept stamp is read out of the kept page itself, never from version.txt, so the two cannot disagree. Served from a dev server the stamp stays `dev`, the check never matches, and every visit fetches the page fresh — nothing to do there.
+
 ## Chasing a flicker or a refresh on a phone
 
 Open the site with `?dbg=1` (`dbgOverlay`): a small green log sits over the page — what loaded it (reload / navigate /
