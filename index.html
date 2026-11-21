@@ -12980,10 +12980,17 @@ function avatarName(m){
   return `<span class="avatar-fallback avatar-name" style="--n:${Math.max(width, 2)}">${escapeHtml(name)}</span>`;
 }
 
+/* A member's photo where it is shown small: the 192px copy beside it (photos/s/, made by scripts/make-photo-thumbs.sh),
+   a tenth of the full one's weight; a copy that is missing falls back to the full photo, so a new photo works before its
+   copy is made. Small spots load lazily: the home page asked for 65 full photos at once, most below the screen. */
+const photoSm = src => /^photos\/[^/]+\.jpg$/.test(src || '') ? 'photos/s/' + src.slice(7) : src;
+const imgFall = src => `data-full="${escapeAttr(src)}" onerror="if(this.dataset.full&&this.src.indexOf('/photos/s/')>-1){this.src=this.dataset.full}else this.remove()"`;
+const AV_FULL = /detail-avatar|qz-pic|bday-today-face/;   // the big ones keep the full photo
 function renderAvatar(m, cls, bg, styleExtra){
   return `<div class="${cls}" style="background:${bg};${styleExtra||''}">
     ${avatarName(m)}
-    ${m.photo ? `<img class="avatar-img" src="${escapeAttr(m.photo)}" alt="" onerror="this.remove()">` : ''}
+    ${m.photo ? (AV_FULL.test(cls) ? `<img class="avatar-img" src="${escapeAttr(m.photo)}" alt="" onerror="this.remove()">`
+      : `<img class="avatar-img" src="${escapeAttr(photoSm(m.photo))}" alt="" loading="lazy" decoding="async" ${imgFall(m.photo)}>`) : ''}
   </div>`;
 }
 
@@ -20519,7 +20526,7 @@ function renderSetlist(ev, head){
 /* ev.rota: who is at each stand, round by round — tabs by kind, a tile for each member (her photo, her name over it),
    a tap on a face lights her in every round. { day, where, kinds:[{k,th,en,c}], rounds:[{k,n,a,b,ids}] } */
 const rotaTile = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
-  return `<button class="rt-f${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}">${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}<span data-noloc>${escapeHtml(nickName(m))}</span></button>`; };
+  return `<button class="rt-f${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}">${m.photo ? `<img src="${escapeAttr(photoSm(m.photo))}" alt="" loading="lazy" decoding="async" ${imgFall(m.photo)}>` : ''}<span data-noloc>${escapeHtml(nickName(m))}</span></button>`; };
 // the rows for the picked day and tab; โอชิฉัน keeps the same page and dims everyone but the reader's oshi
 const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.day; let n = 0;
   root.classList.toggle('is-oshi-only', k === 'oshi');
@@ -20527,7 +20534,7 @@ const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.d
   const none = root.querySelector('.rt-none'); if(none) none.hidden = !(k === 'oshi' && !n); };
 // a table cell of a lanes rota: small photo, name under it
 const rotaCell = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
-  return `<button class="rt-c${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}"><i>${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}</i><span data-noloc${nickName(m).length > 9 ? ' class="is-long"' : ''}>${escapeHtml(nickName(m))}</span></button>`; };
+  return `<button class="rt-c${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}"><i>${m.photo ? `<img src="${escapeAttr(photoSm(m.photo))}" alt="" loading="lazy" decoding="async" ${imgFall(m.photo)}>` : ''}</i><span data-noloc${nickName(m).length > 9 ? ' class="is-long"' : ''}>${escapeHtml(nickName(m))}</span></button>`; };
 const rotaClearHl = root => { root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.hl').forEach(x => x.classList.remove('hl', 'rt-tap', 'rt-ping'));
   const c = root.closest('.modal-glass-card'), b = c && c.querySelector('.rt-go'); if(b) b.remove(); };
 // a second tap on a face now lets her go, so the way to her page is a pill at the foot of the sheet while she is lit
@@ -20548,7 +20555,7 @@ function renderTakeover(ev){
   const cards = T.days.map(x => { const m = getMember(x.id); if(!m) return ''; const g = getGroup(m.groupId), day = parseYmd(x.d);
     const done = at(T.b, x.d) <= now, on = !done && at(T.a, x.d) <= now, isNext = !on && next === x;
     return `<button class="xt-card${done ? ' is-done' : ''}${on ? ' is-now' : ''}${isNext ? ' is-next' : ''}" data-action="open-member" data-id="${m.id}" style="--c:${g.color}">
-      <span class="xt-ph">${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}</span>
+      <span class="xt-ph">${m.photo ? `<img src="${escapeAttr(photoSm(m.photo))}" alt="" loading="lazy" decoding="async" ${imgFall(m.photo)}>` : ''}</span>
       <b data-noloc>${escapeHtml(nickName(m))}</b><small>${WD[day.getDay()]} ${day.getDate()} ${M[day.getMonth()]}</small>
       ${on ? `<em>${en ? 'On now' : 'กำลังเล่นอยู่'}</em>` : isNext ? `<em>${x.d === iso ? (en ? 'Tonight' : 'คืนนี้') : (en ? 'Next' : 'คนถัดไป')}</em>` : ''}</button>`; }).join('');
   return `<h3 class="evm-head">${en ? 'Who posts when' : 'ใครเล่นวันไหน'} <small class="rt-where">${T.a}–${T.b}</small></h3>
@@ -22610,7 +22617,7 @@ function renderMiniCard(m, isCentre, action){
     data-action="${action || 'open-member'}" data-id="${m.id}" title="${escapeAttr(m.name+' · '+(m.nameTh||''))}">
     <div class="avatar-sm" style="background:${g.color}">
       <span class="avatar-fallback">${(nickName(m) || '?')[0]}</span>
-      ${m.photo ? `<img class="avatar-img" src="${escapeAttr(m.photo)}" alt="" onerror="this.remove()">` : ''}
+      ${m.photo ? `<img class="avatar-img" src="${escapeAttr(photoSm(m.photo))}" alt="" loading="lazy" decoding="async" ${imgFall(m.photo)}>` : ''}
     </div>
     <span class="mini-names">
       <span class="mini-name">${escapeHtml(m.name)}</span>
