@@ -2039,7 +2039,7 @@ BEGIN:VEVENT
 UID:ev-cnx-lanna-smile-2026-12-05@48thdb
 DTSTAMP:20261205T000000Z
 SUMMARY:CGM48 "สถานีเชียงใหม่" · Lanna Smile S
- tation + MV Release
+ tation
 LOCATION:ลานกิจกรรม ชั้น 1 แกรนด์
  ฮอลล์\, Central Chiangmai Airport\, Chiang Mai
 DESCRIPTION:• 5 ธ.ค. 12:00–13:00 Show\n• 5 ธ.ค. 14:00–19:00
@@ -2066,7 +2066,7 @@ BEGIN:VEVENT
 UID:ev-cnx-lanna-smile-2026-12-06@48thdb
 DTSTAMP:20261205T000000Z
 SUMMARY:CGM48 "สถานีเชียงใหม่" · Lanna Smile S
- tation + MV Release
+ tation
 LOCATION:ลานกิจกรรม ชั้น 1 แกรนด์
  ฮอลล์\, Central Chiangmai Airport\, Chiang Mai
 DESCRIPTION:• 5 ธ.ค. 12:00–13:00 Show\n• 5 ธ.ค. 14:00–19:00
