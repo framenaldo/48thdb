@@ -7340,6 +7340,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .bo-stamp-note{ margin:8px 0 0; font-size:12px; color:var(--ink-soft); }
   .bo-set{ margin-top:10px; padding-top:10px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink); }
   .bo-set b{ font-size:13px; } .bo-set ul{ margin:4px 0 0; padding-left:18px; color:var(--ink-soft); }
+
+  /* a thing on sale with its own picture (a digital ticket): the picture, its name and price, then the buy button */
+  .evm-related.has-shop-img{ display:grid; grid-template-columns:96px minmax(0, 1fr); grid-template-rows:auto auto; column-gap:12px; row-gap:8px; align-items:center;
+    padding:10px; border-radius:var(--r-card); background:var(--card); border:1px solid var(--line); }
+  .has-shop-img .shop-tk-img{ grid-row:span 2; width:96px; height:96px; object-fit:cover; border-radius:var(--r-sm); }
+  .has-shop-img .shop-tk-t{ display:flex; flex-direction:column; gap:2px; align-self:end; font-size:13.5px; color:var(--ink); }
+  .has-shop-img .shop-tk-t small{ font-size:13px; font-weight:800; color:var(--c); }
+  .has-shop-img .shop-buy{ justify-self:start; align-self:start; }
 </style>
 <script>
   /* Runs before first paint: follow the OS. A tap on the switch holds only for this visit (sessionStorage). */
@@ -9374,8 +9382,10 @@ const SEED_SCHEDULE = [
       'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'],
     /* the three booths, drawn as cards (renderBooths) with their drawings from the activities poster, and the stamp card
        that ties them together (the owner's word, 21 Nov 2026: a list of lines was hard to read) */
-    // the activity tickets are sold in the iAM Shop, the same link as its buy buttons (the owner's word, 21 Nov 2026)
-    links:[{ label:'ซื้อบัตรกิจกรรมใน iAM Shop', url:'https://app.bnk48.com/shop' }],
+    // the activity tickets are sold in the iAM Shop: a shop entry with the ticket's own picture from the app (the owner's word, 21 Nov 2026)
+    shop:{ name:'Digital Event Ticket · Lanna Smile Station', kind:'บัตรกิจกรรม', withName:true,
+      price:'250 บาท', from:'2026-11-21T12:00', to:'2026-12-06T17:00', shopName:'iAM Shop',
+      img:'posters/cgm48-lanna-ticket.jpg', w:494, h:494 },
     booths:{ head:'กิจกรรม Lanna Smile Station', en:'Lanna Smile Station booths', ticket:250,   // a Digital Event Ticket is 250 baht (info above)
       items:[
         { key:'khomloi', name:'Khom Loi Station', th:'สถานีปล่อยโคม', tickets:4,
@@ -15202,7 +15212,7 @@ function renderShopPage(){
     return `<article class="shop-card is-${state} is-openable" style="--c:${e.poster ? e.poster.accent : 'var(--ink-soft)'}"
       data-action="open-event" data-id="${e.id}">
       ${e.poster && e.poster.img ? `<span class="shop-thumb">
-        <img src="${escapeAttr(evThumb(e.poster.img))}" width="${e.poster.w}" height="${e.poster.h}"
+        <img src="${escapeAttr(s.img || evThumb(e.poster.img))}" width="${s.img ? s.w : e.poster.w}" height="${s.img ? s.h : e.poster.h}"
           alt="${escapeAttr(s.name)}" loading="lazy" decoding="async">
       </span>` : ''}
       <div class="shop-body">
@@ -21043,7 +21053,8 @@ function renderEventModal(){
 
         ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
 
-        ${ev.shop && shopUrl(ev.shop) && shopStatus(ev, Date.now()).state !== 'over' ? `<div class="evm-related">
+        ${ev.shop && shopUrl(ev.shop) && shopStatus(ev, Date.now()).state !== 'over' ? `<div class="evm-related${ev.shop.img ? ' has-shop-img' : ''}">
+          ${ev.shop.img ? `<img class="shop-tk-img" src="${escapeAttr(ev.shop.img)}" alt="${escapeAttr(ev.shop.name)}" width="${ev.shop.w}" height="${ev.shop.h}" loading="lazy" decoding="async"><span class="shop-tk-t"><b>${escapeHtml(ev.shop.name)}</b><small>${escapeHtml(ev.shop.price)}</small></span>` : ''}
           <a class="shop-buy" style="--c:${ev.poster && ev.poster.accent || 'var(--pink)'}" href="${escapeAttr(shopUrl(ev.shop))}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18l-1.7 9.4a2 2 0 0 1-2 1.6H7.7a2 2 0 0 1-2-1.6L4 6Z"/><path d="M9 10V5a3 3 0 0 1 6 0v5"/></svg>ซื้อที่ ${escapeHtml(ev.shop.shopName)} <span class="shop-buy-arrow">↗</span></a></div>` : ''}
         ${(ev.links || []).filter(l => !evCtaOn(ev, l)).length ? `<div class="evm-related">${ev.links.filter(l => !evCtaOn(ev, l)).map(l =>
           `<a class="chip chip-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)} ↗</a>`).join('')}</div>` : ''}
