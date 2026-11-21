@@ -2745,6 +2745,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .sl-song small{ font-size:12px; color:var(--ink-soft); }
   .sl-row.is-overture .sl-song b{ font-weight:600; font-style:italic; color:var(--ink-soft); }
   .sl-by{ display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
+  .sl-whotext{ display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:12px; font-weight:700; color:var(--ink); background:color-mix(in srgb, var(--c, var(--pink)) 12%, var(--card)); border:1px solid color-mix(in srgb, var(--c, var(--pink)) 30%, var(--line)); }
   .sl-who{ display:inline-flex; align-items:center; gap:5px; padding:2px 9px 2px 2px; border-radius:99px; font-size:12px; font-weight:700;
     background:var(--paper-dim); border:1px solid var(--line); }
   .sl-face{ width:22px !important; height:22px !important; border-radius:50% !important; font-size:9px; }
@@ -8430,6 +8431,38 @@ const SEED_SCHEDULE = [
       { id:'E',  sections:['EL','ER'],      price:'999',   color:'#EE5FEE' }],
       notes:'ge2026-tickets', bundleIn:'ev-ge6-bundle',
       bundleNote:{ th:'ในราคาเดียว เฉพาะโซน A, BC, BL/BR และ C', en:'at one price, for zones A, BC, BL/BR and C only' } },
+    /* The concert's setlist, from the organiser's card (setlists/journey-of-dreams.jpg): every song names who sang it,
+       by name (`by`) or as the card words it (`who`, e.g. "BNK48 & CGM48 Team Cuteness"); Noey and Sita came back for it */
+    setlist:[
+      { date:'2026-11-14', img:'setlists/journey-of-dreams.jpg', parts:[
+        { s:1, th:'คอนเสิร์ต', en:'Main set', songs:[
+          { no:'M00', title:'Overture', alt:'BNK48 × CGM48 ver.', yt:'ifai7vki9LM' },
+          { no:'M01', title:'Yobisute Fantasy', alt:'เรียกชื่อที ใจไม่ดีแล้ว!', song:'bnk-sp-kimitodoko', who:'BNK48 & CGM48 Team Cuteness' },
+          { no:'M02', title:'Kegareteiru Shinjitsu', alt:'ความจริงสีเทา', song:'bnk-sp-kimitodoko', who:'BNK48 & CGM48 Team Performers' },
+          { no:'M03', title:'Aisuru Hito', alt:'เธอ', song:'bnk-sp-kimitodoko', who:'BNK48 & CGM48 Team Vocalists' },
+          { no:'M04', title:'Kimi to Doko ka e Ikitai', alt:'อยากจะไปกับเธอ', song:'bnk-sp-kimitodoko', who:'Senbatsu Members > All BNK48 & CGM48 Members' },
+          { no:'M05', title:'Classmate', alt:'เพื่อนคนพิเศษ', by:['cgm-jingjing', 'cgm-nana', 'cgm-ploen', 'bnk-rose', 'bnk-saonoi'] },
+          { no:'M06', title:'บัวลอยไข่หวาน', alt:'Original Stage Season2 ver.', by:['bnk-janry', 'bnk-khowjow', 'bnk-luksorn', 'bnk-marine', 'bnk-monet', 'bnk-praew'] },
+          { no:'M07', title:'BINGO!', song:'cgm-s11', by:['cgm-emma', 'cgm-ginna', 'bnk-inkcha', 'bnk-khaimook', 'bnk-mirin', 'cgm-namphet', 'bnk-niya', 'cgm-praifa', 'cgm-punpon', 'cgm-shenae', 'bnk-sindy', 'cgm-tara', 'cgm-valentine', 'bnk-yoghurt'] },
+          { no:'M08', title:'Yume de Kiss me!', song:'bnk-sp-yumedekissme', by:['bnk-pancake'] },
+          { no:'M09', title:'Kanojo ni Naremasu ka?', alt:'ขอเป็นแฟนเธอได้ไหม?', by:['bnk-emmy', 'bnk-hoop', 'cgm-kwan', 'cgm-lewlew', 'cgm-lookked', 'bnk-mail', 'bnk-mayji', 'bnk-micha', 'bnk-nall', 'bnk-nammonn', 'cgm-nisha', 'bnk-palmmy', 'cgm-prae', 'bnk-wawa'] },
+          { no:'M10', title:'Masaka no Confession', alt:'คำสารภาพที่ไม่คาดฝัน', song:'bnk-s20', by:['bnk-berry', 'bnk-cartoon', 'cgm-chifa', 'cgm-else', 'bnk-fame', 'cgm-hongyok', 'bnk-janry', 'cgm-lingling', 'bnk-mint', 'bnk-patt', 'bnk-proud', 'cgm-satangpound'] },
+          { no:'M11', title:'Kimi wa Melody', alt:'เธอคือ...เมโลดี้', song:'bnk-s4', by:['bnk-arlee', 'bnk-blythe', 'bnk-galeya', 'bnk-grape', 'bnk-jew', 'bnk-khowjow', 'bnk-l', 'bnk-luksorn', 'bnk-marine', 'bnk-monet', 'bnk-neen', 'bnk-praew', 'bnk-rose', 'bnk-saonoi', 'bnk-yoghurt', 'bnk-noey'] },
+          { no:'M12', title:'Doushitemo Kimi ga Suki da', alt:'จะยังไงก็รักเธอ', song:'bnk-s20', who:'BNK48 6th Generation × CGM48 4th Generation' },
+          { no:'M13', title:'Hetaretachi yo', alt:'สิ้นสุดทางแพ้', song:'cgm-s10', who:'CGM48 4th Generation × BNK48 6th Generation' },
+          { no:'M14', title:'Kibou Ressha', alt:'รถไฟแห่งความหวัง', song:'cgm-s11', who:'CGM48 5th Generation > CGM48 4-5th Generation & BNK48 6th Generation' },
+          { no:'M15', title:'Chiang Mai 106', alt:'เชียงใหม่ 106', song:'cgm-s1', by:['cgm-chifa', 'cgm-else', 'cgm-hongyok', 'cgm-jingjing', 'cgm-lewlew', 'cgm-namphet', 'cgm-nisha', 'cgm-ploen', 'cgm-prae', 'cgm-praifa', 'cgm-punpon', 'cgm-satangpound', 'cgm-shenae', 'cgm-valentine', 'cgm-sita'] },
+          { no:'M16', title:'DANCE ACT', by:['bnk-hoop', 'bnk-janry', 'cgm-jingjing', 'cgm-kwan', 'cgm-lingling', 'cgm-lookked', 'bnk-monet', 'bnk-neen', 'cgm-nisha', 'bnk-patt', 'cgm-prae', 'bnk-wawa'] },
+          { no:'M17', title:'Beginner', song:'bnk-s6', by:['bnk-berry', 'bnk-blythe', 'bnk-galeya', 'bnk-inkcha', 'bnk-khaimook', 'bnk-mayji', 'bnk-mint', 'bnk-mirin', 'bnk-nammonn', 'bnk-niya', 'bnk-pancake', 'cgm-punpon', 'bnk-rose', 'bnk-saonoi', 'bnk-sindy', 'cgm-valentine'] },
+          { no:'M18', title:'WHISPER ROAR', alt:'Rock ver.', song:'bnk-sp-whisperroar', by:['bnk-arlee', 'cgm-chifa', 'bnk-emmy', 'cgm-ginna', 'bnk-jew', 'bnk-luksorn', 'bnk-marine', 'bnk-nall', 'cgm-namphet', 'bnk-palmmy', 'bnk-patt', 'bnk-praew', 'bnk-proud'] },
+          { no:'M19', title:'RUMOR', song:'bnk-sp-rumor', by:['bnk-blythe', 'bnk-cartoon', 'bnk-fame', 'bnk-grape', 'bnk-hoop', 'bnk-janry', 'cgm-lewlew', 'bnk-micha', 'bnk-monet', 'bnk-neen', 'cgm-praifa', 'cgm-satangpound', 'bnk-wawa'] },
+          { no:'M20', title:'Koi Tsunjatta', alt:'Let me know!', song:'cgm-s11', who:'> All BNK48 & CGM48 Members', by:['cgm-else', 'cgm-emma', 'cgm-hongyok', 'cgm-jingjing', 'bnk-khowjow', 'cgm-kwan', 'bnk-l', 'cgm-lingling', 'cgm-lookked', 'bnk-mail', 'cgm-nana', 'cgm-nisha', 'cgm-ploen', 'cgm-prae', 'bnk-saonoi', 'cgm-shenae'] },
+          { no:'M21', title:'ไกลไม่ไกล', who:'All BNK48 & CGM48 Members' }] },
+        { encore:true, songs:[
+          { no:'EN1', title:'สถานีเชียงใหม่', alt:'Chiang Mai Station · First Performance', song:'cgm-sp-chiangmaistation', by:['cgm-jingjing', 'cgm-kwan', 'cgm-lingling', 'cgm-lookked', 'cgm-nana', 'cgm-ploen', 'cgm-prae', 'cgm-praifa', 'cgm-shenae'] },
+          { no:'EN2', title:'Niji no Ressha', alt:'รถไฟสายรุ้ง', song:'cgm-s4', who:'All BNK48 & CGM48 Members' },
+          { no:'EN3', title:'Shoujotachi yo', alt:'วันใหม่', song:'bnk-s13', who:'All BNK48 & CGM48 Members' },
+          { no:'EN4', title:'Shonichi', alt:'วันแรก', song:'bnk-s3', who:'All BNK48 & CGM48 Members +', by:['bnk-noey', 'cgm-sita'] }] }] }],
     info:['ประตูเปิด 12:00 น. · เริ่มงาน 13:00 น.',
       'บัตรเปิดขาย 15 ต.ค. 2026 12:00 ทาง eventpop.me',
       'จัดรอบกลางวัน วันเดียวกับการประกาศผลการเลือกตั้งซึ่งจัดรอบค่ำ'],
@@ -20373,7 +20406,7 @@ function renderSetlist(ev, head){
     const sub = x.alt;
     const end = x.yt ? `<span class="sl-yt" aria-hidden="true">${YT_ICON}</span>` : x.song ? '<span class="sl-go" aria-hidden="true">›</span>' : '';
     const inner = `<span class="sl-no">${x.no}</span><span class="sl-song" data-noloc><b>${name}</b>${sub ? `<small>${escapeHtml(sub)}</small>` : ''}
-      ${x.by ? `<span class="sl-by">${x.by.map(who).join('')}</span>` : ''}</span>${end}`;
+      ${x.who || x.by ? `<span class="sl-by">${x.who ? `<span class="sl-whotext">${escapeHtml(x.who)}</span>` : ''}${(x.by || []).map(who).join('')}</span>` : ''}</span>${end}`;   // `who`: a line-up as the card words it (a team, a generation, everyone)
     const cls = `sl-row${x.no === 'M00' ? ' is-overture' : ''}`;
     return x.yt ? `<a class="${cls}" href="https://youtu.be/${x.yt}" target="_blank" rel="noopener noreferrer">${inner}</a>`
       : x.song ? `<button class="${cls}" data-action="open-single" data-id="${x.song}">${inner}</button>`
@@ -20381,12 +20414,12 @@ function renderSetlist(ev, head){
   };
   const part = p => p.mc
     ? `<p class="sl-mc">MC${p.mc}${p.game ? (en ? ' · Game' : ' · เกม') : p.end ? (en ? ' · End' : ' · ปิดท้าย') : ''}</p>`
-    : `<div class="sl-sess"><p class="sl-head">${p.encore ? (en ? 'Encore' : 'อังกอร์') : en ? `Session ${p.s}` : `ช่วงที่ ${p.s}`}${p.unit ? (en ? ' · Units' : ' · ยูนิต') : ''}</p>${p.songs.map(row).join('')}</div>`;
+    : `<div class="sl-sess"><p class="sl-head">${p.encore ? (en ? 'Encore' : 'อังกอร์') : p.th ? (en ? p.en || p.th : p.th) : en ? `Session ${p.s}` : `ช่วงที่ ${p.s}`}${p.unit ? (en ? ' · Units' : ' · ยูนิต') : ''}</p>${p.songs.map(row).join('')}</div>`;
   const panel = (d, i) => {
     const n = d.parts.reduce((k, p) => k + (p.songs || []).filter(x => x.no !== 'M00').length, 0);
     return `<div class="sl-panel" data-day="${i}"${i === on ? '' : ' hidden'} role="tabpanel">
       <div class="sl-box">${d.parts.map(part).join('')}</div>
-      <p class="sl-note">${en ? 'A song with no names is sung by the whole line-up' : 'เพลงที่ไม่ระบุชื่อ ขึ้นแสดงทุกคน'}</p>
+      ${d.parts.some(p => (p.songs || []).some(x => x.no !== 'M00' && !x.by && !x.who)) ? `<p class="sl-note">${en ? 'A song with no names is sung by the whole line-up' : 'เพลงที่ไม่ระบุชื่อ ขึ้นแสดงทุกคน'}</p>` : ''}
       <div class="sl-foot"><span class="sl-count">${en ? `${n} songs` : `${n} เพลง`}</span>
         ${d.img ? `<button class="sl-img" data-action="open-poster" data-id="sl:${ev.id}:${i}"><img src="${escapeAttr(d.img.replace(/\.\w+$/, '-s.jpg'))}" alt="" loading="lazy" decoding="async">${en ? 'Setlist card' : 'ภาพเซ็ตลิสต์'}</button>` : ''}</div>
     </div>`;
