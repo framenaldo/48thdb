@@ -7378,6 +7378,24 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --ink:#EEF4FA !important; --ink-soft:rgba(238,244,250,.74) !important; --c-text:#BFDDF2 !important; --line:rgba(255,255,255,.14) !important;
     --paper-dim:rgba(255,255,255,.08) !important; --card:rgba(255,255,255,.1) !important; --glass-card:rgba(255,255,255,.1) !important;
     --glass-edge:rgba(255,255,255,.16) !important; color:var(--ink); }
+  /* …and the same dusk on Kimi's sheet at night (the owner's word, 21 Nov 2026): dark sky, light ink (the wavy lettering is a mask in
+     the ink's colour, so it turns light with it), the notes light, the accent a dusk blue, the clouds dimmed. On a phone the sky is solid (a sheet never blurs the page there); wider, it is glass. */
+  :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-postered.is-scene-kimi{
+    background:linear-gradient(180deg, #3E6488 0, #2C4262 150px, #221E34 330px, #1C1828 80%, #2A3020 100%) !important;
+    border-color:var(--lg-rim); box-shadow:var(--lg-hi), 0 20px 60px rgba(0,0,0,.45);
+    --sheet-bg:#221E34; --sheet-ink:#EEF4FA; --pc:#9FC3E6;
+    --ink:#EEF4FA !important; --ink-soft:rgba(238,244,250,.72) !important; --c-text:#BFDDF2 !important; --line:rgba(255,255,255,.14) !important;
+    --paper:#221E34 !important; --paper-dim:rgba(255,255,255,.08) !important; --card:rgba(255,255,255,.08) !important; --glass-card:rgba(255,255,255,.08) !important;
+    --glass-edge:rgba(255,255,255,.16) !important; --chrome-bg:rgba(255,255,255,.14); --chrome-edge:rgba(255,255,255,.22); --chrome-fg:#EEF4FA; --c:#5E86B4 !important; color:var(--ink); }
+  @media (min-width:641px){
+    :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-postered.is-scene-kimi{
+      background:linear-gradient(180deg, rgba(62,100,136,.84) 0, rgba(44,66,98,.8) 150px, rgba(34,30,52,.8) 330px, rgba(28,24,40,.8) 80%, rgba(42,48,32,.8) 100%) !important;
+      -webkit-backdrop-filter:blur(28px) saturate(160%); backdrop-filter:blur(28px) saturate(160%); } }
+  :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-scene-kimi::after{ opacity:.22; }
+  :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-scene-kimi .evm-fest{ --fest-a:#3E6488; --fest-b:#2C4262; --fest-ink:#EEF4FA; }
+  :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-scene-kimi .evm-fest-sub{ color:#EEF4FA; }
+  :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-scene-kimi .evm-fest-deco .cfs{ color:#BFDDF2; opacity:.45; }
+  :root[data-theme="dark"][data-fx="new"][data-lg="1"] .modal-glass-card.is-scene-kimi .evm-fest-name{ background:rgba(255,255,255,.14); color:#EEF4FA; }
   html[data-lg="1"] .ev-card.is-themed, html[data-lg="1"] .ev-card.is-now{ border-color:var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop); }
   html[data-lg="1"] :is(.ev-person, .tl-chip, .set-btn, .set-go, .page-share-btn, .box-share-btn, .share-act, .share-x, .cal-nav, .cal-sub-btn,
     .calp-subscribe, .mw-sort, .mw-more, .wk-cat, .social-chip, .yt-btn, .iam-link, .rt-tab, .rt-day, .sl-day, .lay-tools button, .bio-pen,
