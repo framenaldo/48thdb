@@ -7369,9 +7369,15 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .shop-card, .stat-cell, .account-card, .cd-next, .past-toggle){ -webkit-backdrop-filter:var(--lg-blur); backdrop-filter:var(--lg-blur); }
   html[data-lg="1"] .ev-card.is-themed:not([class*="is-scene-"]){ background:color-mix(in srgb, var(--sheet-bg) 46%, transparent); border-color:var(--lg-rim); }
   :root[data-theme="dark"][data-lg="1"] .ev-card.is-themed:not([class*="is-scene-"]){ background:color-mix(in srgb, var(--sheet-dark) 62%, transparent); }
-  /* Kimi's sky on a feed card goes see-through as in the owner's Figma (25%); its sheet keeps the full sky, and so does the card at night, its ink being dark */
+  /* Kimi's sky on a feed card goes see-through as in the owner's Figma (25%); its sheet keeps the full sky */
   html:root[data-fx="new"][data-lg="1"]:not([data-theme="dark"]) .ev-card.is-themed.is-scene-kimi{ border-color:var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop);
     background:linear-gradient(180deg, rgba(147,198,234,.5) 0, rgba(191,221,242,.42) 120px, rgba(232,243,250,.36) 260px, rgba(255,255,255,.36) 78%, rgba(211,223,168,.42) 100%); }
+  /* …and at night the other way round (the owner's word, 21 Nov 2026): a dusk sky, see-through, with light ink */
+  html:root[data-fx="new"][data-lg="1"][data-theme="dark"] .ev-card.is-themed.is-scene-kimi{ border-color:var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop);
+    background:linear-gradient(180deg, rgba(70,112,156,.5) 0, rgba(44,66,98,.42) 130px, rgba(30,26,46,.42) 78%, rgba(62,74,40,.42) 100%);
+    --ink:#EEF4FA !important; --ink-soft:rgba(238,244,250,.74) !important; --c-text:#BFDDF2 !important; --line:rgba(255,255,255,.14) !important;
+    --paper-dim:rgba(255,255,255,.08) !important; --card:rgba(255,255,255,.1) !important; --glass-card:rgba(255,255,255,.1) !important;
+    --glass-edge:rgba(255,255,255,.16) !important; color:var(--ink); }
   html[data-lg="1"] .ev-card.is-themed, html[data-lg="1"] .ev-card.is-now{ border-color:var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop); }
   html[data-lg="1"] :is(.ev-person, .tl-chip, .set-btn, .set-go, .page-share-btn, .box-share-btn, .share-act, .share-x, .cal-nav, .cal-sub-btn,
     .calp-subscribe, .mw-sort, .mw-more, .wk-cat, .social-chip, .yt-btn, .iam-link, .rt-tab, .rt-day, .sl-day, .lay-tools button, .bio-pen,
