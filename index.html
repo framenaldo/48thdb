@@ -2556,6 +2556,44 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root .es-box.has-who .es-row .es-bar{ height:3px; background:var(--es-live); }
   :root .es-box.has-who .es-row .es-sl-pill{ background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.5); color:#fff; box-shadow:none; }
   :root .es-box.has-who .es-who{ padding-top:11px; }
+  /* A timetable with faces is a stack of tickets, one a part (the owner's pick of two looks, 21 Nov 2026: the solid bands
+     all looked alike and the status was hard to read): the time on a solid stub at the left in the event's colour, the
+     part's name in dark ink on the light side, the faces under a dashed tear. On now the stub, the rim and the status turn
+     live red; over, it greys out; still to come, it stays in the event's colour. */
+  :root .es-box.has-who{ gap:8px; background:none; border:0; border-radius:0; overflow:visible; }
+  :root .es-box.has-who .es-row, :root .es-box.has-who .es-row.is-alt, :root .es-box.has-who .es-row.is-done{
+    --tk:color-mix(in srgb, var(--c) 40%, var(--line));
+    background:var(--card); border:1.5px solid var(--tk); border-radius:16px; box-shadow:0 2px 8px color-mix(in srgb, var(--c) 16%, transparent);
+    grid-template-columns:86px minmax(0, 1fr); align-items:stretch; padding:0; column-gap:0; overflow:hidden; }
+  /* a ticket whose faces show under it (the picked day's line of faces may come after another day's hidden one) */
+  :root .es-box.has-who .es-row:is(:has(+ .es-who:not([hidden])), :has(+ .es-who[hidden] + .es-who:not([hidden])), :has(+ .es-who[hidden] + .es-who[hidden] + .es-who:not([hidden]))){
+    border-bottom:0; border-radius:16px 16px 0 0; }
+  :root .es-box.has-who .es-row .es-time{ display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
+    background:color-mix(in srgb, var(--c) 82%, #000); color:#fff; opacity:1; font-size:14px; font-weight:800; letter-spacing:0; padding:10px 6px; white-space:normal; line-height:1.2; }
+  :root .es-box.has-who .es-row .es-time small{ color:inherit; opacity:.85; }
+  :root .es-box.has-who .es-row .es-what{ display:flex; flex-direction:column; justify-content:center; align-items:flex-start; padding:10px 12px;
+    color:var(--ink); font-weight:800; font-size:15.5px; letter-spacing:0; opacity:1; }
+  :root .es-box.has-who .es-row:is(.has-sl, .has-gs) .es-what{ flex-direction:row; flex-wrap:wrap; justify-content:space-between; align-items:center; align-content:center; }
+  :root .es-box.has-who .es-row .es-name{ color:var(--ink); opacity:1; }
+  :root .es-box.has-who .es-row .es-st:not(:empty){ margin-top:6px; color:color-mix(in srgb, var(--c) 78%, var(--ink)); background:color-mix(in srgb, var(--c) 12%, var(--card)); box-shadow:none; font-size:12px; }
+  :root .es-box.has-who .es-row .es-sl-pill{ background:var(--card); border-color:var(--tk); color:color-mix(in srgb, var(--c) 78%, var(--ink)); }
+  :root .es-box.has-who .es-row .es-bar{ left:86px; height:4px; background:var(--es-live); }
+  :root .es-box.has-who .es-who, :root .es-box.has-who .es-who.is-alt{ --tk:color-mix(in srgb, var(--c) 40%, var(--line));
+    background:var(--card); border:1.5px solid var(--tk); border-top:1.5px dashed var(--tk); border-radius:0 0 16px 16px; margin-top:-8px; padding-top:11px; }
+  :root .es-box.has-who .es-sl{ margin-top:-8px; }
+  /* on now */
+  :root .es-box.has-who .es-row.is-now{ --tk:var(--es-live); box-shadow:0 4px 14px color-mix(in srgb, var(--es-live) 28%, transparent); }
+  :root .es-box.has-who .es-row.is-now + .es-who, :root .es-box.has-who .es-row.is-now + .es-who + .es-who, :root .es-box.has-who .es-row.is-now + .es-who + .es-who + .es-who{ --tk:var(--es-live); }
+  :root .es-box.has-who .es-row.is-now .es-time{ background:var(--es-live); }
+  :root .es-box.has-who .es-row.is-now .es-st{ background:var(--es-live); color:#fff; box-shadow:none; }
+  :root .es-box.has-who .es-row.is-now .es-st::before{ background:#fff; }
+  /* over */
+  :root .es-box.has-who .es-row.is-done{ box-shadow:none; --tk:var(--line); }
+  :root .es-box.has-who .es-row.is-done + .es-who, :root .es-box.has-who .es-row.is-done + .es-who + .es-who, :root .es-box.has-who .es-row.is-done + .es-who + .es-who + .es-who{ --tk:var(--line); }
+  :root .es-box.has-who .es-row.is-done .es-time{ background:color-mix(in srgb, var(--ink) 30%, var(--card)); opacity:1; }
+  :root .es-box.has-who .es-row.is-done :is(.es-what, .es-name){ color:var(--ink-soft); opacity:1; }
+  :root .es-box.has-who .es-row.is-done .es-st{ background:transparent; color:var(--ink-soft); padding-left:0; opacity:1; }
+  :root .es-box.has-who .es-row.has-sl:active, :root .es-box.has-who .es-row.has-gs:active{ background:color-mix(in srgb, var(--c) 8%, var(--card)); }
   .es-row.is-alt, .es-who.is-alt{ background:color-mix(in srgb, var(--ink) 6%, var(--card)); }
   :root[data-theme="dark"] .es-row.is-alt, :root[data-theme="dark"] .es-who.is-alt{ background:color-mix(in srgb, var(--ink) 9%, var(--card)); }
   .es-kind{ display:inline-block; padding:1px 10px; margin-right:4px; border-radius:99px; font-size:13px; font-weight:800; white-space:nowrap; color:#fff; background:var(--rt); }
