@@ -2556,47 +2556,103 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root .es-box.has-who .es-row .es-bar{ height:3px; background:var(--es-live); }
   :root .es-box.has-who .es-row .es-sl-pill{ background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.5); color:#fff; box-shadow:none; }
   :root .es-box.has-who .es-who{ padding-top:11px; }
-  /* Every timetable is a stack of tickets, one a part (with faces first, then every event: the owner's word, 21 Nov 2026) (the owner's pick of two looks, 21 Nov 2026: the solid bands
+  /* A timetable with faces is a stack of tickets, one a part (the owner's pick of two looks, 21 Nov 2026 (the owner's pick of two looks, 21 Nov 2026: the solid bands
      all looked alike and the status was hard to read): the time on a solid stub at the left in the event's colour, the
-     part's name in dark ink on the light side,
-     (`:is(.has-who, :not(.has-who))` matches every box with the weight of the older .has-who rules above, so it wins over them) the faces under a dashed tear. On now the stub, the rim and the status turn
+     part's name in dark ink on the light side, the faces under a dashed tear. On now the stub, the rim and the status turn
      live red; over, it greys out; still to come, it stays in the event's colour. */
-  :root .es-box:is(.has-who, :not(.has-who)){ gap:8px; background:none; border:0; border-radius:0; overflow:visible; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row, :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-alt, :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-done{
+  :root .es-box.has-who{ gap:8px; background:none; border:0; border-radius:0; overflow:visible; }
+  :root .es-box.has-who .es-row, :root .es-box.has-who .es-row.is-alt, :root .es-box.has-who .es-row.is-done{
     --tk:color-mix(in srgb, var(--c) 40%, var(--line));
     background:var(--card); border:1.5px solid var(--tk); border-radius:16px; box-shadow:0 2px 8px color-mix(in srgb, var(--c) 16%, transparent);
     grid-template-columns:86px minmax(0, 1fr); align-items:stretch; padding:0; column-gap:0; overflow:hidden; }
   /* a ticket whose faces show under it (the picked day's line of faces may come after another day's hidden one) */
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row:is(:has(+ .es-who:not([hidden])), :has(+ .es-who[hidden] + .es-who:not([hidden])), :has(+ .es-who[hidden] + .es-who[hidden] + .es-who:not([hidden]))){
+  :root .es-box.has-who .es-row:is(:has(+ .es-who:not([hidden])), :has(+ .es-who[hidden] + .es-who:not([hidden])), :has(+ .es-who[hidden] + .es-who[hidden] + .es-who:not([hidden]))){
     border-bottom:0; border-radius:16px 16px 0 0; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row .es-time{ display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
+  :root .es-box.has-who .es-row .es-time{ display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
     background:color-mix(in srgb, var(--c) 82%, #000); color:#fff; opacity:1; font-size:14px; font-weight:800; letter-spacing:0; padding:10px 6px; white-space:normal; line-height:1.2; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row .es-time small{ color:inherit; opacity:.85; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row .es-what{ display:flex; flex-direction:column; justify-content:center; align-items:flex-start; padding:10px 12px;
+  :root .es-box.has-who .es-row .es-time small{ color:inherit; opacity:.85; }
+  :root .es-box.has-who .es-row .es-what{ display:flex; flex-direction:column; justify-content:center; align-items:flex-start; padding:10px 12px;
     color:var(--ink); font-weight:800; font-size:15.5px; letter-spacing:0; opacity:1; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row:is(.has-sl, .has-gs) .es-what{ flex-direction:row; flex-wrap:wrap; justify-content:space-between; align-items:center; align-content:center; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row .es-name{ color:var(--ink); opacity:1; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row .es-st:not(:empty){ margin-top:6px; color:color-mix(in srgb, var(--c) 78%, var(--ink)); background:color-mix(in srgb, var(--c) 12%, var(--card)); box-shadow:none; font-size:12px; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row .es-sl-pill{ background:var(--card); border-color:var(--tk); color:color-mix(in srgb, var(--c) 78%, var(--ink)); }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row .es-bar{ left:86px; height:4px; background:var(--es-live); }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-who, :root .es-box:is(.has-who, :not(.has-who)) .es-who.is-alt{ --tk:color-mix(in srgb, var(--c) 40%, var(--line));
+  :root .es-box.has-who .es-row:is(.has-sl, .has-gs) .es-what{ flex-direction:row; flex-wrap:wrap; justify-content:space-between; align-items:center; align-content:center; }
+  :root .es-box.has-who .es-row .es-name{ color:var(--ink); opacity:1; }
+  :root .es-box.has-who .es-row .es-st:not(:empty){ margin-top:6px; color:color-mix(in srgb, var(--c) 78%, var(--ink)); background:color-mix(in srgb, var(--c) 12%, var(--card)); box-shadow:none; font-size:12px; }
+  :root .es-box.has-who .es-row .es-sl-pill{ background:var(--card); border-color:var(--tk); color:color-mix(in srgb, var(--c) 78%, var(--ink)); }
+  :root .es-box.has-who .es-row .es-bar{ left:86px; height:4px; background:var(--es-live); }
+  :root .es-box.has-who .es-who, :root .es-box.has-who .es-who.is-alt{ --tk:color-mix(in srgb, var(--c) 40%, var(--line));
     background:var(--card); border:1.5px solid var(--tk); border-top:1.5px dashed var(--tk); border-radius:0 0 16px 16px; margin-top:-8px; padding-top:11px; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-sl{ margin-top:-8px; }
+  :root .es-box.has-who .es-sl{ margin-top:-8px; }
   /* on now */
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-now{ --tk:var(--es-live); box-shadow:0 4px 14px color-mix(in srgb, var(--es-live) 28%, transparent); }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-now + .es-who, :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-now + .es-who + .es-who, :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-now + .es-who + .es-who + .es-who{ --tk:var(--es-live); }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-now .es-time{ background:var(--es-live); }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-now .es-st{ background:var(--es-live); color:#fff; box-shadow:none; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-now .es-st::before{ background:#fff; }
+  :root .es-box.has-who .es-row.is-now{ --tk:var(--es-live); box-shadow:0 4px 14px color-mix(in srgb, var(--es-live) 28%, transparent); }
+  :root .es-box.has-who .es-row.is-now + .es-who, :root .es-box.has-who .es-row.is-now + .es-who + .es-who, :root .es-box.has-who .es-row.is-now + .es-who + .es-who + .es-who{ --tk:var(--es-live); }
+  :root .es-box.has-who .es-row.is-now .es-time{ background:var(--es-live); }
+  :root .es-box.has-who .es-row.is-now .es-st{ background:var(--es-live); color:#fff; box-shadow:none; }
+  :root .es-box.has-who .es-row.is-now .es-st::before{ background:#fff; }
   /* over */
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-done{ box-shadow:none; --tk:var(--line); }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-done + .es-who, :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-done + .es-who + .es-who, :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-done + .es-who + .es-who + .es-who{ --tk:var(--line); }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-done .es-time{ background:color-mix(in srgb, var(--ink) 30%, var(--card)); opacity:1; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-done :is(.es-what, .es-name){ color:var(--ink-soft); opacity:1; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.is-done .es-st{ background:transparent; color:var(--ink-soft); padding-left:0; opacity:1; }
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.has-sl:active, :root .es-box:is(.has-who, :not(.has-who)) .es-row.has-gs:active{ background:color-mix(in srgb, var(--c) 8%, var(--card)); }
+  :root .es-box.has-who .es-row.is-done{ box-shadow:none; --tk:var(--line); }
+  :root .es-box.has-who .es-row.is-done + .es-who, :root .es-box.has-who .es-row.is-done + .es-who + .es-who, :root .es-box.has-who .es-row.is-done + .es-who + .es-who + .es-who{ --tk:var(--line); }
+  :root .es-box.has-who .es-row.is-done .es-time{ background:color-mix(in srgb, var(--ink) 30%, var(--card)); opacity:1; }
+  :root .es-box.has-who .es-row.is-done :is(.es-what, .es-name){ color:var(--ink-soft); opacity:1; }
+  :root .es-box.has-who .es-row.is-done .es-st{ background:transparent; color:var(--ink-soft); padding-left:0; opacity:1; }
+  :root .es-box.has-who .es-row.has-sl:active, :root .es-box.has-who .es-row.has-gs:active{ background:color-mix(in srgb, var(--c) 8%, var(--card)); }
   /* a part with its own colour (a kind of round) wears it on the stub */
-  :root .es-box:is(.has-who, :not(.has-who)) .es-row.has-tone:not(.is-now):not(.is-done) .es-time{ background:color-mix(in srgb, var(--rt) 85%, #000); }
+  :root .es-box.has-who .es-row.has-tone:not(.is-now):not(.is-done) .es-time{ background:color-mix(in srgb, var(--rt) 85%, #000); }
+  /* A timetable with no faces is a card a day with a timeline inside (look E, the owner's pick of four, 21 Nov 2026: the tickets
+     were too heavy without faces): the day on a band in the event's colour, a line with a dot a part, the time in the event's
+     colour. The line is the way through the day: travelled in the event's colour, filling in live red down the part on now
+     (--p from schedTick), still pale ahead. Motion is transform and opacity only, and none with reduced motion. */
+  :root .es-box:not(.has-who){ gap:10px; background:none; border:0; border-radius:0; overflow:visible; }
+  .es-day{ --lx:96px; border:1.5px solid color-mix(in srgb, var(--c) 35%, var(--line)); border-radius:18px; overflow:hidden; background:var(--card);
+    box-shadow:0 2px 10px color-mix(in srgb, var(--c) 12%, transparent); padding-bottom:6px; }
+  .es-dayh{ margin:0 0 4px; padding:9px 14px; font-size:14px; font-weight:800; color:#fff; background:color-mix(in srgb, var(--c) 82%, #000); }
+  :root .es-box:not(.has-who) .es-row{ background:none; border:0; border-radius:0; box-shadow:none; overflow:visible;
+    grid-template-columns:74px 22px minmax(0, 1fr); column-gap:0; padding:8px 14px 8px 10px; align-items:center; }
+  :root .es-box:not(.has-who) .es-row .es-time{ grid-column:1; text-align:right; font-size:15px; line-height:1.15; white-space:normal;
+    color:color-mix(in srgb, var(--c) 85%, var(--ink)); opacity:1; }
+  :root .es-box:not(.has-who) .es-row .es-time small{ display:none; }
+  :root .es-box:not(.has-who) .es-row .es-what{ grid-column:3; padding-left:8px; font-size:15.5px; font-weight:800; color:var(--ink); opacity:1; }
+  :root .es-box:not(.has-who) .es-row:is(.has-sl, .has-gs) .es-what{ align-items:center; }
+  /* the dot, and the line through it */
+  :root .es-box:not(.has-who) .es-row::before{ content:''; grid-column:2; grid-row:1; justify-self:center; width:12px; height:12px; border-radius:50%; box-sizing:border-box;
+    background:var(--card); border:3px solid var(--dot, color-mix(in srgb, var(--c) 80%, var(--ink))); z-index:1; }
+  :root .es-box:not(.has-who) .es-row::after{ content:''; position:absolute; left:calc(10px + 74px + 10px); top:0; bottom:0; width:2px;
+    background:color-mix(in srgb, var(--c) 22%, var(--line)); }
+  :root .es-box:not(.has-who) .es-dayh + .es-row::after{ top:50%; }
+  :root .es-box:not(.has-who) .es-row:last-child::after{ bottom:50%; }
+  :root .es-box:not(.has-who) .es-dayh + .es-row:last-child::after{ display:none; }
+  :root .es-box:not(.has-who) .es-row.has-tone{ --dot:var(--rt); box-shadow:none; }
+  :root .es-box:not(.has-who) .es-row .es-st:not(:empty){ display:inline-flex; width:max-content; margin-top:4px; padding:2px 10px 2px 8px; border-radius:99px; font-size:12px;
+    color:color-mix(in srgb, var(--c) 78%, var(--ink)); background:color-mix(in srgb, var(--c) 10%, var(--card)); }
+  /* the ripple round the live dot is the row's bar, otherwise unused here */
+  :root .es-box:not(.has-who) .es-row .es-bar{ position:absolute; left:calc(10px + 74px + 11px - 7px); top:calc(50% - 7px); width:14px !important; height:14px; border-radius:50%;
+    background:none; border:2px solid var(--es-live); opacity:0; transition:none; pointer-events:none; }
+  /* over: the dot fills grey with a tick, the travelled line in the event's colour */
+  :root .es-box:not(.has-who) .es-row.is-done::before{ background:var(--ink-soft); border-color:var(--ink-soft); }
+  :root .es-box:not(.has-who) .es-row.is-done::after{ background:color-mix(in srgb, var(--c) 65%, var(--card)); }
+  :root .es-box:not(.has-who) .es-row.is-done :is(.es-time, .es-what, .es-name){ color:var(--ink-soft); opacity:1; }
+  :root .es-box:not(.has-who) .es-row.is-done .es-st{ background:none; padding-left:0; color:var(--ink-soft); }
+  /* on now: red dot with a ripple, the line filling down it */
+  :root .es-box:not(.has-who) .es-row.is-now{ background:none; box-shadow:none; }
+  :root .es-box:not(.has-who) .es-row.is-now::before{ background:var(--es-live); border-color:var(--es-live); box-shadow:0 0 0 4px color-mix(in srgb, var(--es-live) 20%, transparent); }
+  :root .es-box:not(.has-who) .es-row.is-now::after{ background:linear-gradient(180deg, var(--es-live) 0 var(--p, 0%), color-mix(in srgb, var(--c) 22%, var(--line)) var(--p, 0%)); }
+  :root .es-box:not(.has-who) .es-row.is-now .es-time{ color:var(--es-live); }
+  :root .es-box:not(.has-who) .es-row.is-now .es-st{ background:var(--es-live); color:#fff; }
+  :root .es-box:not(.has-who) .es-row.is-now .es-st::before{ background:#fff; }
+  :root .es-box:not(.has-who) .es-row.is-next .es-st{ box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--c) 45%, transparent); }
+  @media (prefers-reduced-motion:no-preference){
+    /* the sheet opens: each day's card rises in, then its dots pop down the line one by one */
+    .es-day{ animation:esDayIn .45s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--d, 0) * 90ms); }
+    :root .es-box:not(.has-who) .es-row::before{ animation:esDotIn .4s cubic-bezier(.3,1.6,.5,1) both; animation-delay:calc(var(--d, 0) * 90ms + 120ms + var(--i, 0) * 70ms); }
+    :root .es-box:not(.has-who) .es-row .es-what{ animation:esWhatIn .4s ease-out both; animation-delay:calc(var(--d, 0) * 90ms + 120ms + var(--i, 0) * 70ms); }
+    /* on now: a ring spreads from the dot every two seconds */
+    :root .es-box:not(.has-who) .es-row.is-now .es-bar{ animation:esRipple 2s ease-out infinite; }
+    /* a part that has just ended: its dot gives a small pop as it greys */
+    :root .es-box:not(.has-who) .es-row.is-done.was-now::before{ animation:esDone .5s cubic-bezier(.3,1.6,.5,1); }
+  }
+  @keyframes esDayIn{ from{ opacity:0; transform:translateY(14px); } }
+  @keyframes esDotIn{ from{ opacity:0; transform:scale(.2); } }
+  @keyframes esWhatIn{ from{ opacity:0; transform:translateX(-8px); } }
+  @keyframes esRipple{ 0%{ opacity:.7; transform:scale(.9); } 100%{ opacity:0; transform:scale(2.6); } }
+  @keyframes esDone{ 40%{ transform:scale(1.5); } }
   .es-row.is-alt, .es-who.is-alt{ background:color-mix(in srgb, var(--ink) 6%, var(--card)); }
   :root[data-theme="dark"] .es-row.is-alt, :root[data-theme="dark"] .es-who.is-alt{ background:color-mix(in srgb, var(--ink) 9%, var(--card)); }
   .es-kind{ display:inline-block; padding:1px 10px; margin-right:4px; border-radius:99px; font-size:13px; font-weight:800; white-space:nowrap; color:#fff; background:var(--rt); }
@@ -20668,7 +20724,17 @@ function renderSchedule(ev){
   const luPills = luDays.length > 1 ? `<div class="sl-days es-days" role="tablist">${luDays.map(d => { const x = parseYmd(d);
     return `<button class="sl-day${d === luOn ? ' is-on' : ''}" data-action="es-day" data-value="${d}" role="tab" aria-selected="${d === luOn}">${luLabel(d)}<small>${
       d === iso ? (en ? 'Today' : 'วันนี้') : (en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'])[x.getDay()]}</small></button>`; }).join('')}</div>` : '';
-  const flushBox = () => { if(box){ out += `${luPills}<div class="es-box${LU ? ' has-who' : ''}" data-rota>${box}</div>`; box = ''; } };
+  // no faces: a card a day (look E), headed by the day; undated rows head with the event's day, or its days
+  let dayKey = null, nDay = 0, nIn = 0;
+  const WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
+  const dayHead = d => { if(d){ const x = parseYmd(d); return `${WD[x.getDay()]} ${x.getDate()} ${M[x.getMonth()]}`; }
+    const a = parseYmd(ev.start), z = parseYmd(eventLastDay(ev));
+    return ev.start === eventLastDay(ev) ? `${WD[a.getDay()]} ${a.getDate()} ${M[a.getMonth()]}`
+      : `${en ? 'Every day' : 'ทุกวัน'} · ${a.getDate()}${a.getMonth() === z.getMonth() ? '' : ' ' + M[a.getMonth()]}–${z.getDate()} ${M[z.getMonth()]}`; };
+  const openDay = r => { if(LU) return ''; const k = r.day || '';
+    if(dayKey === k && box) return ''; const close = dayKey !== null && box ? '</div>' : ''; dayKey = k; nIn = 0;
+    return `${close}<div class="es-day" style="--d:${nDay++}"><p class="es-dayh">${escapeHtml(dayHead(r.day))}</p>`; };
+  const flushBox = () => { if(box){ out += `${luPills}<div class="es-box${LU ? ' has-who' : ''}" data-rota>${box}${!LU && dayKey !== null ? '</div>' : ''}</div>`; box = ''; dayKey = null; } };
   const flushNotes = () => { if(notes){ out += `<ul class="ev-detail">${notes}</ul>`; notes = ''; } };
   let nRow = 0;
   for(const r of items){
@@ -20678,7 +20744,8 @@ function renderSchedule(ev){
     const gs = !r.sl && r.gs >= 0;   // a Group Shot row opens its motion picture
     const open = r.sl && !!_slOpen[ev.id], tag = r.sl || gs ? 'button' : 'div', st = gone ? (en ? 'Over' : 'จบแล้ว') : '';
     const tn = esTone(ev, r.what), alt = !box ? (nRow = 0, false) : ++nRow % 2 === 1;   // every other part of the day on the card's deeper shade (owner, 13 Nov)
-    box += `<${tag} class="es-row${alt ? ' is-alt' : ''}${gone ? ' is-done' : ''}${r.sl ? ' has-sl' : ''}${gs ? ' has-gs' : ''}${tn ? ' has-tone' : ''}"${tn ? ` style="--rt:${tn.c}"` : ''}${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}${r.sl
+    box += openDay(r);
+    box += `<${tag} class="es-row${alt ? ' is-alt' : ''}${gone ? ' is-done' : ''}${r.sl ? ' has-sl' : ''}${gs ? ' has-gs' : ''}${tn ? ' has-tone' : ''}" style="--i:${nIn++}${tn ? `;--rt:${tn.c}` : ''}"${r.from ? ` data-es-from="${r.from}" data-es-to="${r.to}"` : ''}${r.sl
         ? ` data-action="sl-open" data-id="${ev.id}" aria-expanded="${open}" aria-controls="sl-${ev.id}"` : gs ? ` data-action="gs-open" data-id="${ev.id}" data-value="${r.gs}" aria-haspopup="dialog"` : ''}>
       <span class="es-time">${r.a}${r.b ? `–${r.b}` : ''}${r.dayLabel ? `<small>${escapeHtml(r.dayLabel)}</small>` : ''}</span>
       <span class="es-what">${r.sl ? `<span class="es-name">${escapeHtml(r.what)}</span><span class="es-sl-pill">${en ? 'Setlist' : 'เซ็ตลิสต์'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>`
@@ -20722,7 +20789,9 @@ function schedTick(){
     const next = other ? null : rows.find(r => +r.dataset.esFrom > now);
     rows.forEach(r => {
       const a = +r.dataset.esFrom, b = +r.dataset.esTo, on = !other && now >= a && now < b, done = past || (!other && now >= b), nx = r === next;
+      if(done && r.classList.contains('is-now')) r.classList.add('was-now');   // it has just ended: its dot pops as it greys
       r.classList.toggle('is-now', on); r.classList.toggle('is-done', done); r.classList.toggle('is-next', nx);
+      r.style.setProperty('--p', on ? `${Math.min(100, (now - a) / (b - a) * 100).toFixed(1)}%` : '0%');
       r.querySelector('.es-st').textContent = on ? (en ? `On now · ${schedSpan(b - now)} left` : `กำลังจัดอยู่ · เหลือ ${schedSpan(b - now)}`)
         : done ? (en ? 'Over' : 'จบแล้ว') : nx ? (en ? `Next · in ${schedSpan(a - now)}` : `ถัดไป · อีก ${schedSpan(a - now)}`) : '';
       r.querySelector('.es-bar').style.width = on ? `${Math.min(100, (now - a) / (b - a) * 100).toFixed(1)}%` : '0';
