@@ -9215,8 +9215,30 @@ const SEED_SCHEDULE = [
     venue:'Muan More Space', groups:['cgm48'],
     allMembers:'cgm48',
     related:['ev-cnx-lanna-smile','ev-cnx-exhibition','ev-cnx-original-stage'],
-    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048 },
-    info:['Exhibition Book + Fansign กับสมาชิกทุกคน','พรีออเดอร์ 21 พ.ย. – 7 ธ.ค. 2026'] },
+    shop:{ name:'CGM48 สถานีเชียงใหม่ Exhibition Book & Fansign', kind:'Exhibition Book', withName:true,   // the logo is the project's, so the thing on sale is named under it
+      price:'1,750 บาท', from:'2026-11-21T12:00', to:'2026-12-07T23:59', shopName:'iAM Shop' },
+    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-chiang-mai-station.jpg', w:1638, h:2048,
+      more:[{ img:'posters/cgm48-cnx-merch.jpg', w:1638, h:2048, th:'สินค้าและการจอง', en:'Merch & booking' }] },
+    info:['Exhibition Book + Fansign กับสมาชิกทุกคน',
+      'CGM48 สถานีเชียงใหม่ Exhibition Book & Fansign ราคา 1,750 บาท (สินค้าจำนวนจำกัด) ได้รับรูปพิเศษ 1 ใบ (คละจาก 21 เมมเบอร์) และโปสการ์ดสำหรับให้เมมเบอร์เซ็นสด',
+      'จองทาง iAM Shop ในแอป iAM48 21 พ.ย. 12:00 – 7 ธ.ค. 2026 23:59 น.',
+      'ภาพสินค้าตกแต่งเพื่อการโฆษณาเท่านั้น'] },
+  { id:'ev-cnx-merch-preorder', logo:'cnx', start:'2026-11-24', end:'2026-12-13', period:true, bar:'Pre-Order: CGM48 สถานีเชียงใหม่ Merchandise',
+    title:'CGM48 "สถานีเชียงใหม่" Merchandise · Pre-Order', short:'สถานีเชียงใหม่ Merch',
+    shop:{ name:'เสื้อยืดและหมวกแก๊ป CGM48 สถานีเชียงใหม่', kind:'สินค้า', withName:true,
+      price:'480 – 580 บาท', from:'2026-11-24T12:00', to:'2026-12-13T23:59',
+      deliver:'12 ม.ค. 2027 เป็นต้นไป', shopName:'iAM Shop' },
+    groups:['cgm48'],
+    related:['ev-cnx-book-fansign','ev-cnx-exhibition','ev-cnx-original-stage'],
+    poster:{ accent:'#2F6F8F', surface:'#EDF4F9', ink:'#1B2F44', img:'posters/cgm48-cnx-merch.jpg', w:1638, h:2048 },
+    info:['พรีออเดอร์ทาง iAM Shop ในแอป iAM48 24 พ.ย. 12:00 – 13 ธ.ค. 2026 23:59 น.',
+      'ส่งสินค้า 12 ม.ค. 2027 เป็นต้นไป',
+      'ภาพสินค้าตกแต่งเพื่อการโฆษณาเท่านั้น'],
+    sections:[
+      { head:'สินค้า', lines:[
+        'เสื้อยืด CGM48 สถานีเชียงใหม่ — 480 บาท',
+        'หมวกแก๊ป CGM48 สถานีเชียงใหม่ + รูปพิเศษ 1 ใบ (คละจาก 21 เมมเบอร์) — 580 บาท',
+        'Exhibition Tour with Members (หมวกแก๊ป + รูปพิเศษ 1 ใบ) 880 บาท จองรอบทาง Theater & Concert ในแอป iAM48 ตั้งแต่ 24 พ.ย. 2026 18:00 น. ดูรอบที่งาน Exhibition'] }] },
   { id:'ev-cnx-original-stage', logo:'cnx', start:'2027-01-29', end:'2027-01-31',
     title:'CGM48 The Original Stage "สถานีเชียงใหม่" 1st Stage + Cheki', short:'The Original Stage',
     venue:'Muan More Space', groups:['cgm48'],
@@ -14964,8 +14986,8 @@ function renderShopPage(){
       <div class="shop-body">
         <p class="shop-meta"><span class="shop-kind">${escapeHtml(s.kind)}</span>
           <span class="shop-status">${status}</span></p>
-        ${e.logo ? renderSongLogo(e.logo, 'shop-logo')
-          : `<h3 class="shop-title">${escapeHtml(s.name)}</h3>`}
+        ${e.logo ? renderSongLogo(e.logo, 'shop-logo') : ''}
+        ${!e.logo || s.withName ? `<h3 class="shop-title">${escapeHtml(s.name)}</h3>` : ''}
         <p class="shop-price">${escapeHtml(s.price)}</p>
         <ul class="shop-facts">
           <li>${en ? 'On sale' : 'สั่งซื้อ'} ${when(s.from)} – ${when(s.to)}</li>
