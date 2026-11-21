@@ -4622,6 +4622,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-t.is-pic img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .dash-t.is-pic .dash-l{ position:relative; width:100%; margin:0; padding:22px 9px 8px; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.72)); }
   .dash-t.is-pic .dash-l small{ color:rgba(255,255,255,.88); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
+  /* a member's photo as the whole tile: her face kept in view, her group's colour behind while it loads, the quiz's % on a pill */
+  .dash-t.is-pic.is-face{ background:var(--paper-dim); }
+  .dash-t.is-pic.is-face img{ object-position:50% 22%; }
+  .dash-t.is-pic.is-face .dash-l{ font-size:14px; }
+  .dash-pct{ position:absolute; top:8px; left:8px; z-index:1; padding:2px 9px; border-radius:var(--r-pill); font-style:normal; font-size:12px; font-weight:800;
+    color:#fff; background:var(--pink); box-shadow:0 2px 6px rgba(0,0,0,.25); }
   .dash-t.is-gal{ padding:0; justify-content:flex-end; border:0; }
   .dash-t.is-gal img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .dash-t.is-gal .dash-l{ position:relative; width:100%; margin:0; padding:18px 9px 8px; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.65)); }
@@ -16164,8 +16170,8 @@ function renderHomeDash(ge){
     me: sl => { const u = state.account && state.account.loggedIn;
       return tile(`data-tile="${sl}" data-kind="me" data-action="nav" data-view="profile"`, 'is-me', ICONS.profile, state.oshi.length || '–', en ? 'My oshi' : 'โอชิของฉัน', u ? (en ? 'open my profile' : 'เปิดโปรไฟล์ของฉัน') : (en ? 'sign in to keep them' : 'เข้าสู่ระบบเพื่อเก็บไว้')); },
     rand: sl => { const m = mem.slice().sort((x, y) => qzHash(toYmd(todayStart()) + x.id) - qzHash(toYmd(todayStart()) + y.id))[0];
-      return m ? `<button class="dash-t is-rand" data-tile="${sl}" data-kind="rand" data-noloc data-action="open-member" data-id="${m.id}">
-        <span class="dash-q-faces is-one">${renderAvatar(m, 'dash-q-face', getGroup(m.groupId).color)}</span>
+      return m ? `<button class="dash-t is-rand${m.photo ? ' is-pic is-face' : ''}" data-tile="${sl}" data-kind="rand" data-noloc data-action="open-member" data-id="${m.id}">
+        ${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="dash-q-faces is-one">${renderAvatar(m, 'dash-q-face', getGroup(m.groupId).color)}</span>`}
         <span class="dash-l">${escapeHtml(nickName(m))}<small>${en ? 'a new member each day · tap to open' : 'สุ่มใหม่ทุกวัน · แตะดูโปรไฟล์'}</small></span></button>` : ''; },
     ask: sl => tile(`data-tile="${sl}" data-kind="ask" data-action="focus-search"`, 'is-ask', ICONS.star, '?', en ? 'Ask' : 'ถามเว็บ', en ? 'type a question' : 'พิมพ์คำถาม'),
   };
@@ -21661,6 +21667,10 @@ function renderQuizTile(slot = 'quiz'){
   const day = toYmd(todayStart()), faces = m ? [m] : act.slice().sort((x, y) => qzHash(day + x.id) - qzHash(day + y.id)).slice(0, 3);
   const small = next ? `${en ? 'Vote at' : 'ฤกษ์โหวต'} ${next.when === (en ? 'Today' : 'วันนี้') ? '' : next.when + ' '}${next.hours.slice(0, 5)}`
     : m ? (en ? 'your stars’ pick' : 'ดวงถูกโฉลก') : (en ? 'by the stars ✦' : 'จากดวง ✦');
+  // with a match the tile is her photo, whole, like the picture tiles beside it (the small face left it bare, the owner's word, 21 Nov 2026)
+  if(m && m.photo) return `<button class="dash-t is-quiz is-pic is-face" data-tile="${slot}" data-kind="quiz" data-noloc data-action="nav-quiz" title="${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}">
+    <img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()"><i class="dash-pct">${last.pct}%</i>
+    <span class="dash-l">${escapeHtml(nickName(m))}<small>${escapeHtml(small)}</small></span></button>`;
   return `<button class="dash-t is-quiz" data-tile="${slot}" data-kind="quiz" data-noloc data-action="nav-quiz" title="${en ? 'Find your oshi by the stars' : 'หาโอชิจากดวง'}">
     ${m ? `<span class="dash-i">${ICONS.star}</span>` : ''}
     <span class="dash-q-faces${m ? ' is-one' : ''}">${faces.map(x => renderAvatar(x, 'dash-q-face', getGroup(x.groupId).color)).join('')}${m ? `<i>${last.pct}%</i>` : ''}</span>
