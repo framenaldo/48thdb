@@ -661,6 +661,49 @@ DTSTART;TZID=Asia/Bangkok:20261105T180000
 DTEND;TZID=Asia/Bangkok:20261105T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-cgm48-popup-ontour-1124-2026-11-24@48thdb
+DTSTAMP:20261124T000000Z
+SUMMARY:CGM48 POP UP LIVE ON TOUR
+LOCATION:MUAN MORE SPACE\, Chiang Mai
+DESCRIPTION:เมมเบอร์: Else\, Jingjing\, Satangpound\, Nisha
+ \, Kwan\, Namphet\n• 16:00 สินค้า MERCHANDISE เริ่
+ มจำหน่าย\n• 18:00 การแสดง — ถ่าย
+ ทอดสดทาง YouTube CGM48 OFFICIAL\n• ซื้อเคร
+ ื่องดื่ม 1 แก้ว พร้อมแสดงใบ
+ เสร็จ ต่อเจ้าหน้าที่หน้าป
+ ระตูทางเข้า เพื่อเข้าชม CGM48 
+ POP UP LIVE ON TOUR\n• สามารถนำใบเสร็จม
+ ารับเครื่องดื่มกับ Members ได้
+ หลังจบกิจกรรม\n• เครื่องดื
+ ่ม POP UP LIVE ON TOUR 80 บาท\n• สามารถชำร
+ ะได้ที่จุดซื้อสินค้า ขอสง
+ วนสิทธิ์ชำระผ่าน QR Code เท่าน
+ ั้น\n• ลำดับการขอรับสิทธิ์
+ เข้าดู ท่านที่มาถึงก่อน สา
+ มารถเลือกพื้นที่ได้ตามอั
+ ธยาศัยในโซนต่าง ๆ\n• ด้านใน
+ พื้นที่บริเวณหน้าเวที ไม่
+ อนุญาตให้นำบันได ขาตั้งกล
+ ้อง เข้าในพื้นที่ และอนุญา
+ ตให้ถ่ายภาพโดยยกความสูงไ
+ ด้ไม่เกินศีรษะเท่านั้น ส่
+ วนกล้องขนาดใหญ่ต้องอยู่ใ
+ นบริเวณพื้นที่ที่กำหนด\n• Zo
+ ne 1 โซนรับชมด้านในบริเวณกิจ
+ กรรม ถ่ายภาพได้โดยยกความส
+ ูงไม่เกินศีรษะ และไม่รบกว
+ นผู้อื่น\n• Zone 2 โซนสำหรับช่า
+ งภาพที่ต้องการบันทึกภาพแ
+ ละวีดีโอ ใช้กล้องได้ทุกชน
+ ิด และใช้อุปกรณ์เสริมได้\n
+ • ภาพสินค้าสำหรับการโฆษณา
+ เท่านั้น\n\nhttps://48thdb.com/event/ev-cgm48-popup-ontour
+ -1124
+URL:https://48thdb.com/event/ev-cgm48-popup-ontour-1124
+DTSTART;TZID=Asia/Bangkok:20261124T180000
+DTEND;TZID=Asia/Bangkok:20261124T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-cgm48-popup-live-1119-2026-11-19@48thdb
 DTSTAMP:20261119T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Pop Up Live
