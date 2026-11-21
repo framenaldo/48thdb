@@ -20615,7 +20615,8 @@ function renderSchedule(ev){
     if(r.sl) box += `<div class="es-sl" id="sl-${ev.id}"${open ? '' : ' hidden'}>${renderSetlist(ev)}</div>`;
   }
   flushBox(); flushNotes();
-  return `<div class="es" data-noloc>${out}</div>`;
+  // the day on show: the clock marks the rows only on today's; another day's rows say nothing, a past day's are all over
+  return `<div class="es" data-noloc${luDays.length > 1 ? ` data-es-day="${luOn}"` : ''}>${out}</div>`;
 }
 const schedSpan = ms => { const mins = Math.max(1, Math.ceil(ms / 60000)), h = Math.floor(mins / 60), m = mins % 60, en = isEN();
   return h ? (en ? `${h} h${m ? ` ${m} min` : ''}` : `${h} ชม.${m ? ` ${m} นาที` : ''}`) : (en ? `${m} min` : `${m} นาที`); };
@@ -20640,11 +20641,13 @@ function rotaTick(){
 function schedTick(){
   rotaTick();
   const now = Date.now(), en = isEN();
+  const iso = toYmd(todayStart());
   document.querySelectorAll('.es-box').forEach(box => {
+    const es = box.closest('.es'), day = es && es.dataset.esDay, other = !!day && day !== iso, past = other && day < iso;
     const rows = [...box.querySelectorAll('.es-row[data-es-from]')];
-    const next = rows.find(r => +r.dataset.esFrom > now);
+    const next = other ? null : rows.find(r => +r.dataset.esFrom > now);
     rows.forEach(r => {
-      const a = +r.dataset.esFrom, b = +r.dataset.esTo, on = now >= a && now < b, done = now >= b, nx = r === next;
+      const a = +r.dataset.esFrom, b = +r.dataset.esTo, on = !other && now >= a && now < b, done = past || (!other && now >= b), nx = r === next;
       r.classList.toggle('is-now', on); r.classList.toggle('is-done', done); r.classList.toggle('is-next', nx);
       r.querySelector('.es-st').textContent = on ? (en ? `On now · ${schedSpan(b - now)} left` : `กำลังจัดอยู่ · เหลือ ${schedSpan(b - now)}`)
         : done ? (en ? 'Over' : 'จบแล้ว') : nx ? (en ? `Next · in ${schedSpan(a - now)}` : `ถัดไป · อีก ${schedSpan(a - now)}`) : '';
@@ -32826,7 +32829,8 @@ function bindDelegatedEvents(){
     else if(action==='es-day'){
       const es = el.closest('.es'), d = el.dataset.value;
       if(es){ es.querySelectorAll('.es-days .sl-day').forEach(b => { const on = b === el; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
-        es.querySelectorAll('.es-who').forEach(w => { w.hidden = w.dataset.day !== d; }); }
+        es.querySelectorAll('.es-who').forEach(w => { w.hidden = w.dataset.day !== d; });
+        if(es.dataset.esDay){ es.dataset.esDay = d; schedTick(); } }   // the clock follows the day on show
     }
     else if(action==='sl-day'){
       const box = el.closest('.sl'), ev = state.selectedEvent;
