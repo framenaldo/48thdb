@@ -7348,6 +7348,54 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .has-shop-img .shop-tk-t{ display:flex; flex-direction:column; gap:2px; align-self:end; font-size:13.5px; color:var(--ink); }
   .has-shop-img .shop-tk-t small{ font-size:13px; font-weight:800; color:var(--c); }
   .has-shop-img .shop-buy{ justify-self:start; align-self:start; }
+  /* ---- One liquid glass for every card, pill and sheet (the owner's Figma, 21 Nov 2026, "หน้าแรก · กระจกชุดเดียว"; on for everyone,
+     ?lg=off turns it off on one device, kept, =on back; html[data-lg="1"], set in cdShopSync). One rim everywhere — white 32%, 1px,
+     inside — one soft shadow, and a catch of light along the top edge for the glass. Cards on the page are frosted; what sits inside a
+     card or a sheet is a lighter veil with no blur of its own (a blur inside a blur sees nothing and costs a frame). An event card keeps
+     its poster's colours, only see-through; a scene (night, kimi, paper…) keeps its own; the GE red and gold stay artwork. On a phone a
+     sheet is nearly solid and never blurs the page (the cost of a moving sheet, see .modal-glass-card). ---- */
+  html[data-lg="1"]{ --lg-card:rgba(255,255,255,.5); --lg-veil:rgba(255,255,255,.34); --lg-rim:rgba(255,255,255,.32);
+    --lg-hi:inset 0 1px 0 rgba(255,255,255,.78), inset 0 -1px 0 rgba(255,255,255,.2); --lg-drop:0 4px 14px rgba(61,31,61,.08);
+    --lg-blur:blur(14px) saturate(170%); --lg-sheet:rgba(255,255,255,.62); --lg-sheet-ph:rgba(255,255,255,.92); }
+  :root[data-theme="dark"][data-lg="1"]{ --lg-card:rgba(38,30,48,.52); --lg-veil:rgba(255,255,255,.06); --lg-rim:rgba(255,255,255,.14);
+    --lg-hi:inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(255,255,255,.04); --lg-drop:0 4px 16px rgba(0,0,0,.3);
+    --lg-sheet:rgba(30,23,41,.66); --lg-sheet-ph:rgba(30,23,41,.95); }
+  html[data-lg="1"] :is(.card, .cal-wrap, .calp-board, .pd-card, .share-preview, .backup-card, .gal-teaser, .feed-head, .ev-card, .rota,
+    .shop-card, .tl-card, .vis-card, .lay-invite, .lay-card, .bio-card, .ask-card, .qz-card, .qz-result, .account-card, .mini-card,
+    .stat-cell, .bday-chip:not(.today), .otd-row, .dash-t:not(.is-pic), .cd-next, .fb-card, .gel-mini-c, .adv-panel, .past-toggle, .sr-row,
+    .profile-dropdown, .toast){ background:var(--lg-card); border:1px solid var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop); }
+  html[data-lg="1"] :is(.bday-chip.today, .dash-t.is-pic, .per-pic){ border:1px solid var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop); }
+  html[data-lg="1"] #main :is(.card, .cal-wrap, .feed-head, .ev-card, .tl-card, .lay-invite, .lay-card, .bio-card, .qz-card, .fb-card,
+    .shop-card, .stat-cell, .account-card, .cd-next, .past-toggle){ -webkit-backdrop-filter:var(--lg-blur); backdrop-filter:var(--lg-blur); }
+  html[data-lg="1"] .ev-card.is-themed:not([class*="is-scene-"]){ background:color-mix(in srgb, var(--sheet-bg) 46%, transparent); border-color:var(--lg-rim); }
+  :root[data-theme="dark"][data-lg="1"] .ev-card.is-themed:not([class*="is-scene-"]){ background:color-mix(in srgb, var(--sheet-dark) 62%, transparent); }
+  /* Kimi's sky on a feed card goes see-through as in the owner's Figma (25%); its sheet keeps the full sky, and so does the card at night, its ink being dark */
+  html:root[data-fx="new"][data-lg="1"]:not([data-theme="dark"]) .ev-card.is-themed.is-scene-kimi{ border-color:var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop);
+    background:linear-gradient(180deg, rgba(147,198,234,.5) 0, rgba(191,221,242,.42) 120px, rgba(232,243,250,.36) 260px, rgba(255,255,255,.36) 78%, rgba(211,223,168,.42) 100%); }
+  html[data-lg="1"] .ev-card.is-themed, html[data-lg="1"] .ev-card.is-now{ border-color:var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop); }
+  html[data-lg="1"] :is(.ev-person, .tl-chip, .set-btn, .set-go, .page-share-btn, .box-share-btn, .share-act, .share-x, .cal-nav, .cal-sub-btn,
+    .calp-subscribe, .mw-sort, .mw-more, .wk-cat, .social-chip, .yt-btn, .iam-link, .rt-tab, .rt-day, .sl-day, .lay-tools button, .bio-pen,
+    .meow-act, .back-btn-sticky, .search-box, .modal-close-btn, .ev-more-people, .sub-tabs, .subtab-bar, .qz-tabs, .feed-scope, .chip,
+    .fb-face, .cal-item, .calp-ag-row, .lay-row, .rt-row, .tag-row){ border-color:var(--lg-rim); box-shadow:var(--lg-hi); }
+  html[data-lg="1"] :is(.search-box, .set-btn, .page-share-btn, .box-share-btn, .tl-chip, .cal-nav, .back-btn-sticky, .fb-face, .sub-tabs,
+    .subtab-bar, .qz-tabs, .feed-scope){ background:var(--lg-veil); border:1px solid var(--lg-rim); }
+  html[data-lg="1"] .modal-glass-card{ border:1px solid var(--lg-rim); box-shadow:var(--lg-hi), 0 20px 60px rgba(var(--shadow-rgb),.3); }
+  html[data-lg="1"] .modal-glass-card:not(.is-postered){ background:var(--lg-sheet); }
+  @media (max-width:640px), (orientation:landscape) and (max-height:540px){
+    html[data-lg="1"] .modal-glass-card:not(.is-postered){ background:var(--lg-sheet-ph); } }
+  html[data-lg="1"] .ov-layer :is(.card, .cal-wrap, .pd-card, .share-preview, .ev-card, .rota, .shop-card, .tl-card, .bio-card, .ask-card,
+    .qz-card, .qz-result, .mini-card, .stat-cell, .otd-row, .gel-mini-c, .sr-row){ background:var(--lg-veil); -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:var(--lg-hi); }
+  html[data-lg="1"] .ev-open{ text-align:center; }
+  /* ช่วงที่เปิดอยู่ with only one run on: the poster as a banner across the row, its own colours blurred out to the edges, the
+     apply pill (a cta link's `short`) in the corner and the days left in pink under the dates (the owner's Figma, 21 Nov 2026) */
+  .per-blur{ display:none; }
+  .per-list.is-one{ display:block; overflow:visible; }
+  .per-list.is-one .per-tile{ width:100%; }
+  .per-list.is-one .per-pic{ display:flex; justify-content:center; isolation:isolate; }
+  .per-list.is-one .per-blur{ display:block; position:absolute; inset:-30px; z-index:-1; background:center / cover no-repeat; filter:blur(22px) saturate(1.15); }
+  .per-list.is-one .per-pic img{ max-width:100%; }
+  .per-left.is-cta{ left:auto; right:10px; bottom:10px; padding:4px 14px; font-size:11px; background:linear-gradient(90deg, #F4B0ED, #D093CC); color:#4A1F3A; box-shadow:0 2px 8px rgba(61,31,61,.18); }
+  .per-days{ font-size:11.5px; font-weight:700; color:var(--pink); }
 </style>
 <script>
   /* Runs before first paint: follow the OS. A tap on the switch holds only for this visit (sessionStorage). */
@@ -9468,7 +9516,7 @@ const SEED_SCHEDULE = [
     title:'BNK48 7th Generation Audition', short:'7th Gen Audition', groups:['bnk48'],
     poster:{ accent:'#82477F', surface:'#F3EEFA', ink:'#2A2140', img:'posters/bnk48-7th-gen-audition.png', w:1792, h:1024,
       grad:{ light:'linear-gradient(165deg, #F5F0FC 0%, #EFE8FA 48%, #F6E7F2 100%)', dark:'linear-gradient(165deg, #261D38 0%, #221A33 50%, #2E1C31 100%)' } },
-    links:[{ label:'สมัครเข้าร่วมออดิชัน', url:'https://audition.bnk48.com/', cta:true, c:'#82477F', flat:true, sub:'ปิดรับสมัคร 21 ธ.ค. 23:59 น.', subEn:'Applications close 21 Dec, 23:59' }],
+    links:[{ label:'สมัครเข้าร่วมออดิชัน', short:'สมัคร', shortEn:'Apply', url:'https://audition.bnk48.com/', cta:true, c:'#82477F', flat:true, sub:'ปิดรับสมัคร 21 ธ.ค. 23:59 น.', subEn:'Applications close 21 Dec, 23:59' }],
     info:['เปิดรับใบสมัคร 16 พ.ย. 00:00 – 21 ธ.ค. 2026 23:59 น.',
       'สมัครทางเว็บไซต์ audition.bnk48.com'] },
   { id:'ev-shock-me-girls-orientation', start:'2026-11-20', time:'10:00', until:'20:15',
@@ -14754,13 +14802,16 @@ function renderPeriodTile(ev, todayIso){
   const accent = ev.poster ? ev.poster.accent : ((ev.groups || []).length === 1 ? getGroup(ev.groups[0]).color : 'var(--pink)');
   const img = ev.poster && ev.poster.img, open = eventHasMore(ev);
   const tag = open ? 'button' : 'div';
+  const cta = (ev.links || []).find(l => l.cta && l.short), left = eventWhenLabel(ev, todayIso);
   return `<${tag} class="per-tile" style="--c:${accent}"${open ? ` data-action="open-event" data-id="${ev.id}"` : ''} title="${escapeAttr(ev.title)}" aria-label="${escapeAttr(ev.title)}">
     <span class="per-pic">${img
       ? `<img src="${escapeAttr(evThumb(img))}" width="${ev.poster.w || 1200}" height="${ev.poster.h || 1200}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeAttr(img)}'">`
       : `<span class="per-noimg">${escapeHtml(eventShortName(ev))}</span>`}
-      <span class="per-left">${eventWhenLabel(ev, todayIso)}</span></span>
+      ${img ? `<span class="per-blur" style="background-image:url('${escapeAttr(evThumb(img))}')" aria-hidden="true"></span>` : ''}
+      <span class="per-left${cta ? ' is-cta' : ''}">${cta ? escapeHtml(isEN() && cta.shortEn ? cta.shortEn : cta.short) : left}</span></span>
     <span class="per-name">${escapeHtml(ev.short || ev.title.split(' · ').pop())}</span>
     <span class="per-sub">${isEN() ? 'Until' : 'ถึง'} ${d} ${M[m - 1]}</span>
+    ${cta && left ? `<span class="per-days">(${left})</span>` : ''}
   </${tag}>`;
 }
 
@@ -16325,7 +16376,7 @@ function renderGESummary(id){
   const line = n => { const m = M(n); return m ? `<button class="ge-sum-row" style="--t:${tone(n)}" data-action="open-member" data-id="${m.id}"><b>${n}</b>${geFace(m, 'ge-sum-rface')}<span>${escapeHtml(m.name)}</span><small>${V(n)}</small></button>` : ''; };
   const stat = (k, v) => `<div class="ge-sum-stat"><span>${k}</span><b>${v}</b></div>`;
   const center = c ? `<button class="ge-sum-center" data-action="open-member" data-id="${c.id}">${geFace(c, 'ge-sum-face')}<div><small>${en ? 'No. 1 · Center' : 'อันดับ 1 · เซ็นเตอร์'}</small><b>${escapeHtml(c.name)}</b>
-      <span>${V(1)} ${en ? 'votes' : 'คะแนน'}</span></div></button>` : '';
+      <span>${V(1)} ${en ? 'tokens' : 'โทเคน'}</span></div></button>` : '';
   return `<section class="feed-block feed-ge ge-sum">
     <button class="gel-strip ge-sum-top" data-action="open-ge-results">
       <small class="ge-sum-kicker">SENBATSU GENERAL ELECTION 2026</small>
@@ -16976,6 +17027,7 @@ const stageOn = bgPreview('stage'), deskOn = bgPreview('desk'), homeOn = bgPrevi
 // read ?evslide= / ?soonslide= while the address still has them (guarded: scripts/collect-chain.mjs runs this block without them)
 if(typeof todaySlideOn === 'function'){ todaySlideOn(); soonSlideOn(); }
 // On for everyone (owner, 8 Nov 2026): the cards on every page are see-through glass. ?glassall=off turns it off on one device (kept), ?glassall=on back.
+const lgOn = (() => { try{ const q = new URLSearchParams(location.search).get('lg'); if(q === 'off') localStorage.setItem('48thdb-lg', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-lg'); return localStorage.getItem('48thdb-lg') !== 'off'; }catch(e){ return true; } })();
 const gallOn = (() => { try{ const q = new URLSearchParams(location.search).get('glassall'); if(q === 'off') localStorage.setItem('48thdb-gall', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-gall'); return localStorage.getItem('48thdb-gall') !== 'off'; }catch(e){ return true; } })();
 // On for everyone (owner, 8 Nov 2026): the home page's cards are clearer glass. ?clear=off turns it off on one device (kept), ?clear=on back.
 const clearOn = (() => { try{ const q = new URLSearchParams(location.search).get('clear'); if(q === 'off') localStorage.setItem('48thdb-clear', 'off'); else if(q === 'on') localStorage.removeItem('48thdb-clear'); return localStorage.getItem('48thdb-clear') !== 'off'; }catch(e){ return true; } })();
@@ -16992,7 +17044,7 @@ function uiAmbient(){
   document.documentElement.style.setProperty('--u-amb', `url("${src}")`);
 }
 function cdShopSync(){
-  const d = document.documentElement.dataset; if(clearOn) d.clear = '1'; if(gallOn) d.gall = '1';
+  const d = document.documentElement.dataset; if(clearOn) d.clear = '1'; if(gallOn) d.gall = '1'; if(lgOn) d.lg = '1';
   if(uiGlass){ d.ui = 'glass'; uiAmbient(); }
   const sc = typeof bgScenes === 'function' ? bgScenes() : true;
   if(sc && wallOn && state.view === 'browse') d.wall = '1'; else delete d.wall;
@@ -22200,7 +22252,7 @@ function renderFeed(){
     ${periods.length ? `
     <section class="feed-block is-periods">
       <h2 class="section-label">ช่วงที่เปิดอยู่</h2>
-      <div class="per-list">${periods.map(e => renderPeriodTile(e, iso)).join('')}</div>
+      <div class="per-list${periods.length === 1 ? ' is-one' : ''}">${periods.map(e => renderPeriodTile(e, iso)).join('')}</div>
     </section>` : ''}
 
 
