@@ -2605,7 +2605,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     box-shadow:0 2px 10px color-mix(in srgb, var(--c) 12%, transparent); padding-bottom:6px; }
   .es-dayh{ margin:0 0 4px; padding:9px 14px; font-size:14px; font-weight:800; color:#fff; background:color-mix(in srgb, var(--c) 82%, #000); }
   :root .es-box:not(.has-who) .es-row{ background:none; border:0; border-radius:0; box-shadow:none; overflow:visible;
-    grid-template-columns:var(--tw, 96px) 22px minmax(0, 1fr); column-gap:0; padding:8px 14px 8px 8px; align-items:center; }
+    grid-template-columns:var(--es-tw, 96px) 22px minmax(0, 1fr); column-gap:0; padding:8px 14px 8px 8px; align-items:center; }
   /* the time on one line (the owner's word, 21 Nov 2026: two lines looked untidy); a start with no end leaves its column as wide */
   :root .es-box:not(.has-who) .es-row .es-time{ grid-column:1; text-align:right; font-size:13.5px; line-height:1.2; white-space:nowrap; letter-spacing:-.01em;
     color:color-mix(in srgb, var(--c) 85%, var(--ink)); opacity:1; }
@@ -2615,7 +2615,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* the dot, and the line through it */
   :root .es-box:not(.has-who) .es-row::before{ content:''; grid-column:2; grid-row:1; justify-self:center; width:12px; height:12px; border-radius:50%; box-sizing:border-box;
     background:var(--card); border:3px solid var(--dot, color-mix(in srgb, var(--c) 80%, var(--ink))); z-index:1; }
-  :root .es-box:not(.has-who) .es-row::after{ content:''; position:absolute; left:calc(8px + var(--tw, 96px) + 10px); top:0; bottom:0; width:2px;
+  :root .es-box:not(.has-who) .es-row::after{ content:''; position:absolute; left:calc(8px + var(--es-tw, 96px) + 10px); top:0; bottom:0; width:2px;
     background:color-mix(in srgb, var(--c) 22%, var(--line)); }
   :root .es-box:not(.has-who) .es-dayh + .es-row::after{ top:50%; }
   :root .es-box:not(.has-who) .es-row:last-child::after{ bottom:50%; }
@@ -2624,7 +2624,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root .es-box:not(.has-who) .es-row .es-st:not(:empty){ display:inline-flex; width:max-content; margin-top:4px; padding:2px 10px 2px 8px; border-radius:99px; font-size:12px;
     color:color-mix(in srgb, var(--c) 78%, var(--ink)); background:color-mix(in srgb, var(--c) 10%, var(--card)); }
   /* the ripple round the live dot is the row's bar, otherwise unused here */
-  :root .es-box:not(.has-who) .es-row .es-bar{ position:absolute; left:calc(8px + var(--tw, 96px) + 11px - 7px); top:calc(50% - 7px); width:14px !important; height:14px; border-radius:50%;
+  :root .es-box:not(.has-who) .es-row .es-bar{ position:absolute; left:calc(8px + var(--es-tw, 96px) + 11px - 7px); top:calc(50% - 7px); width:14px !important; height:14px; border-radius:50%;
     background:none; border:2px solid var(--es-live); opacity:0; transition:none; pointer-events:none; }
   /* over: the dot fills grey with a tick, the travelled line in the event's colour */
   :root .es-box:not(.has-who) .es-row.is-done::before{ background:var(--ink-soft); border-color:var(--ink-soft); }
@@ -2649,7 +2649,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     /* a part that has just ended: its dot gives a small pop as it greys */
     :root .es-box:not(.has-who) .es-row.is-done.was-now::before{ animation:esDone .5s cubic-bezier(.3,1.6,.5,1); }
   }
-  @media (max-width:359px){ .es-day{ --tw:86px; } :root .es-box:not(.has-who) .es-row .es-time{ font-size:12.5px; } }
+  @media (max-width:359px){ .es-day{ --es-tw:86px; } :root .es-box:not(.has-who) .es-row .es-time{ font-size:12.5px; } }
   @keyframes esDayIn{ from{ opacity:0; transform:translateY(14px); } }
   @keyframes esDotIn{ from{ opacity:0; transform:scale(.2); } }
   @keyframes esWhatIn{ from{ opacity:0; transform:translateX(-8px); } }
