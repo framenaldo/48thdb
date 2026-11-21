@@ -1534,11 +1534,34 @@ SUMMARY:CGM48 "สถานีเชียงใหม่" Exhibition Book
 LOCATION:Muan More Space
 DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
  M48 ทุกคน\n• Exhibition Book + Fansign กับสมาช
- ิกทุกคน\n• พรีออเดอร์ 21 พ.ย. – 
- 7 ธ.ค. 2026\n\nhttps://48thdb.com/event/ev-cnx-book-fansign
+ ิกทุกคน\n• CGM48 สถานีเชียงใหม
+ ่ Exhibition Book & Fansign ราคา 1\,750 บาท (สินค
+ ้าจำนวนจำกัด) ได้รับรูปพิเ
+ ศษ 1 ใบ (คละจาก 21 เมมเบอร์) และ
+ โปสการ์ดสำหรับให้เมมเบอร
+ ์เซ็นสด\n• จองทาง iAM Shop ในแอป iAM
+ 48 21 พ.ย. 12:00 – 7 ธ.ค. 2026 23:59 น.\n• ภาพสิ
+ นค้าตกแต่งเพื่อการโฆษณาเ
+ ท่านั้น\n\nhttps://48thdb.com/event/ev-cnx-book-fansign
 URL:https://48thdb.com/event/ev-cnx-book-fansign
 DTSTART;VALUE=DATE:20261212
 DTEND;VALUE=DATE:20261214
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-cnx-merch-preorder@48thdb
+DTSTAMP:20261124T000000Z
+SUMMARY:Pre-Order: CGM48 สถานีเชียงใหม่ Merchan
+ dise
+DESCRIPTION:• พรีออเดอร์ทาง iAM Shop ในแ
+ อป iAM48 24 พ.ย. 12:00 – 13 ธ.ค. 2026 23:59 น.\n• ส่
+ งสินค้า 12 ม.ค. 2027 เป็นต้นไป\n• 
+ ภาพสินค้าตกแต่งเพื่อการโ
+ ฆษณาเท่านั้น\n\nhttps://48thdb.com/event/ev-cnx-me
+ rch-preorder
+URL:https://48thdb.com/event/ev-cnx-merch-preorder
+DTSTART;VALUE=DATE:20261124
+DTEND;VALUE=DATE:20261214
+TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-cnx-original-stage@48thdb
