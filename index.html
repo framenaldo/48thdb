@@ -3098,8 +3098,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rota-who .ev-person{ margin:0; background:var(--paper-dim); border-color:var(--line); box-shadow:0 2px 6px color-mix(in srgb, rgba(var(--shadow-rgb),.08) 60%, transparent); }
   .rota-who .ev-person:active{ transform:translateY(2px); box-shadow:none; }
   .rota-who .slot-now{ margin:0; align-self:center; background:var(--bnk); }
-  .rota-break{ display:flex; justify-content:center; align-items:baseline; gap:8px; padding:4px 14px;
-    background:var(--ink); color:var(--card); font-size:11.5px; letter-spacing:.04em; }
+  /* the break between rounds: a soft band of the sheet's own ink with the words in that ink, so it reads on any sheet in either mode
+     (it was ink-filled with the card colour for text, and on a see-through night sheet the text vanished, 21 Nov 2026) */
+  .rota-break{ display:flex; justify-content:center; align-items:baseline; gap:8px; padding:7px 14px;
+    background:color-mix(in srgb, var(--ink) 12%, transparent); color:var(--ink); font-size:12px; letter-spacing:.04em;
+    border-block:1px dashed color-mix(in srgb, var(--ink) 22%, transparent); }
   .rota-break b{ font-weight:800; }
   .rota-break span{ opacity:.75; font-variant-numeric:tabular-nums; }
   .slot-days{ display:flex; margin:2px 0 8px; }
