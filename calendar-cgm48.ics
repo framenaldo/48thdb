@@ -1568,17 +1568,4 @@ URL:https://48thdb.com/event/ev-kimi-roadshow-phitsanulok
 DTSTART;TZID=Asia/Bangkok:20261122T120000
 DTEND;TZID=Asia/Bangkok:20261122T180000
 END:VEVENT
-BEGIN:VEVENT
-UID:ev-kimi-roadshow-bigc-rajdamri@48thdb
-DTSTAMP:20261128T000000Z
-SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:Big C Rajdamri\, Bangkok
-DESCRIPTION:รายละเอียดและเวลายังไ
- ม่ประกาศ\n• รายชื่อสมาชิกแ
- ละเวลารอประกาศ\n\nhttps://48thdb.com/event/ev-
- kimi-roadshow-bigc-rajdamri
-URL:https://48thdb.com/event/ev-kimi-roadshow-bigc-rajdamri
-DTSTART;VALUE=DATE:20261128
-DTEND;VALUE=DATE:20261130
-END:VEVENT
 END:VCALENDAR
