@@ -9307,11 +9307,37 @@ const SEED_SCHEDULE = [
       'Zone 3 โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้',
       'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก',
       'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
-  { id:'ev-kimi-roadshow-bigc-rajdamri', logo:'kimi', start:'2026-11-28', end:'2026-11-29', tba:true,
+  { id:'ev-kimi-roadshow-bigc-rajdamri', logo:'kimi', start:'2026-11-28', end:'2026-11-29', time:'12:00',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
-    venue:'Big C Rajdamri, Bangkok', groups:['bnk48','cgm48'],
-    related:['ev-ge6-single','ev-kimi-roadshow-rama9'],
-    info:['รายชื่อสมาชิกและเวลารอประกาศ'] },
+    venue:'ลานกิจกรรม ชั้น 5, Big C Rajdamri, Bangkok', groups:['bnk48'],
+    related:['ev-ge6-single','ev-kimi-roadshow-t21-nov'],
+    poster:{ accent:'#5A5638', surface:'#EEF3F5', ink:'#34321F', img:'posters/kimi-roadshow-bigc-rajdamri.jpg', w:799, h:1200, th:'โปสเตอร์', en:'Poster',
+      more:[{ img:'posters/kimi-roadshow-bigc-rajdamri-2.jpg', w:1200, h:1200, th:'Free Mini Concert', en:'Free Mini Concert' },
+            { img:'posters/kimi-roadshow-bigc-rajdamri-3.jpg', w:1200, h:1200, th:'กำหนดการ', en:'Schedule' },
+            { img:'posters/kimi-roadshow-bigc-rajdamri-4.jpg', w:1200, h:1200, th:'กฎติกาและผังโซน', en:'Rules & zones' }] },
+    members:[...['bnk-arlee','bnk-luksorn','bnk-sindy','bnk-janry','bnk-marine','bnk-emmy'], ...['bnk-grape','bnk-mail','bnk-mirin','bnk-praew','bnk-monet','bnk-blythe']],
+    seatPlan:{ layout:'rama9-roadshow', head:'ผังโซน (จำลอง)',
+      source:'ผังจำลองจากผังโซนที่ผู้จัดประกาศ วาดตามตำแหน่งของแต่ละโซน ไม่ได้ตามสัดส่วนจริงและไม่ใช่ผังทางการ',
+      zones:[
+        { id:'Z1', label:'Zone 1', sections:['Z1'], color:'#5A5240', note:'โซนนั่งชมด้านใน ถ่ายด้วยโทรศัพท์มือถือเท่านั้น ยกไม่เกินระดับศีรษะ' },
+        { id:'Z2', label:'Zone 2', sections:['Z2'], color:'#72AB52', note:'โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้' },
+        { id:'Z3', label:'Zone 3', sections:['Z3L', 'Z3B', 'Z3R'], color:'#63A3D3', note:'โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้' }] },
+    detail:[
+      'รอบเวลาเดียวกันทั้งสองวัน 28 และ 29 พ.ย. เมมเบอร์แต่ละวันไม่ซ้ำกัน',
+      '12:00–13:00 Free Mini Concert',
+      '14:00–15:00 Group Hi-Touch',
+      '15:30–16:30 Merchandise & Hachi Cha',
+      '17:00–18:00 Group Hi-Touch'],
+    lineup:{
+      '2026-11-28':{ 'Mini Concert':['bnk-arlee','bnk-luksorn','bnk-sindy','bnk-janry','bnk-marine','bnk-emmy'], 'Group Hi-Touch':['bnk-arlee','bnk-luksorn','bnk-sindy','bnk-janry','bnk-marine','bnk-emmy'] },
+      '2026-11-29':{ 'Mini Concert':['bnk-grape','bnk-mail','bnk-mirin','bnk-praew','bnk-monet','bnk-blythe'], 'Group Hi-Touch':['bnk-grape','bnk-mail','bnk-mirin','bnk-praew','bnk-monet','bnk-blythe'] } },
+    info:[
+      'บัตรเข้าร่วม Group Hi-Touch ได้จากการซื้อเข็มกลัดภายในงาน',
+      'Zone 1 โซนนั่งชมด้านใน ถ่ายด้วยโทรศัพท์มือถือเท่านั้น ยกไม่เกินระดับศีรษะ',
+      'Zone 2 โซนช่างภาพ ใช้กล้องได้ทุกชนิดและใช้อุปกรณ์เสริมได้',
+      'Zone 3 โซนรอบนอก ใช้กล้องได้ทุกชนิด แต่ห้ามใช้ขาตั้ง บันได เก้าอี้',
+      'Group Hi-Touch ห้ามสวมนาฬิกาข้อมือ แหวน กำไล หรือถือสิ่งของที่อาจเป็นอันตรายต่อสมาชิก',
+      'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
 ];
 SEED_SCHEDULE.forEach(e => {
   if(e.turns) e.slots = myoSlots(e.turns);
