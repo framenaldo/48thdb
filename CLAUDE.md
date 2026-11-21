@@ -228,15 +228,16 @@ the Firebase CLI from the owner's machine.
   `pm:<event>:<n>`). The card and the shop show the first only.
 - A link the whole event is about (the audition's application form) carries `cta:true` (with `sub`/`subEn`, a line under its label): one big button in the poster's colour under the title on the event sheet, counting the days left to the event's end (`renderEventCta`, `evCtaOn`, `.ev-cta`; the owner asked for it loud, 16 Nov 2026). After the event it goes back to a plain chip among the links. `c` on the link is its own colour and `flat:true` the calm look (one flat colour, squarer): the audition's is the plum of audition.bnk48.com's own button, at the owner's word. `poster.grad:{light,dark}` on an event is a wash written by hand that wins over the one read off the poster (`data/poster-grads.json`): the audition's sheet is the application site's pale lavender, not the poster's violet.
 - An event poster (`poster.img`) shows on its card from a small copy,
-  `<poster>-s.jpg`: run `sh scripts/make-event-thumbs.sh` after adding one,
-  then `node scripts/make-poster-grads.mjs` for its sheet colours.
+  `<poster>-s.jpg` (or the lighter `<poster>-s.webp`, `POSTER_WEBP`): run `sh scripts/make-event-thumbs.sh` after adding one,
+  then `node scripts/make-poster-webp.mjs` and `node scripts/make-poster-grads.mjs` for its sheet colours.
   A line-up of every current member (or a whole group) prints as "All Members"
   / "All BNK48 Members" / "All CGM48 Members" by itself — still list the ids.
 - Three languages: `EN/TH` (mix, the default), TH and EN. New Thai UI strings
   need an entry in the `EN` table.
 - Member photos: files under `photos/<member id>.jpg`, about 400×400 (the
   owner's 1500px originals live in Documents/48TH/…/Profile). A few still carry
-  a base64 `photo:` — either form works. A replaced photo needs a new file name.
+  a base64 `photo:` — either form works. A replaced photo needs a new file name. Where a photo is shown small it comes from a 192px copy in `photos/s/`
+  (`photoSm`; run `sh scripts/make-photo-thumbs.sh` after adding a photo; a missing copy falls back to the full one).
 
 ## iAM48 posts
 

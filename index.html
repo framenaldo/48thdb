@@ -14701,7 +14701,10 @@ function renderPeriodTile(ev, todayIso){
   </${tag}>`;
 }
 
-const evThumb = src => String(src).replace(/\.\w+$/, '-s.jpg');
+/* A poster's small copy for its card: <poster>-s.webp where scripts/make-poster-webp.mjs made one (a WebP at least 15% lighter
+   than the JPEG, from the original: 12.4 MB of small copies became 7.2), else <poster>-s.jpg; the full poster is never touched */
+const POSTER_WEBP = new Set(["bday-tee-galeya-2026","bday-tee-ginna-2026","bday-tee-hongyok-2027","bday-tee-janry-2027","bday-tee-jingjing-2027","bday-tee-khaimook-2027","bday-tee-lewlew-2026","bday-tee-prae-2027","bday-tee-praifa-2027","bday-tee-punpon-2027","bnk48-7th-gen-audition","bnk48-anotherdot-1104","cgm-time-to-play-ep2","cgm48-cnx-merch","cgm48-lanna-smile-station","cgm48-lanna-smile-station-activities","cgm48-lanna-smile-station-schedule","cgm48-lanna-smile-station-set","cgm48-lanna-smile-station-ticket","cgm48-members-visit-round","cgm48-members-visit-round-2","cgm48-popup-halloween-1015","cgm48-popup-halloween-1022","cgm48-popup-halloween-1029","cgm48-popup-halloween-ontour-1020","cgm48-popup-halloween-ontour-1027-2","cgm48-popup-halloween-ontour-1027-3","cgm48-popup-live-0929","cgm48-popup-live-1001","cgm48-popup-live-1006","cgm48-popup-live-1008","cgm48-popup-live-1013","cgm48-popup-live-1103","cgm48-popup-live-1105","cgm48-popup-live-1117","cgm48-popup-live-1119","cgm48-popup-live-cnx","cgm48-popup-live-letmeknow","cgm48-popup-ontour-1124","cgm48-popup-ontour-1124-2","cgm48-popup-ontour-1124-3","election-2026","election-fanfest-free","election-final-results","election-final-results-1114","election-final-results-live-1114","fame-fanmeet","fame-fanmeet-1025","ge2026-live-talk-1026","ge2026-live-talk-1109","ge2026-ticket-bundle","ge6-heart-hachicha-2","ge6-heart-letter","ge6-heart-rounds","ge6-heart-rounds-2","ge6-heart-rules","ge6-heart-wawa","ge6-photoset","ge6-single","ge6-single-aw","getaway-pudthailee","hachicha-tsukimi","handshake-kimi","handshake-kimi-1031","handshake-kimi-galeya-move","jew-palmmy-bday-1024","journey-of-dreams","journey-of-dreams-lineup","kimi-busking-1030","kimi-busking-1030-members","kimi-roadshow-bigc-rajdamri","kimi-roadshow-bigc-rajdamri-2","kimi-roadshow-bigc-rajdamri-3","kimi-roadshow-bigc-rajdamri-4","kimi-roadshow-cnx","kimi-roadshow-mbk","kimi-roadshow-phitsanulok","kimi-roadshow-phitsanulok-2","kimi-roadshow-phitsanulok-3","kimi-roadshow-phitsanulok-4","kimi-roadshow-rama9-4","kimi-roadshow-rama9b-2","kimi-roadshow-rama9b-3","kimi-roadshow-t21","kimi-roadshow-t21-nov","kimi-roadshow-t21-nov-2","kimi-roadshow-t21-nov-3","kimi-roadshow-t21-nov-4","kimi-roadshow-union","kimi-special-event-bangkapi","lanna-expo-1017","lanna-tsukimi","mbk-haunted-graveyard-1020","nine-charity","proud-saonoi-bday-1024","roadshow-fashionisland-main","roadshow-mbk","ruamnamjai-16","shock-me-girls-1120","shock-me-girls-1120-schedule","shock-me-girls-1120-seats","shock-me-girls-1120-tickets"]);
+const evThumb = src => { const b = String(src).replace(/\.\w+$/, ''); return POSTER_WEBP.has(b.replace(/^posters\//, '')) ? b + '-s.webp' : b + '-s.jpg'; };
 
 /* A line-up that is every current member, or every current member of one
    group, is named as such (owner's rule) instead of 58 faces: "All Members",
@@ -15146,7 +15149,7 @@ function renderShopPage(){
     return `<article class="shop-card is-${state} is-openable" style="--c:${e.poster ? e.poster.accent : 'var(--ink-soft)'}"
       data-action="open-event" data-id="${e.id}">
       ${e.poster && e.poster.img ? `<span class="shop-thumb">
-        <img src="${escapeAttr(e.poster.img)}" width="${e.poster.w}" height="${e.poster.h}"
+        <img src="${escapeAttr(evThumb(e.poster.img))}" width="${e.poster.w}" height="${e.poster.h}"
           alt="${escapeAttr(s.name)}" loading="lazy" decoding="async">
       </span>` : ''}
       <div class="shop-body">
@@ -16040,7 +16043,7 @@ function renderHomeDash(ge){
       <span class="dash-i">${icon}</span><b class="dash-big">${big}</b><span class="dash-l">${label}${small ? `<small>${small}</small>` : ''}</span></button>`;
   // a poster in a tile is a slide: tapping it opens that event; the strip swipes sideways, the dots follow
   // a calendar slide opens its event; a shop slide (go=false) leaves the tap to the tile, which opens the shop page (the owner's word, 5 Nov)
-  const dashSlide = (e, label, go = true) => `<span class="dash-sl"${go ? ` data-action="open-event" data-id="${escapeAttr(e.id)}"` : ''}><img src="${escapeAttr(e.poster.img.replace(/\.[a-z]+$/i, '-s.jpg'))}" alt="" loading="lazy" decoding="async"><small>${label}</small></span>`;
+  const dashSlide = (e, label, go = true) => `<span class="dash-sl"${go ? ` data-action="open-event" data-id="${escapeAttr(e.id)}"` : ''}><img src="${escapeAttr(evThumb(e.poster.img))}" alt="" loading="lazy" decoding="async"><small>${label}</small></span>`;
   // the slides sit one over the other and fade, one after another; a tap opens the one showing (dashTick)
   const dashStrip = slides => `<span class="dash-strip" data-n="${slides.length}">${slides.map((h, k) => k ? h : h.replace('class="dash-sl"', 'class="dash-sl on"')).join('')}</span>`;
   const dashDots = n => `<span class="dash-dots" aria-hidden="true">${Array.from({ length:n }, (_, k) => `<i${k ? '' : ' class="on"'}></i>`).join('')}</span>`;
@@ -16922,7 +16925,7 @@ function uiAmbient(){
   const iso = toYmd(todayStart());
   const ev = SEED_SCHEDULE.filter(e => !e.period && e.poster && e.poster.img && (e.end || e.start) >= iso)
     .sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'))[0];
-  const src = ev ? ev.poster.img.replace(/\.(jpe?g|png)$/i, '-s.jpg') : 'posters/election-2026-s.jpg';
+  const src = ev ? ev.poster.img.replace(/\.(jpe?g|png)$/i, '-s.jpg') : 'posters/election-2026-s.jpg';   // inside GEC-CORE, which runs alone: no evThumb here
   document.documentElement.style.setProperty('--u-amb', `url("${src}")`);
 }
 function cdShopSync(){
@@ -17707,7 +17710,7 @@ function gecHomeTeaser(en){
   // counted in days, as the GE2026 page counts them
   const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote);
   const left = vote ? Math.max(0, Math.round((parseYmd(eventLastDay(vote)) - parseYmd(toYmd(todayStart()))) / 864e5)) : 0;
-  const poster = `<img class="gec-t-poster" src="posters/election-2026-s.jpg" alt="" loading="lazy" decoding="async">`;
+  const poster = `<img class="gec-t-poster" src="${evThumb('posters/election-2026.jpg')}" alt="" loading="lazy" decoding="async">`;
   const shut = gecClosed();
   const kLine = shut ? `<span class="gec-t-k is-shut"><i class="gec-shut">${en ? 'CLOSED' : 'ปิดโหวตแล้ว'}</i>${en ? 'Final count · from the blockchain' : 'ยอดสุดท้าย · จากบล็อกเชน'}</span>`
     : `<span class="gec-t-k"><i class="gec-live"></i>${en ? 'Voting · live on the blockchain' : 'โทเคนที่โหวตแล้ว · จากบล็อกเชน'}</span>`;
