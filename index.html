@@ -527,6 +527,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .has-lanna .evm-layout::before{ content:''; position:absolute; inset:-22px -18px -28px; z-index:-1; pointer-events:none;
     background:url(bg/lanna-motifs-l-1.png) left top / 180px auto repeat-y, url(bg/lanna-motifs-r-1.png) right 0 top 240px / 180px auto repeat-y; }
   @media (min-width:1024px){ .has-lanna .evm-layout::before{ inset:-26px -26px -32px; } }
+  /* on a phone the sheet's edges are too narrow for whole flowers, so one sits at the end of each heading instead
+     (the owner's pick, 21 Nov 2026), the three in turn */
+  @media (max-width:1023px){
+    .has-lanna .evm-head::after{ content:''; flex:none; margin:-12px 0 -12px auto; width:36px; height:36px; opacity:.8;
+      background:url(bg/lanna-flower-cross-1.png) center / contain no-repeat; }
+    .has-lanna .evm-head:nth-of-type(3n+2)::after{ background-image:url(bg/lanna-flower-rosette-1.png); }
+    .has-lanna .evm-head:nth-of-type(3n)::after{ background-image:url(bg/lanna-flower-square-1.png); }
+  }
   .modal-scroll{ overflow-y:auto; overflow-x:hidden; overscroll-behavior-x:none; touch-action:pan-y; padding:22px 18px 28px; -webkit-overflow-scrolling:touch; }
   /* The close and share buttons sit over whatever is at the top of the sheet.
      On a themed sheet that is the poster band, and the usual near-transparent
@@ -2618,6 +2626,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root .es-box:not(.has-who) .es-row .es-time{ grid-column:1; text-align:right; font-size:13.5px; line-height:1.2; white-space:nowrap; letter-spacing:-.01em;
     color:color-mix(in srgb, var(--c) 85%, var(--ink)); opacity:1; }
   :root .es-box:not(.has-who) .es-row .es-time small{ display:none; }
+  :root .es-box:not(.has-who) .es-row.is-alt{ background:none; }   /* the older every-other-row shade showed as bands at night */
   :root .es-box:not(.has-who) .es-row .es-what{ grid-column:3; padding-left:8px; font-size:15.5px; font-weight:800; color:var(--ink); opacity:1; }
   :root .es-box:not(.has-who) .es-row:is(.has-sl, .has-gs) .es-what{ align-items:center; }
   /* the dot, and the line through it */
