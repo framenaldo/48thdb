@@ -98,7 +98,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --cgm-soft:#E1F1EE;
     --gold:#C08A2E;
     --silver:#8E9AA6;
-    --ink-soft:#6E6577;
+    --ink-soft:#5F5669;
     --line:#EBDCE4;
     --pink:#FF6FA5;
     --pink-soft:#FFD6E8;
@@ -1566,7 +1566,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .single-meta{ font-size:12px; color:var(--ink-soft); margin-top:3px; }
   @media (hover:hover){ button.single-row:hover{ background:var(--paper-dim); } }
   .single-head{ border-left:4px solid var(--c); padding:2px 0 2px 14px; margin:4px 0 6px; }
-  .single-head h2{ font-family:var(--font); font-weight:800; font-size:26px; margin:4px 0 0; }
+  .single-head :is(h1, h2){ font-family:var(--font); font-weight:800; font-size:26px; margin:4px 0 0; }
   .single-th{ color:var(--ink-soft); font-size:14.5px; margin:3px 0 0; }
   .title-alt{ font-weight:500; font-size:13px; color:var(--ink-soft); }
   .album-singles{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:4px; }
@@ -7481,6 +7481,13 @@ button.bar-row::after{ content:''; position:absolute; left:0; right:0; top:-3px;
 .lv-mon{ font-size:10.5px; }
 .chip{ font-size:11px; }
 .captain-badge{ font-size:10px; }
+/* the rest of the pages (same check, 22 Nov 2026) */
+:is(.mw-and, a.chip, button.chip, a.evm-venue, button.badge, .svc-btn, .gec-w){ position:relative; }
+:is(.mw-and, a.chip, button.chip, a.evm-venue, button.badge, .svc-btn, .gec-w)::after{ content:''; position:absolute; left:0; right:0; top:-5px; bottom:-5px; }
+button.bar-row::after{ top:-4px; bottom:-4px; }
+.mw-own{ background-image:linear-gradient(rgba(0,0,0,.22), rgba(0,0,0,.22)); }
+.gec-vcol > small{ height:13px; font-size:10.5px; }
+.sp-sec:focus{ outline:none; } .sp-sec:focus-visible{ filter:drop-shadow(0 0 4px var(--pink)) drop-shadow(0 0 1px #fff); }
 </style>
 <script>
   /* Runs before first paint: follow the OS. A tap on the switch holds only for this visit (sessionStorage). */
@@ -17554,7 +17561,7 @@ async function gecOpenWallet(w){
 function gecFind(ev){ ev.preventDefault(); gecOpenWallet(ev.target.elements.w.value); }
 function renderGECWallet(en, N, hm){
   const W = gecWallet;
-  const form = `<form class="gec-find" onsubmit="gecFind(event)"><input name="w" autocomplete="off" spellcheck="false" placeholder="${gevMay() ? (en ? 'Wallet address 0x… or wallet code' : 'ที่อยู่กระเป๋า 0x… หรือ Wallet code') : (en ? 'Paste a wallet address 0x…' : 'วางที่อยู่กระเป๋า 0x…')}" value="${W ? escapeAttr(W.w) : ''}">
+  const form = `<form class="gec-find" onsubmit="gecFind(event)"><input name="w" aria-label="${en ? 'Wallet address' : 'ที่อยู่กระเป๋า'}" autocomplete="off" spellcheck="false" placeholder="${gevMay() ? (en ? 'Wallet address 0x… or wallet code' : 'ที่อยู่กระเป๋า 0x… หรือ Wallet code') : (en ? 'Paste a wallet address 0x…' : 'วางที่อยู่กระเป๋า 0x…')}" value="${W ? escapeAttr(W.w) : ''}">
     <button class="chip" type="submit">${en ? 'Look up' : 'ดู'}</button></form>`;
   let body = '';
   if(W && W.bad && W.why === 'nocode') body = `<p class="gec-err">${en ? `Wallet code ${escapeHtml(W.w)} is not in the list of GE2026 votes — that wallet did not vote, or the number is mistyped.` : `ไม่พบ Wallet code ${escapeHtml(W.w)} ในรายการโหวต GE2026 — กระเป๋านี้ไม่ได้โหวต หรือพิมพ์เลขผิด`}</p>`;
@@ -19591,7 +19598,7 @@ function spScene(ev, st){
     const h = spHeight(L, sec) + liftOf(z);
     const out = z.off;                               // drawn for the hall's sake, not on sale here
     const open = `<g class="sp-sec${st.pick === z.id ? ' is-on' : ''}${out ? ' is-out' : ''}"${out ? '' :
-      ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}"`} style="--z:${z.color}">`;
+      ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" role="button" tabindex="0" aria-label="${escapeAttr(/zone|โซน/i.test(z.label || '') ? z.label : (isEN() ? 'Zone ' : 'โซน ') + (z.label || z.id))}"`} style="--z:${z.color}">`;
     const chairs = L.seats && L.seats[name] ? spChairsSvg(L.seats[name], h, z.color, P, sp, s, c, st.lod) : '';
     const text = label(sec.at, h + (chairs ? 7 : 0), sec.text || name, (sec.small ? 'is-small' : '') + (chairs ? ' on-seats' : ''), spInk(z.color));
     // a floor zone lies under whatever stands on it (`under`); its name can sit on top of all (`labelTop`)
@@ -19601,7 +19608,7 @@ function spScene(ev, st){
   // things standing on a zone — chairs — rise with it and pick it
   for(const pr of L.props || []){
     const z = zoneOf[pr.sec], base = (L.sections[pr.sec] ? spHeight(L, L.sections[pr.sec]) : 0) + liftOf(z);
-    items.push({ d:depthOf(pr.pts), svg:`<g class="sp-sec is-prop${z && st.pick === z.id ? ' is-on' : ''}"${z ? ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" style="--z:${z.color}"` : ''}>${
+    items.push({ d:depthOf(pr.pts), svg:`<g class="sp-sec is-prop${z && st.pick === z.id ? ' is-on' : ''}"${z ? ` data-action="seat-zone" data-id="${ev.id}" data-zone="${z.id}" role="button" tabindex="0" aria-label="${escapeAttr(/zone|โซน/i.test(z.label || '') ? z.label : (isEN() ? 'Zone ' : 'โซน ') + (z.label || z.id))}" style="--z:${z.color}"` : ''}>${
       prism(pr.pts, pr.h, pr.top, pr.side, base)}</g>` });
   }
   items.sort((a, b) => a.d - b.d);
@@ -25956,7 +25963,7 @@ function renderSingleDetail(){
     <button class="page-share-btn" data-action="share" title="แชร์" aria-label="แชร์">${ICONS.share}<span>แชร์</span></button></div>
   <div class="single-head" style="--c:${g.color}">
     <div class="timeline-year">${workGroups(s).map(id => linkGroup(getGroup(id))).join(' × ')} · ${workLabel(s)} · ${s.year}</div>
-    <h2>${escapeHtml(s.title)}</h2>
+    <h1>${escapeHtml(s.title)}</h1>
     ${s.alt?`<p class="single-th">${escapeHtml(s.alt)}</p>`:''}
     ${s.note?`<p class="muted-note">${escapeHtml(s.note)}</p>`:''}
   </div>
@@ -34155,6 +34162,11 @@ function bindDelegatedEvents(){
   });
 
   // search/Enter on something that reads as a question, or that the search does not find, asks it
+  // something drawn as a button that is not one (a seat plan's zone): Enter or Space presses it
+  document.body.addEventListener('keydown', e => {
+    const t = e.target; if(!(e.key === 'Enter' || e.key === ' ') || !t.matches || !t.matches('[role="button"][data-action]:not(button, a)')) return;
+    e.preventDefault(); t.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  });
   document.body.addEventListener('keydown', (e)=>{
     if(e.target.id !== 'search-input' || e.key !== 'Enter' || e.isComposing) return;
     const q = state.query.trim();
