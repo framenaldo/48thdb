@@ -26457,7 +26457,8 @@ function renderDiscography(){
   const en = isEN(), cat = WORKS_CATS.some(c => c.id === state.worksCat) ? state.worksCat : 'music';
   const inGroupW = w => state.groupFilter === 'all' || mediaGroups(w).includes(state.groupFilter);
   const inGroupS = x => state.groupFilter === 'all' || workGroups(x).includes(state.groupFilter);
-  const n = { music: [...SEED_SINGLES, ...SEED_ALBUMS, ...SEED_SPECIALS, ...SEED_STAGES].filter(inGroupS).length };
+  // the music tab counts songs, as the stats page does (the owner's word, 22 Nov 2026); the others count works
+  const n = { music: songCatalog().filter(t => inGroupS(t.work)).length };
   SEED_MEDIA.forEach(w => { if(inGroupW(w)){ const k = mediaCat(w); n[k] = (n[k] || 0) + 1; } });
   const cats = `<div class="wk-cats" role="tablist">${WORKS_CATS.map(c => `<button class="wk-cat${c.id === cat ? ' is-on' : ''}" data-action="works-cat" data-value="${c.id}" role="tab" aria-selected="${c.id === cat}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${c.icon}</svg>
