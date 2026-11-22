@@ -10320,7 +10320,7 @@ const SEED_SPECIALS = [
     title:'Koisuru Fortune Cookie (Remix ver.)', alt:'คุกกี้เสี่ยงทาย', date:'2023-01', year:2023,
     note:'ยังไม่ทราบวันปล่อยแน่ชัด',
     tracks:[
-      { track:'Koisuru Fortune Cookie – คุกกี้เสี่ยงทาย (Remix ver.)', centers:[], members:[] },
+      { track:'Koisuru Fortune Cookie – คุกกี้เสี่ยงทาย (Remix ver.)', skip:true, centers:[], members:[] },
     ] },
   { id:'bnk-sp-sawmhuay', groupId:'bnk48', groups:['bnk48'], kind:'digital',
     title:'Shock Me Girls OST (Season 2)', alt:'', date:'2026-11-19', year:2026,
@@ -10563,13 +10563,13 @@ const SEED_SPECIALS = [
   { id:'cgm-sp-maliremix', groupId:'cgm48', groups:['cgm48'], kind:'digital',
     title:'มะลิ (Remix Version)', alt:'Mali (Remix Version)', date:'2026-04-10', year:2026,
     tracks:[
-      { track:'มะลิ (Remix Version)', centers:['cgm-kaning'],
+      { track:'มะลิ (Remix Version)', skip:true, centers:['cgm-kaning'],
         members:['cgm-aom', 'cgm-angel', 'cgm-champoo', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-kaning', 'cgm-marmink', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
     ] },
   { id:'cgm-sp-daimairemix', groupId:'cgm48', groups:['cgm48'], kind:'digital',
     title:'ได้(ด้าย)ไหม (Remix Version)', alt:'Dai (Daai) Mai (Remix Version)', date:'2026-04-10', year:2026,
     tracks:[
-      { track:'ได้(ด้าย)ไหม (Remix Version)', centers:['cgm-nisha', 'cgm-ploen'],
+      { track:'ได้(ด้าย)ไหม (Remix Version)', skip:true, centers:['cgm-nisha', 'cgm-ploen'],
         members:['cgm-jingjing', 'cgm-kwan', 'cgm-lookked', 'cgm-nana', 'cgm-prae', 'cgm-else', 'cgm-emma', 'cgm-ginna', 'cgm-lingling', 'cgm-nisha', 'cgm-ploen', 'cgm-shenae'] },
     ] },
   { id:'bnk-sp-ramwong', groupId:'bnk48', groups:['bnk48'], kind:'digital',
@@ -10735,7 +10735,7 @@ SEED_STAGES.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 /* Every song the groups put out, each version once: releases, specials, digital singles and the stages, less an
    album's copy of a digital single (`dup`), a stage's repeat of a released song (`again`) and a song of
    Independent Records' units (`ir`) or a "Special ver." (`special`), neither counted for now (the owner's word, 22 Nov 2026); `skip` is any other song the owner leaves out
-   (Bualoy Khaiwaan's soundtrack take). A stage's own take of a
+   (Bualoy Khaiwaan's soundtrack take, the remixes). A stage's own take of a
    song ("Original Stage ver.", `stageOf` the release, or `stageOfUnit`) is a version of its own and is counted; the page
    says nothing under it (the owner's word). */
 const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir && !t.special && !t.skip);
