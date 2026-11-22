@@ -243,6 +243,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     outline:none;
   }
   .search-box::placeholder{color:var(--ink-soft);}
+  .search-box{ -webkit-appearance:none; appearance:none; }   /* type=search: no native frame on Safari */
+  .search-box:focus-visible, .ticker-link:focus-visible{ outline:2px solid var(--pink); outline-offset:2px; }
   .search-box:focus{ border-color:rgba(255,255,255,calc(.95*var(--glass-k))); background:rgba(255,255,255,calc(.65*var(--glass-k))); }
 
   .btn-add{
@@ -3325,6 +3327,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     background:color-mix(in srgb, #E02118 14%, transparent); color:#C21C14;
     font-family:var(--font); font-size:11px; font-weight:800; letter-spacing:.7px; white-space:nowrap;
   }
+  .live-chip[hidden]{ display:none; }
   .live-chip::before{ content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
   /* in the sheet's meta row the flex gap already spaces it */
   .live-chip.is-meta{ margin-left:0; padding:4px 11px 4px 9px; font-size:12px; }
@@ -4617,17 +4620,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-sl{ position:absolute; inset:0; display:flex; align-items:flex-end; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .7s ease; }
   .dash-sl.on{ opacity:1; pointer-events:auto; }
   .dash-sl img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .dash-sl small{ position:relative; width:100%; padding:20px 8px 14px; color:#fff; font-size:11px; font-weight:800; line-height:1.2; background:linear-gradient(transparent, rgba(0,0,0,.72));
+  .dash-sl small{ position:relative; width:100%; padding:20px 8px 14px; color:#fff; font-size:11px; font-weight:800; line-height:1.2; text-shadow:0 1px 3px rgba(0,0,0,.6); background:linear-gradient(transparent, rgba(0,0,0,.86));
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   @media (prefers-reduced-motion:reduce){ .dash-sl{ transition:none; } }
-  .dash-badge{ position:absolute; left:6px; top:30px; z-index:1; padding:2px 8px; border-radius:var(--r-pill); font-size:11px; font-weight:800; color:#fff; background:rgba(0,0,0,.5); }
+  .dash-badge{ position:absolute; left:6px; top:30px; z-index:1; padding:2px 8px; border-radius:var(--r-pill); font-size:11px; font-weight:800; color:#fff; background:rgba(0,0,0,.7); text-shadow:0 1px 2px rgba(0,0,0,.5); }
   .dash-dots{ position:absolute; left:0; right:0; bottom:5px; display:flex; justify-content:center; gap:4px; pointer-events:none; }
   .dash-dots i{ width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.5); } .dash-dots i.on{ background:#fff; }
   .dash-t.is-cal.is-pic{ padding:0; overflow:hidden; } .dash-t.is-cal.is-pic .dash-cal-h{ margin:0; position:relative; z-index:1; }
   .dash-t.is-pic{ padding:0; justify-content:flex-end; border:0; overflow:hidden; }
   .dash-t.is-pic img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .dash-t.is-pic .dash-l{ position:relative; width:100%; margin:0; padding:22px 9px 8px; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.72)); }
-  .dash-t.is-pic .dash-l small{ color:rgba(255,255,255,.88); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
+  .dash-t.is-pic .dash-l small{ color:rgba(255,255,255,.9); overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
   /* a member's photo as the whole tile: her face kept in view, her group's colour behind while it loads, the quiz's % on a pill */
   .dash-t.is-pic.is-face{ background:var(--paper-dim); }
   .dash-t.is-pic.is-face img{ object-position:50% 22%; }
@@ -5938,7 +5941,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .cd-next{ display:flex; align-items:center; gap:8px; width:100%; margin:9px 0 0; padding:7px 8px 7px 12px; border-radius:var(--r-card); font:inherit; color:var(--ink); text-align:left; cursor:pointer;
     background:color-mix(in srgb, var(--card) 70%, transparent); border:1px solid var(--line); box-shadow:0 2px 6px color-mix(in srgb, rgba(var(--shadow-rgb),.06) 60%, transparent); transition:transform .1s; }
   .cd-next:active{ transform:translateY(2px); box-shadow:none; }
-  .cd-k{ flex:none; font-size:10.5px; font-weight:800; letter-spacing:.06em; color:var(--bnk); }
+  .cd-k{ flex:none; font-size:10.5px; font-weight:800; letter-spacing:.06em; color:color-mix(in srgb, var(--bnk) 72%, #000); }
+  :root[data-theme="dark"] .cd-k{ color:color-mix(in srgb, var(--bnk) 70%, #fff); }
   .cd-t{ flex:1; min-width:0; font-size:13px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .cd-clock{ flex:none; display:flex; align-items:center; gap:3px; font-variant-numeric:tabular-nums; }
   .cd-clock > i{ font-style:normal; font-weight:800; color:var(--ink-soft); font-size:12px; }
@@ -13038,7 +13042,7 @@ function renderHeader(){
   return `
   <header class="top">
     <a class="wordmark" href="/" data-action="logo-home" aria-label="48thDb — หน้าแรก" style="cursor:pointer;text-decoration:none;">${LOGO_SVG}</a>
-    <input class="search-box" id="search-input" type="text" placeholder="${_aiOn ? 'ค้นหา หรือพิมพ์คำถาม…' : 'ค้นหาสมาชิก เพลง งาน...'}" value="${escapeAttr(state.query)}">
+    <input class="search-box" id="search-input" type="search" aria-label="${isEN() ? 'Search' : 'ค้นหา'}" placeholder="${_aiOn ? 'ค้นหา หรือพิมพ์คำถาม…' : 'ค้นหาสมาชิก เพลง งาน...'}" value="${escapeAttr(state.query)}">
     <div class="set-wrap">
       <button class="set-btn${state.setMenuOpen ? ' is-on' : ''}" data-action="toggle-set-menu" aria-label="เมนูและการตั้งค่า" aria-expanded="${state.setMenuOpen ? 'true' : 'false'}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
@@ -15026,7 +15030,7 @@ function renderEventCard(ev, todayIso){
     <div class="ev-body">
       ${(()=>{ const at = over ? null : startsAt(ev, todayIso);
         return at ? startsPill('ev-starts', ev, todayIso, at) : ''; })()}
-      <h3 class="ev-title">${cancelTag(ev)}${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':ev.tag==='partner'?'<span class="ev-tag">Partner</span>':''}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
+      <h3 class="ev-title">${cancelTag(ev)}${renderEventIcon(ev, 'ev-icon')}${ev.tag==='media'?'<span class="ev-tag">Media</span>':ev.tag==='partner'?'<span class="ev-tag">Partner</span>':''}${escapeHtml(ev.title)} ${renderLiveChip(ev)}</h3>
       ${ev.venue ? `<p class="ev-venue">${escapeHtml(ev.venue)}</p>` : ''}
       ${(ev.cardNote || []).length ? `<ul class="ev-note">${ev.cardNote.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>` : ''}
       ${renderSaleLine(ev)}
@@ -15137,7 +15141,7 @@ function renderTodayHero(ev, todayIso){
     <div class="today-hero-top">
       <div class="today-hero-body">
         <p class="today-hero-status${live ? ' is-live' : ''}"><span class="today-live" aria-hidden="true"></span><span>${status}${days > 1 ? ` · <span class="nowrap">วันที่ ${dayOf} จาก ${days}</span>` : ''}</span></p>
-        <h3 class="today-hero-title">${renderEventIcon(ev, 'ev-icon is-hero')}${escapeHtml(ev.title)}${renderLiveChip(ev)}</h3>
+        <h3 class="today-hero-title">${renderEventIcon(ev, 'ev-icon is-hero')}${escapeHtml(ev.title)} ${renderLiveChip(ev)}</h3>
         <p class="today-hero-meta">${hours ? `${hours} น.` : ''}${hours && ev.venue ? ' · ' : ''}${ev.venue ? escapeHtml(ev.venue) : ''}</p>
       </div>
       ${img ? `<div class="today-hero-art"><img src="${escapeAttr(evThumb(img))}"${ev.poster.w ? ` width="${ev.poster.w}" height="${ev.poster.h}"` : ''} alt="โปสเตอร์งาน ${escapeAttr(ev.title)}" decoding="async"></div>` : ''}
