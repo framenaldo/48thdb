@@ -10302,11 +10302,13 @@ const SEED_SENBATSU = {
 const SEED_SPECIALS = [
   /* Releases the 242-song list (OTA STORY, 22 Nov 2026) counts and the site did not hold. Charaline (Kaew, Namneung,
      Noey, Orn, Tarwaan) re-recorded one song each for their "Verb of Feeling" project; the list puts them between
-     Melon Juice and Warota People, so late 2020 — the day is not known. Nor is the Cookie remix's (the list puts it
-     early in 2023). eRAA is the BNK48 & CGM48 unit under Independent Records. */
+     Melon Juice and Warota People, but the AKB48 wiki (QUINNIES, the unit's other name) has them out one by one,
+     7–21 Dec 2021. The Cookie remix's day is not known (the list puts it early in 2023). Not counted, at the owner's
+     word (22 Nov 2026): eRAA and anything else on Independent Records (IR) for now, a live version of a released song
+     (Kimi to Doko ka e Ikitai's Live Session), Mimigumo's overture. */
   { id:'bnk-sp-charaline', groupId:'bnk48', groups:['bnk48'], kind:'digital',
-    title:'Charaline – Verb of Feeling', alt:'', date:'2020-12', year:2020,
-    note:'เพลงเดิมที่ยูนิต Charaline อัดใหม่คนละเพลง · ยังไม่ทราบวันปล่อยแน่ชัด',
+    title:'Charaline – Verb of Feeling', alt:'', date:'2021-12-07', year:2021,
+    note:'เพลงเดิมที่ยูนิต Charaline (QUINNIES) อัดใหม่คนละเพลง ปล่อยทีละเพลง 7–21 ธ.ค. 2021',
     tracks:[
       { track:"Anata to Christmas Eve – คำสัญญาแห่งคริสต์มาสอีฟ (Kaew's Ver.)", centers:[], members:['bnk-kaew'] },
       { track:"Yokaze no Shiwaza – พระจันทร์เสี้ยว (Tarwaan's Ver.)", centers:[], members:['bnk-tarwaan'] },
@@ -10319,18 +10321,6 @@ const SEED_SPECIALS = [
     note:'ยังไม่ทราบวันปล่อยแน่ชัด',
     tracks:[
       { track:'Koisuru Fortune Cookie – คุกกี้เสี่ยงทาย (Remix ver.)', centers:[], members:[] },
-    ] },
-  { id:'bnk-sp-eraa-dekdue', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
-    title:'เด็กดื้อย์', alt:'Dek Due', date:'2023-04-01', year:2023,
-    note:'ซิงเกิลแรกของยูนิต eRAA (Independent Records)',
-    tracks:[
-      { track:'เด็กดื้อย์', unit:'eRAA', centers:[], members:['bnk-earth', 'bnk-eve', 'bnk-gygee', 'bnk-pakwan', 'bnk-pancake', 'cgm-aom'] },
-    ] },
-  { id:'bnk-sp-eraa-kangmoryai', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
-    title:'แกงหม้อใหญ่', alt:'Kang Mor Yai', date:'2023-07-08', year:2023,
-    note:'ซิงเกิลที่ 2 ของยูนิต eRAA (Independent Records)',
-    tracks:[
-      { track:'แกงหม้อใหญ่', unit:'eRAA', centers:[], members:['bnk-earth', 'bnk-eve', 'bnk-gygee', 'bnk-pakwan', 'bnk-pancake', 'cgm-aom'] },
     ] },
   { id:'bnk-sp-sawmhuay', groupId:'bnk48', groups:['bnk48'], kind:'digital',
     title:'สาวหมวย', alt:'Saw Mhuay', date:'2026-11-19', year:2026,
@@ -10348,7 +10338,6 @@ const SEED_SPECIALS = [
         members:['bnk-music'] },
       { track:'Heart Gata Virus – หัวใจไวรัส', centers:['bnk-jaa'],
         members:['bnk-jaa', 'bnk-kaimook', 'bnk-music'] },
-      { track:'Overture (Mimigumo ver.)', centers:[], members:[] },
     ] },
   { id:'bnk-sp-touchbyheart', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
     title:'Touch By Heart', alt:'หัวใจใกล้กัน', date:'2020-04-02', year:2020,
@@ -10595,7 +10584,6 @@ const SEED_SPECIALS = [
         members:['bnk-sindy', 'cgm-ploen', 'bnk-galeya', 'bnk-inkcha', 'bnk-mayji', 'bnk-micha', 'bnk-mint', 'bnk-mirin', 'bnk-rose', 'bnk-saonoi', 'cgm-praifa', 'cgm-valentine'] },
       { track:'Yobisute Fantasy – เรียกชื่อที ใจไม่ดีแล้ว!', unit:'Team Cuteness', centers:['bnk-palmmy', 'cgm-else'],
         members:['bnk-palmmy', 'cgm-else', 'bnk-berry', 'bnk-blythe', 'bnk-cartoon', 'bnk-khaimook', 'bnk-nammonn', 'bnk-niya', 'bnk-proud', 'cgm-hongyok', 'cgm-punpon', 'cgm-tara'] },
-      { track:'Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ (Live Session ver.)', centers:[], members:[] },
     ] },
   /* The main song of CGM48's first stage of its own, The Original Stage "สถานีเชียงใหม่": first sung at the
      Journey of Dreams concert (14 Nov 2026) and out on the streaming services the next day. Line-up and its two
@@ -10706,29 +10694,30 @@ const SEED_STAGES = [
     ] },
   { id:'bnk-st-1', groupId:'bnk48', groups:['bnk48'], kind:'stage', team:'BNK48',
     title:'WHISPER ROAR', alt:'', date:'2024-12-20', year:2024,
-    note:'สเตจออริจินัลแรกของ BNK48 (เริ่ม 20 ธ.ค. 2024) เพลงของวงเองทั้งหมด',
+    note:'สเตจออริจินัลแรกของ BNK48 (เริ่ม 20 ธ.ค. 2024) เป็นเพลงไทยทั้งสเตจ',
     tracks:[
       { no:'M01', track:'For Your Dream – อยากให้เธอรอ', centers:[], members:[] },
-      { no:'M02', track:'สัญญานะ (Original Stage ver.)', centers:[], members:[] },
+      { no:'M02', track:'สัญญานะ (Original Stage ver.)', again:'bnk-s14', centers:[], members:[] },
       { no:'M03', track:'New Better Day – ดีกว่าเมื่อวาน', centers:[], members:[] },
       { no:'M04', track:'Bloom', centers:[], members:[] },
       { no:'M05', track:'บัวลอยไข่หวาน', centers:[], members:[] },
       { no:'M06', track:'First Love – รักครั้งแรก', centers:[], members:[] },
-      { no:'M07', track:'เสียงของใบไม้ (Original Stage ver.)', centers:[], members:[] },
-      { no:'M08', track:'Cry – ฉันต้องนอนร้องไห้ (Original Stage ver.)', centers:[], members:[] },
-      { no:'M09', track:'Believers (Original Stage ver.)', centers:[], members:[] },
-      { no:'M10', track:"It's Life (Original Stage ver.)", centers:[], members:[] },
+      { no:'M07', track:'เสียงของใบไม้ (Original Stage ver.)', again:'bnk-s13', centers:[], members:[] },
+      { no:'M08', track:'Cry – ฉันต้องนอนร้องไห้ (Original Stage ver.)', again:'bnk-sp-cry', centers:[], members:[] },
+      { no:'M09', track:'Believers (Original Stage ver.)', again:'bnk-s12', centers:[], members:[] },
+      { no:'M10', track:"It's Life (Original Stage ver.)", again:'bnk-s7', centers:[], members:[] },
       { no:'M11', track:'WHISPER ROAR', again:'bnk-sp-whisperroar', centers:[], members:[] },
       { no:'M12', track:'ไม่อยากนอน', centers:[], members:[] },
       { no:'EN01', track:'เมโลดี้นี้', centers:[], members:[] },
-      { no:'EN02', track:'เด็กดื้อย์ (Original Stage ver.)', centers:[], members:[] },
+      { no:'EN02', track:'เด็กดื้อย์ (Original Stage ver.)', ir:'eRAA', centers:[], members:[] },
       { no:'EN04', track:'ไกลไม่ไกล', centers:[], members:[] },
     ] },
 ];
 SEED_STAGES.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 /* Every song the groups put out, each version once: releases, specials, digital singles and the stages, less an
-   album's copy of a digital single (`dup`) and a stage's repeat of a released song (`again`). */
-const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again);
+   album's copy of a digital single (`dup`), a stage's repeat of a released song (`again`) and a song of
+   Independent Records' units sung on stage (`ir`, not counted for now — the owner's word, 22 Nov 2026). */
+const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir);
 /* Work outside the group's own records: films, series, TV and online shows,
    other artists' music videos and Thai voice roles — one entry each, with every
    member in it. Pieced together in October 2026 from the two fan wikis'
@@ -25881,6 +25870,7 @@ function renderSingleDetail(){
         ${renderYouTube(s.id, i, t.track)}
       </div>
       ${from ? `<div class="track-sub">${isEN() ? 'On' : 'อยู่ใน'} <button class="link-inline" data-action="open-single" data-id="${from.id}">${escapeHtml(from.title)}</button></div>`
+        : t.ir ? `<div class="track-sub">${isEN() ? `${escapeHtml(t.ir)}'s song (Independent Records)` : `เพลงของ ${escapeHtml(t.ir)} (ค่าย Independent Records)`}</div>`
         : !t.members.length ? (isStage ? '' : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}ยังไม่ทราบรายชื่อผู้ร้อง</div>`)
         : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}${t.members.length} คน${t.centers.length
         ? ` · ${isMix() ? 'Center' : 'เซ็นเตอร์'} ` + t.centers.map(id=>linkMember(getMember(id))).join(', ')
@@ -26303,8 +26293,8 @@ function renderWorkRow(w, kind){
   if(kind === 'stage') return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${w.id}">
     <div class="timeline-year">${w.year} · ${escapeHtml(w.team || workGroupNames(w))} · ${workLabel(w)}</div>
     <div class="timeline-title">${escapeHtml(w.title)}${w.alt && !(isMix() && mixTitle(w.title) !== w.title) ?` <span class="title-alt">${escapeHtml(w.alt)}</span>`:''}</div>
-    <div class="single-meta">${isEN() ? `${(tracks || []).length} songs in the setlist · ${(tracks || []).filter(t => !t.again).length} only on stage`
-      : `${(tracks || []).length} เพลงในเซ็ตลิสต์ · ${(tracks || []).filter(t => !t.again).length} เพลงที่มีแค่ในสเตจ`}</div>
+    <div class="single-meta">${isEN() ? `${(tracks || []).length} songs in the setlist · ${(tracks || []).filter(t => !t.again && !t.ir).length} only on stage`
+      : `${(tracks || []).length} เพลงในเซ็ตลิสต์ · ${(tracks || []).filter(t => !t.again && !t.ir).length} เพลงที่มีแค่ในสเตจ`}</div>
   </button>`;
   return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${w.id}">
     <div class="timeline-year">${w.year} · ${workGroupNames(w)} · ${workLabel(w)}</div>

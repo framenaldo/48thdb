@@ -159,8 +159,10 @@ the Firebase CLI from the owner's machine.
   work with no names on record (ads, channel shows).
 - **Every song, counted** (`songCatalog()`, the stats page's "เพลงทั้งหมด"): each song the groups put out, each version once —
   singles, albums, specials, digital singles and the theater stages (`SEED_STAGES`, kind `stage`, the Works page's fourth tab
-  "สเตจ"), matched to the 242-song list (OTA STORY on X, 22 Nov 2026) plus Touch By Heart's Grab version, which the owner counts:
-  243. An album's copy of a digital single carries `dup:true`; a stage song that is also on a release carries `again:` that
+  "สเตจ"), 233 on 22 Nov 2026. Built from the 242-song list (OTA STORY on X) with the owner's corrections: Touch By Heart's
+  Grab version counts; a live take or a stage take ("Original Stage ver.") of a released song is the same song; overture of a
+  unit is not a song; anything on Independent Records (eRAA and the like) is not counted for now (`ir:` on a stage track).
+  An album's copy of a digital single carries `dup:true`; a stage song that is also on a release carries `again:` that
   release's id, and the stage page links to it. Stage tracks name no one (the cast changes show to show) and go by their setlist
   number (`no:`). The other statistics still read only the main releases (`allTracks()`). A new song goes in its release, a new
   stage in `SEED_STAGES`.
