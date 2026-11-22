@@ -10322,6 +10322,18 @@ const SEED_SPECIALS = [
     tracks:[
       { track:'Koisuru Fortune Cookie – คุกกี้เสี่ยงทาย (Remix ver.)', skip:true, centers:[], members:[] },
     ] },
+  { id:'bnk-sp-eraa-dekdue', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
+    title:'เด็กดื้อย์', alt:'Dek Due', date:'2023-03-31', year:2023,
+    note:'ซิงเกิลแรกของยูนิต eRAA (ค่าย Independent Records)',
+    tracks:[
+      { track:'เด็กดื้อย์', unit:'eRAA', ir:'eRAA', centers:[], members:['bnk-earth', 'bnk-eve', 'bnk-gygee', 'bnk-pakwan', 'bnk-pancake', 'cgm-aom'] },
+    ] },
+  { id:'bnk-sp-eraa-kangmoryai', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
+    title:'แกงหม้อใหญ่', alt:'Kang Mor Yai', date:'2023-07-08', year:2023,
+    note:'ซิงเกิลที่ 2 ของยูนิต eRAA (ค่าย Independent Records)',
+    tracks:[
+      { track:'แกงหม้อใหญ่', unit:'eRAA', ir:'eRAA', centers:[], members:['bnk-earth', 'bnk-eve', 'bnk-gygee', 'bnk-pakwan', 'bnk-pancake', 'cgm-aom'] },
+    ] },
   { id:'bnk-sp-sawmhuay', groupId:'bnk48', groups:['bnk48'], kind:'digital',
     title:'Shock Me Girls OST (Season 2)', alt:'', date:'2026-11-19', year:2026,
     note:'เพลงประกอบซีรีส์ Shock Me Girls ซีซัน 2',
@@ -10602,6 +10614,7 @@ const SEED_SPECIALS = [
         members:['bnk-sindy', 'cgm-ploen', 'bnk-galeya', 'bnk-inkcha', 'bnk-mayji', 'bnk-micha', 'bnk-mint', 'bnk-mirin', 'bnk-rose', 'bnk-saonoi', 'cgm-praifa', 'cgm-valentine'] },
       { track:'Yobisute Fantasy – เรียกชื่อที ใจไม่ดีแล้ว!', unit:'Team Cuteness', centers:['bnk-palmmy', 'cgm-else'],
         members:['bnk-palmmy', 'cgm-else', 'bnk-berry', 'bnk-blythe', 'bnk-cartoon', 'bnk-khaimook', 'bnk-nammonn', 'bnk-niya', 'bnk-proud', 'cgm-hongyok', 'cgm-punpon', 'cgm-tara'] },
+      { track:'Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ (Live Session ver.)', skip:true, centers:[], members:[] },
     ] },
   /* The main song of CGM48's first stage of its own, The Original Stage "สถานีเชียงใหม่": first sung at the
      Journey of Dreams concert (14 Nov 2026) and out on the streaming services the next day. Line-up and its two
@@ -10739,6 +10752,8 @@ SEED_STAGES.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
    song ("Original Stage ver.", `stageOf` the release, or `stageOfUnit`) is a version of its own and is counted; the page
    says nothing under it (the owner's word). */
 const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir && !t.special && !t.skip);
+/* …and the rest that the site lists but the total leaves out: special and remix versions, live and soundtrack takes, IR songs */
+const songExtras = () => allTracks(true).filter(t => !t.dup && !t.again && (t.ir || t.special || t.skip));
 /* Work outside the group's own records: films, series, TV and online shows,
    other artists' music videos and Thai voice roles — one entry each, with every
    member in it. Pieced together in October 2026 from the two fan wikis'
@@ -24963,7 +24978,7 @@ function renderStatsOverview(){
       <div class="group-head"><h2 style="font-size:21px;">เพลง</h2>
         <button class="link-inline" data-action="stats-tab" data-value="songs">ดูทั้งหมด →</button></div>
       <div class="stat-grid" style="margin-bottom:4px;">
-        <button class="stat-cell" data-action="stats-tab" data-value="songs"><div class="label">เพลงทั้งหมด</div><div class="value">${songCatalog().length} เพลง</div></button>
+        <button class="stat-cell" data-action="stats-tab" data-value="songs"><div class="label">เพลงทั้งหมด</div><div class="value">${songCatalog().length} เพลง</div><div class="sub">${isEN() ? `+ ${songExtras().length} other versions` : `+ เวอร์ชันอื่น ${songExtras().length} เพลง`}</div></button>
         <button class="stat-cell" data-action="nav-select" data-value="discography"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length+SEED_ALBUMS.length} ชิ้น</div></button>
         <div class="stat-cell"><div class="label">เซ็มบัตสึเฉลี่ย</div><div class="value">${mean} คน</div></div>
         <div class="stat-cell"><div class="label">มีเพลงอย่างน้อย 1</div><div class="value">${appearances.size} คน</div></div>
@@ -25094,7 +25109,7 @@ function renderStatsSongs(){
 
   return `
   <div class="stat-grid">
-    <div class="stat-cell"><div class="label">เพลงทั้งหมด</div><div class="value">${songCatalog().length} เพลง</div></div>
+    <div class="stat-cell"><div class="label">เพลงทั้งหมด</div><div class="value">${songCatalog().length} เพลง</div><div class="sub">${isEN() ? `+ ${songExtras().length} other versions` : `+ เวอร์ชันอื่น ${songExtras().length} เพลง`}</div></div>
     <button class="stat-cell" data-action="nav-select" data-value="discography"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length + SEED_ALBUMS.length} ชิ้น</div></button>
     <div class="stat-cell"><div class="label">มีเพลงอย่างน้อย 1</div><div class="value">${appearances.size} คน</div></div>
     <div class="stat-cell"><div class="label">เซ็มบัตสึเฉลี่ย</div><div class="value">${mean} คน</div></div>
