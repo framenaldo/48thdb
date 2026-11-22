@@ -164,10 +164,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     --bg-header:linear-gradient(135deg, rgba(255,111,165,.15), rgba(47,216,169,.13));
     --bg-nav:rgba(28,22,34,.34);
     color-scheme:dark;
-    /* motion */
-    --ease-spring:cubic-bezier(.34,1.56,.64,1);
-    --ease-out:cubic-bezier(.22,1,.36,1);
   }
+  /* motion — for both modes: these sat in the dark block alone, so in light mode every transition that named them was
+     invalid and things jumped instead of moving (found 22 Nov 2026) */
+  :root{ --ease-spring:cubic-bezier(.34,1.56,.64,1); --ease-out:cubic-bezier(.22,1,.36,1); }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   @keyframes viewFadeIn{ from{opacity:0;} to{opacity:1;} }
   .view-fade-in{ animation:viewFadeIn .18s linear; }
@@ -7422,14 +7422,18 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-lg="1"] .ov-layer :is(.card, .cal-wrap, .pd-card, .share-preview, .ev-card, .rota, .shop-card, .tl-card, .bio-card, .ask-card,
     .qz-card, .qz-result, .mini-card, .stat-cell, .otd-row, .gel-mini-c, .sr-row){ background:var(--lg-veil); -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:var(--lg-hi); }
   html[data-lg="1"] .ev-open{ text-align:center; }
+  /* a card with no foot: the link is a row of its own under both columns, centred on the card (the owner's word, 22 Nov 2026) */
+  .ev-card:has(> .ev-open.is-row){ flex-wrap:wrap; }
+  .ev-card > .ev-open.is-row{ order:3; flex:1 0 100%; margin:0; text-align:center; }
   /* Anything that can be pressed lifts a little under the mouse (the owner's word, 21 Nov 2026); only with a mouse, never on a touch
      screen, and with `translate` so it adds to whatever transform the thing already has (its press, its own motion). Left still: a
      link in running text, the dim behind a sheet, the ticker, the menu bar, a table's rows and cells, the cat. Cards also cast a
-     deeper shadow as they rise, pills a small one. */
+     deeper shadow as they rise, pills a small one. The rise is slow and soft, half a second with a long ease-out (a
+     quick .22s looked stiff, the owner's word, 22 Nov 2026). */
   @media (hover:hover) and (pointer:fine){
     html[data-lg="1"] :where(button, a[href][class], [data-action], [role="button"]):not(:disabled, .modal-backdrop, .link-inline, .ticker,
       .ticker-link, .glass-nav *, .gnav, .row, .cell, .dtable *, [class*="meow"], .per-tile){
-      transition:translate .22s var(--ease-out), box-shadow .22s var(--ease-out), transform .2s var(--ease-out), border-color .2s ease, background-color .2s ease; }
+      transition:translate .5s cubic-bezier(.22,.9,.32,1), box-shadow .5s cubic-bezier(.22,.9,.32,1), transform .2s var(--ease-out), border-color .3s ease, background-color .3s ease; }
     html[data-lg="1"] :where(button, a[href][class], [data-action], [role="button"]):not(:disabled, .modal-backdrop, .link-inline, .ticker,
       .ticker-link, .glass-nav *, .gnav, .row, .cell, .dtable *, [class*="meow"], .per-tile):hover{ translate:0 -2px; }
     html[data-lg="1"] :is(button, a[href], [data-action], [role="button"]):is(.card, .cal-wrap, .ev-card, .rota, .shop-card, .tl-card, .lay-card,
@@ -7440,7 +7444,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
       .box-share-btn, .share-act, .cal-nav, .sub-tab, .scope-btn, .rt-tab, .rt-day, .sl-day, .bio-pen, .back-btn, .modal-close-btn, .modal-share-btn,
       .btn-add, .btn-secondary, .fb-face, .wk-cat, .social-chip, .yt-btn, .iam-link, .gen-filter-chip, .ge-hist-chip, .fest-pill, .signin-btn):hover{
       box-shadow:var(--lg-hi), 0 6px 14px rgba(var(--shadow-rgb),.14); }
-    html[data-lg="1"] button.per-tile .per-pic{ transition:translate .22s var(--ease-out), box-shadow .22s var(--ease-out), transform .12s; }
+    html[data-lg="1"] button.per-tile .per-pic{ transition:translate .5s cubic-bezier(.22,.9,.32,1), box-shadow .5s cubic-bezier(.22,.9,.32,1), transform .12s; }
     html[data-lg="1"] button.per-tile:hover .per-pic{ translate:0 -3px; box-shadow:var(--lg-hi), 0 12px 28px rgba(var(--shadow-rgb),.18); }
     html[data-lg="1"] :is(button, a[href], [data-action], [role="button"]):active{ translate:0 0; }
   }
@@ -15029,8 +15033,8 @@ function renderEventCard(ev, todayIso){
       ${ev.lineupTba ? `<p class="ev-tba">รอประกาศรายชื่อ</p>` : ''}
       ${img ? '' : renderEventPeople(people, 6, '', ev)}
       ${!img && mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
-      ${(!img || !people.length) && hasMore ? `<p class="ev-open">ดูรายละเอียด</p>` : ''}
     </div>
+    ${(!img || !people.length) && hasMore ? `<p class="ev-open is-row">ดูรายละเอียด</p>` : ''}
     ${img && people.length ? `<div class="ev-foot">
       ${renderEventPeople(people, 8, '', ev)}
       ${mine.length ? `<p class="ev-mine">มีโอชิของคุณ ${mine.length} คน</p>` : ''}
