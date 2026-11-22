@@ -157,6 +157,13 @@ the Firebase CLI from the owner's machine.
   fill "ผลงานอื่น" on a member's sheet, so a credit only counts while she was
   in the group. `own` marks the group's own productions; `whole` a whole-group
   work with no names on record (ads, channel shows).
+- **Every song, counted** (`songCatalog()`, the stats page's "เพลงทั้งหมด"): each song the groups put out, each version once —
+  singles, albums, specials, digital singles and the theater stages (`SEED_STAGES`, kind `stage`, the Works page's fourth tab
+  "สเตจ"), matched to the 242-song list (OTA STORY on X, 22 Nov 2026) plus Touch By Heart's Grab version, which the owner counts:
+  243. An album's copy of a digital single carries `dup:true`; a stage song that is also on a release carries `again:` that
+  release's id, and the stage page links to it. Stage tracks name no one (the cast changes show to show) and go by their setlist
+  number (`no:`). The other statistics still read only the main releases (`allTracks()`). A new song goes in its release, a new
+  stage in `SEED_STAGES`.
 - A roadshow's mini concert setlist is `setlist` on the event, a day each
   (`renderSetlist`): sessions, the MCs between, a song's release to open and a
   unit song's members. It folds under the "Mini Concert" row of กำหนดการ

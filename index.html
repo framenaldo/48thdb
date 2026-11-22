@@ -10241,11 +10241,11 @@ const SEED_SENBATSU = {
       members:['bnk-cherprang', 'bnk-jennis', 'bnk-korn', 'bnk-minmin', 'bnk-myyu', 
         'bnk-pun', 'bnk-wee', 'bnk-gygee', 'bnk-new', 'bnk-orn', 'bnk-pakwan', 'cgm-kyla', 
         'cgm-milk', 'cgm-nena', 'cgm-nicha', 'cgm-parima'] },
-    { track:'เธอนั่นแหละ (Can you...?)', centers:['bnk-cherprang'],
+    { track:'เธอนั่นแหละ (Can you...?)', dup:true, centers:['bnk-cherprang'],
       members:['bnk-cherprang', 'bnk-jennis', 'bnk-jane', 'bnk-kaew', 'bnk-noey', 'bnk-pun', 
         'bnk-wee', 'bnk-fond', 'bnk-mewnich', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 
         'bnk-orn', 'bnk-phukkhom', 'bnk-pupe', 'bnk-tarwaan'] },
-    { track:'Ma Ma Milk', centers:['bnk-jane'],
+    { track:'Ma Ma Milk', dup:true, centers:['bnk-jane'],
       members:['bnk-cherprang', 'bnk-jane', 'bnk-minmin', 'bnk-wee', 'bnk-bamboo', 
         'bnk-gygee', 'bnk-mewnich', 'bnk-mobile', 'bnk-music', 'bnk-phukkhom', 'bnk-pupe', 
         'bnk-tarwaan'] },
@@ -10300,6 +10300,44 @@ const SEED_SENBATSU = {
    release sung by both groups lists both in `groups`; `groupId` is the first,
    for colour. */
 const SEED_SPECIALS = [
+  /* Releases the 242-song list (OTA STORY, 22 Nov 2026) counts and the site did not hold. Charaline (Kaew, Namneung,
+     Noey, Orn, Tarwaan) re-recorded one song each for their "Verb of Feeling" project; the list puts them between
+     Melon Juice and Warota People, so late 2020 — the day is not known. Nor is the Cookie remix's (the list puts it
+     early in 2023). eRAA is the BNK48 & CGM48 unit under Independent Records. */
+  { id:'bnk-sp-charaline', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Charaline – Verb of Feeling', alt:'', date:'2020-12', year:2020,
+    note:'เพลงเดิมที่ยูนิต Charaline อัดใหม่คนละเพลง · ยังไม่ทราบวันปล่อยแน่ชัด',
+    tracks:[
+      { track:"Anata to Christmas Eve – คำสัญญาแห่งคริสต์มาสอีฟ (Kaew's Ver.)", centers:[], members:['bnk-kaew'] },
+      { track:"Yokaze no Shiwaza – พระจันทร์เสี้ยว (Tarwaan's Ver.)", centers:[], members:['bnk-tarwaan'] },
+      { track:"High Tension (Namneung's Ver.)", centers:[], members:['bnk-namneung'] },
+      { track:"Kimi wa Melody – เธอคือ...เมโลดี้ (Noey's Ver.)", centers:[], members:['bnk-noey'] },
+      { track:"RIVER (Orn's Ver.)", centers:[], members:['bnk-orn'] },
+    ] },
+  { id:'bnk-sp-kfcremix', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'Koisuru Fortune Cookie (Remix ver.)', alt:'คุกกี้เสี่ยงทาย', date:'2023-01', year:2023,
+    note:'ยังไม่ทราบวันปล่อยแน่ชัด',
+    tracks:[
+      { track:'Koisuru Fortune Cookie – คุกกี้เสี่ยงทาย (Remix ver.)', centers:[], members:[] },
+    ] },
+  { id:'bnk-sp-eraa-dekdue', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
+    title:'เด็กดื้อย์', alt:'Dek Due', date:'2023-04-01', year:2023,
+    note:'ซิงเกิลแรกของยูนิต eRAA (Independent Records)',
+    tracks:[
+      { track:'เด็กดื้อย์', unit:'eRAA', centers:[], members:['bnk-earth', 'bnk-eve', 'bnk-gygee', 'bnk-pakwan', 'bnk-pancake', 'cgm-aom'] },
+    ] },
+  { id:'bnk-sp-eraa-kangmoryai', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
+    title:'แกงหม้อใหญ่', alt:'Kang Mor Yai', date:'2023-07-08', year:2023,
+    note:'ซิงเกิลที่ 2 ของยูนิต eRAA (Independent Records)',
+    tracks:[
+      { track:'แกงหม้อใหญ่', unit:'eRAA', centers:[], members:['bnk-earth', 'bnk-eve', 'bnk-gygee', 'bnk-pakwan', 'bnk-pancake', 'cgm-aom'] },
+    ] },
+  { id:'bnk-sp-sawmhuay', groupId:'bnk48', groups:['bnk48'], kind:'digital',
+    title:'สาวหมวย', alt:'Saw Mhuay', date:'2026-11-19', year:2026,
+    note:'เพลงประกอบซีรีส์ Shock Me Girls ซีซัน 2',
+    tracks:[
+      { track:'สาวหมวย', centers:[], members:['bnk-blythe', 'bnk-grape', 'bnk-mail', 'bnk-mirin'] },
+    ] },
   { id:'bnk-sp-mimigumo', groupId:'bnk48', groups:['bnk48'], kind:'special',
     title:'Mimigumo', alt:'', date:'2019-10-10', year:2019,
     note:'ซิงเกิลแรกของยูนิต Mimigumo',
@@ -10310,6 +10348,7 @@ const SEED_SPECIALS = [
         members:['bnk-music'] },
       { track:'Heart Gata Virus – หัวใจไวรัส', centers:['bnk-jaa'],
         members:['bnk-jaa', 'bnk-kaimook', 'bnk-music'] },
+      { track:'Overture (Mimigumo ver.)', centers:[], members:[] },
     ] },
   { id:'bnk-sp-touchbyheart', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
     title:'Touch By Heart', alt:'หัวใจใกล้กัน', date:'2020-04-02', year:2020,
@@ -10404,6 +10443,7 @@ const SEED_SPECIALS = [
     tracks:[
       { track:'น่ายักแบบนี้ เป็นของเธอนะ', centers:['cgm-champoo'],
         members:['bnk-hoop', 'cgm-champoo', 'cgm-kaning', 'cgm-lookked', 'cgm-nenie', 'cgm-sita'] },
+      { track:'น่ายักแบบนี้ เป็นของเธอนะ (Special ver.)', unit:'CGM48', centers:[], members:[] },
     ] },
   { id:'bnk-sp-sportsday', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
     title:'Sports Day 2024: Neko Wars', alt:'', date:'2024-07-28', year:2024,
@@ -10436,7 +10476,9 @@ const SEED_SPECIALS = [
   { id:'bnk-sp-lokenee', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
     title:'โลกนี้ก็แค่ปากซอย', alt:'Loke Nee Kau Khae Paak Soy', date:'2025-04-07', year:2025,
     note:'ร่วมกับ Nok Air',
-    tracks:[] },
+    tracks:[
+      { track:'โลกนี้ก็แค่ปากซอย', centers:[], members:[] },
+    ] },
   { id:'cgm-sp-sadcupid', groupId:'cgm48', groups:['cgm48'], kind:'digital',
     title:'Sad Cupid', alt:'', date:'2025-06-27', year:2025,
     tracks:[
@@ -10553,6 +10595,7 @@ const SEED_SPECIALS = [
         members:['bnk-sindy', 'cgm-ploen', 'bnk-galeya', 'bnk-inkcha', 'bnk-mayji', 'bnk-micha', 'bnk-mint', 'bnk-mirin', 'bnk-rose', 'bnk-saonoi', 'cgm-praifa', 'cgm-valentine'] },
       { track:'Yobisute Fantasy – เรียกชื่อที ใจไม่ดีแล้ว!', unit:'Team Cuteness', centers:['bnk-palmmy', 'cgm-else'],
         members:['bnk-palmmy', 'cgm-else', 'bnk-berry', 'bnk-blythe', 'bnk-cartoon', 'bnk-khaimook', 'bnk-nammonn', 'bnk-niya', 'bnk-proud', 'cgm-hongyok', 'cgm-punpon', 'cgm-tara'] },
+      { track:'Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ (Live Session ver.)', centers:[], members:[] },
     ] },
   /* The main song of CGM48's first stage of its own, The Original Stage "สถานีเชียงใหม่": first sung at the
      Journey of Dreams concert (14 Nov 2026) and out on the streaming services the next day. Line-up and its two
@@ -10567,6 +10610,125 @@ const SEED_SPECIALS = [
     ] },
 ];
 SEED_SPECIALS.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
+
+/* Theater stages: the songs sung in the theater that came out on no single or album (the 242-song list, OTA STORY,
+   22 Nov 2026, counts them; setlists from the AKB48 wiki). A song the stage shares with a release is listed for the
+   setlist but carries `again:` that release, so it is counted once. Who sings what changes show to show, so the
+   tracks name no one. The WHISPER ROAR stage lists its first setlist (the song of the day and the later swaps left out). */
+const SEED_STAGES = [
+  { id:'bnk-st-biii1', groupId:'bnk48', groups:['bnk48'], kind:'stage', team:'Team BIII',
+    title:'PARTY ga Hajimaru yo', alt:'ปาร์ตี้ในฝัน', date:'2018-05-11', year:2018,
+    note:'สเตจแรกของทีม BIII (11 พ.ค. 2018 – 14 ธ.ค. 2019) จากสเตจ Team A 1st ของ AKB48',
+    tracks:[
+      { no:'M00', track:'overture (BNK48 ver.)', centers:[], members:[] },
+      { no:'M01', track:'PARTY ga Hajimaru yo – ปาร์ตี้ในฝัน', centers:[], members:[] },
+      { no:'M02', track:'Dear my teacher', centers:[], members:[] },
+      { no:'M03', track:'Doku Ringo wo Tabesasete – แอปเปิ้ลอาบยาพิษ', centers:[], members:[] },
+      { no:'M04', track:'Skirt, Hirari – พลิ้ว', again:'bnk-s2', centers:[], members:[] },
+      { no:'M05', track:'Classmate – เพื่อนคนพิเศษ', centers:[], members:[] },
+      { no:'M06', track:'Anata to Christmas Eve – คำสัญญาแห่งคริสต์มาสอีฟ', again:'bnk-s3', centers:[], members:[] },
+      { no:'M07', track:'Kiss wa Dame yo – จูบ...ไม่ได้นะ', centers:[], members:[] },
+      { no:'M08', track:'Hoshi no Ondo – อุณหภูมิของดวงดาว', centers:[], members:[] },
+      { no:'M09', track:'Sakura no Hanabiratachi – ความทรงจำและคำอำลา', again:'bnk-s3', centers:[], members:[] },
+      { no:'M10', track:'Aozora no Soba ni Ite – ฟ้าสีคราม', centers:[], members:[] },
+      { no:'EN01', track:'BNK48', again:'bnk-s2', centers:[], members:[] },
+      { no:'EN02', track:'Skirt, Hirari – พลิ้ว (Encore ver.)', again:'bnk-s2', centers:[], members:[] },
+      { no:'EN03', track:'365-nichi no Kamihikouki – 365 วันกับเครื่องบินกระดาษ', again:'bnk-s1', centers:[], members:[] },
+      { no:'EN04', track:'Sakura no Hanabiratachi – ความทรงจำและคำอำลา (Encore ver.)', again:'bnk-s3', centers:[], members:[] },
+    ] },
+  { id:'bnk-st-biii2', groupId:'bnk48', groups:['bnk48'], kind:'stage', team:'Team BIII',
+    title:'Saishuu Bell ga Naru', alt:'เสียงระฆังแห่งความฝัน', date:'2020-08-09', year:2020,
+    note:'สเตจที่ 2 ของทีม BIII (เริ่ม 9 ส.ค. 2020) จากสเตจ Team K 2nd ของ AKB48',
+    tracks:[
+      { no:'M00', track:'overture (BNK48 ver.)', again:'bnk-st-biii1', centers:[], members:[] },
+      { no:'M01', track:'Mammoth', centers:[], members:[] },
+      { no:'M02', track:'Saishuu Bell ga Naru – เสียงระฆังแห่งความฝัน', centers:[], members:[] },
+      { no:'M03', track:'Boyfriend no Tsukurikata – หลักสูตรความรัก', centers:[], members:[] },
+      { no:'M04', track:'Erai Hito ni Naritakunai – (แค่)ไม่อยากเป็นเด็กดี', centers:[], members:[] },
+      { no:'M05', track:'Return Match', centers:[], members:[] },
+      { no:'M06', track:'Hatsukoi Dorobou – จอมโจรปล้นรัก', centers:[], members:[] },
+      { no:'M07', track:'Gomen ne Jewel – Jewel ในดวงใจ', centers:[], members:[] },
+      { no:'M08', track:'Oshibe to Meshibe to Yoru no Chouchou – ทุ่งดอกไม้ยามรัตติกาล', centers:[], members:[] },
+      { no:'M09', track:'8-nin Shimai no Uta – 8 เสียงของพวกเรา', centers:[], members:[] },
+      { no:'M10', track:'Stand Up', centers:[], members:[] },
+      { no:'M11', track:'Cool Girl', centers:[], members:[] },
+      { no:'M12', track:'Kaiyuugyo no Capacity – หมดทั้งใจให้เธอ', centers:[], members:[] },
+      { no:'M13', track:'Ai ni Ikou – ไปกันนะ เจอกันหน่อย', centers:[], members:[] },
+      { no:'EN01', track:'Shamu Neko – แมวสยาม', centers:[], members:[] },
+      { no:'EN02', track:'Melos no Michi – เส้นทางแห่งชีวิต', centers:[], members:[] },
+      { no:'EN03', track:'Sasae – เราจะเดินไปด้วยกัน', centers:[], members:[] },
+    ] },
+  { id:'bnk-st-nv1', groupId:'bnk48', groups:['bnk48'], kind:'stage', team:'Team NV',
+    title:'Theater no Megami', alt:'เทพธิดาเธียเตอร์', date:'2020-08-09', year:2020,
+    note:'สเตจแรกของทีม NV (เริ่ม 9 ส.ค. 2020) จากสเตจ Team B 5th ของ AKB48',
+    tracks:[
+      { no:'M00', track:'Romance Kakurenbo – บันทึกรักจากไดอารี่', centers:[], members:[] },
+      { no:'M00', track:'overture (BNK48 ver.)', again:'bnk-st-biii1', centers:[], members:[] },
+      { no:'M01', track:'Yuuki no Hammer – ลุยเข้าไป', centers:[], members:[] },
+      { no:'M02', track:'Inseki no Kakuritsu – ปรากฏการณ์รัก', centers:[], members:[] },
+      { no:'M03', track:'Ai no Stripper – รักที่อยากปลดเปลื้อง', centers:[], members:[] },
+      { no:'M04', track:'Theater no Megami – เทพธิดาเธียเตอร์', centers:[], members:[] },
+      { no:'M05', track:'Hatsukoi yo Konnichiwa – เสียงหัวใจตึกตัก', centers:[], members:[] },
+      { no:'M06', track:'Arashi no Yoru ni wa – ถึงผิดก็ยอม', centers:[], members:[] },
+      { no:'M07', track:'Candy', again:'bnk-sp-mimigumo', centers:[], members:[] },
+      { no:'M08', track:'Locker Room Boy', centers:[], members:[] },
+      { no:'M09', track:'Yokaze no Shiwaza – พระจันทร์เสี้ยว', centers:[], members:[] },
+      { no:'M10', track:'100-Metre Konbini – ร้านสะดวกซื้อ 100 เมตร', centers:[], members:[] },
+      { no:'M11', track:'Suki Suki Suki – ชอบเธอ ชอบเธอ', centers:[], members:[] },
+      { no:'M12', track:'Sayonara no Kanashibari – หัวใจคนถูกเท', centers:[], members:[] },
+      { no:'M13', track:'Shiokaze no Shoutaijou – อ้อมกอดของยาย', centers:[], members:[] },
+      { no:'EN01', track:'Honest Man', centers:[], members:[] },
+      { no:'EN02', track:'Team NV Oshi', centers:[], members:[] },
+      { no:'EN03', track:'Bokutachi no Kamihikouki – เราจะบินไปพร้อมกัน', centers:[], members:[] },
+    ] },
+  { id:'cgm-st-c1', groupId:'cgm48', groups:['cgm48'], kind:'stage', team:'Team C',
+    title:'RESET', alt:'', date:'2024-11-22', year:2024,
+    note:'สเตจแรกของทีม C ของ CGM48 (เริ่ม 22 พ.ย. 2024) จากสเตจ Team K 6th ของ AKB48',
+    tracks:[
+      { no:'M00', track:'Lemon no Toshigoro – รสชาติของเลมอน', centers:[], members:[] },
+      { no:'M00', track:'overture (CGM48 ver.)', centers:[], members:[] },
+      { no:'M01', track:'RESET', again:'cgm-s8', centers:[], members:[] },
+      { no:'M02', track:'Sentaku Monotachi – ผ้าผืนใหม่', centers:[], members:[] },
+      { no:'M03', track:'Kanojo ni Naremasu ka? – ขอเป็นแฟนเธอได้ไหม?', centers:[], members:[] },
+      { no:'M04', track:'UHHO UHHOHO', centers:[], members:[] },
+      { no:'M05', track:'Seifuku Resistance – ผู้ต่อต้านชุดนักเรียน', centers:[], members:[] },
+      { no:'M06', track:'Kiseki wa Ma ni Awanai – รถบัสปาฏิหาริย์', centers:[], members:[] },
+      { no:'M07', track:'Gyakuten Oujisama – เจ้าชายในฝัน', centers:[], members:[] },
+      { no:'M08', track:'Ashita no Tame ni Kiss wo – Kiss for Tomorrow', centers:[], members:[] },
+      { no:'M09', track:'Kokoro no Hashi no Sofa – โซฟาตัวโปรด', centers:[], members:[] },
+      { no:'M10', track:'Dokugumo – แมงมุมพิษ', centers:[], members:[] },
+      { no:'M11', track:'Okera – การพนันแห่งรัก', centers:[], members:[] },
+      { no:'M12', track:'White Day ni wa... – วันไวท์เดย์', centers:[], members:[] },
+      { no:'M13', track:'Jigsaw Puzzle 48', centers:[], members:[] },
+      { no:'EN01', track:'Hoshizora no Mistake – รู้ตัวอีกทีก็อิจฉาไปแล้ว', centers:[], members:[] },
+      { no:'EN02', track:'Yume no Kane – ระฆังแห่งความหวัง', centers:[], members:[] },
+      { no:'EN03', track:'Hikkoshimashita – ห้องหัวใจที่ไม่มีเธอ', centers:[], members:[] },
+    ] },
+  { id:'bnk-st-1', groupId:'bnk48', groups:['bnk48'], kind:'stage', team:'BNK48',
+    title:'WHISPER ROAR', alt:'', date:'2024-12-20', year:2024,
+    note:'สเตจออริจินัลแรกของ BNK48 (เริ่ม 20 ธ.ค. 2024) เพลงของวงเองทั้งหมด',
+    tracks:[
+      { no:'M01', track:'For Your Dream – อยากให้เธอรอ', centers:[], members:[] },
+      { no:'M02', track:'สัญญานะ (Original Stage ver.)', centers:[], members:[] },
+      { no:'M03', track:'New Better Day – ดีกว่าเมื่อวาน', centers:[], members:[] },
+      { no:'M04', track:'Bloom', centers:[], members:[] },
+      { no:'M05', track:'บัวลอยไข่หวาน', centers:[], members:[] },
+      { no:'M06', track:'First Love – รักครั้งแรก', centers:[], members:[] },
+      { no:'M07', track:'เสียงของใบไม้ (Original Stage ver.)', centers:[], members:[] },
+      { no:'M08', track:'Cry – ฉันต้องนอนร้องไห้ (Original Stage ver.)', centers:[], members:[] },
+      { no:'M09', track:'Believers (Original Stage ver.)', centers:[], members:[] },
+      { no:'M10', track:"It's Life (Original Stage ver.)", centers:[], members:[] },
+      { no:'M11', track:'WHISPER ROAR', again:'bnk-sp-whisperroar', centers:[], members:[] },
+      { no:'M12', track:'ไม่อยากนอน', centers:[], members:[] },
+      { no:'EN01', track:'เมโลดี้นี้', centers:[], members:[] },
+      { no:'EN02', track:'เด็กดื้อย์ (Original Stage ver.)', centers:[], members:[] },
+      { no:'EN04', track:'ไกลไม่ไกล', centers:[], members:[] },
+    ] },
+];
+SEED_STAGES.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
+/* Every song the groups put out, each version once: releases, specials, digital singles and the stages, less an
+   album's copy of a digital single (`dup`) and a stage's repeat of a released song (`again`). */
+const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again);
 /* Work outside the group's own records: films, series, TV and online shows,
    other artists' music videos and Thai voice roles — one entry each, with every
    member in it. Pieced together in October 2026 from the two fan wikis'
@@ -11144,6 +11306,9 @@ const EN = {
   'เพลงที่มีเซ็นเตอร์ร่วมกันหลายคน นับให้ทุกคน': 'Songs with joint centres count for each of them',
   'เซ็มบัตสึมากที่สุด': 'Largest senbatsu',
   'เพลงทั้งหมด': 'Songs in total',
+  'สเตจ': 'Stages',
+  'เธียเตอร์สเตจ': 'Theater stage',
+  'เพลงที่ร้องในเธียเตอร์ เพลงที่ซ้ำกับซิงเกิลหรืออัลบั้มนับไว้ที่ผลงานนั้นครั้งเดียว': 'Songs sung in the theater; one that is also on a single or album is counted there, once.',
   'ผลงาน': 'Releases',
   'เซ็มบัตสึเฉลี่ย': 'Average senbatsu',
   'มีเพลงอย่างน้อย 1': 'With at least one song',
@@ -13178,7 +13343,7 @@ const ALL_WORKS = () => [...SEED_SINGLES, ...SEED_ALBUMS];
    bnk-sp-all-the-way would have tripped. Specials say what they are. */
 const WORK_KIND = w => w.kind || (/-a\d+$/.test(w.id) ? 'album' : 'single');
 const isSpecialWork = w => ['special', 'digital'].includes(WORK_KIND(w));
-const findWork = id => ALL_WORKS().find(w => w.id === id) || SEED_SPECIALS.find(w => w.id === id);
+const findWork = id => ALL_WORKS().find(w => w.id === id) || SEED_SPECIALS.find(w => w.id === id) || SEED_STAGES.find(w => w.id === id);
 const workGroups = w => w.groups || [w.groupId];
 const workGroupNames = w => workGroups(w).map(id => getGroup(id).name).join(' × ');
 
@@ -13187,14 +13352,14 @@ function workLabel(w){
   const k = WORK_KIND(w);
   return k === 'album' ? `อัลบั้มที่ ${w.num}`
        : k === 'single' ? `ซิงเกิลที่ ${w.num}`
-       : k === 'special' ? 'ซิงเกิลพิเศษ' : 'ซิงเกิลดิจิทัล';
+       : k === 'special' ? 'ซิงเกิลพิเศษ' : k === 'stage' ? 'เธียเตอร์สเตจ' : 'ซิงเกิลดิจิทัล';
 }
 
 /** Every track of the main releases; the statistics read only these. Pass
     true to take the special releases in as well. */
 function allTracks(withSpecials){
   const out = [];
-  for(const w of withSpecials ? [...ALL_WORKS(), ...SEED_SPECIALS] : ALL_WORKS()){
+  for(const w of withSpecials ? [...ALL_WORKS(), ...SEED_SPECIALS, ...SEED_STAGES] : ALL_WORKS()){
     for(const t of (SEED_SENBATSU[w.id] || [])) out.push({ work:w, ...t });
   }
   return out;
@@ -21292,7 +21457,7 @@ function searchEverything(q){
   return {
     members: state.members.filter(m => any(m.name, m.nameTh, m.realName, m.realNameTh)),
     tracks:  allTracks(true).filter(t => hit(t.track)),
-    works:   [...ALL_WORKS(), ...SEED_SPECIALS].filter(w => any(w.title, w.alt)),
+    works:   [...ALL_WORKS(), ...SEED_SPECIALS, ...SEED_STAGES].filter(w => any(w.title, w.alt)),
     events:  SEED_SCHEDULE.filter(e => any(e.title, e.venue)
                || (e.info || []).some(hit) || (e.detail || []).some(hit)),
     teams:   TEAMS.filter(t => hit(t.name)),
@@ -23405,7 +23570,7 @@ function bioFindRefs(q){
     const g = getGroup(m.groupId);
     return { kind:'m', id:m.id, label:nickName(m), sub:`${g.name}${m.gen ? ` · ${en ? 'Gen' : 'รุ่น'} ${m.gen}` : ''}${m.graduated ? (en ? ' · graduated' : ' · จบแล้ว') : ''}` };
   });
-  const works = pick([...ALL_WORKS(), ...SEED_SPECIALS], w => score(w.title, w.alt), 3).map(w => {
+  const works = pick([...ALL_WORKS(), ...SEED_SPECIALS, ...SEED_STAGES], w => score(w.title, w.alt), 3).map(w => {
     const k = WORK_KIND(w), g = getGroup(w.groupId);
     return { kind:'w', id:w.id, label:w.title, sub:`${g ? g.name : ''} · ${k === 'album' ? (en ? 'Album' : 'อัลบั้ม') + ' ' + w.num : k === 'single' ? (en ? 'Single' : 'ซิงเกิล') + ' ' + w.num : (en ? 'Special' : 'เพลงพิเศษ')}` };
   });
@@ -24788,7 +24953,7 @@ function renderStatsOverview(){
       <div class="group-head"><h2 style="font-size:21px;">เพลง</h2>
         <button class="link-inline" data-action="stats-tab" data-value="songs">ดูทั้งหมด →</button></div>
       <div class="stat-grid" style="margin-bottom:4px;">
-        <button class="stat-cell" data-action="stats-tab" data-value="songs"><div class="label">เพลงทั้งหมด</div><div class="value">${tracks.length} เพลง</div></button>
+        <button class="stat-cell" data-action="stats-tab" data-value="songs"><div class="label">เพลงทั้งหมด</div><div class="value">${songCatalog().length} เพลง</div></button>
         <button class="stat-cell" data-action="nav-select" data-value="discography"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length+SEED_ALBUMS.length} ชิ้น</div></button>
         <div class="stat-cell"><div class="label">เซ็มบัตสึเฉลี่ย</div><div class="value">${mean} คน</div></div>
         <div class="stat-cell"><div class="label">มีเพลงอย่างน้อย 1</div><div class="value">${appearances.size} คน</div></div>
@@ -24919,7 +25084,7 @@ function renderStatsSongs(){
 
   return `
   <div class="stat-grid">
-    <div class="stat-cell"><div class="label">เพลงทั้งหมด</div><div class="value">${tracks.length} เพลง</div></div>
+    <div class="stat-cell"><div class="label">เพลงทั้งหมด</div><div class="value">${songCatalog().length} เพลง</div></div>
     <button class="stat-cell" data-action="nav-select" data-value="discography"><div class="label">ผลงาน</div><div class="value">${SEED_SINGLES.length + SEED_ALBUMS.length} ชิ้น</div></button>
     <div class="stat-cell"><div class="label">มีเพลงอย่างน้อย 1</div><div class="value">${appearances.size} คน</div></div>
     <div class="stat-cell"><div class="label">เซ็มบัตสึเฉลี่ย</div><div class="value">${mean} คน</div></div>
@@ -25705,7 +25870,9 @@ function renderSingleDetail(){
   // The first track is the single's title song; the rest are its coupling songs.
   const renderTrack = (t, i) => {
     const rest = t.members.filter(id=>!t.centers.includes(id));
-    const tag = isAlbum ? (i===0?'เพลงไตเติล':'เพลงในอัลบั้ม') : (i===0?'เพลงหลัก':'เพลงรอง');
+    const isStage = WORK_KIND(s) === 'stage';
+    const tag = isStage ? (t.no || '') : isAlbum ? (i===0?'เพลงไตเติล':'เพลงในอัลบั้ม') : (i===0?'เพลงหลัก':'เพลงรอง');
+    const from = t.again && findWork(t.again);
     return `
     <div class="track-block${i===0?' is-lead':''}" style="--c:${getGroup(s.groupId).color}">
       <div class="track-head">
@@ -25713,9 +25880,11 @@ function renderSingleDetail(){
         <span class="track-name">${escapeHtml(t.track)}</span>
         ${renderYouTube(s.id, i, t.track)}
       </div>
-      <div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}${t.members.length} คน${t.centers.length
+      ${from ? `<div class="track-sub">${isEN() ? 'On' : 'อยู่ใน'} <button class="link-inline" data-action="open-single" data-id="${from.id}">${escapeHtml(from.title)}</button></div>`
+        : !t.members.length ? (isStage ? '' : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}ยังไม่ทราบรายชื่อผู้ร้อง</div>`)
+        : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}${t.members.length} คน${t.centers.length
         ? ` · ${isMix() ? 'Center' : 'เซ็นเตอร์'} ` + t.centers.map(id=>linkMember(getMember(id))).join(', ')
-        : ''}</div>
+        : ''}</div>`}
       ${renderTrackGrid(s, t, card)}
       ${renderStage(s, i, t)}
     </div>`;
@@ -26121,7 +26290,7 @@ function galView(id, i, from){
   requestAnimationFrame(() => room.classList.add('is-open'));
 }
 
-const DISC_TABS = [{ id:'singles', label:'ซิงเกิล' }, { id:'albums', label:'อัลบั้ม' }, { id:'specials', label:'เพลงพิเศษ' }];
+const DISC_TABS = [{ id:'singles', label:'ซิงเกิล' }, { id:'albums', label:'อัลบั้ม' }, { id:'specials', label:'เพลงพิเศษ' }, { id:'stages', label:'สเตจ' }];
 
 function renderWorkRow(w, kind){
   const g = getGroup(w.groupId);
@@ -26131,6 +26300,12 @@ function renderWorkRow(w, kind){
   // Only a numbered single or a special single has a senbatsu; a digital
   // single just has the people who sang it.
   const who = kind==='album' ? 'เพลงประจำอัลบั้ม ' : kind==='digital' ? '' : 'เซ็มบัตสึ ';
+  if(kind === 'stage') return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${w.id}">
+    <div class="timeline-year">${w.year} · ${escapeHtml(w.team || workGroupNames(w))} · ${workLabel(w)}</div>
+    <div class="timeline-title">${escapeHtml(w.title)}${w.alt && !(isMix() && mixTitle(w.title) !== w.title) ?` <span class="title-alt">${escapeHtml(w.alt)}</span>`:''}</div>
+    <div class="single-meta">${isEN() ? `${(tracks || []).length} songs in the setlist · ${(tracks || []).filter(t => !t.again).length} only on stage`
+      : `${(tracks || []).length} เพลงในเซ็ตลิสต์ · ${(tracks || []).filter(t => !t.again).length} เพลงที่มีแค่ในสเตจ`}</div>
+  </button>`;
   return `<button class="timeline-item single-row" style="--c:${g.color}" data-action="open-single" data-id="${w.id}">
     <div class="timeline-year">${w.year} · ${workGroupNames(w)} · ${workLabel(w)}</div>
     <div class="timeline-title">${escapeHtml(w.title)}${w.alt && !(isMix() && mixTitle(w.title) !== w.title) ?` <span class="title-alt">${escapeHtml(w.alt)}</span>`:''}</div>
@@ -26256,7 +26431,7 @@ function renderDiscography(){
   const en = isEN(), cat = WORKS_CATS.some(c => c.id === state.worksCat) ? state.worksCat : 'music';
   const inGroupW = w => state.groupFilter === 'all' || mediaGroups(w).includes(state.groupFilter);
   const inGroupS = x => state.groupFilter === 'all' || workGroups(x).includes(state.groupFilter);
-  const n = { music: [...SEED_SINGLES, ...SEED_ALBUMS, ...SEED_SPECIALS].filter(inGroupS).length };
+  const n = { music: [...SEED_SINGLES, ...SEED_ALBUMS, ...SEED_SPECIALS, ...SEED_STAGES].filter(inGroupS).length };
   SEED_MEDIA.forEach(w => { if(inGroupW(w)){ const k = mediaCat(w); n[k] = (n[k] || 0) + 1; } });
   const cats = `<div class="wk-cats" role="tablist">${WORKS_CATS.map(c => `<button class="wk-cat${c.id === cat ? ' is-on' : ''}" data-action="works-cat" data-value="${c.id}" role="tab" aria-selected="${c.id === cat}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${c.icon}</svg>
@@ -26280,14 +26455,17 @@ function renderMusicWorks(){
   const singles = SEED_SINGLES.filter(inGroup).sort((a,b)=> b.year-a.year || b.num-a.num);
   const albums = SEED_ALBUMS.filter(inGroup).sort((a,b)=> b.year-a.year || b.num-a.num);
   const specials = SEED_SPECIALS.filter(inGroup).sort((a,b)=> b.date.localeCompare(a.date));
+  const stages = SEED_STAGES.filter(inGroup).sort((a,b)=> b.date.localeCompare(a.date));
   const cols = {
     singles: { rows: singles.map(s=>renderWorkRow(s,'single')).join(''), note:'' },
     albums: { rows: albums.map(a=>renderWorkRow(a,'album')).join(''),
       note:'อัลบั้มรวมเพลงจากซิงเกิลที่ออกก่อนหน้า และมีเพลงเฉพาะอัลบั้มเพิ่มมา — แสดงเฉพาะเพลงเฉพาะอัลบั้ม' },
     specials: { rows: specials.map(w=>renderWorkRow(w, WORK_KIND(w))).join(''),
       note:'ซิงเกิลพิเศษและซิงเกิลดิจิทัลนอกเหนือจากซิงเกิลและอัลบั้มหลัก — ไม่นับรวมในสถิติเพลง' },
+    stages: { rows: stages.map(w=>renderWorkRow(w,'stage')).join(''),
+      note:'เพลงที่ร้องในเธียเตอร์ เพลงที่ซ้ำกับซิงเกิลหรืออัลบั้มนับไว้ที่ผลงานนั้นครั้งเดียว' },
   };
-  const counts = { singles: singles.length, albums: albums.length, specials: specials.length };
+  const counts = { singles: singles.length, albums: albums.length, specials: specials.length, stages: stages.length };
 
   // A phone shows the tab it is on; a wide screen shows all three side by side
   // and the tabs go away. Each column carries its own heading for that case.
@@ -29134,7 +29312,7 @@ async function drawStatsSongsCard(g, url){
   const tracks = allTracks(), app = new Map(), cen = new Map();
   for(const t of tracks){ t.members.forEach(id => app.set(id, (app.get(id) || 0) + 1)); t.centers.forEach(id => cen.set(id, (cen.get(id) || 0) + 1)); }
   const sizes = tracks.map(t => t.members.length), mean = sizes.length ? Math.round(sizes.reduce((s, n) => s + n, 0) / sizes.length) : 0;
-  statsTiles(g, 250, [[tracks.length, en ? 'songs' : 'เพลงทั้งหมด'], [SEED_SINGLES.length + SEED_ALBUMS.length, en ? 'releases' : 'ผลงาน'],
+  statsTiles(g, 250, [[songCatalog().length, en ? 'songs' : 'เพลงทั้งหมด'], [SEED_SINGLES.length + SEED_ALBUMS.length, en ? 'releases' : 'ผลงาน'],
     [app.size, en ? 'members with a song' : 'มีเพลงอย่างน้อย 1'], [mean, en ? 'avg. line-up' : 'เซ็มบัตสึเฉลี่ย']]);
   const rank = map => [...map.entries()].filter(([id]) => getMember(id)).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const colW = (SHARE_W - 120 - 20) / 2;
