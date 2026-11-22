@@ -10717,7 +10717,8 @@ SEED_STAGES.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 /* Every song the groups put out, each version once: releases, specials, digital singles and the stages, less an
    album's copy of a digital single (`dup`), a stage's repeat of a released song (`again`) and a song of
    Independent Records' units (`ir`, not counted for now — the owner's word, 22 Nov 2026). A stage's own take of a
-   song ("Original Stage ver.", `stageOf` the release, or `stageOfUnit`) is a version of its own and is counted. */
+   song ("Original Stage ver.", `stageOf` the release, or `stageOfUnit`) is a version of its own and is counted; the page
+   says nothing under it (the owner's word). */
 const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir);
 /* Work outside the group's own records: films, series, TV and online shows,
    other artists' music videos and Thai voice roles — one entry each, with every
@@ -25871,8 +25872,7 @@ function renderSingleDetail(){
         ${renderYouTube(s.id, i, t.track)}
       </div>
       ${from ? `<div class="track-sub">${isEN() ? 'On' : 'อยู่ใน'} <button class="link-inline" data-action="open-single" data-id="${from.id}">${escapeHtml(from.title)}</button></div>`
-        : t.stageOf && findWork(t.stageOf) ? `<div class="track-sub">${isEN() ? 'Stage version of the song on' : 'เวอร์ชันสเตจของเพลงใน'} <button class="link-inline" data-action="open-single" data-id="${t.stageOf}">${escapeHtml(findWork(t.stageOf).title)}</button></div>`
-        : t.stageOfUnit ? `<div class="track-sub">${isEN() ? `Stage version of ${escapeHtml(t.stageOfUnit)}'s song` : `เวอร์ชันสเตจของเพลง ${escapeHtml(t.stageOfUnit)}`}</div>`
+        : t.stageOf || t.stageOfUnit ? ''
         : t.ir ? `<div class="track-sub">${isEN() ? `${escapeHtml(t.ir)}'s song (Independent Records)` : `เพลงของ ${escapeHtml(t.ir)} (ค่าย Independent Records)`}</div>`
         : !t.members.length ? (isStage ? '' : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}ยังไม่ทราบรายชื่อผู้ร้อง</div>`)
         : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}${t.members.length} คน${t.centers.length
