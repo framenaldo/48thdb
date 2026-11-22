@@ -2409,7 +2409,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .es-row.is-done + .es-who{ opacity:.55; }
   /* the faces under a timetable row: round photos, the name under each, all on one line (owner, 13 Nov);
      each shrinks to fit the row and a long line-up scrolls sideways instead of wrapping */
-  .es-who .rt-g{ display:flex; flex-wrap:nowrap; gap:5px; overflow-x:auto; scrollbar-width:none; padding:3px 2px 2px; }
+  .es-who .rt-g{ display:flex; flex-wrap:nowrap; gap:5px; overflow-x:auto; scrollbar-width:none; padding:9px 9px 6px; margin:-6px -7px -4px; }   /* room for a tapped face's ring, which the sideways scroll would clip */
   .es-who .rt-g::-webkit-scrollbar{ display:none; }
   .es-who .rt-f{ flex:1 1 0; min-width:38px; max-width:66px; aspect-ratio:auto; overflow:visible; border-radius:0; background:none; box-shadow:none; color:var(--ink); }
   .es-who .rt-f::after{ display:none; }
@@ -2542,6 +2542,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   @keyframes rt-ring{ from{ box-shadow:0 0 0 0 rgba(255,200,61,.8); } to{ box-shadow:0 0 0 12px rgba(255,200,61,0); } }
   @media (min-width:700px){ .rt-t .rt-c.rt-tap, .rt-t .rt-c.rt-ping{ animation-name:rt-tap; animation-iteration-count:1; } .rt-t .rt-c.rt-ping{ animation-name:none; } .rt-t .rt-c.rt-tap i{ animation:rt-ring .55s ease-out; } .rt-t .rt-c.rt-ping i{ animation:rt-ring .55s ease-out .12s 2 backwards; } }
   @media (prefers-reduced-motion:reduce){ .rt-wave .rt-c, .rt-wave .rt-f, .rt-t thead .is-now::after{ transition:none; } .rt-t tbody td.is-now::after, .rt-t .rt-c.rt-tap, .rt-t .rt-c.rt-ping, .rt-f.rt-tap, .rt-f.rt-ping, .rt-t .rt-c.rt-tap i, .rt-t .rt-c.rt-ping i{ animation:none; } }
+  /* a timetable's faces are round (.es-who): the ring goes round the photo, not the square button (the owner saw a square flash, 22 Nov 2026) */
+  .es-who .rt-f{ --rb:var(--c); } .es-who .rt-f.is-oshi, .es-who .rt-f.hl{ --rb:#FFC83D; }
+  .es-who .rt-f.rt-tap{ animation:rt-tap .36s cubic-bezier(.3,1.5,.5,1); } .es-who .rt-f.rt-ping{ animation:none; } .es-who .rt-f.rt-new{ animation:rt-pop .42s cubic-bezier(.3,1.5,.5,1); }
+  .es-who .rt-f.rt-tap img{ animation:rt-ring-o .55s ease-out; } .es-who .rt-f.rt-ping img{ animation:rt-ring-o .55s ease-out .12s 2 backwards; } .es-who .rt-f.rt-new img{ animation:rt-ring-o .6s ease-out; }
+  @keyframes rt-ring-o{ from{ box-shadow:0 0 0 2.5px var(--rb), 0 0 0 2.5px rgba(255,200,61,.8); } to{ box-shadow:0 0 0 2.5px var(--rb), 0 0 0 10px rgba(255,200,61,0); } }
+  @media (prefers-reduced-motion:reduce){ .es-who .rt-f.rt-tap, .es-who .rt-f.rt-new, .es-who .rt-f img{ animation:none !important; } }
   .rt-go{ position:absolute; z-index:8; left:50%; bottom:14px; transform:translateX(-50%); max-width:calc(100% - 28px); white-space:nowrap; font:inherit; font-size:13.5px; font-weight:800; padding:9px 18px; border-radius:var(--r-pill); border:2px solid #FFC83D; background:var(--card); color:var(--ink); cursor:pointer; box-shadow:0 3px 9px color-mix(in srgb, #FFC83D 60%, transparent), 0 8px 20px -6px rgba(0,0,0,.45); animation:rt-go-in .22s ease-out; }
   .rt-go:active{ transform:translateX(-50%) translateY(2px); box-shadow:0 1px 0 #FFC83D; }
   @keyframes rt-go-in{ from{ opacity:0; transform:translateX(-50%) translateY(10px); } }
@@ -15435,7 +15441,9 @@ function penWrite(el, ms = 2300){
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.uniform1i(gl.getUniformLocation(pr, name), unit); });
     // a mask-drawn logo takes the colour it would have been painted in; a picture keeps its own
-    const tint = el.dataset.wrImg ? (getComputedStyle(el).color.match(/[\d.]+/g) || [0, 0, 0]).slice(0, 3).map(n => n / 255) : [1, 1, 1];
+    // (a colour-mix comes back as color(srgb r g b) in 0..1, not rgb() in 0..255: read as 255ths it wrote in black)
+    const col = getComputedStyle(el).color, unit = /^color\(/.test(col) ? 1 : 255;
+    const tint = el.dataset.wrImg ? (col.replace(/^color\(srgb/, '').match(/[\d.]+/g) || [0, 0, 0]).slice(0, 3).map(n => n / unit) : [1, 1, 1];
     gl.uniform3f(gl.getUniformLocation(pr, 'uTint'), tint[0], tint[1], tint[2]);
     gl.uniform1f(gl.getUniformLocation(pr, 'uUse'), el.dataset.wrImg ? 1 : 0);
     const FADE = .1; gl.uniform1f(gl.getUniformLocation(pr, 'uFade'), FADE);
@@ -15686,8 +15694,10 @@ const SONG_LOGOS = {
   kimi: { src:'logos/kimi-to-doko-ka-e-ikitai-v2.svg', png:'logos/kimi-to-doko-ka-e-ikitai-v2.png',
     ratio: 841.89 / 347.07, alt:'Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ', tm:'logos/kimi-to-doko-ka-e-ikitai-v2-t.png' },
   // the hand-drawn, wavy lettering the later posters use, lifted off the 30 Oct Busking poster by its dark ink
-  // "สถานีเชียงใหม่" (Chiang Mai Station), the owner's own clean logo (22 Nov 2026; the first was cut off the overview poster)
-  cnx: { src:'logos/cgm48-chiang-mai-station-v2.png', png:'logos/cgm48-chiang-mai-station-v2.png', ratio: 1750 / 809, w:210, alt:'สถานีเชียงใหม่ — Chiang Mai Station' },
+  // "สถานีเชียงใหม่" (Chiang Mai Station), the owner's own clean logo (22 Nov 2026; the first was cut off the overview poster);
+  // written by the pen on the event sheet (the owner's word, 22 Nov 2026): make-writing-map "[230,690]" 40, overlap .5
+  cnx: { src:'logos/cgm48-chiang-mai-station-v2.png', png:'logos/cgm48-chiang-mai-station-v2.png', ratio: 1750 / 809, w:210, alt:'สถานีเชียงใหม่ — Chiang Mai Station',
+    tm:'logos/cgm48-chiang-mai-station-v2-t.png' },
   kimiwavy: { src:'logos/kimi-to-doko-ka-e-ikitai-wavy.png', png:'logos/kimi-to-doko-ka-e-ikitai-wavy.png',
     ratio: 1104 / 458, alt:'Kimi to Doko ka e Ikitai — อยากจะไปกับเธอ', tm:'logos/kimi-to-doko-ka-e-ikitai-wavy-t.png' },
 };

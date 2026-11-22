@@ -1,5 +1,5 @@
 // usage: node scripts/make-writing-map.mjs <logo url on the local server> <out.png> [line breaks as y values, "[120,190]"] [min piece area] [debug sheet.png] [overlap 0..1]
-// the three in logos/ were made so: journey-of-dreams "[120,190,390]" 40 · kimi-…-wavy "[400]" 120 · ge2026-logo "[30,128,270]" 120 (overlap .55 .5 .45)
+// the logos in logos/ were made so: cgm48-chiang-mai-station-v2 "[230,690]" 40 (overlap .5) · journey-of-dreams "[120,190,390]" 40 · kimi-…-wavy "[400]" 120 · ge2026-logo "[30,128,270]" 120 (overlap .55 .5 .45)
 // A "writing" time map for a logo: for every pixel, when (0..1) a pen drawing the logo would reach it.
 // Strokes (connected pieces of ink) are taken in reading order — line by line, left to right — and in each the
 // pen starts at its top-left end and runs along it, so time is the distance along the shape from that start.
