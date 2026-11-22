@@ -4,3 +4,10 @@ firebase-rules/
 public/
 .wrangler/
 worker/.vapid-private
+
+# skills installed with `npx skills add` (local tools, never part of the site)
+.agents/
+.aider-desk/
+.claude/skills/
+skills-lock.json
+.taste-skill/
