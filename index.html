@@ -10614,7 +10614,6 @@ const SEED_SPECIALS = [
         members:['bnk-sindy', 'cgm-ploen', 'bnk-galeya', 'bnk-inkcha', 'bnk-mayji', 'bnk-micha', 'bnk-mint', 'bnk-mirin', 'bnk-rose', 'bnk-saonoi', 'cgm-praifa', 'cgm-valentine'] },
       { track:'Yobisute Fantasy – เรียกชื่อที ใจไม่ดีแล้ว!', unit:'Team Cuteness', centers:['bnk-palmmy', 'cgm-else'],
         members:['bnk-palmmy', 'cgm-else', 'bnk-berry', 'bnk-blythe', 'bnk-cartoon', 'bnk-khaimook', 'bnk-nammonn', 'bnk-niya', 'bnk-proud', 'cgm-hongyok', 'cgm-punpon', 'cgm-tara'] },
-      { track:'Kimi to Doko ka e Ikitai – อยากจะไปกับเธอ (Live Session ver.)', skip:true, centers:[], members:[] },
     ] },
   /* The main song of CGM48's first stage of its own, The Original Stage "สถานีเชียงใหม่": first sung at the
      Journey of Dreams concert (14 Nov 2026) and out on the streaming services the next day. Line-up and its two
@@ -10752,7 +10751,7 @@ SEED_STAGES.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
    song ("Original Stage ver.", `stageOf` the release, or `stageOfUnit`) is a version of its own and is counted; the page
    says nothing under it (the owner's word). */
 const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir && !t.special && !t.skip);
-/* …and the rest that the site lists but the total leaves out: special and remix versions, live and soundtrack takes, IR songs */
+/* …and the rest that the site lists but the total leaves out: special and remix versions, the soundtrack take, IR songs */
 const songExtras = () => allTracks(true).filter(t => !t.dup && !t.again && (t.ir || t.special || t.skip));
 /* Work outside the group's own records: films, series, TV and online shows,
    other artists' music videos and Thai voice roles — one entry each, with every

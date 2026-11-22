@@ -159,7 +159,7 @@ the Firebase CLI from the owner's machine.
   work with no names on record (ads, channel shows).
 - **Every song, counted** (`songCatalog()`, the stats page's "เพลงทั้งหมด"): each song the groups put out, each version once —
   singles, albums, specials, digital singles and the theater stages (`SEED_STAGES`, kind `stage`, the Works page's fourth tab
-  "สเตจ"), 242 on 22 Nov 2026 — the remixes and Bualoy Khaiwaan's soundtrack take are listed but not counted (`skip`). The stats page shows those left out beside the total (`songExtras()`, "+ เวอร์ชันอื่น N เพลง"): Special and remix versions, live and soundtrack takes, eRAA's songs. Built from the 242-song list (OTA STORY on X) with the owner's corrections: Touch By Heart's
+  "สเตจ"), 242 on 22 Nov 2026 — the remixes and Bualoy Khaiwaan's soundtrack take are listed but not counted (`skip`). The stats page shows those left out beside the total (`songExtras()`, "+ เวอร์ชันอื่น N เพลง"): Special and remix versions, Bualoy Khaiwaan's soundtrack take, eRAA's songs. Kimi to Doko ka e Ikitai's Live Session is a YouTube video only, not a release: not listed (the owner's word). Built from the 242-song list (OTA STORY on X) with the owner's corrections: Touch By Heart's
   Grab version counts; a live take of a released song is the same song, but a stage's "Original Stage ver." counts as a version of
   its own (`stageOf:` the release, nothing written under it); overture of a
   the overtures count (Mimigumo's too); a "Special ver." does not (`special:true`, still listed); and so does every studio version released on its own
