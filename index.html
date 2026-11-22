@@ -7435,10 +7435,12 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
       .ticker-link, .glass-nav *, .gnav, .row, .cell, .dtable *, [class*="meow"], .per-tile){
       transition:translate .5s cubic-bezier(.22,.9,.32,1), box-shadow .5s cubic-bezier(.22,.9,.32,1), transform .2s var(--ease-out), border-color .3s ease, background-color .3s ease; }
     html[data-lg="1"] :where(button, a[href][class], [data-action], [role="button"]):not(:disabled, .modal-backdrop, .link-inline, .ticker,
-      .ticker-link, .glass-nav *, .gnav, .row, .cell, .dtable *, [class*="meow"], .per-tile):hover{ translate:0 -2px; }
+      .ticker-link, .glass-nav *, .gnav, .row, .cell, .dtable *, [class*="meow"], .per-tile, .ge-sum-center):hover{ translate:0 -2px; }
+    /* a row that scrolls sideways clips whatever rises out of it: room above and below for the lift and its shadow */
+    html[data-lg="1"] :is(.bday-next, .tl-row, .tl-locked, .today-slide, .per-list){ padding-top:8px; padding-bottom:24px; margin-top:-6px; margin-bottom:-16px; }
     html[data-lg="1"] :is(button, a[href], [data-action], [role="button"]):is(.card, .cal-wrap, .ev-card, .rota, .shop-card, .tl-card, .lay-card,
       .bio-card, .qz-card, .mini-card, .stat-cell, .bday-chip, .otd-row, .dash-t, .dash-ge, .cd-next, .gel-mini-c, .gel-strip, .ge-sum-center,
-      .past-toggle, .sr-row, .gal-teaser, .account-card, .vis-card, .ev-cta, .work-row, .gec-teaser, .xt-card):hover{
+      .past-toggle, .sr-row, .gal-teaser, .account-card, .vis-card, .ev-cta, .work-row, .gec-teaser, .xt-card):not(.ge-sum-center):hover{
       translate:0 -3px; box-shadow:var(--lg-hi), 0 12px 28px rgba(var(--shadow-rgb),.16); }
     html[data-lg="1"] :is(button, a[href], [data-action], [role="button"]):is(.chip, .pill, .ev-person, .tl-chip, .set-btn, .set-go, .page-share-btn,
       .box-share-btn, .share-act, .cal-nav, .sub-tab, .scope-btn, .rt-tab, .rt-day, .sl-day, .bio-pen, .back-btn, .modal-close-btn, .modal-share-btn,
