@@ -10410,13 +10410,13 @@ const SEED_SPECIALS = [
   { id:'bnk-sp-mhokkob', groupId:'bnk48', groups:['bnk48'], kind:'digital',
     title:'หมกกบ', alt:'Mhok Kob', date:'2022-06-04', year:2022,
     tracks:[
-      { track:'หมกกบ', centers:[],
+      { track:'หมกกบ', ir:'eRAA', centers:[],
         members:['bnk-wee', 'bnk-gygee', 'bnk-mobile', 'bnk-namneung', 'bnk-pupe'] },
     ] },
   { id:'bnk-sp-monrak', groupId:'bnk48', groups:['bnk48'], kind:'digital',
     title:'มนต์รักจิ้งหรีด', alt:'Mon Rak Jing Rit', date:'2022-06-25', year:2022,
     tracks:[
-      { track:'มนต์รักจิ้งหรีด', centers:[],
+      { track:'มนต์รักจิ้งหรีด', ir:'eRAA', centers:[],
         members:['bnk-wee', 'bnk-gygee', 'bnk-mobile'] },
     ] },
   { id:'bnk-sp-jiwarudays', groupId:'bnk48', groups:['bnk48'], kind:'special',
@@ -25891,7 +25891,7 @@ function renderSingleDetail(){
       </div>
       ${from ? `<div class="track-sub">${isEN() ? 'On' : 'อยู่ใน'} <button class="link-inline" data-action="open-single" data-id="${from.id}">${escapeHtml(from.title)}</button></div>`
         : t.stageOf || t.stageOfUnit ? ''
-        : t.ir ? `<div class="track-sub">${isEN() ? `${escapeHtml(t.ir)}'s song (Independent Records)` : `เพลงของ ${escapeHtml(t.ir)} (ค่าย Independent Records)`}</div>`
+        : t.ir && !t.members.length ? `<div class="track-sub">${isEN() ? `${escapeHtml(t.ir)}'s song (Independent Records)` : `เพลงของ ${escapeHtml(t.ir)} (ค่าย Independent Records)`}</div>`
         : !t.members.length ? (isStage ? '' : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}ยังไม่ทราบรายชื่อผู้ร้อง</div>`)
         : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}${t.members.length} คน${t.centers.length
         ? ` · ${isMix() ? 'Center' : 'เซ็นเตอร์'} ` + t.centers.map(id=>linkMember(getMember(id))).join(', ')
