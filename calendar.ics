@@ -661,6 +661,25 @@ DTSTART;TZID=Asia/Bangkok:20261105T180000
 DTEND;TZID=Asia/Bangkok:20261105T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-bnk48-major-loykrathong-1124-2026-11-24@48thdb
+DTSTAMP:20261124T000000Z
+SUMMARY:Major Loy Krathong Fair 2026
+LOCATION:เมเจอร์ รัชโยธิน (ถนนคนเ
+ ดิน)\, Bangkok
+DESCRIPTION:เมมเบอร์: Rose\, Fame\, Hoop\, Arlee\, Micha\n
+ • 19:00 พบกับศิลปิน BNK48 — ร่วมพู
+ ดคุยและลอยกระทง\n• คืนวันเ
+ พ็ญ เล่นงานวัด — เข้าฟรี\n• 
+ ร่วมลอยกระทงและเชยชมกระท
+ งยักษ์ใจกลางรัชโยธิน พร้อ
+ มตลาดงานวัดและดีเจ\n• Dress code: 
+ ไทยร่วมสมัย\n\nhttps://48thdb.com/event/ev-bnk48-maj
+ or-loykrathong-1124
+URL:https://48thdb.com/event/ev-bnk48-major-loykrathong-1124
+DTSTART;TZID=Asia/Bangkok:20261124T190000
+DTEND;TZID=Asia/Bangkok:20261124T210000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-cgm48-popup-ontour-1124-2026-11-24@48thdb
 DTSTAMP:20261124T000000Z
 SUMMARY:CGM48 POP UP LIVE ON TOUR
