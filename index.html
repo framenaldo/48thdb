@@ -6837,9 +6837,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     .shop-grid{ grid-template-columns:repeat(auto-fill, minmax(min(100%, 440px), 1fr)); }
     .shop-card{ grid-template-columns:124px minmax(0, 1fr); }
 
-    /* songs: singles, albums and specials as three columns */
+    /* songs: singles, albums, specials and stages as four columns */
     .disc-tabs{ display:none; }
-    .disc-cols{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:0 clamp(24px, 3vw, 56px); align-items:start; }
+    .disc-cols{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:0 clamp(24px, 3vw, 56px); align-items:start; }
     .disc-col{ display:block; min-width:0; }
     .disc-col-head{ display:block; }
 
@@ -7310,6 +7310,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .sub-tab.active, .subtab.active, .qz-tab.is-on, .scope-btn.is-on{ background:var(--ink); color:var(--card); border-color:var(--ink);
     box-shadow:0 2px 7px rgba(var(--shadow-rgb), .22); }
   .sub-tab:active, .subtab:active, .qz-tab:active, .scope-btn:active{ transform:translateY(2px); box-shadow:none; }
+  /* the Works page's four song tabs share the row evenly on a phone; from a laptop up the four lists stand side by side
+     and the tabs go (the shared look above set them back to flex, 22 Nov 2026) */
+  .subtab-bar.disc-tabs{ flex:1 1 100%; }
+  .disc-tabs .subtab{ flex:1 1 0; min-width:0; padding:8px 6px; text-align:center; }
+  @media (min-width:1024px){ .subtab-bar.disc-tabs{ display:none; } }
   .ge-tabs .sub-tab.active, .gel-rounds .sub-tab.active{ background:var(--ge); border-color:var(--ge); color:#fff; }
   html[data-stage="1"] .subtab.active{ background:rgba(255,255,255,.9); color:#1B1426; }
 
