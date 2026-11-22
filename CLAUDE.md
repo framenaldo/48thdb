@@ -159,10 +159,10 @@ the Firebase CLI from the owner's machine.
   work with no names on record (ads, channel shows).
 - **Every song, counted** (`songCatalog()`, the stats page's "เพลงทั้งหมด"): each song the groups put out, each version once —
   singles, albums, specials, digital singles and the theater stages (`SEED_STAGES`, kind `stage`, the Works page's fourth tab
-  "สเตจ"), 250 on 22 Nov 2026. Built from the 242-song list (OTA STORY on X) with the owner's corrections: Touch By Heart's
+  "สเตจ"), 248 on 22 Nov 2026. Built from the 242-song list (OTA STORY on X) with the owner's corrections: Touch By Heart's
   Grab version counts; a live take of a released song is the same song, but a stage's "Original Stage ver." counts as a version of
   its own (`stageOf:` the release, nothing written under it); overture of a
-  unit is not a song, but the BNK48 and CGM48 overtures count, and so does every studio version released on its own
+  the overtures count (Mimigumo's too); a "Special ver." does not (`special:true`, still listed); and so does every studio version released on its own
   (Charaline's, the remixes, Na Yak's special version, Touch By Heart's languages); anything on Independent Records (eRAA and the like) is not counted for now (`ir:` on a stage track).
   An album's copy of a digital single carries `dup:true`; a stage song that is also on a release carries `again:` that
   release's id, and the stage page links to it. Stage tracks name no one (the cast changes show to show) and go by their setlist

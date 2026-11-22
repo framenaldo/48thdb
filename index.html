@@ -10272,7 +10272,7 @@ const SEED_SENBATSU = {
       members:['cgm-aom', 'cgm-angel', 'cgm-champoo', 'cgm-fortune', 'cgm-jjae', 
         'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-marmink', 'cgm-mei', 'cgm-nenie', 
         'cgm-parima', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
-    { track:'มะลิ (Special Ver.)', centers:['cgm-kaning'],
+    { track:'มะลิ (Special Ver.)', special:true, centers:['cgm-kaning'],
       members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 
         'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 
         'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 
@@ -10353,6 +10353,7 @@ const SEED_SPECIALS = [
         members:['bnk-music'] },
       { track:'Heart Gata Virus – หัวใจไวรัส', centers:['bnk-jaa'],
         members:['bnk-jaa', 'bnk-kaimook', 'bnk-music'] },
+      { track:'Overture (Mimigumo ver.)', centers:[], members:[] },
     ] },
   { id:'bnk-sp-touchbyheart', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
     title:'Touch By Heart', alt:'หัวใจใกล้กัน', date:'2020-04-02', year:2020,
@@ -10364,7 +10365,7 @@ const SEED_SPECIALS = [
         members:['bnk-miori', 'bnk-jaa', 'bnk-kaimook', 'bnk-music', 'bnk-satchan', 'cgm-izurina'] },
       { track:'Touch By Heart (Lanna Version)', centers:[],
         members:['cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
-      { track:'Touch By Heart (Special Version)', centers:[],
+      { track:'Touch By Heart (Special Version)', special:true, centers:[],
         members:['bnk-cherprang', 'bnk-faii', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-june', 'bnk-kaew', 'bnk-kate', 'bnk-kheng', 'bnk-korn', 'bnk-minmin', 'bnk-miori', 'bnk-myyu', 'bnk-niky', 'bnk-noey', 'bnk-panda', 'bnk-piam', 'bnk-pun', 'bnk-wee', 'bnk-bamboo', 'bnk-fond', 'bnk-gygee', 'bnk-jaa', 'bnk-kaimook', 'bnk-mewnich', 'bnk-mobile', 'bnk-music', 'bnk-namneung', 'bnk-namsai', 'bnk-new', 'bnk-nine', 'bnk-orn', 'bnk-phukkhom', 'bnk-pupe', 'bnk-satchan', 'bnk-stang', 'bnk-tarwaan', 'bnk-fifa', 'bnk-khamin', 'bnk-mind', 'bnk-pakwan', 'bnk-ratah', 'bnk-view', 'cgm-aom', 'cgm-izurina', 'cgm-angel', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
       { track:'Touch By Heart (English Version)', centers:[],
         members:['bnk-kaew', 'bnk-noey', 'bnk-namneung', 'bnk-orn', 'bnk-tarwaan'] },
@@ -10447,7 +10448,7 @@ const SEED_SPECIALS = [
     tracks:[
       { track:'น่ายักแบบนี้ เป็นของเธอนะ', centers:['cgm-champoo'],
         members:['bnk-hoop', 'cgm-champoo', 'cgm-kaning', 'cgm-lookked', 'cgm-nenie', 'cgm-sita'] },
-      { track:'น่ายักแบบนี้ เป็นของเธอนะ (Special ver.)', unit:'CGM48', centers:[], members:[] },
+      { track:'น่ายักแบบนี้ เป็นของเธอนะ (Special ver.)', special:true, unit:'CGM48', centers:[], members:[] },
     ] },
   { id:'bnk-sp-sportsday', groupId:'bnk48', groups:['bnk48', 'cgm48'], kind:'digital',
     title:'Sports Day 2024: Neko Wars', alt:'', date:'2024-07-28', year:2024,
@@ -10733,10 +10734,10 @@ const SEED_STAGES = [
 SEED_STAGES.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 /* Every song the groups put out, each version once: releases, specials, digital singles and the stages, less an
    album's copy of a digital single (`dup`), a stage's repeat of a released song (`again`) and a song of
-   Independent Records' units (`ir`, not counted for now — the owner's word, 22 Nov 2026). A stage's own take of a
+   Independent Records' units (`ir`) or a "Special ver." (`special`), neither counted for now (the owner's word, 22 Nov 2026). A stage's own take of a
    song ("Original Stage ver.", `stageOf` the release, or `stageOfUnit`) is a version of its own and is counted; the page
    says nothing under it (the owner's word). */
-const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir);
+const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir && !t.special);
 /* Work outside the group's own records: films, series, TV and online shows,
    other artists' music videos and Thai voice roles — one entry each, with every
    member in it. Pieced together in October 2026 from the two fan wikis'
