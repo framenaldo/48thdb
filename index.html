@@ -10697,26 +10697,27 @@ const SEED_STAGES = [
     note:'สเตจออริจินัลแรกของ BNK48 (เริ่ม 20 ธ.ค. 2024) เป็นเพลงไทยทั้งสเตจ',
     tracks:[
       { no:'M01', track:'For Your Dream – อยากให้เธอรอ', centers:[], members:[] },
-      { no:'M02', track:'สัญญานะ (Original Stage ver.)', again:'bnk-s14', centers:[], members:[] },
+      { no:'M02', track:'สัญญานะ (Original Stage ver.)', stageOf:'bnk-s14', centers:[], members:[] },
       { no:'M03', track:'New Better Day – ดีกว่าเมื่อวาน', centers:[], members:[] },
       { no:'M04', track:'Bloom', centers:[], members:[] },
       { no:'M05', track:'บัวลอยไข่หวาน', centers:[], members:[] },
       { no:'M06', track:'First Love – รักครั้งแรก', centers:[], members:[] },
-      { no:'M07', track:'เสียงของใบไม้ (Original Stage ver.)', again:'bnk-s13', centers:[], members:[] },
-      { no:'M08', track:'Cry – ฉันต้องนอนร้องไห้ (Original Stage ver.)', again:'bnk-sp-cry', centers:[], members:[] },
-      { no:'M09', track:'Believers (Original Stage ver.)', again:'bnk-s12', centers:[], members:[] },
-      { no:'M10', track:"It's Life (Original Stage ver.)", again:'bnk-s7', centers:[], members:[] },
+      { no:'M07', track:'เสียงของใบไม้ (Original Stage ver.)', stageOf:'bnk-s13', centers:[], members:[] },
+      { no:'M08', track:'Cry – ฉันต้องนอนร้องไห้ (Original Stage ver.)', stageOf:'bnk-sp-cry', centers:[], members:[] },
+      { no:'M09', track:'Believers (Original Stage ver.)', stageOf:'bnk-s12', centers:[], members:[] },
+      { no:'M10', track:"It's Life (Original Stage ver.)", stageOf:'bnk-s7', centers:[], members:[] },
       { no:'M11', track:'WHISPER ROAR', again:'bnk-sp-whisperroar', centers:[], members:[] },
       { no:'M12', track:'ไม่อยากนอน', centers:[], members:[] },
       { no:'EN01', track:'เมโลดี้นี้', centers:[], members:[] },
-      { no:'EN02', track:'เด็กดื้อย์ (Original Stage ver.)', ir:'eRAA', centers:[], members:[] },
+      { no:'EN02', track:'เด็กดื้อย์ (Original Stage ver.)', stageOfUnit:'eRAA', centers:[], members:[] },
       { no:'EN04', track:'ไกลไม่ไกล', centers:[], members:[] },
     ] },
 ];
 SEED_STAGES.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 /* Every song the groups put out, each version once: releases, specials, digital singles and the stages, less an
    album's copy of a digital single (`dup`), a stage's repeat of a released song (`again`) and a song of
-   Independent Records' units sung on stage (`ir`, not counted for now — the owner's word, 22 Nov 2026). */
+   Independent Records' units (`ir`, not counted for now — the owner's word, 22 Nov 2026). A stage's own take of a
+   song ("Original Stage ver.", `stageOf` the release, or `stageOfUnit`) is a version of its own and is counted. */
 const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir);
 /* Work outside the group's own records: films, series, TV and online shows,
    other artists' music videos and Thai voice roles — one entry each, with every
@@ -25870,6 +25871,8 @@ function renderSingleDetail(){
         ${renderYouTube(s.id, i, t.track)}
       </div>
       ${from ? `<div class="track-sub">${isEN() ? 'On' : 'อยู่ใน'} <button class="link-inline" data-action="open-single" data-id="${from.id}">${escapeHtml(from.title)}</button></div>`
+        : t.stageOf && findWork(t.stageOf) ? `<div class="track-sub">${isEN() ? 'Stage version of the song on' : 'เวอร์ชันสเตจของเพลงใน'} <button class="link-inline" data-action="open-single" data-id="${t.stageOf}">${escapeHtml(findWork(t.stageOf).title)}</button></div>`
+        : t.stageOfUnit ? `<div class="track-sub">${isEN() ? `Stage version of ${escapeHtml(t.stageOfUnit)}'s song` : `เวอร์ชันสเตจของเพลง ${escapeHtml(t.stageOfUnit)}`}</div>`
         : t.ir ? `<div class="track-sub">${isEN() ? `${escapeHtml(t.ir)}'s song (Independent Records)` : `เพลงของ ${escapeHtml(t.ir)} (ค่าย Independent Records)`}</div>`
         : !t.members.length ? (isStage ? '' : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}ยังไม่ทราบรายชื่อผู้ร้อง</div>`)
         : `<div class="track-sub">${t.unit ? `${escapeHtml(t.unit)} · ` : ''}${t.members.length} คน${t.centers.length
