@@ -10327,7 +10327,7 @@ const SEED_SPECIALS = [
     note:'เพลงประกอบซีรีส์ Shock Me Girls ซีซัน 2',
     tracks:[
       { track:'สาวหมวย', centers:[], members:['bnk-blythe', 'bnk-grape', 'bnk-mail', 'bnk-mirin'] },
-      { track:'บัวลอยไข่หวาน (OST ver.)', centers:[], members:['bnk-janry', 'bnk-marine', 'bnk-monet', 'bnk-praew', 'bnk-sindy'] },
+      { track:'บัวลอยไข่หวาน (OST ver.)', skip:true, centers:[], members:['bnk-janry', 'bnk-marine', 'bnk-monet', 'bnk-praew', 'bnk-sindy'] },
     ] },
   { id:'bnk-sp-3rdgencover', groupId:'bnk48', groups:['bnk48'], kind:'digital',
     title:'BNK48 3rd Generation Music Cover Project', alt:'', date:'2023-10-01', year:2023,
@@ -10734,10 +10734,11 @@ const SEED_STAGES = [
 SEED_STAGES.forEach(w => { SEED_SENBATSU[w.id] = w.tracks; });
 /* Every song the groups put out, each version once: releases, specials, digital singles and the stages, less an
    album's copy of a digital single (`dup`), a stage's repeat of a released song (`again`) and a song of
-   Independent Records' units (`ir`) or a "Special ver." (`special`), neither counted for now (the owner's word, 22 Nov 2026). A stage's own take of a
+   Independent Records' units (`ir`) or a "Special ver." (`special`), neither counted for now (the owner's word, 22 Nov 2026); `skip` is any other song the owner leaves out
+   (Bualoy Khaiwaan's soundtrack take). A stage's own take of a
    song ("Original Stage ver.", `stageOf` the release, or `stageOfUnit`) is a version of its own and is counted; the page
    says nothing under it (the owner's word). */
-const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir && !t.special);
+const songCatalog = () => allTracks(true).filter(t => !t.dup && !t.again && !t.ir && !t.special && !t.skip);
 /* Work outside the group's own records: films, series, TV and online shows,
    other artists' music videos and Thai voice roles — one entry each, with every
    member in it. Pieced together in October 2026 from the two fan wikis'
