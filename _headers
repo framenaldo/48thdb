@@ -8,6 +8,12 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
 
+# Except the home page, which other sites may show in a frame (the owner's word, 24 Nov 2026). Any other address still
+# refuses, and inside another site's frame the page keeps the owner's powers off (FRAMED_OUT in index.html).
+/
+  ! X-Frame-Options
+  ! Content-Security-Policy
+
 # The page itself must never be served from a stale copy: the service worker is
 # network-first for exactly this reason, and a CDN cache would undo that.
 /index.html

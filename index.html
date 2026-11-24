@@ -12661,7 +12661,11 @@ async function checkGEHelper(){
     return live.some(x => x.h === hex); }catch(e){ return false; }
 }
 const geCanEnter = () => state.isOwner || (state.geHelper && GE_HELPERS.some(x => Date.now() < x.until));
+/* Another site may show the home page in a frame (_headers, the owner's word, 24 Nov 2026). Inside someone else's frame the
+   owner's powers stay off, so a page laid over ours cannot trick the owner into approving or deleting anything. */
+const FRAMED_OUT = (() => { try{ return window.top !== window.self && window.top.location.origin !== location.origin; }catch(e){ return true; } })();
 async function checkOwner(){
+  if(FRAMED_OUT) return false;
   const u = fbAuth.currentUser;
   if(!u || u.isAnonymous) return false;
   try{ await fbDb.collection('admin').doc('owner').get(); return true; }
@@ -34353,7 +34357,7 @@ async function init(){
     }
     listenGE();   // the results need nothing below; started first, the dashboard has them sooner
     state.isOwner = await checkOwner();
-    state.geHelper = !state.isOwner && await checkGEHelper();
+    state.geHelper = !FRAMED_OUT && !state.isOwner && await checkGEHelper();
     // the owner sees the dressed-up events wherever they are signed in, the Home Screen app included
     // (it keeps its own storage, so a ?fx=new opened in Safari never reaches it); ?fx=off still turns it off
     if(state.isOwner && !/[?&]fx=off\b/.test(location.search)){
