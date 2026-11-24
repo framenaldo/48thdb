@@ -2928,8 +2928,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     background:linear-gradient(160deg, color-mix(in srgb, var(--c) 22%, rgba(24,18,32,.5)), rgba(24,18,32,.42)) !important; color:var(--ink);
     -webkit-backdrop-filter:blur(12px) saturate(1.3); backdrop-filter:blur(12px) saturate(1.3); }
   html[data-clear="1"][data-theme="dark"] .today-hero :is(.today-hero-title, .today-hero-meta, .today-hero-body > p:not(.today-hero-status), .today-hero-foot > p:not(.today-hero-open)){ color:var(--ink) !important; }
-  /* the member chips stay white pills, so their names keep dark type */
-  html[data-clear="1"][data-theme="dark"] .today-hero :is(.ev-person, .ev-more-people, .chip, .chip-link){ --ink:#1B1426 !important; --ink-soft:rgba(27,20,38,.7) !important; color:#1B1426 !important; }
+  /* the member chips are smoked glass at night now (the liquid glass), not white pills: their names take the card's light type
+     (dark type sank into them, 24 Nov 2026); a plain .chip that is still a white pill keeps dark type */
+  html[data-clear="1"][data-theme="dark"] .today-hero :is(.ev-person, .ev-more-people){ color:var(--ink) !important; }
+  html[data-clear="1"][data-theme="dark"] .today-hero :is(.chip, .chip-link){ --ink:#1B1426 !important; --ink-soft:rgba(27,20,38,.7) !important; color:#1B1426 !important; }
   html[data-clear="1"][data-theme="dark"] .today-hero .today-hero-open{ color:var(--c-text) !important; }
   html[data-clear="1"] .today-hero::after{ padding:1.5px; opacity:.55; }
   html[data-clear="1"] .today-hero::before{ opacity:.35; }
