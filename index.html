@@ -31542,6 +31542,9 @@ class MeowRoamer extends MeowWalker {
     this.T = 0; this.free = false; this.low = false; this.sneezed = false;
     if(this.mode !== 'ledge') return;
     const b = this.box(); if(!b){ this.fall(); return; }
+    // her ring of buttons is open: she waits facing the reader rather than starting off somewhere, which shut the ring as soon as
+    // she hopped (24 Nov 2026). What she was already doing ran its course; the ring closes by itself in 6.5 s and she goes on.
+    if(_meowRing && _meowRing.w === this && this.awake()){ this.act = 'front'; this.dur = 1.2; this.draw(); return; }
     for(let guard = 0; guard < 14; guard++){
       if(!this.queue.length) this.queue = this.think();
       const st = this.queue.shift(); if(!st) continue;
@@ -32329,8 +32332,21 @@ function meowBubblePos(w){
   if(!_meowBubble || !_meowBubble.classList.contains('on')) return;
   const hx = w.headX(), hy = w.headY ? w.headY() : 0, bw = _meowBubble.offsetWidth, bh = _meowBubble.offsetHeight, left = hx + bw > innerWidth - 8;
   _meowBubble.classList.toggle('is-left', left);
-  const x = Math.max(4, Math.min(innerWidth - bw - 4, left ? hx - bw : hx - 4)), y = Math.max(4, hy - 8 - bh), [ox, oy] = w.off ? w.off() : [0, 0];
+  const x = Math.max(4, Math.min(innerWidth - bw - 4, left ? hx - bw : hx - 4)), [ox, oy] = w.off ? w.off() : [0, 0];
+  let y = Math.max(4, hy - 8 - bh);
   _meowBubble.style.transform = `translate(${(x + ox).toFixed(0)}px, ${(y + oy).toFixed(0)}px)`;
+  // with her ring of buttons open the bubble would sit right among them, half hidden (the first tap's hint did, 24 Nov 2026):
+  // it goes over the ring and its labels, or under it when there is no room above
+  if(_meowRing && _meowRing.w === w){
+    let t = Infinity, b = -Infinity;
+    for(const el of _meowRing.el.querySelectorAll('.meow-rb, .meow-rb small')){ const r = el.getBoundingClientRect(); if(r.height){ t = Math.min(t, r.top); b = Math.max(b, r.bottom); } }
+    const me = _meowBubble.getBoundingClientRect();
+    if(t < Infinity && me.bottom > t - 6 && me.top < b + 6){
+      const up = t - 6 - me.bottom;   // its bottom just over the ring's top
+      y += me.top + up >= meowBand().top + 4 ? up : (b + 6) - me.top;   // else its top just under the ring's foot
+      _meowBubble.style.transform = `translate(${(x + ox).toFixed(0)}px, ${(y + oy).toFixed(0)}px)`;
+    }
+  }
 }
 function meowFx(host, w, html, cls = ''){
   if(!host || !w) return;
