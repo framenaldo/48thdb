@@ -298,7 +298,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     color:var(--gold); background:transparent;
   }
   .pill-grad.active{
-    background:var(--gold); color:#fff; border-style:solid; border-color:transparent;
+    background:var(--gold); color:#2A1D05; border-style:solid; border-color:transparent;   /* dark type: white on the gold read at 2.3:1 */
   }
   .pill-grad .grad-cap{ display:inline-flex; width:14px; height:14px; }
   .pill-grad .grad-cap svg{ width:100%; height:100%; display:block; }
@@ -2633,9 +2633,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     color:color-mix(in srgb, var(--c) 85%, var(--ink)); opacity:1; }
   :root .es-box:not(.has-who) .es-row .es-time small{ display:none; }
   /* at night a dark poster colour (navy, maroon) sank into the dark card: the time, the dot and the pill lean to white instead */
-  :root[data-theme="dark"] .es-box:not(.has-who) .es-row:not(.is-now, .is-done) .es-time{ color:color-mix(in srgb, var(--c) 40%, #fff); }
-  :root[data-theme="dark"] .es-box:not(.has-who) .es-row:not(.is-now, .is-done) .es-st:not(:empty){ color:color-mix(in srgb, var(--c) 35%, #fff); background:color-mix(in srgb, var(--c) 30%, var(--card)); }
-  :root[data-theme="dark"] .es-box:not(.has-who) .es-row:not(.is-now, .is-done, .has-tone){ --dot:color-mix(in srgb, var(--c) 45%, #fff); }
+  :root[data-theme="dark"] .modal-glass-card:not(.is-scene-paper, .is-scene-airline) .es-box:not(.has-who) .es-row:not(.is-now, .is-done) .es-time{ color:color-mix(in srgb, var(--c) 40%, #fff); }
+  :root[data-theme="dark"] .modal-glass-card:not(.is-scene-paper, .is-scene-airline) .es-box:not(.has-who) .es-row:not(.is-now, .is-done) .es-st:not(:empty){ color:color-mix(in srgb, var(--c) 35%, #fff); background:color-mix(in srgb, var(--c) 30%, var(--card)); }
+  :root[data-theme="dark"] .modal-glass-card:not(.is-scene-paper, .is-scene-airline) .es-box:not(.has-who) .es-row:not(.is-now, .is-done, .has-tone){ --dot:color-mix(in srgb, var(--c) 45%, #fff); }
   :root .es-box:not(.has-who) .es-row.is-alt{ background:none; }   /* the older every-other-row shade showed as bands at night */
   :root .es-box:not(.has-who) .es-row .es-what{ grid-column:3; padding-left:8px; font-size:15.5px; font-weight:800; color:var(--ink); opacity:1; }
   :root .es-box:not(.has-who) .es-row:is(.has-sl, .has-gs) .es-what{ align-items:center; }
@@ -6414,6 +6414,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     transition:background .16s ease, color .16s ease, border-color .16s ease;
   }
   .sub-tab.active{ background:var(--ink); color:var(--card); border-color:var(--ink); }
+  :root[data-theme="dark"] .sub-tab.active{ color:#1E1729; }   /* --card is see-through glass at night: the tab's word came out at 55% (24 Nov 2026) */
 
   @media (hover:hover){
     .bday-chip:hover{
