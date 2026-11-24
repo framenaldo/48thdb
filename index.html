@@ -31315,7 +31315,12 @@ function meowRun(w){ _meowRun.add(w); if(!_meowRaf){ _meowLast = 0; _meowRaf = r
    left rail's screens, the foot of the screen); she walks along one, sits, and now and then jumps to another in
    reach. A card carries her as the page scrolls; when it leaves the screen she jumps down to the menu bar. ---- */
 let _meowPage = null, _meowWalk = null, _meowLayer = null, _meowBubble = null, _meowSayT = 0, _meowLedges = [], _meowLedgeT = 0, _meowPois = [];
-const MEOW_LEDGE_SEL = 'main .card, main [class*="-card"], main .feed-block > *, main .dash > *, main .today-hero, main section > .ev-card, #main .ev-card';
+const MEOW_LEDGE_SEL = 'main .card, main [class*="-card"], main .feed-block > *, main .dash > *, main .today-hero, main section > .ev-card, #main .ev-card, #main .timeline-item, #main .gal-hall, #main .gal-mini';
+/* floors wider than the screen, in a box that scrolls sideways (the members table's rows): she stands on the part on screen, which is
+   the same height whatever the sideways scroll. Without them the members table, the Works page's song list and the gallery had no
+   floor at all (the gallery's framed pictures, square-cornered, did not look like cards either), and calling her there sent her to the very foot of the page (24 Nov 2026). */
+const MEOW_WIDE_SEL = '#main .table-wrap .dtable > .row:not(.head)';
+const MEOW_LEDGE_ALL = MEOW_LEDGE_SEL + ', ' + MEOW_WIDE_SEL;
 const MEOW_POI_SEL = '[data-action="open-member"][data-id], [data-action="open-event"][data-id]';
 let _meowBandC = null, _meowBandT = 0;
 function meowBand(){
@@ -31337,7 +31342,7 @@ function meowScanLedges(catW, nearY){
   _meowPois = [];
   const root = document.getElementById('main') || document.querySelector('main'); if(!root) return out;
   const R = root.id ? '#main' : 'main', sx = scrollX, sy = scrollY, focus = nearY != null ? nearY : sy + innerHeight / 2;
-  const els = root.querySelectorAll(MEOW_LEDGE_SEL + ', ' + R + ' > * > *, ' + R + ' > * > * > *, ' + R + ' ' + MEOW_POI_SEL.split(', ').join(', ' + R + ' '));
+  const els = root.querySelectorAll(MEOW_LEDGE_ALL + ', ' + R + ' > * > *, ' + R + ' > * > * > *, ' + R + ' ' + MEOW_POI_SEL.split(', ').join(', ' + R + ' '));
   const seen = new Set(), cand = [], pois = [], pin = new Map();
   // a card that sticks to the screen (a side column on a wide screen) stays in the same place on screen while the page scrolls: a floor
   // there would carry her and anything set down on it along with the scroll. Nothing that is, or sits in, a fixed or sticky box is a floor.
@@ -31352,7 +31357,8 @@ function meowScanLedges(catW, nearY){
     // things worth a look: a member's face, an event
     if(el.matches(MEOW_POI_SEL)) pois.push([el, d]);
     if(r.width < catW + 24 || r.height < 28 || top < MEOW_H * 4) continue;
-    if(r.left < b.railRight - 2 || r.right > innerWidth + 2) continue;
+    const wide = el.matches(MEOW_WIDE_SEL);
+    if(!wide && (r.left < b.railRight - 2 || r.right > innerWidth + 2)) continue;
     cand.push({ el, r, top, d });
   }
   cand.sort((x, y) => x.d - y.d);
@@ -31361,11 +31367,11 @@ function meowScanLedges(catW, nearY){
     if(out.length > 120 || c.d > innerHeight * 4) break;
     const el = c.el, r = c.r;
     // anything that looks like a card: a box with its own rounded frame or fill
-    if(!el.matches(MEOW_LEDGE_SEL) && !el.matches(MEOW_POI_SEL)){ const cs = getComputedStyle(el); if(cs.position === 'fixed' || cs.position === 'sticky' || parseFloat(cs.borderTopLeftRadius) < 8 || (cs.backgroundColor === 'rgba(0, 0, 0, 0)' && cs.backgroundImage === 'none' && parseFloat(cs.borderTopWidth) < 1)) continue; }
+    if(!el.matches(MEOW_LEDGE_ALL) && !el.matches(MEOW_POI_SEL)){ const cs = getComputedStyle(el); if(cs.position === 'fixed' || cs.position === 'sticky' || parseFloat(cs.borderTopLeftRadius) < 8 || (cs.backgroundColor === 'rgba(0, 0, 0, 0)' && cs.backgroundImage === 'none' && parseFloat(cs.borderTopWidth) < 1)) continue; }
     // one floor per edge: skip an element whose top sits on one already taken
     if(tops.some(o => Math.abs(o.top - r.top) < 6 && o.left < r.right && o.right > r.left)) continue;
     tops.push(r);
-    out.push({ el, pad:el.matches(MEOW_POI_SEL) ? 2 : 6 });
+    out.push({ el, pad:el.matches(MEOW_POI_SEL) ? 2 : 6, wide:el.matches(MEOW_WIDE_SEL) });
   }
   pois.sort((x, y) => x[1] - y[1]); _meowPois = pois.slice(0, 60).map(x => x[0]);
   return out;
@@ -31406,6 +31412,7 @@ function meowLedgeBox(L){
     if(!L.el || !L.el.isConnected) return null;
     const r = L.el.getBoundingClientRect(); if(!r.width) return null;
     B = { l:r.left + L.pad + scrollX, r:r.right - L.pad + scrollX, y:r.top + 1 + scrollY };
+    if(L.wide){ B.l = Math.max(B.l, scrollX + 4); B.r = Math.min(B.r, scrollX + innerWidth - 4); }
   }
   L._bx = B; return B;
 }
@@ -31512,7 +31519,7 @@ class MeowRoamer extends MeowWalker {
     _meowLedges = meowScanLedges(this.cw, this.mode && this.vy != null ? this.vy : null);
     if(!this.mode){
       this.mode = 'ledge'; this.spd = 1; this.cur = .4; this.born = meowSec(); this.squash = 0; this.fxT = 0; this.viewAt = state.view;
-      const vis = this.onScreen(); this.ledge = vis.length ? meowPick(vis) : _meowLedges[0];
+      const vis = this.onScreen(); this.ledge = vis.length ? meowPick(vis) : this.nearest();
       const B = meowLedgeBox(this.ledge); this.rx = B ? Math.random() * Math.max(0, B.r - B.l - this.cw) : 0;
       // she knows where she stands from the start: drawn before her first frame she sat in the screen's bottom-left corner, and a
       // card redrawn in that moment dropped her from nowhere (a position that is not a number, which never moved again: 10 Nov 2026)
@@ -31528,6 +31535,13 @@ class MeowRoamer extends MeowWalker {
   near(B, k = 1.1){ const me = this.vy != null ? this.vy : scrollY; return B && Math.abs(B.y - me) < innerHeight * k; }
   visible(){ const d = this.dc; return !!d && d.y > scrollY - 20 && d.y < scrollY + innerHeight + 20; }
   base(){ return _meowLedges[0]; }
+  // nothing to stand on in view: the floor nearest the screen (the page's foot only when it is the nearest) — calling her on a page
+  // with no card on screen sent her to its very foot, thousands of pixels away (24 Nov 2026)
+  nearest(){
+    const mid = scrollY + innerHeight * .6; let best = this.base(), bd = Infinity;
+    for(const L of _meowLedges){ const B = meowLedgeBox(L); if(!B || B.r - B.l < this.cw) continue; const d = Math.abs(B.y - mid); if(d < bd){ bd = d; best = L; } }
+    return best;
+  }
   onBase(){ return this.mode === 'ledge' && meowSame(this.ledge, this.base()); }
   box(){ return meowLedgeBox(this.ledge); }
   awake(){ return this.pet && !meowAsleep(this.pet, meowNow()); }
@@ -31997,7 +32011,7 @@ class MeowRoamer extends MeowWalker {
   // she comes (back) onto the screen: a leap in from the side onto a card in view
   reenter(say, quiet){
     _meowLedges = meowScanLedges(this.cw, null);
-    const vis = this.onScreen(), L = vis.length ? meowPick(vis) : this.base(), B = meowLedgeBox(L); if(!B) return;
+    const vis = this.onScreen(), L = vis.length ? meowPick(vis) : this.nearest(), B = meowLedgeBox(L); if(!B) return;
     const left = Math.random() < .5;
     this.mode = 'ledge'; this.backAt = meowSec(); this.cur = .1; this.tw = null; this.dc = null; this.queue = [];
     this.vx = left ? -this.cw : innerWidth; this.vy = Math.max(scrollY + 40, B.y - 60); this.dir = left ? 1 : -1;
