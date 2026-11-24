@@ -1,26 +1,27 @@
-# Every file: no other site may show these pages inside a frame (clickjacking), the browser keeps to https for a year
-# and never guesses a file's type, and a link out says only which site it came from. The site frames nothing of its own;
-# the YouTube players it shows are frames of YouTube's pages, which these rules do not touch.
+# Every file: the browser keeps to https for a year and never guesses a file's type, and a link out says only which site
+# it came from. Below it, no other site may show a page in a frame (clickjacking) except the home page. The site frames
+# nothing of its own; the YouTube players it shows are frames of YouTube's pages, which these rules do not touch.
 /*
-  X-Frame-Options: SAMEORIGIN
-  Content-Security-Policy: frame-ancestors 'self'
   Strict-Transport-Security: max-age=31536000
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+# The framing headers go on every address but the home page (the owner's word, 24 Nov 2026: other sites may show the
+# home page in a frame). "/:p" and "/:p/*" match anything below the root and never "/" itself — taking the headers off
+# "/" with "! X-Frame-Options" worked in wrangler dev but not on the live site. Inside another site's frame the page
+# keeps the owner's powers off (FRAMED_OUT in index.html).
+/:p
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self'
+/:p/*
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self'
 
 # The page itself must never be served from a stale copy: the service worker is
 # network-first for exactly this reason, and a CDN cache would undo that.
-# Other sites may show the home page in a frame (the owner's word, 24 Nov 2026): it drops the two framing headers of /*.
-# Any other address still refuses, and inside another site's frame the page keeps the owner's powers off (FRAMED_OUT in
-# index.html). One block a path: a second block for the same path replaces the first, so these lines live here.
 /index.html
   Cache-Control: no-cache
-  ! X-Frame-Options
-  ! Content-Security-Policy
 /
   Cache-Control: no-cache
-  ! X-Frame-Options
-  ! Content-Security-Policy
 
 # Asked for again every minute or two; a cached copy would defeat the point.
 /data/live-now.json
