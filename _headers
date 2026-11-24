@@ -1,3 +1,13 @@
+# Every file: no other site may show these pages inside a frame (clickjacking), the browser keeps to https for a year
+# and never guesses a file's type, and a link out says only which site it came from. The site frames nothing of its own;
+# the YouTube players it shows are frames of YouTube's pages, which these rules do not touch.
+/*
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self'
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
 # The page itself must never be served from a stale copy: the service worker is
 # network-first for exactly this reason, and a CDN cache would undo that.
 /index.html
