@@ -441,6 +441,18 @@ DTSTART;TZID=Asia/Bangkok:20261109T180000
 DTEND;TZID=Asia/Bangkok:20261109T200000
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-kimi-live-talk-1125-2026-11-25@48thdb
+DTSTAMP:20261125T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Live Talk
+LOCATION:YouTube BNK48 Official
+DESCRIPTION:เมมเบอร์: Jew\, Luksorn\, Praifa\, Punpon\, Emm
+ y\, Hoop\, Jingjing\, Else\n\nhttps://48thdb.com/event/ev-kimi-live-talk-1
+ 125
+URL:https://48thdb.com/event/ev-kimi-live-talk-1125
+DTSTART;TZID=Asia/Bangkok:20261125T180000
+DTEND;TZID=Asia/Bangkok:20261125T200000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-election-results-2026-11-14@48thdb
 DTSTAMP:20261114T000000Z
 SUMMARY:BNK48 & CGM48 Senbatsu General Election 2026 · Final Results

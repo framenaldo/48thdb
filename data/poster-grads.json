@@ -167,6 +167,10 @@
   "light": "linear-gradient(180deg, hsl(210 41% 89%) 0%, hsl(209 44% 89%) 17%, hsl(212 33% 90%) 33%, hsl(39 9% 92%) 50%, hsl(45 8% 92%) 67%, hsl(45 12% 81%) 83%, hsl(76 18% 86%) 100%)",
   "dark": "linear-gradient(180deg, hsl(210 29% 17%) 0%, hsl(209 31% 17%) 17%, hsl(212 23% 18%) 33%, hsl(39 6% 19%) 50%, hsl(45 6% 19%) 67%, hsl(45 9% 13%) 83%, hsl(76 12% 16%) 100%)"
  },
+ "posters/kimi-live-talk-1125.jpg": {
+  "light": "linear-gradient(180deg, hsl(203 32% 91%) 0%, hsl(214 19% 91%) 17%, hsl(207 15% 87%) 33%, hsl(231 6% 87%) 50%, hsl(218 11% 85%) 67%, hsl(221 7% 83%) 83%, hsl(236 14% 82%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(203 22% 18%) 0%, hsl(214 13% 19%) 17%, hsl(207 10% 17%) 33%, hsl(231 4% 16%) 50%, hsl(218 7% 16%) 67%, hsl(221 5% 15%) 83%, hsl(236 9% 14%) 100%)"
+ },
  "posters/kimi-roadshow-bigc-rajdamri.jpg": {
   "light": "linear-gradient(180deg, hsl(203 39% 87%) 0%, hsl(206 46% 89%) 17%, hsl(209 18% 91%) 33%, hsl(327 12% 88%) 50%, hsl(309 13% 86%) 67%, hsl(286 14% 86%) 83%, hsl(63 12% 82%) 100%)",
   "dark": "linear-gradient(180deg, hsl(203 27% 17%) 0%, hsl(206 32% 17%) 17%, hsl(209 12% 19%) 33%, hsl(327 9% 17%) 50%, hsl(309 9% 16%) 67%, hsl(286 10% 16%) 83%, hsl(63 9% 14%) 100%)"
