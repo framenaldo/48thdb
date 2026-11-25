@@ -1572,6 +1572,20 @@ DTSTART;VALUE=DATE:20261212
 DTEND;VALUE=DATE:20261214
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-santy-factory@48thdb
+DTSTAMP:20261225T000000Z
+SUMMARY:BNK48 & CGM48 Santy Factory
+LOCATION:MCC HALL\, THE MALL LIFESTORE BANGKAPI\, Bangkok
+DESCRIPTION:รอประกาศรายชื่อ\n• งานค
+ ริสต์มาสของ BNK48 และ CGM48 วันที่
+  25–27 ธ.ค. 2026\n• เวลา กิจกรรม และ
+ รายชื่อสมาชิกรอประกาศ\n\nhttps:/
+ /48thdb.com/event/ev-santy-factory
+URL:https://48thdb.com/event/ev-santy-factory
+DTSTART;VALUE=DATE:20261225
+DTEND;VALUE=DATE:20261228
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-cnx-merch-preorder@48thdb
 DTSTAMP:20261124T000000Z
 SUMMARY:Pre-Order: CGM48 สถานีเชียงใหม่ Merchan
