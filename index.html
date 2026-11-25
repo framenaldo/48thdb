@@ -2494,11 +2494,17 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-t thead small{ display:block; font-size:9.5px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
   .rt-grid .rt-t .rt-ln{ width:46px; font-size:10px; line-height:1.2; }
   .rt-grid .rt-t td{ background:color-mix(in srgb, var(--b) 12%, transparent); padding:4px 2px; }
+  /* time slots in alternate bands, a light one and a deeper one, so one round's names never run into the next (the owner, 25 Nov 2026) */
+  .rt-grid .rt-t tbody tr:nth-child(even) td{ background:color-mix(in srgb, var(--b) 26%, transparent); }
+  .rt-grid .rt-t tbody tr:nth-child(odd) td{ background:color-mix(in srgb, var(--b) 7%, transparent); }
+  .rt-grid .rt-t tbody tr:nth-child(even) .rt-ln{ background:color-mix(in srgb, var(--b) 18%, transparent); }
+  .rt-grid .rt-t tbody td, .rt-grid .rt-t tbody .rt-ln{ padding-top:7px; padding-bottom:7px; }
   .rt-grid .rt-t thead th{ background:color-mix(in srgb, var(--b) 28%, transparent); }
   .rt-grid .rt-t thead .rt-ln{ background:none; }
   .rt-grid .rt-t tr.is-now .rt-ln{ color:var(--b); }
   .rt-t .rt-cg .rt-c{ flex:none; width:calc(100% / var(--per) - 3px); margin:0; }
-  .rt-cg{ display:flex; flex-wrap:wrap; justify-content:center; gap:3px; }
+  @media (min-width:700px){ .rt-t .rt-cg .rt-c{ width:calc(100% / var(--per-w, var(--per)) - 3px); } }
+  .rt-cg{ display:flex; flex-wrap:wrap; justify-content:flex-start; gap:3px; }   /* a short last line keeps to the columns above it, not floating in the middle */
   .rt-t .rt-ln{ width:24px; font-size:11px; font-weight:800; color:var(--ink-soft); }
   .rt-t thead .rt-ln{ font-size:9.5px; }
   .rt-t .is-done{ opacity:.45; }
@@ -2563,6 +2569,41 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* on a wide screen each cell is a block of one width, so the photos of a round stand in a straight line under its heading */
   .rt-tbl{ container-type:inline-size; }
   @media (min-width:700px){ .rt-t .rt-c{ flex-direction:row; justify-content:flex-start; gap:8px; width:min(100%, 126px); margin:0 auto; } .rt-c span, .rt-c span.is-long{ font-size:12.5px; letter-spacing:0; } .rt-c span{ min-width:0; flex:1; text-align:left; } .rt-c span.is-long{ font-size:10px; overflow:hidden; max-width:100%; } .rt-t .rt-c.is-oshi i, .rt-t .rt-c i{ box-shadow:0 0 0 2px var(--c); } .rt-t .rt-c.is-oshi i{ box-shadow:0 0 0 2px #FFC83D; } .rt-t .rt-c.hl i{ box-shadow:0 0 0 3px #FFC83D; } .rt-t .rt-ln{ width:40px; font-size:12.5px; } .rt-t thead b{ font-size:14px; } .rt-t thead small{ font-size:11px; } }
+  /* A grid rota (Lanna Smile Station's table): the names lead, each a pill with a small face, so a round reads as a list of names; a tap
+     on her (rota-hl) floats her face up out of the pill (the owner's word, 25 Nov 2026). Nothing in the table changes size. */
+  .rt-grid .rt-t .rt-cg{ gap:4px; align-items:center; }   /* the lit one grows alone: the others in its line keep their own height */
+  .rt-grid .rt-t .rt-cg .rt-c{ position:relative; display:inline-flex; flex-direction:row; align-items:center; gap:6px; width:auto; max-width:100%; aspect-ratio:auto;
+    margin:0; padding:3px 10px 3px 3px; border-radius:var(--r-pill); overflow:visible; background:color-mix(in srgb, var(--c) 20%, rgba(255,255,255,.06));
+    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent); color:var(--ink); }
+  .rt-grid .rt-t .rt-cg .rt-c::after, .rt-grid .rt-t .rt-cg .rt-c::before{ display:none; }
+  .rt-grid .rt-t, .rt-grid .rt-t td, .rt-grid .rt-cg{ overflow:visible; }   /* room for a floating face over the row above */
+  .rt-grid .rt-t .rt-cg .rt-c i{ position:relative; inset:auto; width:24px; height:24px; border-radius:50%; box-shadow:0 0 0 1.5px var(--c) !important;
+    transition:transform .26s cubic-bezier(.3,1.5,.5,1), box-shadow .2s; }
+  .rt-grid .rt-t .rt-cg .rt-c span, .rt-grid .rt-t .rt-cg .rt-c span.is-long{ position:static; flex:none; max-width:none; overflow:visible; text-align:left;
+    font-size:13px; font-weight:800; letter-spacing:0; line-height:1.2; color:inherit; text-shadow:none; }
+  .rt-grid .rt-t .rt-cg .rt-c.is-long, .rt-grid .rt-t .rt-cg .rt-c:has(span.is-long){ padding-right:7px; }
+  .rt-grid .rt-t .rt-cg .rt-c span.is-long{ font-size:11px; letter-spacing:-.45px; }   /* a long name is squeezed to stay in her cell */
+  .rt-grid .rt-t .rt-cg .rt-c{ min-width:0; }
+  /* three stations side by side on a phone: each pill fills its cell and the name is squeezed into it */
+  @media (max-width:699px){
+    .rt-grid.is-c3 .rt-t .rt-cg .rt-c{ width:100%; gap:4px; padding:2px 5px 2px 2px; }
+    .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:20px; height:20px; }
+    .rt-grid.is-c3 .rt-t .rt-cg .rt-c span, .rt-grid.is-c3 .rt-t .rt-cg .rt-c span.is-long{ flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:clip;
+      font-size:11px; letter-spacing:-.35px; }
+    .rt-grid.is-c3 .rt-t .rt-cg .rt-c span.is-long{ font-size:8.6px; letter-spacing:-.6px; }
+  }
+  .rt-grid .rt-t .rt-cg .rt-c:focus{ outline:none; }
+  .rt-grid .rt-t .rt-cg .rt-c.rt-tap, .rt-grid .rt-t .rt-cg .rt-c.rt-ping, .rt-grid .rt-t .rt-cg .rt-c.rt-tap i, .rt-grid .rt-t .rt-cg .rt-c.rt-ping i{ animation:none; }   /* the face's own float is the answer to the tap */   /* no square focus box round the pill and her floating face */
+  .rt-grid .rt-t .rt-cg .rt-c:focus-visible{ outline:none; box-shadow:inset 0 0 0 2px var(--pink); }
+  .rt-grid .rt-t .rt-cg .rt-c.is-oshi{ box-shadow:inset 0 0 0 1.5px #FFC83D; }
+  .rt-grid .rt-t .rt-cg .rt-c.is-oshi i{ box-shadow:0 0 0 2px #FFC83D !important; }
+  /* lit: her pill stays as it is and her face floats up out of it, round and big, over the row above — nothing moves in the table
+     (the owner's word, 25 Nov 2026). The floating face takes no taps: a tap there falls on whoever is under it, which only lets her go. */
+  .rt-grid .rt-t .rt-cg .rt-c.hl{ z-index:4; box-shadow:inset 0 0 0 2px #FFC83D; background:color-mix(in srgb, var(--c) 32%, rgba(255,255,255,.1)); }
+  .rt-grid .rt-t .rt-cg .rt-c.hl i{ z-index:5; pointer-events:none; transform-origin:50% 100%; transform:translate(0, -30px) scale(3.3);   /* wholly above her pill, so her name stays in sight */
+    box-shadow:0 0 0 1px #FFC83D, 0 3px 8px rgba(0,0,0,.35) !important; }
+  :root:not([data-theme="dark"]) .rt-grid .rt-t .rt-cg .rt-c{ background:color-mix(in srgb, var(--c) 14%, #fff); }
+  @media (prefers-reduced-motion:reduce){ .rt-grid .rt-t .rt-cg .rt-c i{ transition:none; } }
   .rt-g .rt-f{ min-width:0; } .slot-who .rt-g, .rota-who .rt-g, .es-who .rt-g, .es-gwho .rt-g{ width:100%; }
   .rt-days{ display:flex; gap:6px; overflow-x:auto; padding:0 1px 8px; scrollbar-width:none; } .rt-days::-webkit-scrollbar{ display:none; }
   .rt-day{ flex:none; display:flex; flex-direction:column; align-items:center; min-width:54px; padding:5px 10px; border-radius:var(--r-sm); border:1px solid var(--line); background:var(--card); font:inherit; font-size:15px; font-weight:800; color:var(--ink); line-height:1.15; box-shadow:0 2px 6px color-mix(in srgb, var(--line) 60%, transparent); cursor:pointer; }
@@ -21120,11 +21161,15 @@ function renderRota(ev){
   // a grid rota (Lanna Smile Station, the poster's own table): time down the side, a column for each station or group, the members of the round in each cell
   const gridTable = (g, D) => { const rs = rounds.filter(r => dayOf(r) === D && g.cols.includes(r.k)); if(!rs.length) return '';
     const slots = [...new Set(rs.map(r => r.a + '|' + r.b))].sort();
+    // a table of one column (Hachi Cha) has the room for each round on one line on a phone, as on the poster: as many across as its biggest
+    // round (up to 6); on a wide screen the tiles carry the name beside the face, so three across (--per-w) and a short line keeps to the
+    // columns above it — a round of 5 was three and two left floating in the middle (the owner, 25 Nov 2026)
+    const per = g.cols.length >= 3 ? 2 : g.cols.length === 2 ? 3 : Math.min(6, Math.max(3, ...rs.map(r => r.ids.length)));
     const head = g.cols.map(k => { const K = kind(k); return `<th style="--b:${K.c}"><small>${escapeHtml(en ? K.en : K.th)}</small></th>`; }).join('');
     const body = slots.map(sl => { const [a, b] = sl.split('|'), done = at(b, D) <= now, on = !done && at(a, D) <= now;
       return `<tr${done ? ' class="is-done"' : on ? ' class="is-now"' : ''}><th class="rt-ln rt-time">${a}–${b}</th>${g.cols.map(k => { const r = rs.find(x => x.k === k && x.a === a && x.b === b);
-        return `<td style="--b:${kind(k).c}">${r ? `<div class="rt-cg" style="--per:${g.cols.length >= 3 ? 2 : 3}">${r.ids.map(rotaCell).join('')}</div>` : '<span class="rt-empty">–</span>'}</td>`; }).join('')}</tr>`; }).join('');
-    return `<div class="rt-row rt-tbl rt-grid" data-d="${D}" data-k="${g.k}" data-oshi="${hasOshi(rs.flatMap(r => r.ids))}" style="--b:${g.c}">
+        return `<td style="--b:${kind(k).c}">${r ? `<div class="rt-cg" style="--per:${per}; --per-w:${Math.min(per, 3)}">${r.ids.map(rotaCell).join('')}</div>` : '<span class="rt-empty">–</span>'}</td>`; }).join('')}</tr>`; }).join('');
+    return `<div class="rt-row rt-tbl rt-grid${g.cols.length >= 3 ? ' is-c3' : ''}" data-d="${D}" data-k="${g.k}" data-oshi="${hasOshi(rs.flatMap(r => r.ids))}" style="--b:${g.c}">
       <div class="rt-h"><span class="rt-kind">${escapeHtml(en ? g.en : g.th)}</span><em></em></div>
       <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Time' : 'เวลา'}</th>${head}</tr></thead><tbody>${body}</tbody></table></div>`; };
   const seen = new Set();
@@ -33642,6 +33687,9 @@ function bindDelegatedEvents(){
     else if(action==='rota-day'){ const root = el.closest('[data-rota]'); root.dataset.day = id; root.querySelectorAll('.rt-day').forEach(x => x.classList.toggle('on', x === el)); rotaAnim(root, 'rt-in'); rotaShow(root); }
     else if(action==='rota-hl'){ const root = el.closest('[data-rota]'), same = root.dataset.hl === id;
       if(same){ rotaClearHl(root); return; }
+      // a grid rota (Lanna Smile Station): while one is lit, a tap on anyone else only lets her go — the next is lit by a tap after
+      // that, so a big floating face is never swapped by a tap that missed (the owner's word, 25 Nov 2026)
+      if(root.dataset.hl && root.querySelector('.rt-grid')){ rotaClearHl(root); return; }
       root.dataset.hl = id;
       root.classList.add('has-hl');
       root.querySelectorAll('.rt-f, .rt-c').forEach(x => { const on = x.dataset.id === id; x.classList.toggle('hl', on); x.classList.remove('rt-tap', 'rt-ping'); if(on){ void x.offsetWidth; x.classList.add(x === el ? 'rt-tap' : 'rt-ping'); } }); rotaGo(root, id); }
