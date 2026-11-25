@@ -2624,7 +2624,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-grid.is-c3 .rt-t .rt-cg > .rt-c{ gap:5px; padding:3px 5px 3px 3px; }
   .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:22px; height:22px; }
   @media (max-width:379px){ .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:17px; height:17px; } .rt-grid.is-c3 .rt-t .rt-cg > .rt-c{ gap:3px; padding:3px 2px; } }
-  @media (min-width:1100px){ .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:28px; height:28px; } }
+  @media (min-width:1100px){ .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:24px; height:24px; } }
   .rt-grid.is-c3 .rt-t .rt-cg .rt-c span{ font-size:11px; letter-spacing:-.3px; }   /* rotaFitNames then sizes each to her cell */
   .rt-grid.is-c3 .rt-t .rt-cg .rt-c span.is-long{ font-size:9px; letter-spacing:-.4px; }
   .rt-grid.is-c3 .rt-t td{ padding:0; } .rt-grid.is-c3 .rt-t tbody td{ padding-top:0; padding-bottom:0; }
@@ -21128,7 +21128,7 @@ const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.d
 // a table cell of a lanes rota: small photo, name under it
 const rotaCell = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
   return `<button class="rt-c${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}"><i>${m.photo ? `<img src="${escapeAttr(photoSm(m.photo))}" alt="" loading="lazy" decoding="async" ${imgFall(m.photo)}>` : ''}</i><span data-noloc${nickName(m).length > 9 ? ' class="is-long"' : ''}>${escapeHtml(nickName(m))}</span></button>`; };
-/* A station table's names (Lanna Smile Station): as big as the cells let them be, up to 16px (a long name up to 14px), made smaller only as
+/* A station table's names (Lanna Smile Station): as big as the cells let them be, up to 13px like Hachi Cha's pills below (a long name up to 11px; 16 was a touch big on a computer, 25 Nov 2026), made smaller only as
    far as they must to be read whole (the owner, 25 Nov 2026). Run when a sheet is drawn, a day or tab is shown, and the window is resized. */
 function rotaFitNames(root){
   if(!root) return;
@@ -21136,7 +21136,7 @@ function rotaFitNames(root){
   const fits = (sp, fs) => { sp.style.fontSize = fs + 'px'; return sp.scrollWidth <= sp.clientWidth + .5; };
   requestAnimationFrame(() => root.querySelectorAll('.rt-grid.is-c3').forEach(t => {
     const all = [...t.querySelectorAll('.rt-c span')].filter(sp => sp.offsetWidth);
-    for(const [list, top] of [[all.filter(sp => !sp.classList.contains('is-long')), 16], [all.filter(sp => sp.classList.contains('is-long')), 14]]){
+    for(const [list, top] of [[all.filter(sp => !sp.classList.contains('is-long')), 13], [all.filter(sp => sp.classList.contains('is-long')), 11]]){
       let fs = top; while(fs > 7 && !list.every(sp => fits(sp, fs))) fs -= .5;
       list.forEach(sp => { sp.style.fontSize = fs + 'px'; });
     }
