@@ -12628,6 +12628,10 @@ const MONTH_NAMES = ['มกราคม','กุมภาพันธ์','ม�
 // everywhere it appears, so totals never silently include former members.
 function activeMembers(){ return state.members.filter(m=>!m.graduated); }
 
+/* An event that sells its own ticket (Lanna Smile Station's Digital Event Ticket, 21 Nov 2026) carries a shop: but it is
+   still an outing, with a day and a time: it stays on the home page, the calendar's pictures, a member's sheet and the
+   rest. Only a shop item with no time of its own (merchandise, pre-orders, a book) is kept out of those lists. */
+const shopOnly = e => !!e.shop && (e.period || !e.time);
 function escapeAttr(s){ return (s==null?'':s.toString()).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function escapeHtml(s){ return escapeAttr(s); }
 
@@ -16559,7 +16563,7 @@ function renderHomeDash(ge){
   // the slides sit one over the other and fade, one after another; a tap opens the one showing (dashTick)
   const dashStrip = slides => `<span class="dash-strip" data-n="${slides.length}">${slides.map((h, k) => k ? h : h.replace('class="dash-sl"', 'class="dash-sl on"')).join('')}</span>`;
   const dashDots = n => `<span class="dash-dots" aria-hidden="true">${Array.from({ length:n }, (_, k) => `<i${k ? '' : ' class="on"'}></i>`).join('')}</span>`;
-  const calPics = SEED_SCHEDULE.filter(e => !e.period && !e.cancelled && !e.shop && e.poster && e.poster.img && e.start <= wk && eventLastDay(e) >= iso)
+  const calPics = SEED_SCHEDULE.filter(e => !e.period && !e.cancelled && !shopOnly(e) && e.poster && e.poster.img && e.start <= wk && eventLastDay(e) >= iso)
     .sort((x, y) => (x.start > iso ? x.start : iso).localeCompare(y.start > iso ? y.start : iso) || x.start.localeCompare(y.start)).slice(0, 8);
   const shopOpen = SEED_SCHEDULE.filter(e => e.shop && shopStatus(e, Date.now()).state === 'open'), shops = shopOpen.length;
   // the tile slides through the posters of the open shops (small copies), the one that closes first leading
@@ -16583,7 +16587,7 @@ function renderHomeDash(ge){
         ${m.hometown ? `<small>${escapeHtml(m.hometown)}</small>` : ''}</span><span class="bk-go">${en ? 'Open →' : 'ดูโปรไฟล์ →'}</span>`, g.color); },
     oshi: () => { const k = (state.kamiOshi && getMember(state.kamiOshi)) || (state.oshi[0] && getMember(state.oshi[0])) || null;
       if(!k) return bk('oshi', 'data-action="nav" data-view="profile"', `<span class="bk-main"><b>${en ? 'My oshi' : 'โอชิของฉัน'}</b><span>${en ? 'Pick a Kami Oshi and she stands here' : 'เลือก Kami Oshi แล้วเธอจะมาอยู่ตรงนี้'}</span></span><span class="bk-go">${en ? 'Open my profile →' : 'ไปโปรไฟล์ →'}</span>`, '#E4457E');
-      const g = getGroup(k.groupId), ev = SEED_SCHEDULE.filter(e => !e.shop && !e.period && !e.cancelled && eventLastDay(e) >= iso && askOn(e, k.id)).sort((a, b) => a.start.localeCompare(b.start))[0];
+      const g = getGroup(k.groupId), ev = SEED_SCHEDULE.filter(e => !shopOnly(e) && !e.period && !e.cancelled && eventLastDay(e) >= iso && askOn(e, k.id)).sort((a, b) => a.start.localeCompare(b.start))[0];
       const bd = k.birthday && !k.graduated ? daysUntilBirthday(k, todayStart()) : null;
       return bk('oshi', `data-action="open-member" data-id="${k.id}"`, `${photo(k)}<span class="bk-shade"></span>
         <span class="bk-top"><i>${state.kamiOshi === k.id ? 'Kami Oshi' : 'Oshi'}</i></span>
@@ -19039,7 +19043,7 @@ function renderDayModal(){
   const covering = SEED_SCHEDULE.filter(e => e.start <= iso && eventLastDay(e) >= iso)
     .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
   const bdays = activeMembers().filter(m => m.birthday && m.birthday.slice(5) === iso.slice(5));
-  const outings = covering.filter(e => !e.period && !e.shop);
+  const outings = covering.filter(e => !e.period && !shopOnly(e));
 
   // steps of every campaign timeline that land on this day
   const steps = [];
@@ -19067,7 +19071,7 @@ function renderDayModal(){
   const kept = steps.filter(({ it }) => !it.ev || !shown.has(it.ev));
   steps.length = 0; steps.push(...kept);
   const byStep = new Set(steps.map(({ it }) => it.ev).filter(Boolean));
-  const open = covering.filter(e => (e.period || e.shop) && !shown.has(e.id) && !byStep.has(e.id));
+  const open = covering.filter(e => (e.period || shopOnly(e)) && !shown.has(e.id) && !byStep.has(e.id));
 
   // Laid out like a phone calendar's day: the week across the top, what has no
   // hour of its own in an all-day row, the rest placed on the hours.
@@ -21797,7 +21801,7 @@ function askAnswer(q, P){
 
   if(intent === 'events'){
     const [from, to, label, open] = askRange(P.when, P.month);
-    const pick = e => !e.shop && eventLastDay(e) >= from && e.start <= to
+    const pick = e => !shopOnly(e) && eventLastDay(e) >= from && e.start <= to
       && people.every(m => askOn(e, m.id))
       && (!group || (e.groups || []).includes(group) || e.allMembers || (e.members || []).some(id => (getMember(id) || {}).groupId === group))
       && askPlace(e, P.place)
@@ -21813,7 +21817,7 @@ function askAnswer(q, P){
       line = en ? `No events ${label}${who ? ' for ' + who : ''}${P.place ? ' · ' + escapeHtml(P.place) : ''}` : `ไม่มีงาน${label}${who ? 'ของ ' + who : ''}${P.place ? ' · ' + escapeHtml(P.place) : ''}`;
       // nothing coming up: the most recent ones instead
       if(open && people.length){
-        list = SEED_SCHEDULE.filter(e => !e.shop && eventLastDay(e) < iso && people.every(m => askOn(e, m.id))).sort((a, b) => b.start.localeCompare(a.start)).slice(0, 3);
+        list = SEED_SCHEDULE.filter(e => !shopOnly(e) && eventLastDay(e) < iso && people.every(m => askOn(e, m.id))).sort((a, b) => b.start.localeCompare(a.start)).slice(0, 3);
         if(list.length) line += en ? ' · the latest:' : ' · งานล่าสุด:';
       }
     }
@@ -22603,7 +22607,7 @@ function renderFeed(){
     .filter(x => x.d > 0).sort((a,b) => a.d - b.d).slice(0, 10);
 
   // Things on sale have a shop of their own; the feed is for what happens.
-  const events = SEED_SCHEDULE.filter(e => !e.shop && !e.noHome && (!mine || hasMyOshi(e)))
+  const events = SEED_SCHEDULE.filter(e => !shopOnly(e) && !e.noHome && (!mine || hasMyOshi(e)))
     .slice().sort((a,b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'));
   const running = events.filter(e => !e.cancelled && e.start <= iso && eventLastDay(e) >= iso);
   const nowOn = running.filter(e => !e.period && !doneForToday(e, iso));
@@ -23223,7 +23227,7 @@ function renderFlashComposer(){
   const live = [...flashLive(state.flash), ...flashWaiting(state.flash)];
   const now = new Date(), day = toYmd(now), hm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   const iso = toYmd(todayStart());
-  const soon = SEED_SCHEDULE.filter(e => !e.shop && !e.noHome && eventLastDay(e) >= iso)
+  const soon = SEED_SCHEDULE.filter(e => !shopOnly(e) && !e.noHome && eventLastDay(e) >= iso)
     .sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99')).slice(0, 14);
   return `<div class="pd-head"><h3 class="section-label">ประกาศบนป้ายไฟ</h3>
       <span class="muted-note">ขึ้นบนป้ายไฟ LED ทุกเครื่องทันที</span></div>
@@ -24276,7 +24280,7 @@ function homeExtraZone(k){
 function oshiEventsList(n){
   const en = isEN(), iso = toYmd(todayStart());
   if(!state.oshi.length) return `<p class="muted-note">${en ? 'Star members to make them your oshi — their events gather here.' : 'กดดาวที่สมาชิกเพื่อเพิ่มเป็นโอชิ แล้วงานของโอชิจะมารวมอยู่ตรงนี้'}</p>`;
-  const list = SEED_SCHEDULE.filter(e => !e.shop && !e.cancelled && hasMyOshi(e) && eventLastDay(e) >= iso)
+  const list = SEED_SCHEDULE.filter(e => !shopOnly(e) && !e.cancelled && hasMyOshi(e) && eventLastDay(e) >= iso)
     .sort((a, b) => (a.start + (a.time || '')).localeCompare(b.start + (b.time || ''))).slice(0, n);
   const soonB = activeMembers().filter(m => m.birthday && isMyOshi(m))
     .map(m => { const d = parseYmd(iso.slice(0, 4) + m.birthday.slice(4)); if(toYmd(d) < iso) d.setFullYear(d.getFullYear() + 1);
@@ -29696,9 +29700,9 @@ async function drawTodayCard(g, url){
   shareText(g, `${DAYS_LONG[now.getDay()]}${en ? ' ' : 'ที่ '}${shareThaiDate(now)}`, P, 84, '700 32px "Noto Sans Thai", sans-serif', 'rgba(255,255,255,.9)');
   shareText(g, en ? 'Today at 48' : 'วันนี้ที่ 48', P, 214, '800 104px "Noto Sans Thai", sans-serif', '#ffffff');
 
-  const todays = SEED_SCHEDULE.filter(e => !e.period && !e.shop && !e.cancelled && e.start <= iso && eventLastDay(e) >= iso)
+  const todays = SEED_SCHEDULE.filter(e => !e.period && !shopOnly(e) && !e.cancelled && e.start <= iso && eventLastDay(e) >= iso)
     .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
-  const upcoming = SEED_SCHEDULE.filter(e => !e.period && !e.shop && e.start > iso).sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'));
+  const upcoming = SEED_SCHEDULE.filter(e => !e.period && !shopOnly(e) && e.start > iso).sort((a, b) => a.start.localeCompare(b.start) || (a.time || '99').localeCompare(b.time || '99'));
   const list = todays.length ? todays : upcoming;
   const heading = todays.length ? (en ? `${todays.length} on today` : `งานวันนี้ ${todays.length} งาน`) : (en ? 'Nothing today — coming up' : 'วันนี้ไม่มีงาน · งานถัดไป');
   shareText(g, heading, P, 282, '800 32px "Noto Sans Thai", sans-serif', '#fff');
@@ -31162,7 +31166,8 @@ function meowNight(t){ const h = meowThaiHour(t); return h >= 23 || h < 7; }
 function meowDay(t){ return new Date(t + 7 * MEOW_HR).toISOString().slice(0, 10); }
 const meowClamp = v => Math.max(0, Math.min(100, v));
 function meowLoad(){
-  try{ const s = JSON.parse(localStorage.getItem(MEOW_KEY) || 'null'); if(s && typeof s === 'object') return s; }catch(e){}
+  try{ const s = JSON.parse(localStorage.getItem(MEOW_KEY) || 'null'); if(s && typeof s === 'object'){ if(_meowBase == null) _meowBase = s.base != null ? s.base : (s.saved || 0); return s; } }catch(e){}
+  if(_meowBase == null) _meowBase = 0;
   return { v:1, pet:null, snacks:3, day:'', opens:0, home:false, saved:0 };
 }
 /* Her cloud copy is `users/<uid>.meow`. Signed in, there is ONE cat, the account's, on every device (a Home Screen or Dock
@@ -31170,16 +31175,37 @@ function meowLoad(){
    ever overwriting her: nothing goes up before the account's copy has been read (`_meowCloudRead`), and an empty cat is
    never uploaded. */
 let _meowPush = 0, _meowCloudRead = false, _meowSync = null;   // _meowSync: how the last upload went { ok, at, err }
+/* `_meowBase`: the `saved` stamp of the copy this device last shared with the account (read from it, or put up to it), kept with her
+   as `base`. Comparing the account's stamp with the device's own `saved` was wrong: opening the page stamps the device's copy at once
+   (the day's snacks, the needs running down), so an old copy on the computer looked newer than a meal given on the phone, won, and
+   was put up over it — the two devices seemed to keep two cats (the owner, 25 Nov 2026). Now the account wins whenever it changed
+   since this device last shared with it, and every upload checks first. */
+var _meowBase;   // var with no value: meowLoad may set it before this line runs, which must not undo it
 // upload her now; resolves true when the account holds her
 function meowPushNow(){
   const u = typeof fbAuth !== 'undefined' && fbAuth.currentUser;
   if(!_meow || !_meow.pet || !u) return Promise.resolve(false);
-  let data; try{ data = JSON.parse(JSON.stringify(_meow)); }catch(e){ return Promise.resolve(false); }   // no undefined values, which Firestore refuses
-  return fbDb.collection('users').doc(u.uid).set({ meow:data }, { merge:true })
-    .then(() => { _meowSync = { ok:true, at:Date.now() }; return true; })
+  const ref = fbDb.collection('users').doc(u.uid);
+  // another device changed her since this one last shared with the account (a tab left open on the computer): take that copy, never put
+  // this older one over it
+  return ref.get().then(d => {
+    const m = d.exists ? d.data().meow : null, c = m && m.pet, mine = _meow && _meow.pet;
+    if(c && mine && c.born === mine.born && c.name === mine.name && (m.saved || 0) > (_meowBase || 0)){ meowFromAccount(m); return 'took'; }
+    if(!_meow || !_meow.pet) return false;
+    _meow.base = _meow.saved;
+    let data; try{ data = JSON.parse(JSON.stringify(_meow)); }catch(e){ return false; }   // no undefined values, which Firestore refuses
+    return ref.set({ meow:data }, { merge:true }).then(() => { _meowBase = data.saved || 0; try{ localStorage.setItem(MEOW_KEY, JSON.stringify(_meow)); }catch(e){} return true; });
+  })
+    .then(r => { if(r) _meowSync = { ok:true, at:Date.now() }; return !!r; })
     .catch(e => { _meowSync = { ok:false, at:Date.now(), err:String((e && (e.code || e.message)) || e).slice(0, 80) }; try{ console.warn('meow sync', e); }catch(x){} return false; })
     .then(r => { meowSyncPaint(); return r; });
 }
+// coming back to a tab left open: another device may have fed her meanwhile, so read the account's copy again (at most every 20 s)
+let _meowPullT = 0;
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden || !_meowCloudRead || !_meow || !_meow.pet || !meowSignedIn() || Date.now() - _meowPullT < 20e3) return;
+  _meowPullT = Date.now(); meowPullCloud();
+});
 // fetch her from the account on request (a new device, or after a failed first read)
 async function meowPullCloud(){
   const u = typeof fbAuth !== 'undefined' && fbAuth.currentUser; if(!u || !meowSignedIn()) return null;
@@ -31213,11 +31239,15 @@ function meowFromAccount(m){
   const mine = _meow && _meow.pet, theirs = m && typeof m === 'object' ? m.pet : null;
   if(!theirs){ if(mine) meowSave(); return; }
   const same = mine && mine.born === theirs.born && mine.name === theirs.name;
-  if(same && !(m.saved > ((_meow && _meow.saved) || 0))){ meowSave(); return; }
+  // the same cat: the account's copy wins when it changed since this device last shared with it; else this device's stands, and goes
+  // up only if it holds something the account does not
+  if(same && !((m.saved || 0) > (_meowBase || 0))){ if((_meow.saved || 0) > (_meowBase || 0)) meowSave(); return; }
+  m.base = m.saved || 0; _meowBase = m.base;
   if(mine && !same){ try{ localStorage.setItem(MEOW_KEY + '-aside', JSON.stringify(_meow)); }catch(e){} }
   _meow = m; try{ localStorage.setItem(MEOW_KEY, JSON.stringify(m)); }catch(e){}
   if(!same && typeof toast === 'function') toast(isEN() ? `${theirs.name} came along from your account` : `น้อง${theirs.name}ตามมาจากบัญชีของคุณแล้ว`);
   meowMount();
+  if(_meowSheet && typeof meowSheetPaint === 'function') meowSheetPaint();
   if(typeof state !== 'undefined' && state.view === 'profile' && typeof render === 'function') render();
 }
 /* there is no bedtime. Like a real cat she sleeps 12–16 hours a day in bouts of about an hour, mostly in the middle of
