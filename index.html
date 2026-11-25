@@ -2610,7 +2610,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
      every two; Hachi Cha and Group Hi-Touch keep their pills (the owner, 25 Nov 2026) */
   .rt-grid.is-c3 .rt-t .rt-cg{ --rl:color-mix(in srgb, var(--b) 55%, transparent); display:grid; grid-template-columns:repeat(var(--cm), minmax(0, 1fr)); gap:0;
     border-top:1px solid var(--rl); border-left:1px solid var(--rl); }
-  @media (min-width:700px){ .rt-grid.is-c3 .rt-t .rt-cg{ grid-template-columns:repeat(var(--cw), minmax(0, 1fr)); } }
+  @media (min-width:1100px){ .rt-grid.is-c3 .rt-t .rt-cg{ grid-template-columns:repeat(var(--cw), minmax(0, 1fr)); } }   /* two side by side only where a station's column is wide */
   .rt-grid.is-c3 .rt-t .rt-cg > .rt-c, .rt-grid.is-c3 .rt-t .rt-cg > .rt-fill{ border-right:1px solid var(--rl); border-bottom:1px solid var(--rl); }
   .rt-grid.is-c3 .rt-t .rt-cg .rt-c{ display:flex; width:auto; min-height:34px; border-radius:0; padding:4px 6px 4px 4px; gap:5px;
     background:none; box-shadow:none; justify-content:flex-start; }
@@ -2620,13 +2620,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-fill{ display:block; min-height:34px; }
   @media (max-width:699px){ .rt-fill.is-w{ display:none; } }
   @media (min-width:700px){ .rt-fill.is-m{ display:none; } }
-  /* a station's cell is narrow: a smaller face and the name squeezed so it is read whole, never cut */
-  .rt-grid.is-c3 .rt-t .rt-cg .rt-c{ gap:4px; padding:3px 4px 3px 3px; }
-  .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:20px; height:20px; }
-  .rt-grid.is-c3 .rt-t .rt-cg .rt-c span{ font-size:11px; letter-spacing:-.4px; }
-  .rt-grid.is-c3 .rt-t .rt-cg .rt-c span.is-long{ font-size:8.4px; letter-spacing:-.55px; }
-  @media (max-width:379px){ .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:17px; height:17px; } .rt-grid.is-c3 .rt-t .rt-cg .rt-c{ gap:3px; padding:3px 2px; }
-    .rt-grid.is-c3 .rt-t .rt-cg .rt-c span{ font-size:9.8px; letter-spacing:-.45px; } .rt-grid.is-c3 .rt-t .rt-cg .rt-c span.is-long{ font-size:7.4px; letter-spacing:-.5px; } }
+  /* a station's name fills her cell: as big as the cell allows and squeezed only where it is narrow (rotaFitNames), read whole, never cut */
+  .rt-grid.is-c3 .rt-t .rt-cg > .rt-c{ gap:5px; padding:3px 5px 3px 3px; }
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:22px; height:22px; }
+  @media (max-width:379px){ .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:17px; height:17px; } .rt-grid.is-c3 .rt-t .rt-cg > .rt-c{ gap:3px; padding:3px 2px; } }
+  @media (min-width:1100px){ .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:28px; height:28px; } }
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c span{ font-size:11px; letter-spacing:-.3px; }   /* rotaFitNames then sizes each to her cell */
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c span.is-long{ font-size:9px; letter-spacing:-.4px; }
   .rt-grid.is-c3 .rt-t td{ padding:0; } .rt-grid.is-c3 .rt-t tbody td{ padding-top:0; padding-bottom:0; }
   .rt-g .rt-f{ min-width:0; } .slot-who .rt-g, .rota-who .rt-g, .es-who .rt-g, .es-gwho .rt-g{ width:100%; }
   .rt-days{ display:flex; gap:6px; overflow-x:auto; padding:0 1px 8px; scrollbar-width:none; } .rt-days::-webkit-scrollbar{ display:none; }
@@ -21128,6 +21128,22 @@ const rotaShow = root => { const k = root.dataset.k || 'all', d = root.dataset.d
 // a table cell of a lanes rota: small photo, name under it
 const rotaCell = id => { const m = getMember(id); if(!m) return ''; const g = getGroup(m.groupId);
   return `<button class="rt-c${(state.oshi || []).includes(id) ? ' is-oshi' : ''}" data-action="rota-hl" data-id="${id}" style="--c:${g.color}"><i>${m.photo ? `<img src="${escapeAttr(photoSm(m.photo))}" alt="" loading="lazy" decoding="async" ${imgFall(m.photo)}>` : ''}</i><span data-noloc${nickName(m).length > 9 ? ' class="is-long"' : ''}>${escapeHtml(nickName(m))}</span></button>`; };
+/* A station table's names (Lanna Smile Station): as big as the cells let them be, up to 16px (a long name up to 14px), made smaller only as
+   far as they must to be read whole (the owner, 25 Nov 2026). Run when a sheet is drawn, a day or tab is shown, and the window is resized. */
+function rotaFitNames(root){
+  if(!root) return;
+  // one size for the whole table, so the names read as one list: the largest every (not long) name fits at; a long name gets its own
+  const fits = (sp, fs) => { sp.style.fontSize = fs + 'px'; return sp.scrollWidth <= sp.clientWidth + .5; };
+  requestAnimationFrame(() => root.querySelectorAll('.rt-grid.is-c3').forEach(t => {
+    const all = [...t.querySelectorAll('.rt-c span')].filter(sp => sp.offsetWidth);
+    for(const [list, top] of [[all.filter(sp => !sp.classList.contains('is-long')), 16], [all.filter(sp => sp.classList.contains('is-long')), 14]]){
+      let fs = top; while(fs > 7 && !list.every(sp => fits(sp, fs))) fs -= .5;
+      list.forEach(sp => { sp.style.fontSize = fs + 'px'; });
+    }
+  }));
+}
+let _rotaFitT = 0;
+addEventListener('resize', () => { clearTimeout(_rotaFitT); _rotaFitT = setTimeout(() => rotaFitNames(document.querySelector('.ov-layer')), 150); });
 const rotaClearHl = root => { root.dataset.hl = ''; root.classList.remove('has-hl'); root.querySelectorAll('.hl').forEach(x => x.classList.remove('hl', 'rt-tap', 'rt-ping'));
   const c = root.closest('.modal-glass-card'), b = c && c.querySelector('.rt-go'); if(b) b.remove(); };
 // a second tap on a face now lets her go, so the way to her page is a pill at the foot of the sheet while she is lit
@@ -27876,7 +27892,7 @@ function renderMain(){
     localize(layer);
     syncBodyScrollLock();
     geAnimate(layer); odoRun(layer);
-    sheetBirthdayFx(layer); bannerPlay(layer); cdTick();
+    sheetBirthdayFx(layer); bannerPlay(layer); cdTick(); rotaFitNames(layer);
     bindPosterZoom();
     applyPageMeta();
     FEST.sync();
@@ -27926,7 +27942,7 @@ function renderMain(){
   if(state.view === 'timeline' && state.geTab === 'songs') addBoxShareButtons(main);
   geAnimate(main);
   odoRun(main);
-  sheetBirthdayFx(main); bannerPlay(main); cdTick();
+  sheetBirthdayFx(main); bannerPlay(main); cdTick(); rotaFitNames(main);
   attachMainEvents();
   startBirthdayFireworks();
   geHeroFx();
@@ -33711,8 +33727,8 @@ function bindDelegatedEvents(){
     else if(action==='rota-tab'){ const root = el.closest('[data-rota]'), k = el.dataset.id;
       root.querySelectorAll('.rt-tab').forEach(x => x.classList.toggle('on', x === el));
       if((root.dataset.k || 'all') !== k) rotaAnim(root, k === 'oshi' || root.dataset.k === 'oshi' ? 'rt-wave' : 'rt-in');
-      root.dataset.k = k; rotaShow(root); }
-    else if(action==='rota-day'){ const root = el.closest('[data-rota]'); root.dataset.day = id; root.querySelectorAll('.rt-day').forEach(x => x.classList.toggle('on', x === el)); rotaAnim(root, 'rt-in'); rotaShow(root); }
+      root.dataset.k = k; rotaShow(root); rotaFitNames(root); }
+    else if(action==='rota-day'){ const root = el.closest('[data-rota]'); root.dataset.day = id; root.querySelectorAll('.rt-day').forEach(x => x.classList.toggle('on', x === el)); rotaAnim(root, 'rt-in'); rotaShow(root); rotaFitNames(root); }
     else if(action==='rota-hl'){ const root = el.closest('[data-rota]'), same = root.dataset.hl === id;
       if(same){ rotaClearHl(root); return; }
       // a grid rota (Lanna Smile Station): while one is lit, a tap on anyone else only lets her go — the next is lit by a tap after
