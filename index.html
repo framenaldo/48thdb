@@ -2492,6 +2492,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .rt-t thead th{ border-top:0; padding:3px 1px 5px; font-weight:800; line-height:1.15; color:var(--ink); border-radius:var(--r-sm) var(--r-sm) 0 0; }
   .rt-t thead b{ display:block; font-size:12px; font-variant-numeric:tabular-nums; }
   .rt-t thead small{ display:block; font-size:9.5px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .rt-grid .rt-t .rt-ln{ width:46px; font-size:10px; line-height:1.2; }
+  .rt-grid .rt-t td{ background:color-mix(in srgb, var(--b) 12%, transparent); padding:4px 2px; }
+  .rt-grid .rt-t thead th{ background:color-mix(in srgb, var(--b) 28%, transparent); }
+  .rt-grid .rt-t thead .rt-ln{ background:none; }
+  .rt-grid .rt-t tr.is-now .rt-ln{ color:var(--b); }
+  .rt-t .rt-cg .rt-c{ flex:none; width:calc(100% / var(--per) - 3px); margin:0; }
+  .rt-cg{ display:flex; flex-wrap:wrap; justify-content:center; gap:3px; }
   .rt-t .rt-ln{ width:24px; font-size:11px; font-weight:800; color:var(--ink-soft); }
   .rt-t thead .rt-ln{ font-size:9.5px; }
   .rt-t .is-done{ opacity:.45; }
@@ -9557,6 +9564,9 @@ const SEED_SCHEDULE = [
       'กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'],
     members:['cgm-prae','cgm-praifa','cgm-lookked','cgm-lingling','cgm-jingjing','cgm-nana','cgm-kwan','cgm-emma','cgm-punpon','cgm-ploen','cgm-tara','cgm-shenae','cgm-satangpound','cgm-nisha','cgm-else','cgm-chifa','cgm-hongyok','cgm-namphet','cgm-lewlew','cgm-ginna','cgm-valentine'],
     rota:{ day:'2026-12-05', head:'ตารางสมาชิกแต่ละสถานี', where:'ลานกิจกรรม ชั้น 1 แกรนด์ฮอลล์',
+      grid:[{ k:'st', th:'3 สถานี', en:'3 stations', c:'#F39A1F', cols:['khom','tung','janken'] },
+        { k:'hc', th:'Hachi Cha & Merchandise', en:'Hachi Cha & Merchandise', c:'#2E6FB5', cols:['hachi'] },
+        { k:'gh', th:'Group Hi-Touch', en:'Group Hi-Touch', c:'#2FA58F', cols:['ga','gb'] }],
       kinds:[{ k:'khom', th:'สถานีปล่อยโคมลอย', en:'Khom Loi Station', c:'#F39A1F' },
         { k:'tung', th:'สถานีนำโชค', en:'Tung Num Chok Station', c:'#22B5A8' },
         { k:'janken', th:'สถานีเป่ายิ้งฉุบเจ้า', en:'Janken Jao Station', c:'#F2765F' },
@@ -21095,10 +21105,20 @@ function renderRota(ev){
       <div class="rt-h"><span class="rt-kind">${escapeHtml(en ? K.en : K.th)}</span><em></em></div>
       <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Lane' : 'เลน'}</th>${list.map(r => `<th${cls(r)}${stateOf(r).on ? ` style="--p:${((now - at(r.a, D)) / (at(r.b, D) - at(r.a, D))).toFixed(3)}"` : ''} data-from="${at(r.a, D)}" data-to="${at(r.b, D)}"><small>${r.ge ? 'Senbatsu' : `${en ? 'R' : 'รอบ'} ${r.n}`}</small><b>${r.a}</b><small>–${r.b}</small></th>`).join('')}</tr></thead>
       <tbody>${Array.from({ length:n }, (_, i) => `<tr style="--r:${i}"><th class="rt-ln">${i + 1}</th>${list.map((r, c) => `<td${cls(r)} style="--i:${c}">${r.ids[i] ? rotaCell(r.ids[i]) : '<span class="rt-empty">–</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
+  // a grid rota (Lanna Smile Station, the poster's own table): time down the side, a column for each station or group, the members of the round in each cell
+  const gridTable = (g, D) => { const rs = rounds.filter(r => dayOf(r) === D && g.cols.includes(r.k)); if(!rs.length) return '';
+    const slots = [...new Set(rs.map(r => r.a + '|' + r.b))].sort();
+    const head = g.cols.map(k => { const K = kind(k); return `<th style="--b:${K.c}"><small>${escapeHtml(en ? K.en : K.th)}</small></th>`; }).join('');
+    const body = slots.map(sl => { const [a, b] = sl.split('|'), done = at(b, D) <= now, on = !done && at(a, D) <= now;
+      return `<tr${done ? ' class="is-done"' : on ? ' class="is-now"' : ''}><th class="rt-ln rt-time">${a}–${b}</th>${g.cols.map(k => { const r = rs.find(x => x.k === k && x.a === a && x.b === b);
+        return `<td style="--b:${kind(k).c}">${r ? `<div class="rt-cg" style="--per:${g.cols.length >= 3 ? 2 : 3}">${r.ids.map(rotaCell).join('')}</div>` : '<span class="rt-empty">–</span>'}</td>`; }).join('')}</tr>`; }).join('');
+    return `<div class="rt-row rt-tbl rt-grid" data-d="${D}" data-k="${g.k}" data-oshi="${hasOshi(rs.flatMap(r => r.ids))}" style="--b:${g.c}">
+      <div class="rt-h"><span class="rt-kind">${escapeHtml(en ? g.en : g.th)}</span><em></em></div>
+      <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Time' : 'เวลา'}</th>${head}</tr></thead><tbody>${body}</tbody></table></div>`; };
   const seen = new Set();
   // a `ge` round joins the table of the kind that comes just before it
   const geOf = r => { const i = rounds.indexOf(r); for(let j = i - 1; j >= 0; j--) if(!rounds[j].ge) return rounds[j]; return null; };
-  const rows = rounds.map(r => { if(!R.lanes || kind(r.k).nolane || r.ge) return roundRow(r);   // a booth has no lanes: its rounds are rows of faces; the Senbatsu round also stands alone, for its own tab
+  const rows = R.grid ? R.grid.map(g => days.map(d => gridTable(g, d)).join('')).join('') : rounds.map(r => { if(!R.lanes || kind(r.k).nolane || r.ge) return roundRow(r);   // a booth has no lanes: its rounds are rows of faces; the Senbatsu round also stands alone, for its own tab
     const key = dayOf(r) + '|' + r.k; if(seen.has(key)) return ''; seen.add(key);
     return laneTable(rounds.filter(x => !x.ge && dayOf(x) + '|' + x.k === key).concat(R.lanes ? rounds.filter(x => x.ge && geOf(x) && dayOf(geOf(x)) + '|' + geOf(x).k === key) : [])); }).join('');
   const M = monthsShort(), WD = en ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
@@ -21108,7 +21128,7 @@ function renderRota(ev){
   return `<h3 class="evm-head">${en ? 'Member schedule' : R.head}${R.where ? ` <small class="rt-where">${escapeHtml(R.where)}</small>` : ''}</h3>
     <div class="rt-box" data-rota data-day="${pick}">
       ${dayPills}
-      <div class="rt-tabs" role="tablist">${tab('all', en ? 'All' : 'ทั้งหมด')}${R.kinds.map(K => tab(K.k, en ? K.en : K.th, K.c)).join('')}${mine.length ? tab('oshi', en ? 'My oshi' : 'โอชิฉัน', '#E4457E') : ''}</div>
+      <div class="rt-tabs" role="tablist">${tab('all', en ? 'All' : 'ทั้งหมด')}${(R.grid || R.kinds).map(K => tab(K.k, en ? K.en : K.th, K.c)).join('')}${mine.length ? tab('oshi', en ? 'My oshi' : 'โอชิฉัน', '#E4457E') : ''}</div>
       <p class="rt-hint">${en ? 'Tap a face to see every round she is in, tap it again or elsewhere to clear' : 'แตะหน้าเมมเบอร์เพื่อดูทุกรอบที่เธออยู่ แตะซ้ำหรือแตะที่อื่นเพื่อยกเลิก'}</p>
       <div class="rt-list">${rowsHtml}<p class="rt-none" hidden>${en ? 'None of your oshi are on this day.' : 'โอชิของคุณไม่อยู่ในรอบของวันนี้'}</p></div></div>`;
 }
