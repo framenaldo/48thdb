@@ -238,5 +238,9 @@
  "posters/ruamnamjai-16.jpg": {
   "light": "linear-gradient(180deg, hsl(55 20% 91%) 0%, hsl(64 20% 87%) 17%, hsl(85 8% 89%) 33%, hsl(185 50% 86%) 50%, hsl(19 18% 88%) 67%, hsl(60 14% 88%) 83%, hsl(87 34% 92%) 100%)",
   "dark": "linear-gradient(180deg, hsl(55 14% 18%) 0%, hsl(64 14% 17%) 17%, hsl(85 5% 18%) 33%, hsl(185 35% 16%) 50%, hsl(19 12% 17%) 67%, hsl(60 10% 17%) 83%, hsl(87 24% 19%) 100%)"
+ },
+ "posters/shock-me-girls-special-live-1125.jpg": {
+  "light": "linear-gradient(180deg, hsl(299 69% 91%) 0%, hsl(306 46% 89%) 17%, hsl(301 38% 90%) 33%, hsl(303 50% 90%) 50%, hsl(300 31% 88%) 67%, hsl(302 37% 88%) 83%, hsl(301 54% 90%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(299 35% 19%) 0%, hsl(306 32% 18%) 17%, hsl(301 26% 18%) 33%, hsl(303 35% 18%) 50%, hsl(300 22% 17%) 67%, hsl(302 26% 17%) 83%, hsl(301 35% 18%) 100%)"
  }
 }

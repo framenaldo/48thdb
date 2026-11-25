@@ -1290,6 +1290,22 @@ DTEND;VALUE=DATE:20261222
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-shock-me-girls-special-live-1125-2026-11-25@48thdb
+DTSTAMP:20261125T000000Z
+SUMMARY:SHOCK ME GIRLS: "สาวหมวย" SPECIAL LIVE · Watching MV
+  Together
+LOCATION:TikTok @shockmegirls.official
+DESCRIPTION:เมมเบอร์: Marine\, Praew\, Sindy\, Mirin\, Grap
+ e\, Mail\n• ดู MV "สาวหมวย" ไปพร้อมก
+ ัน\n• เวลา 20:00 น. (GMT+7)\n• #BNK48_สาวหมว
+ ย #ShockMeGirlsTH #รักช็อตใจยัยช็อตฟ
+ ีล #BNK48 #CGM48\n\nhttps://48thdb.com/event/ev-shock-me-girls-special
+ -live-1125
+URL:https://48thdb.com/event/ev-shock-me-girls-special-live-1125
+DTSTART;TZID=Asia/Bangkok:20261125T200000
+DTEND;TZID=Asia/Bangkok:20261125T220000
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-shock-me-girls-orientation-2026-11-20@48thdb
 DTSTAMP:20261120T000000Z
 SUMMARY:SHOCK ME GIRLS: SEMESTER 2 ORIENTATION DAY
