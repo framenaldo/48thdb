@@ -723,6 +723,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   :root[data-theme="dark"] .is-scene-airline :is(.evm-price, .evm-logo, .slot-date, .ev-starts){ color:var(--ink); }
   .evm-fest-img{ position:relative; display:block; width:min(240px, 66%); height:auto; margin:2px auto 6px; transform:rotate(-3deg);
     filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff); }
+  /* a logo shown as cut, with no white edge (Santy Factory's ribbon lettering: the owner chose it without, 25 Nov 2026) */
+  .evm-fest-img.is-noedge{ width:min(270px, 74%); transform:none; filter:drop-shadow(0 2px 6px rgba(0,0,0,.3)); }
   .modal-glass-card.is-postered.is-scene-meadow{
     background:linear-gradient(180deg, #86B5DA 0%, #B9D5EB 14%, #E6EFF5 32%, #F6F4EC 56%, #EFEBCB 76%, #D3DB9D 90%, #B3C07A 100%);
   }
@@ -15392,7 +15394,7 @@ const FEST_KINDS = {
 /* where the title alone would not say, or an event has its own way of putting it */
 const FEST_EVENT = {
   'ev-concert-2026':   { kind:'concert', word:'Journey of Dreams', sub:'夢の旅 · CONCERT' },
-  'ev-santy-factory':  { word:'Santy Factory', sub:'BNK48 & CGM48 · CHRISTMAS', motif:'stars' },
+  'ev-santy-factory':  { word:'Santy Factory', sub:'BNK48 & CGM48 · CHRISTMAS', motif:'stars', img:'logos/santy-factory-2.png', tm:'logos/santy-factory-2-t.png', glint:true, edge:false },
   'ev-ge6-live-talk-1026': { word:'Live Talk', sub:'GE2026 · FINAL RESULTS' },
   'ev-ge6-live-talk-1109': { word:'Live Talk', sub:'GE2026 · FINAL RESULTS' },
   'ev-cgm-time-to-play-ep1': { word:'Time to Play!', sub:'YOUTUBE PREMIERE · EP.1' },
@@ -15530,7 +15532,7 @@ function renderEventBanner(ev){
     ${K.fx === 'moon' ? '<span class="evm-fest-moon" aria-hidden="true"></span><span class="evm-fest-drip" aria-hidden="true"></span>' : ''}
     <span class="evm-fest-deco" aria-hidden="true">${renderFestDeco(K.motif)}</span>
     ${K.img && (K.glint || (K.tm && fxNew())) ? `<span class="evm-fest-imgw${K.blend ? ' is-screen' : ''}${K.glint ? '' : ' is-plain'}" style="--logo:url('${escapeAttr(K.shape || K.img)}')"${K.tm ? ` data-wr-t="${escapeAttr(K.tm)}"` : ''}><img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">${K.glint ? '<i class="evm-glint" aria-hidden="true"></i>' : ''}</span>`
-      : K.img ? `<img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">`
+      : K.img ? `<img class="evm-fest-img${K.edge === false ? ' is-noedge' : ''}" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">`
       : K.song ? renderSongLogo(K.song, 'evm-fest-song', true)
       : festWordHtml(K.word)}
     ${sub ? `<span class="evm-fest-sub${long ? ' is-long' : ''}${thSub ? ' is-th' : ''}" data-noloc>${escapeHtml(sub)}</span>` : ''}
