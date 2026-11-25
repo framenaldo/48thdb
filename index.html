@@ -2606,6 +2606,28 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
     box-shadow:0 0 0 1px #FFC83D, 0 3px 8px rgba(0,0,0,.35) !important; }
   :root:not([data-theme="dark"]) .rt-grid .rt-t .rt-cg .rt-c{ background:color-mix(in srgb, var(--c) 14%, #fff); }
   @media (prefers-reduced-motion:reduce){ .rt-grid .rt-t .rt-cg .rt-c i{ transition:none; } }
+  /* the three stations only (each member is at a booth on her own): one ruled cell a member, as on the poster, with a hairline between
+     every two; Hachi Cha and Group Hi-Touch keep their pills (the owner, 25 Nov 2026) */
+  .rt-grid.is-c3 .rt-t .rt-cg{ --rl:color-mix(in srgb, var(--b) 55%, transparent); display:grid; grid-template-columns:repeat(var(--cm), minmax(0, 1fr)); gap:0;
+    border-top:1px solid var(--rl); border-left:1px solid var(--rl); }
+  @media (min-width:700px){ .rt-grid.is-c3 .rt-t .rt-cg{ grid-template-columns:repeat(var(--cw), minmax(0, 1fr)); } }
+  .rt-grid.is-c3 .rt-t .rt-cg > .rt-c, .rt-grid.is-c3 .rt-t .rt-cg > .rt-fill{ border-right:1px solid var(--rl); border-bottom:1px solid var(--rl); }
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c{ display:flex; width:auto; min-height:34px; border-radius:0; padding:4px 6px 4px 4px; gap:5px;
+    background:none; box-shadow:none; justify-content:flex-start; }
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c span, .rt-grid.is-c3 .rt-t .rt-cg .rt-c span.is-long{ flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:clip; }
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c.is-oshi{ box-shadow:inset 0 0 0 1.5px #FFC83D; }
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c.hl{ box-shadow:inset 0 0 0 2px #FFC83D; background:color-mix(in srgb, var(--b) 30%, transparent); }
+  .rt-fill{ display:block; min-height:34px; }
+  @media (max-width:699px){ .rt-fill.is-w{ display:none; } }
+  @media (min-width:700px){ .rt-fill.is-m{ display:none; } }
+  /* a station's cell is narrow: a smaller face and the name squeezed so it is read whole, never cut */
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c{ gap:4px; padding:3px 4px 3px 3px; }
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:20px; height:20px; }
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c span{ font-size:11px; letter-spacing:-.4px; }
+  .rt-grid.is-c3 .rt-t .rt-cg .rt-c span.is-long{ font-size:8.4px; letter-spacing:-.55px; }
+  @media (max-width:379px){ .rt-grid.is-c3 .rt-t .rt-cg .rt-c i{ width:17px; height:17px; } .rt-grid.is-c3 .rt-t .rt-cg .rt-c{ gap:3px; padding:3px 2px; }
+    .rt-grid.is-c3 .rt-t .rt-cg .rt-c span{ font-size:9.8px; letter-spacing:-.45px; } .rt-grid.is-c3 .rt-t .rt-cg .rt-c span.is-long{ font-size:7.4px; letter-spacing:-.5px; } }
+  .rt-grid.is-c3 .rt-t td{ padding:0; } .rt-grid.is-c3 .rt-t tbody td{ padding-top:0; padding-bottom:0; }
   .rt-g .rt-f{ min-width:0; } .slot-who .rt-g, .rota-who .rt-g, .es-who .rt-g, .es-gwho .rt-g{ width:100%; }
   .rt-days{ display:flex; gap:6px; overflow-x:auto; padding:0 1px 8px; scrollbar-width:none; } .rt-days::-webkit-scrollbar{ display:none; }
   .rt-day{ flex:none; display:flex; flex-direction:column; align-items:center; min-width:54px; padding:5px 10px; border-radius:var(--r-sm); border:1px solid var(--line); background:var(--card); font:inherit; font-size:15px; font-weight:800; color:var(--ink); line-height:1.15; box-shadow:0 2px 6px color-mix(in srgb, var(--line) 60%, transparent); cursor:pointer; }
@@ -21167,10 +21189,14 @@ function renderRota(ev){
     // round (up to 6); on a wide screen the tiles carry the name beside the face, so three across (--per-w) and a short line keeps to the
     // columns above it — a round of 5 was three and two left floating in the middle (the owner, 25 Nov 2026)
     const per = g.cols.length >= 3 ? 2 : g.cols.length === 2 ? 3 : Math.min(6, Math.max(3, ...rs.map(r => r.ids.length)));
+    // each member has a cell of her own, ruled off as on the poster (the owner, 25 Nov 2026): so many cells a line on a phone (cm) and
+    // on a wide screen (cw) — a station's cell is too narrow on a phone for two names side by side, so one a line there —, and blank cells to square off a short last line
+    const cm = g.cols.length >= 3 ? 1 : g.cols.length === 2 ? 2 : 3, cw = g.cols.length >= 3 ? 2 : g.cols.length === 2 ? 3 : per;
+    const fill = n => { const f = (k, cls) => `<span class="rt-fill ${cls}"></span>`.repeat((k - n % k) % k); return g.cols.length >= 3 ? f(cm, 'is-m') + f(cw, 'is-w') : ''; };
     const head = g.cols.map(k => { const K = kind(k); return `<th style="--b:${K.c}"><small>${escapeHtml(en ? K.en : K.th)}</small></th>`; }).join('');
     const body = slots.map(sl => { const [a, b] = sl.split('|'), done = at(b, D) <= now, on = !done && at(a, D) <= now;
       return `<tr${done ? ' class="is-done"' : on ? ' class="is-now"' : ''}><th class="rt-ln rt-time">${a}–${b}</th>${g.cols.map(k => { const r = rs.find(x => x.k === k && x.a === a && x.b === b);
-        return `<td style="--b:${kind(k).c}">${r ? `<div class="rt-cg" style="--per:${per}; --per-w:${Math.min(per, 3)}">${r.ids.map(rotaCell).join('')}</div>` : '<span class="rt-empty">–</span>'}</td>`; }).join('')}</tr>`; }).join('');
+        return `<td style="--b:${kind(k).c}">${r ? `<div class="rt-cg" style="--per:${per}; --per-w:${Math.min(per, 3)}; --cm:${cm}; --cw:${cw}">${r.ids.map(rotaCell).join('')}${fill(r.ids.length)}</div>` : '<span class="rt-empty">–</span>'}</td>`; }).join('')}</tr>`; }).join('');
     return `<div class="rt-row rt-tbl rt-grid${g.cols.length >= 3 ? ' is-c3' : ''}" data-d="${D}" data-k="${g.k}" data-oshi="${hasOshi(rs.flatMap(r => r.ids))}" style="--b:${g.c}">
       <div class="rt-h"><span class="rt-kind">${escapeHtml(en ? g.en : g.th)}</span><em></em></div>
       <table class="rt-t"><thead><tr><th class="rt-ln">${en ? 'Time' : 'เวลา'}</th>${head}</tr></thead><tbody>${body}</tbody></table></div>`; };
