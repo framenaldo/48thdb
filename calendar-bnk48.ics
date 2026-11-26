@@ -1306,19 +1306,42 @@ DTSTART;VALUE=DATE:20261127
 DTEND;VALUE=DATE:20261128
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-union-dec@48thdb
+UID:ev-kimi-roadshow-union-dec-2026-12-05@48thdb
 DTSTAMP:20261205T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
 LOCATION:Union Mall\, Bangkok
 DESCRIPTION:เมมเบอร์: Hoop\, Khaimook\, Khowjow\, Mint\, Wa
- wa\, Yoghurt\, Fame\n• 5 ธ.ค. — Hoop\, Khaimook\, Khowjow\, Mint\,
-  Wawa\, Yoghurt\n• 6 ธ.ค. — Fame\, Hoop\, Khaimook\, Khowjow\, Min
- t\, Wawa\n• เวลาและรายละเอียดอื่
- นรอประกาศ\n\nhttps://48thdb.com/event/ev-kimi-roadshow-u
- nion-dec
+ wa\, Yoghurt\, Fame\n• กำหนดการอ้างอิงจ
+ าก Roadshow ครั้งก่อน รอผู้จัดปร
+ ะกาศยืนยัน\n• 12:00–13:00 Free Mini Concert\n• 1
+ 4:00–15:00 Group Hi-Touch\n• 15:30–16:30 Merchandise & Hachi Cha\n
+ • 17:00–18:00 Group Hi-Touch\n• 5 ธ.ค. — Hoop\, Khaimook\, Kho
+ wjow\, Mint\, Wawa\, Yoghurt\n• 6 ธ.ค. — Fame\, Hoop\, Khaimook\, 
+ Khowjow\, Mint\, Wawa\n• กำหนดการอาจเปลี
+ ่ยนแปลงตามความเหมาะสม\n\nhttps:/
+ /48thdb.com/event/ev-kimi-roadshow-union-dec
 URL:https://48thdb.com/event/ev-kimi-roadshow-union-dec
-DTSTART;VALUE=DATE:20261205
-DTEND;VALUE=DATE:20261207
+DTSTART;TZID=Asia/Bangkok:20261205T120000
+DTEND;TZID=Asia/Bangkok:20261205T180000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-union-dec-2026-12-06@48thdb
+DTSTAMP:20261205T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Union Mall\, Bangkok
+DESCRIPTION:เมมเบอร์: Hoop\, Khaimook\, Khowjow\, Mint\, Wa
+ wa\, Yoghurt\, Fame\n• กำหนดการอ้างอิงจ
+ าก Roadshow ครั้งก่อน รอผู้จัดปร
+ ะกาศยืนยัน\n• 12:00–13:00 Free Mini Concert\n• 1
+ 4:00–15:00 Group Hi-Touch\n• 15:30–16:30 Merchandise & Hachi Cha\n
+ • 17:00–18:00 Group Hi-Touch\n• 5 ธ.ค. — Hoop\, Khaimook\, Kho
+ wjow\, Mint\, Wawa\, Yoghurt\n• 6 ธ.ค. — Fame\, Hoop\, Khaimook\, 
+ Khowjow\, Mint\, Wawa\n• กำหนดการอาจเปลี
+ ่ยนแปลงตามความเหมาะสม\n\nhttps:/
+ /48thdb.com/event/ev-kimi-roadshow-union-dec
+URL:https://48thdb.com/event/ev-kimi-roadshow-union-dec
+DTSTART;TZID=Asia/Bangkok:20261206T120000
+DTEND;TZID=Asia/Bangkok:20261206T180000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-kimi-roadshow-mbk-dec@48thdb

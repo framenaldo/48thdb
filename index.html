@@ -9761,12 +9761,21 @@ const SEED_SCHEDULE = [
     title:'Detective Conan: The Crimson Closing Day Gala Premiere', short:'Conan Gala Premiere',
     venue:'SF World Cinema, centralwOrld, Bangkok', groups:['bnk48'],
     members:['bnk-hoop','bnk-khowjow','bnk-l','bnk-neen'] },
-  { id:'ev-kimi-roadshow-union-dec', logo:'kimi', start:'2026-12-05', end:'2026-12-06',
+  { id:'ev-kimi-roadshow-union-dec', logo:'kimi', start:'2026-12-05', end:'2026-12-06', time:'12:00',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'Union Mall, Bangkok', groups:['bnk48'],
     related:['ev-ge6-single','ev-kimi-roadshow-bigc-rajdamri'],
     members:['bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa','bnk-yoghurt','bnk-fame'],
-    info:['5 ธ.ค. — Hoop, Khaimook, Khowjow, Mint, Wawa, Yoghurt','6 ธ.ค. — Fame, Hoop, Khaimook, Khowjow, Mint, Wawa','เวลาและรายละเอียดอื่นรอประกาศ'] },
+    detail:[
+      'กำหนดการอ้างอิงจาก Roadshow ครั้งก่อน รอผู้จัดประกาศยืนยัน',
+      '12:00–13:00 Free Mini Concert',
+      '14:00–15:00 Group Hi-Touch',
+      '15:30–16:30 Merchandise & Hachi Cha',
+      '17:00–18:00 Group Hi-Touch'],
+    lineup:{
+      '2026-12-05':{ 'Mini Concert':['bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa','bnk-yoghurt'], 'Group Hi-Touch':['bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa','bnk-yoghurt'] },
+      '2026-12-06':{ 'Mini Concert':['bnk-fame','bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa'], 'Group Hi-Touch':['bnk-fame','bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa'] } },
+    info:['5 ธ.ค. — Hoop, Khaimook, Khowjow, Mint, Wawa, Yoghurt','6 ธ.ค. — Fame, Hoop, Khaimook, Khowjow, Mint, Wawa','กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
   { id:'ev-kimi-roadshow-mbk-dec', logo:'kimi', start:'2026-12-12', end:'2026-12-13',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'MBK Center, Bangkok', groups:['bnk48','cgm48'], lineupTba:true,
@@ -11308,6 +11317,7 @@ function getMember(id){ return state.members.find(m=>m.id===id); }
    than a hunt through the markup. Whole text nodes are matched, never fragments,
    so a phrase can never be half-replaced inside a longer sentence. */
 const EN = {
+  'กำหนดการอ้างอิงจาก Roadshow ครั้งก่อน รอผู้จัดประกาศยืนยัน': 'Times follow the previous roadshow; awaiting the organiser\'s confirmation',
   // venue names follow the language switch (the owner's word, 26 Nov 2026)
   '08:00 โรงเรียนศรีอยุธยา ในพระอุปถัมภ์ฯ': '08:00 Sriayudhya School',
   '11:30 โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม)': '11:30 Srinakharinwirot University Demonstration School Prasarnmit, Secondary Division',
