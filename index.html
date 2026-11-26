@@ -9752,7 +9752,7 @@ const SEED_SCHEDULE = [
   // from the official "Upcoming Event Schedule Nov–Dec 2026" poster (the owner, 26 Nov 2026): dates, venues and line-ups as printed; [To be announced] stays TBA
   { id:'ev-kimi-school-tour-1127', logo:'kimi', start:'2026-11-27', time:'08:00', until:'13:00',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" School Tour', short:'School Tour',
-    venue:'โรงเรียนศรีอยุธยา ในพระอุปถัมภ์ฯ, Bangkok', groups:['bnk48'],
+    venue:'โรงเรียนศรีอยุธยา ในพระอุปถัมภ์ฯ · โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม)', venues:['โรงเรียนศรีอยุธยา ในพระอุปถัมภ์ฯ, Bangkok','โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม), Bangkok'], groups:['bnk48'],
     poster:{ accent:'#0F5A4D', surface:'#EAF4F1', ink:'#0B3A31', img:'posters/kimi-school-tour-1127.jpg', w:1500, h:1500 },
     related:['ev-ge6-single','ev-kimi-roadshow-bigc-rajdamri'],
     members:['bnk-blythe','bnk-grape','bnk-hoop','bnk-janry','bnk-mail','bnk-mirin'],
@@ -21609,10 +21609,10 @@ function renderEventModal(){
         ${ev.logo && evScene(ev) !== 'kimi' ? renderSongLogo(ev.logo, 'evm-logo', true) : ''}
         <h2 class="evm-title">${escapeHtml(ev.title)}</h2>
         <hr class="evm-rule">
-        ${ev.venue ? `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.venue)}"
+        ${ev.venue ? (ev.venues || [ev.venue]).map(v => `<a class="evm-venue evm-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v)}"
             target="_blank" rel="noopener noreferrer" title="เปิดใน Google Maps">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span>${escapeHtml(ev.venue)}</span></a>`
+            <span>${escapeHtml(v)}</span></a>`).join('')
           : ev.online ? `<span class="evm-venue evm-online">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
             <span>${escapeHtml(ev.online)}</span></span>` : ''}
