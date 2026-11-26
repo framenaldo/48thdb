@@ -13211,7 +13211,7 @@ function renderCheckinBtn(ev){
   if(!open && !tryIt && !got) return '';
   const en = isEN();
   if(got) return `<span class="ck-chip is-done" style="--k:${escapeAttr(got.c || '#E4457E')}">✓ ${en ? 'Checked in' : 'เช็กอินแล้ว'}</span>`;
-  return `<button class="ck-chip" data-action="ck-open" data-id="${escapeAttr(ev.id)}"><span aria-hidden="true">📸</span>${en ? 'Check in' : 'เช็กอิน'}${tryIt ? (en ? ' (try)' : ' (ทดลอง)') : ''}</button>`;
+  return `<button class="ck-chip" data-action="ck-open" data-id="${escapeAttr(ev.id)}"><span aria-hidden="true">📸</span>${en ? 'Check in' : 'เช็กอิน'}${tryIt ? (en ? ' (Beta)' : ' (ทดลอง)') : ''}</button>`;
 }
 // the profile's book
 function renderStampBook(){
