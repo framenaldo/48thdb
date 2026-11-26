@@ -1,4 +1,4 @@
-// OshiTalk's only script: the editor's style buttons, "are you sure?" on deleting, and no double sends.
+// 48thHako's only script: the editor's style buttons, "are you sure?" on deleting, and no double sends.
 // Every page works without it.
 (function () {
   function wrap(ta, tag) {

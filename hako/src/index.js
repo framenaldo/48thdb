@@ -1,4 +1,4 @@
-// OshiTalk: one Worker answers every address. Files in public/ are served before it runs.
+// 48thHako: one Worker answers every address. Files in public/ are served before it runs.
 import { currentUser, isMod } from './auth.js';
 import { message } from './views.js';
 import { MOD_COUNT_SQL } from './db.js';

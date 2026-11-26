@@ -1,5 +1,5 @@
 // A walk through the board in a real browser, against `wrangler dev` with a fresh local database:
-//   npx wrangler d1 migrations apply oshitalk --local && npx wrangler dev --port 8790
+//   npx wrangler d1 migrations apply 48thhako --local && npx wrangler dev --port 8790
 //   node test/smoke.js [http://localhost:8790] [folder for screenshots]
 // It signs three members up, makes the first an admin (through wrangler d1 execute --local),
 // and goes through posting, the moderators' queue, quoting, reporting, pinning and search.
@@ -14,7 +14,7 @@ try { ({ chromium } = require('playwright')); } catch { ({ chromium } = require(
 const BASE = process.argv[2] || 'http://localhost:8790';
 const SHOTS = process.argv[3] || '';
 const WRANGLER = process.env.WRANGLER || 'npx';
-const sql = (q) => execFileSync(WRANGLER, [...(WRANGLER === 'npx' ? ['wrangler'] : []), 'd1', 'execute', 'oshitalk', '--local', '--command', q], { stdio: 'pipe' });
+const sql = (q) => execFileSync(WRANGLER, [...(WRANGLER === 'npx' ? ['wrangler'] : []), 'd1', 'execute', '48thhako', '--local', '--command', q], { stdio: 'pipe' });
 
 const stamp = Date.now().toString(36).slice(-4);
 const A = `ชาเย็น${stamp}`, B = `mango_${stamp}`, C = `ปลาทู${stamp}`;

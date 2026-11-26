@@ -1,9 +1,9 @@
 {
-  "name": "oshitalk",
+  "name": "48thhako",
   "private": true,
   "type": "module",
   "scripts": {
-    "db:local": "wrangler d1 migrations apply oshitalk --local",
+    "db:local": "wrangler d1 migrations apply 48thhako --local",
     "dev": "wrangler dev --port 8790",
     "test": "node --test test/markup.test.js",
     "smoke": "node test/smoke.js"

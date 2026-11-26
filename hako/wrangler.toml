@@ -1,7 +1,7 @@
-# OshiTalk: a fans' web board. One Worker renders every page and keeps the board in D1.
-# Deploy: GitHub Actions "Deploy OshiTalk" (it creates the database on first run and fills in its id),
+# 48thHako: a fans' web board. One Worker renders every page and keeps the board in D1.
+# Deploy: GitHub Actions "Deploy 48thHako" (it creates the database on first run and fills in its id),
 # or by hand — see README.md.
-name = "oshitalk"
+name = "48thhako"
 main = "src/index.js"
 compatibility_date = "2026-09-21"
 workers_dev = true
@@ -12,7 +12,7 @@ directory = "./public"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "oshitalk"
+database_name = "48thhako"
 database_id = "REPLACE_WITH_D1_ID"
 migrations_dir = "migrations"
 

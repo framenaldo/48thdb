@@ -1,4 +1,7 @@
-# OshiTalk — a fans' web board
+# 48thHako — a fans' web board
+
+Hako (箱) is a box; to fans a *hako-oshi* cheers the whole group, and in Japanese music
+slang the hako is the venue. The logo is a box with light sticks in it.
 
 A classic web board (forum index → forums → topics, replies / views / last post, a
 poster's box beside each post) for BNK48 and CGM48 fans. It is its own site: own
@@ -12,7 +15,7 @@ for now; the folder is self-contained and can move to a repo of its own as it is
   after every change (`refreshTopic`, `refreshForum` in `src/db.js`), so they can't drift.
 - **Files in `public/`** (style.css, app.js, the icon, robots.txt) are served before the
   Worker runs. Bump `ASSET_V` in `src/views.js` when style.css or app.js changes.
-- The 48thDb site deploy skips `oshitalk/` (see `.github/workflows/deploy.yml`).
+- The 48thDb site deploy skips `hako/` (see `.github/workflows/deploy.yml`).
 
 ## What it does
 
@@ -30,9 +33,9 @@ Optional: Cloudflare Turnstile on the sign-up form — set `TURNSTILE_SITE` in
 ## Run it locally
 
 ```sh
-cd oshitalk
+cd hako
 npm install
-npx wrangler d1 migrations apply oshitalk --local
+npx wrangler d1 migrations apply 48thhako --local
 npx wrangler dev --port 8790          # http://localhost:8790
 npm test                              # the BBCode tests
 node test/smoke.js                    # a browser walk through everything (needs Playwright and the dev server)
@@ -40,13 +43,13 @@ node test/smoke.js                    # a browser walk through everything (needs
 
 ## Put it online
 
-1. Merge to `main`, then GitHub → Actions → **Deploy OshiTalk** → Run workflow. The first
-   run creates the D1 database `oshitalk`, applies the migrations and deploys to
-   `oshitalk.<your-subdomain>.workers.dev`. The `CLOUDFLARE_API_TOKEN` secret needs
+1. Merge to `main`, then GitHub → Actions → **Deploy 48thHako** → Run workflow. The first
+   run creates the D1 database `48thhako`, applies the migrations and deploys to
+   `48thhako.<your-subdomain>.workers.dev`. The `CLOUDFLARE_API_TOKEN` secret needs
    **D1: Edit** as well as Workers Scripts: Edit.
 2. Sign up on the live board with your own name, then make yourself admin:
    ```sh
-   npx wrangler d1 execute oshitalk --remote --command "UPDATE users SET role='admin' WHERE name='YOUR NAME'"
+   npx wrangler d1 execute 48thhako --remote --command "UPDATE users SET role='admin' WHERE name='YOUR NAME'"
    ```
    From then on, roles are set on a member's profile page.
 3. A domain of its own later: add a `routes = [{ pattern = "…", custom_domain = true }]` to `wrangler.toml`.
@@ -55,7 +58,7 @@ Reset someone's password (they tell you a new one; nothing is e-mailed):
 
 ```sh
 node -e "import('./src/auth.js').then(async a => console.log(await a.hashPassword(process.argv[1])))" 'new-password'
-npx wrangler d1 execute oshitalk --remote --command "UPDATE users SET pass='<the line printed above>' WHERE name='THEIR NAME'"
+npx wrangler d1 execute 48thhako --remote --command "UPDATE users SET pass='<the line printed above>' WHERE name='THEIR NAME'"
 ```
 
 ## Not built yet
