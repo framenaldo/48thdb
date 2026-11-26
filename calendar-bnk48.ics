@@ -1295,15 +1295,19 @@ DTSTART;TZID=Asia/Bangkok:20261127T080000
 DTEND;TZID=Asia/Bangkok:20261127T130000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-conan-crimson-gala-1127@48thdb
+UID:ev-conan-crimson-gala-1127-2026-11-27@48thdb
 DTSTAMP:20261127T000000Z
 SUMMARY:Detective Conan: The Crimson Closing Day Gala Premiere
-LOCATION:SF World Cinema\, centralwOrld\, Bangkok
-DESCRIPTION:เมมเบอร์: Hoop\, Khowjow\, L\, Neen\n\nhttps://
- 48thdb.com/event/ev-conan-crimson-gala-1127
+LOCATION:SF World Cinema\, centralwOrld Fl.8\, Bangkok
+DESCRIPTION:เมมเบอร์: Neen\, Hoop\, L\, Khowjow\n• 19:00
+ –20:00 แขกรับเชิญพิเศษ งานเปิ
+ ดตัวภาพยนตร์ ยอดนักสืบจิ๋
+ วโคนัน บทส่งท้ายสีชาด\n• จั
+ ดโดย Japan Anime Movie Thailand\n\nhttps://48thdb.com/event/ev-con
+ an-crimson-gala-1127
 URL:https://48thdb.com/event/ev-conan-crimson-gala-1127
-DTSTART;VALUE=DATE:20261127
-DTEND;VALUE=DATE:20261128
+DTSTART;TZID=Asia/Bangkok:20261127T190000
+DTEND;TZID=Asia/Bangkok:20261127T200000
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-kimi-roadshow-union-dec-2026-12-05@48thdb

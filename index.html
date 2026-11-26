@@ -9757,10 +9757,13 @@ const SEED_SCHEDULE = [
     related:['ev-ge6-single','ev-kimi-roadshow-bigc-rajdamri'],
     members:['bnk-blythe','bnk-grape','bnk-hoop','bnk-janry','bnk-mail','bnk-mirin'],
     detail:['08:00 โรงเรียนศรีอยุธยา ในพระอุปถัมภ์ฯ','11:30 โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม)'] },
-  { id:'ev-conan-crimson-gala-1127', start:'2026-11-27',
+  { id:'ev-conan-crimson-gala-1127', start:'2026-11-27', time:'19:00', until:'20:00',
     title:'Detective Conan: The Crimson Closing Day Gala Premiere', short:'Conan Gala Premiere',
-    venue:'SF World Cinema, centralwOrld, Bangkok', groups:['bnk48'],
-    members:['bnk-hoop','bnk-khowjow','bnk-l','bnk-neen'] },
+    venue:'SF World Cinema, centralwOrld Fl.8, Bangkok', groups:['bnk48'],
+    poster:{ accent:'#7A2F6E', img:'posters/conan-crimson-gala-1127.jpg', w:1638, h:2048, th:'โปสเตอร์', en:'Poster' },
+    members:['bnk-neen','bnk-hoop','bnk-l','bnk-khowjow'],
+    detail:['19:00–20:00 แขกรับเชิญพิเศษ งานเปิดตัวภาพยนตร์ ยอดนักสืบจิ๋วโคนัน บทส่งท้ายสีชาด'],
+    info:['จัดโดย Japan Anime Movie Thailand'] },
   { id:'ev-kimi-roadshow-union-dec', logo:'kimi', start:'2026-12-05', end:'2026-12-06', time:'12:00',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'Union Mall, Bangkok', groups:['bnk48'],
@@ -11318,6 +11321,8 @@ function getMember(id){ return state.members.find(m=>m.id===id); }
    so a phrase can never be half-replaced inside a longer sentence. */
 const EN = {
   'กำหนดการอ้างอิงจาก Roadshow ครั้งก่อน รอผู้จัดประกาศยืนยัน': 'Times follow the previous roadshow; awaiting the organiser\'s confirmation',
+  '19:00–20:00 แขกรับเชิญพิเศษ งานเปิดตัวภาพยนตร์ ยอดนักสืบจิ๋วโคนัน บทส่งท้ายสีชาด': '19:00–20:00 Special guests at the premiere of Detective Conan: The Crimson Closing Day',
+  'จัดโดย Japan Anime Movie Thailand': 'Organised by Japan Anime Movie Thailand',
   // venue names follow the language switch (the owner's word, 26 Nov 2026)
   '08:00 โรงเรียนศรีอยุธยา ในพระอุปถัมภ์ฯ': '08:00 Sriayudhya School',
   '11:30 โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม)': '11:30 Srinakharinwirot University Demonstration School Prasarnmit, Secondary Division',
