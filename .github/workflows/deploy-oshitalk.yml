@@ -1,0 +1,55 @@
+# Deploy OshiTalk (oshitalk/), the fans' web board, by hand: Actions → Deploy OshiTalk → Run workflow.
+# The first run creates its D1 database "oshitalk"; every run applies new migrations, then deploys.
+# Uses the site's CLOUDFLARE_API_TOKEN, which needs Workers Scripts: Edit and D1: Edit.
+name: Deploy OshiTalk
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-oshitalk
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: oshitalk
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 8e5e921b23884747506b07a3ba030dcf
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test the post markup
+        run: node --test test/markup.test.js
+
+      - name: Find or create the database
+        run: |
+          find_id() {
+            npx --yes wrangler@4.135.0 d1 list --json | node -e '
+              let s = ""; process.stdin.on("data", (d) => (s += d)).on("end", () => {
+                const list = JSON.parse(s.slice(s.indexOf("[")));
+                const db = list.find((x) => x.name === "oshitalk");
+                process.stdout.write(db ? db.uuid : "");
+              });'
+          }
+          id=$(find_id)
+          if [ -z "$id" ]; then
+            npx --yes wrangler@4.135.0 d1 create oshitalk
+            id=$(find_id)
+          fi
+          if [ -z "$id" ]; then echo "::error::Could not find or create the D1 database 'oshitalk' (does the token have D1: Edit?)"; exit 1; fi
+          sed -i "s/REPLACE_WITH_D1_ID/$id/" wrangler.toml
+          echo "D1 database: $id"
+
+      - name: Apply migrations
+        run: npx --yes wrangler@4.135.0 d1 migrations apply oshitalk --remote
+
+      - name: Deploy
+        run: npx --yes wrangler@4.135.0 deploy

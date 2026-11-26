@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /mod
+Disallow: /settings
+Disallow: /login
+Disallow: /register
+Disallow: /search
+Disallow: /new/
+Disallow: /unread

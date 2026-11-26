@@ -1,0 +1,14 @@
+{
+  "name": "oshitalk",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db:local": "wrangler d1 migrations apply oshitalk --local",
+    "dev": "wrangler dev --port 8790",
+    "test": "node --test test/markup.test.js",
+    "smoke": "node test/smoke.js"
+  },
+  "devDependencies": {
+    "wrangler": "4.135.0"
+  }
+}

@@ -19,6 +19,16 @@ sign-in, the review queue, flash announcements, election results and event-link
 corrections. The Firestore rules are **not in this repo** and are deployed with
 the Firebase CLI from the owner's machine.
 
+## OshiTalk (oshitalk/)
+
+A web board for fans, its own site (the owner's choice, 26 Nov 2026: build it, keep it apart from
+48thDb for now, join parts later). A classic board — forum index, forums, topics with replies /
+views / last post, a poster's box beside each post — in violet with a light-stick logo; the
+look was approved from a mock-up of phpBB's layout redrawn in its own colours. One Worker renders
+every page on the server, D1 keeps the board, own accounts (no e-mail kept), nothing shared with
+48thDb. The site deploy skips the folder; it goes out by hand from Actions "Deploy OshiTalk".
+Everything else is in oshitalk/README.md.
+
 ## Shape of index.html
 
 - Every view has a clean address — 48thdb.com/gallery, /vote, /results,
