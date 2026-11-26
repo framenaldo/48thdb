@@ -3,7 +3,7 @@
 import { b64, unb64, now, randomToken, sha256hex, sameBytes, cookie } from './util.js';
 
 const ITER = 100000;                       // the most Workers' PBKDF2 allows
-const COOKIE = 'hk_s';
+const COOKIE = 'f48_s';
 const SESSION_DAYS = 30;
 export const TRUST_AFTER = 3;              // a new account's first posts wait for a moderator
 
@@ -94,7 +94,7 @@ export function reviewReason(user, text) {
 }
 
 // ---- names ----
-const RESERVED = /^(admin|administrator|mod|moderator|root|system|staff|hako|48thhako|48thdb|official|แอดมิน|ผู้ดูแล.*|ทีมงาน.*|เจ้าของเว็บ.*)$/i;
+const RESERVED = /^(admin|administrator|mod|moderator|root|system|staff|forum|48thforum|48thdb|official|แอดมิน|ผู้ดูแล.*|ทีมงาน.*|เจ้าของเว็บ.*)$/i;
 export function nameProblem(name) {
   const n = [...name].length;
   if (n < 3 || n > 20) return 'ชื่อต้องยาว 3–20 ตัวอักษร';

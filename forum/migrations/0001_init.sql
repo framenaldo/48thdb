@@ -1,4 +1,4 @@
--- 48thHako: the board's tables and its first rooms.
+-- 48thForum: the board's tables and its first rooms.
 -- Times are Unix seconds. A post's status is ok, pending (waits for a moderator),
 -- hidden (reported three times, waits for a moderator) or deleted. A topic's status
 -- always follows its first post's.
@@ -125,4 +125,4 @@ INSERT INTO forums (cat_id, slug, title, descr, icon, rules, trade, sort) VALUES
   (1, 'music',    'เพลง/ผลงาน',        'ซิงเกิล อัลบั้ม MV สเตจเธียเตอร์',              '🎵', '', 0, 3),
   (1, 'ge',       'GE / เลือกตั้ง',     'ผลด่วน ผลสุดท้าย และการเชียร์',                '🗳️', 'เชียร์คนที่ชอบได้เต็มที่ แต่ไม่ด่าหรือดูถูกสมาชิกคนอื่นและแฟนคลับของเขา', 0, 4),
   (2, 'trade',    'ซื้อขายแลกเปลี่ยน',  'โฟโต้เซ็ต ของที่ระลึก · ห้ามขายบัตรเกินราคา',     '🛍️', 'ห้ามขายบัตรเกินราคาหน้าบัตร · นัดรับที่งานปลอดภัยที่สุด · โพสต์ที่มีเลขบัญชีหรือเบอร์โทรจะรอผู้ดูแลตรวจก่อน', 1, 1),
-  (2, 'feedback', 'ข้อเสนอแนะเว็บ',     'แจ้งปัญหา เสนอไอเดียให้ 48thHako',             '💡', '', 0, 2);
+  (2, 'feedback', 'ข้อเสนอแนะเว็บ',     'แจ้งปัญหา เสนอไอเดียให้ 48thForum',             '💡', '', 0, 2);

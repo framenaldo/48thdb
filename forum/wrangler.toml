@@ -1,7 +1,7 @@
-# 48thHako: a fans' web board. One Worker renders every page and keeps the board in D1.
-# Deploy: GitHub Actions "Deploy 48thHako" (it creates the database on first run and fills in its id),
+# 48thForum: a fans' web board. One Worker renders every page and keeps the board in D1.
+# Deploy: GitHub Actions "Deploy 48thForum" (it creates the database on first run and fills in its id),
 # or by hand — see README.md.
-name = "48thhako"
+name = "48thforum"
 main = "src/index.js"
 compatibility_date = "2026-09-21"
 workers_dev = true
@@ -12,7 +12,7 @@ directory = "./public"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "48thhako"
+database_name = "48thforum"
 database_id = "REPLACE_WITH_D1_ID"
 migrations_dir = "migrations"
 

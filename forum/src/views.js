@@ -2,7 +2,7 @@
 import { esc, num, dateTh, monthTh, initial } from './util.js';
 import { isMod } from './auth.js';
 
-export const ASSET_V = '2';                // bump when style.css or app.js changes
+export const ASSET_V = '3';                // bump when style.css or app.js changes
 export const PER_FORUM = 25;
 export const PER_TOPIC = 20;
 
@@ -19,7 +19,7 @@ export const tagHtml = (t) => (TAGS[t] ? `<span class="tg ${TAGS[t].c}">${TAGS[t
 
 const FLASH = {
   pending:  'ส่งแล้ว · โพสต์นี้จะขึ้นหลังผู้ดูแลตรวจ (3 โพสต์แรกของบัญชีใหม่ และโพสต์ที่มีเลขบัญชีหรือเบอร์โทร รอตรวจก่อนเสมอ)',
-  welcome:  'ยินดีต้อนรับสู่ 48thHako! อ่านกติกาสักนิดก่อนโพสต์นะ · 3 โพสต์แรกจะรอผู้ดูแลตรวจก่อนขึ้น',
+  welcome:  'ยินดีต้อนรับสู่ 48thForum! อ่านกติกาสักนิดก่อนโพสต์นะ · 3 โพสต์แรกจะรอผู้ดูแลตรวจก่อนขึ้น',
   login:    'เข้าสู่ระบบแล้ว',
   logout:   'ออกจากระบบแล้ว',
   saved:    'บันทึกแล้ว',
@@ -80,7 +80,7 @@ export function layout(c, { title = '', crumbs = [], body = '', desc = '', noind
     u ? `<form method="post" action="/logout" class="inline"><button class="linkbtn">ออกจากระบบ</button></form>` : ''}`;
   const html = `<!doctype html>
 <html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(title ? `${title} · 48thHako` : '48thHako · เว็บบอร์ดแฟนคลับไอดอล')}</title>
+<title>${esc(title ? `${title} · 48thForum` : '48thForum · เว็บบอร์ดแฟนคลับไอดอล')}</title>
 ${desc ? `<meta name="description" content="${esc(desc)}">` : ''}${noindex ? '<meta name="robots" content="noindex">' : ''}
 <meta name="theme-color" content="#3A2799">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -90,8 +90,8 @@ ${desc ? `<meta name="description" content="${esc(desc)}">` : ''}${noindex ? '<m
 <script src="/app.js?v=${ASSET_V}" defer></script>
 </head><body><div class="wrap">
 <header class="head">
-  <a href="/" class="logo" aria-label="48thHako หน้าแรก"><img class="mark" src="/hako.svg" width="40" height="40" alt=""><span>48th<b>Hako</b></span></a>
-  <div class="tagline"><div class="t">เว็บบอร์ดแฟนคลับไอดอล BNK48 · CGM48</div><div class="d">ทุกโอชิมารวมกันในกล่องเดียว · ทำโดยแฟน เพื่อแฟน</div></div>
+  <a href="/" class="logo" aria-label="48thForum หน้าแรก"><img class="mark" src="/mark.svg" width="40" height="40" alt=""><span>48th<b>Forum</b></span></a>
+  <div class="tagline"><div class="t">เว็บบอร์ดแฟนคลับไอดอล BNK48 · CGM48</div><div class="d">ที่คุยของแฟนทุกโอชิ · ทำโดยแฟน เพื่อแฟน</div></div>
   <form class="search" action="/search" role="search"><input name="q" placeholder="ค้นหาในบอร์ด…" aria-label="ค้นหาในบอร์ด" value="${esc(c.url.pathname === '/search' ? c.url.searchParams.get('q') || '' : '')}"><button>ค้นหา</button></form>
 </header>
 <nav class="navbar">
@@ -100,7 +100,7 @@ ${desc ? `<meta name="description" content="${esc(desc)}">` : ''}${noindex ? '<m
 </nav>
 ${flash ? `<div class="flash">${esc(flash)}</div>` : ''}
 <main>${body}</main>
-<footer class="foot">48thHako · เว็บบอร์ดที่แฟนทำกันเอง ไม่ใช่ช่องทางทางการของวงหรือต้นสังกัด · <a href="/faq">กติกา & คำถามที่พบบ่อย</a></footer>
+<footer class="foot">48thForum · เว็บบอร์ดที่แฟนทำกันเอง ไม่ใช่ช่องทางทางการของวงหรือต้นสังกัด · <a href="/faq">กติกา & คำถามที่พบบ่อย</a></footer>
 </div></body></html>`;
   return new Response(html, { status, headers: c.headers({ 'Content-Type': 'text/html; charset=utf-8' }) });
 }

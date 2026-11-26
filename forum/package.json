@@ -1,9 +1,9 @@
 {
-  "name": "48thhako",
+  "name": "48thforum",
   "private": true,
   "type": "module",
   "scripts": {
-    "db:local": "wrangler d1 migrations apply 48thhako --local",
+    "db:local": "wrangler d1 migrations apply 48thforum --local",
     "dev": "wrangler dev --port 8790",
     "test": "node --test test/markup.test.js",
     "smoke": "node test/smoke.js"

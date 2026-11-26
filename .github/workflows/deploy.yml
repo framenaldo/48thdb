@@ -4,7 +4,7 @@
 # those workflows run this one by name when they have pushed.
 #
 # Only the files people actually load are uploaded: the scripts, the Worker
-# source, the workflows and 48thHako (the web board, its own Worker) stay in the
+# source, the workflows and 48thForum (the web board, its own Worker) stay in the
 # repo but are not served.
 #
 # Needs one secret, CLOUDFLARE_API_TOKEN (Edit Cloudflare Workers template).
@@ -18,7 +18,7 @@ on:
       - 'worker/**'
       - '.github/**'
       - '.claude/**'
-      - 'hako/**'
+      - 'forum/**'
   workflow_dispatch:
 
 permissions:
@@ -39,7 +39,7 @@ jobs:
         run: |
           mkdir -p public
           git ls-files -z \
-            | grep -zvE '^(scripts/|worker/|hako/|\.github/|\.claude/|\.gitignore|CLAUDE\.md|\.firebaserc|firebase\.json|site\.wrangler\.toml|senbatsu-idol-database)' \
+            | grep -zvE '^(scripts/|worker/|forum/|\.github/|\.claude/|\.gitignore|CLAUDE\.md|\.firebaserc|firebase\.json|site\.wrangler\.toml|senbatsu-idol-database)' \
             | tar -cf - --null -T - | tar -xf - -C public
           # the page's build stamp: a hash of the page, written into it and published beside it (sw.js reads both)
           H=$(sha256sum public/index.html | cut -c1-32)
