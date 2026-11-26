@@ -5443,7 +5443,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .bio-text{ font-size:15px; line-height:1.85; overflow-wrap:anywhere; }
   .bio-text p{ margin:0 0 10px; } .bio-text p:last-child{ margin-bottom:0; }
   .bio-text.is-clamp{ max-height:calc(1.85em * 4); overflow:hidden; position:relative; }
-  .bio-text.is-clamp:not(.is-short)::after{ content:''; position:absolute; left:0; right:0; bottom:0; height:2.4em; background:linear-gradient(transparent, var(--card)); pointer-events:none; }
+  /* the last lines fade out by a mask, so the fade matches whatever is behind (a gradient in --card drew a dark band on a see-through cell) */
+  .bio-text.is-clamp:not(.is-short){ -webkit-mask-image:linear-gradient(#000 calc(100% - 2.4em), transparent); mask-image:linear-gradient(#000 calc(100% - 2.4em), transparent); }
   .bio-text.is-short{ max-height:none; }
   .bio-mn, .bio-ht{ font-weight:800; cursor:pointer; border-radius:4px; }
   .bio-mn{ color:var(--bio-mn); } .bio-ht{ color:var(--bio-ht); }
@@ -7512,6 +7513,11 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-lg="1"] .ov-layer :is(.card, .cal-wrap, .pd-card, .share-preview, .ev-card, .rota, .shop-card, .tl-card, .bio-card, .ask-card,
     .qz-card, .qz-result, .mini-card, .stat-cell, .otd-row, .gel-mini-c, .sr-row){ background:var(--lg-veil); -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:var(--lg-hi); }
   html[data-lg="1"] .ev-open{ text-align:center; }
+  /* A stat grid drew its hairlines with a solid --line fill under the cells; once the cells went see-through that fill showed
+     through every cell as a muddy purple-grey, and each cell's own rim doubled the lines (the owner's word, 26 Nov 2026). At night,
+     under the liquid glass, the grid has no fill: its cells are tiles of their own, a little apart. */
+  :root[data-theme="dark"][data-lg="1"] .stat-grid{ background:none; border:0; gap:6px; overflow:visible; }
+  :root[data-theme="dark"][data-lg="1"] .stat-grid > .stat-cell{ border-radius:var(--r-sm); }
   /* a card with no foot: the link is a row of its own under both columns, centred on the card (the owner's word, 22 Nov 2026) */
   .ev-card:has(> .ev-open.is-row){ flex-wrap:wrap; }
   .ev-card > .ev-open.is-row{ order:3; flex:1 0 100%; margin:0; text-align:center; }
