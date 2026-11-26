@@ -3,6 +3,7 @@
 import { esc, now, num, when, clockTh, oneLine, localPath } from './util.js';
 import { isMod, isAdmin } from './auth.js';
 import { plain } from './markup.js';
+import { imageKeys, dropImages } from './images.js';
 import { refreshTopic, refreshForum, postById } from './db.js';
 import { layout, message, userLink } from './views.js';
 
@@ -40,6 +41,7 @@ export async function queue(c) {
     : `<span class="flag rep">⚑ รายงาน ${p.open} ครั้ง${p.status === 'hidden' ? ' · ซ่อนอยู่' : ''}</span>`}<span class="sp"></span><span>${when(p.created_at, at)}</span></div>
   <div class="mwhere">${p.id === p.first_post_id ? 'กระทู้ใหม่' : 'ตอบใน'} <a href="/p/${p.id}">${esc(p.title)}</a> · ${esc(p.ftitle)} · โดย ${userLink(p.user_id, p.name, p.role)}</div>
   <div class="mq">“${esc(excerpt.slice(0, 400))}${excerpt.length > 400 ? '…' : ''}”</div>
+  ${imageKeys(p.body).length ? `<div class="mpics">${imageKeys(p.body).map((k) => `<a href="/i/${k}" target="_blank" rel="noopener"><img src="/i/${k}" alt="รูปในโพสต์" loading="lazy"></a>`).join('')}</div>` : ''}
   ${kind === 'r' && p.reasons ? `<div class="why">เหตุผล: ${esc(p.reasons)}</div>` : ''}
   <div class="mbtns">${buttons}</div>
 </article>`;
@@ -84,6 +86,7 @@ export async function act(c) {
       env.DB.prepare(`UPDATE posts SET status = ?, flag = '', reports = CASE WHEN ? THEN 0 ELSE reports END WHERE id = ?`).bind(status, a === 'keep' ? 1 : 0, p.id),
       env.DB.prepare('UPDATE reports SET done = 1 WHERE post_id = ?').bind(p.id),
     ]);
+    if (status === 'deleted') await dropImages(env, [p.id], c.url.origin);
     await refreshTopic(env, p.topic_id, [p.user_id]);
     return done();
   }
@@ -134,6 +137,7 @@ export async function act(c) {
       env.DB.prepare("UPDATE posts SET status = 'deleted' WHERE id = ?").bind(topic.first_post_id),
       env.DB.prepare('UPDATE reports SET done = 1 WHERE post_id IN (SELECT id FROM posts WHERE topic_id = ?)').bind(topic.id),
     ]);
+    await dropImages(env, [topic.first_post_id], c.url.origin);
     await refreshTopic(env, topic.id, [topic.user_id]);
     const f = await env.DB.prepare('SELECT slug FROM forums WHERE id = ?').bind(topic.forum_id).first();
     return Response.redirect(`${c.url.origin}/f/${f.slug}?m=deleted`, 303);

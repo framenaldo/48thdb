@@ -24,6 +24,7 @@ for now; the folder is self-contained and can move to a repo of its own as it is
 | Writing | new topic with a label (ถาม, รีวิว, หาเพื่อน …) · reply, quick reply, quote · edit, delete own · preview · BBCode `[b] [i] [u] [s] [quote="name"] [url=…]`, bare links (`src/markup.js`, everything escaped first) |
 | Accounts | sign-up with a board name and password (PBKDF2, 100k rounds) · a session cookie (HttpOnly, SameSite=Lax), its hash in D1 · settings: oshi, signature, password · **no e-mail is kept**, so a forgotten password is reset by an admin (below) |
 | Safety | a new account's first 3 posts wait for a moderator · a post with a phone number, bank account or พร้อมเพย์ waits always · 3 reports from different members hide a post until a moderator looks · rate limits: 3 topics and 20 posts an hour, 3 sign-ups a day per address (hashed, never stored), 10 sign-in tries in 15 minutes · forms from another site are refused · strict CSP |
+| Pictures | 📷 in the editor: several at once, 10 a post; the browser shrinks each (long side 1,600 px, JPEG on white — EXIF and the phone's location are dropped; a GIF up to 2 MB goes as it is) and sends it to `POST /upload` (30 an hour; the bytes must be a JPEG, PNG, GIF or WebP); kept in R2 as `p/<key>`, shown at `/i/<key>` straight from R2 (an hour in caches); a post holds `[img=WxH]key[/img]` — only our own pictures, never another site's · a topic's row shows 📷 and how many its first post has · the moderators' queue shows a waiting post's pictures · deleting a post deletes its pictures at once; pictures never posted go after a day (`src/images.js`, table `images`) |
 | Busy days | every page reads only the rows it shows (counters kept on the forum and the topic, indexes for the rest) · search through a trigram index (`post_fts`, `topic_fts`, kept in step by triggers; 2-letter words look through the latest 3,000 posts) · guests' pages kept at the edge for `GUEST_CACHE` seconds (30; works once the board has its own domain — the Cache API keeps nothing on workers.dev) · every night at 03:17 a cron clears read marks older than 30 days, spent rate limits and old sessions |
 | Moderators | `/mod`: waiting posts, reported posts, banned members — pass, reject, delete, restore, ban 1/7/30 days or for good · on a topic: lock, pin, announce, move, delete · ✓ ผ่าน straight on a waiting post · admins set roles on a member's profile |
 
@@ -46,8 +47,9 @@ node test/smoke.js                    # a browser walk through everything (needs
 
 1. Merge to `main`, then GitHub → Actions → **Deploy 48thForum** → Run workflow. The first
    run creates the D1 database `48thforum`, applies the migrations and deploys to
-   `48thforum.<your-subdomain>.workers.dev`. The `CLOUDFLARE_API_TOKEN` secret needs
-   **D1: Edit** as well as Workers Scripts: Edit.
+   `48thforum.<your-subdomain>.workers.dev`. It also creates the R2 bucket `48thforum-images` for
+   pictures. The `CLOUDFLARE_API_TOKEN` secret needs **D1: Edit** and **Workers R2 Storage: Edit** as
+   well as Workers Scripts: Edit, and R2 has to be turned on once in the Cloudflare dashboard.
 2. Sign up on the live board with your own name, then make yourself admin:
    ```sh
    npx wrangler d1 execute 48thforum --remote --command "UPDATE users SET role='admin' WHERE name='YOUR NAME'"
@@ -64,6 +66,6 @@ npx wrangler d1 execute 48thforum --remote --command "UPDATE users SET pass='<th
 
 ## Not built yet
 
-Pictures in posts (R2), private messages, notifications, sub-forums, a dark mode,
+Private messages, notifications, sub-forums, a dark mode,
 e-mail for password resets, and anything shared with 48thDb (one sign-in, oshi and
 check-in stamps on the poster's box).

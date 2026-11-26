@@ -4,6 +4,7 @@ import { isMod, isBanned, overLimit, reviewReason } from './auth.js';
 import { render, quoteOf } from './markup.js';
 import { forumBySlug, topicById, postById, canSee, refreshTopic } from './db.js';
 import { layout, message, editor, TAGS, tagHtml, userLink } from './views.js';
+import { linkImages, dropImages } from './images.js';
 
 const go = (c, path) => Response.redirect(c.url.origin + path, 303);
 
@@ -46,7 +47,7 @@ function newTopicPage(c, f, { title = '', tag = '', body = '', error = '', previ
     body: `<h1 class="ft">ตั้งกระทู้ใหม่ใน ${esc(f.title)}</h1>
 ${f.rules ? `<div class="rules"><b>กฎของห้องนี้</b>${esc(f.rules)}</div>` : ''}
 ${preview ? previewHtml(body) : ''}
-<section class="box">${editor({ action: `/new/${f.slug}`, title, tag, body, forum: f, submit: 'โพสต์กระทู้', error })}</section>
+<section class="box">${editor({ action: `/new/${f.slug}`, title, tag, body, forum: f, submit: 'โพสต์กระทู้', error, pics: !!c.env.IMAGES })}</section>
 <p class="muted center">โปรดอ่าน<a href="/faq">กติกาบอร์ด</a>ก่อนโพสต์ · 3 โพสต์แรกของบัญชีใหม่จะรอผู้ดูแลตรวจก่อนขึ้น</p>`,
   });
 }
@@ -80,7 +81,8 @@ export async function newTopic(c, slug) {
     VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id`).bind(f.id, user.id, title, tag, status, t, t).first();
   const post = await env.DB.prepare(`INSERT INTO posts (topic_id, user_id, body, status, flag, created_at)
     VALUES (?, ?, ?, ?, ?, ?) RETURNING id`).bind(topic.id, user.id, body, status, why, t).first();
-  await env.DB.prepare('UPDATE topics SET first_post_id = ?1, last_post_id = ?1 WHERE id = ?2').bind(post.id, topic.id).run();
+  const pics = await linkImages(env, post.id, body, [user.id]);
+  await env.DB.prepare('UPDATE topics SET first_post_id = ?1, last_post_id = ?1, pics = ?3 WHERE id = ?2').bind(post.id, topic.id, pics).run();
   await refreshTopic(env, topic.id, [user.id]);
   return go(c, `/t/${topic.id}${status === 'pending' ? '?m=pending' : ''}`);
 }
@@ -104,7 +106,7 @@ async function replyPage(c, t, { body = '', error = '', preview = false } = {}) 
     crumbs: [{ href: `/f/${t.slug}`, label: t.ftitle }, { href: `/t/${t.id}`, label: t.title }, { label: 'ตอบกลับ' }],
     body: `<h1 class="ft">ตอบกลับ: ${tagHtml(t.tag)}${esc(t.title)}</h1>
 ${preview ? previewHtml(body) : ''}
-<section class="box">${editor({ action: `/t/${t.id}/reply`, body, forum: t, error })}</section>
+<section class="box">${editor({ action: `/t/${t.id}/reply`, body, forum: t, error, pics: !!c.env.IMAGES })}</section>
 ${last.length ? `<section class="tbl list"><div class="thd"><span>ข้อความล่าสุดในกระทู้</span></div>${last.map((p) => `<div class="tr1">
   <span class="muted">${userLink(p.uid, p.name, p.role)} · ${when(p.created_at, at)}</span><div class="ptext small">${render(p.body)}</div></div>`).join('')}</section>` : ''}`,
   });
@@ -141,6 +143,7 @@ export async function reply(c, id) {
   const status = why ? 'pending' : 'ok';
   const post = await env.DB.prepare(`INSERT INTO posts (topic_id, user_id, body, status, flag, created_at)
     VALUES (?, ?, ?, ?, ?, ?) RETURNING id`).bind(t.id, user.id, body, status, why, now()).first();
+  await linkImages(env, post.id, body, [user.id]);
   await refreshTopic(env, t.id, [user.id]);
   return go(c, `/p/${post.id}${status === 'pending' ? '?m=pending' : ''}`);
 }
@@ -162,7 +165,7 @@ async function editPage(c, p, first, { title, tag, body, error = '', preview = f
     crumbs: [{ href: `/f/${f.slug}`, label: f.title }, { href: `/p/${p.id}`, label: p.title }, { label: 'แก้ไข' }],
     body: `<h1 class="ft">แก้ไขข้อความ</h1>
 ${preview ? previewHtml(body) : ''}
-<section class="box">${editor({ action: `/p/${p.id}/edit`, title: first ? title : null, tag, body, forum: f, submit: 'บันทึก', error })}</section>`,
+<section class="box">${editor({ action: `/p/${p.id}/edit`, title: first ? title : null, tag, body, forum: f, submit: 'บันทึก', error, pics: !!c.env.IMAGES })}</section>`,
   });
 }
 
@@ -193,8 +196,9 @@ export async function edit(c, id) {
     if (why) { status = 'pending'; flag = `แก้ไขแล้ว · ${why}`; }
   }
   const stmts = [env.DB.prepare('UPDATE posts SET body = ?, status = ?, flag = ?, edited_at = ? WHERE id = ?').bind(body, status, flag, now(), p.id)];
-  if (first) stmts.push(env.DB.prepare('UPDATE topics SET title = ?, tag = ? WHERE id = ?').bind(title, tag, p.topic_id));
   await env.DB.batch(stmts);
+  const pics = await linkImages(env, p.id, body, [p.user_id, user.id]);
+  if (first) await env.DB.prepare('UPDATE topics SET title = ?, tag = ?, pics = ? WHERE id = ?').bind(title, tag, pics, p.topic_id).run();
   await refreshTopic(env, p.topic_id, [p.user_id]);
   return go(c, `/p/${p.id}${status === 'pending' && p.status === 'ok' ? '?m=pending' : ''}`);
 }
@@ -208,6 +212,7 @@ export async function remove(c, id) {
     env.DB.prepare("UPDATE posts SET status = 'deleted' WHERE id = ?").bind(p.id),
     env.DB.prepare('UPDATE reports SET done = 1 WHERE post_id = ?').bind(p.id),
   ]);
+  await dropImages(env, [p.id], c.url.origin);
   await refreshTopic(env, p.topic_id, [p.user_id]);
   if (first) {
     const f = await env.DB.prepare('SELECT slug FROM forums WHERE id = ?').bind(p.forum_id).first();

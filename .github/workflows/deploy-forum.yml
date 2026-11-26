@@ -1,6 +1,7 @@
 # Deploy 48thForum (forum/), the fans' web board, by hand: Actions → Deploy 48thForum → Run workflow.
 # The first run creates its D1 database "48thforum"; every run applies new migrations, then deploys.
-# Uses the site's CLOUDFLARE_API_TOKEN, which needs Workers Scripts: Edit and D1: Edit.
+# It also creates the R2 bucket for pictures (48thforum-images) if missing.
+# Uses the site's CLOUDFLARE_API_TOKEN, which needs Workers Scripts: Edit, D1: Edit and Workers R2 Storage: Edit.
 name: Deploy 48thForum
 
 on:
@@ -47,6 +48,13 @@ jobs:
           if [ -z "$id" ]; then echo "::error::Could not find or create the D1 database '48thforum' (does the token have D1: Edit?)"; exit 1; fi
           sed -i "s/REPLACE_WITH_D1_ID/$id/" wrangler.toml
           echo "D1 database: $id"
+
+      - name: Find or create the picture bucket
+        run: |
+          if ! npx --yes wrangler@4.135.0 r2 bucket list | grep -q "48thforum-images"; then
+            npx --yes wrangler@4.135.0 r2 bucket create 48thforum-images || {
+              echo "::error::Could not create the R2 bucket 48thforum-images. Turn R2 on once in the Cloudflare dashboard (R2 → Purchase/enable), and give the token Workers R2 Storage: Edit."; exit 1; }
+          fi
 
       - name: Apply migrations
         run: npx --yes wrangler@4.135.0 d1 migrations apply 48thforum --remote

@@ -44,3 +44,15 @@ test('plain text and quoting', () => {
   assert.equal(plain('[quote="x"]old[/quote][b]new[/b] [url=https://a.com]link[/url]'), 'new link');
   assert.equal(quoteOf('ชาเย็น', '[quote="x"]old[/quote]\nใหม่'), '[quote="ชาเย็น"]ใหม่[/quote]\n');
 });
+
+test('pictures: our own addresses only, at most ten, sized', () => {
+  const h = render('ดูนี่\n[img=1200x900]abcdefghijklmnop[/img]');
+  assert.match(h, /<a class="pic" href="\/i\/abcdefghijklmnop"[^>]*><img src="\/i\/abcdefghijklmnop" width="1200" height="900" loading="lazy"/);
+  assert.doesNotMatch(render('[img]https://evil.example/x.png[/img]'), /<img/);   // another site's picture is only a link
+  assert.equal(render('[img]short[/img]'), '[img]short[/img]');
+  assert.doesNotMatch(render('[img="onerror=alert(1)]abcdefghijklmnop[/img]'), /onerror=alert\(1\)[^<]*<img/);
+  const many = Array.from({ length: 12 }, (_, i) => `[img]abcdefghijklmn${String(i).padStart(2, '0')}[/img]`).join('');
+  assert.equal((render(many).match(/<img /g) || []).length, 10);
+  assert.equal(plain('ก่อน [img=10x10]abcdefghijklmnop[/img] หลัง'), 'ก่อน 📷 หลัง');
+  assert.equal(quoteOf('x', 'รูป [img]abcdefghijklmnop[/img]'), '[quote="x"]รูป [รูป][/quote]\n');
+});

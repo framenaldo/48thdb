@@ -2,7 +2,7 @@
 import { esc, num, dateTh, monthTh, initial } from './util.js';
 import { isMod } from './auth.js';
 
-export const ASSET_V = '3';                // bump when style.css or app.js changes
+export const ASSET_V = '4';                // bump when style.css or app.js changes
 export const PER_FORUM = 25;
 export const PER_TOPIC = 20;
 
@@ -114,11 +114,12 @@ export function message(c, title, text, { status = 200, link = null } = {}) {
 }
 
 // the editor used for a new topic, a reply and an edit
-export function editor({ action, body = '', title = null, tag = '', forum = null, submit = 'ส่งข้อความ', quick = false, error = '' }) {
+export function editor({ action, body = '', title = null, tag = '', forum = null, submit = 'ส่งข้อความ', quick = false, error = '', pics = false }) {
   const tools = `<div class="tools" role="toolbar" aria-label="จัดรูปแบบ">
     <button type="button" data-bb="b" title="ตัวหนา"><b>B</b></button><button type="button" data-bb="i" title="ตัวเอียง"><i>i</i></button>
     <button type="button" data-bb="u" title="ขีดเส้นใต้"><u>U</u></button><button type="button" data-bb="s" title="ขีดฆ่า"><s>S</s></button>
-    <button type="button" data-bb="quote" title="อ้างอิง">“ ”</button><button type="button" data-bb="url" title="ใส่ลิงก์">🔗 ลิงก์</button></div>`;
+    <button type="button" data-bb="quote" title="อ้างอิง">“ ”</button><button type="button" data-bb="url" title="ใส่ลิงก์">🔗 ลิงก์</button>${
+    pics ? `<button type="button" data-pic title="แนบรูป (ได้ครั้งละหลายรูป)">📷 รูป</button><input type="file" accept="image/*" multiple hidden data-pic-input><span class="upl" role="status" aria-live="polite"></span>` : ''}</div>`;
   return `<form method="post" action="${action}" class="editor${quick ? ' quick' : ''}">
   ${error ? `<div class="err">${esc(error)}</div>` : ''}
   ${forum?.trade ? `<div class="warn"><b>⚠️ ก่อนซื้อขาย</b>นัดรับที่งานปลอดภัยที่สุด อย่าโอนเงินก่อนได้ของ และห้ามขายบัตรเกินราคาหน้าบัตร · โพสต์ที่มีเลขบัญชีหรือเบอร์โทรจะรอผู้ดูแลตรวจก่อน</div>` : ''}
@@ -129,7 +130,8 @@ export function editor({ action, body = '', title = null, tag = '', forum = null
   ${quick ? '' : '<label class="lbl" for="f-body">ข้อความ</label>'}
   ${tools}
   <textarea id="f-body" name="body" rows="${quick ? 5 : 12}" maxlength="10000" required placeholder="พิมพ์ข้อความ…">${esc(body)}</textarea>
-  <div class="hint">[b]หนา[/b] · [i]เอียง[/i] · [quote]อ้างอิง[/quote] · [url=https://…]ลิงก์[/url] · ลิงก์ที่วางไว้เฉย ๆ กดได้เอง</div>
+  <div class="hint">[b]หนา[/b] · [i]เอียง[/i] · [quote]อ้างอิง[/quote] · [url=https://…]ลิงก์[/url] · ลิงก์ที่วางไว้เฉย ๆ กดได้เอง${
+    pics ? ' · 📷 รูปถูกย่อให้เล็กลงก่อนส่ง (ข้อมูลตำแหน่งในรูปถูกลบออก) ได้โพสต์ละ 10 รูป' : ''}</div>
   <div class="actions end"><button class="btn" name="preview" value="1">ดูตัวอย่าง</button><button class="btn new">${esc(submit)}</button></div>
 </form>`;
 }

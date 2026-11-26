@@ -7,6 +7,20 @@
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
+import { deflateSync } from 'node:zlib';
+
+// a w×h PNG (a colour ramp) made here, so the test needs no picture file
+function png(w, h) {
+  const crcT = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+  const crc = (b) => { let c = 0xffffffff; for (const x of b) c = crcT[(c ^ x) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+  const chunk = (type, data) => { const t = Buffer.from(type); const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
+    const sum = Buffer.alloc(4); sum.writeUInt32BE(crc(Buffer.concat([t, data]))); return Buffer.concat([len, t, data, sum]); };
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4); ihdr[8] = 8; ihdr[9] = 2;
+  const raw = Buffer.alloc((w * 3 + 1) * h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const o = y * (w * 3 + 1) + 1 + x * 3; raw[o] = x % 256; raw[o + 1] = y % 256; raw[o + 2] = 160; }
+  return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw)), chunk('IEND', Buffer.alloc(0))]);
+}
+const BIG = { name: 'concert.png', mimeType: 'image/png', buffer: png(2400, 1200) };
 
 const require = createRequire(import.meta.url);
 let chromium;
@@ -104,6 +118,31 @@ await b.waitForURL(/\/t\/\d+(\?[^#]*)?#p\d+$/);
 assert.doesNotMatch(b.url(), /pending/);
 console.log('✓ after three approved posts a member posts straight away');
 
+// a picture: shrunk in the browser to 1,600 px, sent, shown in the post, served as a JPEG
+await b.setInputFiles('.reply [data-pic-input]', BIG);
+await b.waitForFunction(() => /\[img=1600x800\][A-Za-z0-9_-]{16}\[\/img\]/.test(document.querySelector('.reply textarea').value));
+const picKey = (await b.inputValue('.reply textarea')).match(/\](\S{16})\[/)[1];
+await b.locator('.reply textarea').press('End');
+await b.locator('.reply textarea').type('รูปจากหน้างาน');
+await b.click('.reply button.btn.new');
+await b.waitForURL(/#p\d+$/);
+const pic = b.locator(`.ptext a.pic img[src="/i/${picKey}"]`);
+await pic.waitFor();
+assert.equal(await pic.evaluate((i) => i.decode().then(() => i.naturalWidth)), 1600);
+const served = await b.request.get(`${BASE}/i/${picKey}`);
+assert.equal(served.status(), 200);
+assert.equal(served.headers()['content-type'], 'image/jpeg');
+assert.equal((await served.body())[0], 0xff);
+assert.equal((await b.request.post(`${BASE}/upload?w=1&h=1`, { data: 'not a picture', headers: { 'Content-Type': 'text/plain' } })).status(), 415);
+assert.equal((await guest.request.post(`${BASE}/upload?w=1&h=1`, { data: BIG.buffer })).status(), 401);
+console.log('✓ a picture is shrunk to 1,600 px, posted, shown and served; a non-picture and a guest are refused');
+
+// deleting the post deletes its picture
+await b.locator('.post', { hasText: 'รูปจากหน้างาน' }).locator('form[action$="/delete"] button').click();
+await b.waitForURL(/m=deleted/);
+assert.equal((await b.request.get(`${BASE}/i/${picKey}`)).status(), 404);
+console.log('✓ a deleted post takes its picture with it');
+
 // a trusted member's post with a phone number still waits
 await b.fill('.reply textarea', 'สนใจทักมาที่ 081-234-5678 ได้เลย');
 await b.click('.reply button.btn.new');
@@ -120,9 +159,12 @@ await c.locator('.post').first().locator('a.b', { hasText: 'อ้างอิ�
 assert.match(await c.inputValue('#f-body'), /^\[quote="mango_/);
 await c.locator('#f-body').press('End');
 await c.locator('#f-body').type('เห็นด้วยเรื่องไฟเวที! รอบหน้าจะไปโซนซ้ายบ้าง');
+await c.setInputFiles('[data-pic-input]', { ...BIG, name: 'from-phone.png' });           // on a phone-sized screen
+await c.waitForFunction(() => /\[img=1600x800\]/.test(document.querySelector('#f-body').value));
 await c.click('button.btn.new');
 await c.waitForURL(/m=pending/);
 await a.goto(`${BASE}/mod`);
+assert.equal(await a.locator('.mcard', { hasText: 'โซนซ้ายบ้าง' }).locator('.mpics img').count(), 1);   // a moderator sees the picture
 await a.locator('.mcard', { hasText: 'โซนซ้ายบ้าง' }).locator('button.mb.ok').click();
 await a.waitForURL(/m=done/);
 await guest.goto(topicUrl);
@@ -173,6 +215,23 @@ for (const [slug, tag, title, body] of more) {
   await a.waitForURL(/\/t\/\d+$/);
 }
 console.log('✓ the admin\'s topics go up straight away');
+
+// a topic of pictures: two at once, and the forum's row says so
+await a.goto(`${BASE}/new/events`);
+await a.fill('#f-title', `ทริปเชียงใหม่ รูปเยอะมาก ${stamp}`);
+await a.fill('#f-body', 'บรรยากาศหน้างาน');
+await a.setInputFiles('[data-pic-input]', [BIG, { ...BIG, name: 'stage.png' }]);
+await a.waitForFunction(() => (document.querySelector('#f-body').value.match(/\[img=/g) || []).length === 2);
+await a.click('button.btn.new');
+await a.waitForURL(/\/t\/\d+$/);
+assert.equal(await a.locator('.ptext a.pic img').count(), 2);
+await a.goto(`${BASE}/f/events`);
+assert.match(await a.locator('.topics .tr', { hasText: `ทริปเชียงใหม่ รูปเยอะมาก ${stamp}` }).innerText(), /📷 2/);
+await shot(a, 'pics-forum');
+await a.locator('.topics .tr a', { hasText: `ทริปเชียงใหม่ รูปเยอะมาก ${stamp}` }).click();
+await a.locator('.ptext a.pic img').first().evaluate((i) => i.decode());
+await shot(a, 'pics-topic');
+console.log('✓ a topic with two pictures shows them, and its row shows 📷 2');
 
 // the red ring: B has not read the admin's new topic in พูดคุยทั่วไป; after reading it the ring goes
 const ring = async () => { await b.goto(BASE); return b.locator('.forums .tr', { hasText: 'พูดคุยทั่วไป' }).locator('.ic.unread').count(); };

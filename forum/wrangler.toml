@@ -16,6 +16,11 @@ database_name = "48thforum"
 database_id = "REPLACE_WITH_D1_ID"
 migrations_dir = "migrations"
 
+# Pictures in posts (src/images.js). The deploy workflow creates the bucket if it is missing.
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "48thforum-images"
+
 # Optional: Cloudflare Turnstile on the sign-up form. Set both to turn it on
 #   TURNSTILE_SITE in [vars], and  npx wrangler secret put TURNSTILE_SECRET
 [vars]

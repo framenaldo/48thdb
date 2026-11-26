@@ -257,3 +257,13 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
   .row select{flex:1}
   .actions .pg{margin-left:auto}
 }
+
+/* pictures in posts: as wide as the post allows, never taller than most of the screen */
+.ptext a.pic{display:inline-block;max-width:100%;margin:6px 0;line-height:0;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:#fff;vertical-align:top}
+.ptext a.pic img{display:block;max-width:100%;height:auto;max-height:78vh;width:auto;object-fit:contain}
+.quote a.pic img{max-height:200px}
+.pics{font-size:11.5px;font-weight:700;color:var(--ink-2);margin-left:6px;white-space:nowrap}
+.tools button:disabled{opacity:.5;cursor:progress}
+.upl{font-size:12px;color:var(--ink-2);align-self:center;margin-left:4px}
+.mpics{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.mpics img{width:88px;height:88px;object-fit:cover;border-radius:8px;border:1px solid #2F2752;display:block}

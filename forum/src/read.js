@@ -96,7 +96,7 @@ function topicRow(t, at) {
   const st = t.status === 'pending' ? '<span class="stl pending">รอตรวจ</span>' : t.status === 'hidden' ? '<span class="stl hidden">ถูกซ่อน</span>' : '';
   return `<div class="tr${t.status !== 'ok' ? ' dim' : ''}">
     <div class="main"><span class="ic${t.unread ? ' unread' : ''}${t.kind ? ' ann' : ''}${t.locked ? ' lock' : ''}" aria-hidden="true">${icon}</span>
-      <div class="tbody"><div class="tt">${tagHtml(t.tag)}<a href="/t/${t.id}">${esc(t.title)}</a>${st}</div>
+      <div class="tbody"><div class="tt">${tagHtml(t.tag)}<a href="/t/${t.id}">${esc(t.title)}</a>${t.pics ? `<span class="pics" title="มีรูป ${t.pics} รูป">📷 ${t.pics}</span>` : ''}${st}</div>
       <div class="by">โดย ${userLink(t.user_id, t.author, t.arole)} » ${when(t.created_at, at)}</div>
       <div class="mstats">💬 ${num(t.replies)} · 👁 ${num(t.views)}${t.lp_at ? ` · ล่าสุด ${when(t.lp_at, at)}` : ''}</div></div>
       ${miniPager(t.id, t.replies + 1)}</div>
@@ -237,7 +237,7 @@ ${bar}
 ${modBar}
 ${posts.map(postHtml).join('\n')}
 ${posts.length > 3 ? bar : ''}
-${canReply ? `<section class="reply"><h2>ตอบกลับด่วน</h2>${editor({ action: `/t/${t.id}/reply`, quick: true, forum: t })}</section>`
+${canReply ? `<section class="reply"><h2>ตอบกลับด่วน</h2>${editor({ action: `/t/${t.id}/reply`, quick: true, forum: t, pics: !!c.env.IMAGES })}</section>`
   : !user ? `<div class="box center">อยากร่วมพูดคุย? <a href="/login?back=${here}">เข้าสู่ระบบ</a> หรือ <a href="/register">สมัครสมาชิก</a></div>`
   : isBanned(user) ? `<div class="box center">บัญชีนี้ถูกระงับการโพสต์ถึง ${dateTh(user.banned_until)}</div>` : ''}`,
   });
@@ -422,7 +422,9 @@ export function faq(c) {
 <tr><td><code>[s]ขีดฆ่า[/s]</code></td><td><s>ขีดฆ่า</s></td></tr>
 <tr><td><code>[quote="ชื่อ"]ข้อความ[/quote]</code></td><td>กล่องอ้างอิง</td></tr>
 <tr><td><code>[url=https://…]คำ[/url]</code></td><td>ลิงก์</td></tr></table>
-<p>ตอนนี้ยังแนบรูปไม่ได้ วางลิงก์รูปหรือโพสต์ไว้แทนก่อนได้</p>
+<h2>แนบรูป</h2>
+<p>กดปุ่ม 📷 รูป ในช่องพิมพ์ เลือกได้ครั้งละหลายรูป โพสต์ละไม่เกิน 10 รูป รูปจะถูกย่อในเครื่องคุณก่อนส่ง และข้อมูลตำแหน่ง (GPS) ที่ติดมากับรูปถ่ายจะถูกลบออก
+ห้ามโพสต์รูปที่ละเมิดกติกาข้อ 1–2 · รูปที่ไม่ได้ใช้ในโพสต์จะถูกลบภายในหนึ่งวัน และเมื่อโพสต์ถูกลบ รูปในโพสต์ก็ถูกลบด้วย</p>
 <h2>ลืมรหัสผ่าน</h2>
 <p>บอร์ดไม่เก็บอีเมล จึงยังรีเซ็ตเองไม่ได้ ติดต่อผู้ดูแลในห้อง “ข้อเสนอแนะเว็บ” จากบัญชีอื่น หรือช่องทางที่ผู้ดูแลประกาศไว้</p>
 <h2>เกี่ยวกับ 48thForum</h2>

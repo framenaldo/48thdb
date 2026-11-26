@@ -7,6 +7,7 @@ import * as read from './read.js';
 import * as write from './write.js';
 import * as account from './account.js';
 import * as mod from './mod.js';
+import * as images from './images.js';
 
 const CSP = [
   "default-src 'self'",
@@ -14,7 +15,7 @@ const CSP = [
   "frame-src https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src https://fonts.gstatic.com",
-  "img-src 'self' data:",
+  "img-src 'self' data: blob:",                 // blob: — the browser shrinks a picture before sending it
   "connect-src 'self'",
   "form-action 'self'",
   "base-uri 'none'",
@@ -41,6 +42,7 @@ const ROUTES = [
   ['GET',  /^\/p\/(\d+)\/report$/,    write.reportForm],
   ['POST', /^\/p\/(\d+)\/report$/,    write.report],
   ['POST', /^\/markread$/,            write.markRead],
+  ['POST', /^\/upload$/,              images.upload],
   ['GET',  /^\/register$/,            account.registerForm],
   ['POST', /^\/register$/,            account.register],
   ['GET',  /^\/login$/,               account.loginForm],
@@ -66,6 +68,7 @@ export default {
       env.DB.prepare('DELETE FROM hits WHERE until < ?').bind(t),
       env.DB.prepare('DELETE FROM sessions WHERE expires_at < ?').bind(t),
     ]);
+    await images.dropLoose(env);                  // pictures uploaded but never posted, a day on
   },
 
   async fetch(req, env, ctx) {
@@ -87,6 +90,10 @@ export default {
         if ((origin && new URL(origin).host !== url.host) || req.headers.get('Sec-Fetch-Site') === 'cross-site')
           return new Response('Forbidden', { status: 403 });
       }
+      // a picture: straight from R2, before anything else (no session, no database)
+      const pic = req.method === 'GET' && url.pathname.match(/^\/i\/([A-Za-z0-9_-]{16,32})$/);
+      if (pic) return await images.serve(req, env, ctx, pic[1]);
+
       // a trailing slash goes to the address without it
       if (url.pathname.length > 1 && url.pathname.endsWith('/'))
         return Response.redirect(url.origin + url.pathname.replace(/\/+$/, '') + url.search, 301);

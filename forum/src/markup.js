@@ -1,9 +1,13 @@
 // Posts are written in a small BBCode: [b] [i] [u] [s], [quote] / [quote="name"],
-// [url=https://…]words[/url], [url]https://…[/url], and bare links. Everything is
+// [url=https://…]words[/url], [url]https://…[/url], bare links, and [img=WxH]key[/img] for a picture
+// uploaded here (only our own /i/ addresses: no picture from another site, so no tracking pixels). Everything is
 // escaped first, so nothing a member types can become HTML of its own.
 import { esc } from './util.js';
 
 const LINK_ATTR = 'rel="nofollow ugc noopener" target="_blank"';
+export const PER_POST = 10;
+// the same pattern reads the tag as typed and after escaping (nothing in it is escaped)
+export const IMG_TAG = /\[img(?:=(\d{1,4})x(\d{1,4}))?\]([A-Za-z0-9_-]{16,32})\[\/img\]/gi;
 // a bare link, stopping at spaces, brackets and the escapes of < > " '
 const BARE = /https?:\/\/(?:(?!&quot;|&#39;|&lt;|&gt;)[^\s\[\]<])+/gi;
 
@@ -20,6 +24,14 @@ export function render(src) {
   let s = esc(String(src ?? '').replace(/[\u0001\u0002]/g, ''));
   const keep = [];
   const hold = (html) => `\u0001${keep.push(html) - 1}\u0002`;
+
+  // pictures, at most PER_POST; the size given keeps the page from jumping as they arrive
+  let pics = 0;
+  s = s.replace(IMG_TAG, (m, w, h, key) => {
+    if (++pics > PER_POST) return m;
+    const size = w && h ? ` width="${+w}" height="${+h}"` : '';
+    return hold(`<a class="pic" href="/i/${key}" target="_blank" rel="noopener"><img src="/i/${key}"${size} loading="lazy" decoding="async" alt="รูปที่แนบ"></a>`);
+  });
 
   // [url=…]words[/url] and [url]…[/url] first, so the words inside are not linked again
   s = s.replace(/\[url=(?:&quot;)?(https?:\/\/[^\s\]]+?)(?:&quot;)?\]([\s\S]*?)\[\/url\]/gi,
@@ -63,7 +75,7 @@ export function plain(src) {
     s = s.replace(/\[quote(?:=[^\]]*)?\](?:(?!\[quote)[\s\S])*?\[\/quote\]/gi, ' ');
     if (s === before) break;
   }
-  return s.replace(/\[url=[^\]]*\]([\s\S]*?)\[\/url\]/gi, '$1')
+  return s.replace(IMG_TAG, ' 📷 ').replace(/\[url=[^\]]*\]([\s\S]*?)\[\/url\]/gi, '$1')
     .replace(/\[\/?(?:b|i|u|s|url|quote)(?:=[^\]]*)?\]/gi, '')
     .replace(/\s+/g, ' ').trim();
 }
@@ -76,5 +88,6 @@ export function quoteOf(name, body) {
     s = s.replace(/\[quote(?:=[^\]]*)?\](?:(?!\[quote)[\s\S])*?\[\/quote\]\n?/gi, '');
     if (s === before) break;
   }
+  s = s.replace(IMG_TAG, '[รูป]');                       // the pictures stay in the post they were in
   return `[quote="${String(name).replace(/["\]]/g, '')}"]${s.trim()}[/quote]\n`;
 }

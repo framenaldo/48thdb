@@ -25,8 +25,8 @@ A web board for fans, its own site (the owner's choice, 26 Nov 2026: build it, k
 48thDb for now, join parts later). A classic board — forum index, forums, topics with replies /
 views / last post, a poster's box beside each post — in violet with a speech bubble and a light stick for a logo (named 48thForum by the owner, 26 Nov, after OshiTalk and 48thHako); the
 look was approved from a mock-up of phpBB's layout redrawn in its own colours. One Worker renders
-every page on the server, D1 keeps the board, own accounts (no e-mail kept), nothing shared with
-48thDb. The site deploy skips the folder; it goes out by hand from Actions "Deploy 48thForum".
+every page on the server, D1 keeps the board, R2 its pictures, own accounts (no e-mail kept), nothing
+shared with 48thDb. The site deploy skips the folder; it goes out by hand from Actions "Deploy 48thForum".
 Everything else is in forum/README.md.
 
 ## Shape of index.html
