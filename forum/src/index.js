@@ -1,7 +1,8 @@
 // 48thForum: one Worker answers every address. Files in public/ are served before it runs.
-import { currentUser, isMod } from './auth.js';
+import { currentUser, isMod, COOKIE } from './auth.js';
+import { cookie } from './util.js';
 import { message } from './views.js';
-import { MOD_COUNT_SQL } from './db.js';
+import { MOD_COUNT_SQL, UNREAD_DAYS } from './db.js';
 import * as read from './read.js';
 import * as write from './write.js';
 import * as account from './account.js';
@@ -51,7 +52,22 @@ const ROUTES = [
   ['POST', /^\/mod\/act$/,            mod.act],
 ];
 
+// Pages a guest sees exactly as every other guest does: kept at Cloudflare's edge for GUEST_CACHE seconds
+// (30 by default; 0 turns it off), so a crowd of readers costs the database one read each half minute.
+// The Cache API keeps nothing on workers.dev — it starts working once the board has its own domain.
+const GUEST_PAGES = /^\/($|f\/[a-z0-9-]+$|t\/\d+$|u\/\d+$|members$|faq$)/;
+
 export default {
+  // every night: clear read marks older than the "new posts" window, spent rate limits and old sessions
+  async scheduled(event, env) {
+    const t = Math.floor(Date.now() / 1000);
+    await env.DB.batch([
+      env.DB.prepare('DELETE FROM reads WHERE at < ?').bind(t - UNREAD_DAYS * 86400),
+      env.DB.prepare('DELETE FROM hits WHERE until < ?').bind(t),
+      env.DB.prepare('DELETE FROM sessions WHERE expires_at < ?').bind(t),
+    ]);
+  },
+
   async fetch(req, env, ctx) {
     const url = new URL(req.url);
     const c = {
@@ -75,6 +91,20 @@ export default {
       if (url.pathname.length > 1 && url.pathname.endsWith('/'))
         return Response.redirect(url.origin + url.pathname.replace(/\/+$/, '') + url.search, 301);
 
+      const ttl = Math.max(0, parseInt(env.GUEST_CACHE ?? '30', 10) || 0);
+      const shared = ttl > 0 && req.method === 'GET' && !cookie(req, COOKIE) && GUEST_PAGES.test(url.pathname) && typeof caches !== 'undefined';
+      if (shared) {
+        const hit = await caches.default.match(req.url);
+        if (hit) {
+          const tm = url.pathname.match(/^\/t\/(\d+)$/);
+          if (tm) ctx.waitUntil(env.DB.prepare('UPDATE topics SET views = views + 1 WHERE id = ?').bind(+tm[1]).run());
+          const res = new Response(hit.body, hit);
+          res.headers.set('Cache-Control', 'no-store');
+          res.headers.set('X-Board-Cache', 'hit');
+          return res;
+        }
+      }
+
       c.user = await currentUser(req, env, ctx);
       if (isMod(c.user)) {
         c.modCount = (await env.DB.prepare(MOD_COUNT_SQL).first())?.n || 0;
@@ -83,7 +113,13 @@ export default {
         const m = url.pathname.match(re);
         if (!m) continue;
         if (req.method !== method && !(method === 'GET' && req.method === 'HEAD')) continue;
-        return await fn(c, ...m.slice(1));
+        const res = await fn(c, ...m.slice(1));
+        if (shared && res.status === 200) {
+          const copy = new Response(res.clone().body, res);
+          copy.headers.set('Cache-Control', `public, max-age=${ttl}`);
+          ctx.waitUntil(caches.default.put(req.url, copy));
+        }
+        return res;
       }
       return message(c, 'ไม่พบหน้านี้', 'ลิงก์อาจผิด หรือกระทู้นี้ถูกลบไปแล้ว', { status: 404 });
     } catch (e) {

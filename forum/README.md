@@ -20,10 +20,11 @@ for now; the folder is self-contained and can move to a repo of its own as it is
 
 | | |
 |---|---|
-| Reading | forum index with "who is online" and stats · forums with announcements, stickies, pages · topics with numbered posts, the poster's box (rank by posts, oshi, joined) · unread markers (a red ring) · search (titles and posts) · member list · profiles · rules & FAQ |
+| Reading | forum index with "who is online" and stats · forums with announcements, stickies, pages · topics with numbered posts, the poster's box (rank by posts, oshi, joined) · unread markers (a red ring, for 30 days) · search (titles and posts; any piece of 3+ letters, Thai or English) · member list · profiles · rules & FAQ |
 | Writing | new topic with a label (ถาม, รีวิว, หาเพื่อน …) · reply, quick reply, quote · edit, delete own · preview · BBCode `[b] [i] [u] [s] [quote="name"] [url=…]`, bare links (`src/markup.js`, everything escaped first) |
 | Accounts | sign-up with a board name and password (PBKDF2, 100k rounds) · a session cookie (HttpOnly, SameSite=Lax), its hash in D1 · settings: oshi, signature, password · **no e-mail is kept**, so a forgotten password is reset by an admin (below) |
 | Safety | a new account's first 3 posts wait for a moderator · a post with a phone number, bank account or พร้อมเพย์ waits always · 3 reports from different members hide a post until a moderator looks · rate limits: 3 topics and 20 posts an hour, 3 sign-ups a day per address (hashed, never stored), 10 sign-in tries in 15 minutes · forms from another site are refused · strict CSP |
+| Busy days | every page reads only the rows it shows (counters kept on the forum and the topic, indexes for the rest) · search through a trigram index (`post_fts`, `topic_fts`, kept in step by triggers; 2-letter words look through the latest 3,000 posts) · guests' pages kept at the edge for `GUEST_CACHE` seconds (30; works once the board has its own domain — the Cache API keeps nothing on workers.dev) · every night at 03:17 a cron clears read marks older than 30 days, spent rate limits and old sessions |
 | Moderators | `/mod`: waiting posts, reported posts, banned members — pass, reject, delete, restore, ban 1/7/30 days or for good · on a topic: lock, pin, announce, move, delete · ✓ ผ่าน straight on a waiting post · admins set roles on a member's profile |
 
 Optional: Cloudflare Turnstile on the sign-up form — set `TURNSTILE_SITE` in
@@ -35,9 +36,10 @@ Optional: Cloudflare Turnstile on the sign-up form — set `TURNSTILE_SITE` in
 cd forum
 npm install
 npx wrangler d1 migrations apply 48thforum --local
-npx wrangler dev --port 8790          # http://localhost:8790
+npx wrangler dev --port 8790 --var GUEST_CACHE:0   # http://localhost:8790, guests' cache off
 npm test                              # the BBCode tests
 node test/smoke.js                    # a browser walk through everything (needs Playwright and the dev server)
+# the nightly job: start dev with --test-scheduled, then  curl 'localhost:8790/__scheduled?cron=17+20+*+*+*'
 ```
 
 ## Put it online

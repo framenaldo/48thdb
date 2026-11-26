@@ -3,7 +3,7 @@
 import { esc, num, now, when, dateTh, clockTh } from './util.js';
 import { isMod, isAdmin, isBanned } from './auth.js';
 import { render, plain } from './markup.js';
-import { forumBySlug, topicById, canSee } from './db.js';
+import { forumBySlug, topicById, canSee, UNREAD_DAYS } from './db.js';
 import {
   layout, message, pager, miniPager, tagHtml, rank, avatar, userLink, oshiHtml, userPanel, editor,
   PER_FORUM, PER_TOPIC,
@@ -11,8 +11,9 @@ import {
 
 const pageOf = (c) => Math.max(1, parseInt(c.url.searchParams.get('page'), 10) || 1);
 const notFound = (c) => message(c, 'ไม่พบหน้านี้', 'ลิงก์อาจผิด หรือกระทู้นี้ถูกลบไปแล้ว', { status: 404 });
-// what counts as new: for a member, since they last read it (or pressed "อ่านแล้วทั้งหมด"); for a guest, the last day
-const markOf = (c) => (c.user ? Math.max(c.user.mark_all_at, c.user.created_at) : now() - 86400);
+// What counts as new: for a member, what they have not read since it last changed (or since they pressed
+// "อ่านแล้วทั้งหมด"), within the last UNREAD_DAYS — older read marks are cleared every night; for a guest, the last day.
+const markOf = (c) => (c.user ? Math.max(c.user.mark_all_at, c.user.created_at, now() - UNREAD_DAYS * 86400) : now() - 86400);
 
 // ---------------- the front page ----------------
 export async function index(c) {
@@ -22,14 +23,17 @@ export async function index(c) {
     env.DB.prepare(`
       SELECT f.*, c.title AS cat_title,
         p.created_at AS lp_at, p.id AS lp_id, lt.title AS lp_title, lu.id AS lp_uid, lu.name AS lp_user, lu.role AS lp_role,
-        EXISTS(SELECT 1 FROM topics t2 LEFT JOIN reads r ON r.topic_id = t2.id AND r.user_id = ?1
-               WHERE t2.forum_id = f.id AND t2.status = 'ok' AND t2.last_post_at > MAX(COALESCE(r.at, 0), ?2)) AS unread
+        CASE WHEN ?1 = 0 THEN COALESCE(p.created_at, 0) > ?2
+             ELSE EXISTS(SELECT 1 FROM topics t2 WHERE t2.forum_id = f.id AND t2.status = 'ok' AND t2.last_post_at > ?2
+                          AND NOT EXISTS(SELECT 1 FROM reads r WHERE r.user_id = ?1 AND r.topic_id = t2.id AND r.at >= t2.last_post_at))
+        END AS unread
       FROM forums f JOIN categories c ON c.id = f.cat_id
       LEFT JOIN posts p ON p.id = f.last_post_id
       LEFT JOIN topics lt ON lt.id = p.topic_id
       LEFT JOIN users lu ON lu.id = p.user_id
       ORDER BY c.sort, f.sort`).bind(user?.id || 0, markOf(c)),
-    env.DB.prepare(`SELECT (SELECT COUNT(*) FROM users) AS users,
+    // no account is ever deleted, so the highest id is how many there are (and costs one row, not all of them)
+    env.DB.prepare(`SELECT (SELECT COALESCE(MAX(id), 0) FROM users) AS users,
       (SELECT id FROM users ORDER BY id DESC LIMIT 1) AS nid, (SELECT name FROM users ORDER BY id DESC LIMIT 1) AS nname`),
     env.DB.prepare('SELECT id, name, role FROM users WHERE last_seen > ? ORDER BY last_seen DESC LIMIT 60').bind(t - 300),
     env.DB.prepare("SELECT v FROM meta WHERE k = 'max_online'"),
@@ -86,7 +90,6 @@ const TOPIC_COLS = `t.*, u.name AS author, u.role AS arole,
 const TOPIC_FROM = `topics t JOIN users u ON u.id = t.user_id
   LEFT JOIN posts lp ON lp.id = t.last_post_id LEFT JOIN users lu ON lu.id = lp.user_id
   LEFT JOIN reads r ON r.topic_id = t.id AND r.user_id = ?2`;
-const TOPIC_SEEN = `(t.status = 'ok' OR (?4 AND t.status IN ('pending','hidden')) OR (t.user_id = ?2 AND t.status IN ('pending','hidden')))`;
 
 function topicRow(t, at) {
   const icon = t.kind === 2 ? '📢' : t.kind === 1 ? '📌' : t.locked ? '🔒' : t.replies >= 20 ? '🔥' : '💬';
@@ -113,19 +116,23 @@ export async function forum(c, slug) {
   const mod = isMod(user) ? 1 : 0;
   const uid = user?.id || 0;
   const at = now();
-  const args = [f.id, uid, markOf(c), mod];
-  const [cnt, pinned, mods] = await env.DB.batch([
-    env.DB.prepare(`SELECT COUNT(*) AS n FROM topics t WHERE t.forum_id = ?1 AND t.kind = 0 AND ${TOPIC_SEEN}`).bind(f.id, uid, 0, mod),
-    env.DB.prepare(`SELECT ${TOPIC_COLS} FROM ${TOPIC_FROM} WHERE t.forum_id = ?1 AND t.kind > 0 AND ${TOPIC_SEEN}
-      ORDER BY t.kind DESC, t.last_post_at DESC`).bind(...args),
+  const mark = markOf(c);
+  const [pinned, waiting, mods] = await env.DB.batch([
+    env.DB.prepare(`SELECT ${TOPIC_COLS} FROM ${TOPIC_FROM} WHERE t.forum_id = ?1 AND t.status = 'ok' AND t.kind > 0
+      ORDER BY t.kind DESC, t.last_post_at DESC`).bind(f.id, uid, mark),
+    // topics waiting for a moderator or hidden: a moderator sees them all, a member their own; few, so read apart
+    env.DB.prepare(`SELECT ${TOPIC_COLS} FROM ${TOPIC_FROM} WHERE t.forum_id = ?1 AND t.status IN ('pending','hidden') AND (?4 OR t.user_id = ?2)
+      ORDER BY t.last_post_at DESC LIMIT 50`).bind(f.id, uid, mark, mod),
     env.DB.prepare("SELECT id, name, role FROM users WHERE role IN ('admin','mod') ORDER BY role, id"),
   ]);
-  const total = cnt.results[0].n;
+  // forums.topics counts the approved topics, pinned ones too
+  const total = Math.max(0, f.topics - pinned.results.length);
   const pages = Math.max(1, Math.ceil(total / PER_FORUM));
   const page = Math.min(pageOf(c), pages);
-  const { results: rows } = await env.DB.prepare(`SELECT ${TOPIC_COLS} FROM ${TOPIC_FROM}
-      WHERE t.forum_id = ?1 AND t.kind = 0 AND ${TOPIC_SEEN} ORDER BY t.last_post_at DESC LIMIT ?5 OFFSET ?6`)
-    .bind(...args, PER_FORUM, (page - 1) * PER_FORUM).all();
+  const { results: approved } = await env.DB.prepare(`SELECT ${TOPIC_COLS} FROM ${TOPIC_FROM}
+      WHERE t.forum_id = ?1 AND t.status = 'ok' AND t.kind = 0 ORDER BY t.last_post_at DESC LIMIT ?4 OFFSET ?5`)
+    .bind(f.id, uid, mark, PER_FORUM, (page - 1) * PER_FORUM).all();
+  const rows = page === 1 ? [...waiting.results, ...approved] : approved;
 
   const canPost = user && !isBanned(user);
   const newBtn = canPost ? `<a class="btn new" href="/new/${f.slug}">ตั้งกระทู้ใหม่ ✎</a>`
@@ -156,8 +163,11 @@ export async function topic(c, id) {
   const mod = isMod(user);
   if (!t || !canSee(user, t, mod)) return notFound(c);
   const uid = user?.id || 0;
-  const total = (await env.DB.prepare(`SELECT COUNT(*) AS n FROM posts p WHERE p.topic_id = ?1 AND ${POST_SEEN}`)
-    .bind(t.id, mod ? 1 : 0, uid).first()).n;
+  // approved posts are counted on the topic already (replies + the first); what waits or was hidden is counted here
+  const total = t.status === 'ok'
+    ? t.replies + 1 + (await env.DB.prepare(`SELECT COUNT(*) AS n FROM posts p WHERE p.topic_id = ?1 AND p.status IN ('pending','hidden') AND (?2 OR p.user_id = ?3)`)
+      .bind(t.id, mod ? 1 : 0, uid).first()).n
+    : (await env.DB.prepare(`SELECT COUNT(*) AS n FROM posts p WHERE p.topic_id = ?1 AND ${POST_SEEN}`).bind(t.id, mod ? 1 : 0, uid).first()).n;
   const pages = Math.max(1, Math.ceil(total / PER_TOPIC));
   const page = c.url.searchParams.get('page') === 'last' ? pages : Math.min(pageOf(c), pages);
   const { results: posts } = await env.DB.prepare(`
@@ -291,7 +301,7 @@ ${modTools}
 
 export async function members(c) {
   const { env } = c;
-  const total = (await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first()).n;
+  const total = (await env.DB.prepare('SELECT COALESCE(MAX(id), 0) AS n FROM users').first()).n;   // no account is ever deleted
   const per = 50;
   const pages = Math.max(1, Math.ceil(total / per));
   const page = Math.min(pageOf(c), pages);
@@ -311,6 +321,34 @@ export async function members(c) {
 }
 
 // ---------------- search ----------------
+const SEARCH_COLS = 'p.id, p.body, p.created_at, t.title, u.id AS uid, u.name, u.role';
+// Three letters or more go through the trigram index (posts and titles, newest first); two letters, which the
+// index cannot hold, are looked for in the latest 3,000 posts.
+async function findPosts(env, q, fid) {
+  if ([...q].length >= 3) {
+    const phrase = `"${q.replace(/"/g, '""')}"`;
+    const [byBody, byTitle] = await env.DB.batch([
+      env.DB.prepare(`SELECT ${SEARCH_COLS}
+        FROM (SELECT rowid FROM post_fts WHERE post_fts MATCH ?1 ORDER BY rowid DESC LIMIT 300) h
+        JOIN posts p ON p.id = h.rowid JOIN topics t ON t.id = p.topic_id JOIN users u ON u.id = p.user_id
+        WHERE p.status = 'ok' AND t.status = 'ok' AND (?2 = 0 OR t.forum_id = ?2) ORDER BY p.id DESC LIMIT 30`).bind(phrase, fid),
+      env.DB.prepare(`SELECT ${SEARCH_COLS}
+        FROM (SELECT rowid FROM topic_fts WHERE topic_fts MATCH ?1 ORDER BY rowid DESC LIMIT 100) h
+        JOIN topics t ON t.id = h.rowid JOIN posts p ON p.id = t.first_post_id JOIN users u ON u.id = p.user_id
+        WHERE p.status = 'ok' AND t.status = 'ok' AND (?2 = 0 OR t.forum_id = ?2) ORDER BY p.id DESC LIMIT 30`).bind(phrase, fid),
+    ]);
+    const seen = new Map();
+    for (const r of [...byBody.results, ...byTitle.results]) seen.set(r.id, r);
+    return [...seen.values()].sort((a, b) => b.id - a.id).slice(0, 30);
+  }
+  const like = `%${q.replace(/[\\%_]/g, (m) => `\\${m}`)}%`;
+  return (await env.DB.prepare(`SELECT ${SEARCH_COLS}
+      FROM posts p JOIN topics t ON t.id = p.topic_id JOIN users u ON u.id = p.user_id
+     WHERE p.id > (SELECT COALESCE(MAX(id), 0) FROM posts) - 3000 AND p.status = 'ok' AND t.status = 'ok' AND (?2 = 0 OR t.forum_id = ?2)
+       AND (p.body LIKE ?1 ESCAPE '\\' OR (p.id = t.first_post_id AND t.title LIKE ?1 ESCAPE '\\'))
+     ORDER BY p.id DESC LIMIT 30`).bind(like, fid).all()).results;
+}
+
 export async function search(c) {
   const { env } = c;
   const q = (c.url.searchParams.get('q') || '').trim().slice(0, 60);
@@ -319,14 +357,9 @@ export async function search(c) {
   let body = `<h1 class="ft">ค้นหา</h1>
 <form class="actions find" action="/search"><input name="q" value="${esc(q)}" placeholder="คำที่ต้องการค้นหา" aria-label="คำค้นหา" autofocus>
   ${f ? `<input type="hidden" name="f" value="${f.slug}"><span class="muted">ในห้อง ${esc(f.title)} · <a href="/search?q=${encodeURIComponent(q)}">ค้นทั้งบอร์ด</a></span>` : ''}<button class="btn">ค้นหา</button></form>`;
-  if ([...q].length >= 2) {
-    const like = `%${q.replace(/[\\%_]/g, (m) => `\\${m}`)}%`;
-    const { results } = await env.DB.prepare(`
-      SELECT p.id, p.body, p.created_at, t.id AS tid, t.title, u.id AS uid, u.name, u.role
-        FROM posts p JOIN topics t ON t.id = p.topic_id JOIN users u ON u.id = p.user_id
-       WHERE p.status = 'ok' AND t.status = 'ok' ${f ? 'AND t.forum_id = ?2' : 'AND ?2 = 0'}
-         AND (p.body LIKE ?1 ESCAPE '\\' OR (p.id = t.first_post_id AND t.title LIKE ?1 ESCAPE '\\'))
-       ORDER BY p.id DESC LIMIT 30`).bind(like, f ? f.id : 0).all();
+  const qn = [...q].length;
+  if (qn >= 2) {
+    const results = await findPosts(env, q, f ? f.id : 0);
     const at = now();
     const mark = (txt) => {
       const lo = txt.toLowerCase(), ql = q.toLowerCase();
@@ -342,6 +375,7 @@ export async function search(c) {
     body += `<section class="tbl list"><div class="thd"><span>พบ ${results.length}${results.length === 30 ? '+' : ''} ข้อความ</span></div>
       ${results.length ? results.map((r) => `<div class="tr1"><a href="/p/${r.id}">${mark(r.title)}</a><span class="muted"> · โดย ${userLink(r.uid, r.name, r.role)} · ${when(r.created_at, at)}</span>
         <div class="snip">${mark(snip(plain(r.body)))}</div></div>`).join('') : '<div class="empty">ไม่พบข้อความที่ตรงกัน</div>'}</section>`;
+    if (qn === 2) body += '<p class="muted center">คำ 2 ตัวอักษรค้นได้เฉพาะโพสต์ล่าสุด พิมพ์ให้ยาวขึ้นเพื่อค้นทั้งบอร์ด</p>';
   } else if (q) body += '<div class="box center">พิมพ์อย่างน้อย 2 ตัวอักษร</div>';
   return layout(c, { title: q ? `ค้นหา: ${q}` : 'ค้นหา', crumbs: [{ label: 'ค้นหา' }], noindex: true, body });
 }
@@ -351,8 +385,8 @@ export async function unread(c) {
   if (!user) return Response.redirect(`${c.url.origin}/login?back=%2Funread`, 302);
   const at = now();
   const { results } = await env.DB.prepare(`SELECT ${TOPIC_COLS} FROM ${TOPIC_FROM}
-     WHERE t.status = 'ok' AND t.last_post_at > MAX(COALESCE(r.at, 0), ?3) AND ?1 = 0 AND ?4 = 0
-     ORDER BY t.last_post_at DESC LIMIT 50`).bind(0, user.id, markOf(c), 0).all();
+     WHERE t.status = 'ok' AND t.last_post_at > ?3 AND (r.at IS NULL OR r.at < t.last_post_at)
+     ORDER BY t.last_post_at DESC LIMIT 50`).bind(0, user.id, markOf(c)).all();
   return layout(c, {
     title: 'กระทู้ที่ยังไม่ได้อ่าน', crumbs: [{ label: 'กระทู้ที่ยังไม่ได้อ่าน' }], noindex: true,
     body: `<h1 class="ft">กระทู้ที่ยังไม่ได้อ่าน</h1>

@@ -1,5 +1,6 @@
 // A walk through the board in a real browser, against `wrangler dev` with a fresh local database:
-//   npx wrangler d1 migrations apply 48thforum --local && npx wrangler dev --port 8790
+//   npx wrangler d1 migrations apply 48thforum --local && npx wrangler dev --port 8790 --var GUEST_CACHE:0
+// (the guest cache off: the test's guest must see each change at once)
 //   node test/smoke.js [http://localhost:8790] [folder for screenshots]
 // It signs three members up, makes the first an admin (through wrangler d1 execute --local),
 // and goes through posting, the moderators' queue, quoting, reporting, pinning and search.
@@ -173,9 +174,22 @@ for (const [slug, tag, title, body] of more) {
 }
 console.log('✓ the admin\'s topics go up straight away');
 
+// the red ring: B has not read the admin's new topic in พูดคุยทั่วไป; after reading it the ring goes
+const ring = async () => { await b.goto(BASE); return b.locator('.forums .tr', { hasText: 'พูดคุยทั่วไป' }).locator('.ic.unread').count(); };
+assert.equal(await ring(), 1);
+await b.goto(`${BASE}/f/general`);
+await b.locator('.topics .tr a', { hasText: 'เพลงไหนฟังแล้วร้องไห้ทุกที' }).click();
+await b.waitForURL(/\/t\/\d+$/);
+assert.equal(await ring(), 0);
+console.log('✓ a forum with an unread topic has its ring, and loses it once read');
+
 // search, profile, members, unread, faq, 404
-await guest.goto(`${BASE}/search?q=${encodeURIComponent('ไฟเวที')}`);
+const found = async (q) => { await guest.goto(`${BASE}/search?q=${encodeURIComponent(q)}`); return guest.locator('.tr1').count(); };
+assert.ok(await found('ไฟเวที') >= 1, 'a Thai word inside a sentence');           // the trigram index
 assert.ok(await guest.locator('.tr1 mark').count() >= 1);
+assert.ok(await found('HOOP') >= 1, 'a title, whatever the capitals');
+assert.ok(await found('ไฟ') >= 1, 'two letters, from the latest posts');           // shorter than the index holds
+assert.equal(await found('ไม่มีคำนี้แน่นอน'), 0);
 await guest.goto(`${BASE}/members`);
 assert.match(await text(guest), new RegExp(B));
 await b.goto(`${BASE}/unread`);

@@ -20,3 +20,9 @@ migrations_dir = "migrations"
 #   TURNSTILE_SITE in [vars], and  npx wrangler secret put TURNSTILE_SECRET
 [vars]
 TURNSTILE_SITE = ""
+# how long a guest's page is kept at the edge, in seconds (0 = never); see GUEST_PAGES in src/index.js
+GUEST_CACHE = "30"
+
+# every night at 03:17 Thai time: clear old read marks, spent rate limits and old sessions
+[triggers]
+crons = ["17 20 * * *"]

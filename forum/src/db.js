@@ -1,3 +1,6 @@
+// Marks of what a member has read are kept this long; anything older counts as read (see markOf in read.js).
+export const UNREAD_DAYS = 30;
+
 // Queries more than one page needs. Counters are worked out again from the posts after
 // every change, rather than added to and taken from, so they can never drift.
 

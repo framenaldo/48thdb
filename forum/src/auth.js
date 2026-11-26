@@ -3,7 +3,7 @@
 import { b64, unb64, now, randomToken, sha256hex, sameBytes, cookie } from './util.js';
 
 const ITER = 100000;                       // the most Workers' PBKDF2 allows
-const COOKIE = 'f48_s';
+export const COOKIE = 'f48_s';
 const SESSION_DAYS = 30;
 export const TRUST_AFTER = 3;              // a new account's first posts wait for a moderator
 
