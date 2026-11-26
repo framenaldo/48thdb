@@ -15340,7 +15340,7 @@ function renderTodayHero(ev, todayIso){
   const dayOf = ev.end ? Math.round((parseYmd(todayIso) - parseYmd(ev.start)) / 86400000) + 1 : 0;
   const days = ev.end ? Math.round((parseYmd(ev.end) - parseYmd(ev.start)) / 86400000) + 1 : 0;
   const status = rota && rota.current ? (ev.online ? 'กำลังคุยอยู่ตอนนี้' : 'อยู่ที่บูธตอนนี้')
-    : at ? `<span data-starts-at="${at}">${startsLabel(at)}</span>`
+    : at ? (() => { const end = endsAtToday(ev, todayIso); return `<span data-starts-at="${at}"${end ? ` data-ends-at="${end}"` : ''}>${startsLabel(at, end)}</span>`; })()
     : rota && rota.today.length ? 'รอบวันนี้จบแล้ว'
     : (ev.time ? 'กำลังจัดอยู่' : 'วันนี้');
   // on right now: the booth is open, or the day's show has begun
