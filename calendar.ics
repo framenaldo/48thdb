@@ -2191,11 +2191,14 @@ BEGIN:VEVENT
 UID:ev-kimi-school-tour-1127-2026-11-27@48thdb
 DTSTAMP:20261127T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" School Tour
-LOCATION:Sriayudhya School\, Bangkok
+LOCATION:โรงเรียนศรีอยุธยา ในพร
+ ะอุปถัมภ์ฯ\, Bangkok
 DESCRIPTION:เมมเบอร์: Blythe\, Grape\, Hoop\, Janry\, Mail\
- , Mirin\n• 08:00 Sriayudhya School\, Bangkok\n• 11:30 Srinakharinwirot
-  University Demonstration School Prasarnmit\, Secondary Division\, Bangkok
- \n\nhttps://48thdb.com/event/ev-kimi-school-tour-1127
+ , Mirin\n• 08:00 โรงเรียนศรีอยุธยา ใ
+ นพระอุปถัมภ์ฯ\n• 12:00 โรงเรีย
+ นสาธิตมหาวิทยาลัยศรีนคริ
+ นทรวิโรฒ ประสานมิตร (ฝ่ายม
+ ัธยม)\n\nhttps://48thdb.com/event/ev-kimi-school-tour-1127
 URL:https://48thdb.com/event/ev-kimi-school-tour-1127
 DTSTART;TZID=Asia/Bangkok:20261127T080000
 DTEND;TZID=Asia/Bangkok:20261127T130000
