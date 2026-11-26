@@ -1572,6 +1572,30 @@ DTSTART;VALUE=DATE:20261212
 DTEND;VALUE=DATE:20261214
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-kimi-roadshow-mbk-dec@48thdb
+DTSTAMP:20261212T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:MBK Center\, Bangkok
+DESCRIPTION:รอประกาศรายชื่อ\n• รายช
+ ื่อสมาชิกรอประกาศ\n\nhttps://48thdb.com/
+ event/ev-kimi-roadshow-mbk-dec
+URL:https://48thdb.com/event/ev-kimi-roadshow-mbk-dec
+DTSTART;VALUE=DATE:20261212
+DTEND;VALUE=DATE:20261214
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-paradise-dec@48thdb
+DTSTAMP:20261219T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Paradise Park\, Bangkok
+DESCRIPTION:รอประกาศรายชื่อ\n• รายช
+ ื่อสมาชิกรอประกาศ\n\nhttps://48thdb.com/
+ event/ev-kimi-roadshow-paradise-dec
+URL:https://48thdb.com/event/ev-kimi-roadshow-paradise-dec
+DTSTART;VALUE=DATE:20261219
+DTEND;VALUE=DATE:20261221
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-santy-factory@48thdb
 DTSTAMP:20261225T000000Z
 SUMMARY:BNK48 & CGM48 Santy Factory

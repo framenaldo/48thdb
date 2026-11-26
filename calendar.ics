@@ -2188,6 +2188,93 @@ DTSTART;VALUE=DATE:20261212
 DTEND;VALUE=DATE:20261214
 END:VEVENT
 BEGIN:VEVENT
+UID:ev-kimi-school-tour-1127-2026-11-27@48thdb
+DTSTAMP:20261127T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" School Tour
+LOCATION:Sriayudhya School\, Bangkok
+DESCRIPTION:เมมเบอร์: Blythe\, Grape\, Hoop\, Janry\, Mail\
+ , Mirin\n• 08:00 Sriayudhya School\, Bangkok\n• 11:30 Srinakharinwirot
+  University Demonstration School Prasarnmit\, Secondary Division\, Bangkok
+ \n\nhttps://48thdb.com/event/ev-kimi-school-tour-1127
+URL:https://48thdb.com/event/ev-kimi-school-tour-1127
+DTSTART;TZID=Asia/Bangkok:20261127T080000
+DTEND;TZID=Asia/Bangkok:20261127T130000
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-conan-crimson-gala-1127@48thdb
+DTSTAMP:20261127T000000Z
+SUMMARY:Detective Conan: The Crimson Closing Day Gala Premiere
+LOCATION:SF World Cinema\, centralwOrld\, Bangkok
+DESCRIPTION:เมมเบอร์: Hoop\, Khowjow\, L\, Neen\n\nhttps://
+ 48thdb.com/event/ev-conan-crimson-gala-1127
+URL:https://48thdb.com/event/ev-conan-crimson-gala-1127
+DTSTART;VALUE=DATE:20261127
+DTEND;VALUE=DATE:20261128
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-union-dec@48thdb
+DTSTAMP:20261205T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Union Mall\, Bangkok
+DESCRIPTION:เมมเบอร์: Hoop\, Khaimook\, Khowjow\, Mint\, Wa
+ wa\, Yoghurt\, Fame\n• 5 ธ.ค. — Hoop\, Khaimook\, Khowjow\, Mint\,
+  Wawa\, Yoghurt\n• 6 ธ.ค. — Fame\, Hoop\, Khaimook\, Khowjow\, Min
+ t\, Wawa\n• เวลาและรายละเอียดอื่
+ นรอประกาศ\n\nhttps://48thdb.com/event/ev-kimi-roadshow-u
+ nion-dec
+URL:https://48thdb.com/event/ev-kimi-roadshow-union-dec
+DTSTART;VALUE=DATE:20261205
+DTEND;VALUE=DATE:20261207
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-mbk-dec@48thdb
+DTSTAMP:20261212T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:MBK Center\, Bangkok
+DESCRIPTION:รอประกาศรายชื่อ\n• รายช
+ ื่อสมาชิกรอประกาศ\n\nhttps://48thdb.com/
+ event/ev-kimi-roadshow-mbk-dec
+URL:https://48thdb.com/event/ev-kimi-roadshow-mbk-dec
+DTSTART;VALUE=DATE:20261212
+DTEND;VALUE=DATE:20261214
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-kimi-roadshow-paradise-dec@48thdb
+DTSTAMP:20261219T000000Z
+SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
+LOCATION:Paradise Park\, Bangkok
+DESCRIPTION:รอประกาศรายชื่อ\n• รายช
+ ื่อสมาชิกรอประกาศ\n\nhttps://48thdb.com/
+ event/ev-kimi-roadshow-paradise-dec
+URL:https://48thdb.com/event/ev-kimi-roadshow-paradise-dec
+DTSTART;VALUE=DATE:20261219
+DTEND;VALUE=DATE:20261221
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-praew-wawa-bday-1220@48thdb
+DTSTAMP:20261220T000000Z
+SUMMARY:Praew BNK48 & Wawa BNK48's Birthday Fanmeet
+LOCATION:the Bazaar hotel Bangkok\, Bangkok
+DESCRIPTION:เมมเบอร์: Praew\, Wawa\n• เวลาแล
+ ะรายละเอียดอื่นรอประกาศ\n\nh
+ ttps://48thdb.com/event/ev-praew-wawa-bday-1220
+URL:https://48thdb.com/event/ev-praew-wawa-bday-1220
+DTSTART;VALUE=DATE:20261220
+DTEND;VALUE=DATE:20261221
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-luksorn-mail-bday-1220@48thdb
+DTSTAMP:20261220T000000Z
+SUMMARY:Luksorn BNK48 & Mail BNK48's Birthday Fanmeet
+LOCATION:the Bazaar hotel Bangkok\, Bangkok
+DESCRIPTION:เมมเบอร์: Luksorn\, Mail\n• เวลาแ
+ ละรายละเอียดอื่นรอประกาศ\n
+ \nhttps://48thdb.com/event/ev-luksorn-mail-bday-1220
+URL:https://48thdb.com/event/ev-luksorn-mail-bday-1220
+DTSTART;VALUE=DATE:20261220
+DTEND;VALUE=DATE:20261221
+END:VEVENT
+BEGIN:VEVENT
 UID:ev-santy-factory@48thdb
 DTSTAMP:20261225T000000Z
 SUMMARY:BNK48 & CGM48 Santy Factory
