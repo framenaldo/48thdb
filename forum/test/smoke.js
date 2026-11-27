@@ -143,6 +143,16 @@ await b.waitForURL(/m=deleted/);
 assert.equal((await b.request.get(`${BASE}/i/${picKey}`)).status(), 404);
 console.log('✓ a deleted post takes its picture with it');
 
+// a profile picture: cut square, sent, shown beside the member's posts
+await b.goto(`${BASE}/settings`);
+await b.setInputFiles('[data-avatar-input]', { ...BIG, name: 'me.png' });
+await b.waitForURL(/settings\?m=saved/);
+await b.goto(topicUrl);
+const face = b.locator('.post .puser img.ava').first();
+assert.match(await face.getAttribute('src'), /^\/i\/[A-Za-z0-9_-]{16}$/);
+assert.equal(await face.evaluate((i) => i.decode().then(() => i.naturalWidth)), 256);
+console.log('✓ a profile picture is cut square, saved and shown beside the posts');
+
 // a trusted member's post with a phone number still waits
 await b.fill('.reply textarea', 'สนใจทักมาที่ 081-234-5678 ได้เลย');
 await b.click('.reply button.btn.new');
@@ -173,12 +183,12 @@ console.log('✓ quoting works and shows as a quote box');
 
 // reporting: C reports B's post
 await c.goto(topicUrl);
-await c.locator('.post').nth(1).locator('a.b', { hasText: 'รายงาน' }).click();
+await c.locator('.post').nth(1).locator('a.b', { hasText: 'แจ้งลบ' }).click();
 await c.check('input[name=reason][value="4"]');
 await c.click('button.btn.new');
 await c.waitForURL(/m=reported/);
 await a.goto(`${BASE}/mod`);
-assert.match(await a.locator('.moddesk').innerText(), /รายงาน 1 ครั้ง/);
+assert.match(await a.locator('.moddesk').innerText(), /แจ้งลบ 1 ครั้ง/);
 await a.locator('.mcard', { hasText: 'สแปม' }).locator('button.mb.ok').click();
 await a.waitForURL(/m=done/);
 console.log('✓ a report reaches the queue and is cleared');
@@ -226,15 +236,15 @@ await a.click('button.btn.new');
 await a.waitForURL(/\/t\/\d+$/);
 assert.equal(await a.locator('.ptext a.pic img').count(), 2);
 await a.goto(`${BASE}/f/events`);
-assert.match(await a.locator('.topics .tr', { hasText: `ทริปเชียงใหม่ รูปเยอะมาก ${stamp}` }).innerText(), /📷 2/);
+assert.match(await a.locator('.topics .tr', { hasText: `ทริปเชียงใหม่ รูปเยอะมาก ${stamp}` }).innerText(), /2 รูป/);
 await shot(a, 'pics-forum');
 await a.locator('.topics .tr a', { hasText: `ทริปเชียงใหม่ รูปเยอะมาก ${stamp}` }).click();
 await a.locator('.ptext a.pic img').first().evaluate((i) => i.decode());
 await shot(a, 'pics-topic');
-console.log('✓ a topic with two pictures shows them, and its row shows 📷 2');
+console.log('✓ a topic with two pictures shows them, and its row says (2 รูป)');
 
 // the red ring: B has not read the admin's new topic in พูดคุยทั่วไป; after reading it the ring goes
-const ring = async () => { await b.goto(BASE); return b.locator('.forums .tr', { hasText: 'พูดคุยทั่วไป' }).locator('.ic.unread').count(); };
+const ring = async () => { await b.goto(BASE); return b.locator('.forums .tr', { hasText: 'พูดคุยทั่วไป' }).locator('.ic.new').count(); };
 assert.equal(await ring(), 1);
 await b.goto(`${BASE}/f/general`);
 await b.locator('.topics .tr a', { hasText: 'เพลงไหนฟังแล้วร้องไห้ทุกที' }).click();

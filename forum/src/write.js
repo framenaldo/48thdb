@@ -42,13 +42,13 @@ const sameAgain = (c, body) => c.env.DB.prepare('SELECT id FROM posts WHERE user
 // ---------------- new topic ----------------
 function newTopicPage(c, f, { title = '', tag = '', body = '', error = '', preview = false } = {}) {
   return layout(c, {
-    title: `ตั้งกระทู้ใหม่ · ${f.title}`, noindex: true,
-    crumbs: [{ href: `/f/${f.slug}`, label: f.title }, { label: 'ตั้งกระทู้ใหม่' }],
-    body: `<h1 class="ft">ตั้งกระทู้ใหม่ใน ${esc(f.title)}</h1>
-${f.rules ? `<div class="rules"><b>กฎของห้องนี้</b>${esc(f.rules)}</div>` : ''}
+    title: `ตั้งกระทู้ - ${f.title}`, noindex: true,
+    crumbs: [{ href: `/f/${f.slug}`, label: f.title }, { label: 'ตั้งกระทู้' }],
+    body: `<h1 class="ft">ตั้งกระทู้ในห้อง ${esc(f.title)}</h1>
+${f.rules ? `<div class="rules"><b>กฎของห้อง</b>${esc(f.rules)}</div>` : ''}
 ${preview ? previewHtml(body) : ''}
-<section class="box">${editor({ action: `/new/${f.slug}`, title, tag, body, forum: f, submit: 'โพสต์กระทู้', error, pics: !!c.env.IMAGES })}</section>
-<p class="muted center">โปรดอ่าน<a href="/faq">กติกาบอร์ด</a>ก่อนโพสต์ · 3 โพสต์แรกของบัญชีใหม่จะรอผู้ดูแลตรวจก่อนขึ้น</p>`,
+<section class="box">${editor({ action: `/new/${f.slug}`, title, tag, body, forum: f, submit: 'ตั้งกระทู้', error, pics: !!c.env.IMAGES })}</section>
+<p class="muted center">อ่าน<a href="/faq#rules">กติกา</a>ก่อนโพสต์นะ</p>`,
   });
 }
 
@@ -102,12 +102,12 @@ async function replyPage(c, t, { body = '', error = '', preview = false } = {}) 
     WHERE p.topic_id = ? AND p.status = 'ok' ORDER BY p.id DESC LIMIT 5`).bind(t.id).all();
   const at = now();
   return layout(c, {
-    title: `ตอบกลับ · ${t.title}`, noindex: true,
-    crumbs: [{ href: `/f/${t.slug}`, label: t.ftitle }, { href: `/t/${t.id}`, label: t.title }, { label: 'ตอบกลับ' }],
-    body: `<h1 class="ft">ตอบกลับ: ${tagHtml(t.tag)}${esc(t.title)}</h1>
+    title: `ตอบกระทู้ - ${t.title}`, noindex: true,
+    crumbs: [{ href: `/f/${t.slug}`, label: t.ftitle }, { href: `/t/${t.id}`, label: t.title }, { label: 'ตอบกระทู้' }],
+    body: `<h1 class="ft">ตอบกระทู้ <a href="/t/${t.id}">${tagHtml(t.tag)}${esc(t.title)}</a></h1>
 ${preview ? previewHtml(body) : ''}
-<section class="box">${editor({ action: `/t/${t.id}/reply`, body, forum: t, error, pics: !!c.env.IMAGES })}</section>
-${last.length ? `<section class="tbl list"><div class="thd"><span>ข้อความล่าสุดในกระทู้</span></div>${last.map((p) => `<div class="tr1">
+<section class="box">${editor({ action: `/t/${t.id}/reply`, body, forum: t, submit: 'ส่งความคิดเห็น', error, pics: !!c.env.IMAGES })}</section>
+${last.length ? `<section class="tbl list"><div class="thd"><span>ความคิดเห็นล่าสุดในกระทู้</span></div>${last.map((p) => `<div class="tr1">
   <span class="muted">${userLink(p.uid, p.name, p.role)} · ${when(p.created_at, at)}</span><div class="ptext small">${render(p.body)}</div></div>`).join('')}</section>` : ''}`,
   });
 }
@@ -227,7 +227,7 @@ export const REASONS = ['ข้อมูลส่วนตัวของสม�
 async function reportable(c, id) {
   const p = await postById(c.env, +id);
   if (!p || p.status !== 'ok' || p.tstatus !== 'ok') return { stop: notFound(c) };
-  if (p.user_id === c.user.id) return { stop: message(c, 'รายงานไม่ได้', 'นี่เป็นข้อความของคุณเอง', { status: 400 }) };
+  if (p.user_id === c.user.id) return { stop: message(c, 'แจ้งลบไม่ได้', 'นี่เป็นโพสต์ของคุณเอง ลบเองได้จากปุ่ม ลบ', { status: 400 }) };
   return { p };
 }
 
@@ -236,15 +236,15 @@ export async function reportForm(c, id) {
   const { p, stop } = await reportable(c, id);
   if (stop) return stop;
   return layout(c, {
-    title: 'รายงานข้อความ', noindex: true, crumbs: [{ href: `/p/${p.id}`, label: p.title }, { label: 'รายงาน' }],
-    body: `<h1 class="ft">⚑ รายงานข้อความ</h1>
+    title: 'แจ้งลบโพสต์', noindex: true, crumbs: [{ href: `/p/${p.id}`, label: p.title }, { label: 'แจ้งลบ' }],
+    body: `<h1 class="ft">แจ้งลบโพสต์</h1>
 <section class="box"><div class="quote small"><b>${esc(p.name)} เขียน:</b>${render(p.body)}</div>
 <form method="post" action="/p/${p.id}/report" class="stack">
   <fieldset><legend class="lbl">ผิดกติกาเรื่องอะไร</legend>
   ${REASONS.map((r, i) => `<label class="radio"><input type="radio" name="reason" value="${i}"${i === 0 ? ' required' : ''}> ${esc(r)}</label>`).join('')}</fieldset>
   <label class="lbl" for="r-note">รายละเอียดเพิ่มเติม (ไม่บังคับ)</label><input id="r-note" name="note" maxlength="200">
-  <p class="muted">ผู้ดูแลจะเห็นว่ามีการรายงาน แต่เจ้าของข้อความไม่เห็นว่าใครรายงาน · ถ้ามีคนรายงาน 3 คน ข้อความจะถูกซ่อนไว้ก่อน</p>
-  <div class="actions end"><a class="btn" href="/p/${p.id}">ยกเลิก</a><button class="btn new">ส่งรายงาน</button></div>
+  <p class="muted">เจ้าของโพสต์จะไม่รู้ว่าใครแจ้ง · ถ้ามีคนแจ้ง 3 คน โพสต์จะถูกซ่อนไว้ก่อนจนผู้ดูแลมาดู</p>
+  <div class="actions end"><a class="btn" href="/p/${p.id}">ยกเลิก</a><button class="btn new">แจ้งลบ</button></div>
 </form></section>`,
   });
 }

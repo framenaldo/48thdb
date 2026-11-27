@@ -75,7 +75,7 @@ export function plain(src) {
     s = s.replace(/\[quote(?:=[^\]]*)?\](?:(?!\[quote)[\s\S])*?\[\/quote\]/gi, ' ');
     if (s === before) break;
   }
-  return s.replace(IMG_TAG, ' 📷 ').replace(/\[url=[^\]]*\]([\s\S]*?)\[\/url\]/gi, '$1')
+  return s.replace(IMG_TAG, ' [รูป] ').replace(/\[url=[^\]]*\]([\s\S]*?)\[\/url\]/gi, '$1')
     .replace(/\[\/?(?:b|i|u|s|url|quote)(?:=[^\]]*)?\]/gi, '')
     .replace(/\s+/g, ' ').trim();
 }

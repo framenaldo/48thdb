@@ -3,7 +3,7 @@
 import { esc, now, num, when, clockTh, oneLine, localPath } from './util.js';
 import { isMod, isAdmin } from './auth.js';
 import { plain } from './markup.js';
-import { imageKeys, dropImages } from './images.js';
+import { imageKeys, dropImages, clearAvatar } from './images.js';
 import { refreshTopic, refreshForum, postById } from './db.js';
 import { layout, message, userLink } from './views.js';
 
@@ -37,9 +37,9 @@ export async function queue(c) {
       : `${btn('delete', 'ลบโพสต์', 'no', { post: p.id }, 'ลบโพสต์นี้?')}${banBtn}${btn('keep', p.status === 'hidden' ? 'คืนโพสต์' : 'ไม่ผิดกติกา', 'ok', { post: p.id })}`;
     return `<article class="mcard">
   <div class="mtop">${kind === 'p'
-    ? `<span class="flag ${p.flag.startsWith('บัญชีใหม่') ? 'new' : 'money'}">${p.flag.startsWith('บัญชีใหม่') ? '🆕' : '💳'} ${esc(p.flag || 'รอตรวจ')}</span>`
-    : `<span class="flag rep">⚑ รายงาน ${p.open} ครั้ง${p.status === 'hidden' ? ' · ซ่อนอยู่' : ''}</span>`}<span class="sp"></span><span>${when(p.created_at, at)}</span></div>
-  <div class="mwhere">${p.id === p.first_post_id ? 'กระทู้ใหม่' : 'ตอบใน'} <a href="/p/${p.id}">${esc(p.title)}</a> · ${esc(p.ftitle)} · โดย ${userLink(p.user_id, p.name, p.role)}</div>
+    ? `<span class="flag ${p.flag.startsWith('บัญชีใหม่') ? 'new' : 'money'}">${esc(p.flag || 'รอตรวจ')}</span>`
+    : `<span class="flag rep">แจ้งลบ ${p.open} ครั้ง${p.status === 'hidden' ? ' · ซ่อนอยู่' : ''}</span>`}<span class="sp"></span><span>${when(p.created_at, at)}</span></div>
+  <div class="mwhere">${p.id === p.first_post_id ? 'ตั้งกระทู้' : 'ตอบใน'} <a href="/p/${p.id}">${esc(p.title)}</a> · ${esc(p.ftitle)} · ${userLink(p.user_id, p.name, p.role)}</div>
   <div class="mq">“${esc(excerpt.slice(0, 400))}${excerpt.length > 400 ? '…' : ''}”</div>
   ${imageKeys(p.body).length ? `<div class="mpics">${imageKeys(p.body).map((k) => `<a href="/i/${k}" target="_blank" rel="noopener"><img src="/i/${k}" alt="รูปในโพสต์" loading="lazy"></a>`).join('')}</div>` : ''}
   ${kind === 'r' && p.reasons ? `<div class="why">เหตุผล: ${esc(p.reasons)}</div>` : ''}
@@ -49,16 +49,16 @@ export async function queue(c) {
 
   const P = pending.results, R = reported.results, B = banned.results;
   return layout(c, {
-    title: 'จัดการบอร์ด', noindex: true, crumbs: [{ label: 'จัดการบอร์ด' }],
+    title: 'งานผู้ดูแล', noindex: true, crumbs: [{ label: 'งานผู้ดูแล' }],
     body: `<section class="moddesk">
-  <div class="mhead"><div class="k">MOD DESK</div><h1>วันนี้ต้องดู ${num(P.length + R.length)} รายการ</h1></div>
-  <div class="kpis"><div class="kpi hot"><b>${num(R.length)}</b><span>ถูกรายงาน</span></div><div class="kpi wait"><b>${num(P.length)}</b><span>รอตรวจ</span></div><div class="kpi calm"><b>${num(B.length)}</b><span>ถูกระงับอยู่</span></div></div>
-  <h2>⚑ ถูกรายงาน</h2>
-  ${R.length ? R.map((p) => card(p, 'r')).join('') : '<p class="mnone">ไม่มีรายงานค้าง</p>'}
-  <h2>⏳ รอตรวจ</h2>
-  ${P.length ? P.map((p) => card(p, 'p')).join('') : '<p class="mnone">ไม่มีโพสต์รอตรวจ</p>'}
-  <h2>🚫 ระงับการโพสต์อยู่</h2>
-  ${B.length ? B.map((u) => `<div class="mrow">${userLink(u.id, u.name, u.role)} <span>ถึง ${clockTh(u.banned_until)}${u.ban_reason ? ` · ${esc(u.ban_reason)}` : ''}</span><span class="sp"></span>${btn('unban', 'ยกเลิก', 'ghost', { user: u.id })}</div>`).join('') : '<p class="mnone">ไม่มี</p>'}
+  <h1 class="ft">งานผู้ดูแล</h1>
+  <div class="counts">แจ้งลบ <b>${num(R.length)}</b> · รอตรวจ <b>${num(P.length)}</b> · ระงับอยู่ <b>${num(B.length)}</b></div>
+  <section class="tbl list"><div class="thd"><span>โพสต์ที่ถูกแจ้งลบ (${num(R.length)})</span></div>
+  ${R.length ? R.map((p) => card(p, 'r')).join('') : '<p class="mnone">ไม่มีโพสต์ที่ถูกแจ้งลบ</p>'}</section>
+  <section class="tbl list"><div class="thd"><span>โพสต์รอตรวจ (${num(P.length)})</span></div>
+  ${P.length ? P.map((p) => card(p, 'p')).join('') : '<p class="mnone">ไม่มีโพสต์รอตรวจ</p>'}</section>
+  <section class="tbl list"><div class="thd"><span>ระงับการโพสต์อยู่ (${num(B.length)})</span></div>
+  ${B.length ? B.map((u) => `<div class="mrow">${userLink(u.id, u.name, u.role)} <span>ถึง ${clockTh(u.banned_until)}${u.ban_reason ? ` · ${esc(u.ban_reason)}` : ''}</span><span class="sp"></span>${btn('unban', 'ยกเลิก', 'ghost', { user: u.id })}</div>`).join('') : '<p class="mnone">ไม่มี</p>'}</section>
 </section>`,
   });
 }
@@ -92,7 +92,7 @@ export async function act(c) {
   }
 
   // ---- a member ----
-  if (['ban', 'unban', 'role'].includes(a)) {
+  if (['ban', 'unban', 'role', 'unavatar'].includes(a)) {
     const u = await env.DB.prepare('SELECT id, role FROM users WHERE id = ?').bind(parseInt(form.get('user'), 10)).first();
     if (!u || u.id === user.id) return message(c, 'ทำรายการนี้ไม่ได้', 'ไม่พบสมาชิก หรือเป็นบัญชีของคุณเอง', { status: 400 });
     if (a === 'role') {
@@ -102,6 +102,10 @@ export async function act(c) {
       return done();
     }
     if (u.role !== 'user' && !isAdmin(user)) return message(c, 'ทำรายการนี้ไม่ได้', 'ผู้ดูแลระงับผู้ดูแลด้วยกันไม่ได้', { status: 403 });
+    if (a === 'unavatar') {
+      await clearAvatar(env, u.id, c.url.origin);
+      return done();
+    }
     if (a === 'unban') {
       await env.DB.prepare("UPDATE users SET banned_until = 0, ban_reason = '' WHERE id = ?").bind(u.id).run();
     } else {

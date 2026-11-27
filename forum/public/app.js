@@ -101,6 +101,43 @@
     inp.value = '';
   });
 
+  // ---- a profile picture: the middle square, 256 px, then it is saved as the member's own
+  function squareOf(file) {
+    return loadImage(file).then(function (r) {
+      var w = r.img.naturalWidth, h = r.img.naturalHeight, side = Math.min(w, h), out = 256;
+      var cv = document.createElement('canvas');
+      cv.width = out; cv.height = out;
+      var g = cv.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, out, out);
+      g.drawImage(r.img, (w - side) / 2, (h - side) / 2, side, side, 0, 0, out, out);
+      URL.revokeObjectURL(r.url);
+      return new Promise(function (ok, no) { cv.toBlob(function (b) { b ? ok(b) : no(new Error('ย่อรูปไม่สำเร็จ')); }, 'image/jpeg', 0.85); });
+    });
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-avatar]');
+    if (!b) return;
+    ev.preventDefault();
+    b.parentNode.querySelector('[data-avatar-input]').click();
+  });
+  document.addEventListener('change', function (ev) {
+    var inp = ev.target.closest('[data-avatar-input]');
+    if (!inp || !inp.files.length) return;
+    var say = inp.parentNode.querySelector('.upl');
+    say.textContent = 'กำลังส่งรูป…';
+    squareOf(inp.files[0]).then(function (blob) {
+      return fetch('/upload?w=256&h=256', { method: 'POST', body: blob, headers: { 'Content-Type': 'image/jpeg' }, credentials: 'same-origin' });
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (j) {
+        if (!res.ok || !j.key) throw new Error(j.error || 'ส่งรูปไม่สำเร็จ (' + res.status + ')');
+        var f = document.getElementById('avatar-form');
+        f.querySelector('[name=key]').value = j.key;
+        f.submit();
+      });
+    }).catch(function (e) { say.textContent = e.message; });
+    inp.value = '';
+  });
+
   document.addEventListener('submit', function (ev) {
     var f = ev.target;
     var ask = f.getAttribute('data-confirm');

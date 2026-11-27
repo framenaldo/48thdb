@@ -3,7 +3,8 @@ import { esc, now, clean, oneLine, len, localPath } from './util.js';
 import {
   hashPassword, checkPassword, startSession, endSession, overLimit, ipKey, nameProblem, nameKey,
 } from './auth.js';
-import { layout } from './views.js';
+import { layout, avatar } from './views.js';
+import { setAvatar, clearAvatar } from './images.js';
 
 const safeBack = (b) => { const p = localPath(b); return p.startsWith('/login') || p.startsWith('/register') ? '/' : p; };
 const go = (path, cookieHeader) => new Response(null, {
@@ -133,6 +134,14 @@ function settingsPage(c, { error = '', ok = '' } = {}) {
     title: 'ตั้งค่า', noindex: true, crumbs: [{ href: `/u/${u.id}`, label: u.name }, { label: 'ตั้งค่า' }],
     body: `<h1 class="ft">ตั้งค่า</h1>
 ${error ? `<div class="err">${esc(error)}</div>` : ''}${ok ? `<div class="flash">${esc(ok)}</div>` : ''}
+${c.env.IMAGES ? `<section class="box narrow">
+<h2>รูปโปรไฟล์</h2>
+<div class="avatar-set">${avatar(u, 'big')}
+  <div><button type="button" class="btn" data-avatar>เลือกรูป</button><input type="file" accept="image/*" hidden data-avatar-input>
+  ${u.avatar ? `<form method="post" action="/settings" data-confirm="ลบรูปโปรไฟล์?"><input type="hidden" name="what" value="noavatar"><button class="linkbtn">ลบรูป</button></form>` : ''}
+  <div class="hint">รูปจะถูกตัดเป็นสี่เหลี่ยมจัตุรัส <span class="upl" role="status" aria-live="polite"></span></div></div></div>
+<form method="post" action="/settings" id="avatar-form" hidden><input type="hidden" name="what" value="avatar"><input type="hidden" name="key"></form>
+</section>` : ''}
 <section class="box narrow">
 <h2>โปรไฟล์</h2>
 <form method="post" action="/settings" class="stack">
@@ -168,6 +177,14 @@ export async function settings(c) {
   if (!c.user) return Response.redirect(`${c.url.origin}/login?back=%2Fsettings`, 302);
   const { env, user } = c;
   const form = await c.req.formData();
+  if (form.get('what') === 'avatar') {
+    if (!(await setAvatar(env, user, String(form.get('key') || ''), c.url.origin))) return settingsPage(c, { error: 'ตั้งรูปไม่สำเร็จ ลองเลือกรูปใหม่อีกครั้ง' });
+    return go('/settings?m=saved');
+  }
+  if (form.get('what') === 'noavatar') {
+    await clearAvatar(env, user.id, c.url.origin);
+    return go('/settings?m=saved');
+  }
   if (form.get('what') === 'password') {
     const fresh = String(form.get('new') || '');
     if (!(await checkPassword(String(form.get('old') || ''), user.pass))) return settingsPage(c, { error: 'รหัสผ่านเดิมไม่ถูกต้อง' });
