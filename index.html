@@ -9770,21 +9770,6 @@ const SEED_SCHEDULE = [
     members:['bnk-neen','bnk-hoop','bnk-l','bnk-khowjow'],
     detail:['19:00–20:00 แขกรับเชิญพิเศษ งานเปิดตัวภาพยนตร์ ยอดนักสืบจิ๋วโคนัน บทส่งท้ายสีชาด'],
     info:['จัดโดย Japan Anime Movie Thailand'] },
-  { id:'ev-kimi-roadshow-union-dec', logo:'kimi', start:'2026-12-05', end:'2026-12-06', time:'12:00',
-    title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
-    venue:'Union Mall, Bangkok', groups:['bnk48'],
-    related:['ev-ge6-single','ev-kimi-roadshow-bigc-rajdamri'],
-    members:['bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa','bnk-yoghurt','bnk-fame'],
-    detail:[
-      'กำหนดการอ้างอิงจาก Roadshow ครั้งก่อน รอผู้จัดประกาศยืนยัน',
-      '12:00–13:00 Free Mini Concert',
-      '14:00–15:00 Group Hi-Touch',
-      '15:30–16:30 Merchandise & Hachi Cha',
-      '17:00–18:00 Group Hi-Touch'],
-    lineup:{
-      '2026-12-05':{ 'Mini Concert':['bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa','bnk-yoghurt'], 'Group Hi-Touch':['bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa','bnk-yoghurt'] },
-      '2026-12-06':{ 'Mini Concert':['bnk-fame','bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa'], 'Group Hi-Touch':['bnk-fame','bnk-hoop','bnk-khaimook','bnk-khowjow','bnk-mint','bnk-wawa'] } },
-    info:['5 ธ.ค. — Hoop, Khaimook, Khowjow, Mint, Wawa, Yoghurt','6 ธ.ค. — Fame, Hoop, Khaimook, Khowjow, Mint, Wawa','กำหนดการอาจเปลี่ยนแปลงตามความเหมาะสม'] },
   { id:'ev-kimi-roadshow-mbk-dec', logo:'kimi', start:'2026-12-12', end:'2026-12-13',
     title:'BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow',
     venue:'MBK Center, Bangkok', groups:['bnk48','cgm48'], lineupTba:true,
@@ -9805,10 +9790,10 @@ const SEED_SCHEDULE = [
     members:['bnk-luksorn','bnk-mail'], info:['เวลาและรายละเอียดอื่นรอประกาศ'] },
   { id:'ev-santy-factory', start:'2026-12-25', end:'2026-12-27',
     title:'BNK48 & CGM48 Santy Factory',
-    venue:'MCC HALL, THE MALL LIFESTORE BANGKAPI, Bangkok', groups:['bnk48','cgm48'], lineupTba:true,
+    venue:'MCC HALL, THE MALL LIFESTORE BANGKAPI, Bangkok', groups:['bnk48','cgm48'], allMembers:true,   // All BNK48 & CGM48 Members (the Nov–Dec schedule, 27 Nov 2026)
     poster:{ accent:'#B8232F', surface:'#FBEDEE', ink:'#3A1418', img:'posters/santy-factory.jpg', w:2000, h:2500 },
     info:['งานคริสต์มาสของ BNK48 และ CGM48 วันที่ 25–27 ธ.ค. 2026',
-      'เวลา กิจกรรม และรายชื่อสมาชิกรอประกาศ'] },
+      'เวลาและกิจกรรมรอประกาศ'] },
   { id:'ev-cnx-merch-preorder', logo:'cnx', start:'2026-11-24', end:'2026-12-13', period:true, bar:'Pre-Order: CGM48 สถานีเชียงใหม่ Merchandise',
     title:'CGM48 "สถานีเชียงใหม่" Merchandise · Pre-Order', short:'สถานีเชียงใหม่ Merch',
     shop:{ name:'เสื้อยืดและหมวกแก๊ป CGM48 สถานีเชียงใหม่', kind:'สินค้า', withName:true,
@@ -12264,6 +12249,7 @@ const EN = {
     'A Group Hi-Touch pass comes with a badge bought at the event',
   'Members Visit Round ราคา 880 บาท ได้รับ: สิทธิ์เข้าชมนิทรรศการพร้อมกับเมมเบอร์ในรอบที่เลือก, หมวกแก๊ป CGM48 The Original Stage "สถานีเชียงใหม่" และรูป 1 ใบ (คละจาก 21 แบบ)':
     'Members Visit Round, 880 baht: a visit to the exhibition with the members of the round you pick, a CGM48 The Original Stage "Chiang Mai Station" cap and 1 photo (one of 21, at random)',
+  'เวลาและกิจกรรมรอประกาศ': 'Times and activities to be announced',
   'ปล่อย MV "สถานีเชียงใหม่" (MV Release) ในงานวันที่ 5 ธ.ค.':
     'MV release: "สถานีเชียงใหม่" (Chiang Mai Station), at the event on 5 Dec',
   'บัตรกิจกรรมเปิดขายทาง iAM48 Application 21 พ.ย. 12:00 – 6 ธ.ค. 2026 17:00 น. ใบละ 250 บาท (Digital Event Ticket)':
