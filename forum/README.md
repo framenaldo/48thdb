@@ -46,7 +46,8 @@ node test/smoke.js                    # a browser walk through everything (needs
 ## Put it online
 
 1. Merge to `main`, then GitHub → Actions → **Deploy 48thForum** → Run workflow. The first
-   run creates the D1 database `48thforum`, applies the migrations and deploys to
+   run creates the D1 database `48thforum` in Asia-Pacific (`--location apac`: a D1 database stays where it
+   is made, and one in the US made every page wait on round trips across the Pacific), applies the migrations and deploys to
    `48thforum.<your-subdomain>.workers.dev`. It also creates the R2 bucket `48thforum-images` for
    pictures. The `CLOUDFLARE_API_TOKEN` secret needs **D1: Edit** and **Workers R2 Storage: Edit** as
    well as Workers Scripts: Edit, and R2 has to be turned on once in the Cloudflare dashboard.

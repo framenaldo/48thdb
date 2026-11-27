@@ -1,5 +1,6 @@
 # Deploy 48thForum (forum/), the fans' web board, by hand: Actions → Deploy 48thForum → Run workflow.
-# The first run creates its D1 database "48thforum"; every run applies new migrations, then deploys.
+# The first run creates its D1 database "48thforum" (in Asia-Pacific, near the readers); every run applies
+# new migrations, then deploys.
 # It also creates the R2 bucket for pictures (48thforum-images) if missing.
 # Uses the site's CLOUDFLARE_API_TOKEN, which needs Workers Scripts: Edit, D1: Edit and Workers R2 Storage: Edit.
 name: Deploy 48thForum
@@ -32,20 +33,31 @@ jobs:
 
       - name: Find or create the database
         run: |
-          find_id() {
-            npx --yes wrangler@4.135.0 d1 list --json | node -e '
-              let s = ""; process.stdin.on("data", (d) => (s += d)).on("end", () => {
-                const list = JSON.parse(s.slice(s.indexOf("[")));
-                const db = list.find((x) => x.name === "48thforum");
-                process.stdout.write(db ? db.uuid : "");
-              });'
+          W="npx --yes wrangler@4.135.0"
+          list() {
+            # a refusal (a token without D1) stops here with a plain message, not a JSON error further on
+            if ! $W d1 list --json > d1.json 2> d1.err; then
+              cat d1.err
+              echo "::error::Cloudflare would not list the D1 databases. The token CLOUDFLARE_API_TOKEN needs the permission D1: Edit (shown as Write in the dashboard)."
+              exit 1
+            fi
           }
+          find_id() {
+            node -e '
+              const s = require("fs").readFileSync("d1.json", "utf8");
+              const at = s.search(/^\s*\[/m);                       // the JSON, past any notice wrangler prints first
+              const db = at < 0 ? null : JSON.parse(s.slice(at)).find((x) => x.name === "48thforum");
+              process.stdout.write(db ? db.uuid : "");'
+          }
+          list
           id=$(find_id)
           if [ -z "$id" ]; then
-            npx --yes wrangler@4.135.0 d1 create 48thforum
+            # in Asia-Pacific, near the readers: a database stays where it is made, so this matters at creation only
+            $W d1 create 48thforum --location apac
+            list
             id=$(find_id)
           fi
-          if [ -z "$id" ]; then echo "::error::Could not find or create the D1 database '48thforum' (does the token have D1: Edit?)"; exit 1; fi
+          if [ -z "$id" ]; then echo "::error::Could not find or create the D1 database '48thforum'."; exit 1; fi
           sed -i "s/REPLACE_WITH_D1_ID/$id/" wrangler.toml
           echo "D1 database: $id"
 
