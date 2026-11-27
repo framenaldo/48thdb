@@ -222,7 +222,7 @@ export async function remove(c, id) {
 }
 
 // ---------------- report ----------------
-export const REASONS = ['ข้อมูลส่วนตัวของสมาชิก', 'เนื้อหาทางเพศ', 'ขายบัตรเกินราคา / โกง', 'ด่าทอ ดูถูก', 'สแปม / โฆษณา', 'อื่น ๆ'];
+export const REASONS = ['ข้อมูลส่วนตัวของเมมเบอร์', 'เนื้อหาทางเพศ', 'ของปลอม / โกง', 'ด่าทอ ดูถูก', 'สแปม / โฆษณา', 'อื่น ๆ'];
 
 async function reportable(c, id) {
   const p = await postById(c.env, +id);

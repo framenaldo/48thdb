@@ -153,7 +153,7 @@ export function editor({ action, body = '', title = null, tag = '', forum = null
     pics ? `<button type="button" data-pic title="แนบรูป เลือกได้หลายรูป">แนบรูป</button><input type="file" accept="image/*" multiple hidden data-pic-input><span class="upl" role="status" aria-live="polite"></span>` : ''}</div>`;
   return `<form method="post" action="${action}" class="editor${quick ? ' quick' : ''}">
   ${error ? `<div class="err">${esc(error)}</div>` : ''}
-  ${forum?.trade ? `<div class="warn"><b>ก่อนซื้อขาย</b>นัดรับที่งานจะปลอดภัยที่สุด อย่าโอนเงินก่อนได้ของ และห้ามขายบัตรเกินราคาหน้าบัตร</div>` : ''}
+  ${forum?.trade ? `<div class="warn"><b>ก่อนซื้อขาย</b>ห้ามขายของปลอม · นัดรับที่งานปลอดภัยที่สุด อย่าโอนเงินก่อนได้ของ</div>` : ''}
   ${title !== null ? `<label class="lbl" for="f-title">หัวข้อ</label>
   <div class="row"><select name="tag" aria-label="ป้ายหน้าหัวข้อ"><option value="">ไม่มีป้าย</option>${
     Object.entries(TAGS).map(([k, t]) => `<option value="${k}"${k === tag ? ' selected' : ''}>[${t.th}]</option>`).join('')}</select>
