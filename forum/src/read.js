@@ -5,7 +5,7 @@ import { isMod, isAdmin, isBanned } from './auth.js';
 import { render, plain } from './markup.js';
 import { forumBySlug, topicById, canSee, UNREAD_DAYS } from './db.js';
 import {
-  layout, message, pager, miniPager, tagHtml, rankHtml, avatar, userLink, oshiHtml, userPanel, editor, icon,
+  layout, message, pager, miniPager, tagHtml, rankHtml, avatar, userLink, oshiHtml, oshiNames, userPanel, editor, icon,
   PER_FORUM, PER_TOPIC,
 } from './views.js';
 
@@ -169,7 +169,7 @@ export async function topic(c, id) {
   const pages = Math.max(1, Math.ceil(total / PER_TOPIC));
   const page = c.url.searchParams.get('page') === 'last' ? pages : Math.min(pageOf(c), pages);
   const { results: posts } = await env.DB.prepare(`
-    SELECT p.*, u.id AS uid, u.name, u.role, u.oshi, u.sig, u.color, u.avatar, u.posts AS uposts, u.created_at AS joined
+    SELECT p.*, u.id AS uid, u.name, u.role, u.oshi, u.oshi_ids, u.sig, u.color, u.avatar, u.posts AS uposts, u.created_at AS joined
       FROM posts p JOIN users u ON u.id = p.user_id
      WHERE p.topic_id = ?1 AND ${POST_SEEN} ORDER BY p.id LIMIT ?4 OFFSET ?5`)
     .bind(t.id, mod ? 1 : 0, uid, PER_TOPIC, (page - 1) * PER_TOPIC).all();
@@ -199,7 +199,7 @@ export async function topic(c, id) {
     const first = p.id === t.first_post_id;
     return `<article class="post${p.status !== 'ok' ? ' dim' : ''}" id="p${p.id}">
   <div class="phead"><span class="lab${first ? ' first' : ''}">${first ? 'เจ้าของกระทู้' : `ความคิดเห็นที่ ${n - 1}`}</span><span>${when(p.created_at, at)}${p.edited_at ? ` · <span title="แก้ไขเมื่อ ${clockTh(p.edited_at)}">แก้ไขแล้ว</span>` : ''}</span><a href="/p/${p.id}" class="pn">#${n}</a></div>
-  ${userPanel({ uid: p.uid, name: p.name, role: p.role, oshi: p.oshi, color: p.color, avatar: p.avatar, posts: p.uposts, joined: p.joined })}
+  ${userPanel({ uid: p.uid, name: p.name, role: p.role, oshi: p.oshi, oshi_ids: p.oshi_ids, color: p.color, avatar: p.avatar, posts: p.uposts, joined: p.joined })}
   <div class="pbody">
     ${note}
     <div class="ptext">${render(p.body)}</div>
@@ -285,7 +285,7 @@ export async function profile(c, id) {
     title: u.name, crumbs: [{ href: '/members', label: 'รายชื่อสมาชิก' }, { label: u.name }],
     body: `<section class="profile box">
   ${avatar(u, 'big')}
-  <div><h1 class="ft">${esc(u.name)}</h1>${rankHtml(u)} ${oshiHtml(u.oshi)}
+  <div><h1 class="ft">${esc(u.name)}</h1>${rankHtml(u)} ${oshiHtml(u.oshi, u.oshi_ids)}
   <p class="facts"><span>โพสต์ <b>${num(u.posts)}</b></span><span>สมาชิกตั้งแต่ ${dateTh(u.created_at)}</span><span>เข้ามาล่าสุด ${u.last_seen ? when(u.last_seen, at) : '-'}</span></p>
   ${u.sig ? `<p class="sig">${esc(u.sig)}</p>` : ''}</div>
 </section>
@@ -304,7 +304,7 @@ export async function members(c) {
   const per = 50;
   const pages = Math.max(1, Math.ceil(total / per));
   const page = Math.min(pageOf(c), pages);
-  const { results } = await env.DB.prepare('SELECT id, name, role, oshi, posts, color, avatar, created_at FROM users ORDER BY posts DESC, id LIMIT ? OFFSET ?')
+  const { results } = await env.DB.prepare('SELECT id, name, role, oshi, oshi_ids, posts, color, avatar, created_at FROM users ORDER BY posts DESC, id LIMIT ? OFFSET ?')
     .bind(per, (page - 1) * per).all();
   return layout(c, {
     title: 'รายชื่อสมาชิก', crumbs: [{ label: 'รายชื่อสมาชิก' }],
@@ -314,7 +314,7 @@ export async function members(c) {
   <div class="thd"><span>สมาชิก</span><span>โอชิ</span><span>โพสต์</span><span>สมาชิกตั้งแต่</span></div>
   ${results.map((u) => `<div class="tr">
     <div class="main">${avatar(u)}<div><div class="tt">${userLink(u.id, u.name, u.role)}</div>${rankHtml(u)}</div></div>
-    <div class="n">${esc(u.oshi) || '<span class="muted">-</span>'}</div><div class="n">${num(u.posts)}</div><div class="n">${dateTh(u.created_at)}</div></div>`).join('')}
+    <div class="n">${oshiNames(u.oshi, u.oshi_ids) || '<span class="muted">-</span>'}</div><div class="n">${num(u.posts)}</div><div class="n">${dateTh(u.created_at)}</div></div>`).join('')}
 </section>`,
   });
 }

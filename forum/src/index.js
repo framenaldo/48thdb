@@ -9,18 +9,21 @@ import * as account from './account.js';
 import * as mod from './mod.js';
 import * as images from './images.js';
 
-const CSP = [
+// Firebase (a 48thDb account): its scripts from gstatic and apis.google.com, its sign-in calls to googleapis,
+// and the hidden frame on 48thDb's own auth domain that carries the Google pop-up's answer back
+let CSP = '';
+const csp = (env) => CSP || (CSP = [
   "default-src 'self'",
-  "script-src 'self' https://challenges.cloudflare.com",
-  "frame-src https://challenges.cloudflare.com",
+  "script-src 'self' https://challenges.cloudflare.com https://www.gstatic.com https://apis.google.com",
+  `frame-src https://challenges.cloudflare.com${/^[a-z0-9.-]+$/.test(env.FIREBASE_AUTH_DOMAIN || '') ? ` https://${env.FIREBASE_AUTH_DOMAIN}` : ''}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src https://fonts.gstatic.com",
   "img-src 'self' data: blob:",                 // blob: — the browser shrinks a picture before sending it
-  "connect-src 'self'",
+  "connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com",
   "form-action 'self'",
   "base-uri 'none'",
   "frame-ancestors 'none'",
-].join('; ');
+].join('; '));
 
 const ROUTES = [
   ['GET',  /^\/$/,                    read.index],
@@ -48,6 +51,7 @@ const ROUTES = [
   ['GET',  /^\/login$/,               account.loginForm],
   ['POST', /^\/login$/,               account.login],
   ['POST', /^\/logout$/,              account.logout],
+  ['POST', /^\/auth\/48thdb$/,        account.auth48],
   ['GET',  /^\/settings$/,            account.settingsForm],
   ['POST', /^\/settings$/,            account.settings],
   ['GET',  /^\/mod$/,                 mod.queue],
@@ -76,7 +80,7 @@ export default {
     const c = {
       req, env, ctx, url, user: null, modCount: 0,
       headers: (extra = {}) => ({
-        'Content-Security-Policy': CSP,
+        'Content-Security-Policy': csp(env),
         'X-Content-Type-Options': 'nosniff',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         'Cache-Control': 'no-store',
