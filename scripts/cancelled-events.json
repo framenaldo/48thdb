@@ -1,0 +1,70 @@
+{
+ "about": "Events the groups cancelled. Not shown on 48thdb.com (an upcoming event that is cancelled is taken off the schedule); kept here so the owner can ask for counts and details. Not deployed (scripts/ stays out of the site). Add one entry per cancellation.",
+ "events": [
+  {
+   "id": "ev-roadshow-fashionisland",
+   "title": "CGM48 11th Single \"Koi Tsunjatta – Let me know!\" Roadshow",
+   "dates": [
+    "2026-09-26",
+    "2026-09-27"
+   ],
+   "venue": "Grand Station ชั้น 2, Fashion Island, Bangkok",
+   "groups": [
+    "cgm48"
+   ],
+   "members": [
+    "cgm-ginna",
+    "cgm-kwan",
+    "cgm-jingjing",
+    "cgm-nisha",
+    "cgm-ploen",
+    "cgm-hongyok"
+   ],
+   "reason": "ยกเลิกการจัดงาน เนื่องจากศูนย์การค้าแฟชั่นไอส์แลนด์ปิดให้บริการชั่วคราว (สถานการณ์น้ำท่วม)",
+   "cancelledNoted": "2026-09",
+   "stillOnSite": "yes, marked ยกเลิกแล้ว (it was already past when this rule began)"
+  },
+  {
+   "id": "ev-kimi-roadshow-union-dec",
+   "title": "BNK48 & CGM48 Special Single \"Kimi to Doko ka e Ikitai\" Roadshow",
+   "dates": [
+    "2026-12-05",
+    "2026-12-06"
+   ],
+   "venue": "Union Mall, Bangkok",
+   "groups": [
+    "bnk48"
+   ],
+   "members": [
+    "bnk-hoop",
+    "bnk-khaimook",
+    "bnk-khowjow",
+    "bnk-mint",
+    "bnk-wawa",
+    "bnk-yoghurt",
+    "bnk-fame"
+   ],
+   "lineup": {
+    "2026-12-05": [
+     "bnk-hoop",
+     "bnk-khaimook",
+     "bnk-khowjow",
+     "bnk-mint",
+     "bnk-wawa",
+     "bnk-yoghurt"
+    ],
+    "2026-12-06": [
+     "bnk-fame",
+     "bnk-hoop",
+     "bnk-khaimook",
+     "bnk-khowjow",
+     "bnk-mint",
+     "bnk-wawa"
+    ]
+   },
+   "reason": "[CANCELLED] on the official Upcoming Event Schedule, November–December 2026 (no reason given)",
+   "cancelledNoted": "2026-11-27",
+   "stillOnSite": "no, taken off the schedule (commit c14977f)"
+  }
+ ]
+}

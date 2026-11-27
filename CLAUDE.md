@@ -405,6 +405,12 @@ any event link from the event sheet; those corrections live in Firestore
 (`eventlinks/`) and are laid over what is written here — when you learn of one,
 fix the code too so the two agree.
 
+**Cancelled events.** An upcoming event that is cancelled comes off the schedule (out of `SEED_SCHEDULE`, the owner's word,
+27 Nov 2026), but is logged in `scripts/cancelled-events.json` (one entry: id, title, dates, venue, groups, members and line-up as
+announced, reason, when noted, and whether it is still on the site). The log is never shown on the site (`scripts/` is not
+deployed); it is there for the owner's questions ("how many were cancelled", "who was in them"). A postponement with a new date to
+come keeps the `cancelled` + `postponed` marking. Fashion Island's roadshow (26–27 Sep) stays on the site marked, as it was.
+
 **Pop-ups.** A CGM48 Pop Up Live held on a Thursday is usually behind closed
 doors — no audience, only the YouTube stream — so it is an online event (`online:`,
 no venue); the ones on tour have a venue and an audience. Don't write on the page
