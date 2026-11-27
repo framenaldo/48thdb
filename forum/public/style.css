@@ -187,6 +187,8 @@ h1 .tg{font-size:13px;vertical-align:3px}
 .profile .facts{flex-direction:row;flex-wrap:wrap;gap:4px 16px;margin-top:6px;font-size:13px;color:var(--ink-2)}
 .prose h2{margin-top:14px}
 .prose ol{padding-left:22px}
+.prose ul{padding-left:18px;margin:2px 0 4px}
+.prose ul li{margin:1px 0}
 .prose li,.prose p{margin:4px 0;color:var(--ink-2)}
 .prose li b{color:var(--ink)}
 .codes{border-collapse:collapse;margin:6px 0}

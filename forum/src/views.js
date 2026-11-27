@@ -2,7 +2,7 @@
 import { esc, num, dateTh, monthTh, initial } from './util.js';
 import { isMod } from './auth.js';
 
-export const ASSET_V = '4';                // bump when style.css or app.js changes
+export const ASSET_V = '5';                // bump when style.css or app.js changes
 export const PER_FORUM = 25;
 export const PER_TOPIC = 20;
 
