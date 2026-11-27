@@ -2221,44 +2221,6 @@ DTSTART;TZID=Asia/Bangkok:20261127T190000
 DTEND;TZID=Asia/Bangkok:20261127T200000
 END:VEVENT
 BEGIN:VEVENT
-UID:ev-kimi-roadshow-union-dec-2026-12-05@48thdb
-DTSTAMP:20261205T000000Z
-SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:Union Mall\, Bangkok
-DESCRIPTION:เมมเบอร์: Hoop\, Khaimook\, Khowjow\, Mint\, Wa
- wa\, Yoghurt\, Fame\n• กำหนดการอ้างอิงจ
- าก Roadshow ครั้งก่อน รอผู้จัดปร
- ะกาศยืนยัน\n• 12:00–13:00 Free Mini Concert\n• 1
- 4:00–15:00 Group Hi-Touch\n• 15:30–16:30 Merchandise & Hachi Cha\n
- • 17:00–18:00 Group Hi-Touch\n• 5 ธ.ค. — Hoop\, Khaimook\, Kho
- wjow\, Mint\, Wawa\, Yoghurt\n• 6 ธ.ค. — Fame\, Hoop\, Khaimook\, 
- Khowjow\, Mint\, Wawa\n• กำหนดการอาจเปลี
- ่ยนแปลงตามความเหมาะสม\n\nhttps:/
- /48thdb.com/event/ev-kimi-roadshow-union-dec
-URL:https://48thdb.com/event/ev-kimi-roadshow-union-dec
-DTSTART;TZID=Asia/Bangkok:20261205T120000
-DTEND;TZID=Asia/Bangkok:20261205T180000
-END:VEVENT
-BEGIN:VEVENT
-UID:ev-kimi-roadshow-union-dec-2026-12-06@48thdb
-DTSTAMP:20261205T000000Z
-SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
-LOCATION:Union Mall\, Bangkok
-DESCRIPTION:เมมเบอร์: Hoop\, Khaimook\, Khowjow\, Mint\, Wa
- wa\, Yoghurt\, Fame\n• กำหนดการอ้างอิงจ
- าก Roadshow ครั้งก่อน รอผู้จัดปร
- ะกาศยืนยัน\n• 12:00–13:00 Free Mini Concert\n• 1
- 4:00–15:00 Group Hi-Touch\n• 15:30–16:30 Merchandise & Hachi Cha\n
- • 17:00–18:00 Group Hi-Touch\n• 5 ธ.ค. — Hoop\, Khaimook\, Kho
- wjow\, Mint\, Wawa\, Yoghurt\n• 6 ธ.ค. — Fame\, Hoop\, Khaimook\, 
- Khowjow\, Mint\, Wawa\n• กำหนดการอาจเปลี
- ่ยนแปลงตามความเหมาะสม\n\nhttps:/
- /48thdb.com/event/ev-kimi-roadshow-union-dec
-URL:https://48thdb.com/event/ev-kimi-roadshow-union-dec
-DTSTART;TZID=Asia/Bangkok:20261206T120000
-DTEND;TZID=Asia/Bangkok:20261206T180000
-END:VEVENT
-BEGIN:VEVENT
 UID:ev-kimi-roadshow-mbk-dec@48thdb
 DTSTAMP:20261212T000000Z
 SUMMARY:BNK48 & CGM48 Special Single "Kimi to Doko ka e Ikitai" Roadshow
@@ -2311,11 +2273,11 @@ UID:ev-santy-factory@48thdb
 DTSTAMP:20261225T000000Z
 SUMMARY:BNK48 & CGM48 Santy Factory
 LOCATION:MCC HALL\, THE MALL LIFESTORE BANGKAPI\, Bangkok
-DESCRIPTION:รอประกาศรายชื่อ\n• งานค
- ริสต์มาสของ BNK48 และ CGM48 วันที่
-  25–27 ธ.ค. 2026\n• เวลา กิจกรรม และ
- รายชื่อสมาชิกรอประกาศ\n\nhttps:/
- /48thdb.com/event/ev-santy-factory
+DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
+ M48 ทุกคน\n• งานคริสต์มาสของ BNK
+ 48 และ CGM48 วันที่ 25–27 ธ.ค. 2026\n• เวล
+ าและกิจกรรมรอประกาศ\n\nhttps://48thd
+ b.com/event/ev-santy-factory
 URL:https://48thdb.com/event/ev-santy-factory
 DTSTART;VALUE=DATE:20261225
 DTEND;VALUE=DATE:20261228
