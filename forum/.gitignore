@@ -1,0 +1,5 @@
+node_modules/
+.wrangler/
+.dev.vars
+# the repo root ignores public/ (the site deploy stages into it); this one is the board's own files
+!public/

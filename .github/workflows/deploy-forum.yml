@@ -1,0 +1,63 @@
+# Deploy 48thForum (forum/), the fans' web board, by hand: Actions → Deploy 48thForum → Run workflow.
+# The first run creates its D1 database "48thforum"; every run applies new migrations, then deploys.
+# It also creates the R2 bucket for pictures (48thforum-images) if missing.
+# Uses the site's CLOUDFLARE_API_TOKEN, which needs Workers Scripts: Edit, D1: Edit and Workers R2 Storage: Edit.
+name: Deploy 48thForum
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-forum
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: forum
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 8e5e921b23884747506b07a3ba030dcf
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test the post markup
+        run: node --test test/markup.test.js
+
+      - name: Find or create the database
+        run: |
+          find_id() {
+            npx --yes wrangler@4.135.0 d1 list --json | node -e '
+              let s = ""; process.stdin.on("data", (d) => (s += d)).on("end", () => {
+                const list = JSON.parse(s.slice(s.indexOf("[")));
+                const db = list.find((x) => x.name === "48thforum");
+                process.stdout.write(db ? db.uuid : "");
+              });'
+          }
+          id=$(find_id)
+          if [ -z "$id" ]; then
+            npx --yes wrangler@4.135.0 d1 create 48thforum
+            id=$(find_id)
+          fi
+          if [ -z "$id" ]; then echo "::error::Could not find or create the D1 database '48thforum' (does the token have D1: Edit?)"; exit 1; fi
+          sed -i "s/REPLACE_WITH_D1_ID/$id/" wrangler.toml
+          echo "D1 database: $id"
+
+      - name: Find or create the picture bucket
+        run: |
+          if ! npx --yes wrangler@4.135.0 r2 bucket list | grep -q "48thforum-images"; then
+            npx --yes wrangler@4.135.0 r2 bucket create 48thforum-images || {
+              echo "::error::Could not create the R2 bucket 48thforum-images. Turn R2 on once in the Cloudflare dashboard (R2 → Purchase/enable), and give the token Workers R2 Storage: Edit."; exit 1; }
+          fi
+
+      - name: Apply migrations
+        run: npx --yes wrangler@4.135.0 d1 migrations apply 48thforum --remote
+
+      - name: Deploy
+        run: npx --yes wrangler@4.135.0 deploy
