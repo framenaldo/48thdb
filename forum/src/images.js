@@ -107,6 +107,27 @@ async function dropKeys(env, keys, origin = '') {
   }
 }
 
+// A member's own picture: one they uploaded themselves, not yet in a post. The old one goes.
+export async function setAvatar(env, user, key, origin = '') {
+  if (!env.IMAGES || !/^[A-Za-z0-9_-]{16,32}$/.test(String(key))) return false;
+  const img = await env.DB.prepare('SELECT key FROM images WHERE key = ? AND user_id = ? AND (post_id IS NULL OR post_id = ?)')
+    .bind(key, user.id, -user.id).first();
+  if (!img) return false;
+  await env.DB.batch([
+    env.DB.prepare('UPDATE images SET post_id = ? WHERE key = ?').bind(-user.id, key),
+    env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(key, user.id),
+  ]);
+  if (user.avatar && user.avatar !== key) await dropKeys(env, [user.avatar], origin);
+  return true;
+}
+
+export async function clearAvatar(env, userId, origin = '') {
+  const u = await env.DB.prepare('SELECT avatar FROM users WHERE id = ?').bind(userId).first();
+  if (!u?.avatar) return;
+  await env.DB.prepare("UPDATE users SET avatar = '' WHERE id = ?").bind(userId).run();
+  if (env.IMAGES) await dropKeys(env, [u.avatar], origin);
+}
+
 // nightly: pictures uploaded but never posted, a day on
 export async function dropLoose(env) {
   if (!env.IMAGES) return;

@@ -53,6 +53,6 @@ test('pictures: our own addresses only, at most ten, sized', () => {
   assert.doesNotMatch(render('[img="onerror=alert(1)]abcdefghijklmnop[/img]'), /onerror=alert\(1\)[^<]*<img/);
   const many = Array.from({ length: 12 }, (_, i) => `[img]abcdefghijklmn${String(i).padStart(2, '0')}[/img]`).join('');
   assert.equal((render(many).match(/<img /g) || []).length, 10);
-  assert.equal(plain('ก่อน [img=10x10]abcdefghijklmnop[/img] หลัง'), 'ก่อน 📷 หลัง');
+  assert.equal(plain('ก่อน [img=10x10]abcdefghijklmnop[/img] หลัง'), 'ก่อน [รูป] หลัง');
   assert.equal(quoteOf('x', 'รูป [img]abcdefghijklmnop[/img]'), '[quote="x"]รูป [รูป][/quote]\n');
 });

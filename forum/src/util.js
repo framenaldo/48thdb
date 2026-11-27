@@ -7,12 +7,14 @@ export const now = () => Math.floor(Date.now() / 1000);
 
 export const num = (n) => String(Math.trunc(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-// ---- dates, in Thai time (UTC+7, no daylight saving) ----
+// ---- dates, in Thai time (UTC+7, no daylight saving) and the Thai year (พ.ศ.), as Thai boards write them:
+// "27 พ.ย. 69 20:38" in lists, "พ.ย. 2569" for when someone joined ----
 const MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 const TZ = 7 * 3600;
 const parts = (ts) => {
   const d = new Date((ts + TZ) * 1000);
-  return { y: d.getUTCFullYear(), m: d.getUTCMonth(), d: d.getUTCDate(), H: d.getUTCHours(), M: d.getUTCMinutes() };
+  const y = d.getUTCFullYear() + 543;
+  return { y, yy: String(y).slice(-2), m: d.getUTCMonth(), d: d.getUTCDate(), H: d.getUTCHours(), M: d.getUTCMinutes() };
 };
 const hm = (p) => `${String(p.H).padStart(2, '0')}:${String(p.M).padStart(2, '0')}`;
 const day = (ts) => Math.floor((ts + TZ) / 86400);
@@ -25,11 +27,11 @@ export function when(ts, at = now()) {
   const p = parts(ts);
   if (day(ts) === day(at)) return `วันนี้ ${hm(p)}`;
   if (day(at) - day(ts) === 1) return `เมื่อวาน ${hm(p)}`;
-  return `${p.d} ${MON[p.m]} ${p.y} ${hm(p)}`;
+  return `${p.d} ${MON[p.m]} ${p.yy} ${hm(p)}`;
 }
-export const dateTh = (ts) => { const p = parts(ts); return `${p.d} ${MON[p.m]} ${p.y}`; };
+export const dateTh = (ts) => { const p = parts(ts); return `${p.d} ${MON[p.m]} ${p.yy}`; };
 export const monthTh = (ts) => { const p = parts(ts); return `${MON[p.m]} ${p.y}`; };
-export const clockTh = (ts) => { const p = parts(ts); return `${p.d} ${MON[p.m]} ${p.y} ${hm(p)}`; };
+export const clockTh = (ts) => { const p = parts(ts); return `${p.d} ${MON[p.m]} ${p.yy} ${hm(p)} น.`; };
 
 // ---- crypto ----
 const enc = new TextEncoder();
