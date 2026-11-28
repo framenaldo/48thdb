@@ -362,7 +362,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .is-feedback{ order:8; }
   /* the live vote leads, the results right under it; while a round is being
      read out the results lead and the vote takes its old place among today's */
-  .feed-cols .is-gevote{ order:0; } .feed-cols .feed-ge, .feed-cols .feed-dash, .feed-cols .is-iamtl{ order:1; }
+  .feed-cols .is-gevote{ order:0; } .feed-cols .feed-ge, .feed-cols .feed-dash, .feed-cols .is-iamtl, .feed-cols .is-trend{ order:1; }
   .feed-cols.is-ge-live .feed-ge{ order:0; } .feed-cols.is-ge-live .is-gevote{ order:1; }
 
 
@@ -1039,6 +1039,16 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* beside the date and time on an event's sheet; the meta row keeps room for the share and close buttons only where the body sits beside them */
   .ck-chip{ display:inline-flex; align-items:center; gap:4px; font:inherit; font-size:11.5px; font-weight:800; line-height:inherit; padding:3px 11px; border-radius:var(--r-pill); border:2px solid var(--pink); background:var(--pink); color:#fff; cursor:pointer; white-space:nowrap; box-shadow:0 2px 6px color-mix(in srgb, #c9457c 60%, transparent); transition:transform .08s, box-shadow .08s; }
   .ck-chip:active{ transform:translateY(2px); box-shadow:none; }
+  /* กำลังมาแรง: a row of faces, each with why under her name; on a phone it runs to the screen's edge like the birthday row */
+  .trend-row{ display:flex; gap:12px; overflow-x:auto; scrollbar-width:none; margin:0 -20px; padding:4px 20px 6px; }
+  .trend-row::-webkit-scrollbar{ display:none; }
+  @media (min-width:1024px){ .trend-row{ margin:0; padding:4px 0 6px; flex-wrap:wrap; overflow:visible; } }
+  .trend-face{ flex:none; width:88px; display:flex; flex-direction:column; align-items:center; gap:3px; padding:0; background:none; border:0; font:inherit; color:var(--ink); cursor:pointer; text-align:center; transition:transform .1s; }
+  .trend-face:active{ transform:scale(.95); }
+  .trend-face .trend-ph{ width:74px; height:74px; border-radius:50%; position:relative; overflow:hidden; display:grid; place-items:center; color:#fff; font-size:24px; font-weight:800; border:3px solid var(--c); box-shadow:0 3px 0 color-mix(in srgb, var(--c) 40%, transparent); flex:none; }
+  .trend-face .trend-ph .avatar-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .trend-face b{ font-size:13.5px; font-weight:800; line-height:1.2; margin-top:4px; }
+  .trend-face small{ font-size:11px; font-weight:700; color:var(--ink-soft); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
   /* ไปงานนี้: a pill in the event's own colour beside the date; ticked when the reader is going */
   .go-chip{ display:inline-flex; align-items:center; gap:4px; font:inherit; font-size:11.5px; font-weight:800; line-height:inherit; padding:3px 11px; border-radius:var(--r-pill); border:2px solid var(--c, var(--teal)); background:var(--card); color:var(--c, var(--teal)); cursor:pointer; white-space:nowrap; transition:transform .08s, box-shadow .08s; box-shadow:0 2px 0 color-mix(in srgb, var(--c, var(--teal)) 45%, transparent); }
   .go-chip:active{ transform:translateY(2px); box-shadow:none; }
@@ -5375,6 +5385,7 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-bk.bk-works{ background:linear-gradient(150deg, #C8902A, #3a1a10 130%); }
   .dash-bk .bk-list{ display:flex; flex-direction:column; gap:5px; margin:32px 0 auto; }
   .dash-bk .bk-row{ display:flex; flex-direction:column; padding:5px 9px; border-radius:var(--r-sm); background:rgba(0,0,0,.28); }
+  @media (max-width:599px){ .dash-bk.bk-works .bk-row:nth-child(n+3){ display:none; } }   /* a phone's square holds two */
   .dash-bk .bk-row b{ font-size:12.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.2; } .dash-bk .bk-row small{ font-size:11px; opacity:.8; }
   .dash-bk.bk-quiz{ background:linear-gradient(140deg, #E4457E, #2E8C82); } .dash-bk.bk-oshi:not(:has(.bk-img)){ background:linear-gradient(150deg, #E4457E, #1b1224 120%); }
   .dash-t.is-bday .dash-l small, .dash-t.is-oshi .dash-l small, .dash-t.is-iam .dash-l small{ overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; white-space:normal; }
@@ -13300,6 +13311,7 @@ function checkSocial(){
     if(!j || _socOn) return;
     _socOn = true; _socOshi = j.oshi || {};
     socialOshiSync();
+    loadTrend();
     if(state.selectedEvent || state.selectedMember) renderMain();
   }).catch(() => {});
 }
@@ -13409,6 +13421,95 @@ function socialOshiSync(force){
       if(r.ok) try{ localStorage.setItem(key, JSON.stringify({ v:now, at:Date.now() })); }catch(e){}
     }catch(e){}
   }, 1500);
+}
+/* ============================= กำลังมาแรง =============================
+   A row of seven faces on the home page: the current members with the most going on this week; why is not shown,
+   not even on hover (the owner's word); only a screen reader says it. No ranks, no numbers, no arrows down: only good news (the owner keeps members from being compared in
+   public). What counts: her birthday this week; events with her in the next 7 days (not whole-group line-ups); a new
+   release in the last 3 weeks, more as its centre; a video of hers passing a round number of views this week; her
+   iAM48 posts in the last two days; her sheet opened more on 48thDb this week than the week before, and readers newly
+   taking her as oshi (api.48thdb.com/social/trend, kept in localStorage `48thdb-trend` for the first paint). */
+let TREND = (() => { try{ return JSON.parse(localStorage.getItem('48thdb-trend') || 'null'); }catch(e){ return null; } })(), _trendAt = 0;
+function loadTrend(){
+  if(!_socOn || Date.now() - _trendAt < 600000) return;
+  _trendAt = Date.now();
+  fetch(`${LIVE_API}/social/trend`).then(r => r.ok ? r.json() : null).then(j => {
+    if(!j) return;
+    const was = JSON.stringify(trendPick().map(x => x.m.id));
+    TREND = j; try{ localStorage.setItem('48thdb-trend', JSON.stringify(j)); }catch(e){}
+    if(state.view === 'feed' && JSON.stringify(trendPick().map(x => x.m.id)) !== was){
+      const z = document.querySelector('.is-trend .trend-row'); if(z) z.outerHTML = trendRow();
+    }
+  }).catch(() => {});
+}
+// a member's sheet opened: told to the Worker once per visit
+const _trendSeen = new Set();
+function trendView(id){
+  if(!_socOn || !id || _trendSeen.has(id)) return;
+  _trendSeen.add(id);
+  fetch(`${LIVE_API}/social/view`, { method:'POST', body:JSON.stringify({ m:id }) }).catch(() => {});
+}
+function trendPick(){
+  const en = isEN(), iso = toYmd(todayStart()), today = todayStart(), wk = toYmd(new Date(today.getTime() + 7 * 864e5));
+  const act = activeMembers(), score = {}, why = {};
+  const add = (id, pts, label) => { if(!pts) return; score[id] = (score[id] || 0) + pts; if(!why[id] || why[id].p < pts) why[id] = { p:pts, t:label }; };
+  act.forEach(m => {
+    if(!m.birthday) return;
+    const d = daysUntilBirthday(m, today);
+    if(d === 0 || m.birthday.slice(5) === iso.slice(5)) add(m.id, 8, en ? 'Birthday today' : 'วันเกิดวันนี้');
+    else if(d > 0 && d <= 7) add(m.id, 6 - d * .4, en ? `Birthday in ${d} day${d > 1 ? 's' : ''}` : (d === 1 ? 'วันเกิดพรุ่งนี้' : `วันเกิดอีก ${d} วัน`));
+  });
+  const actIds = new Set(act.map(m => m.id)), evCount = {};
+  SEED_SCHEDULE.filter(e => !e.cancelled && !shopOnly(e) && !e.period && e.start <= wk && eventLastDay(e) >= iso).forEach(e => {
+    const ids = (e.members || []).filter(id => actIds.has(id));
+    if(!ids.length || lineupGroups(ids).whole.length) return;   // a whole group says nothing about anyone
+    ids.forEach(id => { (evCount[id] = evCount[id] || []).push(e); });
+  });
+  Object.entries(evCount).forEach(([id, list]) => add(id, Math.min(3, list.length) * 1.6,
+    list.length === 1 ? (en ? `${eventShortName(list[0])} this week` : `${eventShortName(list[0])} สัปดาห์นี้`) : (en ? `${list.length} events this week` : `${list.length} งานสัปดาห์นี้`)));
+  const since = toYmd(new Date(today.getTime() - 21 * 864e5));
+  [...ALL_WORKS(), ...SEED_SPECIALS].filter(w => w.date && w.date >= since && w.date <= iso).forEach(w => {
+    const wt = String(w.title).replace(/\s*[\(（].*$/, '').trim() || w.title;   // "สถานีเชียงใหม่", not its English name in brackets
+    (SEED_SENBATSU[w.id] || []).forEach((t, i) => {
+      if(i > 0) return;
+      (t.members || []).forEach(id => add(id, (t.centers || []).includes(id) ? 4 : 2,
+        (t.centers || []).includes(id) ? (en ? `Centre of ${wt}` : `เซ็นเตอร์ ${wt}`) : (en ? `New song ${wt}` : `เพลงใหม่ ${wt}`)));
+    });
+  });
+  if(typeof ytMilestones === 'function') ytMilestones().filter(x => Date.now() - ytAt(x.at) < 7 * 864e5).forEach(x => {
+    const t = (SEED_SENBATSU[x.workId] || [])[x.i];
+    (t ? t.members || [] : []).forEach(id => add(id, 2.5, en ? `${x.work.title} passed ${milestoneWords(x.mark)}` : `${x.work.title} ครบ ${milestoneWords(x.mark)}`));
+  });
+  const posts = {};
+  ((IAMTL && IAMTL.posts) || []).filter(p => Date.now() - Date.parse(p.at) < 2 * 864e5).forEach(p => { posts[p.m] = (posts[p.m] || 0) + 1; });
+  Object.entries(posts).forEach(([id, n]) => add(id, Math.min(2, n * .6), en ? 'Posting on iAM48' : 'เพิ่งโพสต์ iAM48'));
+  if(TREND){
+    const now = TREND.now || {}, before = TREND.before || {};
+    Object.keys(now).forEach(id => { const up = (now[id] || 0) - (before[id] || 0);
+      if(up >= 3) add(id, Math.min(4, up / 2), en ? 'Opened more this week' : 'คนเปิดดูมากขึ้น'); });
+    const on = TREND.oshiNow || {}, then = TREND.oshiThen || {};
+    Object.keys(on).forEach(id => { const up = (on[id] || 0) - (then[id] || 0);
+      if(up >= 1) add(id, Math.min(4, up * 1.5), en ? 'New oshi this week' : 'มีคนเพิ่มเป็นโอชิ'); });
+  }
+  // the same order all day: ties are broken by the day, not by chance
+  const h = s => { let x = 0; for(const c of s) x = (x * 31 + c.charCodeAt(0)) | 0; return x; };
+  return act.filter(m => actIds.has(m.id) && score[m.id] >= 2)
+    .sort((a, b) => score[b.id] - score[a.id] || h(iso + a.id) - h(iso + b.id)).slice(0, 7)   // seven fill one row on a wide screen
+    .map(m => ({ m, why:why[m.id].t }));
+}
+function trendRow(){
+  const list = trendPick();
+  return `<div class="trend-row">${list.map(({ m, why }) => { const g = getGroup(m.groupId) || {};
+    // the reason is not shown at all, not even on hover (the owner's word): only a screen reader says it
+    return `<button class="trend-face" style="--c:${g.color || 'var(--pink)'}" data-action="open-member" data-id="${escapeAttr(m.id)}" aria-label="${escapeAttr(nickName(m) + ' · ' + why)}">
+      ${renderAvatar(m, 'trend-ph', g.color)}<b>${escapeHtml(nickName(m))}</b></button>`; }).join('')}</div>`;
+}
+function renderTrendZone(){
+  loadTrend();
+  if(filteringByOshi()) return '';
+  const row = trendRow();
+  if(!row.includes('trend-face')) return '';
+  return `<section class="feed-block is-trend"><h2 class="section-label">${isEN() ? 'On the rise this week' : 'กำลังมาแรงสัปดาห์นี้'}</h2>${row}</section>`;
 }
 // the profile's book
 function renderStampBook(){
@@ -16915,12 +17016,7 @@ function renderHomeDash(ge){
   const photo = m => m.photo ? `<img class="bk-img" src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
   const bk = (kind, attrs, inner, bg) => `<button class="dash-ge dash-bk bk-${kind}" data-tile="ge" data-kind="${kind}" data-noloc ${attrs}${bg ? ` style="--bk:${bg}"` : ''}>${inner}</button>`;
   const bigKinds = {
-    rand: () => { const m = mem.slice().sort((x, y) => qzHash(toYmd(todayStart()) + x.id) - qzHash(toYmd(todayStart()) + y.id))[0]; if(!m) return '';
-      const g = getGroup(m.groupId), age = m.birthday ? calcAge(m.birthday) : null;
-      return bk('rand', `data-action="open-member" data-id="${m.id}"`, `${photo(m)}<span class="bk-shade"></span>
-        <span class="bk-top"><i>${en ? 'Member of the day' : 'เมมเบอร์ประจำวัน'}</i><small>${en ? 'new each day' : 'สุ่มใหม่ทุกวัน'}</small></span>
-        <span class="bk-main"><b>${escapeHtml(nickName(m))}</b><span>${escapeHtml(g.name)}${m.gen ? ` · ${en ? 'Gen ' + m.gen : 'รุ่น ' + m.gen}` : ''}${age != null ? ` · ${en ? age + ' yrs' : age + ' ปี'}` : ''}</span>
-        ${m.hometown ? `<small>${escapeHtml(m.hometown)}</small>` : ''}</span><span class="bk-go">${en ? 'Open →' : 'ดูโปรไฟล์ →'}</span>`, g.color); },
+    // the member of the day (rand) came off the dashboard when กำลังมาแรงสัปดาห์นี้ took its part (the owner's word, 28 Nov 2026)
     oshi: () => { const k = (state.kamiOshi && getMember(state.kamiOshi)) || (state.oshi[0] && getMember(state.oshi[0])) || null;
       if(!k) return bk('oshi', 'data-action="nav" data-view="profile"', `<span class="bk-main"><b>${en ? 'My oshi' : 'โอชิของฉัน'}</b><span>${en ? 'Pick a Kami Oshi and she stands here' : 'เลือก Kami Oshi แล้วเธอจะมาอยู่ตรงนี้'}</span></span><span class="bk-go">${en ? 'Open my profile →' : 'ไปโปรไฟล์ →'}</span>`, '#E4457E');
       const g = getGroup(k.groupId), ev = SEED_SCHEDULE.filter(e => !shopOnly(e) && !e.period && !e.cancelled && eventLastDay(e) >= iso && askOn(e, k.id)).sort((a, b) => a.start.localeCompare(b.start))[0];
@@ -16937,7 +17033,9 @@ function renderHomeDash(ge){
     mosaic: () => { const day = toYmd(todayStart()), faces = mem.slice().sort((x, y) => qzHash(day + 'm' + x.id) - qzHash(day + 'm' + y.id)).slice(0, 9);
       return bk('mosaic', 'data-action="nav" data-view="browse"', `<span class="bk-faces">${faces.map(x => renderAvatar(x, 'bk-face', getGroup(x.groupId).color)).join('')}</span>
         <span class="bk-main"><b>${mem.length} ${en ? 'members' : 'สมาชิก'}</b><span>BNK48 ${nb} · CGM48 ${mem.length - nb}</span></span><span class="bk-go">${en ? 'See everyone →' : 'ดูทุกคน →'}</span>`); },
-    works: () => { const ws = ALL_WORKS().slice().sort((x, y) => y.year - x.year || workSeq(y) - workSeq(x)).slice(0, 3);
+    // the newest releases by date, the digital and special singles too (Chiang Mai Station is newer than any single)
+    works: () => { const when = w => w.date || (w.year ? w.year + '-00' : ''), ws = [...ALL_WORKS(), ...SEED_SPECIALS].filter(w => SEED_SENBATSU[w.id] && !w.ir)
+        .sort((x, y) => when(y).localeCompare(when(x)) || workSeq(y) - workSeq(x)).slice(0, 3);
       return bk('works', 'data-action="nav" data-view="discography"', `<span class="bk-top"><i>${en ? 'Latest releases' : 'ผลงานล่าสุด'}</i></span>
         <span class="bk-list">${ws.map(w => `<span class="bk-row"><b>${escapeHtml(w.title)}</b><small>${escapeHtml(getGroup(w.groupId).name)} · ${w.year}</small></span>`).join('')}</span>
         <span class="bk-go">${en ? 'All works →' : 'ผลงานทั้งหมด →'}</span>`); },
@@ -16972,18 +17070,15 @@ function renderHomeDash(ge){
     ge: sl => tile(`data-tile="${sl}" data-kind="ge" data-action="open-ge"`, 'is-ge', ICONS.ballot, 'GE', 'GE2026', en ? 'candidates, songs, results' : 'ผู้สมัคร เพลง ผลเลือกตั้ง'),
     me: sl => { const u = state.account && state.account.loggedIn;
       return tile(`data-tile="${sl}" data-kind="me" data-action="nav" data-view="profile"`, 'is-me', ICONS.profile, state.oshi.length || '–', en ? 'My oshi' : 'โอชิของฉัน', u ? (en ? 'open my profile' : 'เปิดโปรไฟล์ของฉัน') : (en ? 'sign in to keep them' : 'เข้าสู่ระบบเพื่อเก็บไว้')); },
-    rand: sl => { const m = mem.slice().sort((x, y) => qzHash(toYmd(todayStart()) + x.id) - qzHash(toYmd(todayStart()) + y.id))[0];
-      return m ? `<button class="dash-t is-rand${m.photo ? ' is-pic is-face' : ''}" data-tile="${sl}" data-kind="rand" data-noloc data-action="open-member" data-id="${m.id}">
-        ${m.photo ? `<img src="${escapeAttr(m.photo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="dash-q-faces is-one">${renderAvatar(m, 'dash-q-face', getGroup(m.groupId).color)}</span>`}
-        <span class="dash-l">${escapeHtml(nickName(m))}<small>${en ? 'a new member each day · tap to open' : 'สุ่มใหม่ทุกวัน · แตะดูโปรไฟล์'}</small></span></button>` : ''; },
     ask: sl => tile(`data-tile="${sl}" data-kind="ask" data-action="focus-search"`, 'is-ask', ICONS.star, '?', en ? 'Ask' : 'ถามเว็บ', en ? 'type a question' : 'พิมพ์คำถาม'),
   };
   const L = (myLayout().dash || {}).kinds || {};
   const bigKind = ((myLayout().dash || {}).kinds || {}).ge;
   const vote = SEED_SCHEDULE.find(e => e.id === GE_PAGE.vote), night = SEED_SCHEDULE.find(e => e.id === GE_PAGE.results);
   const waitGE = !ge && !_geLoaded && !Object.keys(state.geRounds || {}).length && vote && night && iso >= vote.start && iso <= eventLastDay(night);
-  // the big square once the GE summary is gone (1 Dec 2026): the member of the day, unless the reader picked another
-  const bigNow = bigKind || (!ge && !waitGE && geHomeOver() ? 'rand' : '');
+  // the big square once the GE summary is gone (1 Dec 2026): the latest releases, unless the reader picked another
+  // (a kind that is gone, like the member of the day, counts as not picked)
+  const bigNow = (bigKind && bigKinds[bigKind] ? bigKind : '') || (!ge && !waitGE && geHomeOver() ? 'works' : '');
   // a slot never repeats what the big square or an earlier slot shows: a default that would, falls back to the slot's own kind
   const used = new Set(bigNow && bigKinds[bigNow] ? [bigNow] : []);
   const slot = k => { let pick = L[k] || DASH_DEFAULT[k] || k;
@@ -23003,6 +23098,7 @@ function renderFeed(){
     ${geLive ? '' : gecHomeCard(isEN())}
     ${(() => { const ge = renderHomeGE(); return ge.includes('feed-dash') ? ge : ge + renderHomeDash(null); })()}
     ${renderTimelineZone()}
+    ${renderTrendZone()}
 
     ${nowOn.length ? `
     <section class="feed-block today-hero-block">
@@ -23237,6 +23333,7 @@ function sheetBirthdayFx(root){
 function renderDetailModal(){
   const m = getMember(state.selectedId);
   if(!m) return '';
+  trendView(m.id);
   const g = getGroup(m.groupId);
   const t = getTeam(m.teamId);
   const isOshi = state.oshi.includes(m.id);
@@ -24558,6 +24655,7 @@ const LAYOUT_ZONES = {
     { k:'results', cls:'feed-ge', th:'ผลเลือกตั้ง', en:'Election results' },
     { k:'dash', cls:'feed-dash', th:'แดชบอร์ด', en:'Dashboard' },
     { k:'iamtl', cls:'is-iamtl', th:'iAM48 ล่าสุด', en:'Latest on iAM48' },
+    { k:'trend', cls:'is-trend', th:'กำลังมาแรงสัปดาห์นี้', en:'On the rise this week' },
     { k:'fanfest', cls:'is-fflive', th:'Fan Festival', en:'Fan Festival' },
     { k:'today', cls:'today-hero-block', th:'งานวันนี้', en:'Today' },
     { k:'overtoday', cls:'is-over-today', th:'จบไปแล้ววันนี้', en:'Over today' },
@@ -24725,10 +24823,11 @@ const bgLabel = p => { const m = /^bg-(pick|now):(.+)$/.exec(p), b = m && (m[2] 
 const DASH_KINDS = [{ k:'quiz', th:'หาโอชิจากดวง', en:'Find your oshi' }, { k:'cal', th:'งานใน 7 วัน', en:'Events this week' }, { k:'shop', th:'ร้านค้า', en:'Shop' },
   { k:'gal', th:'แกลเลอรี', en:'Gallery' }, { k:'members', th:'สมาชิกทั้งหมด', en:'All members' }, { k:'work', th:'ซิงเกิลและอัลบั้ม', en:'Songs & albums' },
   { k:'stats', th:'สถิติ', en:'Stats' }, { k:'org', th:'วงและทีม · ผังวง', en:'Groups & org chart' }, { k:'ge', th:'หน้า GE2026', en:'GE2026 page' },
-  { k:'me', th:'โอชิของฉัน', en:'My oshi' }, { k:'rand', th:'เมมเบอร์ประจำวัน', en:'Member of the day' }, { k:'ask', th:'ถาม 48thDb (ค้นหาด้วยคำถาม)', en:'Ask 48thDb' }];
-// the member of the day took the shop's tile and the shop took the gallery's (the owner's word, 5 Nov; the gallery is a ☰ menu entry too); the reader can put either back
-const DASH_DEFAULT = { shop:'rand', gal:'shop' };
-const DASH_BIG = [{ k:'ge', th:'ผลด่วนเลือกตั้ง', en:'Election results' }, { k:'rand', th:'เมมเบอร์ประจำวัน', en:'Member of the day' }, { k:'oshi', th:'โอชิของฉัน', en:'My oshi' },
+  { k:'me', th:'โอชิของฉัน', en:'My oshi' }, { k:'ask', th:'ถาม 48thDb (ค้นหาด้วยคำถาม)', en:'Ask 48thDb' }];
+// the shop took the gallery's tile (the owner's word, 5 Nov; the gallery is a ☰ menu entry too); the member of the day, which had the
+// shop's tile, came off when กำลังมาแรงสัปดาห์นี้ took its part (28 Nov 2026) and the stats went there; the reader can pick any kind
+const DASH_DEFAULT = { shop:'stats', gal:'shop' };
+const DASH_BIG = [{ k:'ge', th:'ผลด่วนเลือกตั้ง', en:'Election results' }, { k:'oshi', th:'โอชิของฉัน', en:'My oshi' },
   { k:'hub', th:'GE2026 · นับถอยหลัง', en:'GE2026 · countdown' }, { k:'mosaic', th:'สมาชิกทั้งหมด', en:'All members' }, { k:'works', th:'ผลงานล่าสุด', en:'Latest releases' }, { k:'quiz', th:'หาโอชิจากดวง', en:'Find your oshi' }];
 const DASH_TILES = [{ k:'ge', th:'ผลด่วน', en:'Results' }, { k:'quiz', th:'หาโอชิ', en:'Find your oshi' }, { k:'cal', th:'ปฏิทิน', en:'Calendar' },
   { k:'shop', th:'ร้านค้า', en:'Shop' }, { k:'gal', th:'แกลเลอรี', en:'Gallery' }];

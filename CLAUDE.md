@@ -79,18 +79,19 @@ Everything else is in forum/README.md.
   Zones are matched by class (home) or `data-zone` (profile) and ordered with
   CSS `order`, so a new home section needs a row in `LAYOUT_ZONES.home` or it
   can't be moved.
+- **กำลังมาแรงสัปดาห์นี้** (zone `trend`, `renderTrendZone`, `trendPick`): seven faces with names, no ranks, no numbers and no reason shown (not even on hover — the owner's word; a screen reader says it). Scored from birthdays this week, events with her in the next 7 days (not whole-group line-ups), new releases (centre more), video milestones, iAM48 posts, and from api.48thdb.com/social/trend: sheet opens this week vs last (`trendView`, once a day per address) and new oshi.
+- **ไปงานนี้ · เช็กอินแล้ว · โอชิเดียวกัน** (`renderGoingBtn`, `renderCheckinCount`, `renderOshiCount`, worker/social.js): counts only, never who; going needs sign-in and is kept in `users/<uid>.going`; a reader with reminders on gets one for every event they are going to (push prefs `ev`). The words say คน, never แฟน (the owner's word).
 - **Dashboard tiles** are arranged one by one while arranging the home page:
   `layout.dash = { order, hidden }` over `DASH_TILES` (results, quiz, calendar,
   shop, gallery), picked up where it is — a held press on a phone, a drag with a mouse —
   and carried over the others (`tileDown`…`tileDrop`), with an eye in its corner
   (`applyDash`, `dash-toggle`). Each small slot (quiz, cal, shop, gal) also takes
   another kind of tile — a way into another part of the site (members, singles,
-  stats, groups, the GE2026 page, my oshi, member of the day, ask) and nothing the
+  stats, groups, the GE2026 page, my oshi, ask) and nothing the
   home page already shows — from a sheet behind the ⇄ button
   (`DASH_KINDS`, `openDashKindSheet`, `layout.dash.kinds`); the shop's slot shows the
-  member of the day by default (`DASH_DEFAULT`); the big results square also
-  takes a look of its own (`DASH_BIG`, `bigKinds`, `layout.dash.kinds.ge`): member of
-  the day on her photo, my oshi, GE2026 countdown, all members, latest releases, the
+  stats by default (`DASH_DEFAULT`; the member of the day came off the dashboard on 28 Nov 2026, when กำลังมาแรงสัปดาห์นี้ took its part); the big results square also
+  takes a look of its own (`DASH_BIG`, `bigKinds`, `layout.dash.kinds.ge`): my oshi, GE2026 countdown, all members, latest releases, the
   quiz; ค่าเดิม on the home page resets them too. A new tile needs a
   `data-tile` and a row in `DASH_TILES`.
 - **Biographies.** Each member's sheet has a short biography (IMDb-style)
@@ -445,7 +446,7 @@ translated. Everything else in Thai.
 
 **A candidate's facts sheet, on for everyone** (the owner's word, 15 Nov 2026; `?gefact=off` turns it off on one device, kept, `=on` back): a row of the Final Results opens a sheet of her figures and facts instead of her profile (`openGeFact`, `geFactList`, `geFactData`) — score, share, gaps, the three rounds, her earlier elections, her form, and facts counted from the page's data (first to be No. 1 or a centre twice, the song and whose choice it was, firsts, streaks, bests). Only good news is written as a fact; a missed aim or a fall shows only in the plain tables. One line is the owner's own knowledge, not counted: the first time two centres wanted one song. **Voters** (16 Nov 2026): the organiser's own list of every vote (43,581 votes, 5,649 wallets, each with the candidate's name — the chain itself still shows only salted hashes) gave `GE_VOTERS` [votes cast, wallets] a candidate, shown as two cells and a fact. Who voted is private: the wallets and wallet codes are in KV only (`gev:<member id>`, put there by hand with `wrangler kv bulk put`), never in the page or this public repo, and `GET api.48thdb.com/gevoters?id=` answers only the owner's sign-in (the sheet's 🔒 row, drawn only when `state.isOwner`). Never print a wallet or its code anywhere a visitor can see. **Shared by code** (the owner's wish, 16 Nov 2026): the owner makes a code on their profile (`openGevCode`, POST `/gevoters` `act:new|list|revoke`; KV `gek:<code>`, 8 characters, one use, 7 days), a signed-in reader types it on their own profile (`act:redeem`, 10 tries an hour) and that account may read the wallets too (`gea:<uid>`) until the owner takes it back; `gevMay()` (the owner, or localStorage `48thdb-gev` = the uid) only decides what is drawn — the Worker decides who is answered. The owner's list sorts, searches by code or address, opens a row to the full code and address and whom that wallet voted for (`geWalletWho`, `?w=` an address or a wallet code; KV `gew:<address>`, `gewc:<code>`), and links to the wallet's card on the vote page, where the owner alone also sees "โหวตให้ใคร" and may type a wallet code in the look-up box.
 
-**The home page's GE2026 summary** (the owner's choice, 18 Nov 2026): short — the Kami 7 and the link to all 36 (`GE_HOME_SHORT`) — and gone by itself on 1 Dec 2026 (`GE_HOME_UNTIL`, `geHomeOver`); from then the dashboard's big square shows the member of the day unless the reader picked another, and a dashboard slot never repeats what the big square or an earlier slot shows.
+**The home page's GE2026 summary** (the owner's choice, 18 Nov 2026): short — the Kami 7 and the link to all 36 (`GE_HOME_SHORT`) — and gone by itself on 1 Dec 2026 (`GE_HOME_UNTIL`, `geHomeOver`); from then the dashboard's big square shows the latest releases (by date, digital and special singles too) unless the reader picked another, and a dashboard slot never repeats what the big square or an earlier slot shows.
 
 **After the GE2026 (16 Nov 2026)** the owner took the candidate card (poster and clip) off the member sheet; past results stay ("ผลเลือกตั้งที่ผ่านมา" on the sheet, the GE page's results tab). Other GE2026 spots (header menu, home tile, the page itself) are not yet taken off: ask which.
 
