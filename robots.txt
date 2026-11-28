@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://48thdb.com/sitemap.xml
+Sitemap: https://48thdb.com/sitemap-pages.xml

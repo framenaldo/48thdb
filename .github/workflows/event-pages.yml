@@ -1,0 +1,50 @@
+# Rebuild the plain pages for search engines (e/<id>, s/<id>, sitemap-pages.xml)
+# whenever the schedule or the songs in index.html change, so a new event can be
+# found on Google without anyone remembering to run the script.
+name: Event and song pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['index.html', 'scripts/make-event-pages.mjs']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write     # to start "Deploy site" after a push, below
+
+concurrency:
+  group: event-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build pages
+        env:
+          CHROME: /usr/bin/google-chrome
+        run: |
+          node .claude/serve.mjs 8823 &
+          sleep 2
+          node scripts/make-event-pages.mjs
+      - name: Publish if anything changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add -A -- e s sitemap-pages.xml
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git config user.name  "48thdb-bot"
+          git config user.email "48thdb-bot@users.noreply.github.com"
+          git commit -m "Rebuild event and song pages"
+          git pull --rebase
+          git push
+          gh workflow run deploy.yml --ref main

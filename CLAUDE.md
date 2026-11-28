@@ -39,7 +39,7 @@ Everything else is in forum/README.md.
   index.html (`not_found_handling` in site.wrangler.toml); the older `?v=<view>`
   links still open and are rewritten. An event, member, song or tag is /event/<id>,
   /member/<id>, /song/<id>, /tag/<name> (a GE candidate's poster /ge2026/<id>); the old `?e=` `?m=` `?s=`
-  `?t=` `?p=` forms still open and are rewritten. /m/<id> is the static profile page for search engines. Don't name a folder after a view slug unless it has no index.html.
+  `?t=` `?p=` forms still open and are rewritten. /m/<id> is the static profile page for search engines. /e/<id> (every event) and /s/<id> (every release) are the same for search, with /e/ and /s/ lists and `sitemap-pages.xml` (named in robots.txt): `scripts/make-event-pages.mjs` writes them, and the "Event and song pages" workflow reruns it on every index.html push — before them Google sent about 27 visits a week (28 Nov 2026). Don't name a folder after a view slug unless it has no index.html.
   Each view sets its own title, description and canonical (`PAGE_META`,
   `applyPageMeta`); index.html carries no static canonical. A new view needs
   a `PAGE_META` row and a place in `VIEWS` in scripts/make-member-pages.mjs,
