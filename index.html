@@ -6014,6 +6014,20 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .evm-fest-sub.is-th{ letter-spacing:0; text-indent:0; font-size:14px; }
   .evm-fest.is-play :is(.evm-fest-word, .evm-fest-img, .evm-fest-song){ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
   .evm-fest.is-play .evm-fest-imgw .evm-fest-img{ animation:none; }
+  /* a sticker logo in layers (Shock Me Girls 2): the white sticker pops up, the black lettering shows across it, then the pink 2 is slapped on
+     (the owner's motion, 28 Nov 2026); without the play class every layer simply sits there */
+  .evm-fest-stk{ position:relative; display:block; width:min(250px, 68%); margin:2px auto 6px; aspect-ratio:720/651; transform:rotate(-3deg); }
+  .evm-fest-stk img{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .evm-fest-stk .stk-0{ filter:drop-shadow(0 3px 8px rgba(0,0,0,.28)); }
+  .evm-fest.is-play .evm-fest-stk{ animation:stk-shake .3s 1.5s both; }
+  .evm-fest.is-play .stk-0{ animation:stk-pop .5s .1s cubic-bezier(.3,1.5,.5,1) both; }
+  .evm-fest.is-play .stk-1{ animation:stk-reveal .6s .55s cubic-bezier(.6,0,.3,1) both; }
+  .evm-fest.is-play .stk-2{ animation:stk-slap .38s 1.2s cubic-bezier(.2,.9,.3,1.3) both; }
+  @keyframes stk-pop{ from{ opacity:0; transform:scale(.35) rotate(-10deg); } 70%{ opacity:1; transform:scale(1.05) rotate(1deg); } to{ opacity:1; transform:none; } }
+  @keyframes stk-reveal{ from{ clip-path:inset(0 100% 0 0); } to{ clip-path:inset(0 0 0 0); } }
+  @keyframes stk-slap{ from{ opacity:0; transform:scale(2.3) rotate(16deg); } 70%{ opacity:1; transform:scale(.93) rotate(-2deg); } to{ opacity:1; transform:none; } }
+  @keyframes stk-shake{ 0%,100%{ transform:rotate(-3deg); } 25%{ transform:rotate(-3deg) translate(3px,-2px); } 50%{ transform:rotate(-3deg) translate(-3px,2px); } 75%{ transform:rotate(-3deg) translate(2px,1px); } }
+  @media (prefers-reduced-motion:reduce){ .evm-fest.is-play :is(.evm-fest-stk, .evm-fest-stk img){ animation:none !important; } }
   .evm-fest.is-play .evm-fest-imgw{ animation:fest-write 1.1s .15s cubic-bezier(.45,.1,.25,1) both; }
   /* a logo with its own shine: a soft band of light crosses it as it opens and now and then after */
   .evm-fest-imgw{ position:relative; display:block; width:min(290px, 80%); margin:4px auto 8px; }
@@ -15835,7 +15849,7 @@ const FEST_EVENT = {
   'ev-shock-me-girls-x-takeover': { word:'X Takeover', sub:'X TAKEOVER · 7–8 PM', motif:'bolts', img:'logos/shock-me-girls.png', tm:'logos/shock-me-girls-t.png' },
   'ev-shock-me-girls-orientation': { word:'Shock Me Girls', sub:'SEMESTER 2 · ORIENTATION DAY', motif:'bolts', img:'logos/shock-me-girls.png', tm:'logos/shock-me-girls-t.png' },
   'ev-shock-me-girls-special-live-1125': { word:'Shock Me Girls', sub:'SPECIAL LIVE · WATCHING MV TOGETHER', motif:'bolts', img:'logos/shock-me-girls.png', tm:'logos/shock-me-girls-t.png' },
-  'ev-shock-me-girls-s2-ep1': { word:'Shock Me Girls', sub:'SEASON 2 · EP.1', motif:'bolts', img:'logos/shock-me-girls.png', tm:'logos/shock-me-girls-t.png' },
+  'ev-shock-me-girls-s2-ep1': { word:'Shock Me Girls 2', sub:'EP.1', motif:'bolts', layers:['logos/shock-me-girls-2-base.png', 'logos/shock-me-girls-2-ink.png', 'logos/shock-me-girls-2-two.png'] },
   'ev-cgm48-popup-halloween-ontour-1020': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
   'ev-cgm48-popup-halloween-ontour-1027': { word:'POP UP หลอน', sub:'CGM48 · ON TOUR · CHIANG MAI', motif:'spooky', fx:'moon', pal:'blood', own:true },
 };
@@ -15955,7 +15969,8 @@ function renderEventBanner(ev){
     ${K.fx === 'bunting' ? renderFestBunting() : ''}
     ${K.fx === 'moon' ? '<span class="evm-fest-moon" aria-hidden="true"></span><span class="evm-fest-drip" aria-hidden="true"></span>' : ''}
     <span class="evm-fest-deco" aria-hidden="true">${renderFestDeco(K.motif)}</span>
-    ${K.img && (K.glint || (K.tm && fxNew())) ? `<span class="evm-fest-imgw${K.blend ? ' is-screen' : ''}${K.glint ? '' : ' is-plain'}" style="--logo:url('${escapeAttr(K.shape || K.img)}')"${K.tm ? ` data-wr-t="${escapeAttr(K.tm)}"` : ''}><img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">${K.glint ? '<i class="evm-glint" aria-hidden="true"></i>' : ''}</span>`
+    ${K.layers ? `<span class="evm-fest-stk" role="img" aria-label="${escapeAttr(K.word)}">${K.layers.map((src, k) => `<img class="stk-${k}" src="${escapeAttr(src)}" alt="" decoding="async">`).join('')}</span>`
+      : K.img && (K.glint || (K.tm && fxNew())) ? `<span class="evm-fest-imgw${K.blend ? ' is-screen' : ''}${K.glint ? '' : ' is-plain'}" style="--logo:url('${escapeAttr(K.shape || K.img)}')"${K.tm ? ` data-wr-t="${escapeAttr(K.tm)}"` : ''}><img class="evm-fest-img" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">${K.glint ? '<i class="evm-glint" aria-hidden="true"></i>' : ''}</span>`
       : K.img ? `<img class="evm-fest-img${K.edge === false ? ' is-noedge' : ''}" src="${escapeAttr(K.img)}" alt="${escapeAttr(K.word)}" decoding="async">`
       : K.song ? renderSongLogo(K.song, 'evm-fest-song', true)
       : festWordHtml(K.word)}
