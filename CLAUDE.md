@@ -406,6 +406,11 @@ against the votes). A sales channel is a wallet the vault gave 1,000 tokens or m
 **Volume card** (`gecVolumeCard`, under the headline of the vote tab; it replaced the older hour-by-hour list, which said the same thing). Tokens voted as bars from the first hour of voting to now, by the hour (891 columns) or by the day (a day = 24 hours from the opening, as in the day-by-day card) with a switch (`gecVolMode`, action `gec-volmode`). Four cells for what is shown: busiest, quietest not counting zero, average, and the unfinished current hour/day; gold = the tallest bar, pink = the one still running. Each bar carries its token count above it and its time (and date) under it; the bars scroll sideways, opening on the newest, and a redraw keeps where the reader scrolled to (`gecVolX`, `gecVolSet`). It is what is left of a stock-market and then coin-exchange look for the page (ticker tape, GE6/THB pair header, mono numbers, dark panel) that the owner previewed and put back ("ตัวเลขมันดูยาก") — don't bring that theme back unasked; the page keeps its normal look.
 ## House rules
 
+**Pushing** (the owner's word, 28 Nov 2026). Data, content and fixes — schedule and shop updates, links, corrections, bug
+fixes — go to `main` as soon as they are checked (`check-site.mjs` passes), without asking; say afterwards what went live.
+Anything that changes how the site looks (a new look, layout, style, a redesign) waits: send phone-width screenshots and push
+only on the owner's "ขึ้นเลย". Either way commit only your own changes — other sessions share this working tree.
+
 **Sources.** For current BNK48 members, bnk48.com wins outright — overwrite what
 the database holds. Date a graduation by the member's last day with the group,
 never the announcement day.
