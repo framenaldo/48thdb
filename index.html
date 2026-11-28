@@ -7503,6 +7503,13 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   html[data-lg="1"] :is(.bday-chip.today, .dash-t.is-pic, .per-pic){ border:1px solid var(--lg-rim); box-shadow:var(--lg-hi), var(--lg-drop); }
   html[data-lg="1"] #main :is(.card, .cal-wrap, .feed-head, .ev-card, .tl-card, .lay-invite, .lay-card, .bio-card, .qz-card, .fb-card,
     .shop-card, .stat-cell, .account-card, .cd-next, .past-toggle){ -webkit-backdrop-filter:var(--lg-blur); backdrop-filter:var(--lg-blur); }
+  /* the iAM48 row scrolls sideways: a blur behind every card made each step of the swipe repaint them all, and the snap pulled the row
+     back to a card's edge; it felt sticky and juddered on a phone (the owner, 28 Nov 2026). The cards are a nearly solid fill instead
+     and the row runs free. */
+  .tl-row, .tl-locked{ scroll-snap-type:none !important; }
+  html[data-lg="1"] #main .tl-card, html[data-clear="1"] .tl-card, html[data-clear="1"] .tl-chip{ -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  html[data-lg="1"] #main .tl-card{ background:rgba(255,255,255,.82); contain:paint; }
+  :root[data-theme="dark"][data-lg="1"] #main .tl-card{ background:rgba(38,30,48,.86); }
   html[data-lg="1"] .ev-card.is-themed:not([class*="is-scene-"]){ background:color-mix(in srgb, var(--sheet-bg) 46%, transparent); border-color:var(--lg-rim); }
   :root[data-theme="dark"][data-lg="1"] .ev-card.is-themed:not([class*="is-scene-"]){ background:color-mix(in srgb, var(--sheet-dark) 62%, transparent); }
   /* Kimi's sky on a feed card goes see-through as in the owner's Figma (25%), one smooth fall from sky to clear in shares of the card's
