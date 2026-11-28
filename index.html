@@ -5356,6 +5356,8 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .svc-btn img{ height:11px; width:auto; display:block; }
   .svc-btn:active{ transform:translateY(2px); box-shadow:none; }
   .svc-btn.is-text{ background:#00A8E1; color:#fff; border-color:#00A8E1; padding:4px 10px; }
+  .svc-btn.is-tiktok.is-text{ background:#111; border-color:#111; }
+  :root[data-theme="dark"] .svc-btn.is-tiktok.is-text{ border-color:rgba(255,255,255,.28); }
   .svc-btn.is-prime img{ height:13px; }
   .svc-btn.is-trueid img{ height:13px; }
   .svc-ico{ display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#fff; box-shadow:0 2px 6px color-mix(in srgb, rgba(0,0,0,.2) 60%, transparent); margin:0 6px 0 0; }
@@ -11169,7 +11171,10 @@ const SEED_MEDIA = [
   { kind:'series', title:'Bussaba Lui Fai', alt:'บุษบาลุยไฟ', year:2023, by:'Thai PBS', members:['bnk-cherprang'], roles:{ 'bnk-cherprang':'Lamjuan' } },
   { kind:'series', title:'Club Friday the Series: Moments & Memories', year:2023, by:'One 31', members:['bnk-cherprang'] },
   { kind:'series', title:'Escape to Homestay', alt:'เพื่อนผมมีมรดกเป็นโฮมสเตย์ครับ', year:2023, members:['bnk-fond'] },
-  { kind:'series', title:'Shock Me Girls', alt:'รักช็อตใจ ยัยช็อตฟีล', year:2026, by:'TikTok', own:true, members:['bnk-monet', 'bnk-praew', 'bnk-grape', 'bnk-marine', 'bnk-janry', 'bnk-niya', 'bnk-wawa', 'bnk-patt', 'bnk-mint', 'bnk-cartoon', 'bnk-mirin', 'bnk-khowjow', 'bnk-luksorn', 'bnk-galeya', 'bnk-blythe', 'bnk-inkcha', 'bnk-mail', 'bnk-micha', 'bnk-sindy', 'bnk-emmy', 'cgm-ploen', 'cgm-nisha', 'bnk-rose'], roles:{ 'bnk-monet':'Georgie', 'bnk-praew':'Mintra', 'bnk-grape':'Saimai', 'bnk-marine':'Sia', 'bnk-janry':'Tawan', 'bnk-niya':'Oil', 'bnk-wawa':'Gungun', 'bnk-patt':'Jubia', 'bnk-mint':'Lunla', 'bnk-cartoon':'Micha', 'bnk-mirin':'Ninja', 'bnk-khowjow':'Anna', 'bnk-luksorn':'Kae', 'bnk-galeya':'Future', 'bnk-blythe':'Bungorn', 'bnk-inkcha':'Jubjang', 'bnk-mail':'Bonus', 'bnk-micha':'Mei', 'bnk-sindy':'Mona', 'bnk-emmy':'Mew', 'cgm-ploen':'Kiwi', 'cgm-nisha':'Keawlin', 'bnk-rose':'Ally' } },
+  // the seasons' playlists on the show's own TikTok: a new episode shows up there by itself (season 2 from 28 Nov 2026)
+  { kind:'series', title:'Shock Me Girls', alt:'รักช็อตใจ ยัยช็อตฟีล', year:2026, by:'TikTok', own:true,
+    watch:[{ svc:'tiktok', url:'https://www.tiktok.com/@shockmegirls.official/playlist/SHOCK%20ME%20GIRLS%202!%F0%9F%92%97%E2%9A%A1%EF%B8%8F-7713097831216679698', th:'ดูซีซัน 2 ที่ TikTok', en:'Season 2 on TikTok' },
+           { svc:'tiktok', url:'https://www.tiktok.com/@shockmegirls.official/playlist/SHOCK%20ME%20GIRLS!%F0%9F%92%97%E2%9A%A1%EF%B8%8F-7611816932682517255', th:'ดูซีซัน 1 ที่ TikTok', en:'Season 1 on TikTok' }], members:['bnk-monet', 'bnk-praew', 'bnk-grape', 'bnk-marine', 'bnk-janry', 'bnk-niya', 'bnk-wawa', 'bnk-patt', 'bnk-mint', 'bnk-cartoon', 'bnk-mirin', 'bnk-khowjow', 'bnk-luksorn', 'bnk-galeya', 'bnk-blythe', 'bnk-inkcha', 'bnk-mail', 'bnk-micha', 'bnk-sindy', 'bnk-emmy', 'cgm-ploen', 'cgm-nisha', 'bnk-rose'], roles:{ 'bnk-monet':'Georgie', 'bnk-praew':'Mintra', 'bnk-grape':'Saimai', 'bnk-marine':'Sia', 'bnk-janry':'Tawan', 'bnk-niya':'Oil', 'bnk-wawa':'Gungun', 'bnk-patt':'Jubia', 'bnk-mint':'Lunla', 'bnk-cartoon':'Micha', 'bnk-mirin':'Ninja', 'bnk-khowjow':'Anna', 'bnk-luksorn':'Kae', 'bnk-galeya':'Future', 'bnk-blythe':'Bungorn', 'bnk-inkcha':'Jubjang', 'bnk-mail':'Bonus', 'bnk-micha':'Mei', 'bnk-sindy':'Mona', 'bnk-emmy':'Mew', 'cgm-ploen':'Kiwi', 'cgm-nisha':'Keawlin', 'bnk-rose':'Ally' } },
   { kind:'series', title:'CGM48 Dorm', alt:'CGM48 Dorm มหาสนุก', year:2021, by:'YouTube CGM48', note:'sitcom', own:true, members:['cgm-angel', 'cgm-aom', 'cgm-champoo', 'cgm-fahsai', 'cgm-fortune', 'cgm-izurina', 'cgm-jayda', 'cgm-jjae', 'cgm-kaiwan', 'cgm-kaning', 'cgm-kyla', 'cgm-latin', 'cgm-marmink', 'cgm-meen', 'cgm-mei', 'cgm-milk', 'cgm-nena', 'cgm-nenie', 'cgm-nicha', 'cgm-parima', 'cgm-pepo', 'cgm-pim', 'cgm-ping', 'cgm-punch', 'cgm-sita'] },
   { kind:'show', title:'BNK48 Senpai', year:2017, by:'Channel 3', note:'doc', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
   { kind:'show', title:'BNK48 Show', year:2017, by:'Channel 3', own:true, members:['bnk-can', 'bnk-cherprang', 'bnk-cincin', 'bnk-jaa', 'bnk-jan', 'bnk-jane', 'bnk-jennis', 'bnk-jib', 'bnk-kaew', 'bnk-kaimook', 'bnk-kate', 'bnk-kitkat', 'bnk-korn', 'bnk-maysa', 'bnk-mind', 'bnk-miori', 'bnk-mobile', 'bnk-music', 'bnk-namhom', 'bnk-namneung', 'bnk-namsai', 'bnk-nink', 'bnk-noey', 'bnk-orn', 'bnk-piam', 'bnk-pun', 'bnk-pupe', 'bnk-satchan', 'bnk-tarwaan'] },
@@ -27449,7 +27454,7 @@ function mediaEps(w, en){
     <ol class="mw-eps-list" data-noloc>${L.map(([t, id, len]) => `<li><a href="https://www.youtube.com/watch?v=${encodeURIComponent(id)}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(t)}</span><small>${escapeHtml(len)}</small></a></li>`).join('')}</ol></details>`;
 }
 // the badge of each service is a plain mark in its colours, not its logo
-const STREAM_NAME = { netflix:'Netflix', prime:'Prime Video', trueid:'TrueID' };
+const STREAM_NAME = { netflix:'Netflix', prime:'Prime Video', trueid:'TrueID', tiktok:'TikTok' };
 // services whose logo files are in streaming/ (the rest show their name as text until a logo is sent)
 const STREAM_LOGO = { netflix:true, prime:true, trueid:true };
 // those with a round icon as well (the N); the rest use their wordmark, or their name where space is short
@@ -27461,7 +27466,8 @@ function mediaWatch(w, en, small){
   // a film: its trailer and the whole film; a show with a channel of its own: the channel (one chip each in the member's row: the film, else the first)
   const items = [w.film && [v(w.film), en ? 'Watch the film' : 'ดูหนัง'], w.yt && [v(w.yt), en ? e : th], w.chan && ['https://www.youtube.com/' + w.chan, en ? 'YouTube channel' : 'ช่อง YouTube']].filter(Boolean);
   // a streaming service that still has the title (`watch` on the row): its own badge, dropped when the title leaves
-  for(const x of w.watch || []) items.push([x.url, (en ? 'Watch on ' : 'ดูที่ ') + STREAM_NAME[x.svc], x.svc]);
+  // an entry may name itself (a season's playlist: `th`/`en`)
+  for(const x of w.watch || []) items.push([x.url, (en ? x.en : x.th) || (en ? 'Watch on ' : 'ดูที่ ') + STREAM_NAME[x.svc], x.svc]);
   // the service's own logo: the wordmark on a long button, the N in a round one where space is short
   const chipSvc = (href, label, svc) => !STREAM_LOGO[svc] || (small && !STREAM_ICON[svc]) ? `<a class="svc-btn is-${svc} is-text" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttr(label + ' · ' + w.title)}"><span>${escapeHtml(label)}</span></a>`
     : small
