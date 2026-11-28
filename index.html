@@ -1404,14 +1404,16 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .yt-btn svg{ width:20px; height:20px; display:block; }
   .yt-views{ padding-left:7px; border-left:1px solid var(--line); font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
   .yt-btn:hover{ border-color:#FF0000; }
-  .trk-links{ display:inline-flex; flex-wrap:wrap; justify-content:flex-end; gap:6px; margin-left:auto; }
+  .trk-links{ display:inline-flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:6px; margin-left:auto; }
   .trk-links:empty{ display:none; }
   .trk-links .yt-btn{ margin-left:0; }
   /* the streaming services: the bare logo, no frame (the owner's word) */
   .trk-links .sp-btn, .trk-links .am-btn{ padding:2px; background:none !important; border:0 !important; box-shadow:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
-  .sp-btn svg, .trk-links .am-btn svg{ width:28px; height:28px; }
+  /* a square reads bigger than a circle of the same width, so Apple's tile is drawn smaller to look the same size as Spotify's disc */
+  .trk-links .sp-btn svg{ width:28px; height:28px; }
+  .trk-links .am-btn svg{ width:24px; height:24px; margin:2px; }
   .sp-btn:hover{ border-color:#1ED760; }
-  .am-btn svg{ border-radius:7px; }
+  .am-btn svg{ border-radius:6px; }
   .am-btn:hover{ border-color:#FA233B; }
   .yt-btn:active{ transform:scale(.95); }
   /* a video that has just passed a round number of views */
