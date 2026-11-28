@@ -2276,11 +2276,34 @@ LOCATION:MCC HALL\, THE MALL LIFESTORE BANGKAPI\, Bangkok
 DESCRIPTION:เมมเบอร์: สมาชิก BNK48 และ CG
  M48 ทุกคน\n• งานคริสต์มาสของ BNK
  48 และ CGM48 วันที่ 25–27 ธ.ค. 2026\n• เวล
- าและกิจกรรมรอประกาศ\n\nhttps://48thd
- b.com/event/ev-santy-factory
+ าและกิจกรรมรอประกาศ\n• สิน
+ ค้า Santy Factory ทุกชิ้นขายที่หน้
+ างานด้วย\n\nhttps://48thdb.com/event/ev-santy-factory
 URL:https://48thdb.com/event/ev-santy-factory
 DTSTART;VALUE=DATE:20261225
 DTEND;VALUE=DATE:20261228
+END:VEVENT
+BEGIN:VEVENT
+UID:ev-santy-merch-preorder@48thdb
+DTSTAMP:20261201T000000Z
+SUMMARY:Pre-Order: Santy Factory Merchandise
+DESCRIPTION:• พรีออเดอร์ทาง iAM Shop ในแ
+ อป iAM48 1 ธ.ค. 2026 12:00 – 4 ม.ค. 2027 23:59 น.\n• ล
+ ็อต 1: สั่งก่อน 14 ธ.ค. 2026 ส่งสิน
+ ค้า 21 ธ.ค. 2026 เป็นต้นไป\n• ล็อต 2
+ : สั่งตั้งแต่ 14 ธ.ค. 2026 ส่งสินค
+ ้า 18 ม.ค. 2027 เป็นต้นไป\n• การจั
+ ดส่งอาจล่าช้าตามจำนวนคำส
+ ั่งซื้อ ไม่เกิน 45 วันทำการจ
+ ากวันที่กำหนด\n• สินค้าทุก
+ ชิ้นขายที่หน้างาน BNK48 & CGM48 Santy Fa
+ ctory 25–27 ธ.ค. 2026 ด้วย\n• ภาพสินค้า
+ ตกแต่งเพื่อการโฆษณาเท่าน
+ ั้น\n\nhttps://48thdb.com/event/ev-santy-merch-preorder
+URL:https://48thdb.com/event/ev-santy-merch-preorder
+DTSTART;VALUE=DATE:20261201
+DTEND;VALUE=DATE:20270105
+TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:ev-cnx-merch-preorder@48thdb
