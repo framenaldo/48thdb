@@ -30,6 +30,7 @@ const KEEP_MS = 5 * 60 * 1000;        // how long a refused check may stand on t
 import { pushRoute, pushTick } from './push.js';
 import { checkinRoute } from './checkin.js';
 import { roomRoute } from './room.js';
+import { socialRoute } from './social.js';
 export { CatRoom } from './room.js';
 
 const JSON_HEADERS = {
@@ -903,6 +904,8 @@ export default {
     if (pushed) return pushed;
     const checked = await checkinRoute(request, env, new URL(request.url), { claims: firebaseClaims, owner: isOwner, headers: JSON_HEADERS });
     if (checked) return checked;
+    const social = await socialRoute(request, env, new URL(request.url), { claims: firebaseClaims, headers: JSON_HEADERS });   // going / check-in / oshi counts (social.js)
+    if (social) return social;
     if (new URL(request.url).pathname === '/translate') {
       const own = { ...JSON_HEADERS, 'cache-control': 'private, no-store' };
       const say = (body, status) => new Response(JSON.stringify(body), { status, headers: own });

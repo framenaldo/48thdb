@@ -55,6 +55,7 @@ async function wake(sub, env) {
 const cleanPrefs = (p) => ({
   mode: p && p.mode === 'oshi' ? 'oshi' : 'all',
   oshi: (p && Array.isArray(p.oshi) ? p.oshi : []).filter((id) => typeof id === 'string' && /^[a-z]+-[\w-]{1,40}$/.test(id)).slice(0, 80),
+  ev: (p && Array.isArray(p.ev) ? p.ev : []).filter((id) => typeof id === 'string' && /^ev-[\w-]{1,100}$/.test(id)).slice(0, 100),   // events the reader said they are going to
 });
 
 export async function pushRoute(request, env, url) {
@@ -99,7 +100,7 @@ async function schedule(env) {
   await env.IAM.put('push-schedule', JSON.stringify(rows), { expirationTtl: 600 });
   return rows;
 }
-const wants = (prefs, row) => prefs.mode !== 'oshi' || row.a || (row.m || []).some((id) => prefs.oshi.includes(id));
+const wants = (prefs, row) => prefs.mode !== 'oshi' || row.a || (row.m || []).some((id) => prefs.oshi.includes(id)) || (prefs.ev || []).includes(row.e);
 
 /* every five minutes: queue and send what is 25–35 minutes away */
 export async function pushTick(env, now = Date.now()) {

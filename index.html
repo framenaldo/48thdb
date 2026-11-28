@@ -1039,6 +1039,14 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   /* beside the date and time on an event's sheet; the meta row keeps room for the share and close buttons only where the body sits beside them */
   .ck-chip{ display:inline-flex; align-items:center; gap:4px; font:inherit; font-size:11.5px; font-weight:800; line-height:inherit; padding:3px 11px; border-radius:var(--r-pill); border:2px solid var(--pink); background:var(--pink); color:#fff; cursor:pointer; white-space:nowrap; box-shadow:0 2px 6px color-mix(in srgb, #c9457c 60%, transparent); transition:transform .08s, box-shadow .08s; }
   .ck-chip:active{ transform:translateY(2px); box-shadow:none; }
+  /* ไปงานนี้: a pill in the event's own colour beside the date; ticked when the reader is going */
+  .go-chip{ display:inline-flex; align-items:center; gap:4px; font:inherit; font-size:11.5px; font-weight:800; line-height:inherit; padding:3px 11px; border-radius:var(--r-pill); border:2px solid var(--c, var(--teal)); background:var(--card); color:var(--c, var(--teal)); cursor:pointer; white-space:nowrap; transition:transform .08s, box-shadow .08s; box-shadow:0 2px 0 color-mix(in srgb, var(--c, var(--teal)) 45%, transparent); }
+  .go-chip:active{ transform:translateY(2px); box-shadow:none; }
+  .go-chip.is-on{ background:var(--c, var(--teal)); color:#fff; }
+  .go-chip.is-past{ cursor:default; box-shadow:none; border:0; background:none; padding:0; color:var(--ink-soft); }
+  .go-chip .go-n{ font-variant-numeric:tabular-nums; }
+  .go-ck{ font-size:11.5px; font-weight:800; color:var(--ink-soft); white-space:nowrap; }
+  .oshi-count{ margin:8px 0 0; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .ck-chip.is-done{ background:none; border-color:var(--k); color:var(--k); box-shadow:none; cursor:default; }
   @media (max-width:1023px){ .evm-meta:has(.ck-chip){ padding-right:0; } }
   .ck-btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; font:inherit; font-weight:700; font-size:15px; padding:11px 20px; border-radius:var(--r-pill); border:2px solid var(--pink); background:linear-gradient(135deg,var(--pink),#ff9bc0); color:#fff; cursor:pointer; box-shadow:0 4px 12px color-mix(in srgb, #c9457c 60%, transparent); transition:transform .08s, box-shadow .08s; }
@@ -13044,7 +13052,7 @@ async function loadOshiData(){
   try{
     const doc = await fbDb.collection('users').doc(fbAuth.currentUser.uid).get();
     const d = doc.exists ? doc.data() : {};
-    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null, layout:d.layout||null, meow:d.meow||null, quiz:d.quiz||null, stamps:d.stamps||null};
+    return {oshi:d.oshi||[], kamiOshi:d.kamiOshi||null, avatar:d.avatar||null, layout:d.layout||null, meow:d.meow||null, quiz:d.quiz||null, stamps:d.stamps||null, going:d.going||null};
   }catch(e){ return {oshi:[], kamiOshi:null}; }
 }
 async function saveOshiData(){
@@ -13105,7 +13113,7 @@ async function pushSubscribe(mode){
   const reg = await navigator.serviceWorker.ready;
   let sub = await reg.pushManager.getSubscription();
   if(!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlB64(_pushKey) });
-  const res = await fetch(`${LIVE_API}/push/sub`, { method:'POST', body:JSON.stringify({ sub:sub.toJSON(), prefs:{ mode, oshi:pushOshi() } }) });
+  const res = await fetch(`${LIVE_API}/push/sub`, { method:'POST', body:JSON.stringify({ sub:sub.toJSON(), prefs:{ mode, oshi:pushOshi(), ev:goMine() } }) });
   if(!res.ok) throw new Error('push ' + res.status);
   const j = await res.json();
   try{ localStorage.setItem(PUSH_LS, JSON.stringify({ mode, k:j.k, at:Date.now() })); }catch(e){}
@@ -13279,6 +13287,128 @@ function renderCheckinBtn(ev){
   const en = isEN();
   if(got) return `<span class="ck-chip is-done" style="--k:${escapeAttr(got.c || '#E4457E')}">✓ ${en ? 'Checked in' : 'เช็กอินแล้ว'}</span>`;
   return `<button class="ck-chip" data-action="ck-open" data-id="${escapeAttr(ev.id)}"><span aria-hidden="true">📸</span>${en ? 'Check in' : 'เช็กอิน'}${tryIt ? (en ? ' (Beta)' : ' (ทดลอง)') : ''}</button>`;
+}
+/* ============================= แฟนคนอื่นก็อยู่ตรงนี้: ไปงานนี้ · เช็กอิน · โอชิเดียวกัน =============================
+   Numbers only, never who (the owner's choice over a feed or a board, 28 Nov 2026). api.48thdb.com/social (worker/social.js)
+   keeps how many signed-in readers said "ไปงานนี้" for each event, how many checked in by photo, and how many have each member
+   among their oshi. Hidden until GET /social answers (checkSocial), so the page can ship before the Worker.
+   The reader's own "going" list: localStorage `48thdb-going:<uid>` and users/<uid>.going (their own doc), joined by union.
+   A reader who has turned on reminders gets one for every event they are going to, whatever the mode (push prefs `ev`). */
+let _socOn = false, _socGoing = {}, _socCk = {}, _socOshi = null, _socAsked = new Set(), _socT = 0, _socCloudRead = false;
+function checkSocial(){
+  return fetch(`${LIVE_API}/social?e=&m=1`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).then(j => {
+    if(!j || _socOn) return;
+    _socOn = true; _socOshi = j.oshi || {};
+    socialOshiSync();
+    if(state.selectedEvent || state.selectedMember) renderMain();
+  }).catch(() => {});
+}
+// counts for these events, asked in one go a moment after a sheet opens; the pills are filled in place
+function socialWant(ids){
+  if(!_socOn) return;
+  ids.filter(Boolean).forEach(id => _socAsked.add(id));
+  clearTimeout(_socT);
+  _socT = setTimeout(() => {
+    const ids = [..._socAsked].slice(0, 60); _socAsked.clear();
+    if(!ids.length) return;
+    fetch(`${LIVE_API}/social?e=${encodeURIComponent(ids.join(','))}`).then(r => r.ok ? r.json() : null).then(j => {
+      if(!j) return;
+      ids.forEach(id => { _socGoing[id] = (j.going || {})[id] || 0; _socCk[id] = (j.ck || {})[id] || 0; });
+      socialPaint();
+    }).catch(() => {});
+  }, 120);
+}
+const socUid = () => (state.account && state.account.loggedIn && fbAuth.currentUser && fbAuth.currentUser.uid) || null;
+function goMine(){
+  const u = socUid(); if(!u) return [];
+  try{ const a = JSON.parse(localStorage.getItem('48thdb-going:' + u) || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; }
+}
+function goSave(list){
+  const u = socUid(); if(!u) return;
+  try{ localStorage.setItem('48thdb-going:' + u, JSON.stringify(list)); }catch(e){}
+  if(_socCloudRead) fbDb.collection('users').doc(u).set({ going:list }, { merge:true }).catch(() => {});
+}
+// after sign-in: the account's list and the device's, joined
+function goFromAccount(cloud){
+  _socCloudRead = true;
+  const mine = goMine(), all = [...new Set([...(Array.isArray(cloud) ? cloud : []), ...mine])];
+  if(all.length !== mine.length) goSave(all);
+  else if(Array.isArray(cloud) && cloud.length !== all.length) goSave(all);
+}
+// over once its last day's last time has passed (no time known: the end of that day), Thai time
+const goEnded = ev => { const end = ev.end || ev.start, t = (ev.time && eventUntil(ev, end)) || '23:59';
+  return Date.now() > Date.parse(`${end}T${/^\d{2}:\d{2}$/.test(t) ? t : '23:59'}:00+07:00`); };
+function renderGoingBtn(ev){
+  if(!_socOn || !ev || ev.cancelled || ev.period || shopOnly(ev)) return '';
+  socialWant([ev.id]);
+  const en = isEN(), n = _socGoing[ev.id], mine = goMine().includes(ev.id), num = n ? ` · ${n.toLocaleString()}` : '';
+  if(goEnded(ev)) return n ? `<span class="go-chip is-past" data-soc-go="${escapeAttr(ev.id)}">${en ? `🙋 ${n.toLocaleString()} went` : `🙋 ไป ${n.toLocaleString()} คน`}</span>` : `<span class="go-chip is-past" data-soc-go="${escapeAttr(ev.id)}" hidden></span>`;
+  return `<button class="go-chip${mine ? ' is-on' : ''}" data-action="go-toggle" data-id="${escapeAttr(ev.id)}" data-soc-go="${escapeAttr(ev.id)}" aria-pressed="${mine}">
+    <span aria-hidden="true">${mine ? '✓' : '🙋'}</span><span class="go-t">${mine ? (en ? 'Going' : 'ไปแน่') : (en ? 'Going?' : 'ไปงานนี้')}</span><span class="go-n">${num}</span></button>`;
+}
+function renderCheckinCount(ev){
+  if(!_socOn || !ev || ev.online || !ev.venue || ev.period) return '';
+  const n = _socCk[ev.id], en = isEN();
+  return `<span class="go-ck" data-soc-ck="${escapeAttr(ev.id)}"${n ? '' : ' hidden'}>📸 ${en ? `${(n || 0).toLocaleString()} checked in` : `เช็กอินแล้ว ${(n || 0).toLocaleString()} คน`}</span>`;
+}
+function renderOshiCount(m){
+  if(!_socOn || !m || !_socOshi) return '';
+  const n = _socOshi[m.id] || 0; if(!n) return '';
+  const en = isEN();
+  return `<p class="oshi-count">${en ? `${n.toLocaleString()} ${n === 1 ? 'person' : 'people'} here have ${escapeHtml(nickName(m))} as oshi` : `${n.toLocaleString()} คนในเว็บนี้มี ${escapeHtml(nickName(m))} เป็นโอชิ`}</p>`;
+}
+// fill the counts in where they are on screen, without a redraw
+function socialPaint(){
+  const en = isEN();
+  document.querySelectorAll('[data-soc-go]').forEach(el => {
+    const n = _socGoing[el.dataset.socGo] || 0;
+    if(el.classList.contains('is-past')){ el.hidden = !n; el.textContent = en ? `🙋 ${n.toLocaleString()} went` : `🙋 ไป ${n.toLocaleString()} คน`; return; }
+    const b = el.querySelector('.go-n'); if(b) b.textContent = n ? ` · ${n.toLocaleString()}` : '';
+  });
+  document.querySelectorAll('[data-soc-ck]').forEach(el => {
+    const n = _socCk[el.dataset.socCk] || 0; el.hidden = !n;
+    el.textContent = `📸 ${en ? `${n.toLocaleString()} checked in` : `เช็กอินแล้ว ${n.toLocaleString()} คน`}`;
+  });
+}
+async function goToggle(id){
+  const en = isEN();
+  if(!socUid()){ toast(en ? 'Sign in first to say you are going' : 'เข้าสู่ระบบก่อน แล้วกดไปงานนี้ได้เลย'); return; }
+  const list = goMine(), on = !list.includes(id);
+  const next = on ? [...list, id] : list.filter(x => x !== id);
+  goSave(next);
+  _socGoing[id] = Math.max(0, (_socGoing[id] || 0) + (on ? 1 : -1));
+  document.querySelectorAll(`.go-chip[data-id="${CSS.escape(id)}"]`).forEach(b => {
+    b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on);
+    b.querySelector('[aria-hidden]').textContent = on ? '✓' : '🙋';
+    b.querySelector('.go-t').textContent = on ? (en ? 'Going' : 'ไปแน่') : (en ? 'Going?' : 'ไปงานนี้');
+  });
+  socialPaint();
+  try{
+    const tok = await fbAuth.currentUser.getIdToken();
+    const r = await fetch(`${LIVE_API}/social/going`, { method:'POST', headers:{ authorization:'Bearer ' + tok, 'content-type':'application/json' }, body:JSON.stringify({ e:id, on }) });
+    const j = r.ok ? await r.json() : null;
+    if(j && typeof j.n === 'number'){ _socGoing[id] = j.n; socialPaint(); }
+  }catch(e){}
+  // reminders: a reader who has them on is told about this event too, whatever the mode
+  const pr = pushPrefs();
+  if(on && pr && pushCan() && Notification.permission === 'granted') pushSubscribe(pr.mode).catch(() => {});
+  else if(on && _pushKey && !(pr && pushCan() && Notification.permission === 'granted')) toast(en ? 'Turn on reminders in the ☰ menu to be told before it starts' : 'เปิด "แจ้งเตือนงาน" ในเมนู ☰ แล้วจะเตือนก่อนงานนี้เริ่ม');
+}
+// the reader's oshi, told to the Worker when they change and once a day (for the counts on member sheets)
+let _socOshiT = 0;
+function socialOshiSync(force){
+  const u = socUid(); if(!_socOn || !u) return;
+  const key = '48thdb-oshi-sent:' + u, now = JSON.stringify([...state.oshi].sort());
+  let last = null; try{ last = JSON.parse(localStorage.getItem(key) || 'null'); }catch(e){}
+  if(!force && last && last.v === now && Date.now() - last.at < 86400000) return;
+  clearTimeout(_socOshiT);
+  _socOshiT = setTimeout(async () => {
+    try{
+      const tok = await fbAuth.currentUser.getIdToken();
+      const r = await fetch(`${LIVE_API}/social/oshi`, { method:'POST', headers:{ authorization:'Bearer ' + tok, 'content-type':'application/json' }, body:JSON.stringify({ ids:state.oshi }) });
+      if(r.ok) try{ localStorage.setItem(key, JSON.stringify({ v:now, at:Date.now() })); }catch(e){}
+    }catch(e){}
+  }, 1500);
 }
 // the profile's book
 function renderStampBook(){
@@ -21688,7 +21818,7 @@ function renderEventModal(){
         <div class="evm-meta">
           ${renderStreamLink(ev, 'evm-icon')}
           <p class="evm-date"><span>${ev.dateTag ? `<span class="evm-date-tag">${escapeHtml(ev.dateTag)}</span> · ` : ''}${eventDateYear(ev)}${ev.time?' · '+ev.time+' น.':''}${ev.part?' · '+escapeHtml(ev.part):''}</span></p>
-          ${renderCheckinBtn(ev)}
+          ${renderCheckinBtn(ev)}${renderGoingBtn(ev)}${renderCheckinCount(ev)}
           ${renderLiveChip(ev, 'is-meta')}
           ${(()=>{ const iso = toYmd(todayStart()), at = startsAt(ev, iso);
             return at ? startsPill('evm-starts', ev, iso, at) : ''; })()}
@@ -23154,6 +23284,7 @@ function renderDetailModal(){
           <!-- The comparison stays in the code (and reachable by a ?vs= link) but has
                no button: the owner does not want visitors to see members compared. -->
         </div>
+        ${renderOshiCount(m)}
         ${renderSocial(m)}
         <!-- The GE2026 candidate card (poster, clip) came off the member sheet when the election ended (the owner's word, 16 Nov 2026); her past results stay in the history below. -->
         </div>
@@ -34671,7 +34802,9 @@ function bindDelegatedEvents(){
       state.captainFilter = 'all';
       renderMain(); replaceHistory();
     }
+    else if(action==='go-toggle'){ goToggle(id); }
     else if(action==='toggle-oshi'){
+      if(_socOshi && state.account) _socOshi[id] = Math.max(0, (_socOshi[id] || 0) + (state.oshi.includes(id) ? -1 : 1));
       if(state.oshi.includes(id)){
         state.oshi = state.oshi.filter(x=>x!==id);
         if(state.kamiOshi===id) state.kamiOshi=null;
@@ -34679,16 +34812,24 @@ function bindDelegatedEvents(){
         state.oshi.push(id);
       }
       await saveOshiData();
+      socialOshiSync(true);
       updateOshiButtonsFor(id);
+      // the count under the hearts on her open sheet, in place
+      if(_socOn) document.querySelectorAll(`.oshi-actions:has([data-id="${CSS.escape(id)}"])`).forEach(box => {
+        const old = box.nextElementSibling && box.nextElementSibling.classList.contains('oshi-count') ? box.nextElementSibling : null;
+        const html = renderOshiCount(getMember(id));
+        if(old) old.outerHTML = html || ''; else if(html) box.insertAdjacentHTML('afterend', html);
+      });
     }
     else if(action==='toggle-kami-oshi'){
       if(state.kamiOshi===id){
         state.kamiOshi=null;
       } else {
         state.kamiOshi=id;
-        if(!state.oshi.includes(id)) state.oshi.push(id);
+        if(!state.oshi.includes(id)){ state.oshi.push(id); if(_socOshi && state.account) _socOshi[id] = (_socOshi[id] || 0) + 1; }
       }
       await saveOshiData();
+      socialOshiSync(true);
       updateOshiButtonsFor(id);
     }
     else if(action==='lives-scope'){
@@ -35132,6 +35273,7 @@ async function init(){
   refreshTimeline();   // the members' iAM48 posts need no sign-in, so they come at once
   checkAI();
   checkCheckin();
+  checkSocial();
   checkPush();
   warmMemberSheet();
 
@@ -35195,7 +35337,7 @@ async function init(){
     state.oshi = oshiData.oshi;
     state.kamiOshi = oshiData.kamiOshi;
     if(state.account && oshiData.avatar) state.account.avatar = oshiData.avatar;
-    if(state.account && state.account.loggedIn){ meowFromAccount(oshiData.meow || null); if(quizFromAccount(oshiData.quiz || null)) changed = true; if(ckFromAccount(oshiData.stamps || null)) changed = true; }
+    if(state.account && state.account.loggedIn){ meowFromAccount(oshiData.meow || null); if(quizFromAccount(oshiData.quiz || null)) changed = true; if(ckFromAccount(oshiData.stamps || null)) changed = true; goFromAccount(oshiData.going || null); socialOshiSync(); }
     // the reader's own arrangement; a guest or someone signed out gets the site as it comes
     const lay = state.account ? (oshiData.layout || null) : null;
     if(JSON.stringify(lay) !== JSON.stringify(_authKnown ? state.layout : _bootLayout)) changed = true;
