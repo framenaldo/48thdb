@@ -9803,8 +9803,30 @@ const SEED_SCHEDULE = [
     title:'BNK48 & CGM48 Santy Factory',
     venue:'MCC HALL, THE MALL LIFESTORE BANGKAPI, Bangkok', groups:['bnk48','cgm48'], allMembers:true,   // All BNK48 & CGM48 Members (the Nov–Dec schedule, 27 Nov 2026)
     poster:{ accent:'#B8232F', surface:'#FBEDEE', ink:'#3A1418', img:'posters/santy-factory.jpg', w:2000, h:2500 },
+    related:['ev-santy-merch-preorder'],
     info:['งานคริสต์มาสของ BNK48 และ CGM48 วันที่ 25–27 ธ.ค. 2026',
-      'เวลาและกิจกรรมรอประกาศ'] },
+      'เวลาและกิจกรรมรอประกาศ',
+      'สินค้า Santy Factory ทุกชิ้นขายที่หน้างานด้วย'] },
+  { id:'ev-santy-merch-preorder', start:'2026-12-01', end:'2027-01-04', period:true, bar:'Pre-Order: Santy Factory Merchandise',
+    title:'BNK48 & CGM48 Santy Factory Official Merchandise · Pre-Order', short:'Santy Factory Merch',
+    shop:{ name:'BNK48 & CGM48 Santy Factory Official Merchandise', kind:'สินค้า', withName:true,
+      price:'180 – 250 บาท', from:'2026-12-01T12:00', to:'2027-01-04T23:59',
+      deliver:'21 ธ.ค. 2026 เป็นต้นไป (สั่งก่อน 14 ธ.ค.)', shopName:'iAM Shop' },
+    groups:['bnk48','cgm48'],
+    related:['ev-santy-factory'],
+    poster:{ accent:'#B8232F', surface:'#FBEDEE', ink:'#3A1418', img:'posters/santy-factory-merch.jpg', w:1638, h:2048 },
+    info:['พรีออเดอร์ทาง iAM Shop ในแอป iAM48 1 ธ.ค. 2026 12:00 – 4 ม.ค. 2027 23:59 น.',
+      'ล็อต 1: สั่งก่อน 14 ธ.ค. 2026 ส่งสินค้า 21 ธ.ค. 2026 เป็นต้นไป',
+      'ล็อต 2: สั่งตั้งแต่ 14 ธ.ค. 2026 ส่งสินค้า 18 ม.ค. 2027 เป็นต้นไป',
+      'การจัดส่งอาจล่าช้าตามจำนวนคำสั่งซื้อ ไม่เกิน 45 วันทำการจากวันที่กำหนด',
+      'สินค้าทุกชิ้นขายที่หน้างาน BNK48 & CGM48 Santy Factory 25–27 ธ.ค. 2026 ด้วย',
+      'ภาพสินค้าตกแต่งเพื่อการโฆษณาเท่านั้น'],
+    sections:[
+      { head:'สินค้า', lines:[
+        '2027 Wall Calendar (เลือกเมมเบอร์ได้) — 180 บาท',
+        '2027 Greeting Card (ส.ค.ส.) ออกแบบโดยเมมเบอร์ (คละ 1 จาก 58 แบบ) — 180 บาท',
+        'Air Freshener พร้อม Selfie Card (คละ 1 จาก 58 แบบ) — 180 บาท',
+        'Photoset (คละ 5 จาก 174 ใบ) — 250 บาท'] }] },
   { id:'ev-cnx-merch-preorder', logo:'cnx', start:'2026-11-24', end:'2026-12-13', period:true, bar:'Pre-Order: CGM48 สถานีเชียงใหม่ Merchandise',
     title:'CGM48 "สถานีเชียงใหม่" Merchandise · Pre-Order', short:'สถานีเชียงใหม่ Merch',
     shop:{ name:'เสื้อยืดและหมวกแก๊ป CGM48 สถานีเชียงใหม่', kind:'สินค้า', withName:true,
@@ -15060,6 +15082,14 @@ function daysUntilBirthday(m, today){
 function eventLastDay(ev){ return ev.end || ev.start; }
 
 /* "28-30 ส.ค." for a run, "5 ก.ย." for a single day. */
+/* The dates with their year; a run that crosses New Year names both years (Santy Factory's pre-order, 1 Dec 2026 – 4 Jan 2027). */
+function eventDateYear(ev){
+  if(ev.end && ev.end.slice(0,4) !== ev.start.slice(0,4)){
+    const M = monthsShort(), [y1, m1, d1] = ev.start.split('-').map(Number), [y2, m2, d2] = ev.end.split('-').map(Number);
+    return `${d1} ${M[m1-1]} ${y1} - ${d2} ${M[m2-1]} ${y2}`;
+  }
+  return eventDateLabel(ev) + ' ' + ev.start.slice(0,4);
+}
 function eventDateLabel(ev){
   const M = monthsShort();
   const [, m1, d1] = ev.start.split('-').map(Number);
@@ -15360,7 +15390,7 @@ function renderPeriodTile(ev, todayIso){
 
 /* A poster's small copy for its card: <poster>-s.webp where scripts/make-poster-webp.mjs made one (a WebP at least 15% lighter
    than the JPEG, from the original: 12.4 MB of small copies became 7.2), else <poster>-s.jpg; the full poster is never touched */
-const POSTER_WEBP = new Set(["bday-tee-galeya-2026","bday-tee-ginna-2026","bday-tee-hongyok-2027","bday-tee-janry-2027","bday-tee-jingjing-2027","bday-tee-khaimook-2027","bday-tee-lewlew-2026","bday-tee-prae-2027","bday-tee-praifa-2027","bday-tee-punpon-2027","bnk48-7th-gen-audition","bnk48-anotherdot-1104","cgm-time-to-play-ep2","cgm48-cnx-merch","cgm48-lanna-members-5dec","cgm48-lanna-members-6dec","cgm48-lanna-members-hachicha","cgm48-lanna-members-hitouch","cgm48-lanna-smile-station","cgm48-lanna-smile-station-activities","cgm48-lanna-smile-station-schedule","cgm48-lanna-smile-station-set","cgm48-lanna-smile-station-ticket","cgm48-lanna-ticket","cgm48-members-visit-round","cgm48-members-visit-round-2","cgm48-popup-halloween-1015","cgm48-popup-halloween-1022","cgm48-popup-halloween-1029","cgm48-popup-halloween-ontour-1020","cgm48-popup-halloween-ontour-1027-2","cgm48-popup-halloween-ontour-1027-3","cgm48-popup-live-0929","cgm48-popup-live-1001","cgm48-popup-live-1006","cgm48-popup-live-1008","cgm48-popup-live-1013","cgm48-popup-live-1103","cgm48-popup-live-1105","cgm48-popup-live-1117","cgm48-popup-live-1119","cgm48-popup-live-cnx","cgm48-popup-live-letmeknow","cgm48-popup-ontour-1124","cgm48-popup-ontour-1124-2","cgm48-popup-ontour-1124-3","election-2026","election-fanfest-free","election-final-results","election-final-results-1114","election-final-results-live-1114","fame-fanmeet","fame-fanmeet-1025","ge2026-live-talk-1026","ge2026-live-talk-1109","ge2026-ticket-bundle","ge6-heart-hachicha-2","ge6-heart-letter","ge6-heart-rounds","ge6-heart-rounds-2","ge6-heart-rules","ge6-heart-wawa","ge6-photoset","ge6-single","ge6-single-aw","getaway-pudthailee","hachicha-tsukimi","handshake-kimi","handshake-kimi-1031","handshake-kimi-galeya-move","jew-palmmy-bday-1024","journey-of-dreams","journey-of-dreams-lineup","kimi-busking-1030","kimi-busking-1030-members","kimi-live-talk-1125","kimi-roadshow-bigc-rajdamri","kimi-roadshow-bigc-rajdamri-2","kimi-roadshow-bigc-rajdamri-3","kimi-roadshow-bigc-rajdamri-4","kimi-roadshow-cnx","kimi-roadshow-mbk","kimi-roadshow-phitsanulok","kimi-roadshow-phitsanulok-2","kimi-roadshow-phitsanulok-3","kimi-roadshow-phitsanulok-4","kimi-roadshow-rama9-4","kimi-roadshow-rama9b-2","kimi-roadshow-rama9b-3","kimi-roadshow-t21","kimi-roadshow-t21-nov","kimi-roadshow-t21-nov-2","kimi-roadshow-t21-nov-3","kimi-roadshow-t21-nov-4","kimi-roadshow-union","kimi-special-event-bangkapi","lanna-expo-1017","lanna-tsukimi","major-loykrathong-1124","mbk-haunted-graveyard-1020","nine-charity","proud-saonoi-bday-1024","roadshow-fashionisland-main","roadshow-mbk","ruamnamjai-16","santy-factory","shock-me-girls-1120","shock-me-girls-1120-schedule","shock-me-girls-1120-seats","shock-me-girls-1120-tickets","shock-me-girls-special-live-1125"]);
+const POSTER_WEBP = new Set(["bday-tee-galeya-2026","bday-tee-ginna-2026","bday-tee-hongyok-2027","bday-tee-janry-2027","bday-tee-jingjing-2027","bday-tee-khaimook-2027","bday-tee-lewlew-2026","bday-tee-prae-2027","bday-tee-praifa-2027","bday-tee-punpon-2027","bnk48-7th-gen-audition","bnk48-anotherdot-1104","cgm-time-to-play-ep2","cgm48-cnx-merch","cgm48-lanna-members-5dec","cgm48-lanna-members-6dec","cgm48-lanna-members-hachicha","cgm48-lanna-members-hitouch","cgm48-lanna-smile-station","cgm48-lanna-smile-station-activities","cgm48-lanna-smile-station-schedule","cgm48-lanna-smile-station-set","cgm48-lanna-smile-station-ticket","cgm48-lanna-ticket","cgm48-members-visit-round","cgm48-members-visit-round-2","cgm48-popup-halloween-1015","cgm48-popup-halloween-1022","cgm48-popup-halloween-1029","cgm48-popup-halloween-ontour-1020","cgm48-popup-halloween-ontour-1027-2","cgm48-popup-halloween-ontour-1027-3","cgm48-popup-live-0929","cgm48-popup-live-1001","cgm48-popup-live-1006","cgm48-popup-live-1008","cgm48-popup-live-1013","cgm48-popup-live-1103","cgm48-popup-live-1105","cgm48-popup-live-1117","cgm48-popup-live-1119","cgm48-popup-live-cnx","cgm48-popup-live-letmeknow","cgm48-popup-ontour-1124","cgm48-popup-ontour-1124-2","cgm48-popup-ontour-1124-3","election-2026","election-fanfest-free","election-final-results","election-final-results-1114","election-final-results-live-1114","fame-fanmeet","fame-fanmeet-1025","ge2026-live-talk-1026","ge2026-live-talk-1109","ge2026-ticket-bundle","ge6-heart-hachicha-2","ge6-heart-letter","ge6-heart-rounds","ge6-heart-rounds-2","ge6-heart-rules","ge6-heart-wawa","ge6-photoset","ge6-single","ge6-single-aw","getaway-pudthailee","hachicha-tsukimi","handshake-kimi","handshake-kimi-1031","handshake-kimi-galeya-move","jew-palmmy-bday-1024","journey-of-dreams","journey-of-dreams-lineup","kimi-busking-1030","kimi-busking-1030-members","kimi-live-talk-1125","kimi-roadshow-bigc-rajdamri","kimi-roadshow-bigc-rajdamri-2","kimi-roadshow-bigc-rajdamri-3","kimi-roadshow-bigc-rajdamri-4","kimi-roadshow-cnx","kimi-roadshow-mbk","kimi-roadshow-phitsanulok","kimi-roadshow-phitsanulok-2","kimi-roadshow-phitsanulok-3","kimi-roadshow-phitsanulok-4","kimi-roadshow-rama9-4","kimi-roadshow-rama9b-2","kimi-roadshow-rama9b-3","kimi-roadshow-t21","kimi-roadshow-t21-nov","kimi-roadshow-t21-nov-2","kimi-roadshow-t21-nov-3","kimi-roadshow-t21-nov-4","kimi-roadshow-union","kimi-school-tour-1127","kimi-special-event-bangkapi","lanna-expo-1017","lanna-tsukimi","major-loykrathong-1124","mbk-haunted-graveyard-1020","nine-charity","proud-saonoi-bday-1024","roadshow-fashionisland-main","roadshow-mbk","ruamnamjai-16","santy-factory","santy-factory-merch","shock-me-girls-1120","shock-me-girls-1120-schedule","shock-me-girls-1120-seats","shock-me-girls-1120-tickets","shock-me-girls-special-live-1125"]);
 const evThumb = src => { const b = String(src).replace(/\.\w+$/, ''); return POSTER_WEBP.has(b.replace(/^posters\//, '')) ? b + '-s.webp' : b + '-s.jpg'; };
 
 /* A line-up that is every current member, or every current member of one
@@ -15491,6 +15521,7 @@ const FEST_KINDS = {
 const FEST_EVENT = {
   'ev-concert-2026':   { kind:'concert', word:'Journey of Dreams', sub:'夢の旅 · CONCERT' },
   'ev-santy-factory':  { word:'Santy Factory', sub:'BNK48 & CGM48 · CHRISTMAS', motif:'stars', img:'logos/santy-factory-2.png', tm:'logos/santy-factory-2-t.png', glint:true, edge:false },
+  'ev-santy-merch-preorder': { word:'Santy Factory', sub:'OFFICIAL MERCHANDISE', motif:'stars', img:'logos/santy-factory-2.png', tm:'logos/santy-factory-2-t.png', glint:true, edge:false },
   'ev-ge6-live-talk-1026': { word:'Live Talk', sub:'GE2026 · FINAL RESULTS' },
   'ev-ge6-live-talk-1109': { word:'Live Talk', sub:'GE2026 · FINAL RESULTS' },
   'ev-cgm-time-to-play-ep1': { word:'Time to Play!', sub:'YOUTUBE PREMIERE · EP.1' },
@@ -21629,7 +21660,7 @@ function renderEventModal(){
         ${ev.cancelled ? `<p class="evm-cancel" role="status">${escapeHtml(ev.cancelled)}</p>` : ''}
         <div class="evm-meta">
           ${renderStreamLink(ev, 'evm-icon')}
-          <p class="evm-date"><span>${ev.dateTag ? `<span class="evm-date-tag">${escapeHtml(ev.dateTag)}</span> · ` : ''}${eventDateLabel(ev)} ${ev.start.slice(0,4)}${ev.time?' · '+ev.time+' น.':''}${ev.part?' · '+escapeHtml(ev.part):''}</span></p>
+          <p class="evm-date"><span>${ev.dateTag ? `<span class="evm-date-tag">${escapeHtml(ev.dateTag)}</span> · ` : ''}${eventDateYear(ev)}${ev.time?' · '+ev.time+' น.':''}${ev.part?' · '+escapeHtml(ev.part):''}</span></p>
           ${renderCheckinBtn(ev)}
           ${renderLiveChip(ev, 'is-meta')}
           ${(()=>{ const iso = toYmd(todayStart()), at = startsAt(ev, iso);

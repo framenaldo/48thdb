@@ -254,5 +254,9 @@
  "posters/shock-me-girls-special-live-1125.jpg": {
   "light": "linear-gradient(180deg, hsl(299 70% 91%) 0%, hsl(306 47% 89%) 17%, hsl(301 39% 90%) 33%, hsl(303 51% 90%) 50%, hsl(301 32% 88%) 67%, hsl(302 38% 88%) 83%, hsl(301 55% 90%) 100%)",
   "dark": "linear-gradient(180deg, hsl(299 35% 19%) 0%, hsl(306 33% 17%) 17%, hsl(301 27% 18%) 33%, hsl(303 35% 18%) 50%, hsl(301 22% 17%) 67%, hsl(302 27% 17%) 83%, hsl(301 35% 18%) 100%)"
+ },
+ "posters/santy-factory-merch.jpg": {
+  "light": "linear-gradient(180deg, hsl(317 16% 86%) 0%, hsl(224 18% 88%) 17%, hsl(353 21% 87%) 33%, hsl(350 23% 89%) 50%, hsl(11 21% 89%) 67%, hsl(205 9% 91%) 83%, hsl(357 32% 84%) 100%)",
+  "dark": "linear-gradient(180deg, hsl(317 11% 16%) 0%, hsl(224 13% 17%) 17%, hsl(353 15% 16%) 33%, hsl(350 16% 17%) 50%, hsl(11 14% 18%) 67%, hsl(205 6% 19%) 83%, hsl(357 22% 15%) 100%)"
  }
 }
