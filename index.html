@@ -1050,9 +1050,9 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .trend-face b{ font-size:13.5px; font-weight:800; line-height:1.2; margin-top:4px; }
   .trend-face small{ font-size:11px; font-weight:700; color:var(--ink-soft); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
   /* ไปงานนี้: a pill in the event's own colour beside the date; ticked when the reader is going */
-  .go-chip{ display:inline-flex; align-items:center; gap:4px; font:inherit; font-size:11.5px; font-weight:800; line-height:inherit; padding:3px 11px; border-radius:var(--r-pill); border:2px solid var(--c, var(--teal)); background:var(--card); color:var(--c, var(--teal)); cursor:pointer; white-space:nowrap; transition:transform .08s, box-shadow .08s; box-shadow:0 2px 0 color-mix(in srgb, var(--c, var(--teal)) 45%, transparent); }
+  .go-chip{ display:inline-flex; align-items:center; gap:4px; font:inherit; font-size:11.5px; font-weight:800; line-height:inherit; padding:3px 11px; border-radius:var(--r-pill); border:2px solid var(--c, #2E8C82); background:var(--card); color:var(--c, #2E8C82); cursor:pointer; white-space:nowrap; transition:transform .08s, box-shadow .08s; box-shadow:0 2px 0 color-mix(in srgb, var(--c, #2E8C82) 45%, transparent); }
   .go-chip:active{ transform:translateY(2px); box-shadow:none; }
-  .go-chip.is-on{ background:var(--c, var(--teal)); color:#fff; }
+  .go-chip.is-on{ background:var(--c, #2E8C82); color:#fff; }
   .go-chip.is-past{ cursor:default; box-shadow:none; border:0; background:none; padding:0; color:var(--ink-soft); }
   .go-chip .go-n{ font-variant-numeric:tabular-nums; }
   .go-ck{ font-size:11.5px; font-weight:800; color:var(--ink-soft); white-space:nowrap; }
@@ -4763,6 +4763,10 @@ if(location.pathname.length > 1 && location.pathname.endsWith('/')) history.repl
   .dash-q-faces.is-one .dash-q-face{ width:36px; height:36px; }
   .dash-q-faces i{ position:absolute; left:24px; bottom:-3px; padding:1px 5px; border-radius:var(--r-pill); font-style:normal; font-size:10px; font-weight:800; color:#fff;
     background:linear-gradient(135deg, var(--brand-a), var(--brand-b)); border:2px solid var(--card); }
+  .dash-t.is-chart{ --c:#E4457E; }
+  .dash-bars{ align-self:stretch; flex:none; height:50%; display:flex; align-items:flex-end; gap:2px; margin:4px 0 0; padding-bottom:2px; border-bottom:1.5px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+  .dash-bars i{ flex:1; height:var(--h); border-radius:3px 3px 1px 1px; background:color-mix(in srgb, #2E8C82 55%, transparent); }
+  .dash-bars i.on{ background:var(--c); }
   .dash-t.is-cal{ padding-top:0; } .dash-t.is-cal .dash-big{ margin-top:6px; } .dash-cal-h{ align-self:stretch; margin:0 -10px; padding:3px 10px; font-size:11px; font-weight:800; color:#fff; background:#E0243A; }
   .dash-t.is-cal .dash-big{ font-size:26px; } .dash-cal-h{ white-space:nowrap; }
   /* wide screens: the results a third of the width and as tall as their three names, the four tiles two by two beside them;
@@ -14883,13 +14887,24 @@ const iamUrl = m => m && !m.graduated && m.groupId && m.name
    figures built from pairs and days (same day, together, streaks and so on)
    wait for the night's run. */
 let LIVES = null, _livesLoading = false, _livesTimer = 0;
+// lives by month (current members), kept small for the home page's tile; the file is asked for at most every six hours from there
+function livesMonths(){
+  if(LIVES && LIVES.stats && LIVES.stats.months) return LIVES.stats.months;
+  let c = null; try{ c = JSON.parse(localStorage.getItem('48thdb-lives-m') || 'null'); }catch(e){}
+  if(!c || Date.now() - c.at > 6 * 3600e3) setTimeout(() => loadLives(), 1500);
+  return c ? c.m : null;
+}
 const IAM_API = 'https://api.48thdb.com/iam';
 function loadLives(){
   if(LIVES || _livesLoading) return;
   _livesLoading = true;
   fetch('data/lives.json', { cache:'no-cache' })
     .then(r => r.ok ? r.json() : null)
-    .then(d => { LIVES = d || { members:{} }; if(state.selectedId || state.view === 'stats') renderMain(); refreshRecentLives(true); })
+    .then(d => { LIVES = d || { members:{} };
+      if(LIVES.stats && LIVES.stats.months){ const had = (() => { try{ return JSON.parse(localStorage.getItem('48thdb-lives-m') || 'null'); }catch(e){ return null; } })();
+        try{ localStorage.setItem('48thdb-lives-m', JSON.stringify({ at:Date.now(), m:LIVES.stats.months })); }catch(e){}
+        if(state.view === 'feed' && (!had || JSON.stringify(had.m) !== JSON.stringify(LIVES.stats.months))) calmRender(() => renderMain()); }
+      if(state.selectedId || state.view === 'stats') renderMain(); refreshRecentLives(true); })
     .catch(() => { LIVES = { members:{} }; })
     .finally(() => { _livesLoading = false; });
 }
@@ -17064,7 +17079,14 @@ function renderHomeDash(ge){
     work: sl => { const w = ALL_WORKS().slice().sort((x, y) => y.year - x.year || workSeq(y) - workSeq(x))[0];
       return tile(`data-tile="${sl}" data-kind="work" data-noloc${w ? ` data-action="open-single" data-id="${w.id}"` : ' data-action="nav" data-view="discography"'}`, 'is-work', ICONS.works,
         ALL_WORKS().length, en ? 'Singles' : 'ซิงเกิล·อัลบั้ม', w ? (en ? `latest: ${escapeHtml(w.title)}` : `ล่าสุด ${escapeHtml(w.title)}`) : ''); },
-    stats: sl => { const bn = mem.filter(m => m.birthday && m.birthday.slice(5, 7) === iso.slice(5, 7)).length;
+    // lives on iAM48 by month, the last twelve, this month in pink (the owner's pick over the birthdays, 28 Nov 2026); figures from
+    // data/lives.json (current members), kept small in localStorage `48thdb-lives-m` so the tile is drawn at once (livesMonths)
+    stats: sl => { const LM = livesMonths(), bn = mem.filter(m => m.birthday && m.birthday.slice(5, 7) === iso.slice(5, 7)).length;
+      if(LM){ const keys = Array.from({ length:12 }, (_, k) => { const d = new Date(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 12 + k, 1)); return d.toISOString().slice(0, 7); });
+        const per = keys.map(k => LM[k] || 0), top = Math.max(1, ...per), n = per[11];
+        return `<button class="dash-t is-stats is-chart" data-tile="${sl}" data-kind="stats" data-noloc data-action="nav-lives">
+        <span class="dash-bars" aria-hidden="true">${per.map((v, k) => `<i${k === 11 ? ' class="on"' : ''} style="--h:${Math.max(6, Math.round(v / top * 100))}%"></i>`).join('')}</span>
+        <span class="dash-l">${en ? 'Lives' : 'ไลฟ์'}<small>${en ? `${n.toLocaleString()} this month` : `เดือนนี้ ${n.toLocaleString()}`}</small></span></button>`; }
       return tile(`data-tile="${sl}" data-kind="stats" data-action="nav" data-view="stats"`, 'is-stats', ICONS.stats, bn, en ? 'Stats' : 'สถิติ', en ? 'birthdays this month' : 'วันเกิดในเดือนนี้'); },
     org: sl => tile(`data-tile="${sl}" data-kind="org" data-action="nav" data-view="org"`, 'is-org', ICONS.groups, GROUPS.length, en ? 'Groups & teams' : 'วงและทีม', en ? 'org chart' : 'ผังวง'),
     ge: sl => tile(`data-tile="${sl}" data-kind="ge" data-action="open-ge"`, 'is-ge', ICONS.ballot, 'GE', 'GE2026', en ? 'candidates, songs, results' : 'ผู้สมัคร เพลง ผลเลือกตั้ง'),
@@ -24822,7 +24844,7 @@ const bgLabel = p => { const m = /^bg-(pick|now):(.+)$/.exec(p), b = m && (m[2] 
    keys. Each shows ‹ eye › while arranging; the order is CSS `order` in the dashboard's grid. */
 const DASH_KINDS = [{ k:'quiz', th:'หาโอชิจากดวง', en:'Find your oshi' }, { k:'cal', th:'งานใน 7 วัน', en:'Events this week' }, { k:'shop', th:'ร้านค้า', en:'Shop' },
   { k:'gal', th:'แกลเลอรี', en:'Gallery' }, { k:'members', th:'สมาชิกทั้งหมด', en:'All members' }, { k:'work', th:'ซิงเกิลและอัลบั้ม', en:'Songs & albums' },
-  { k:'stats', th:'สถิติ', en:'Stats' }, { k:'org', th:'วงและทีม · ผังวง', en:'Groups & org chart' }, { k:'ge', th:'หน้า GE2026', en:'GE2026 page' },
+  { k:'stats', th:'ไลฟ์ต่อเดือน (สถิติ)', en:'Lives by month (stats)' }, { k:'org', th:'วงและทีม · ผังวง', en:'Groups & org chart' }, { k:'ge', th:'หน้า GE2026', en:'GE2026 page' },
   { k:'me', th:'โอชิของฉัน', en:'My oshi' }, { k:'ask', th:'ถาม 48thDb (ค้นหาด้วยคำถาม)', en:'Ask 48thDb' }];
 // the shop took the gallery's tile (the owner's word, 5 Nov; the gallery is a ☰ menu entry too); the member of the day, which had the
 // shop's tile, came off when กำลังมาแรงสัปดาห์นี้ took its part (28 Nov 2026) and the stats went there; the reader can pick any kind
@@ -34939,6 +34961,7 @@ function bindDelegatedEvents(){
       state.bdayScope = id === 'all' ? 'all' : 'current';
       renderMain(); replaceHistory();
     }
+    else if(action==='nav-lives'){ state.statsTab = 'lives'; state.view = 'stats'; state.selectedId = null; state.editingId = null; render(); pushHistory(); }
     else if(action==='stats-tab'){
       state.statsTab = el.dataset.value;
       renderMain(); replaceHistory();
