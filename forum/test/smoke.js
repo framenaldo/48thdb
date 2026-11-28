@@ -42,7 +42,8 @@ async function member(name, mobile = false) {
     : { viewport: { width: 1200, height: 900 }, deviceScaleFactor: 2 });
   const page = await ctx.newPage();
   page.on('pageerror', (e) => errors.push(`${name}: ${e.message}`));
-  page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.g|status of 404/.test(m.text())) errors.push(`${name}: ${m.text()}`); });
+  // Google's fonts and Firebase (the 48thDb sign-in) may not be reachable where the test runs: the page works on without them
+  page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.g|status of 404/.test(m.text()) && !/gstatic\.com|googleapis\.com/.test(m.location()?.url || '')) errors.push(`${name}: ${m.text()}`); });
   page.on('dialog', (d) => d.accept());
   return page;
 }
@@ -52,7 +53,7 @@ async function register(page, name) {
   await page.fill('#r-pass', PW);
   await page.fill('#r-pass2', PW);
   await page.check('input[name=rules]');
-  await page.click('button.big');
+  await page.click('form[action="/register"] button.big');   // not the 48thDb button above it
   await page.waitForURL(/m=welcome/);
 }
 const shot = async (page, file, full = true) => { if (SHOTS) await page.screenshot({ path: `${SHOTS}/${file}.png`, fullPage: full }); };
@@ -71,7 +72,7 @@ assert.match(guest.url(), /\/login\?back=/);
 // a fourth sign-up from the same address today is refused
 await guest.goto(`${BASE}/register`);
 await guest.fill('#r-name', `extra${stamp}`); await guest.fill('#r-pass', PW); await guest.fill('#r-pass2', PW); await guest.check('input[name=rules]');
-await guest.click('button.big');
+await guest.click('form[action="/register"] button.big');
 assert.match(await text(guest), /หลายบัญชีเกินไป/);
 console.log('✓ guests must sign in; a fourth sign-up from one address is refused');
 

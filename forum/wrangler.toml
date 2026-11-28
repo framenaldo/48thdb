@@ -25,6 +25,11 @@ bucket_name = "48thforum-images"
 #   TURNSTILE_SITE in [vars], and  npx wrangler secret put TURNSTILE_SECRET
 [vars]
 TURNSTILE_SITE = ""
+# Signing in with a 48thDb account (src/fb.js, public/fb.js): 48thDb's Firebase project, the same values
+# 48thdb.com's page carries (an API key for Firebase is not a secret). Leave FIREBASE_PROJECT empty to turn it off.
+FIREBASE_PROJECT = "thdatabase"
+FIREBASE_API_KEY = "AIzaSyDnh4nwoEyJor6GHFyZL8CqWhq5xVcejOg"
+FIREBASE_AUTH_DOMAIN = "thdatabase.firebaseapp.com"
 # how long a guest's page is kept at the edge, in seconds (0 = never); see GUEST_PAGES in src/index.js
 GUEST_CACHE = "30"
 

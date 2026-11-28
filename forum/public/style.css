@@ -95,6 +95,23 @@ input:focus,select:focus,textarea:focus{outline:2px solid #7FB8B0;outline-offset
 .lbl{font-size:14px;font-weight:700;color:var(--ink);margin:10px 0 3px;display:block}
 .hint{font-size:13px;color:var(--ink-3);margin-top:3px}
 .check,.radio{display:flex;gap:8px;align-items:center;margin:6px 0}
+/* ---- a 48thDb account: Google's button, the e-mail form folded under it, a line between it and the board's own ---- */
+.fbnote{font-size:14px;margin:4px 0 2px}
+.fbnote b{display:block}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:9px}
+.gbtn svg{width:18px;height:18px;flex:none}
+.fbmail{margin-top:8px;font-size:14px}
+.fbmail summary{cursor:pointer;color:var(--link);display:inline-block}
+.fbmail summary:hover{color:var(--link-h);text-decoration:underline}
+.fbmail[open] summary{margin-bottom:2px}
+.fbsign .err{margin:8px 0 0}
+.fbsign.is-busy{opacity:.7}
+.or{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:13px;margin:16px 0 2px}
+.or::before,.or::after{content:"";flex:1;border-top:1px solid var(--line)}
+.unlink{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line)}
+.linked{color:var(--ok-t);font-weight:700}
+.linked::before{content:"✓ "}
+.oshi b a{color:inherit}
 fieldset{border:0}
 .row{display:flex;gap:8px}
 .row select{width:auto;flex:none}

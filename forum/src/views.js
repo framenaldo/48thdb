@@ -2,7 +2,7 @@
 import { esc, num, dateTh, monthTh, initial } from './util.js';
 import { isMod } from './auth.js';
 
-export const ASSET_V = '6';                // bump when style.css or app.js changes
+export const ASSET_V = '7';                // bump when style.css or app.js changes
 export const PER_FORUM = 25;
 export const PER_TOPIC = 20;
 
@@ -40,6 +40,9 @@ const FLASH = {
   deleted:  'ลบแล้ว',
   done:     'เรียบร้อย',
   read:     'อ่านแล้วทั้งหมด',
+  linked:   'เชื่อมบัญชี 48thDb แล้ว',
+  synced:   'ดึงโอชิจาก 48thDb แล้ว',
+  unlinked: 'เลิกเชื่อมบัญชี 48thDb แล้ว',
 };
 
 // Ranks by posts, shown as words and five little bars, as boards always have.
@@ -62,7 +65,13 @@ export const avatar = (u, cls = '') => (u.avatar
   : `<span class="ava av-${(u.color ?? 0) % 8} ${cls}" aria-hidden="true">${esc(initial(u.name || '?'))}</span>`);
 export const userLink = (id, name, role) =>
   `<a href="/u/${id}" class="${role === 'admin' ? 'nm-admin' : role === 'mod' ? 'nm-mod' : ''}">${esc(name)}</a>`;
-export const oshiHtml = (o) => (o ? `<span class="oshi">โอชิ <b>${esc(o)}</b></span>` : '');
+// a member's oshi; brought from 48thDb (ids kept beside the names) each name opens her page there
+export function oshiNames(o, ids = '') {
+  const names = String(o || '').split(', '), list = ids ? String(ids).split(',') : [];
+  if (!o || list.length !== names.length || !list.every((id) => /^[a-z0-9-]{2,40}$/.test(id))) return esc(o);
+  return names.map((n, i) => `<a href="https://48thdb.com/member/${list[i]}" target="_blank" rel="noopener" title="${esc(n)} ใน 48thDb">${esc(n)}</a>`).join(', ');
+}
+export const oshiHtml = (o, ids = '') => (o ? `<span class="oshi">โอชิ <b>${oshiNames(o, ids)}</b></span>` : '');
 
 export function pager(base, page, pages, cls = '') {
   if (pages <= 1) return '';
@@ -168,7 +177,7 @@ export function editor({ action, body = '', title = null, tag = '', forum = null
 
 export function userPanel(u) {
   return `<aside class="puser">${avatar(u, 'big')}<div class="who"><div class="uname">${userLink(u.uid, u.name, u.role)}</div>
-  ${rankHtml(u)}${oshiHtml(u.oshi)}
+  ${rankHtml(u)}${oshiHtml(u.oshi, u.oshi_ids)}
   <div class="facts"><span>โพสต์ ${num(u.posts)}</span><span>สมาชิกตั้งแต่ ${monthTh(u.joined)}</span></div></div></aside>`;
 }
 

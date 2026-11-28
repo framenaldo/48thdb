@@ -3,9 +3,10 @@
 The logo is a speech bubble with a light stick: talk, and cheering.
 
 A classic web board (forum index → forums → topics, replies / views / last post, a
-poster's box beside each post) for BNK48 and CGM48 fans. It is its own site: own
-accounts, own database, nothing shared with 48thDb yet. It lives in this repo only
-for now; the folder is self-contained and can move to a repo of its own as it is.
+poster's box beside each post) for BNK48 and CGM48 fans. It is its own site with its own
+database; the one thing it shares with 48thDb is the sign-in (a 48thdb.com account can sign in
+here, and its oshi comes along — below). It lives in this repo only for now; the folder is
+self-contained and can move to a repo of its own as it is.
 
 - **One Cloudflare Worker** renders every page on the server (`src/`), plain HTML forms,
   no build step. Works without JavaScript; `public/app.js` only adds the editor's style
@@ -23,6 +24,7 @@ for now; the folder is self-contained and can move to a repo of its own as it is
 | Reading | forum index with "who is online" and stats · forums with announcements, stickies, pages · topics with numbered posts, the poster's box (rank by posts, oshi, joined) · unread markers (a red ring, for 30 days) · search (titles and posts; any piece of 3+ letters, Thai or English) · member list · profiles · rules & FAQ |
 | Writing | new topic with a label (ถาม, รีวิว, หาเพื่อน …) · reply, quick reply, quote · edit, delete own · preview · BBCode `[b] [i] [u] [s] [quote="name"] [url=…]`, bare links (`src/markup.js`, everything escaped first) |
 | Accounts | sign-up with a board name and password (PBKDF2, 100k rounds) · a session cookie (HttpOnly, SameSite=Lax), its hash in D1 · settings: oshi, signature, password · **no e-mail is kept**, so a forgotten password is reset by an admin (below) |
+| 48thDb account | "เข้าด้วย Google" or the 48thDb e-mail and password on the sign-in, sign-up and settings pages (`public/fb.js`, `src/fb.js`, `POST /auth/48thdb`). The browser signs in to 48thDb's Firebase (project `thdatabase`, in memory only, signed out at once) and posts the ID token; the Worker checks it against Google's keys (as `firebaseClaims` in the 48thDb Worker does), then reads `users/<uid>` and `members/<id>` from Firestore **with that same token**, so 48thDb's own rules decide what it sees — nothing new is asked of them. First time: the reader picks a board name (`users.fb_uid` keeps the link; no password, `'!'`, until they set one in settings). Every 48thDb sign-in brings the oshi again (Kami Oshi first, whole names up to 40 characters, each linked to 48thdb.com/member/<id> — `users.oshi_ids`) unless the reader typed their own; the 48thDb profile picture comes once, if the board has none. A board account made with a password links from settings; unlinking needs a password first. Anonymous 48thDb visitors are refused. No e-mail is kept. |
 | Safety | a new account's first 3 posts wait for a moderator · a post with a phone number, bank account or พร้อมเพย์ waits always · 3 reports from different members hide a post until a moderator looks · rate limits: 3 topics and 20 posts an hour, 3 sign-ups a day per address (hashed, never stored), 10 sign-in tries in 15 minutes · forms from another site are refused · strict CSP |
 | Pictures | 📷 in the editor: several at once, 10 a post; the browser shrinks each (long side 1,600 px, JPEG on white — EXIF and the phone's location are dropped; a GIF up to 2 MB goes as it is) and sends it to `POST /upload` (30 an hour; the bytes must be a JPEG, PNG, GIF or WebP); kept in R2 as `p/<key>`, shown at `/i/<key>` straight from R2 (an hour in caches); a post holds `[img=WxH]key[/img]` — only our own pictures, never another site's · a topic's row shows 📷 and how many its first post has · the moderators' queue shows a waiting post's pictures · deleting a post deletes its pictures at once; pictures never posted go after a day (`src/images.js`, table `images`) |
 | Busy days | every page reads only the rows it shows (counters kept on the forum and the topic, indexes for the rest) · search through a trigram index (`post_fts`, `topic_fts`, kept in step by triggers; 2-letter words look through the latest 3,000 posts) · guests' pages kept at the edge for `GUEST_CACHE` seconds (30; works once the board has its own domain — the Cache API keeps nothing on workers.dev) · every night at 03:17 a cron clears read marks older than 30 days, spent rate limits and old sessions |
@@ -40,6 +42,7 @@ npx wrangler d1 migrations apply 48thforum --local
 npx wrangler dev --port 8790 --var GUEST_CACHE:0   # http://localhost:8790, guests' cache off
 npm test                              # the BBCode tests
 node test/smoke.js                    # a browser walk through everything (needs Playwright and the dev server)
+node test/sso.js                      # the 48thDb sign-in, with a test key and a stand-in Firestore (starts its own dev server)
 # the nightly job: start dev with --test-scheduled, then  curl 'localhost:8790/__scheduled?cron=17+20+*+*+*'
 ```
 
@@ -57,6 +60,11 @@ node test/smoke.js                    # a browser walk through everything (needs
    ```
    From then on, roles are set on a member's profile page.
 3. A domain of its own later: add a `routes = [{ pattern = "…", custom_domain = true }]` to `wrangler.toml`.
+4. For "เข้าด้วย Google" the board's address must be on 48thDb's Firebase list: Firebase console → project
+   thdatabase → Authentication → Settings → **Authorized domains** → add `48thforum.<your-subdomain>.workers.dev`
+   (and the board's own domain when it has one). Until then the Google button says so and the 48thDb e-mail
+   sign-in still works. If the API key is limited to certain websites (Google Cloud → Credentials), add the
+   board there too.
 
 Reset someone's password (they tell you a new one; nothing is e-mailed):
 
@@ -68,5 +76,4 @@ npx wrangler d1 execute 48thforum --remote --command "UPDATE users SET pass='<th
 ## Not built yet
 
 Private messages, notifications, sub-forums, a dark mode,
-e-mail for password resets, and anything shared with 48thDb (one sign-in, oshi and
-check-in stamps on the poster's box).
+e-mail for password resets, and more shared with 48thDb (check-in stamps on the poster's box).
